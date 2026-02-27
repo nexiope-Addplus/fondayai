@@ -15,6 +15,12 @@ import {
   Shield,
   Leaf,
   AlertCircle,
+  Grid,
+  Activity,
+  Target,
+  Flame,
+  Eye,
+  Zap,
 } from "lucide-react";
 import { ThemeToggle } from "@/components/ThemeToggle";
 
@@ -276,6 +282,11 @@ function ResultScreen({ onGoMagazine, onBack }: { onGoMagazine: () => void; onBa
     { label: "종합 컨디션", score: 65, color: "#D4836B", icon: Sparkles },
     { label: "수분 밸런스", score: 42, color: "#3B82C4", icon: Droplets },
     { label: "붉은기 수준", score: 78, color: "#E05A3A", icon: Sun },
+    { label: "모공 상태", score: 55, color: "#4A7C6E", icon: Grid },
+    { label: "주름 및 탄력", score: 72, color: "#8C8070", icon: Activity },
+    { label: "잡티/색소침착", score: 48, color: "#A67C52", icon: Target },
+    { label: "트러블 위험", score: 30, color: "#D97706", icon: Flame },
+    { label: "다크서클", score: 60, color: "#6366F1", icon: Eye },
   ];
 
   return (
