@@ -269,7 +269,7 @@ function ScanningScreen({ onComplete }: { onComplete: () => void }) {
   );
 }
 
-function ResultScreen({ onGoMagazine }: { onGoMagazine: () => void }) {
+function ResultScreen({ onGoMagazine, onBack }: { onGoMagazine: () => void; onBack: () => void }) {
   const [showWaitlist, setShowWaitlist] = useState(false);
 
   const scores = [
@@ -286,13 +286,25 @@ function ResultScreen({ onGoMagazine }: { onGoMagazine: () => void }) {
       animate="animate"
       data-testid="scan-result"
     >
-      <motion.div variants={fadeChild} className="mb-5">
-        <span className="text-[10px] font-bold tracking-[0.15em] uppercase" style={{ color: DEEP_GREEN_LIGHT }}>
-          Analysis Complete
-        </span>
-        <h2 className="text-xl font-extrabold mt-1" style={{ color: DEEP_GREEN }}>
-          오늘의 피부 리포트
-        </h2>
+      <motion.div variants={fadeChild} className="mb-5 flex items-start justify-between">
+        <motion.button
+          onClick={onBack}
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border bg-background/50 backdrop-blur-sm shadow-sm"
+          style={{ borderColor: DEEP_GREEN + "20" }}
+          whileTap={{ scale: 0.95 }}
+          data-testid="button-back-to-scan"
+        >
+          <Camera className="w-4 h-4" style={{ color: DEEP_GREEN }} />
+          <span className="text-[11px] font-bold" style={{ color: DEEP_GREEN }}>다시 촬영</span>
+        </motion.button>
+        <div className="text-right">
+          <span className="text-[10px] font-bold tracking-[0.15em] uppercase" style={{ color: DEEP_GREEN_LIGHT }}>
+            Analysis Complete
+          </span>
+          <h2 className="text-xl font-extrabold mt-1" style={{ color: DEEP_GREEN }}>
+            오늘의 피부 리포트
+          </h2>
+        </div>
       </motion.div>
 
       <motion.div
@@ -586,6 +598,10 @@ export default function SkinScanPage() {
     setScanState("result");
   }, []);
 
+  const handleBack = useCallback(() => {
+    setScanState("idle");
+  }, []);
+
   const handleGoMagazine = useCallback(() => {
     setActiveTab("magazine");
   }, []);
@@ -614,7 +630,7 @@ export default function SkinScanPage() {
             >
               {scanState === "idle" && <ScanIdleScreen onCapture={handleCapture} />}
               {scanState === "scanning" && <ScanningScreen onComplete={handleScanComplete} />}
-              {scanState === "result" && <ResultScreen onGoMagazine={handleGoMagazine} />}
+              {scanState === "result" && <ResultScreen onGoMagazine={handleGoMagazine} onBack={handleBack} />}
             </motion.div>
           )}
           {activeTab === "magazine" && (
