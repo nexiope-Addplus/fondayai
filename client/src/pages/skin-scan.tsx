@@ -16,6 +16,7 @@ import {
   Leaf,
   AlertCircle,
 } from "lucide-react";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 type TabId = "scan" | "magazine";
 type ScanState = "idle" | "scanning" | "result";
@@ -72,8 +73,7 @@ function BottomNav({ active, onChange }: { active: TabId; onChange: (t: TabId) =
   ];
   return (
     <nav
-      className="fixed bottom-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-2xl"
-      style={{ borderTop: "1px solid rgba(0,0,0,0.06)" }}
+      className="fixed bottom-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-2xl border-t border-border transition-colors"
       data-testid="bottom-nav"
     >
       <div className="flex items-center justify-around h-[60px] max-w-md mx-auto">
@@ -598,7 +598,10 @@ export default function SkinScanPage() {
   };
 
   return (
-    <div className="min-h-[100dvh] bg-white" data-testid="app-root">
+    <div className="min-h-[100dvh] bg-background text-foreground transition-colors" data-testid="app-root">
+      <div className="absolute top-4 right-4 z-[100]">
+        <ThemeToggle />
+      </div>
       <div className="overflow-y-auto" style={{ minHeight: "calc(100dvh - 60px)", paddingBottom: 0 }}>
         <AnimatePresence mode="wait">
           {activeTab === "scan" && (
