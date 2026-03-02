@@ -14,7 +14,7 @@ import {
   ArrowRight,
   Heart,
   Droplets,
-  Grid,
+  LayoutGrid,
   Activity,
   Target,
   Flame,
@@ -22,6 +22,8 @@ import {
   Zap,
   Leaf,
   ChevronRight,
+  Star,
+  Waves,
 } from "lucide-react";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
@@ -72,11 +74,13 @@ const iconMap: Record<string, any> = {
   "종합 컨디션": Sparkles,
   "수분 밸런스": Droplets,
   "붉은기 수준": Sun,
-  "모공 상태": Grid,
+  "모공 상태": LayoutGrid,
   "주름 및 탄력": Activity,
   "잡티/색소침착": Target,
   "트러블 위험": Flame,
   "다크서클": Eye,
+  "피부 광채": Star,
+  "피부결 균일도": Waves,
 };
 
 const colorMap: Record<string, string> = {
@@ -88,6 +92,8 @@ const colorMap: Record<string, string> = {
   "잡티/색소침착": "#A67C52",
   "트러블 위험": "#D97706",
   "다크서클": "#6366F1",
+  "피부 광채": "#F59E0B",
+  "피부결 균일도": "#10B981",
 };
 
 const articles = [
@@ -358,9 +364,9 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, onBack, onGoMagazi
         </div>
 
         {/* 이미지 + 핫스팟 */}
-        <Card className="overflow-hidden border-none shadow-2xl rounded-3xl">
-          <div className="relative w-full h-56">
-            <img src={imageSrc} className="w-full h-full object-cover object-top" />
+        <Card className="overflow-hidden border-none shadow-2xl rounded-3xl bg-zinc-900">
+          <div className="relative w-full">
+            <img src={imageSrc} className="w-full max-h-80 object-contain" />
             {analysisResult?.hotspots?.map((dot: any, i: number) => (
               <motion.div key={i} className="absolute w-4 h-4 -ml-2 -mt-2 rounded-full border-2 border-white bg-red-500 shadow-lg" style={{ left: `${dot.x}%`, top: `${dot.y}%` }} animate={{ scale: [1, 1.3, 1] }} transition={{ repeat: Infinity, duration: 1.5, delay: i * 0.2 }} />
             ))}
