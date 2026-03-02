@@ -590,6 +590,39 @@ function ResultScreen({ surveyData, onGoMagazine, onBack }: { surveyData: Survey
       </motion.div>
 
       <motion.div variants={fadeChild}>
+        <div className="rounded-2xl p-6 mb-8 border-2 border-dashed flex flex-col items-center text-center bg-white/40" 
+             style={{ borderColor: DEEP_GREEN + "30" }}>
+          <div className="w-12 h-12 rounded-full bg-white flex items-center justify-center mb-3 shadow-sm">
+            <Lock className="w-6 h-6" style={{ color: DEEP_GREEN }} />
+          </div>
+          <h3 className="font-bold text-[15px] mb-1" style={{ color: DEEP_GREEN }}>내 피부 기록을 저장할까요?</h3>
+          <p className="text-[12px] mb-5 leading-relaxed" style={{ color: TEXT_SECONDARY }}>
+            로그인하면 오늘의 리포트를 저장하고<br />
+            내일의 피부와 실시간으로 비교해볼 수 있습니다.
+          </p>
+          
+          <div className="w-full space-y-2">
+            <button 
+              className="w-full py-3 rounded-xl font-bold text-[13px] flex items-center justify-center gap-2 bg-white border border-gray-200 shadow-sm"
+              onClick={() => window.location.href = "/auth/google"}
+            >
+              <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" className="w-4 h-4" alt="Google" />
+              구글로 3초만에 시작하기
+            </button>
+            <button 
+              className="w-full py-3 rounded-xl font-bold text-[13px] flex items-center justify-center gap-2 bg-[#FEE500] text-[#3c1e1e]"
+              onClick={() => window.location.href = "/auth/kakao"}
+            >
+              <div className="w-4 h-4 flex items-center justify-center">
+                <svg viewBox="0 0 24 24" fill="currentColor" className="w-full h-full"><path d="M12 3c-4.97 0-9 3.185-9 7.115 0 2.558 1.712 4.8 4.346 6.09l-.843 3.09c-.067.247.078.47.284.47.098 0 .195-.03.273-.09l3.63-2.4c.42.06.85.094 1.31.094 4.97 0 9-3.185 9-7.115S16.97 3 12 3z"/></svg>
+              </div>
+              카카오로 3초만에 시작하기
+            </button>
+          </div>
+        </div>
+      </motion.div>
+
+      <motion.div variants={fadeChild}>
         <motion.button
           onClick={() => setShowWaitlist(true)}
           className="w-full py-4 rounded-2xl text-[15px] font-bold text-white"
