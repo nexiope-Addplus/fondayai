@@ -1,5 +1,1 @@
-# API requests should not be redirected
-/api/* /api/* 200
-
-# All other requests go to index.html
 /* /index.html 200

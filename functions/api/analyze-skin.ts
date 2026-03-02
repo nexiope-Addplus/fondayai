@@ -8,7 +8,10 @@ export const onRequestPost = async (context: any) => {
     const { image, surveyData } = body;
 
     if (!env.GOOGLE_API_KEY) {
-      return new Response(JSON.stringify({ error: "API KEY MISSING" }), { 
+      return new Response(JSON.stringify({ 
+        message: "API KEY MISSING", 
+        detail: "Cloudflare 환경 변수에 GOOGLE_API_KEY를 추가해 주세요." 
+      }), { 
         status: 500,
         headers: { "Content-Type": "application/json" }
       });
@@ -25,8 +28,14 @@ export const onRequestPost = async (context: any) => {
       ]
     });
 
-    const prompt = `피부 전문가로서 사진과 정보(${JSON.stringify(surveyData)})를 분석하여 8가지 점수와 고민 부위 좌표(x,y)를 JSON으로만 답하세요. 
-    구조: {"scores": [{"label": "종합 컨디션", "score": 80}, ...], "hotspots": [{"x": 50, "y": 50, "type": "점"}], "aiComment": "평가"}`;
+    const prompt = `피부 분석 전문가로서 다음 사진과 정보(${JSON.stringify(surveyData)})를 분석하세요.
+    반드시 다음 JSON 형식으로만 답하세요:
+    {
+      "scores": [{"label": "종합 컨디션", "score": 80}, ...],
+      "hotspots": [{"x": 50, "y": 50, "type": "트러블"}],
+      "aiComment": "피부 요약 평"
+    }
+    8가지 항목(종합 컨디션, 수분 밸런스, 붉은기 수준, 모공 상태, 주름 및 탄력, 잡티/색소침착, 트러블 위험, 다크서클)을 모두 포함하세요.`;
 
     const base64Data = image.split(",")[1] || image;
 
@@ -41,14 +50,18 @@ export const onRequestPost = async (context: any) => {
     ]);
 
     const text = result.response.text();
-    const jsonStr = text.substring(text.indexOf("{"), text.lastIndexOf("}") + 1);
+    const jsonMatch = text.match(/\{[\s\S]*\}/);
+    const jsonStr = jsonMatch ? jsonMatch[0] : text;
     
     return new Response(jsonStr, {
       headers: { "Content-Type": "application/json" }
     });
 
   } catch (error: any) {
-    return new Response(JSON.stringify({ error: error.message }), {
+    return new Response(JSON.stringify({ 
+      message: "AI 분석 실패", 
+      detail: error.message 
+    }), {
       status: 500,
       headers: { "Content-Type": "application/json" }
     });
