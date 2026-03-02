@@ -31,6 +31,8 @@ interface SurveyData {
   gender: string;
   age: string;
   skinType: string;
+  concerns: string[];
+  condition: string;
 }
 
 const DEEP_GREEN = "#2D5F4F";
@@ -215,8 +217,136 @@ function ScanIdleScreen({ onCapture }: { onCapture: () => void }) {
       <motion.div variants={fadeChild} className="mt-10 flex items-center gap-2">
         <Sparkles className="w-3.5 h-3.5" style={{ color: DEEP_GREEN_LIGHT }} />
         <span className="text-[11px] font-medium" style={{ color: TEXT_SECONDARY }}>
-          카메라로 셀카를 찍으면 즉시 분석이 시작돼요
+          카메라로 셀카를 찍으면 분석 준비가 시작돼요
         </span>
+      </motion.div>
+    </motion.div>
+  );
+}
+
+function SurveyScreen({ onSubmit, onBack }: { onSubmit: (data: SurveyData) => void; onBack: () => void }) {
+  const [gender, setGender] = useState("여성");
+  const [age, setAge] = useState("20대 후반");
+  const [skinType, setSkinType] = useState("복합성");
+  const [concerns, setConcerns] = useState<string[]>([]);
+  const [condition, setCondition] = useState("맨얼굴");
+
+  const toggleConcern = (concern: string) => {
+    setConcerns(prev => 
+      prev.includes(concern) ? prev.filter(c => c !== concern) : [...prev, concern]
+    );
+  };
+
+  const ageGroups = ["10대", "20대 초반", "20대 후반", "30대 초반", "30대 후반", "40대 초반", "40대 후반", "50대+"];
+  const skinConcerns = ["모공/피지", "주름/탄력", "트러블/민감", "기미/잡티", "다크서클", "건조함"];
+
+  return (
+    <motion.div
+      className="px-6 py-8 flex flex-col gap-8 min-h-[calc(100dvh-60px)]"
+      variants={stagger}
+      initial="initial"
+      animate="animate"
+    >
+      <motion.div variants={fadeChild}>
+        <div className="flex items-center gap-2 mb-2">
+          <div className="w-1.5 h-6 rounded-full" style={{ background: DEEP_GREEN }} />
+          <h2 className="text-xl font-extrabold" style={{ color: DEEP_GREEN }}>피부 분석 기초 정보</h2>
+        </div>
+        <p className="text-[13px] leading-relaxed" style={{ color: TEXT_SECONDARY }}>정확한 분석을 위해 현재 상태를 선택해 주세요.</p>
+      </motion.div>
+
+      <div className="space-y-7 pb-10">
+        <motion.div variants={fadeChild} className="space-y-3">
+          <label className="text-[12px] font-bold uppercase tracking-wider flex items-center gap-1.5" style={{ color: DEEP_GREEN_LIGHT }}>
+            <span className="w-1 h-1 rounded-full bg-current" /> 성별
+          </label>
+          <div className="flex gap-2">
+            {["여성", "남성"].map((item) => (
+              <button
+                key={item}
+                onClick={() => setGender(item)}
+                className={`flex-1 py-3.5 rounded-xl text-[13px] font-bold border transition-all ${
+                  gender === item ? "bg-[#2D5F4F] text-white border-[#2D5F4F] shadow-md" : "bg-white text-[#8C8070] border-gray-100"
+                }`}
+              >
+                {item}
+              </button>
+            ))}
+          </div>
+        </motion.div>
+
+        <motion.div variants={fadeChild} className="space-y-3">
+          <label className="text-[12px] font-bold uppercase tracking-wider flex items-center gap-1.5" style={{ color: DEEP_GREEN_LIGHT }}>
+            <span className="w-1 h-1 rounded-full bg-current" /> 나이대
+          </label>
+          <div className="grid grid-cols-2 gap-2">
+            {ageGroups.map((item) => (
+              <button
+                key={item}
+                onClick={() => setAge(item)}
+                className={`py-3 rounded-xl text-[12px] font-bold border transition-all ${
+                  age === item ? "bg-[#2D5F4F] text-white border-[#2D5F4F] shadow-sm" : "bg-white text-[#8C8070] border-gray-100"
+                }`}
+              >
+                {item}
+              </button>
+            ))}
+          </div>
+        </motion.div>
+
+        <motion.div variants={fadeChild} className="space-y-3">
+          <label className="text-[12px] font-bold uppercase tracking-wider flex items-center gap-1.5" style={{ color: DEEP_GREEN_LIGHT }}>
+            <span className="w-1 h-1 rounded-full bg-current" /> 촬영 당시 상태
+          </label>
+          <div className="flex gap-2">
+            {["맨얼굴", "기초 케어", "풀 메이크업"].map((item) => (
+              <button
+                key={item}
+                onClick={() => setCondition(item)}
+                className={`flex-1 py-3.5 rounded-xl text-[12px] font-bold border transition-all ${
+                  condition === item ? "bg-[#2D5F4F] text-white border-[#2D5F4F] shadow-sm" : "bg-white text-[#8C8070] border-gray-100"
+                }`}
+              >
+                {item}
+              </button>
+            ))}
+          </div>
+        </motion.div>
+
+        <motion.div variants={fadeChild} className="space-y-3">
+          <label className="text-[12px] font-bold uppercase tracking-wider flex items-center gap-1.5" style={{ color: DEEP_GREEN_LIGHT }}>
+            <span className="w-1 h-1 rounded-full bg-current" /> 현재 가장 큰 피부 고민 (다중 선택)
+          </label>
+          <div className="grid grid-cols-3 gap-2">
+            {skinConcerns.map((item) => (
+              <button
+                key={item}
+                onClick={() => toggleConcern(item)}
+                className={`py-3 rounded-xl text-[11px] font-bold border transition-all ${
+                  concerns.includes(item) ? "bg-[#3D7A66] text-white border-[#3D7A66] shadow-sm" : "bg-white text-[#8C8070] border-gray-100"
+                }`}
+              >
+                {item}
+              </button>
+            ))}
+          </div>
+        </motion.div>
+      </div>
+
+      <motion.div variants={fadeChild} className="mt-auto pt-6 flex gap-3 sticky bottom-4">
+        <button
+          onClick={onBack}
+          className="flex-1 py-4 rounded-2xl text-[14px] font-bold bg-gray-100 text-gray-500"
+        >
+          이전으로
+        </button>
+        <button
+          onClick={() => onSubmit({ gender, age, skinType, concerns, condition })}
+          className="flex-[2.5] py-4 rounded-2xl text-[14px] font-bold text-white shadow-xl"
+          style={{ background: `linear-gradient(135deg, ${DEEP_GREEN_LIGHT}, ${DEEP_GREEN})` }}
+        >
+          AI 정밀 분석 시작하기
+        </button>
       </motion.div>
     </motion.div>
   );
@@ -224,13 +354,14 @@ function ScanIdleScreen({ onCapture }: { onCapture: () => void }) {
 
 function ScanningScreen({ onComplete }: { onComplete: () => void }) {
   const [textIdx, setTextIdx] = useState(0);
-  const texts = ["모공 분석 중...", "수분 밸런스 측정 중...", "피부 톤 분석 중..."];
+  const texts = ["데이터 보정 중...", "모공 및 질감 분석 중...", "수분 밸런스 측정 중...", "피부 톤 분석 중..."];
 
   useEffect(() => {
-    const t1 = setTimeout(() => setTextIdx(1), 1000);
-    const t2 = setTimeout(() => setTextIdx(2), 2000);
-    const t3 = setTimeout(() => onComplete(), 3000);
-    return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); };
+    const t1 = setTimeout(() => setTextIdx(1), 800);
+    const t2 = setTimeout(() => setTextIdx(2), 1600);
+    const t3 = setTimeout(() => setTextIdx(3), 2400);
+    const t4 = setTimeout(() => onComplete(), 3200);
+    return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); clearTimeout(t4); };
   }, [onComplete]);
 
   return (
@@ -261,7 +392,7 @@ function ScanningScreen({ onComplete }: { onComplete: () => void }) {
         <div className="absolute bottom-3 right-3 w-6 h-6 border-r-2 border-b-2 rounded-br-lg" style={{ borderColor: DEEP_GREEN_LIGHT + "80" }} />
       </div>
 
-      <div className="mt-8 text-center">
+      <div className="mt-8 text-center px-6">
         <AnimatePresence mode="wait">
           <motion.p
             key={textIdx}
@@ -275,25 +406,31 @@ function ScanningScreen({ onComplete }: { onComplete: () => void }) {
             {texts[textIdx]}
           </motion.p>
         </AnimatePresence>
-        <p className="text-xs text-gray-500 mt-2">AI가 피부를 정밀 분석하고 있어요</p>
+        <p className="text-xs text-gray-500 mt-2">입력하신 정보와 사진을 결합하여 정밀 분석 중입니다</p>
       </div>
     </motion.div>
   );
 }
 
-function ResultScreen({ onGoMagazine, onBack }: { onGoMagazine: () => void; onBack: () => void }) {
+function ResultScreen({ surveyData, onGoMagazine, onBack }: { surveyData: SurveyData | null; onGoMagazine: () => void; onBack: () => void }) {
   const [showWaitlist, setShowWaitlist] = useState(false);
 
   const scores = [
-    { label: "종합 컨디션", score: 65, color: "#D4836B", icon: Sparkles },
-    { label: "수분 밸런스", score: 42, color: "#3B82C4", icon: Droplets },
-    { label: "붉은기 수준", score: 78, color: "#E05A3A", icon: Sun },
-    { label: "모공 상태", score: 55, color: "#4A7C6E", icon: Grid },
-    { label: "주름 및 탄력", score: 72, color: "#8C8070", icon: Activity },
-    { label: "잡티/색소침착", score: 48, color: "#A67C52", icon: Target },
-    { label: "트러블 위험", score: 30, color: "#D97706", icon: Flame },
-    { label: "다크서클", score: 60, color: "#6366F1", icon: Eye },
+    { label: "종합 컨디션", score: 68, color: "#D4836B", icon: Sparkles },
+    { label: "수분 밸런스", score: surveyData?.concerns.includes("건조함") ? 35 : 58, color: "#3B82C4", icon: Droplets },
+    { label: "붉은기 수준", score: surveyData?.concerns.includes("트러블/민감") ? 78 : 42, color: "#E05A3A", icon: Sun },
+    { label: "모공 상태", score: surveyData?.concerns.includes("모공/피지") ? 45 : 65, color: "#4A7C6E", icon: Grid },
+    { label: "주름 및 탄력", score: surveyData?.age.includes("40") || surveyData?.age.includes("50") || surveyData?.concerns.includes("주름/탄력") ? 52 : 78, color: "#8C8070", icon: Activity },
+    { label: "잡티/색소침착", score: surveyData?.concerns.includes("기미/잡티") ? 48 : 72, color: "#A67C52", icon: Target },
+    { label: "트러블 위험", score: surveyData?.age.includes("10") || surveyData?.concerns.includes("트러블/민감") ? 72 : 28, color: "#D97706", icon: Flame },
+    { label: "다크서클", score: surveyData?.concerns.includes("다크서클") ? 42 : 68, color: "#6366F1", icon: Eye },
   ];
+
+  const baumannType = (surveyData?.skinType === "지성" || surveyData?.concerns.includes("모공/피지")) ? "O" : "D";
+  const baumannSens = surveyData?.concerns.includes("트러블/민감") ? "S" : "R";
+  const baumannPig = scores[5].score < 60 ? "P" : "N";
+  const baumannWrink = scores[4].score < 60 ? "W" : "T";
+  const finalType = `${baumannType}${baumannSens}${baumannPig}${baumannWrink}`;
 
   return (
     <motion.div
@@ -335,14 +472,14 @@ function ResultScreen({ onGoMagazine, onBack }: { onGoMagazine: () => void; onBa
             className="w-14 h-14 rounded-2xl flex items-center justify-center"
             style={{ background: `linear-gradient(135deg, ${DEEP_GREEN}, ${DEEP_GREEN_LIGHT})` }}
           >
-            <span className="text-2xl font-extrabold text-white" style={{ fontFamily: "'Playfair Display', serif" }}>65</span>
+            <span className="text-2xl font-extrabold text-white" style={{ fontFamily: "'Playfair Display', serif" }}>68</span>
           </div>
           <div>
-            <p className="text-[15px] font-bold" style={{ color: DEEP_GREEN }}>
-              오늘의 피부 컨디션: 65점
+            <p className="text-[14px] font-bold" style={{ color: DEEP_GREEN }}>
+              {surveyData?.age} {surveyData?.gender} / {surveyData?.condition}
             </p>
             <p className="text-xs font-semibold" style={{ color: "#D4836B" }}>
-              붉은기 심함 · 수분 부족 주의
+              바우만 타입: <span className="underline underline-offset-2">{finalType}</span>형
             </p>
           </div>
         </div>
@@ -391,7 +528,7 @@ function ResultScreen({ onGoMagazine, onBack }: { onGoMagazine: () => void; onBa
           data-testid="button-go-magazine"
         >
           <Leaf className="w-4 h-4" />
-          <span className="text-[13px] font-bold">지금 내 피부에 딱 맞는 응급처치법 보러 가기</span>
+          <span className="text-[13px] font-bold">맞춤 응급처치 가이드 보러 가기</span>
           <ChevronRight className="w-4 h-4" />
         </motion.button>
       </motion.div>
@@ -606,8 +743,14 @@ function MagazineTab() {
 export default function SkinScanPage() {
   const [activeTab, setActiveTab] = useState<TabId>("scan");
   const [scanState, setScanState] = useState<ScanState>("idle");
+  const [surveyData, setSurveyData] = useState<SurveyData | null>(null);
 
   const handleCapture = useCallback(() => {
+    setScanState("survey");
+  }, []);
+
+  const handleSurveySubmit = useCallback((data: SurveyData) => {
+    setSurveyData(data);
     setScanState("scanning");
   }, []);
 
@@ -617,6 +760,7 @@ export default function SkinScanPage() {
 
   const handleBack = useCallback(() => {
     setScanState("idle");
+    setSurveyData(null);
   }, []);
 
   const handleGoMagazine = useCallback(() => {
@@ -625,9 +769,6 @@ export default function SkinScanPage() {
 
   const handleTabChange = (tab: TabId) => {
     setActiveTab(tab);
-    if (tab === "scan" && scanState === "result") {
-      // keep result
-    }
   };
 
   return (
@@ -646,8 +787,9 @@ export default function SkinScanPage() {
               transition={{ duration: 0.2 }}
             >
               {scanState === "idle" && <ScanIdleScreen onCapture={handleCapture} />}
+              {scanState === "survey" && <SurveyScreen onSubmit={handleSurveySubmit} onBack={handleBack} />}
               {scanState === "scanning" && <ScanningScreen onComplete={handleScanComplete} />}
-              {scanState === "result" && <ResultScreen onGoMagazine={handleGoMagazine} onBack={handleBack} />}
+              {scanState === "result" && <ResultScreen surveyData={surveyData} onGoMagazine={handleGoMagazine} onBack={handleBack} />}
             </motion.div>
           )}
           {activeTab === "magazine" && (
