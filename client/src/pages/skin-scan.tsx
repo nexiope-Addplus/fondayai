@@ -21,6 +21,8 @@ import {
   Flame,
   Eye,
   Zap,
+  Instagram,
+  Share2,
 } from "lucide-react";
 import { ThemeToggle } from "@/components/ThemeToggle";
 
@@ -432,6 +434,22 @@ function ResultScreen({ surveyData, onGoMagazine, onBack }: { surveyData: Survey
   const baumannWrink = scores[4].score < 60 ? "W" : "T";
   const finalType = `${baumannType}${baumannSens}${baumannPig}${baumannWrink}`;
 
+  const handleShare = async () => {
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: 'Fonday AI 피부 분석 리포트',
+          text: `오늘 내 피부 점수는 ${scores[0].score}점! 바우만 타입은 ${finalType}형이 나왔어요. #Fonday #피부분석 #AI스킨케어`,
+          url: window.location.href,
+        });
+      } catch (err) {
+        console.error('공유 실패:', err);
+      }
+    } else {
+      alert('공유하기를 지원하지 않는 브라우저입니다. 리포트를 캡처해서 공유해 주세요!');
+    }
+  };
+
   return (
     <motion.div
       className="px-5 pt-6 pb-24"
@@ -463,54 +481,71 @@ function ResultScreen({ surveyData, onGoMagazine, onBack }: { surveyData: Survey
 
       <motion.div
         variants={fadeChild}
-        className="rounded-2xl p-5 mb-4"
-        style={{ background: BEIGE }}
+        className="rounded-3xl p-6 mb-5 shadow-sm"
+        style={{ background: `linear-gradient(180deg, ${BEIGE}, #FFFFFF)`, border: "1px solid rgba(0,0,0,0.03)" }}
         data-testid="result-summary"
       >
-        <div className="flex items-center gap-3 mb-4">
+        <div className="flex items-center gap-4 mb-6">
           <div
-            className="w-14 h-14 rounded-2xl flex items-center justify-center"
+            className="w-16 h-16 rounded-2xl flex items-center justify-center shadow-lg"
             style={{ background: `linear-gradient(135deg, ${DEEP_GREEN}, ${DEEP_GREEN_LIGHT})` }}
           >
-            <span className="text-2xl font-extrabold text-white" style={{ fontFamily: "'Playfair Display', serif" }}>68</span>
+            <span className="text-3xl font-extrabold text-white" style={{ fontFamily: "'Playfair Display', serif" }}>68</span>
           </div>
           <div>
-            <p className="text-[14px] font-bold" style={{ color: DEEP_GREEN }}>
-              {surveyData?.age} {surveyData?.gender} / {surveyData?.condition}
-            </p>
-            <p className="text-xs font-semibold" style={{ color: "#D4836B" }}>
-              바우만 타입: <span className="underline underline-offset-2">{finalType}</span>형
+            <div className="flex items-center gap-1.5 mb-0.5">
+              <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-white text-[#2D5F4F] border border-[#2D5F4F10]">
+                {surveyData?.age} {surveyData?.gender}
+              </span>
+            </div>
+            <p className="text-lg font-extrabold" style={{ color: DEEP_GREEN }}>
+              바우만 <span style={{ color: "#D4836B" }}>{finalType}</span>형
             </p>
           </div>
         </div>
 
-        <div className="space-y-3.5">
+        {/* 인스타그램 공유 버튼 추가 */}
+        <motion.button
+          onClick={handleShare}
+          className="w-full py-3.5 rounded-2xl flex items-center justify-center gap-2.5 text-white mb-6 shadow-md"
+          style={{
+            background: `linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%)`,
+          }}
+          whileTap={{ scale: 0.97 }}
+        >
+          <Instagram className="w-5 h-5" />
+          <span className="text-[14px] font-bold">인스타에 결과 인증하기</span>
+        </motion.button>
+
+        <div className="space-y-4">
           {scores.map((item, i) => {
             const Icon = item.icon;
             return (
               <div key={item.label}>
                 <div className="flex items-center justify-between gap-2 mb-1.5">
                   <div className="flex items-center gap-2">
-                    <Icon className="w-4 h-4" style={{ color: item.color }} />
-                    <span className="text-[13px] font-semibold" style={{ color: DEEP_GREEN }}>{item.label}</span>
+                    <div className="w-6 h-6 rounded-full flex items-center justify-center bg-white shadow-sm border border-gray-50">
+                      <Icon className="w-3.5 h-3.5" style={{ color: item.color }} />
+                    </div>
+                    <span className="text-[13px] font-bold text-gray-700">{item.label}</span>
                   </div>
                   <motion.span
                     className="text-sm font-extrabold tabular-nums"
                     style={{ color: item.color }}
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
-                    transition={{ delay: 0.3 + i * 0.15, type: "spring", stiffness: 300 }}
+                    transition={{ delay: 0.3 + i * 0.1, type: "spring" }}
                   >
                     {item.score}점
                   </motion.span>
                 </div>
-                <div className="h-2 rounded-full overflow-hidden" style={{ background: "rgba(0,0,0,0.06)" }}>
+                <div className="h-1.5 rounded-full overflow-hidden" style={{ background: "rgba(0,0,0,0.04)" }}>
                   <motion.div
                     className="h-full rounded-full"
                     style={{ background: item.color }}
                     initial={{ width: "0%" }}
                     animate={{ width: `${item.score}%` }}
-                    transition={{ delay: 0.3 + i * 0.15, duration: 1, ease: [0.22, 1, 0.36, 1] }}
+                    transition={{ delay: 0.3 + i * 0.1, duration: 1 }}
                   />
                 </div>
               </div>
@@ -522,15 +557,39 @@ function ResultScreen({ surveyData, onGoMagazine, onBack }: { surveyData: Survey
       <motion.div variants={fadeChild}>
         <motion.button
           onClick={onGoMagazine}
-          className="w-full py-3.5 rounded-xl flex items-center justify-center gap-2 mb-5 border"
-          style={{ borderColor: DEEP_GREEN + "25", color: DEEP_GREEN }}
+          className="w-full py-3.5 rounded-xl flex items-center justify-center gap-2 mb-8 border bg-white shadow-sm"
+          style={{ borderColor: DEEP_GREEN + "15", color: DEEP_GREEN }}
           whileTap={{ scale: 0.98 }}
-          data-testid="button-go-magazine"
         >
-          <Leaf className="w-4 h-4" />
+          <Leaf className="w-4 h-4 text-emerald-600" />
           <span className="text-[13px] font-bold">맞춤 응급처치 가이드 보러 가기</span>
           <ChevronRight className="w-4 h-4" />
         </motion.button>
+      </motion.div>
+
+      <motion.div variants={fadeChild}>
+        <div className="rounded-2xl p-5 mb-8 border border-dashed flex flex-col items-center text-center bg-gray-50/50" 
+             style={{ borderColor: DEEP_GREEN + "20" }}>
+          <h3 className="font-bold text-[14px] mb-1" style={{ color: DEEP_GREEN }}>기록 저장하고 그래프로 보기</h3>
+          <p className="text-[11px] mb-4 text-gray-500">3초 로그인을 통해 내 피부 히스토리를 관리하세요.</p>
+          
+          <div className="flex gap-2 w-full">
+            <button 
+              className="flex-1 py-3 rounded-xl font-bold text-[12px] flex items-center justify-center gap-2 bg-white border border-gray-200"
+              onClick={() => window.location.href = "/auth/google"}
+            >
+              <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" className="w-3.5 h-3.5" alt="Google" />
+              구글
+            </button>
+            <button 
+              className="flex-1 py-3 rounded-xl font-bold text-[12px] flex items-center justify-center gap-2 bg-[#FEE500] text-[#3c1e1e]"
+              onClick={() => window.location.href = "/auth/kakao"}
+            >
+              <svg viewBox="0 0 24 24" fill="currentColor" className="w-3.5 h-3.5"><path d="M12 3c-4.97 0-9 3.185-9 7.115 0 2.558 1.712 4.8 4.346 6.09l-.843 3.09c-.067.247.078.47.284.47.098 0 .195-.03.273-.09l3.63-2.4c.42.06.85.094 1.31.094 4.97 0 9-3.185 9-7.115S16.97 3 12 3z"/></svg>
+              카카오
+            </button>
+          </div>
+        </div>
       </motion.div>
 
       <motion.div variants={fadeChild} data-testid="lock-area">
@@ -587,39 +646,6 @@ function ResultScreen({ surveyData, onGoMagazine, onBack }: { surveyData: Survey
             Fonday 정밀 스캐너로 진짜 피부 속 상태를 확인하세요.
           </span>
         </p>
-      </motion.div>
-
-      <motion.div variants={fadeChild}>
-        <div className="rounded-2xl p-6 mb-8 border-2 border-dashed flex flex-col items-center text-center bg-white/40" 
-             style={{ borderColor: DEEP_GREEN + "30" }}>
-          <div className="w-12 h-12 rounded-full bg-white flex items-center justify-center mb-3 shadow-sm">
-            <Lock className="w-6 h-6" style={{ color: DEEP_GREEN }} />
-          </div>
-          <h3 className="font-bold text-[15px] mb-1" style={{ color: DEEP_GREEN }}>내 피부 기록을 저장할까요?</h3>
-          <p className="text-[12px] mb-5 leading-relaxed" style={{ color: TEXT_SECONDARY }}>
-            로그인하면 오늘의 리포트를 저장하고<br />
-            내일의 피부와 실시간으로 비교해볼 수 있습니다.
-          </p>
-          
-          <div className="w-full space-y-2">
-            <button 
-              className="w-full py-3 rounded-xl font-bold text-[13px] flex items-center justify-center gap-2 bg-white border border-gray-200 shadow-sm"
-              onClick={() => window.location.href = "/auth/google"}
-            >
-              <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" className="w-4 h-4" alt="Google" />
-              구글로 3초만에 시작하기
-            </button>
-            <button 
-              className="w-full py-3 rounded-xl font-bold text-[13px] flex items-center justify-center gap-2 bg-[#FEE500] text-[#3c1e1e]"
-              onClick={() => window.location.href = "/auth/kakao"}
-            >
-              <div className="w-4 h-4 flex items-center justify-center">
-                <svg viewBox="0 0 24 24" fill="currentColor" className="w-full h-full"><path d="M12 3c-4.97 0-9 3.185-9 7.115 0 2.558 1.712 4.8 4.346 6.09l-.843 3.09c-.067.247.078.47.284.47.098 0 .195-.03.273-.09l3.63-2.4c.42.06.85.094 1.31.094 4.97 0 9-3.185 9-7.115S16.97 3 12 3z"/></svg>
-              </div>
-              카카오로 3초만에 시작하기
-            </button>
-          </div>
-        </div>
       </motion.div>
 
       <motion.div variants={fadeChild}>
