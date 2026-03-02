@@ -37,8 +37,15 @@ interface SurveyData {
   condition: string;
 }
 
+interface Hotspot {
+  x: number;
+  y: number;
+  type: string;
+}
+
 interface AnalysisResult {
   scores: { label: string; score: number }[];
+  hotspots: Hotspot[];
   aiComment: string;
 }
 
@@ -421,12 +428,14 @@ function ResultScreen({
   surveyData, 
   analysisResult, 
   onGoMagazine, 
-  onBack 
+  onBack,
+  imageSrc
 }: { 
   surveyData: SurveyData | null; 
   analysisResult: AnalysisResult | null;
   onGoMagazine: () => void; 
-  onBack: () => void 
+  onBack: () => void;
+  imageSrc: string | null;
 }) {
   const [showWaitlist, setShowWaitlist] = useState(false);
   const [email, setEmail] = useState("");
@@ -453,7 +462,6 @@ function ResultScreen({
     } finally { setIsSubmitting(false); }
   };
 
-  // AI 분석 결과 아이콘 매핑
   const iconMap: Record<string, any> = {
     "종합 컨디션": Sparkles,
     "수분 밸런스": Droplets,
@@ -479,7 +487,6 @@ function ResultScreen({
   const scores = analysisResult?.scores || [];
   const overallScore = scores.find(s => s.label === "종합 컨디션")?.score || 0;
 
-  // 바우만 타입 유추 (로직 고도화 가능)
   const isOily = scores.find(s => s.label === "모공 상태")?.score! < 50; 
   const isSens = scores.find(s => s.label === "붉은기 수준")?.score! > 50;
   const isPig = scores.find(s => s.label === "잡티/색소침착")?.score! > 50;
@@ -512,6 +519,36 @@ function ResultScreen({
           <span className="text-[10px] font-bold tracking-[0.15em] uppercase" style={{ color: DEEP_GREEN_LIGHT }}>AI Analysis Complete</span>
           <h2 className="text-xl font-extrabold mt-1" style={{ color: DEEP_GREEN }}>오늘의 피부 리포트</h2>
         </div>
+      </motion.div>
+
+      {/* 촬영 이미지 & AI 붉은 점 표시 섹션 */}
+      <motion.div variants={fadeChild} className="relative w-full aspect-[3/4] rounded-3xl overflow-hidden mb-6 shadow-2xl border-4 border-white">
+        {imageSrc && (
+          <>
+            <img src={imageSrc} className="w-full h-full object-cover" alt="My Skin" />
+            {/* AI가 찾은 붉은 점 오버레이 */}
+            {analysisResult?.hotspots?.map((dot, i) => (
+              <motion.div
+                key={i}
+                className="absolute w-4 h-4 -ml-2 -mt-2 rounded-full border-2 border-white shadow-[0_0_10px_rgba(255,0,0,0.8)]"
+                style={{
+                  left: `${dot.x}%`,
+                  top: `${dot.y}%`,
+                  background: "radial-gradient(circle, #FF4D4D, #CC0000)",
+                }}
+                initial={{ scale: 0, opacity: 0 }}
+                animate={{ scale: [1, 1.2, 1], opacity: [0.8, 1, 0.8] }}
+                transition={{ repeat: Infinity, duration: 1.5, delay: i * 0.2 }}
+              >
+                <div className="absolute inset-0 rounded-full bg-red-500 animate-ping opacity-40" />
+              </motion.div>
+            ))}
+            <div className="absolute bottom-4 left-4 bg-black/40 backdrop-blur-md px-3 py-1.5 rounded-full flex items-center gap-2">
+              <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+              <span className="text-[10px] font-bold text-white uppercase tracking-wider">AI Detection Active</span>
+            </div>
+          </>
+        )}
       </motion.div>
 
       <motion.div variants={fadeChild} className="rounded-3xl p-6 mb-5 shadow-sm" style={{ background: `linear-gradient(180deg, ${BEIGE}, #FFFFFF)`, border: "1px solid rgba(0,0,0,0.03)" }}>
@@ -587,7 +624,6 @@ function ResultScreen({
         </div>
       </motion.div>
 
-      {/* ... (잠금 영역 및 얼리버드 폼) */}
       <motion.div variants={fadeChild}>
         <motion.button onClick={() => setShowWaitlist(true)} className="w-full py-4 rounded-2xl text-[15px] font-bold text-white shadow-lg" style={{ background: `linear-gradient(135deg, #D4836B, #C06A55)` }}>
           <span className="flex items-center justify-center gap-2">Fonday 얼리버드 알림 받기 <ArrowRight className="w-5 h-5" /></span>
@@ -654,9 +690,11 @@ export default function SkinScanPage() {
   const [surveyData, setSurveyData] = useState<SurveyData | null>(null);
   const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imageSrc, setImageSrc] = useState<string | null>(null);
 
   const handleCapture = useCallback((file: File) => {
     setImageFile(file);
+    setImageSrc(URL.createObjectURL(file));
     setScanState("survey");
   }, []);
 
@@ -666,7 +704,6 @@ export default function SkinScanPage() {
 
     if (!imageFile) return;
 
-    // 이미지를 Base64로 변환
     const reader = new FileReader();
     reader.readAsDataURL(imageFile);
     reader.onload = async () => {
@@ -698,7 +735,7 @@ export default function SkinScanPage() {
               {scanState === "idle" && <ScanIdleScreen onCapture={handleCapture} />}
               {scanState === "survey" && <SurveyScreen onSubmit={handleSurveySubmit} onBack={() => setScanState("idle")} />}
               {scanState === "scanning" && <ScanningScreen />}
-              {scanState === "result" && <ResultScreen surveyData={surveyData} analysisResult={analysisResult} onGoMagazine={() => setActiveTab("magazine")} onBack={() => setScanState("idle")} />}
+              {scanState === "result" && <ResultScreen surveyData={surveyData} analysisResult={analysisResult} imageSrc={imageSrc} onGoMagazine={() => setActiveTab("magazine")} onBack={() => setScanState("idle")} />}
             </motion.div>
           )}
           {activeTab === "magazine" && <MagazineTab />}
