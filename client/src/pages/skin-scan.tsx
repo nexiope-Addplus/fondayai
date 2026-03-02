@@ -3,30 +3,23 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   Camera,
   BookOpen,
-  Lock,
-  Sparkles,
-  ArrowRight,
-  Heart,
-  Clock,
-  ChevronRight,
   ScanLine,
-  Droplets,
-  Sun,
-  Shield,
-  Leaf,
   AlertCircle,
-  Grid,
-  Activity,
-  Target,
-  Flame,
-  Eye,
-  Zap,
+  Shield,
+  Sun,
   Instagram,
   LineChart as LineChartIcon,
-  Save,
+  ChevronLeft,
 } from "lucide-react";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Separator } from "@/components/ui/separator";
 
 type TabId = "scan" | "magazine";
 type ScanState = "idle" | "survey" | "scanning" | "result";
@@ -53,7 +46,6 @@ interface AnalysisResult {
 
 const DEEP_GREEN = "#2D5F4F";
 const DEEP_GREEN_LIGHT = "#3D7A66";
-const BEIGE = "#F5F0EB";
 const TEXT_SECONDARY = "#8C8070";
 
 const fadeChild = {
@@ -96,26 +88,21 @@ const articles = [
 ];
 
 function BottomNav({ active, onChange }: { active: TabId; onChange: (t: TabId) => void }) {
-  const tabs: { id: TabId; label: string; icon: any }[] = [
-    { id: "scan", label: "AI 스캔", icon: Camera },
-    { id: "magazine", label: "매거진", icon: BookOpen },
-  ];
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-2xl border-t border-border transition-colors">
-      <div className="flex items-center justify-around h-[60px] max-w-md mx-auto">
-        {tabs.map((tab) => {
-          const active_ = active === tab.id;
-          const Icon = tab.icon;
-          return (
-            <button key={tab.id} onClick={() => onChange(tab.id)} className="flex flex-col items-center gap-1 flex-1 py-1.5 relative">
-              {active_ && (
-                <motion.div className="absolute -top-[1px] left-1/2 -translate-x-1/2 w-8 h-[3px] rounded-full" style={{ background: DEEP_GREEN }} layoutId="nav-indicator" />
-              )}
-              <Icon className="w-5 h-5 transition-colors" style={{ color: active_ ? DEEP_GREEN : "#B0B0B0" }} />
-              <span className="text-[10px] font-semibold transition-colors" style={{ color: active_ ? DEEP_GREEN : "#B0B0B0" }}>{tab.label}</span>
-            </button>
-          );
-        })}
+      <div className="max-w-md mx-auto px-6">
+        <Tabs value={active} onValueChange={(v) => onChange(v as TabId)} className="w-full">
+          <TabsList className="grid w-full grid-cols-2 h-[60px] bg-transparent">
+            <TabsTrigger value="scan" className="data-[state=active]:text-[#2D5F4F] data-[state=active]:bg-transparent flex flex-col gap-1">
+              <Camera className="w-5 h-5" />
+              <span className="text-[10px] font-semibold">AI 스캔</span>
+            </TabsTrigger>
+            <TabsTrigger value="magazine" className="data-[state=active]:text-[#2D5F4F] data-[state=active]:bg-transparent flex flex-col gap-1">
+              <BookOpen className="w-5 h-5" />
+              <span className="text-[10px] font-semibold">매거진</span>
+            </TabsTrigger>
+          </TabsList>
+        </Tabs>
       </div>
     </nav>
   );
@@ -130,16 +117,24 @@ function ScanIdleScreen({ onCapture }: { onCapture: (file: File) => void }) {
   return (
     <motion.div className="flex flex-col items-center justify-center px-6 text-center" style={{ minHeight: "calc(100dvh - 60px)" }} variants={stagger} initial="initial" animate="animate">
       <motion.div variants={fadeChild} className="mb-4">
-        <span className="text-[10px] font-bold tracking-[0.18em] uppercase" style={{ color: DEEP_GREEN_LIGHT }}>AI Skin Scanner</span>
+        <Badge variant="outline" className="px-3 py-1 border-[#3D7A66] text-[#3D7A66] font-bold tracking-widest uppercase text-[10px]">
+          AI Skin Scanner
+        </Badge>
       </motion.div>
       <motion.div variants={fadeChild} className="mb-10">
-        <p className="text-[15px] font-medium leading-relaxed" style={{ color: TEXT_SECONDARY }}>지금 내 피부 상태,<br />AI가 <span className="font-bold" style={{ color: DEEP_GREEN }}>3초</span>만에 알려줄게요.</p>
+        <h1 className="text-2xl font-bold mb-2 tracking-tight">피부의 목소리를 들어보세요</h1>
+        <p className="text-[15px] font-medium leading-relaxed text-muted-foreground">지금 내 피부 상태,<br />AI가 <span className="font-bold text-[#2D5F4F]">3초</span>만에 알려줄게요.</p>
       </motion.div>
       <motion.div variants={fadeChild}>
-        <motion.button onClick={() => fileRef.current?.click()} className="relative w-52 h-52 rounded-full flex flex-col items-center justify-center gap-3 text-white" style={{ background: `radial-gradient(circle at 35% 35%, ${DEEP_GREEN_LIGHT}, ${DEEP_GREEN})`, boxShadow: `0 20px 60px rgba(45,95,79,0.35)` }} whileTap={{ scale: 0.95 }}>
+        <Button 
+          onClick={() => fileRef.current?.click()} 
+          size="icon"
+          className="w-52 h-52 rounded-full flex flex-col items-center justify-center gap-3 text-white transition-all hover:scale-105 active:scale-95 shadow-2xl" 
+          style={{ background: `radial-gradient(circle at 35% 35%, ${DEEP_GREEN_LIGHT}, ${DEEP_GREEN})` }}
+        >
           <ScanLine className="w-12 h-12" />
-          <span className="text-[13px] font-bold leading-snug px-6">내 피부 상태<br />AI로 3초 스캔하기</span>
-        </motion.button>
+          <span className="text-[14px] font-bold leading-snug px-6">내 피부 상태<br />AI로 3초 스캔하기</span>
+        </Button>
         <input ref={fileRef} type="file" accept="image/*" capture="user" className="hidden" onChange={handleChange} />
       </motion.div>
     </motion.div>
@@ -157,38 +152,48 @@ function SurveyScreen({ onSubmit, onBack }: { onSubmit: (data: SurveyData) => vo
   return (
     <motion.div className="px-6 py-8 flex flex-col gap-8 min-h-[calc(100dvh-60px)]" variants={stagger} initial="initial" animate="animate">
       <motion.div variants={fadeChild}>
-        <h2 className="text-xl font-extrabold" style={{ color: DEEP_GREEN }}>피부 분석 기초 정보</h2>
-        <p className="text-[13px]" style={{ color: TEXT_SECONDARY }}>정확한 분석을 위해 현재 상태를 선택해 주세요.</p>
+        <div className="flex items-center gap-2 mb-1">
+          <Button variant="ghost" size="icon" onClick={onBack} className="-ml-2">
+            <ChevronLeft className="w-6 h-6" />
+          </Button>
+          <h2 className="text-xl font-bold text-[#2D5F4F]">피부 분석 기초 정보</h2>
+        </div>
+        <p className="text-[13px] text-muted-foreground ml-10">정확한 분석을 위해 현재 상태를 선택해 주세요.</p>
       </motion.div>
-      <div className="space-y-7 pb-10 overflow-y-auto">
-        <div className="flex flex-col gap-3">
-          <label className="text-[12px] font-bold" style={{ color: DEEP_GREEN_LIGHT }}>성별</label>
-          <div className="flex gap-2">
-            {["여성", "남성"].map(item => (
-              <button key={item} onClick={() => setGender(item)} className={`flex-1 py-3.5 rounded-xl text-[13px] font-bold border ${gender === item ? "bg-[#2D5F4F] text-white" : "bg-white text-[#8C8070] border-gray-100"}`}>{item}</button>
-            ))}
+
+      <ScrollArea className="flex-1 -mx-6 px-6">
+        <div className="space-y-8 pb-10">
+          <div className="space-y-3">
+            <label className="text-[12px] font-bold text-[#3D7A66] ml-1 uppercase tracking-wider">성별</label>
+            <div className="flex gap-2">
+              {["여성", "남성"].map(item => (
+                <Button key={item} onClick={() => setGender(item)} variant={gender === item ? "default" : "outline"} className={`flex-1 h-14 rounded-xl text-[14px] font-bold ${gender === item ? "bg-[#2D5F4F] hover:bg-[#2D5F4F]" : ""}`}>{item}</Button>
+              ))}
+            </div>
+          </div>
+
+          <div className="space-y-3">
+            <label className="text-[12px] font-bold text-[#3D7A66] ml-1 uppercase tracking-wider">나이대</label>
+            <div className="grid grid-cols-2 gap-2">
+              {ageGroups.map(item => (
+                <Button key={item} onClick={() => setAge(item)} variant={age === item ? "default" : "outline"} className={`h-12 rounded-xl text-[13px] font-bold ${age === item ? "bg-[#2D5F4F] hover:bg-[#2D5F4F]" : ""}`}>{item}</Button>
+              ))}
+            </div>
+          </div>
+
+          <div className="space-y-3">
+            <label className="text-[12px] font-bold text-[#3D7A66] ml-1 uppercase tracking-wider">피부 고민 (다중)</label>
+            <div className="grid grid-cols-3 gap-2">
+              {skinConcerns.map(item => (
+                <Button key={item} onClick={() => toggleConcern(item)} variant={concerns.includes(item) ? "secondary" : "outline"} className={`h-12 rounded-xl text-[12px] font-bold ${concerns.includes(item) ? "bg-[#3D7A66] text-white hover:bg-[#3D7A66]" : ""}`}>{item}</Button>
+              ))}
+            </div>
           </div>
         </div>
-        <div className="flex flex-col gap-3">
-          <label className="text-[12px] font-bold" style={{ color: DEEP_GREEN_LIGHT }}>나이대</label>
-          <div className="grid grid-cols-2 gap-2">
-            {ageGroups.map(item => (
-              <button key={item} onClick={() => setAge(item)} className={`py-3 rounded-xl text-[12px] font-bold border ${age === item ? "bg-[#2D5F4F] text-white" : "bg-white text-[#8C8070] border-gray-100"}`}>{item}</button>
-            ))}
-          </div>
-        </div>
-        <div className="flex flex-col gap-3">
-          <label className="text-[12px] font-bold" style={{ color: DEEP_GREEN_LIGHT }}>피부 고민 (다중)</label>
-          <div className="grid grid-cols-3 gap-2">
-            {skinConcerns.map(item => (
-              <button key={item} onClick={() => toggleConcern(item)} className={`py-3 rounded-xl text-[11px] font-bold border ${concerns.includes(item) ? "bg-[#3D7A66] text-white" : "bg-white text-[#8C8070] border-gray-100"}`}>{item}</button>
-            ))}
-          </div>
-        </div>
-      </div>
-      <motion.div variants={fadeChild} className="mt-auto pt-6 flex gap-3 sticky bottom-4">
-        <button onClick={onBack} className="flex-1 py-4 rounded-2xl font-bold bg-gray-100 text-gray-500">이전</button>
-        <button onClick={() => onSubmit({ gender, age, skinType: "복합성", concerns, condition: "맨얼굴" })} className="flex-[2.5] py-4 rounded-2xl font-bold text-white shadow-xl" style={{ background: `linear-gradient(135deg, ${DEEP_GREEN_LIGHT}, ${DEEP_GREEN})` }}>AI 분석 시작</button>
+      </ScrollArea>
+
+      <motion.div variants={fadeChild} className="pt-6 sticky bottom-4">
+        <Button onClick={() => onSubmit({ gender, age, skinType: "복합성", concerns, condition: "맨얼굴" })} className="w-full h-14 rounded-2xl font-bold text-white shadow-xl bg-[#2D5F4F] hover:bg-[#3D7A66] transition-all text-lg">AI 분석 시작</Button>
       </motion.div>
     </motion.div>
   );
@@ -196,12 +201,15 @@ function SurveyScreen({ onSubmit, onBack }: { onSubmit: (data: SurveyData) => vo
 
 function ScanningScreen() {
   return (
-    <div className="flex flex-col items-center justify-center min-h-[calc(100dvh-60px)] bg-black text-white">
-      <div className="relative w-64 h-80 rounded-3xl overflow-hidden bg-gray-900 flex items-center justify-center">
-        <Camera className="w-16 h-16 opacity-20" />
-        <motion.div className="absolute left-0 right-0 h-[2px] bg-emerald-400" animate={{ top: ["5%", "95%", "5%"] }} transition={{ duration: 2, repeat: Infinity }} />
+    <div className="flex flex-col items-center justify-center min-h-[calc(100dvh-60px)] bg-background">
+      <div className="relative w-64 h-80 rounded-3xl overflow-hidden bg-muted flex items-center justify-center shadow-inner">
+        <Camera className="w-16 h-16 opacity-10" />
+        <motion.div className="absolute left-0 right-0 h-1 bg-[#2D5F4F] shadow-[0_0_15px_rgba(45,95,79,0.5)]" animate={{ top: ["5%", "95%", "5%"] }} transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }} />
       </div>
-      <p className="mt-8 font-bold">AI 분석 중...</p>
+      <div className="mt-8 text-center space-y-2">
+        <p className="font-bold text-xl animate-pulse">AI 분석 중...</p>
+        <p className="text-sm text-muted-foreground italic">전문적인 피부 분석 리포트를 생성하고 있습니다.</p>
+      </div>
     </div>
   );
 }
@@ -212,24 +220,13 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, onBack, user }: an
 
   useEffect(() => {
     if (user) {
-      // 히스토리 가져오기
-      fetch("/api/scans")
-        .then(res => res.json())
-        .then(data => setHistory(data.slice(0, 5).reverse()));
-      
-      // 자동 저장 (최초 1회)
+      fetch("/api/scans").then(res => res.json()).then(data => setHistory(data.slice(0, 5).reverse()));
       if (!isSaved && analysisResult) {
         const overallScore = analysisResult.scores.find((s: any) => s.label === "종합 컨디션")?.score || 0;
         fetch("/api/scans", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            overallScore,
-            scores: analysisResult.scores,
-            hotspots: analysisResult.hotspots,
-            aiComment: analysisResult.aiComment,
-            imageSrc
-          })
+          body: JSON.stringify({ overallScore, scores: analysisResult.scores, hotspots: analysisResult.hotspots, aiComment: analysisResult.aiComment, imageSrc })
         }).then(() => setIsSaved(true));
       }
     }
@@ -237,110 +234,141 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, onBack, user }: an
 
   const scores = analysisResult?.scores || [];
   const overallScore = scores.find((s: any) => s.label === "종합 컨디션")?.score || 0;
-
   const chartData = history.map(item => ({
     date: new Date(item.createdAt).toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' }),
     score: parseInt(item.overallScore)
   }));
 
   return (
-    <motion.div className="px-5 pt-6 pb-24" variants={stagger} initial="initial" animate="animate">
-      <div className="flex justify-between items-center mb-6">
-        <button onClick={onBack} className="px-4 py-2 rounded-full border text-[12px] font-bold border-emerald-100 bg-white shadow-sm flex items-center gap-1.5"><Camera className="w-3.5 h-3.5" /> 다시 촬영</button>
-        <h2 className="text-xl font-extrabold text-emerald-900">피부 리포트</h2>
-      </div>
-
-      <div className="relative w-full aspect-[3/4] rounded-3xl overflow-hidden mb-6 shadow-2xl border-4 border-white">
-        <img src={imageSrc} className="w-full h-full object-cover" />
-        {analysisResult?.hotspots?.map((dot: any, i: number) => (
-          <motion.div key={i} className="absolute w-4 h-4 -ml-2 -mt-2 rounded-full border-2 border-white bg-red-500" style={{ left: `${dot.x}%`, top: `${dot.y}%` }} animate={{ scale: [1, 1.3, 1] }} transition={{ repeat: Infinity, duration: 1.5, delay: i * 0.2 }} />
-        ))}
-      </div>
-
-      <div className="rounded-3xl p-6 mb-6 bg-white shadow-sm border border-emerald-50">
-        <div className="flex items-center gap-4 mb-6">
-          <div className="w-16 h-16 rounded-2xl flex items-center justify-center bg-emerald-600 text-white text-3xl font-black">{overallScore}</div>
-          <div><p className="text-sm font-bold text-emerald-900">{surveyData?.age} {surveyData?.gender}</p><p className="text-xs text-emerald-600">오늘의 점수</p></div>
+    <ScrollArea className="h-[calc(100dvh-60px)]">
+      <motion.div className="px-5 pt-6 pb-24 space-y-6" variants={stagger} initial="initial" animate="animate">
+        <div className="flex justify-between items-center">
+          <Button variant="outline" size="sm" onClick={onBack} className="rounded-full gap-1.5 border-[#2D5F4F] text-[#2D5F4F] hover:bg-emerald-50">
+            <Camera className="w-4 h-4" /> 다시 촬영
+          </Button>
+          <h2 className="text-xl font-black text-[#2D5F4F] tracking-tight">AI 피부 리포트</h2>
         </div>
-        
-        <div className="space-y-4">
-          {scores.map((item: any) => (
-            <div key={item.label} className="space-y-1.5">
-              <div className="flex justify-between text-[13px] font-bold"><span>{item.label}</span><span>{item.score}점</span></div>
-              <div className="h-1.5 rounded-full bg-emerald-50 overflow-hidden"><motion.div className="h-full bg-emerald-500" initial={{ width: 0 }} animate={{ width: `${item.score}%` }} transition={{ duration: 1 }} /></div>
+
+        <Card className="overflow-hidden border-none shadow-2xl rounded-3xl">
+          <div className="relative aspect-[3/4]">
+            <img src={imageSrc} className="w-full h-full object-cover" />
+            {analysisResult?.hotspots?.map((dot: any, i: number) => (
+              <motion.div key={i} className="absolute w-4 h-4 -ml-2 -mt-2 rounded-full border-2 border-white bg-red-500 shadow-lg" style={{ left: `${dot.x}%`, top: `${dot.y}%` }} animate={{ scale: [1, 1.3, 1] }} transition={{ repeat: Infinity, duration: 1.5, delay: i * 0.2 }} />
+            ))}
+          </div>
+        </Card>
+
+        <Card className="border-none shadow-md rounded-3xl bg-white dark:bg-zinc-900">
+          <CardHeader className="pb-2">
+            <div className="flex items-center gap-4">
+              <div className="w-16 h-16 rounded-2xl flex items-center justify-center bg-[#2D5F4F] text-white text-3xl font-black shadow-lg">{overallScore}</div>
+              <div>
+                <CardTitle className="text-lg font-bold text-[#2D5F4F]">{surveyData?.age} {surveyData?.gender}</CardTitle>
+                <CardDescription>종합 점수 및 상세 분석 결과</CardDescription>
+              </div>
             </div>
-          ))}
-        </div>
-        {analysisResult?.aiComment && <div className="mt-6 p-4 rounded-xl bg-emerald-50 text-[13px] leading-relaxed italic">" {analysisResult.aiComment} "</div>}
-      </div>
+          </CardHeader>
+          <CardContent className="space-y-5 pt-4">
+            {scores.map((item: any) => (
+              <div key={item.label} className="space-y-2">
+                <div className="flex justify-between text-[13px] font-bold">
+                  <span>{item.label}</span>
+                  <span className="text-[#2D5F4F]">{item.score}점</span>
+                </div>
+                <Progress value={item.score} className="h-2 bg-emerald-50" />
+              </div>
+            ))}
+            {analysisResult?.aiComment && (
+              <div className="mt-4 p-4 rounded-2xl bg-emerald-50/50 border border-emerald-100/50 text-[14px] leading-relaxed italic text-emerald-900">
+                " {analysisResult.aiComment} "
+              </div>
+            )}
+          </CardContent>
+        </Card>
 
-      {/* 히스토리 그래프 영역 */}
-      {user ? (
-        <div className="rounded-3xl p-6 mb-6 bg-white shadow-sm border border-emerald-50">
-          <div className="flex items-center gap-2 mb-6">
-            <LineChartIcon className="w-5 h-5 text-emerald-600" />
-            <h3 className="font-bold text-emerald-900">피부 변화 추이</h3>
-          </div>
-          <div className="h-48 w-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={[...chartData, { date: '오늘', score: overallScore }]}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
-                <XAxis dataKey="date" axisLine={false} tickLine={false} style={{ fontSize: '10px' }} />
-                <YAxis hide domain={[0, 100]} />
-                <Tooltip />
-                <Line type="monotone" dataKey="score" stroke="#059669" strokeWidth={3} dot={{ r: 4, fill: '#059669' }} />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
-          <div className="mt-4 pt-4 border-t border-gray-100 flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              {user.avatar && <img src={user.avatar} className="w-6 h-6 rounded-full" />}
-              <span className="text-[11px] font-bold text-emerald-900">{user.username}님</span>
-            </div>
-            <button 
-              onClick={() => fetch("/api/logout", { method: "POST" }).then(() => window.location.reload())}
-              className="text-[10px] text-gray-400 underline"
-            >
-              로그아웃
-            </button>
-          </div>
-        </div>
-      ) : (
-        <div className="rounded-3xl p-8 mb-6 border-2 border-dashed border-emerald-200 bg-emerald-50/30 text-center">
-          <h3 className="font-bold text-emerald-900 mb-2">기록 저장하고 그래프로 보기</h3>
-          <p className="text-xs text-gray-500 mb-6">3초 로그인으로 내 피부 히스토리를 관리하세요.</p>
-          <div className="flex flex-col gap-2">
-            <button onClick={() => window.location.href = "/auth/kakao"} className="w-full py-3.5 rounded-xl bg-[#FEE500] font-bold text-[13px] flex items-center justify-center gap-2 shadow-sm text-[#3C1E1E]">
-              <img src="https://developers.kakao.com/assets/img/lib/logos/kakaotalksharing/kakaotalk_sharing_btn_medium.png" className="w-5 h-5" /> 카카오로 계속하기
-            </button>
-            <button onClick={() => window.location.href = "/auth/google"} className="w-full py-3.5 rounded-xl bg-white border border-gray-200 font-bold text-[13px] flex items-center justify-center gap-2 shadow-sm text-gray-700">
-              <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" className="w-4 h-4" /> Google로 계속하기
-            </button>
-          </div>
-        </div>
-      )}
+        {user ? (
+          <Card className="border-none shadow-md rounded-3xl">
+            <CardHeader className="pb-2">
+              <div className="flex items-center gap-2">
+                <LineChartIcon className="w-5 h-5 text-[#2D5F4F]" />
+                <CardTitle className="text-base font-bold">피부 변화 추이</CardTitle>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="h-48 w-full mt-2">
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={[...chartData, { date: '오늘', score: overallScore }]}>
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
+                    <XAxis dataKey="date" axisLine={false} tickLine={false} style={{ fontSize: '10px' }} />
+                    <YAxis hide domain={[0, 100]} />
+                    <Tooltip />
+                    <Line type="monotone" dataKey="score" stroke="#2D5F4F" strokeWidth={3} dot={{ r: 4, fill: '#2D5F4F', strokeWidth: 2, stroke: '#fff' }} activeDot={{ r: 6 }} />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+              <Separator className="my-4" />
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  {user.avatar && <img src={user.avatar} className="w-6 h-6 rounded-full border border-emerald-100" />}
+                  <span className="text-[12px] font-bold text-[#2D5F4F]">{user.username}님</span>
+                </div>
+                <Button variant="ghost" size="sm" onClick={() => fetch("/api/logout", { method: "POST" }).then(() => window.location.reload())} className="text-[11px] text-muted-foreground underline h-auto p-0 hover:bg-transparent">
+                  로그아웃
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        ) : (
+          <Card className="border-2 border-dashed border-emerald-200 bg-emerald-50/30 rounded-3xl p-6 text-center">
+            <CardHeader className="p-0 mb-4">
+              <CardTitle className="text-lg font-bold text-[#2D5F4F]">변화 과정을 기록하세요</CardTitle>
+              <CardDescription className="text-xs">3초 로그인으로 내 피부 히스토리를 관리하세요.</CardDescription>
+            </CardHeader>
+            <CardContent className="p-0 space-y-2">
+              <Button onClick={() => window.location.href = "/auth/kakao"} className="w-full h-12 rounded-xl bg-[#FEE500] hover:bg-[#FEE500]/90 text-[#3C1E1E] font-bold border-none">
+                <img src="https://developers.kakao.com/assets/img/lib/logos/kakaotalksharing/kakaotalk_sharing_btn_medium.png" className="w-5 h-5 mr-2" /> 카카오로 계속하기
+              </Button>
+              <Button onClick={() => window.location.href = "/auth/google"} variant="outline" className="w-full h-12 rounded-xl bg-white font-bold text-zinc-700">
+                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" className="w-4 h-4 mr-2" /> Google로 계속하기
+              </Button>
+            </CardContent>
+          </Card>
+        )}
 
-      <button className="w-full py-4 rounded-2xl flex items-center justify-center gap-2 text-white mb-6 font-bold shadow-md" style={{ background: "linear-gradient(45deg, #f09433, #bc1888)" }}><Instagram className="w-5 h-5" /> 인스타 인증하기</button>
-    </motion.div>
+        <Button className="w-full h-14 rounded-2xl text-white font-bold shadow-lg hover:opacity-90 transition-opacity bg-gradient-to-r from-[#f09433] via-[#bc1888] to-[#8a3ab9]">
+          <Instagram className="w-5 h-5 mr-2" /> 인스타 인증하기
+        </Button>
+      </motion.div>
+    </ScrollArea>
   );
 }
 
 function MagazineTab() {
   return (
-    <motion.div className="px-5 pt-6 pb-24" variants={stagger} initial="initial" animate="animate">
-      <h1 className="text-xl font-extrabold text-emerald-900 mb-6">뷰티 인사이트</h1>
-      <div className="space-y-4">
-        {articles.map((article) => {
-          const Icon = article.icon;
-          return (
-            <div key={article.id} className="rounded-2xl overflow-hidden border bg-white shadow-sm p-4 flex gap-4">
-              <div className={`w-20 h-20 rounded-xl bg-gradient-to-br ${article.gradient} flex items-center justify-center`}><Icon className="w-8 h-8 opacity-20" /></div>
-              <div><h3 className="text-[14px] font-bold mb-1">{article.title}</h3><p className="text-[11px] text-gray-500 line-clamp-2">{article.summary}</p></div>
-            </div>
-          );
-        })}
-      </div>
-    </motion.div>
+    <ScrollArea className="h-[calc(100dvh-60px)]">
+      <motion.div className="px-5 pt-6 pb-24 space-y-6" variants={stagger} initial="initial" animate="animate">
+        <h1 className="text-2xl font-black text-[#2D5F4F] tracking-tight">뷰티 인사이트</h1>
+        <div className="space-y-4">
+          {articles.map((article) => {
+            const Icon = article.icon;
+            return (
+              <Card key={article.id} className="overflow-hidden border-none shadow-sm hover:shadow-md transition-shadow rounded-2xl flex gap-4 p-4 items-center">
+                <div className={`w-20 h-20 shrink-0 rounded-2xl bg-gradient-to-br ${article.gradient} flex items-center justify-center shadow-inner`}>
+                  <Icon className="w-8 h-8 opacity-20" />
+                </div>
+                <div className="space-y-1">
+                  <Badge variant="secondary" className="text-[9px] font-bold bg-emerald-50 text-[#2D5F4F] hover:bg-emerald-50 rounded-md px-1.5 py-0">
+                    {article.tag}
+                  </Badge>
+                  <h3 className="text-[15px] font-bold leading-tight">{article.title}</h3>
+                  <p className="text-[11px] text-muted-foreground line-clamp-2">{article.summary}</p>
+                </div>
+              </Card>
+            );
+          })}
+        </div>
+      </motion.div>
+    </ScrollArea>
   );
 }
 
@@ -354,10 +382,7 @@ export default function SkinScanPage() {
   const [user, setUser] = useState<any>(null);
 
   useEffect(() => {
-    fetch("/api/user")
-      .then((res) => res.ok ? res.json() : null)
-      .then((data) => setUser(data))
-      .catch(() => setUser(null));
+    fetch("/api/user").then((res) => res.ok ? res.json() : null).then((data) => setUser(data)).catch(() => setUser(null));
   }, []);
 
   const handleCapture = useCallback((file: File) => {
@@ -390,11 +415,11 @@ export default function SkinScanPage() {
   }, [imageFile]);
 
   return (
-    <div className="min-h-[100dvh] bg-emerald-50/20 text-black transition-colors">
-      <div className="absolute top-4 right-4 z-[100] flex items-center gap-3">
+    <div className="min-h-[100dvh] bg-emerald-50/10 text-zinc-900 transition-colors dark:bg-black dark:text-zinc-100">
+      <div className="absolute top-4 right-4 z-[100]">
         <ThemeToggle />
       </div>
-      <div className="overflow-y-auto" style={{ minHeight: "calc(100dvh - 60px)" }}>
+      <div className="max-w-md mx-auto relative min-h-[100dvh]">
         <AnimatePresence mode="wait">
           {activeTab === "scan" && (
             <motion.div key="scan" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
