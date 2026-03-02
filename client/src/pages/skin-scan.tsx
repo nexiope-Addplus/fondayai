@@ -55,6 +55,7 @@ interface AnalysisResult {
   scores: { label: string; score: number }[];
   hotspots: Hotspot[];
   aiComment: string;
+  improvements: { title: string; desc: string }[];
 }
 
 const DEEP_GREEN = "#2D5F4F";
@@ -482,6 +483,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, onBack, onGoMagazi
   const [history, setHistory] = useState<any[]>([]);
   const [isSaved, setIsSaved] = useState(false);
   const [showWaitlist, setShowWaitlist] = useState(false);
+  const [showImprovements, setShowImprovements] = useState(false);
   const [email, setEmail] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
@@ -564,11 +566,21 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, onBack, onGoMagazi
             <img src={imageSrc} className="w-full max-h-80 object-contain" />
             {analysisResult?.hotspots?.map((dot: any, i: number) => (
               <motion.div key={i}
-                className="absolute w-4 h-4 -ml-2 -mt-2 rounded-full border-2 border-white bg-red-500 shadow-lg"
+                className="absolute -translate-x-1/2 -translate-y-1/2"
                 style={{ left: `${dot.x}%`, top: `${dot.y}%` }}
-                animate={{ scale: [1, 1.3, 1] }}
-                transition={{ repeat: Infinity, duration: 1.5, delay: i * 0.2 }}
-              />
+                initial={{ scale: 0, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ delay: i * 0.15, type: "spring" }}
+              >
+                {/* 중심 점 */}
+                <div className="w-2 h-2 rounded-full bg-red-500 border border-white/80 shadow-md" />
+                {/* 미세 파동 */}
+                <motion.div
+                  className="absolute inset-0 rounded-full border border-red-400"
+                  animate={{ scale: [1, 2.2, 1], opacity: [0.6, 0, 0.6] }}
+                  transition={{ repeat: Infinity, duration: 2.2, delay: i * 0.3 }}
+                />
+              </motion.div>
             ))}
             <div className="absolute bottom-3 left-3 bg-black/40 backdrop-blur-md px-3 py-1.5 rounded-full flex items-center gap-2">
               <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
@@ -631,11 +643,12 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, onBack, onGoMagazi
           </CardContent>
         </Card>
 
-        {/* 맞춤 가이드 링크 */}
-        <Button variant="outline" onClick={() => onGoMagazine()}
-          className="w-full h-12 rounded-2xl gap-2" style={{ borderColor: `${DEEP_GREEN}30`, color: DEEP_GREEN }}>
+        {/* 개선 방안 버튼 */}
+        <Button onClick={() => setShowImprovements(true)}
+          className="w-full h-12 rounded-2xl gap-2 font-bold text-white shadow-md"
+          style={{ background: `linear-gradient(135deg, ${DEEP_GREEN_LIGHT}, ${DEEP_GREEN})` }}>
           <Leaf className="w-4 h-4" />
-          맞춤 응급처치 가이드 보러 가기
+          나만의 개선 방안 보기
           <ChevronRight className="w-4 h-4" />
         </Button>
 
@@ -711,6 +724,57 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, onBack, onGoMagazi
           <Share2 className="w-5 h-5 mr-2" /> 결과 공유하기
         </Button>
       </motion.div>
+
+      {/* 개선 방안 모달 */}
+      <AnimatePresence>
+        {showImprovements && (
+          <motion.div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center"
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            onClick={() => setShowImprovements(false)}>
+            <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" />
+            <motion.div className="relative bg-white rounded-t-3xl sm:rounded-3xl w-full max-w-sm shadow-xl"
+              initial={{ y: 120, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 120, opacity: 0 }}
+              onClick={e => e.stopPropagation()}>
+              <div className="p-6 pb-2">
+                <div className="w-10 h-1 rounded-full bg-stone-200 mx-auto mb-5" />
+                <div className="flex items-center gap-2 mb-4">
+                  <div className="w-9 h-9 rounded-xl flex items-center justify-center"
+                    style={{ background: `linear-gradient(135deg, ${DEEP_GREEN_LIGHT}, ${DEEP_GREEN})` }}>
+                    <Leaf className="w-4 h-4 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-base" style={{ color: DEEP_GREEN }}>나만의 개선 방안</h3>
+                    <p className="text-[11px] text-stone-400">AI가 분석 결과를 바탕으로 제안합니다</p>
+                  </div>
+                </div>
+              </div>
+              <ScrollArea className="max-h-[60vh]">
+                <div className="px-6 pb-8 space-y-3">
+                  {(analysisResult?.improvements ?? []).length > 0 ? (
+                    (analysisResult.improvements as { title: string; desc: string }[]).map((item, i) => (
+                      <motion.div key={i}
+                        initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: i * 0.08 }}
+                        className="flex gap-3 p-4 rounded-2xl bg-stone-50 border border-stone-100">
+                        <div className="w-7 h-7 rounded-full flex items-center justify-center shrink-0 text-white text-[11px] font-black"
+                          style={{ background: `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})` }}>
+                          {i + 1}
+                        </div>
+                        <div>
+                          <p className="text-[13px] font-bold text-stone-800 mb-0.5">{item.title}</p>
+                          <p className="text-[12px] text-stone-500 leading-relaxed">{item.desc}</p>
+                        </div>
+                      </motion.div>
+                    ))
+                  ) : (
+                    <p className="text-center text-sm text-stone-400 py-6">분석 결과를 불러오는 중...</p>
+                  )}
+                </div>
+              </ScrollArea>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* 얼리버드 모달 */}
       <AnimatePresence>
