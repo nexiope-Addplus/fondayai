@@ -7,7 +7,7 @@ export interface IStorage {
   getUserByGoogleId(googleId: string): Promise<User | undefined>;
   getUserByKakaoId(kakaoId: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
-  
+
   createScan(scan: InsertScan): Promise<Scan>;
   getScansByUserId(userId: string): Promise<Scan[]>;
 }
@@ -22,15 +22,40 @@ export class MemStorage implements IStorage {
   }
 
   async getUser(id: string): Promise<User | undefined> {
-...
+    return this.users.get(id);
+  }
+
+  async getUserByUsername(username: string): Promise<User | undefined> {
+    return Array.from(this.users.values()).find(u => u.username === username);
+  }
+
+  async getUserByGoogleId(googleId: string): Promise<User | undefined> {
+    return Array.from(this.users.values()).find(u => u.googleId === googleId);
+  }
+
+  async getUserByKakaoId(kakaoId: string): Promise<User | undefined> {
+    return Array.from(this.users.values()).find(u => u.kakaoId === kakaoId);
+  }
+
+  async createUser(insertUser: InsertUser): Promise<User> {
+    const id = randomUUID();
+    const user: User = {
+      id,
+      username: insertUser.username,
+      password: insertUser.password ?? null,
+      googleId: insertUser.googleId ?? null,
+      kakaoId: insertUser.kakaoId ?? null,
+      email: insertUser.email ?? null,
+      avatar: insertUser.avatar ?? null,
+    };
     this.users.set(id, user);
     return user;
   }
 
   async createScan(insertScan: InsertScan): Promise<Scan> {
     const id = randomUUID();
-    const scan: Scan = { 
-      id, 
+    const scan: Scan = {
+      id,
       userId: insertScan.userId,
       overallScore: insertScan.overallScore,
       scores: insertScan.scores,

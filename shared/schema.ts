@@ -25,7 +25,10 @@ export const scans = pgTable("scans", {
 });
 
 export const insertUserSchema = createInsertSchema(users).pick({
-...
+  username: true,
+  password: true,
+  googleId: true,
+  kakaoId: true,
   email: true,
   avatar: true,
 });
