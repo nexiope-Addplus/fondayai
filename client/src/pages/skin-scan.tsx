@@ -736,11 +736,22 @@ export default function SkinScanPage() {
       const compressedImage = await resizeImage(imageFile);
       const response = await fetch("/api/analyze-skin", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json",
+          "Accept": "application/json"
+        },
         body: JSON.stringify({ image: compressedImage, surveyData: data }),
       });
       
-      const result = await response.json();
+      const responseText = await response.text();
+      let result;
+      
+      try {
+        result = JSON.parse(responseText);
+      } catch (e) {
+        console.error("JSON Parsing Error. Response was:", responseText);
+        throw new Error(`서버가 JSON이 아닌 응답을 보냈습니다. (상태코드: ${response.status})`);
+      }
       
       if (!response.ok) {
         throw new Error(result.detail || result.message || "서버 오류");
