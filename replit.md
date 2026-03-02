@@ -32,3 +32,4 @@ A mobile-optimized SPA for AI skin scanning and beauty content curation. Users c
 \n- Last AI Activation: Mon Mar  2 07:22:14 AM UTC 2026
 \n- AI Key Rotated: Mon Mar  2 07:40:40 AM UTC 2026
 \n- AI Model Updated to 2.0 Flash Lite: Mon Mar  2 09:20:32 AM UTC 2026
+\n- Switched to OpenAI GPT-4o-mini: Mon Mar  2 09:42:50 AM UTC 2026
