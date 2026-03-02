@@ -30,3 +30,4 @@ A mobile-optimized SPA for AI skin scanning and beauty content curation. Users c
 - lucide-react for icons
 - No database or backend API required
 \n- Last AI Activation: Mon Mar  2 07:22:14 AM UTC 2026
+\n- AI Key Rotated: Mon Mar  2 07:40:40 AM UTC 2026
