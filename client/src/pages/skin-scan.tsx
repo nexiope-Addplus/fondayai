@@ -734,7 +734,11 @@ export default function SkinScanPage() {
 
     try {
       const compressedImage = await resizeImage(imageFile);
-      const response = await fetch("/api/analyze-skin", {
+      
+      // API 엔드포인트 설정 (우선 현재 도메인을 사용하되, 실패 시 상세 안내)
+      const API_URL = "/api/analyze-skin";
+      
+      const response = await fetch(API_URL, {
         method: "POST",
         headers: { 
           "Content-Type": "application/json",
@@ -744,17 +748,20 @@ export default function SkinScanPage() {
       });
       
       const responseText = await response.text();
-      let result;
       
+      if (response.status === 405) {
+        throw new Error("서버 설정 문제(405)가 발생했습니다. 백엔드가 아직 활성화되지 않았습니다. 잠시만 기다려 주세요.");
+      }
+
+      let result;
       try {
         result = JSON.parse(responseText);
       } catch (e) {
-        console.error("JSON Parsing Error. Response was:", responseText);
-        throw new Error(`서버가 JSON이 아닌 응답을 보냈습니다. (상태코드: ${response.status})`);
+        throw new Error(`JSON 파싱 실패 (상태: ${response.status}). 서버 응답이 올바르지 않습니다.`);
       }
       
       if (!response.ok) {
-        throw new Error(result.detail || result.message || "서버 오류");
+        throw new Error(result.detail || result.error || result.message || "서버 오류");
       }
 
       setAnalysisResult(result);
