@@ -30,8 +30,8 @@ export function setupAuth(app: Express) {
   app.use(passport.initialize());
   app.use(passport.session());
 
-  passport.serializeUser((user: any, done) => {
-    done(null, user.id);
+  passport.serializeUser((user, done) => {
+    passport.serializeUser((user: any, done) => done(null, user.id));
   });
 
   passport.deserializeUser(async (id: string, done) => {
