@@ -735,8 +735,8 @@ export default function SkinScanPage() {
     try {
       const compressedImage = await resizeImage(imageFile);
       
-      // API 엔드포인트 설정 (우선 현재 도메인을 사용하되, 실패 시 상세 안내)
-      const API_URL = "/api/analyze-skin";
+      // 독립형 Cloudflare Worker API 주소로 변경
+      const API_URL = "https://fonday-api.nexiope.workers.dev";
       
       const response = await fetch(API_URL, {
         method: "POST",
