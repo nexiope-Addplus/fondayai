@@ -415,7 +415,7 @@ export default function SkinScanPage() {
   }, [imageFile]);
 
   return (
-    <div className="min-h-[100dvh] bg-emerald-50/10 text-zinc-900 transition-colors dark:bg-black dark:text-zinc-100">
+    <div className="min-h-[100dvh] bg-[#FAF9F6] text-zinc-900 transition-colors dark:bg-zinc-950 dark:text-zinc-100">
       <div className="absolute top-4 right-4 z-[100]">
         <ThemeToggle />
       </div>
