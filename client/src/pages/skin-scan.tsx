@@ -707,7 +707,7 @@ export default function SkinScanPage() {
         img.src = event.target?.result as string;
         img.onload = () => {
           const canvas = document.createElement("canvas");
-          const MAX_WIDTH = 800; // 가로 최대 800px로 제한
+          const MAX_WIDTH = 600; // 800에서 600으로 더 축소
           let width = img.width;
           let height = img.height;
 
@@ -720,7 +720,7 @@ export default function SkinScanPage() {
           canvas.height = height;
           const ctx = canvas.getContext("2d");
           ctx?.drawImage(img, 0, 0, width, height);
-          resolve(canvas.toDataURL("image/jpeg", 0.7)); // 품질 70%로 압축
+          resolve(canvas.toDataURL("image/jpeg", 0.6)); // 품질 60%로 더 압축
         };
       };
     });
@@ -740,17 +740,17 @@ export default function SkinScanPage() {
         body: JSON.stringify({ image: compressedImage, surveyData: data }),
       });
       
+      const result = await response.json();
+      
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.detail || "서버 오류");
+        throw new Error(result.detail || result.message || "서버 오류");
       }
 
-      const result = await response.json();
       setAnalysisResult(result);
       setScanState("result");
     } catch (err: any) {
       console.error("분석 실패:", err);
-      alert(`분석 중 오류가 발생했습니다: ${err.message}`);
+      alert(`[분석 오류] ${err.message}`);
       setScanState("idle");
     }
   }, [imageFile]);
