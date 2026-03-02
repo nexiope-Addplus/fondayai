@@ -292,14 +292,29 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, onBack, user }: an
               </LineChart>
             </ResponsiveContainer>
           </div>
+          <div className="mt-4 pt-4 border-t border-gray-100 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              {user.avatar && <img src={user.avatar} className="w-6 h-6 rounded-full" />}
+              <span className="text-[11px] font-bold text-emerald-900">{user.username}님</span>
+            </div>
+            <button 
+              onClick={() => fetch("/api/logout", { method: "POST" }).then(() => window.location.reload())}
+              className="text-[10px] text-gray-400 underline"
+            >
+              로그아웃
+            </button>
+          </div>
         </div>
       ) : (
         <div className="rounded-3xl p-8 mb-6 border-2 border-dashed border-emerald-200 bg-emerald-50/30 text-center">
           <h3 className="font-bold text-emerald-900 mb-2">기록 저장하고 그래프로 보기</h3>
           <p className="text-xs text-gray-500 mb-6">3초 로그인으로 내 피부 히스토리를 관리하세요.</p>
-          <div className="flex gap-2">
-            <button onClick={() => window.location.href = "/auth/google"} className="flex-1 py-3 rounded-xl bg-white border border-gray-200 font-bold text-xs flex items-center justify-center gap-2 shadow-sm">
-              <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" className="w-4 h-4" /> 구글 로그인
+          <div className="flex flex-col gap-2">
+            <button onClick={() => window.location.href = "/auth/kakao"} className="w-full py-3.5 rounded-xl bg-[#FEE500] font-bold text-[13px] flex items-center justify-center gap-2 shadow-sm text-[#3C1E1E]">
+              <img src="https://developers.kakao.com/assets/img/lib/logos/kakaotalksharing/kakaotalk_sharing_btn_medium.png" className="w-5 h-5" /> 카카오로 계속하기
+            </button>
+            <button onClick={() => window.location.href = "/auth/google"} className="w-full py-3.5 rounded-xl bg-white border border-gray-200 font-bold text-[13px] flex items-center justify-center gap-2 shadow-sm text-gray-700">
+              <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" className="w-4 h-4" /> Google로 계속하기
             </button>
           </div>
         </div>
@@ -377,14 +392,6 @@ export default function SkinScanPage() {
   return (
     <div className="min-h-[100dvh] bg-emerald-50/20 text-black transition-colors">
       <div className="absolute top-4 right-4 z-[100] flex items-center gap-3">
-        {user && (
-          <div className="flex items-center gap-2 bg-white/80 backdrop-blur px-3 py-1.5 rounded-full border border-emerald-100 shadow-sm">
-            {user.avatar && (
-              <img src={user.avatar} className="w-6 h-6 rounded-full" />
-            )}
-            <span className="text-[11px] font-bold text-emerald-900">{user.username}님</span>
-          </div>
-        )}
         <ThemeToggle />
       </div>
       <div className="overflow-y-auto" style={{ minHeight: "calc(100dvh - 60px)" }}>
