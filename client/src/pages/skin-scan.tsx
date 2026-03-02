@@ -7,7 +7,7 @@ import {
   AlertCircle,
   Shield,
   Sun,
-  Instagram,
+  Share2,
   LineChart as LineChartIcon,
   ChevronLeft,
   Sparkles,
@@ -238,7 +238,7 @@ function SurveyScreen({ onSubmit, onBack }: { onSubmit: (data: SurveyData) => vo
   );
 }
 
-function ScanningScreen() {
+function ScanningScreen({ imageSrc }: { imageSrc: string | null }) {
   const [textIdx, setTextIdx] = useState(0);
   const texts = ["사진 데이터 최적화 중...", "AI 피부 고민 부위 탐색 중...", "수분 및 유분 정밀 분석 중...", "리포트 결과 요약 중..."];
 
@@ -248,10 +248,21 @@ function ScanningScreen() {
   }, []);
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-[calc(100dvh-60px)] bg-background">
+    <div className="flex flex-col items-center justify-center min-h-[calc(100dvh-60px)] bg-background px-6">
       <div className="relative w-64 h-80 rounded-3xl overflow-hidden bg-muted flex items-center justify-center shadow-inner">
-        <Camera className="w-16 h-16 opacity-10" />
+        {imageSrc ? (
+          <img src={imageSrc} className="w-full h-full object-cover" />
+        ) : (
+          <Camera className="w-16 h-16 opacity-10" />
+        )}
         <motion.div className="absolute left-0 right-0 h-1 bg-[#2D5F4F] shadow-[0_0_15px_rgba(45,95,79,0.5)]" animate={{ top: ["5%", "95%", "5%"] }} transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }} />
+        <div className="absolute inset-0 bg-black/20" />
+        <div className="absolute bottom-4 left-0 right-0 flex justify-center">
+          <div className="bg-black/50 backdrop-blur-md px-3 py-1.5 rounded-full flex items-center gap-2">
+            <div className="w-2 h-2 rounded-full bg-[#2D5F4F] animate-pulse" />
+            <span className="text-[10px] font-bold text-white uppercase tracking-wider">AI Scanning</span>
+          </div>
+        </div>
       </div>
       <div className="mt-8 text-center space-y-2">
         <AnimatePresence mode="wait">
@@ -348,12 +359,12 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, onBack, onGoMagazi
 
         {/* 이미지 + 핫스팟 */}
         <Card className="overflow-hidden border-none shadow-2xl rounded-3xl">
-          <div className="relative aspect-[3/4]">
-            <img src={imageSrc} className="w-full h-full object-cover" />
+          <div className="relative w-full h-56">
+            <img src={imageSrc} className="w-full h-full object-cover object-top" />
             {analysisResult?.hotspots?.map((dot: any, i: number) => (
               <motion.div key={i} className="absolute w-4 h-4 -ml-2 -mt-2 rounded-full border-2 border-white bg-red-500 shadow-lg" style={{ left: `${dot.x}%`, top: `${dot.y}%` }} animate={{ scale: [1, 1.3, 1] }} transition={{ repeat: Infinity, duration: 1.5, delay: i * 0.2 }} />
             ))}
-            <div className="absolute bottom-4 left-4 bg-black/40 backdrop-blur-md px-3 py-1.5 rounded-full flex items-center gap-2">
+            <div className="absolute bottom-3 left-3 bg-black/40 backdrop-blur-md px-3 py-1.5 rounded-full flex items-center gap-2">
               <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
               <span className="text-[10px] font-bold text-white uppercase tracking-wider">AI Detection Active</span>
             </div>
@@ -451,8 +462,9 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, onBack, onGoMagazi
               <CardDescription className="text-xs">3초 로그인으로 내 피부 히스토리를 관리하세요.</CardDescription>
             </CardHeader>
             <CardContent className="p-0 space-y-2">
-              <Button onClick={() => window.location.href = "/auth/kakao"} className="w-full h-12 rounded-xl bg-[#FEE500] hover:bg-[#FEE500]/90 text-[#3C1E1E] font-bold border-none">
-                <img src="https://developers.kakao.com/assets/img/lib/logos/kakaotalksharing/kakaotalk_sharing_btn_medium.png" className="w-5 h-5 mr-2" /> 카카오로 계속하기
+              <Button onClick={() => window.location.href = "/auth/kakao"} className="w-full h-12 rounded-xl bg-[#FEE500] hover:bg-[#FEE500]/90 text-[#3C1E1E] font-bold border-none gap-2">
+                <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5 shrink-0"><path d="M12 3c-4.97 0-9 3.185-9 7.115 0 2.558 1.712 4.8 4.346 6.09l-.843 3.09c-.067.247.078.47.284.47.098 0 .195-.03.273-.09l3.63-2.4c.42.06.85.094 1.31.094 4.97 0 9-3.185 9-7.115S16.97 3 12 3z"/></svg>
+                카카오로 계속하기
               </Button>
               <Button onClick={() => window.location.href = "/auth/google"} variant="outline" className="w-full h-12 rounded-xl bg-white font-bold text-zinc-700">
                 <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" className="w-4 h-4 mr-2" /> Google로 계속하기
@@ -470,9 +482,9 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, onBack, onGoMagazi
           <span className="flex items-center gap-2">Fonday 얼리버드 알림 받기 <ArrowRight className="w-5 h-5" /></span>
         </Button>
 
-        {/* 인스타 공유 */}
+        {/* 결과 공유 */}
         <Button onClick={handleShare} className="w-full h-14 rounded-2xl text-white font-bold shadow-lg hover:opacity-90 transition-opacity bg-gradient-to-r from-[#f09433] via-[#bc1888] to-[#8a3ab9]">
-          <Instagram className="w-5 h-5 mr-2" /> 인스타 인증하기
+          <Share2 className="w-5 h-5 mr-2" /> 결과 공유하기
         </Button>
       </motion.div>
 
@@ -612,7 +624,7 @@ export default function SkinScanPage() {
             <motion.div key="scan" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
               {scanState === "idle" && <ScanIdleScreen onCapture={handleCapture} />}
               {scanState === "survey" && <SurveyScreen onSubmit={handleSurveySubmit} onBack={() => setScanState("idle")} />}
-              {scanState === "scanning" && <ScanningScreen />}
+              {scanState === "scanning" && <ScanningScreen imageSrc={imageSrc} />}
               {scanState === "result" && <ResultScreen surveyData={surveyData} analysisResult={analysisResult} imageSrc={imageSrc} onBack={() => setScanState("idle")} onGoMagazine={() => setActiveTab("magazine")} user={user} />}
             </motion.div>
           )}
