@@ -416,7 +416,38 @@ function ScanningScreen({ onComplete }: { onComplete: () => void }) {
 
 function ResultScreen({ surveyData, onGoMagazine, onBack }: { surveyData: SurveyData | null; onGoMagazine: () => void; onBack: () => void }) {
   const [showWaitlist, setShowWaitlist] = useState(false);
+  const [email, setEmail] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
 
+  const handleWaitlistSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email) return;
+
+    setIsSubmitting(true);
+    try {
+      const response = await fetch("https://formspree.io/f/xgolbgye", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, surveyData }),
+      });
+      if (response.ok) {
+        setIsSuccess(true);
+        setTimeout(() => {
+          setShowWaitlist(false);
+          setIsSuccess(false);
+          setEmail("");
+        }, 2000);
+      }
+    } catch (err) {
+      console.error("신청 실패:", err);
+      alert("오류가 발생했습니다. 잠시 후 다시 시도해 주세요.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // ... (기존 scores, baumannType, handleShare 로직 유지)
   const scores = [
     { label: "종합 컨디션", score: 68, color: "#D4836B", icon: Sparkles },
     { label: "수분 밸런스", score: surveyData?.concerns.includes("건조함") ? 35 : 58, color: "#3B82C4", icon: Droplets },
@@ -504,7 +535,6 @@ function ResultScreen({ surveyData, onGoMagazine, onBack }: { surveyData: Survey
           </div>
         </div>
 
-        {/* 인스타그램 공유 버튼 추가 */}
         <motion.button
           onClick={handleShare}
           className="w-full py-3.5 rounded-2xl flex items-center justify-center gap-2.5 text-white mb-6 shadow-md"
@@ -693,32 +723,55 @@ function ResultScreen({ surveyData, onGoMagazine, onBack }: { surveyData: Survey
               >
                 <Heart className="w-7 h-7 text-white" />
               </div>
-              <h3 className="text-center font-extrabold text-lg mb-2" style={{ color: DEEP_GREEN }}>
-                얼리버드 등록
-              </h3>
-              <p className="text-center text-sm leading-relaxed mb-6" style={{ color: TEXT_SECONDARY }}>
-                Fonday 정밀 스캐너 출시 시<br />특별한 얼리버드 혜택을 드립니다!
-              </p>
-              <motion.button
-                onClick={() => setShowWaitlist(false)}
-                className="w-full py-4 rounded-2xl font-bold text-[15px] text-white mb-3"
-                style={{
-                  background: `linear-gradient(135deg, ${DEEP_GREEN}, ${DEEP_GREEN_LIGHT})`,
-                  boxShadow: "0 8px 24px rgba(45,95,79,0.25)",
-                }}
-                whileTap={{ scale: 0.98 }}
-                data-testid="button-register-waitlist"
-              >
-                등록할게요!
-              </motion.button>
-              <button
-                onClick={() => setShowWaitlist(false)}
-                className="w-full text-sm font-semibold py-2"
-                style={{ color: "#A09080" }}
-                data-testid="button-close-modal"
-              >
-                다음에 할게요
-              </button>
+              
+              {isSuccess ? (
+                <div className="py-10 text-center">
+                  <Sparkles className="w-12 h-12 mx-auto mb-4 text-amber-500" />
+                  <h3 className="font-bold text-lg" style={{ color: DEEP_GREEN }}>등록이 완료되었습니다!</h3>
+                  <p className="text-sm mt-2 text-gray-500">출시 소식을 가장 먼저 알려드릴게요.</p>
+                </div>
+              ) : (
+                <>
+                  <h3 className="text-center font-extrabold text-lg mb-2" style={{ color: DEEP_GREEN }}>
+                    얼리버드 등록
+                  </h3>
+                  <p className="text-center text-sm leading-relaxed mb-6" style={{ color: TEXT_SECONDARY }}>
+                    Fonday 정밀 스캐너 출시 시<br />특별한 얼리버드 혜택을 드립니다!
+                  </p>
+                  
+                  <form onSubmit={handleWaitlistSubmit} className="space-y-4">
+                    <input
+                      type="email"
+                      required
+                      placeholder="이메일 주소를 입력해 주세요"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      className="w-full px-4 py-3.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2"
+                      style={{ "--tw-ring-color": DEEP_GREEN_LIGHT } as any}
+                    />
+                    <motion.button
+                      disabled={isSubmitting}
+                      type="submit"
+                      className="w-full py-4 rounded-2xl font-bold text-[15px] text-white flex items-center justify-center"
+                      style={{
+                        background: `linear-gradient(135deg, ${DEEP_GREEN}, ${DEEP_GREEN_LIGHT})`,
+                        boxShadow: "0 8px 24px rgba(45,95,79,0.25)",
+                        opacity: isSubmitting ? 0.7 : 1,
+                      }}
+                      whileTap={{ scale: 0.98 }}
+                    >
+                      {isSubmitting ? "등록 중..." : "등록할게요!"}
+                    </motion.button>
+                  </form>
+                  <button
+                    onClick={() => setShowWaitlist(false)}
+                    className="w-full text-sm font-semibold py-4 mt-2"
+                    style={{ color: "#A09080" }}
+                  >
+                    다음에 할게요
+                  </button>
+                </>
+              )}
             </motion.div>
           </motion.div>
         )}
