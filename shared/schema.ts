@@ -13,14 +13,26 @@ export const users = pgTable("users", {
   avatar: text("avatar"),
 });
 
+export const scans = pgTable("scans", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull(),
+  overallScore: text("overall_score").notNull(),
+  scores: text("scores").notNull(), // JSON string
+  hotspots: text("hotspots").notNull(), // JSON string
+  aiComment: text("ai_comment"),
+  imageSrc: text("image_src"),
+  createdAt: text("created_at").default(sql`CURRENT_TIMESTAMP`),
+});
+
 export const insertUserSchema = createInsertSchema(users).pick({
-  username: true,
-  password: true,
-  googleId: true,
-  kakaoId: true,
+...
   email: true,
   avatar: true,
 });
 
+export const insertScanSchema = createInsertSchema(scans);
+
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
+export type Scan = typeof scans.$inferSelect;
+export type InsertScan = z.infer<typeof insertScanSchema>;

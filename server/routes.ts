@@ -20,7 +20,6 @@ export async function registerRoutes(
       const genAI = new GoogleGenerativeAI(apiKey);
       const model = genAI.getGenerativeModel({ 
         model: "gemini-1.5-flash",
-        // 안전 설정 추가: 피부 사진 차단 방지
         safetySettings: [
           { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_NONE },
           { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_NONE },
@@ -42,7 +41,6 @@ export async function registerRoutes(
       const response = await result.response;
       const text = response.text();
       
-      // JSON만 추출
       const jsonStr = text.substring(text.indexOf("{"), text.lastIndexOf("}") + 1);
       const analysisData = JSON.parse(jsonStr);
       
@@ -53,6 +51,34 @@ export async function registerRoutes(
         message: "AI 분석 실패", 
         detail: error.message.includes("Safety") ? "이미지가 차단되었습니다. 다른 사진으로 시도해 주세요." : error.message 
       });
+    }
+  });
+
+  app.post("/api/scans", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send("로그인이 필요합니다.");
+    try {
+      const { overallScore, scores, hotspots, aiComment, imageSrc } = req.body;
+      const scan = await storage.createScan({
+        userId: (req.user as any).id,
+        overallScore: overallScore.toString(),
+        scores: JSON.stringify(scores),
+        hotspots: JSON.stringify(hotspots),
+        aiComment,
+        imageSrc
+      });
+      res.json(scan);
+    } catch (error: any) {
+      res.status(500).json({ message: "기록 저장 실패", error: error.message });
+    }
+  });
+
+  app.get("/api/scans", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send("로그인이 필요합니다.");
+    try {
+      const scans = await storage.getScansByUserId((req.user as any).id);
+      res.json(scans);
+    } catch (error: any) {
+      res.status(500).json({ message: "기록 조회 실패", error: error.message });
     }
   });
 
