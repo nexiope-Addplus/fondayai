@@ -691,6 +691,14 @@ export default function SkinScanPage() {
   const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imageSrc, setImageSrc] = useState<string | null>(null);
+  const [user, setUser] = useState<any>(null);
+
+  useEffect(() => {
+    fetch("/api/user")
+      .then((res) => res.ok ? res.json() : null)
+      .then((data) => setUser(data))
+      .catch(() => setUser(null));
+  }, []);
 
   const handleCapture = useCallback((file: File) => {
     setImageFile(file);
@@ -707,7 +715,7 @@ export default function SkinScanPage() {
         img.src = event.target?.result as string;
         img.onload = () => {
           const canvas = document.createElement("canvas");
-          const MAX_WIDTH = 600; // 800에서 600으로 더 축소
+          const MAX_WIDTH = 600; 
           let width = img.width;
           let height = img.height;
 
@@ -720,7 +728,7 @@ export default function SkinScanPage() {
           canvas.height = height;
           const ctx = canvas.getContext("2d");
           ctx?.drawImage(img, 0, 0, width, height);
-          resolve(canvas.toDataURL("image/jpeg", 0.6)); // 품질 60%로 더 압축
+          resolve(canvas.toDataURL("image/jpeg", 0.6)); 
         };
       };
     });
@@ -735,7 +743,6 @@ export default function SkinScanPage() {
     try {
       const compressedImage = await resizeImage(imageFile);
       
-      // 독립형 Cloudflare Worker API 주소로 변경
       const API_URL = "https://fonday-api.nexiope.workers.dev";
       
       const response = await fetch(API_URL, {
@@ -775,7 +782,24 @@ export default function SkinScanPage() {
 
   return (
     <div className="min-h-[100dvh] bg-background text-foreground transition-colors">
-      <div className="absolute top-4 right-4 z-[100]"><ThemeToggle /></div>
+      <div className="absolute top-4 right-4 z-[100] flex items-center gap-3">
+        {user ? (
+          <div className="flex items-center gap-2 bg-white/80 backdrop-blur px-3 py-1.5 rounded-full border border-emerald-100 shadow-sm">
+            {user.avatar && (
+              <img src={user.avatar} className="w-6 h-6 rounded-full border border-emerald-50" />
+            )}
+            <span className="text-[11px] font-bold text-emerald-900">{user.username}님</span>
+          </div>
+        ) : (
+          <button
+            onClick={() => (window.location.href = "/auth/google")}
+            className="bg-white/90 backdrop-blur px-4 py-2 rounded-full border border-emerald-100 shadow-sm text-[11px] font-bold text-emerald-900 hover:bg-emerald-50 transition-colors flex items-center gap-2"
+          >
+            <Lock className="w-3.5 h-3.5" /> 구글 로그인
+          </button>
+        )}
+        <ThemeToggle />
+      </div>
       <div className="overflow-y-auto" style={{ minHeight: "calc(100dvh - 60px)" }}>
         <AnimatePresence mode="wait">
           {activeTab === "scan" && (
