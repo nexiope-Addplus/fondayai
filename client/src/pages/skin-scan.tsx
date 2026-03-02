@@ -368,7 +368,7 @@ function SurveyScreen({ onSubmit, onBack }: { onSubmit: (data: SurveyData) => vo
 
 function ScanningScreen() {
   const [textIdx, setTextIdx] = useState(0);
-  const texts = ["사진 데이터 보정 중...", "AI 피부 질감 분석 중...", "수분 및 유분 밸런스 측정 중...", "정밀 분석 리포트 생성 중..."];
+  const texts = ["사진 데이터 최적화 중...", "AI 피부 고민 부위 탐색 중...", "수분 및 유분 정밀 분석 중...", "리포트 결과 요약 중..."];
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -511,7 +511,7 @@ function ResultScreen({
   return (
     <motion.div className="px-5 pt-6 pb-24" variants={stagger} initial="initial" animate="animate">
       <motion.div variants={fadeChild} className="mb-5 flex items-start justify-between">
-        <motion.button onClick={onBack} className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border bg-background/50 backdrop-blur-sm" style={{ borderColor: DEEP_GREEN + "20" }}>
+        <motion.button onClick={onBack} className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border bg-background/50 backdrop-blur-sm shadow-sm" style={{ borderColor: DEEP_GREEN + "20" }}>
           <Camera className="w-4 h-4" style={{ color: DEEP_GREEN }} />
           <span className="text-[11px] font-bold" style={{ color: DEEP_GREEN }}>다시 촬영</span>
         </motion.button>
@@ -521,12 +521,10 @@ function ResultScreen({
         </div>
       </motion.div>
 
-      {/* 촬영 이미지 & AI 붉은 점 표시 섹션 */}
-      <motion.div variants={fadeChild} className="relative w-full aspect-[3/4] rounded-3xl overflow-hidden mb-6 shadow-2xl border-4 border-white">
-        {imageSrc && (
+      <motion.div variants={fadeChild} className="relative w-full aspect-[3/4] rounded-3xl overflow-hidden mb-6 shadow-2xl border-4 border-white bg-gray-100">
+        {imageSrc ? (
           <>
             <img src={imageSrc} className="w-full h-full object-cover" alt="My Skin" />
-            {/* AI가 찾은 붉은 점 오버레이 */}
             {analysisResult?.hotspots?.map((dot, i) => (
               <motion.div
                 key={i}
@@ -548,6 +546,8 @@ function ResultScreen({
               <span className="text-[10px] font-bold text-white uppercase tracking-wider">AI Detection Active</span>
             </div>
           </>
+        ) : (
+          <div className="w-full h-full flex items-center justify-center text-gray-400">이미지를 불러올 수 없습니다.</div>
         )}
       </motion.div>
 
@@ -595,8 +595,8 @@ function ResultScreen({
         </div>
         
         {analysisResult?.aiComment && (
-          <div className="mt-6 p-4 rounded-xl bg-emerald-50/50 border border-emerald-100/50">
-            <p className="text-[12px] leading-relaxed text-emerald-900 font-medium italic">" {analysisResult.aiComment} "</p>
+          <div className="mt-6 p-4 rounded-xl bg-emerald-50/50 border border-emerald-100/50 shadow-inner">
+            <p className="text-[13px] leading-relaxed text-emerald-900 font-medium">" {analysisResult.aiComment} "</p>
           </div>
         )}
       </motion.div>
@@ -698,31 +698,61 @@ export default function SkinScanPage() {
     setScanState("survey");
   }, []);
 
+  const resizeImage = (file: File): Promise<string> => {
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = (event) => {
+        const img = new Image();
+        img.src = event.target?.result as string;
+        img.onload = () => {
+          const canvas = document.createElement("canvas");
+          const MAX_WIDTH = 800; // 가로 최대 800px로 제한
+          let width = img.width;
+          let height = img.height;
+
+          if (width > MAX_WIDTH) {
+            height *= MAX_WIDTH / width;
+            width = MAX_WIDTH;
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext("2d");
+          ctx?.drawImage(img, 0, 0, width, height);
+          resolve(canvas.toDataURL("image/jpeg", 0.7)); // 품질 70%로 압축
+        };
+      };
+    });
+  };
+
   const handleSurveySubmit = useCallback(async (data: SurveyData) => {
     setSurveyData(data);
     setScanState("scanning");
 
     if (!imageFile) return;
 
-    const reader = new FileReader();
-    reader.readAsDataURL(imageFile);
-    reader.onload = async () => {
-      const base64Image = reader.result as string;
-      try {
-        const response = await fetch("/api/analyze-skin", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ image: base64Image, surveyData: data }),
-        });
-        const result = await response.json();
-        setAnalysisResult(result);
-        setScanState("result");
-      } catch (err) {
-        console.error("분석 실패:", err);
-        alert("분석 중 오류가 발생했습니다.");
-        setScanState("idle");
+    try {
+      const compressedImage = await resizeImage(imageFile);
+      const response = await fetch("/api/analyze-skin", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ image: compressedImage, surveyData: data }),
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.detail || "서버 오류");
       }
-    };
+
+      const result = await response.json();
+      setAnalysisResult(result);
+      setScanState("result");
+    } catch (err: any) {
+      console.error("분석 실패:", err);
+      alert(`분석 중 오류가 발생했습니다: ${err.message}`);
+      setScanState("idle");
+    }
   }, [imageFile]);
 
   return (
