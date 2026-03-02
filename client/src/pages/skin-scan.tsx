@@ -25,7 +25,13 @@ import {
 import { ThemeToggle } from "@/components/ThemeToggle";
 
 type TabId = "scan" | "magazine";
-type ScanState = "idle" | "scanning" | "result";
+type ScanState = "idle" | "survey" | "scanning" | "result";
+
+interface SurveyData {
+  gender: string;
+  age: string;
+  skinType: string;
+}
 
 const DEEP_GREEN = "#2D5F4F";
 const DEEP_GREEN_LIGHT = "#3D7A66";
