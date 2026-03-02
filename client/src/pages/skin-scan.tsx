@@ -1,28 +1,12 @@
-import { useState, useRef, useCallback, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useState, useRef, useCallback } from "react";
 import {
   Camera,
   BookOpen,
-  Lock,
-  Sparkles,
-  ArrowRight,
-  Heart,
-  Clock,
-  ChevronRight,
-  ScanLine,
-  Droplets,
   Sun,
   Shield,
-  Leaf,
   AlertCircle,
-  Grid,
-  Activity,
-  Target,
-  Flame,
-  Eye,
-  Zap,
+  ScanLine,
   Instagram,
-  Share2,
 } from "lucide-react";
 import { ThemeToggle } from "@/components/ThemeToggle";
 
@@ -51,18 +35,7 @@ interface AnalysisResult {
 
 const DEEP_GREEN = "#2D5F4F";
 const DEEP_GREEN_LIGHT = "#3D7A66";
-const BEIGE = "#F5F0EB";
-const BEIGE_DARK = "#E8E0D8";
 const TEXT_SECONDARY = "#8C8070";
-
-const fadeChild = {
-  initial: { opacity: 0, y: 14 },
-  animate: { opacity: 1, y: 0, transition: { duration: 0.45, ease: [0.22, 1, 0.36, 1] } },
-};
-
-const stagger = {
-  animate: { transition: { staggerChildren: 0.08, delayChildren: 0.06 } },
-};
 
 const articles = [
   {
@@ -108,7 +81,7 @@ function BottomNav({ active, onChange }: { active: TabId; onChange: (t: TabId) =
           return (
             <button key={tab.id} onClick={() => onChange(tab.id)} className="flex flex-col items-center gap-1 flex-1 py-1.5 relative">
               {active_ && (
-                <motion.div className="absolute -top-[1px] left-1/2 -translate-x-1/2 w-8 h-[3px] rounded-full" style={{ background: DEEP_GREEN }} layoutId="nav-indicator" />
+                <div className="absolute -top-[1px] left-1/2 -translate-x-1/2 w-8 h-[3px] rounded-full" style={{ background: DEEP_GREEN }} />
               )}
               <Icon className="w-5 h-5 transition-colors" style={{ color: active_ ? DEEP_GREEN : "#B0B0B0" }} />
               <span className="text-[10px] font-semibold transition-colors" style={{ color: active_ ? DEEP_GREEN : "#B0B0B0" }}>{tab.label}</span>
@@ -127,21 +100,21 @@ function ScanIdleScreen({ onCapture }: { onCapture: (file: File) => void }) {
     if (file) onCapture(file);
   };
   return (
-    <motion.div className="flex flex-col items-center justify-center px-6 text-center" style={{ minHeight: "calc(100dvh - 60px)" }} variants={stagger} initial="initial" animate="animate">
-      <motion.div variants={fadeChild} className="mb-4">
+    <div className="flex flex-col items-center justify-center px-6 text-center" style={{ minHeight: "calc(100dvh - 60px)" }}>
+      <div className="mb-4">
         <span className="text-[10px] font-bold tracking-[0.18em] uppercase" style={{ color: DEEP_GREEN_LIGHT }}>AI Skin Scanner</span>
-      </motion.div>
-      <motion.div variants={fadeChild} className="mb-10">
+      </div>
+      <div className="mb-10">
         <p className="text-[15px] font-medium leading-relaxed" style={{ color: TEXT_SECONDARY }}>지금 내 피부 상태,<br />AI가 <span className="font-bold" style={{ color: DEEP_GREEN }}>3초</span>만에 알려줄게요.</p>
-      </motion.div>
-      <motion.div variants={fadeChild}>
-        <motion.button onClick={() => fileRef.current?.click()} className="relative w-52 h-52 rounded-full flex flex-col items-center justify-center gap-3 text-white" style={{ background: `radial-gradient(circle at 35% 35%, ${DEEP_GREEN_LIGHT}, ${DEEP_GREEN})`, boxShadow: `0 20px 60px rgba(45,95,79,0.35)` }} whileTap={{ scale: 0.95 }}>
+      </div>
+      <div>
+        <button onClick={() => fileRef.current?.click()} className="relative w-52 h-52 rounded-full flex flex-col items-center justify-center gap-3 text-white transition-transform active:scale-95" style={{ background: `radial-gradient(circle at 35% 35%, ${DEEP_GREEN_LIGHT}, ${DEEP_GREEN})`, boxShadow: `0 20px 60px rgba(45,95,79,0.35)` }}>
           <ScanLine className="w-12 h-12" />
           <span className="text-[13px] font-bold leading-snug px-6">내 피부 상태<br />AI로 3초 스캔하기</span>
-        </motion.button>
+        </button>
         <input ref={fileRef} type="file" accept="image/*" capture="user" className="hidden" onChange={handleChange} />
-      </motion.div>
-    </motion.div>
+      </div>
+    </div>
   );
 }
 
@@ -154,11 +127,11 @@ function SurveyScreen({ onSubmit, onBack }: { onSubmit: (data: SurveyData) => vo
   const toggleConcern = (concern: string) => { setConcerns(prev => prev.includes(concern) ? prev.filter(c => c !== concern) : [...prev, concern]); };
 
   return (
-    <motion.div className="px-6 py-8 flex flex-col gap-8 min-h-[calc(100dvh-60px)]" variants={stagger} initial="initial" animate="animate">
-      <motion.div variants={fadeChild}>
+    <div className="px-6 py-8 flex flex-col gap-8 min-h-[calc(100dvh-60px)]">
+      <div>
         <h2 className="text-xl font-extrabold" style={{ color: DEEP_GREEN }}>피부 분석 기초 정보</h2>
         <p className="text-[13px]" style={{ color: TEXT_SECONDARY }}>정확한 분석을 위해 현재 상태를 선택해 주세요.</p>
-      </motion.div>
+      </div>
       <div className="space-y-7 pb-10 overflow-y-auto">
         <div className="flex flex-col gap-3">
           <label className="text-[12px] font-bold" style={{ color: DEEP_GREEN_LIGHT }}>성별</label>
@@ -185,11 +158,11 @@ function SurveyScreen({ onSubmit, onBack }: { onSubmit: (data: SurveyData) => vo
           </div>
         </div>
       </div>
-      <motion.div variants={fadeChild} className="mt-auto pt-6 flex gap-3 sticky bottom-4">
+      <div className="mt-auto pt-6 flex gap-3 sticky bottom-4">
         <button onClick={onBack} className="flex-1 py-4 rounded-2xl font-bold bg-gray-100 text-gray-500">이전</button>
         <button onClick={() => onSubmit({ gender, age, skinType: "복합성", concerns, condition: "맨얼굴" })} className="flex-[2.5] py-4 rounded-2xl font-bold text-white shadow-xl" style={{ background: `linear-gradient(135deg, ${DEEP_GREEN_LIGHT}, ${DEEP_GREEN})` }}>AI 분석 시작</button>
-      </motion.div>
-    </motion.div>
+      </div>
+    </div>
   );
 }
 
@@ -198,14 +171,14 @@ function ScanningScreen() {
     <div className="flex flex-col items-center justify-center min-h-[calc(100dvh-60px)] bg-black text-white">
       <div className="relative w-64 h-80 rounded-3xl overflow-hidden bg-gray-900 flex items-center justify-center">
         <Camera className="w-16 h-16 opacity-20" />
-        <motion.div className="absolute left-0 right-0 h-[2px] bg-emerald-400" animate={{ top: ["5%", "95%", "5%"] }} transition={{ duration: 2, repeat: Infinity }} />
+        <div className="absolute left-0 right-0 h-[2px] bg-emerald-400 animate-pulse" style={{ top: "50%" }} />
       </div>
       <p className="mt-8 font-bold">AI 분석 중...</p>
     </div>
   );
 }
 
-function ResultScreen({ surveyData, analysisResult, imageSrc, onBack, onGoMagazine }: any) {
+function ResultScreen({ surveyData, analysisResult, imageSrc, onBack }: any) {
   const [showWaitlist, setShowWaitlist] = useState(false);
   const [email, setEmail] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -235,7 +208,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, onBack, onGoMagazi
   const overallScore = scores.find((s: any) => s.label === "종합 컨디션")?.score || 0;
 
   return (
-    <motion.div className="px-5 pt-6 pb-24" variants={stagger} initial="initial" animate="animate">
+    <div className="px-5 pt-6 pb-24">
       <div className="flex justify-between items-center mb-6">
         <button onClick={onBack} className="px-4 py-2 rounded-full border text-[12px] font-bold border-emerald-100 bg-white shadow-sm flex items-center gap-1.5"><Camera className="w-3.5 h-3.5" /> 다시 촬영</button>
         <h2 className="text-xl font-extrabold text-emerald-900">피부 리포트</h2>
@@ -244,7 +217,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, onBack, onGoMagazi
       <div className="relative w-full aspect-[3/4] rounded-3xl overflow-hidden mb-6 shadow-2xl border-4 border-white">
         <img src={imageSrc} className="w-full h-full object-cover" />
         {analysisResult?.hotspots?.map((dot: any, i: number) => (
-          <motion.div key={i} className="absolute w-4 h-4 -ml-2 -mt-2 rounded-full border-2 border-white bg-red-500" style={{ left: `${dot.x}%`, top: `${dot.y}%` }} animate={{ scale: [1, 1.3, 1] }} transition={{ repeat: Infinity, duration: 1.5, delay: i * 0.2 }} />
+          <div key={i} className="absolute w-4 h-4 -ml-2 -mt-2 rounded-full border-2 border-white bg-red-500" style={{ left: `${dot.x}%`, top: `${dot.y}%` }} />
         ))}
       </div>
 
@@ -258,7 +231,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, onBack, onGoMagazi
           {scores.map((item: any) => (
             <div key={item.label} className="space-y-1.5">
               <div className="flex justify-between text-[13px] font-bold"><span>{item.label}</span><span>{item.score}점</span></div>
-              <div className="h-1.5 rounded-full bg-emerald-50 overflow-hidden"><motion.div className="h-full bg-emerald-500" initial={{ width: 0 }} animate={{ width: `${item.score}%` }} transition={{ duration: 1 }} /></div>
+              <div className="h-1.5 rounded-full bg-emerald-50 overflow-hidden"><div className="h-full bg-emerald-500" style={{ width: `${item.score}%` }} /></div>
             </div>
           ))}
         </div>
@@ -267,30 +240,28 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, onBack, onGoMagazi
 
       <button onClick={() => setShowWaitlist(true)} className="w-full py-4 rounded-2xl text-[15px] font-bold text-white shadow-lg" style={{ background: `linear-gradient(135deg, #D4836B, #C06A55)` }}>얼리버드 알림 받기</button>
 
-      <AnimatePresence>
-        {showWaitlist && (
-          <motion.div className="fixed inset-0 z-[100] flex items-end justify-center" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setShowWaitlist(false)}>
-            <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" />
-            <motion.div className="relative bg-white rounded-t-3xl p-8 w-full max-w-sm shadow-xl" initial={{ y: 100 }} animate={{ y: 0 }} exit={{ y: 100 }} onClick={(e) => e.stopPropagation()}>
-              <div className="w-10 h-1 rounded-full bg-gray-200 mx-auto mb-6" />
-              <h3 className="text-center font-extrabold text-lg mb-6">얼리버드 등록</h3>
-              {isSuccess ? <div className="py-10 text-center font-bold text-emerald-600">등록 완료!</div> : (
-                <form onSubmit={handleWaitlistSubmit} className="space-y-4">
-                  <input type="email" required placeholder="이메일 입력" value={email} onChange={(e) => setEmail(e.target.value)} className="w-full px-4 py-3.5 rounded-xl border border-gray-200" />
-                  <button disabled={isSubmitting} type="submit" className="w-full py-4 rounded-2xl font-bold text-white bg-emerald-600">{isSubmitting ? "등록 중..." : "등록하기"}</button>
-                </form>
-              )}
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </motion.div>
+      {showWaitlist && (
+        <div className="fixed inset-0 z-[100] flex items-end justify-center" onClick={() => setShowWaitlist(false)}>
+          <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" />
+          <div className="relative bg-white rounded-t-3xl p-8 w-full max-w-sm shadow-xl" onClick={(e) => e.stopPropagation()}>
+            <div className="w-10 h-1 rounded-full bg-gray-200 mx-auto mb-6" />
+            <h3 className="text-center font-extrabold text-lg mb-6">얼리버드 등록</h3>
+            {isSuccess ? <div className="py-10 text-center font-bold text-emerald-600">등록 완료!</div> : (
+              <form onSubmit={handleWaitlistSubmit} className="space-y-4">
+                <input type="email" required placeholder="이메일 입력" value={email} onChange={(e) => setEmail(e.target.value)} className="w-full px-4 py-3.5 rounded-xl border border-gray-200" />
+                <button disabled={isSubmitting} type="submit" className="w-full py-4 rounded-2xl font-bold text-white bg-emerald-600">{isSubmitting ? "등록 중..." : "등록하기"}</button>
+              </form>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
   );
 }
 
 function MagazineTab() {
   return (
-    <motion.div className="px-5 pt-6 pb-24" variants={stagger} initial="initial" animate="animate">
+    <div className="px-5 pt-6 pb-24">
       <h1 className="text-xl font-extrabold text-emerald-900 mb-6">뷰티 인사이트</h1>
       <div className="space-y-4">
         {articles.map((article) => {
@@ -303,7 +274,7 @@ function MagazineTab() {
           );
         })}
       </div>
-    </motion.div>
+    </div>
   );
 }
 
