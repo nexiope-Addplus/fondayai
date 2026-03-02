@@ -315,16 +315,21 @@ export default function SkinScanPage() {
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imageSrc, setImageSrc] = useState<string | null>(null);
 
-  const handleCapture = useCallback((file: File) => { setImageFile(file); setImageSrc(URL.createObjectURL(file)); setScanState("survey"); }, []);
+  const handleCapture = useCallback((file: File) => { 
+    setImageFile(file); 
+    setImageSrc(URL.createObjectURL(file)); 
+    setScanState("survey"); 
+  }, []);
 
   const handleSurveySubmit = useCallback(async (data: SurveyData) => {
-    setSurveyData(data); setScanState("scanning");
+    setSurveyData(data); 
+    setScanState("scanning");
     if (!imageFile) return;
     const reader = new FileReader();
     reader.readAsDataURL(imageFile);
     reader.onload = async () => {
       try {
-        const response = await fetch("https://fonday-api.nexiope.workers.dev", {
+        const response = await fetch("/api/analyze-skin", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ image: reader.result, surveyData: data }),
@@ -336,21 +341,21 @@ export default function SkinScanPage() {
   }, [imageFile]);
 
   return (
-    <div className="min-h-[100dvh] bg-emerald-50/20 text-black">
+    <div className="min-h-screen bg-emerald-50/20 text-black pb-20">
       <div className="absolute top-4 right-4 z-[100]"><ThemeToggle /></div>
-      <div className="overflow-y-auto" style={{ minHeight: "calc(100dvh - 60px)" }}>
-        <AnimatePresence mode="wait">
-          {activeTab === "scan" && (
-            <motion.div key="scan" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-              {scanState === "idle" && <ScanIdleScreen onCapture={handleCapture} />}
-              {scanState === "survey" && <SurveyScreen onSubmit={handleSurveySubmit} onBack={() => setScanState("idle")} />}
-              {scanState === "scanning" && <ScanningScreen />}
-              {scanState === "result" && <ResultScreen surveyData={surveyData} analysisResult={analysisResult} imageSrc={imageSrc} onBack={() => setScanState("idle")} />}
-            </motion.div>
-          )}
-          {activeTab === "magazine" && <MagazineTab />}
-        </AnimatePresence>
+      
+      <div className="w-full max-w-md mx-auto min-h-screen pt-4">
+        {activeTab === "scan" && (
+          <div key="scan">
+            {scanState === "idle" && <ScanIdleScreen onCapture={handleCapture} />}
+            {scanState === "survey" && <SurveyScreen onSubmit={handleSurveySubmit} onBack={() => setScanState("idle")} />}
+            {scanState === "scanning" && <ScanningScreen />}
+            {scanState === "result" && <ResultScreen surveyData={surveyData} analysisResult={analysisResult} imageSrc={imageSrc} onBack={() => setScanState("idle")} />}
+          </div>
+        )}
+        {activeTab === "magazine" && <MagazineTab />}
       </div>
+      
       <BottomNav active={activeTab} onChange={setActiveTab} />
     </div>
   );

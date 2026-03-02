@@ -8,9 +8,11 @@ import SkinScanPage from "@/pages/skin-scan";
 
 function Router() {
   return (
-    <Switch>
-      <Route path="/" component={SkinScanPage} />
-    </Switch>
+    <div className="min-h-screen bg-background">
+      <Switch>
+        <Route path="/" component={SkinScanPage} />
+      </Switch>
+    </div>
   );
 }
 
