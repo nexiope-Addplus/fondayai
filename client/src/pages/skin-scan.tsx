@@ -634,7 +634,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, onBack, onGoMagazi
               </div>
             </div>
             {/* 피부 추정 나이 */}
-            {analysisResult?.skinAge && (
+            {analysisResult?.skinAge != null && analysisResult.skinAge > 0 && (
               <div className="flex items-center gap-3 px-1 py-3 border-t border-stone-100">
                 <div className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0"
                   style={{ background: `linear-gradient(135deg, #A78BFA, #7C3AED)` }}>
@@ -651,13 +651,6 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, onBack, onGoMagazi
                     )}
                   </p>
                 </div>
-              </div>
-            )}
-            {/* AI 총평 */}
-            {analysisResult?.aiComment && (
-              <div className="p-4 rounded-2xl text-[13px] leading-relaxed italic text-stone-600"
-                style={{ background: "#FDF1EE", border: "1px solid #F5D5CC" }}>
-                " {analysisResult.aiComment} "
               </div>
             )}
           </CardContent>
@@ -895,6 +888,14 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, onBack, onGoMagazi
               </div>
               <ScrollArea className="max-h-[65vh]">
                 <div className="px-6 pb-8 space-y-3">
+                  {/* 피부 전문가 총평 */}
+                  {analysisResult?.aiComment && (
+                    <div className="p-4 rounded-2xl text-[13px] leading-relaxed text-stone-600"
+                      style={{ background: "#FDF1EE", border: "1px solid #F5D5CC" }}>
+                      <p className="text-[11px] font-bold mb-1.5" style={{ color: SCAN_TO }}>피부 전문가 총평</p>
+                      <p className="italic">" {analysisResult.aiComment} "</p>
+                    </div>
+                  )}
                   {/* 3단계 개선 방안 */}
                   {(analysisResult?.improvements ?? []).slice(0, 3).map((item: { title: string; desc: string }, i: number) => (
                     <motion.div key={i}
