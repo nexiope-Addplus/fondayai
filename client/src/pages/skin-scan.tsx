@@ -54,6 +54,8 @@ interface AnalysisResult {
   scores: { label: string; score: number }[];
   hotspots: Hotspot[];
   aiComment: string;
+  skinAge?: number;
+  skinReport?: { area: string; finding: string }[];
   improvements: { title: string; desc: string }[];
   cosmetics: { type: string; key: string; reason: string }[];
 }
@@ -631,12 +633,67 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, onBack, onGoMagazi
                 </div>
               </div>
             </div>
+            {/* 피부 추정 나이 */}
+            {analysisResult?.skinAge && (
+              <div className="flex items-center gap-3 px-1 py-3 border-t border-stone-100">
+                <div className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0"
+                  style={{ background: `linear-gradient(135deg, #A78BFA, #7C3AED)` }}>
+                  <Eye className="w-4 h-4 text-white" />
+                </div>
+                <div>
+                  <p className="text-[11px] text-stone-400">AI 분석 추정 피부나이</p>
+                  <p className="font-black text-[15px]">
+                    <span style={{ color: "#7C3AED" }}>{analysisResult.skinAge}세</span>
+                    {surveyData?.age && (
+                      <span className="text-[12px] font-medium text-stone-400 ml-1.5">
+                        (실제 {surveyData.age}세 기준)
+                      </span>
+                    )}
+                  </p>
+                </div>
+              </div>
+            )}
+            {/* AI 총평 */}
             {analysisResult?.aiComment && (
               <div className="p-4 rounded-2xl text-[13px] leading-relaxed italic text-stone-600"
                 style={{ background: "#FDF1EE", border: "1px solid #F5D5CC" }}>
                 " {analysisResult.aiComment} "
               </div>
             )}
+          </CardContent>
+        </Card>
+
+        {/* 10가지 점수 */}
+        <Card className="border-none shadow-md rounded-3xl bg-white">
+          <CardHeader className="pb-1 pt-5 px-5">
+            <p className="text-[13px] font-black" style={{ color: DEEP_GREEN }}>10가지 항목별 점수</p>
+          </CardHeader>
+          <CardContent className="px-5 pb-5 space-y-4">
+            {scores.map((item: any, i: number) => {
+              const Icon = SCORE_ICONS[i] || Zap;
+              const color = SCORE_COLORS[i] || DEEP_GREEN;
+              return (
+                <div key={i} className="space-y-1.5">
+                  <div className="flex items-center justify-between text-[13px] font-bold">
+                    <div className="flex items-center gap-2">
+                      <div className="w-6 h-6 rounded-full flex items-center justify-center bg-stone-50 shadow-sm">
+                        <Icon className="w-3.5 h-3.5" style={{ color }} />
+                      </div>
+                      <span className="text-stone-700">{item.label}</span>
+                    </div>
+                    <motion.span style={{ color }} initial={{ scale: 0 }} animate={{ scale: 1 }}
+                      transition={{ delay: 0.3 + i * 0.08, type: "spring" }}>
+                      {item.score}점
+                    </motion.span>
+                  </div>
+                  <div className="h-1.5 rounded-full overflow-hidden bg-stone-100">
+                    <motion.div className="h-full rounded-full" style={{ background: color }}
+                      initial={{ width: "0%" }} animate={{ width: `${item.score}%` }}
+                      transition={{ delay: 0.3 + i * 0.08, duration: 0.9 }} />
+                  </div>
+                </div>
+              );
+            })}
           </CardContent>
         </Card>
 
@@ -758,34 +815,26 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, onBack, onGoMagazi
                 </div>
               </div>
               <ScrollArea className="max-h-[70vh]">
-                <div className="px-6 pb-8 space-y-4">
-                  {/* 10개 점수 */}
-                  <div className="space-y-4">
-                    {scores.map((item: any, i: number) => {
-                      const Icon = SCORE_ICONS[i] || Zap;
-                      const color = SCORE_COLORS[i] || DEEP_GREEN;
-                      return (
-                        <div key={i} className="space-y-1.5">
-                          <div className="flex items-center justify-between text-[13px] font-bold">
-                            <div className="flex items-center gap-2">
-                              <div className="w-6 h-6 rounded-full flex items-center justify-center bg-stone-50 shadow-sm">
-                                <Icon className="w-3.5 h-3.5" style={{ color }} />
-                              </div>
-                              <span className="text-stone-700">{item.label}</span>
-                            </div>
-                            <span style={{ color }}>{item.score}점</span>
-                          </div>
-                          <div className="h-1.5 rounded-full overflow-hidden bg-stone-100">
-                            <motion.div className="h-full rounded-full" style={{ background: color }}
-                              initial={{ width: "0%" }} animate={{ width: `${item.score}%` }}
-                              transition={{ delay: i * 0.06, duration: 0.8 }} />
-                          </div>
+                <div className="px-6 pb-8 space-y-3">
+                  {/* 주요 피부 소견 텍스트 */}
+                  {(analysisResult?.skinReport ?? []).length > 0 ? (
+                    (analysisResult!.skinReport as { area: string; finding: string }[]).map((item, i) => (
+                      <motion.div key={i}
+                        initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: i * 0.07 }}
+                        className="p-4 rounded-2xl border border-stone-100 bg-stone-50">
+                        <div className="flex items-center gap-1.5 mb-1.5">
+                          <div className="w-2 h-2 rounded-full shrink-0" style={{ background: SCAN_TO }} />
+                          <span className="text-[12px] font-black" style={{ color: DEEP_GREEN }}>{item.area}</span>
                         </div>
-                      );
-                    })}
-                  </div>
+                        <p className="text-[13px] text-stone-600 leading-relaxed">{item.finding}</p>
+                      </motion.div>
+                    ))
+                  ) : (
+                    <p className="text-center text-sm text-stone-400 py-6">분석 내용을 불러오는 중...</p>
+                  )}
                   {/* 바우만 타입 설명 */}
-                  <div className="pt-2">
+                  <div className="pt-1">
                     <div className="flex items-center gap-2 mb-3">
                       <Shield className="w-4 h-4" style={{ color: DEEP_GREEN }} />
                       <p className="text-[13px] font-black" style={{ color: DEEP_GREEN }}>
