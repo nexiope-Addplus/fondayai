@@ -504,6 +504,13 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, onBack, onGoMagazi
   const resultScrollRef = useRef<HTMLDivElement>(null);
   const analysisDrag = useDragControls();
   const improvementsDrag = useDragControls();
+  const diaryDrag = useDragControls();
+  const [showDiary, setShowDiary] = useState(false);
+
+  const handleGoogleLogin = () => {
+    sessionStorage.setItem("pendingResult", JSON.stringify({ analysisResult, surveyData }));
+    window.location.href = "/auth/google";
+  };
   const [isSuccess, setIsSuccess] = useState(false);
 
   useEffect(() => {
@@ -533,8 +540,8 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, onBack, onGoMagazi
   useEffect(() => {
     const el = resultScrollRef.current;
     if (!el) return;
-    el.style.overflow = (showAnalysis || showImprovements) ? 'hidden' : 'auto';
-  }, [showAnalysis, showImprovements]);
+    el.style.overflow = (showAnalysis || showImprovements || showDiary) ? 'hidden' : 'auto';
+  }, [showAnalysis, showImprovements, showDiary]);
 
   const handleWaitlistSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -765,113 +772,57 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, onBack, onGoMagazi
           </Button>
         </div>
 
-        {/* 피부 일기 / 로그인 카드 */}
-        {user ? (
-          <Card className="border-none shadow-md rounded-3xl overflow-hidden">
-            <CardHeader className="pb-2 pt-5 px-5">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <LineChartIcon className="w-5 h-5" style={{ color: DEEP_GREEN }} />
-                  <CardTitle className="text-base font-bold" style={{ color: DEEP_GREEN }}>피부 일기</CardTitle>
-                </div>
-                <div className="flex items-center gap-2">
-                  {user.avatar && <img src={user.avatar} className="w-6 h-6 rounded-full border border-stone-100" />}
-                  <span className="text-[11px] font-bold text-stone-500">{user.username}</span>
-                  <button
-                    onClick={() => fetch("/api/logout", { method: "POST" }).then(() => window.location.reload())}
-                    className="text-[10px] text-stone-400 underline">
-                    로그아웃
-                  </button>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent className="px-5 pb-5">
-              {/* 변화 추이 그래프 */}
-              {history.length > 1 && (
-                <div className="h-36 w-full mb-4">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={[...history.slice().reverse().map((item: any) => ({
-                      date: new Date(item.createdAt).toLocaleDateString("ko-KR", { month: "numeric", day: "numeric" }),
-                      score: parseInt(item.overallScore),
-                    })), { date: "오늘", score: overallScore }]}>
-                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
-                      <XAxis dataKey="date" axisLine={false} tickLine={false} style={{ fontSize: "9px" }} />
-                      <YAxis hide domain={[0, 100]} />
-                      <Tooltip />
-                      <Line type="monotone" dataKey="score" stroke={SCAN_TO} strokeWidth={2.5}
-                        dot={{ r: 3, fill: SCAN_TO, strokeWidth: 2, stroke: "#fff" }} activeDot={{ r: 5 }} />
-                    </LineChart>
-                  </ResponsiveContainer>
-                </div>
-              )}
-
-              {/* 일기 목록 */}
-              <div className="space-y-3">
-                {/* 오늘 기록 (현재 결과) */}
-                <div className="p-3 rounded-2xl border-2 border-stone-200 bg-stone-50">
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="flex items-center gap-1.5">
-                      <span className="text-[10px] font-black px-2 py-0.5 rounded-full text-white"
-                        style={{ background: `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})` }}>오늘</span>
-                      <span className="text-[11px] text-stone-400">
-                        {new Date().toLocaleDateString("ko-KR", { year: "numeric", month: "long", day: "numeric" })}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-1.5">
-                      <span className="text-[13px] font-black" style={{ color: SCAN_TO }}>{overallScore}점</span>
-                      {analysisResult?.skinAge && (
-                        <span className="text-[10px] text-stone-400">피부나이 {analysisResult.skinAge}세</span>
-                      )}
-                    </div>
+        {/* 피부 일기 카드 버튼 / 로그인 카드 */}
+        {user === undefined ? (
+          <div className="h-16 rounded-3xl bg-stone-100 animate-pulse" />
+        ) : user ? (
+          <motion.div
+            whileTap={{ scale: 0.98 }}
+            onClick={() => setShowDiary(true)}
+            className="cursor-pointer">
+            <Card className="border-none shadow-md rounded-3xl overflow-hidden">
+              <CardContent className="p-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-11 h-11 rounded-2xl flex items-center justify-center shrink-0"
+                    style={{ background: `linear-gradient(135deg, ${DEEP_GREEN_LIGHT}, ${DEEP_GREEN})` }}>
+                    <LineChartIcon className="w-5 h-5 text-white" />
                   </div>
-                  <div className="flex items-center gap-1.5 mb-1.5">
-                    <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full"
-                      style={{ background: `${SCAN_FROM}20`, color: SCAN_TO }}>바우만 {finalType}형</span>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[13px] font-black" style={{ color: DEEP_GREEN }}>피부 일기</p>
+                    <p className="text-[11px] text-stone-400">
+                      {history.length > 0 ? `${history.length + 1}번의 기록 · 오늘 ${overallScore}점` : "오늘 첫 번째 기록"}
+                    </p>
                   </div>
-                  <p className="text-[11px] text-stone-500 leading-relaxed line-clamp-2">{analysisResult?.aiComment}</p>
+                  {user.avatar && <img src={user.avatar} className="w-7 h-7 rounded-full border border-stone-100 shrink-0" />}
+                  <ArrowRight className="w-4 h-4 text-stone-300 shrink-0" />
                 </div>
-
-                {/* 과거 기록 */}
-                {history.map((item: any) => {
-                  const date = new Date(item.createdAt);
-                  const isToday = date.toDateString() === new Date().toDateString();
-                  if (isToday) return null;
-                  return (
-                    <div key={item.id} className="p-3 rounded-2xl border border-stone-100 bg-white">
-                      <div className="flex items-center justify-between mb-1.5">
-                        <span className="text-[11px] text-stone-400">
-                          {date.toLocaleDateString("ko-KR", { year: "numeric", month: "long", day: "numeric" })}
-                        </span>
-                        <div className="flex items-center gap-1.5">
-                          <span className="text-[13px] font-black" style={{ color: DEEP_GREEN }}>{item.overallScore}점</span>
-                          {item.skinAge && (
-                            <span className="text-[10px] text-stone-400">피부나이 {item.skinAge}세</span>
-                          )}
-                        </div>
-                      </div>
-                      {item.baumannType && (
-                        <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full inline-block mb-1"
-                          style={{ background: `${DEEP_GREEN}15`, color: DEEP_GREEN }}>
-                          바우만 {item.baumannType}형
-                        </span>
-                      )}
-                      {item.aiComment && (
-                        <p className="text-[11px] text-stone-500 leading-relaxed line-clamp-2">{item.aiComment}</p>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            </CardContent>
-          </Card>
+                {/* 미니 스파크라인 */}
+                {history.length >= 1 && (
+                  <div className="h-16 mt-3 -mx-1">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <LineChart data={[...history.slice().reverse().map((item: any) => ({
+                        date: new Date(item.createdAt).toLocaleDateString("ko-KR", { month: "numeric", day: "numeric" }),
+                        score: parseInt(item.overallScore),
+                      })), { date: "오늘", score: overallScore }]}>
+                        <Line type="monotone" dataKey="score" stroke={SCAN_TO} strokeWidth={2}
+                          dot={{ r: 2.5, fill: SCAN_TO, strokeWidth: 0 }} activeDot={false} />
+                        <XAxis dataKey="date" axisLine={false} tickLine={false} style={{ fontSize: "8px" }} />
+                        <YAxis hide domain={[0, 100]} />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </motion.div>
         ) : (
           <Card className="border-2 border-dashed rounded-3xl p-6 text-center" style={{ borderColor: "#F5D5CC", background: "#FDF8F7" }}>
             <CardHeader className="p-0 mb-4">
               <CardTitle className="text-lg font-bold" style={{ color: DEEP_GREEN }}>변화 과정을 기록하세요</CardTitle>
               <CardDescription className="text-xs">로그인으로 내 피부 일기를 시작하세요.</CardDescription>
             </CardHeader>
-            <CardContent className="p-0 space-y-2">
-              <Button onClick={() => window.location.href = "/auth/google"}
+            <CardContent className="p-0">
+              <Button onClick={handleGoogleLogin}
                 className="w-full h-12 rounded-xl bg-white hover:bg-stone-50 font-bold text-zinc-700 gap-2 border border-stone-200 shadow-sm">
                 <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" className="w-4 h-4" />
                 Google로 계속하기
@@ -1093,6 +1044,144 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, onBack, onGoMagazi
         )}
       </AnimatePresence>
 
+      {/* 피부 일기 모달 */}
+      <AnimatePresence>
+        {showDiary && (
+          <motion.div className="fixed inset-0 z-[100] flex items-end justify-center"
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+            <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" onClick={() => setShowDiary(false)} />
+            <motion.div className="relative bg-white rounded-t-3xl w-full max-w-sm shadow-xl max-h-[92dvh] flex flex-col"
+              initial={{ y: "100%" }} animate={{ y: 0 }} exit={{ y: "100%" }}
+              transition={{ type: "spring", damping: 30, stiffness: 300 }}
+              drag="y" dragControls={diaryDrag} dragListener={false}
+              dragConstraints={{ top: 0, bottom: 0 }} dragElastic={{ top: 0, bottom: 0.3 }}
+              onDragEnd={(_, info) => { if (info.offset.y > 80 || info.velocity.y > 400) setShowDiary(false); }}>
+              {/* 핸들 + 헤더 */}
+              <div className="p-6 pb-3 shrink-0 touch-none cursor-grab active:cursor-grabbing"
+                onPointerDown={(e) => diaryDrag.start(e)}>
+                <div className="w-10 h-1 rounded-full bg-stone-200 mx-auto mb-4" />
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <div className="w-9 h-9 rounded-xl flex items-center justify-center"
+                      style={{ background: `linear-gradient(135deg, ${DEEP_GREEN_LIGHT}, ${DEEP_GREEN})` }}>
+                      <LineChartIcon className="w-4 h-4 text-white" />
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-base" style={{ color: DEEP_GREEN }}>피부 일기</h3>
+                      <p className="text-[11px] text-stone-400">{history.length + 1}번의 기록</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {user?.avatar && <img src={user.avatar} className="w-7 h-7 rounded-full border border-stone-100" />}
+                    <button
+                      onClick={() => fetch("/api/logout", { method: "POST" }).then(() => window.location.reload())}
+                      className="text-[10px] text-stone-400 underline px-1">로그아웃</button>
+                    <button onClick={() => setShowDiary(false)} className="w-7 h-7 rounded-full bg-stone-100 flex items-center justify-center">
+                      <X className="w-3.5 h-3.5 text-stone-500" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex-1 overflow-y-auto overscroll-contain">
+                <div className="px-6 pb-8 space-y-4">
+                  {/* 점수 변화 그래프 */}
+                  {history.length >= 1 && (
+                    <div>
+                      <p className="text-[11px] font-bold text-stone-400 mb-2">종합점수 변화 추이</p>
+                      <div className="h-44 rounded-2xl bg-stone-50 px-2 pt-2">
+                        <ResponsiveContainer width="100%" height="100%">
+                          <LineChart data={[...history.slice().reverse().map((item: any) => ({
+                            date: new Date(item.createdAt).toLocaleDateString("ko-KR", { month: "numeric", day: "numeric" }),
+                            score: parseInt(item.overallScore),
+                          })), { date: "오늘", score: overallScore }]}>
+                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e7e5e4" />
+                            <XAxis dataKey="date" axisLine={false} tickLine={false} style={{ fontSize: "9px" }} />
+                            <YAxis hide domain={[0, 100]} />
+                            <Tooltip
+                              contentStyle={{ fontSize: "11px", borderRadius: "8px", border: "none", boxShadow: "0 2px 8px rgba(0,0,0,0.1)" }}
+                              formatter={(v: any) => [`${v}점`, "종합점수"]}
+                            />
+                            <Line type="monotone" dataKey="score" stroke={SCAN_TO} strokeWidth={2.5}
+                              dot={{ r: 4, fill: SCAN_TO, strokeWidth: 2, stroke: "#fff" }} activeDot={{ r: 6 }} />
+                          </LineChart>
+                        </ResponsiveContainer>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* 일기 목록 */}
+                  <div className="space-y-3">
+                    {/* 오늘 기록 */}
+                    <div className="p-4 rounded-2xl border-2 bg-stone-50"
+                      style={{ borderColor: `${SCAN_FROM}60` }}>
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-[10px] font-black px-2 py-0.5 rounded-full text-white"
+                            style={{ background: `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})` }}>오늘</span>
+                          <span className="text-[11px] text-stone-400">
+                            {new Date().toLocaleDateString("ko-KR", { month: "long", day: "numeric" })}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-[15px] font-black" style={{ color: SCAN_TO }}>{overallScore}점</span>
+                          {analysisResult?.skinAge && (
+                            <span className="text-[10px] px-1.5 py-0.5 rounded-full font-bold"
+                              style={{ background: "#A78BFA20", color: "#7C3AED" }}>
+                              피부나이 {analysisResult.skinAge}세
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full inline-block mb-2"
+                        style={{ background: `${SCAN_FROM}20`, color: SCAN_TO }}>바우만 {finalType}형</span>
+                      <p className="text-[12px] text-stone-600 leading-relaxed">{analysisResult?.aiComment}</p>
+                    </div>
+
+                    {/* 과거 기록 */}
+                    {history.map((item: any, i: number) => {
+                      const date = new Date(item.createdAt);
+                      const isToday = date.toDateString() === new Date().toDateString();
+                      if (isToday) return null;
+                      return (
+                        <motion.div key={item.id}
+                          initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: i * 0.04 }}
+                          className="p-4 rounded-2xl border border-stone-100 bg-white">
+                          <div className="flex items-center justify-between mb-2">
+                            <span className="text-[11px] text-stone-400">
+                              {date.toLocaleDateString("ko-KR", { year: "numeric", month: "long", day: "numeric" })}
+                            </span>
+                            <div className="flex items-center gap-2">
+                              <span className="text-[15px] font-black" style={{ color: DEEP_GREEN }}>{item.overallScore}점</span>
+                              {item.skinAge && (
+                                <span className="text-[10px] px-1.5 py-0.5 rounded-full font-bold"
+                                  style={{ background: "#A78BFA20", color: "#7C3AED" }}>
+                                  피부나이 {item.skinAge}세
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                          {item.baumannType && (
+                            <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full inline-block mb-2"
+                              style={{ background: `${DEEP_GREEN}15`, color: DEEP_GREEN }}>
+                              바우만 {item.baumannType}형
+                            </span>
+                          )}
+                          {item.aiComment && (
+                            <p className="text-[12px] text-stone-600 leading-relaxed">{item.aiComment}</p>
+                          )}
+                        </motion.div>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* 얼리버드 모달 */}
       <AnimatePresence>
         {showWaitlist && (
@@ -1176,14 +1265,29 @@ export default function SkinScanPage() {
   const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imageSrc, setImageSrc] = useState<string | null>(null);
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<any>(undefined); // undefined=로딩중, null=미로그인
 
   useEffect(() => {
     fetch("/api/user")
       .then(res => res.ok ? res.json() : null)
-      .then(data => setUser(data))
+      .then(data => setUser(data ?? null))
       .catch(() => setUser(null));
   }, []);
+
+  // OAuth 로그인 후 결과 화면 복원
+  useEffect(() => {
+    if (user === undefined || !user) return;
+    const saved = sessionStorage.getItem("pendingResult");
+    if (!saved) return;
+    try {
+      const { analysisResult: ar, surveyData: sd } = JSON.parse(saved);
+      setAnalysisResult(ar);
+      setSurveyData(sd);
+      setImageSrc(null);
+      setScanState("result");
+    } catch { /* ignore */ }
+    sessionStorage.removeItem("pendingResult");
+  }, [user]);
 
   const handleCapture = useCallback((file: File) => {
     setImageFile(file);
