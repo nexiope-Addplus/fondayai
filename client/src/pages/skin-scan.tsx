@@ -24,6 +24,8 @@ import {
   Star,
   Waves,
   X,
+  Lock,
+  Thermometer,
 } from "lucide-react";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { Button } from "@/components/ui/button";
@@ -694,6 +696,43 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, onBack, onGoMagazi
               );
             })}
           </CardContent>
+        </Card>
+
+        {/* Fonday 잠금 섹션 */}
+        <Card className="border-none shadow-md rounded-3xl overflow-hidden relative bg-white">
+          <CardContent className="p-5">
+            {/* 배경: 블러 처리된 가상 수치 */}
+            <div className="grid grid-cols-2 gap-3 blur-sm opacity-40 pointer-events-none select-none">
+              {[
+                { label: "피부 온도", value: "36.2°C", icon: Thermometer, color: "#E09882" },
+                { label: "수분도", value: "68%", icon: Droplets, color: "#3B82C4" },
+                { label: "유분도", value: "42%", icon: Flame, color: "#F59E0B" },
+                { label: "피부 장벽", value: "B+", icon: Shield, color: "#10B981" },
+              ].map((item, i) => {
+                const Icon = item.icon;
+                return (
+                  <div key={i} className="p-3 rounded-2xl bg-stone-50 border border-stone-100">
+                    <div className="flex items-center gap-1.5 mb-1">
+                      <Icon className="w-3 h-3" style={{ color: item.color }} />
+                      <p className="text-[10px] text-stone-400">{item.label}</p>
+                    </div>
+                    <p className="text-2xl font-black" style={{ color: item.color }}>{item.value}</p>
+                  </div>
+                );
+              })}
+            </div>
+          </CardContent>
+          {/* 잠금 오버레이 */}
+          <div className="absolute inset-0 backdrop-blur-[2px] bg-white/75 flex flex-col items-center justify-center p-6 text-center">
+            <div className="w-12 h-12 rounded-2xl bg-stone-200 flex items-center justify-center mb-3 shadow-inner">
+              <Lock className="w-6 h-6 text-stone-500" />
+            </div>
+            <p className="text-[14px] font-black text-stone-700 mb-2">피부 속 진피층 수분 장벽 측정 불가</p>
+            <p className="text-[12px] text-stone-500 leading-relaxed">
+              스마트폰 카메라로는 피부 속을 볼 수 없습니다.<br />
+              <span className="font-bold" style={{ color: SCAN_TO }}>Fonday 정밀 스캐너</span>로 진짜 피부 속 상태를 확인하세요.
+            </p>
+          </div>
         </Card>
 
         {/* 액션 버튼 2개 */}
