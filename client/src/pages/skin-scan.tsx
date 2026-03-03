@@ -51,7 +51,7 @@ interface Hotspot {
 }
 
 interface AnalysisResult {
-  scores: { label: string; score: number }[];
+  scores: { label: string; score: number; comment?: string }[];
   hotspots: Hotspot[];
   aiComment: string;
   skinAge?: number;
@@ -684,6 +684,9 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, onBack, onGoMagazi
                       initial={{ width: "0%" }} animate={{ width: `${item.score}%` }}
                       transition={{ delay: 0.3 + i * 0.08, duration: 0.9 }} />
                   </div>
+                  {item.comment && (
+                    <p className="text-[11px] text-stone-400 leading-snug pl-8">{item.comment}</p>
+                  )}
                 </div>
               );
             })}
