@@ -33,7 +33,6 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Separator } from "@/components/ui/separator";
 
 type TabId = "scan" | "magazine";
 type ScanState = "idle" | "survey" | "scanning" | "result";
@@ -509,13 +508,22 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, onBack, onGoMagazi
 
   useEffect(() => {
     if (user) {
-      fetch("/api/scans").then(res => res.json()).then(data => setHistory(data.slice(0, 5).reverse()));
+      fetch("/api/scans").then(res => res.json()).then(data => {
+        if (Array.isArray(data)) setHistory(data.slice(0, 10));
+      });
       if (!isSaved && analysisResult) {
         const overallScore = analysisResult.scores.find((s: any) => s.label === "종합 컨디션")?.score || 0;
         fetch("/api/scans", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ overallScore, scores: analysisResult.scores, hotspots: analysisResult.hotspots, aiComment: analysisResult.aiComment, imageSrc })
+          body: JSON.stringify({
+            overallScore,
+            skinAge: analysisResult.skinAge ?? null,
+            baumannType: finalType,
+            scores: analysisResult.scores,
+            hotspots: analysisResult.hotspots,
+            aiComment: analysisResult.aiComment,
+          })
         }).then(() => setIsSaved(true));
       }
     }
@@ -569,10 +577,6 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, onBack, onGoMagazi
     }
   };
 
-  const chartData = history.map(item => ({
-    date: new Date(item.createdAt).toLocaleDateString("ko-KR", { month: "short", day: "numeric" }),
-    score: parseInt(item.overallScore),
-  }));
 
   return (
     <div ref={resultScrollRef} className="h-[calc(100dvh-60px)] overflow-y-auto">
@@ -761,39 +765,102 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, onBack, onGoMagazi
           </Button>
         </div>
 
-        {/* 히스토리 그래프 / 로그인 카드 */}
+        {/* 피부 일기 / 로그인 카드 */}
         {user ? (
-          <Card className="border-none shadow-md rounded-3xl">
-            <CardHeader className="pb-2">
-              <div className="flex items-center gap-2">
-                <LineChartIcon className="w-5 h-5" style={{ color: DEEP_GREEN }} />
-                <CardTitle className="text-base font-bold">피부 변화 추이</CardTitle>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="h-48 w-full mt-2">
-                <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={[...chartData, { date: "오늘", score: overallScore }]}>
-                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
-                    <XAxis dataKey="date" axisLine={false} tickLine={false} style={{ fontSize: "10px" }} />
-                    <YAxis hide domain={[0, 100]} />
-                    <Tooltip />
-                    <Line type="monotone" dataKey="score" stroke={SCAN_TO} strokeWidth={3}
-                      dot={{ r: 4, fill: SCAN_TO, strokeWidth: 2, stroke: "#fff" }} activeDot={{ r: 6 }} />
-                  </LineChart>
-                </ResponsiveContainer>
-              </div>
-              <Separator className="my-4" />
+          <Card className="border-none shadow-md rounded-3xl overflow-hidden">
+            <CardHeader className="pb-2 pt-5 px-5">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  {user.avatar && <img src={user.avatar} className="w-6 h-6 rounded-full border border-stone-100" />}
-                  <span className="text-[12px] font-bold" style={{ color: DEEP_GREEN }}>{user.username}님</span>
+                  <LineChartIcon className="w-5 h-5" style={{ color: DEEP_GREEN }} />
+                  <CardTitle className="text-base font-bold" style={{ color: DEEP_GREEN }}>피부 일기</CardTitle>
                 </div>
-                <Button variant="ghost" size="sm"
-                  onClick={() => fetch("/api/logout", { method: "POST" }).then(() => window.location.reload())}
-                  className="text-[11px] text-muted-foreground underline h-auto p-0 hover:bg-transparent">
-                  로그아웃
-                </Button>
+                <div className="flex items-center gap-2">
+                  {user.avatar && <img src={user.avatar} className="w-6 h-6 rounded-full border border-stone-100" />}
+                  <span className="text-[11px] font-bold text-stone-500">{user.username}</span>
+                  <button
+                    onClick={() => fetch("/api/logout", { method: "POST" }).then(() => window.location.reload())}
+                    className="text-[10px] text-stone-400 underline">
+                    로그아웃
+                  </button>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent className="px-5 pb-5">
+              {/* 변화 추이 그래프 */}
+              {history.length > 1 && (
+                <div className="h-36 w-full mb-4">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart data={[...history.slice().reverse().map((item: any) => ({
+                      date: new Date(item.createdAt).toLocaleDateString("ko-KR", { month: "numeric", day: "numeric" }),
+                      score: parseInt(item.overallScore),
+                    })), { date: "오늘", score: overallScore }]}>
+                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
+                      <XAxis dataKey="date" axisLine={false} tickLine={false} style={{ fontSize: "9px" }} />
+                      <YAxis hide domain={[0, 100]} />
+                      <Tooltip />
+                      <Line type="monotone" dataKey="score" stroke={SCAN_TO} strokeWidth={2.5}
+                        dot={{ r: 3, fill: SCAN_TO, strokeWidth: 2, stroke: "#fff" }} activeDot={{ r: 5 }} />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </div>
+              )}
+
+              {/* 일기 목록 */}
+              <div className="space-y-3">
+                {/* 오늘 기록 (현재 결과) */}
+                <div className="p-3 rounded-2xl border-2 border-stone-200 bg-stone-50">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-[10px] font-black px-2 py-0.5 rounded-full text-white"
+                        style={{ background: `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})` }}>오늘</span>
+                      <span className="text-[11px] text-stone-400">
+                        {new Date().toLocaleDateString("ko-KR", { year: "numeric", month: "long", day: "numeric" })}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-[13px] font-black" style={{ color: SCAN_TO }}>{overallScore}점</span>
+                      {analysisResult?.skinAge && (
+                        <span className="text-[10px] text-stone-400">피부나이 {analysisResult.skinAge}세</span>
+                      )}
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-1.5 mb-1.5">
+                    <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full"
+                      style={{ background: `${SCAN_FROM}20`, color: SCAN_TO }}>바우만 {finalType}형</span>
+                  </div>
+                  <p className="text-[11px] text-stone-500 leading-relaxed line-clamp-2">{analysisResult?.aiComment}</p>
+                </div>
+
+                {/* 과거 기록 */}
+                {history.map((item: any) => {
+                  const date = new Date(item.createdAt);
+                  const isToday = date.toDateString() === new Date().toDateString();
+                  if (isToday) return null;
+                  return (
+                    <div key={item.id} className="p-3 rounded-2xl border border-stone-100 bg-white">
+                      <div className="flex items-center justify-between mb-1.5">
+                        <span className="text-[11px] text-stone-400">
+                          {date.toLocaleDateString("ko-KR", { year: "numeric", month: "long", day: "numeric" })}
+                        </span>
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-[13px] font-black" style={{ color: DEEP_GREEN }}>{item.overallScore}점</span>
+                          {item.skinAge && (
+                            <span className="text-[10px] text-stone-400">피부나이 {item.skinAge}세</span>
+                          )}
+                        </div>
+                      </div>
+                      {item.baumannType && (
+                        <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full inline-block mb-1"
+                          style={{ background: `${DEEP_GREEN}15`, color: DEEP_GREEN }}>
+                          바우만 {item.baumannType}형
+                        </span>
+                      )}
+                      {item.aiComment && (
+                        <p className="text-[11px] text-stone-500 leading-relaxed line-clamp-2">{item.aiComment}</p>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             </CardContent>
           </Card>
@@ -801,18 +868,11 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, onBack, onGoMagazi
           <Card className="border-2 border-dashed rounded-3xl p-6 text-center" style={{ borderColor: "#F5D5CC", background: "#FDF8F7" }}>
             <CardHeader className="p-0 mb-4">
               <CardTitle className="text-lg font-bold" style={{ color: DEEP_GREEN }}>변화 과정을 기록하세요</CardTitle>
-              <CardDescription className="text-xs">3초 로그인으로 내 피부 히스토리를 관리하세요.</CardDescription>
+              <CardDescription className="text-xs">로그인으로 내 피부 일기를 시작하세요.</CardDescription>
             </CardHeader>
             <CardContent className="p-0 space-y-2">
-              <Button onClick={() => window.location.href = "/auth/kakao"}
-                className="w-full h-12 rounded-xl bg-[#FEE500] hover:bg-[#FEE500]/90 text-[#3C1E1E] font-bold border-none gap-2">
-                <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5 shrink-0">
-                  <path d="M12 3c-4.97 0-9 3.185-9 7.115 0 2.558 1.712 4.8 4.346 6.09l-.843 3.09c-.067.247.078.47.284.47.098 0 .195-.03.273-.09l3.63-2.4c.42.06.85.094 1.31.094 4.97 0 9-3.185 9-7.115S16.97 3 12 3z" />
-                </svg>
-                카카오로 계속하기
-              </Button>
-              <Button onClick={() => window.location.href = "/auth/google"} variant="outline"
-                className="w-full h-12 rounded-xl bg-white font-bold text-zinc-700 gap-2">
+              <Button onClick={() => window.location.href = "/auth/google"}
+                className="w-full h-12 rounded-xl bg-white hover:bg-stone-50 font-bold text-zinc-700 gap-2 border border-stone-200 shadow-sm">
                 <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" className="w-4 h-4" />
                 Google로 계속하기
               </Button>
