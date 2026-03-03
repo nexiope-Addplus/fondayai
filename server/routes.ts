@@ -14,12 +14,16 @@ export async function registerRoutes(
       const apiKey = process.env.GOOGLE_API_KEY;
       
       if (!apiKey) {
-        return res.status(500).json({ message: "서버 설정 오류: API 키가 없습니다." });
+        console.error("[Server] GOOGLE_API_KEY is missing in process.env");
+        return res.status(500).json({ 
+          message: "서버 설정 오류: API 키가 없습니다.",
+          detail: "환경 변수 GOOGLE_API_KEY가 설정되지 않았습니다."
+        });
       }
 
       const genAI = new GoogleGenerativeAI(apiKey);
       const model = genAI.getGenerativeModel({
-        model: "gemini-1.5-flash",
+        model: "gemini-2.0-flash-lite",
         safetySettings: [
           { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_NONE },
           { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_NONE },
