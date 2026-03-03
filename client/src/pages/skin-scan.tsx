@@ -1076,10 +1076,15 @@ export default function SkinScanPage() {
           body: JSON.stringify({ image: reader.result, surveyData: data }),
         });
         const result = await response.json();
+        if (!response.ok) {
+          alert(`분석 실패: ${result.detail || result.message || "서버 오류"}`);
+          setScanState("idle");
+          return;
+        }
         setAnalysisResult(result);
         setScanState("result");
       } catch {
-        alert("분석 실패");
+        alert("분석 실패: 네트워크 오류");
         setScanState("idle");
       }
     };

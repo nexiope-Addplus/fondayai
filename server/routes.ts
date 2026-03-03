@@ -53,19 +53,25 @@ cosmetics: 피부 맞춤 추천 화장품 2가지 (type: 6자이내, key: 핵심
 {"scores":[{"label":"종합 컨디션","score":75,"comment":"전반적인 피부 컨디션이 양호합니다."},{"label":"수분 밸런스","score":60,"comment":"수분이 다소 부족합니다."},{"label":"붉은기 수준","score":45,"comment":"붉은기가 약간 관찰됩니다."},{"label":"모공 상태","score":70,"comment":"모공 상태가 깨끗합니다."},{"label":"주름 및 탄력","score":80,"comment":"탄력이 좋은 편입니다."},{"label":"잡티/색소침착","score":55,"comment":"일부 색소침착이 있습니다."},{"label":"트러블 위험","score":65,"comment":"트러블 위험도가 낮습니다."},{"label":"다크서클","score":50,"comment":"다크서클이 다소 있습니다."},{"label":"피부 광채","score":70,"comment":"적당한 광채가 있습니다."},{"label":"피부결 균일도","score":75,"comment":"피부결이 고른 편입니다."}],"skinAge":29,"aiComment":"총평을 여기에 작성하세요.","hotspots":[{"x":45,"y":55,"type":"잡티"}],"skinReport":[{"area":"이마","finding":"이마에 약간의 유분이 관찰됩니다."},{"area":"볼","finding":"볼 부위는 건조한 편입니다."},{"area":"코","finding":"코 주변 모공이 다소 넓습니다."},{"area":"턱","finding":"턱 라인은 비교적 안정적입니다."}],"improvements":[{"title":"수분 보충","desc":"히알루론산 세럼을 아침저녁 사용하세요. 피부 수분 장벽을 강화합니다."},{"title":"자외선 차단","desc":"SPF50+ 선크림을 매일 사용하세요. 색소침착 예방에 필수입니다."},{"title":"진정 루틴","desc":"센텔라 토너로 피부를 진정시키세요. 자극 없는 제품을 선택하세요."}],"cosmetics":[{"type":"수분 세럼","key":"히알루론산","reason":"피부 수분을 채워 건조함을 개선합니다."},{"type":"선크림","key":"징크옥사이드","reason":"자외선 차단으로 피부 노화를 예방합니다."}]}`;
 
       const base64Data = image.split(",")[1] || image;
-      
+      const mimeType = image.startsWith("data:image/png") ? "image/png" : "image/jpeg";
+
       const result = await model.generateContent([
         prompt,
-        { inlineData: { data: base64Data, mimeType: "image/jpeg" } }
+        { inlineData: { data: base64Data, mimeType } }
       ]);
 
       const response = await result.response;
       const text = response.text();
 
-      // 마크다운 코드블록 방어
+      console.log("[Gemini] 응답 길이:", text.length, "/ 앞100자:", text.slice(0, 100));
+
+      // 마크다운 코드블록 + thinking 텍스트 방어
       const jsonStart = text.indexOf("{");
       const jsonEnd = text.lastIndexOf("}");
-      if (jsonStart === -1 || jsonEnd === -1) throw new Error("AI가 JSON을 반환하지 않았습니다.");
+      if (jsonStart === -1 || jsonEnd === -1) {
+        console.error("[Gemini] JSON 없음. 전체 응답:", text.slice(0, 500));
+        throw new Error("AI가 JSON을 반환하지 않았습니다.");
+      }
       const analysisData = JSON.parse(text.slice(jsonStart, jsonEnd + 1));
 
       // scores: 반드시 10개 항목 강제 보정 (comment 포함)
@@ -100,7 +106,7 @@ cosmetics: 피부 맞춤 추천 화장품 2가지 (type: 6자이내, key: 핵심
 
       res.json(analysisData);
     } catch (error: any) {
-      console.error("AI Error:", error.message);
+      console.error("[AI Error]", error.message, error.stack?.slice(0, 300));
       res.status(500).json({ 
         message: "AI 분석 실패", 
         detail: error.message.includes("Safety") ? "이미지가 차단되었습니다. 다른 사진으로 시도해 주세요." : error.message 
