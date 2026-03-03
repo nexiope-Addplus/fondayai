@@ -56,7 +56,19 @@ interface AnalysisResult {
   hotspots: Hotspot[];
   aiComment: string;
   improvements: { title: string; desc: string }[];
+  cosmetics: { type: string; key: string; reason: string }[];
 }
+
+const BAUMANN_DESC: Record<string, { name: string; desc: string; color: string }> = {
+  O: { name: "지성", desc: "피지 분비가 활발해 번들거림이 나타나기 쉬워요.", color: "#F59E0B" },
+  D: { name: "건성", desc: "피지 분비가 적어 건조함과 당김이 느껴질 수 있어요.", color: "#3B82F6" },
+  S: { name: "민감성", desc: "외부 자극에 붉어지거나 트러블이 생기기 쉬워요.", color: "#EF4444" },
+  R: { name: "저항성", desc: "외부 자극에 강하고 트러블이 잘 생기지 않아요.", color: "#10B981" },
+  P: { name: "색소성", desc: "기미·잡티 등 색소침착이 생기기 쉬워요.", color: "#8B5CF6" },
+  N: { name: "비색소성", desc: "색소침착이 적고 피부톤이 균일한 편이에요.", color: "#06B6D4" },
+  W: { name: "주름성", desc: "탄력이 낮아 잔주름이 생기기 쉬운 상태예요.", color: "#6366F1" },
+  T: { name: "탄력성", desc: "피부 탄력이 좋아 주름이 적은 상태예요.", color: "#14B8A6" },
+};
 
 const DEEP_GREEN = "#2D5F4F";
 const DEEP_GREEN_LIGHT = "#3D7A66";
@@ -643,6 +655,43 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, onBack, onGoMagazi
           </CardContent>
         </Card>
 
+        {/* 바우만 타입 설명 카드 */}
+        <Card className="border-none shadow-md rounded-3xl bg-white overflow-hidden">
+          <CardContent className="p-5">
+            <div className="flex items-center gap-2 mb-4">
+              <div className="w-8 h-8 rounded-xl flex items-center justify-center"
+                style={{ background: `linear-gradient(135deg, ${DEEP_GREEN_LIGHT}, ${DEEP_GREEN})` }}>
+                <Shield className="w-4 h-4 text-white" />
+              </div>
+              <div>
+                <p className="text-[11px] text-stone-400">내 피부 유형</p>
+                <p className="font-black text-[15px]" style={{ color: DEEP_GREEN }}>
+                  바우만 <span style={{ color: SCAN_TO }}>{finalType}</span>형이란?
+                </p>
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+              {finalType.split("").map((letter, i) => {
+                const info = BAUMANN_DESC[letter];
+                if (!info) return null;
+                return (
+                  <motion.div key={i}
+                    initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.1 + i * 0.07 }}
+                    className="p-3 rounded-2xl border"
+                    style={{ background: `${info.color}10`, borderColor: `${info.color}30` }}>
+                    <div className="flex items-center gap-1.5 mb-1">
+                      <span className="text-[17px] font-black" style={{ color: info.color }}>{letter}</span>
+                      <span className="text-[12px] font-bold text-stone-700">{info.name}</span>
+                    </div>
+                    <p className="text-[11px] text-stone-500 leading-snug">{info.desc}</p>
+                  </motion.div>
+                );
+              })}
+            </div>
+          </CardContent>
+        </Card>
+
         {/* 개선 방안 버튼 */}
         <Button onClick={() => setShowImprovements(true)}
           className="w-full h-12 rounded-2xl gap-2 font-bold text-white shadow-md"
@@ -748,26 +797,62 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, onBack, onGoMagazi
                   </div>
                 </div>
               </div>
-              <ScrollArea className="max-h-[60vh]">
+              <ScrollArea className="max-h-[65vh]">
                 <div className="px-6 pb-8 space-y-3">
-                  {(analysisResult?.improvements ?? []).length > 0 ? (
-                    (analysisResult.improvements as { title: string; desc: string }[]).map((item, i) => (
-                      <motion.div key={i}
-                        initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: i * 0.08 }}
-                        className="flex gap-3 p-4 rounded-2xl bg-stone-50 border border-stone-100">
-                        <div className="w-7 h-7 rounded-full flex items-center justify-center shrink-0 text-white text-[11px] font-black"
-                          style={{ background: `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})` }}>
+                  {/* 3단계 개선 방안 */}
+                  {(analysisResult?.improvements ?? []).slice(0, 3).map((item: { title: string; desc: string }, i: number) => (
+                    <motion.div key={i}
+                      initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: i * 0.08 }}
+                      className="flex gap-3 p-4 rounded-2xl border"
+                      style={{ background: i === 0 ? "#FDF1EE" : i === 1 ? "#F0F7F5" : "#F5F0FF", borderColor: i === 0 ? "#F5D5CC" : i === 1 ? "#C5DFD8" : "#DDD5F5" }}>
+                      <div className="shrink-0">
+                        <div className="w-8 h-8 rounded-full flex items-center justify-center text-white text-[11px] font-black"
+                          style={{ background: i === 0 ? `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})` : i === 1 ? `linear-gradient(135deg, ${DEEP_GREEN_LIGHT}, ${DEEP_GREEN})` : "linear-gradient(135deg, #A78BFA, #7C3AED)" }}>
                           {i + 1}
                         </div>
-                        <div>
-                          <p className="text-[13px] font-bold text-stone-800 mb-0.5">{item.title}</p>
-                          <p className="text-[12px] text-stone-500 leading-relaxed">{item.desc}</p>
-                        </div>
-                      </motion.div>
-                    ))
-                  ) : (
-                    <p className="text-center text-sm text-stone-400 py-6">분석 결과를 불러오는 중...</p>
+                        <p className="text-[9px] font-bold text-center mt-0.5"
+                          style={{ color: i === 0 ? SCAN_TO : i === 1 ? DEEP_GREEN : "#7C3AED" }}>
+                          STEP
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-[13px] font-bold text-stone-800 mb-0.5">{item.title}</p>
+                        <p className="text-[12px] text-stone-500 leading-relaxed">{item.desc}</p>
+                      </div>
+                    </motion.div>
+                  ))}
+                  {(analysisResult?.improvements ?? []).length === 0 && (
+                    <p className="text-center text-sm text-stone-400 py-6">개선 방안을 불러오는 중...</p>
+                  )}
+
+                  {/* 추천 화장품 */}
+                  {(analysisResult?.cosmetics ?? []).length > 0 && (
+                    <>
+                      <div className="flex items-center gap-2 pt-2 pb-1">
+                        <Sparkles className="w-4 h-4" style={{ color: SCAN_TO }} />
+                        <p className="text-[13px] font-black" style={{ color: DEEP_GREEN }}>추천 화장품</p>
+                      </div>
+                      {(analysisResult.cosmetics as { type: string; key: string; reason: string }[]).map((item, i) => (
+                        <motion.div key={`c-${i}`}
+                          initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: 0.3 + i * 0.07 }}
+                          className="flex items-start gap-3 p-4 rounded-2xl bg-amber-50 border border-amber-100">
+                          <div className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0"
+                            style={{ background: `linear-gradient(135deg, #F59E0B, #D97706)` }}>
+                            <Star className="w-4 h-4 text-white" />
+                          </div>
+                          <div>
+                            <div className="flex items-center gap-1.5 mb-0.5">
+                              <span className="text-[13px] font-black text-stone-800">{item.type}</span>
+                              <span className="text-[10px] px-1.5 py-0.5 rounded-full font-bold text-white"
+                                style={{ background: "#D97706" }}>{item.key}</span>
+                            </div>
+                            <p className="text-[12px] text-stone-500 leading-relaxed">{item.reason}</p>
+                          </div>
+                        </motion.div>
+                      ))}
+                    </>
                   )}
                 </div>
               </ScrollArea>
