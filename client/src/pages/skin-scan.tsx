@@ -21,7 +21,6 @@ import {
   Eye,
   Zap,
   Leaf,
-  ChevronRight,
   Star,
   Waves,
   X,
