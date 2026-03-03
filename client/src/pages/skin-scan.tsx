@@ -385,8 +385,8 @@ function SurveyScreen({ onSubmit, onBack }: { onSubmit: (data: SurveyData) => vo
   const toggleConcern = (c: string) => setConcerns(prev => prev.includes(c) ? prev.filter(x => x !== c) : [...prev, c]);
 
   return (
-    <motion.div className="px-6 py-8 flex flex-col gap-8 min-h-[calc(100dvh-60px)]" variants={stagger} initial="initial" animate="animate">
-      <motion.div variants={fadeChild}>
+    <motion.div className="flex flex-col h-[calc(100dvh-60px)]" variants={stagger} initial="initial" animate="animate">
+      <motion.div variants={fadeChild} className="px-6 pt-8 pb-2 shrink-0">
         <div className="flex items-center gap-2 mb-1">
           <Button variant="ghost" size="icon" onClick={onBack} className="-ml-2">
             <ChevronLeft className="w-6 h-6" />
@@ -396,8 +396,8 @@ function SurveyScreen({ onSubmit, onBack }: { onSubmit: (data: SurveyData) => vo
         <p className="text-[13px] text-muted-foreground ml-10">정확한 분석을 위해 현재 상태를 선택해 주세요.</p>
       </motion.div>
 
-      <ScrollArea className="flex-1 -mx-6 px-6">
-        <div className="space-y-8 pb-10">
+      <div className="flex-1 overflow-y-auto overscroll-contain px-6">
+        <div className="space-y-8 pb-4">
           <div className="space-y-3">
             <label className="text-[12px] font-bold ml-1 uppercase tracking-wider" style={{ color: DEEP_GREEN_LIGHT }}>성별</label>
             <div className="flex gap-2">
@@ -434,9 +434,9 @@ function SurveyScreen({ onSubmit, onBack }: { onSubmit: (data: SurveyData) => vo
             </div>
           </div>
         </div>
-      </ScrollArea>
+      </div>
 
-      <motion.div variants={fadeChild} className="pt-6 sticky bottom-4">
+      <motion.div variants={fadeChild} className="px-6 py-4 shrink-0 bg-white border-t border-stone-100">
         <Button onClick={() => onSubmit({ gender, age, skinType: "복합성", concerns, condition: "맨얼굴" })}
           className="w-full h-14 rounded-2xl font-bold text-white shadow-xl bg-[#2D5F4F] hover:bg-[#3D7A66] text-lg">
           AI 분석 시작
@@ -606,26 +606,25 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, onBack, onGoMagazi
         {/* 요약 카드 */}
         <Card className="border-none shadow-md rounded-3xl bg-white">
           <CardContent className="p-5">
-            <div className="flex items-start gap-4">
-              {/* 왼쪽: 종합점수 + 피부나이 박스 */}
-              <div className="flex flex-col gap-2 shrink-0">
-                <div className="w-[76px] h-[76px] rounded-2xl flex flex-col items-center justify-center text-white shadow-lg"
-                  style={{ background: `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})` }}>
-                  <span className="text-3xl font-black leading-none">{overallScore}</span>
-                  <span className="text-[9px] font-bold opacity-80 mt-1">종합점수</span>
-                </div>
-                {analysisResult?.skinAge != null && analysisResult.skinAge > 0 && (
-                  <div className="w-[76px] h-[76px] rounded-2xl flex flex-col items-center justify-center text-white shadow-lg"
-                    style={{ background: "linear-gradient(135deg, #A78BFA, #7C3AED)" }}>
-                    <span className="text-3xl font-black leading-none">{analysisResult.skinAge}</span>
-                    <span className="text-[9px] font-bold opacity-80 mt-1">피부나이</span>
-                  </div>
-                )}
+            <div className="flex items-center gap-3">
+              {/* 종합점수 */}
+              <div className="w-[72px] h-[72px] rounded-2xl flex flex-col items-center justify-center text-white shadow-lg shrink-0"
+                style={{ background: `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})` }}>
+                <span className="text-3xl font-black leading-none">{overallScore}</span>
+                <span className="text-[9px] font-bold opacity-80 mt-1">종합점수</span>
               </div>
-              {/* 오른쪽: 바우만 타입 */}
-              <div className="min-w-0 flex-1 pt-1">
-                <p className="text-[11px] text-stone-400 mb-1">{surveyData?.age}세 {surveyData?.gender}</p>
-                <div className="flex items-baseline gap-1 mb-2">
+              {/* 피부나이 */}
+              {analysisResult?.skinAge != null && analysisResult.skinAge > 0 && (
+                <div className="w-[72px] h-[72px] rounded-2xl flex flex-col items-center justify-center text-white shadow-lg shrink-0"
+                  style={{ background: "linear-gradient(135deg, #A78BFA, #7C3AED)" }}>
+                  <span className="text-3xl font-black leading-none">{analysisResult.skinAge}</span>
+                  <span className="text-[9px] font-bold opacity-80 mt-1">피부나이</span>
+                </div>
+              )}
+              {/* 바우만 타입 */}
+              <div className="min-w-0 flex-1">
+                <p className="text-[11px] text-stone-400 mb-1">{surveyData?.age} {surveyData?.gender}</p>
+                <div className="flex items-baseline gap-1 mb-1.5">
                   <span className="text-[13px] text-stone-500">바우만</span>
                   <span className="text-xl font-black" style={{ color: SCAN_TO }}>{finalType}</span>
                   <span className="text-[13px] text-stone-500">형</span>
@@ -691,9 +690,6 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, onBack, onGoMagazi
                       initial={{ width: "0%" }} animate={{ width: `${item.score}%` }}
                       transition={{ delay: 0.3 + i * 0.08, duration: 0.9 }} />
                   </div>
-                  {item.comment && (
-                    <p className="text-[11px] text-stone-400 leading-snug pl-8">{item.comment}</p>
-                  )}
                 </div>
               );
             })}
@@ -796,10 +792,10 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, onBack, onGoMagazi
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             onClick={() => setShowAnalysis(false)}>
             <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" />
-            <motion.div className="relative bg-white rounded-t-3xl sm:rounded-3xl w-full max-w-sm shadow-xl"
+            <motion.div className="relative bg-white rounded-t-3xl sm:rounded-3xl w-full max-w-sm shadow-xl max-h-[90dvh] flex flex-col"
               initial={{ y: 120, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 120, opacity: 0 }}
               onClick={e => e.stopPropagation()}>
-              <div className="p-6 pb-2">
+              <div className="p-6 pb-2 shrink-0">
                 <div className="w-10 h-1 rounded-full bg-stone-200 mx-auto mb-5" />
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-2">
@@ -817,7 +813,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, onBack, onGoMagazi
                   </button>
                 </div>
               </div>
-              <ScrollArea className="max-h-[70vh]">
+              <div className="flex-1 overflow-y-auto overscroll-contain">
                 <div className="px-6 pb-8 space-y-3">
                   {/* 10가지 항목별 분석 내용 */}
                   {scores.map((item: any, i: number) => {
@@ -839,6 +835,23 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, onBack, onGoMagazi
                       </motion.div>
                     );
                   })}
+                  {/* 피부 부위별 소견 */}
+                  {(analysisResult?.skinReport ?? []).length > 0 && (
+                    <div className="pt-1">
+                      <div className="flex items-center gap-2 mb-3">
+                        <Activity className="w-4 h-4" style={{ color: DEEP_GREEN }} />
+                        <p className="text-[13px] font-black" style={{ color: DEEP_GREEN }}>피부 부위별 소견</p>
+                      </div>
+                      <div className="grid grid-cols-2 gap-2">
+                        {(analysisResult!.skinReport as { area: string; finding: string }[]).map((item, i) => (
+                          <div key={i} className="p-3 rounded-2xl border border-stone-100 bg-stone-50">
+                            <p className="text-[12px] font-black mb-1" style={{ color: DEEP_GREEN_LIGHT }}>{item.area}</p>
+                            <p className="text-[11px] text-stone-500 leading-snug">{item.finding}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                   {/* 바우만 타입 설명 */}
                   <div className="pt-1">
                     <div className="flex items-center gap-2 mb-3">
@@ -865,7 +878,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, onBack, onGoMagazi
                     </div>
                   </div>
                 </div>
-              </ScrollArea>
+              </div>
             </motion.div>
           </motion.div>
         )}
@@ -878,10 +891,10 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, onBack, onGoMagazi
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             onClick={() => setShowImprovements(false)}>
             <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" />
-            <motion.div className="relative bg-white rounded-t-3xl sm:rounded-3xl w-full max-w-sm shadow-xl"
+            <motion.div className="relative bg-white rounded-t-3xl sm:rounded-3xl w-full max-w-sm shadow-xl max-h-[90dvh] flex flex-col"
               initial={{ y: 120, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 120, opacity: 0 }}
               onClick={e => e.stopPropagation()}>
-              <div className="p-6 pb-2">
+              <div className="p-6 pb-2 shrink-0">
                 <div className="w-10 h-1 rounded-full bg-stone-200 mx-auto mb-5" />
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-2">
@@ -899,7 +912,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, onBack, onGoMagazi
                   </button>
                 </div>
               </div>
-              <ScrollArea className="max-h-[65vh]">
+              <div className="flex-1 overflow-y-auto overscroll-contain">
                 <div className="px-6 pb-8 space-y-3">
                   {/* 3단계 개선 방안 */}
                   {(analysisResult?.improvements ?? []).slice(0, 3).map((item: { title: string; desc: string }, i: number) => (
@@ -957,7 +970,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, onBack, onGoMagazi
                     </>
                   )}
                 </div>
-              </ScrollArea>
+              </div>
             </motion.div>
           </motion.div>
         )}
