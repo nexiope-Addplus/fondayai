@@ -606,21 +606,25 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, onBack, onGoMagazi
         {/* 요약 카드 */}
         <Card className="border-none shadow-md rounded-3xl bg-white">
           <CardContent className="p-5">
-            <div className="flex items-center gap-4">
-              <div className="rounded-2xl flex flex-col items-center justify-center text-white shadow-lg shrink-0 py-3 px-4 min-w-[80px]"
-                style={{ background: `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})` }}>
-                <span className="text-3xl font-black leading-none">{overallScore}</span>
-                <span className="text-[10px] font-bold opacity-80 mt-0.5">종합점수</span>
+            <div className="flex items-start gap-4">
+              {/* 왼쪽: 종합점수 + 피부나이 박스 */}
+              <div className="flex flex-col gap-2 shrink-0">
+                <div className="w-[76px] h-[76px] rounded-2xl flex flex-col items-center justify-center text-white shadow-lg"
+                  style={{ background: `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})` }}>
+                  <span className="text-3xl font-black leading-none">{overallScore}</span>
+                  <span className="text-[9px] font-bold opacity-80 mt-1">종합점수</span>
+                </div>
                 {analysisResult?.skinAge != null && analysisResult.skinAge > 0 && (
-                  <>
-                    <div className="w-8 h-px bg-white/30 my-1.5" />
-                    <span className="text-[16px] font-black leading-none">{analysisResult.skinAge}세</span>
-                    <span className="text-[9px] font-bold opacity-70 mt-0.5">피부나이</span>
-                  </>
+                  <div className="w-[76px] h-[76px] rounded-2xl flex flex-col items-center justify-center text-white shadow-lg"
+                    style={{ background: "linear-gradient(135deg, #A78BFA, #7C3AED)" }}>
+                    <span className="text-3xl font-black leading-none">{analysisResult.skinAge}</span>
+                    <span className="text-[9px] font-bold opacity-80 mt-1">피부나이</span>
+                  </div>
                 )}
               </div>
-              <div className="min-w-0">
-                <p className="text-[11px] text-stone-400 mb-0.5">{surveyData?.age} {surveyData?.gender}</p>
+              {/* 오른쪽: 바우만 타입 */}
+              <div className="min-w-0 flex-1 pt-1">
+                <p className="text-[11px] text-stone-400 mb-1">{surveyData?.age}세 {surveyData?.gender}</p>
                 <div className="flex items-baseline gap-1 mb-2">
                   <span className="text-[13px] text-stone-500">바우만</span>
                   <span className="text-xl font-black" style={{ color: SCAN_TO }}>{finalType}</span>
