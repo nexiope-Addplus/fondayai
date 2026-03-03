@@ -23,13 +23,13 @@ export const onRequest = async (context: any) => {
       if (!env.GOOGLE_API_KEY) {
         return new Response(JSON.stringify({ error: "GOOGLE_API_KEY is missing in environment variables." }), {
           status: 500,
-          headers: { "Content-Type": "application/json" }
+          headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" }
         });
       }
 
       const genAI = new GoogleGenerativeAI(env.GOOGLE_API_KEY);
       const model = genAI.getGenerativeModel({
-        model: "gemini-2.0-flash",
+        model: "gemini-1.5-flash",
         safetySettings: [
           { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_NONE },
           { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_NONE },
@@ -38,20 +38,77 @@ export const onRequest = async (context: any) => {
         ]
       });
 
-      const prompt = `당신은 피부 전문가입니다. 다음 사진과 정보(${JSON.stringify(surveyData)})를 정밀 분석하여 결과를 JSON으로만 답하세요. 
-      형식: {"scores": [{"label": "종합 컨디션", "score": 85}, ...], "hotspots": [{"x": 45, "y": 30, "type": "트러블"}], "aiComment": "평가"}`;
+      const prompt = `당신은 피부과 전문의입니다. 첨부된 얼굴 사진과 설문 정보(${JSON.stringify(surveyData)})를 분석하여 아래 JSON 형식으로만 답하세요. JSON 외 다른 텍스트는 절대 출력하지 마세요.
+
+scores 배열은 반드시 아래 10개 항목을 순서대로 모두 포함해야 합니다 (score: 0~100 정수, comment: 해당 항목에 대한 한국어 해석 1문장):
+{"label":"종합 컨디션","score":숫자,"comment":"해석"}
+{"label":"수분 밸런스","score":숫자,"comment":"해석"}
+{"label":"붉은기 수준","score":숫자,"comment":"해석"}
+{"label":"모공 상태","score":숫자,"comment":"해석"}
+{"label":"주름 및 탄력","score":숫자,"comment":"해석"}
+{"label":"잡티/색소침착","score":숫자,"comment":"해석"}
+{"label":"트러블 위험","score":숫자,"comment":"해석"}
+{"label":"다크서클","score":숫자,"comment":"해석"}
+{"label":"피부 광채","score":숫자,"comment":"해석"}
+{"label":"피부결 균일도","score":숫자,"comment":"해석"}
+
+skinAge: 사진 기반 추정 피부나이 정수
+hotspots: 실제로 보이는 기미·잡티·여드름 위치(% 좌표), 없으면 빈 배열
+aiComment: 총평 2~3문장
+skinReport: 피부 영역별 소견 4가지 (area: 5자이내, finding: 1~2문장)
+improvements: 분석 결과 기반 개선방안 3가지 (title: 6자이내, desc: 2문장이내)
+cosmetics: 피부 맞춤 추천 화장품 2가지 (type: 6자이내, key: 핵심성분, reason: 1문장)
+
+출력 형식 (반드시 이 구조 그대로):
+{"scores":[{"label":"종합 컨디션","score":75,"comment":"전반적인 피부 컨디션이 양호합니다."},{"label":"수분 밸런스","score":60,"comment":"수분이 다소 부족합니다."},{"label":"붉은기 수준","score":45,"comment":"붉은기가 약간 관찰됩니다."},{"label":"모공 상태","score":70,"comment":"모공 상태가 깨끗합니다."},{"label":"주름 및 탄력","score":80,"comment":"탄력이 좋은 편입니다."},{"label":"잡티/색소침착","score":55,"comment":"일부 색소침착이 있습니다."},{"label":"트러블 위험","score":65,"comment":"트러블 위험도가 낮습니다."},{"label":"다크서클","score":50,"comment":"다크서클이 다소 있습니다."},{"label":"피부 광채","score":70,"comment":"적당한 광채가 있습니다."},{"label":"피부결 균일도","score":75,"comment":"피부결이 고른 편입니다."}],"skinAge":29,"aiComment":"총평을 여기에 작성하세요.","hotspots":[{"x":45,"y":55,"type":"잡티"}],"skinReport":[{"area":"이마","finding":"이마에 약간의 유분이 관찰됩니다."},{"area":"볼","finding":"볼 부위는 건조한 편입니다."},{"area":"코","finding":"코 주변 모공이 다소 넓습니다."},{"area":"턱","finding":"턱 라인은 비교적 안정적입니다."}],"improvements":[{"title":"수분 보충","desc":"히알루론산 세럼을 아침저녁 사용하세요. 피부 수분 장벽을 강화합니다."},{"title":"자외선 차단","desc":"SPF50+ 선크림을 매일 사용하세요. 색소침착 예방에 필수입니다."},{"title":"진정 루틴","desc":"센텔라 토너로 피부를 진정시키세요. 자극 없는 제품을 선택하세요."}],"cosmetics":[{"type":"수분 세럼","key":"히알루론산","reason":"피부 수분을 채워 건조함을 개선합니다."},{"type":"선크림","key":"징크옥사이드","reason":"자외선 차단으로 피부 노화를 예방합니다."}]}`;
 
       const base64Data = image.split(",")[1] || image;
+      const mimeType = image.startsWith("data:image/png") ? "image/png" : "image/jpeg";
+
       const result = await model.generateContent([
         prompt,
-        { inlineData: { data: base64Data, mimeType: "image/jpeg" } }
+        { inlineData: { data: base64Data, mimeType } }
       ]);
 
       const text = result.response.text();
-      const jsonMatch = text.match(/\{[\s\S]*\}/);
-      const jsonStr = jsonMatch ? jsonMatch[0] : text;
+      const jsonStart = text.indexOf("{");
+      const jsonEnd = text.lastIndexOf("}");
+      if (jsonStart === -1 || jsonEnd === -1) {
+        throw new Error("AI가 JSON을 반환하지 않았습니다.");
+      }
+      const analysisData = JSON.parse(text.slice(jsonStart, jsonEnd + 1));
 
-      return new Response(jsonStr, {
+      // scores: 반드시 10개 항목 강제 보정
+      const REQUIRED_LABELS = [
+        "종합 컨디션","수분 밸런스","붉은기 수준","모공 상태","주름 및 탄력",
+        "잡티/색소침착","트러블 위험","다크서클","피부 광채","피부결 균일도"
+      ];
+      const existingScores = Array.isArray(analysisData.scores) ? analysisData.scores : [];
+      analysisData.scores = REQUIRED_LABELS.map((label, i) => {
+        const found = existingScores.find((s: any) => s.label === label) || existingScores[i];
+        const score = found ? Math.max(0, Math.min(100, Math.round(Number(found.score) || 50))) : 50;
+        const comment = (found?.comment && typeof found.comment === "string") ? found.comment.trim() : "";
+        return { label, score, comment };
+      });
+
+      // 배열 필드 기본값 보장
+      if (!Array.isArray(analysisData.improvements)) analysisData.improvements = [];
+      if (!Array.isArray(analysisData.cosmetics)) analysisData.cosmetics = [];
+      if (!Array.isArray(analysisData.skinReport)) analysisData.skinReport = [];
+      if (!Array.isArray(analysisData.hotspots)) analysisData.hotspots = [];
+
+      // skinAge 숫자 보장
+      let skinAge = Math.round(Number(analysisData.skinAge));
+      if (!skinAge || isNaN(skinAge) || skinAge <= 0) {
+        const wrinkle = analysisData.scores[4]?.score ?? 70;
+        const radiance = analysisData.scores[8]?.score ?? 70;
+        const base = parseInt(String(surveyData?.age)) || 30;
+        const delta = Math.round(((100 - wrinkle) + (100 - radiance)) / 20 - 5);
+        skinAge = Math.max(15, Math.min(70, base + delta));
+      }
+      analysisData.skinAge = skinAge;
+
+      return new Response(JSON.stringify(analysisData), {
         headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" }
       });
 
