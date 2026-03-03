@@ -1075,16 +1075,23 @@ export default function SkinScanPage() {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ image: reader.result, surveyData: data }),
         });
-        const result = await response.json();
+        const rawText = await response.text();
+        console.log("[API 응답]", response.status, rawText.slice(0, 300));
         if (!response.ok) {
-          alert(`분석 실패: ${result.detail || result.message || "서버 오류"}`);
+          let msg = `HTTP ${response.status}`;
+          try {
+            const errJson = JSON.parse(rawText);
+            msg = errJson.detail || errJson.message || errJson.error || JSON.stringify(errJson);
+          } catch { msg += ": " + rawText.slice(0, 100); }
+          alert(`분석 실패: ${msg}`);
           setScanState("idle");
           return;
         }
+        const result = JSON.parse(rawText);
         setAnalysisResult(result);
         setScanState("result");
-      } catch {
-        alert("분석 실패: 네트워크 오류");
+      } catch (err: any) {
+        alert(`분석 실패: ${err.message || "네트워크 오류"}`);
         setScanState("idle");
       }
     };
