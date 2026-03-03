@@ -1,5 +1,5 @@
 import { useState, useRef, useCallback, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useDragControls } from "framer-motion";
 import {
   Camera,
   BookOpen,
@@ -502,6 +502,9 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, onBack, onGoMagazi
   const [showAnalysis, setShowAnalysis] = useState(false);
   const [email, setEmail] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const resultScrollRef = useRef<HTMLDivElement>(null);
+  const analysisDrag = useDragControls();
+  const improvementsDrag = useDragControls();
   const [isSuccess, setIsSuccess] = useState(false);
 
   useEffect(() => {
@@ -517,6 +520,13 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, onBack, onGoMagazi
       }
     }
   }, [user]);
+
+  // 모달 열릴 때 배경 스크롤 잠금
+  useEffect(() => {
+    const el = resultScrollRef.current;
+    if (!el) return;
+    el.style.overflow = (showAnalysis || showImprovements) ? 'hidden' : 'auto';
+  }, [showAnalysis, showImprovements]);
 
   const handleWaitlistSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -565,7 +575,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, onBack, onGoMagazi
   }));
 
   return (
-    <ScrollArea className="h-[calc(100dvh-60px)]">
+    <div ref={resultScrollRef} className="h-[calc(100dvh-60px)] overflow-y-auto">
       <motion.div className="px-5 pt-6 pb-24 space-y-6" variants={stagger} initial="initial" animate="animate">
         {/* 헤더 */}
         <div className="flex justify-between items-center">
@@ -573,7 +583,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, onBack, onGoMagazi
             style={{ borderColor: SCAN_TO, color: SCAN_TO }}>
             <Camera className="w-4 h-4" /> 다시 촬영
           </Button>
-          <h2 className="text-xl font-black tracking-tight" style={{ color: DEEP_GREEN }}>AI 피부 리포트</h2>
+          <h2 className="text-xl font-black tracking-tight" style={{ color: DEEP_GREEN }}>FondayAI 피부 리포트</h2>
         </div>
 
         {/* 이미지 + 핫스팟 */}
@@ -657,7 +667,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, onBack, onGoMagazi
                   style={{ background: `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})` }}>
                   <Sparkles className="w-4 h-4 text-white" />
                 </div>
-                <p className="text-[13px] font-black" style={{ color: DEEP_GREEN }}>AI 피부 총평</p>
+                <p className="text-[13px] font-black" style={{ color: DEEP_GREEN }}>FondayAI 의 피부 총평</p>
               </div>
               <p className="text-[13px] text-stone-600 leading-relaxed">{analysisResult.aiComment}</p>
             </CardContent>
@@ -827,14 +837,18 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, onBack, onGoMagazi
       {/* 주요 분석결과 모달 */}
       <AnimatePresence>
         {showAnalysis && (
-          <motion.div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center"
-            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            onClick={() => setShowAnalysis(false)}>
-            <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" />
-            <motion.div className="relative bg-white rounded-t-3xl sm:rounded-3xl w-full max-w-sm shadow-xl max-h-[90dvh] flex flex-col"
-              initial={{ y: 120, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 120, opacity: 0 }}
-              onClick={e => e.stopPropagation()}>
-              <div className="p-6 pb-2 shrink-0">
+          <motion.div className="fixed inset-0 z-[100] flex items-end justify-center"
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+            <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" onClick={() => setShowAnalysis(false)} />
+            <motion.div className="relative bg-white rounded-t-3xl w-full max-w-sm shadow-xl max-h-[90dvh] flex flex-col"
+              initial={{ y: "100%" }} animate={{ y: 0 }} exit={{ y: "100%" }}
+              transition={{ type: "spring", damping: 30, stiffness: 300 }}
+              drag="y" dragControls={analysisDrag} dragListener={false}
+              dragConstraints={{ top: 0, bottom: 0 }}
+              dragElastic={{ top: 0, bottom: 0.3 }}
+              onDragEnd={(_, info) => { if (info.offset.y > 80 || info.velocity.y > 400) setShowAnalysis(false); }}>
+              <div className="p-6 pb-2 shrink-0 touch-none cursor-grab active:cursor-grabbing"
+                onPointerDown={(e) => analysisDrag.start(e)}>
                 <div className="w-10 h-1 rounded-full bg-stone-200 mx-auto mb-5" />
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-2">
@@ -926,14 +940,18 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, onBack, onGoMagazi
       {/* 맞춤솔루션 모달 */}
       <AnimatePresence>
         {showImprovements && (
-          <motion.div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center"
-            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            onClick={() => setShowImprovements(false)}>
-            <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" />
-            <motion.div className="relative bg-white rounded-t-3xl sm:rounded-3xl w-full max-w-sm shadow-xl max-h-[90dvh] flex flex-col"
-              initial={{ y: 120, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 120, opacity: 0 }}
-              onClick={e => e.stopPropagation()}>
-              <div className="p-6 pb-2 shrink-0">
+          <motion.div className="fixed inset-0 z-[100] flex items-end justify-center"
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+            <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" onClick={() => setShowImprovements(false)} />
+            <motion.div className="relative bg-white rounded-t-3xl w-full max-w-sm shadow-xl max-h-[90dvh] flex flex-col"
+              initial={{ y: "100%" }} animate={{ y: 0 }} exit={{ y: "100%" }}
+              transition={{ type: "spring", damping: 30, stiffness: 300 }}
+              drag="y" dragControls={improvementsDrag} dragListener={false}
+              dragConstraints={{ top: 0, bottom: 0 }}
+              dragElastic={{ top: 0, bottom: 0.3 }}
+              onDragEnd={(_, info) => { if (info.offset.y > 80 || info.velocity.y > 400) setShowImprovements(false); }}>
+              <div className="p-6 pb-2 shrink-0 touch-none cursor-grab active:cursor-grabbing"
+                onPointerDown={(e) => improvementsDrag.start(e)}>
                 <div className="w-10 h-1 rounded-full bg-stone-200 mx-auto mb-5" />
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-2">
@@ -1055,7 +1073,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, onBack, onGoMagazi
           </motion.div>
         )}
       </AnimatePresence>
-    </ScrollArea>
+    </div>
   );
 }
 
