@@ -496,6 +496,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, onBack, onGoMagazi
   const [isSaved, setIsSaved] = useState(false);
   const [showWaitlist, setShowWaitlist] = useState(false);
   const [showImprovements, setShowImprovements] = useState(false);
+  const [showAnalysis, setShowAnalysis] = useState(false);
   const [email, setEmail] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
@@ -601,53 +602,38 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, onBack, onGoMagazi
           </div>
         </Card>
 
-        {/* 점수 카드 */}
+        {/* 요약 카드 */}
         <Card className="border-none shadow-md rounded-3xl bg-white">
-          <CardHeader className="pb-2">
-            <div className="flex items-center gap-4">
-              <div className="w-16 h-16 rounded-2xl flex items-center justify-center text-white text-3xl font-black shadow-lg"
+          <CardContent className="p-5">
+            <div className="flex items-center gap-4 mb-4">
+              <div className="w-20 h-20 rounded-2xl flex flex-col items-center justify-center text-white shadow-lg shrink-0"
                 style={{ background: `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})` }}>
-                {overallScore}
+                <span className="text-3xl font-black leading-none">{overallScore}</span>
+                <span className="text-[10px] font-bold opacity-80 mt-0.5">종합점수</span>
               </div>
-              <div>
-                <CardTitle className="text-lg font-bold" style={{ color: DEEP_GREEN }}>
-                  {surveyData?.age} {surveyData?.gender}
-                </CardTitle>
-                <CardDescription>
-                  바우만 <span className="font-bold" style={{ color: SCAN_TO }}>{finalType}</span>형
-                </CardDescription>
+              <div className="min-w-0">
+                <p className="text-[11px] text-stone-400 mb-0.5">{surveyData?.age} {surveyData?.gender}</p>
+                <div className="flex items-baseline gap-1 mb-2">
+                  <span className="text-[13px] text-stone-500">바우만</span>
+                  <span className="text-xl font-black" style={{ color: SCAN_TO }}>{finalType}</span>
+                  <span className="text-[13px] text-stone-500">형</span>
+                </div>
+                <div className="flex gap-1 flex-wrap">
+                  {finalType.split("").map((letter, i) => {
+                    const info = BAUMANN_DESC[letter];
+                    if (!info) return null;
+                    return (
+                      <span key={i} className="text-[10px] font-bold px-2 py-0.5 rounded-full"
+                        style={{ background: `${info.color}18`, color: info.color }}>
+                        {info.name}
+                      </span>
+                    );
+                  })}
+                </div>
               </div>
             </div>
-          </CardHeader>
-          <CardContent className="space-y-5 pt-4">
-            {scores.map((item: any, i: number) => {
-              // 인덱스 기반 아이콘/색상 (label 불일치 방지)
-              const Icon = SCORE_ICONS[i] || Zap;
-              const color = SCORE_COLORS[i] || DEEP_GREEN;
-              return (
-                <div key={i} className="space-y-2">
-                  <div className="flex items-center justify-between text-[13px] font-bold">
-                    <div className="flex items-center gap-2">
-                      <div className="w-6 h-6 rounded-full flex items-center justify-center bg-stone-50 shadow-sm">
-                        <Icon className="w-3.5 h-3.5" style={{ color }} />
-                      </div>
-                      <span className="text-stone-700">{item.label}</span>
-                    </div>
-                    <motion.span style={{ color }} initial={{ scale: 0 }} animate={{ scale: 1 }}
-                      transition={{ delay: 0.3 + i * 0.08, type: "spring" }}>
-                      {item.score}점
-                    </motion.span>
-                  </div>
-                  <div className="h-1.5 rounded-full overflow-hidden bg-stone-100">
-                    <motion.div className="h-full rounded-full" style={{ background: color }}
-                      initial={{ width: "0%" }} animate={{ width: `${item.score}%` }}
-                      transition={{ delay: 0.3 + i * 0.08, duration: 0.9 }} />
-                  </div>
-                </div>
-              );
-            })}
             {analysisResult?.aiComment && (
-              <div className="mt-4 p-4 rounded-2xl text-[14px] leading-relaxed italic text-stone-600"
+              <div className="p-4 rounded-2xl text-[13px] leading-relaxed italic text-stone-600"
                 style={{ background: "#FDF1EE", border: "1px solid #F5D5CC" }}>
                 " {analysisResult.aiComment} "
               </div>
@@ -655,51 +641,21 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, onBack, onGoMagazi
           </CardContent>
         </Card>
 
-        {/* 바우만 타입 설명 카드 */}
-        <Card className="border-none shadow-md rounded-3xl bg-white overflow-hidden">
-          <CardContent className="p-5">
-            <div className="flex items-center gap-2 mb-4">
-              <div className="w-8 h-8 rounded-xl flex items-center justify-center"
-                style={{ background: `linear-gradient(135deg, ${DEEP_GREEN_LIGHT}, ${DEEP_GREEN})` }}>
-                <Shield className="w-4 h-4 text-white" />
-              </div>
-              <div>
-                <p className="text-[11px] text-stone-400">내 피부 유형</p>
-                <p className="font-black text-[15px]" style={{ color: DEEP_GREEN }}>
-                  바우만 <span style={{ color: SCAN_TO }}>{finalType}</span>형이란?
-                </p>
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-2">
-              {finalType.split("").map((letter, i) => {
-                const info = BAUMANN_DESC[letter];
-                if (!info) return null;
-                return (
-                  <motion.div key={i}
-                    initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.1 + i * 0.07 }}
-                    className="p-3 rounded-2xl border"
-                    style={{ background: `${info.color}10`, borderColor: `${info.color}30` }}>
-                    <div className="flex items-center gap-1.5 mb-1">
-                      <span className="text-[17px] font-black" style={{ color: info.color }}>{letter}</span>
-                      <span className="text-[12px] font-bold text-stone-700">{info.name}</span>
-                    </div>
-                    <p className="text-[11px] text-stone-500 leading-snug">{info.desc}</p>
-                  </motion.div>
-                );
-              })}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* 개선 방안 버튼 */}
-        <Button onClick={() => setShowImprovements(true)}
-          className="w-full h-12 rounded-2xl gap-2 font-bold text-white shadow-md"
-          style={{ background: `linear-gradient(135deg, ${DEEP_GREEN_LIGHT}, ${DEEP_GREEN})` }}>
-          <Leaf className="w-4 h-4" />
-          나만의 개선 방안 보기
-          <ChevronRight className="w-4 h-4" />
-        </Button>
+        {/* 액션 버튼 2개 */}
+        <div className="grid grid-cols-2 gap-3">
+          <Button onClick={() => setShowAnalysis(true)}
+            className="h-16 rounded-2xl flex-col gap-1.5 font-bold text-white shadow-md"
+            style={{ background: `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})` }}>
+            <LayoutGrid className="w-5 h-5" />
+            <span className="text-[12px]">주요 분석결과</span>
+          </Button>
+          <Button onClick={() => setShowImprovements(true)}
+            className="h-16 rounded-2xl flex-col gap-1.5 font-bold text-white shadow-md"
+            style={{ background: `linear-gradient(135deg, ${DEEP_GREEN_LIGHT}, ${DEEP_GREEN})` }}>
+            <Leaf className="w-5 h-5" />
+            <span className="text-[12px]">맞춤솔루션</span>
+          </Button>
+        </div>
 
         {/* 히스토리 그래프 / 로그인 카드 */}
         {user ? (
@@ -774,7 +730,94 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, onBack, onGoMagazi
         </Button>
       </motion.div>
 
-      {/* 개선 방안 모달 */}
+      {/* 주요 분석결과 모달 */}
+      <AnimatePresence>
+        {showAnalysis && (
+          <motion.div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center"
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            onClick={() => setShowAnalysis(false)}>
+            <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" />
+            <motion.div className="relative bg-white rounded-t-3xl sm:rounded-3xl w-full max-w-sm shadow-xl"
+              initial={{ y: 120, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 120, opacity: 0 }}
+              onClick={e => e.stopPropagation()}>
+              <div className="p-6 pb-2">
+                <div className="w-10 h-1 rounded-full bg-stone-200 mx-auto mb-5" />
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-2">
+                    <div className="w-9 h-9 rounded-xl flex items-center justify-center"
+                      style={{ background: `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})` }}>
+                      <LayoutGrid className="w-4 h-4 text-white" />
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-base" style={{ color: DEEP_GREEN }}>주요 분석결과</h3>
+                      <p className="text-[11px] text-stone-400">10가지 항목 상세 분석</p>
+                    </div>
+                  </div>
+                  <button onClick={() => setShowAnalysis(false)} className="w-7 h-7 rounded-full bg-stone-100 flex items-center justify-center">
+                    <X className="w-3.5 h-3.5 text-stone-500" />
+                  </button>
+                </div>
+              </div>
+              <ScrollArea className="max-h-[70vh]">
+                <div className="px-6 pb-8 space-y-4">
+                  {/* 10개 점수 */}
+                  <div className="space-y-4">
+                    {scores.map((item: any, i: number) => {
+                      const Icon = SCORE_ICONS[i] || Zap;
+                      const color = SCORE_COLORS[i] || DEEP_GREEN;
+                      return (
+                        <div key={i} className="space-y-1.5">
+                          <div className="flex items-center justify-between text-[13px] font-bold">
+                            <div className="flex items-center gap-2">
+                              <div className="w-6 h-6 rounded-full flex items-center justify-center bg-stone-50 shadow-sm">
+                                <Icon className="w-3.5 h-3.5" style={{ color }} />
+                              </div>
+                              <span className="text-stone-700">{item.label}</span>
+                            </div>
+                            <span style={{ color }}>{item.score}점</span>
+                          </div>
+                          <div className="h-1.5 rounded-full overflow-hidden bg-stone-100">
+                            <motion.div className="h-full rounded-full" style={{ background: color }}
+                              initial={{ width: "0%" }} animate={{ width: `${item.score}%` }}
+                              transition={{ delay: i * 0.06, duration: 0.8 }} />
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                  {/* 바우만 타입 설명 */}
+                  <div className="pt-2">
+                    <div className="flex items-center gap-2 mb-3">
+                      <Shield className="w-4 h-4" style={{ color: DEEP_GREEN }} />
+                      <p className="text-[13px] font-black" style={{ color: DEEP_GREEN }}>
+                        바우만 <span style={{ color: SCAN_TO }}>{finalType}</span>형 상세
+                      </p>
+                    </div>
+                    <div className="grid grid-cols-2 gap-2">
+                      {finalType.split("").map((letter, i) => {
+                        const info = BAUMANN_DESC[letter];
+                        if (!info) return null;
+                        return (
+                          <div key={i} className="p-3 rounded-2xl border"
+                            style={{ background: `${info.color}10`, borderColor: `${info.color}30` }}>
+                            <div className="flex items-center gap-1.5 mb-1">
+                              <span className="text-[17px] font-black" style={{ color: info.color }}>{letter}</span>
+                              <span className="text-[12px] font-bold text-stone-700">{info.name}</span>
+                            </div>
+                            <p className="text-[11px] text-stone-500 leading-snug">{info.desc}</p>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+              </ScrollArea>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* 맞춤솔루션 모달 */}
       <AnimatePresence>
         {showImprovements && (
           <motion.div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center"
@@ -786,15 +829,20 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, onBack, onGoMagazi
               onClick={e => e.stopPropagation()}>
               <div className="p-6 pb-2">
                 <div className="w-10 h-1 rounded-full bg-stone-200 mx-auto mb-5" />
-                <div className="flex items-center gap-2 mb-4">
-                  <div className="w-9 h-9 rounded-xl flex items-center justify-center"
-                    style={{ background: `linear-gradient(135deg, ${DEEP_GREEN_LIGHT}, ${DEEP_GREEN})` }}>
-                    <Leaf className="w-4 h-4 text-white" />
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-2">
+                    <div className="w-9 h-9 rounded-xl flex items-center justify-center"
+                      style={{ background: `linear-gradient(135deg, ${DEEP_GREEN_LIGHT}, ${DEEP_GREEN})` }}>
+                      <Leaf className="w-4 h-4 text-white" />
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-base" style={{ color: DEEP_GREEN }}>맞춤솔루션</h3>
+                      <p className="text-[11px] text-stone-400">AI가 분석 결과를 바탕으로 제안합니다</p>
+                    </div>
                   </div>
-                  <div>
-                    <h3 className="font-bold text-base" style={{ color: DEEP_GREEN }}>나만의 개선 방안</h3>
-                    <p className="text-[11px] text-stone-400">AI가 분석 결과를 바탕으로 제안합니다</p>
-                  </div>
+                  <button onClick={() => setShowImprovements(false)} className="w-7 h-7 rounded-full bg-stone-100 flex items-center justify-center">
+                    <X className="w-3.5 h-3.5 text-stone-500" />
+                  </button>
                 </div>
               </div>
               <ScrollArea className="max-h-[65vh]">
