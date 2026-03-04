@@ -26,6 +26,9 @@ import {
   X,
   Lock,
   Thermometer,
+  FileText,
+  PlusSquare,
+  SmartphoneNfc,
 } from "lucide-react";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { Button } from "@/components/ui/button";
@@ -34,7 +37,7 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
-type TabId = "scan" | "magazine";
+type TabId = "scan" | "report" | "magazine";
 type ScanState = "idle" | "survey" | "scanning" | "result";
 
 interface SurveyData {
@@ -273,33 +276,48 @@ function CameraCapture({ onCapture, onClose }: { onCapture: (file: File) => void
 }
 
 // ─── 하단 네비게이션 ──────────────────────────────────────────────
-function BottomNav({ active, onChange }: { active: TabId; onChange: (t: TabId) => void }) {
+function BottomNav({ active, onChange, onScanNew, onInstall }: {
+  active: TabId;
+  onChange: (t: TabId) => void;
+  onScanNew: () => void;
+  onInstall: () => void;
+}) {
+  const btn = (tab: TabId, icon: React.ReactNode, label: string) => (
+    <button
+      onClick={() => onChange(tab)}
+      className={`flex flex-col items-center justify-center gap-0.5 transition-colors ${active === tab ? "text-[#C97062]" : "text-stone-400"}`}>
+      {icon}
+      <span className="text-[10px] font-semibold">{label}</span>
+    </button>
+  );
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-2xl border-t border-stone-100">
-      <div className="max-w-md mx-auto px-6">
-        <div className="grid grid-cols-3 h-[64px]">
+      <div className="max-w-md mx-auto px-2">
+        <div className="grid grid-cols-5 h-[64px]">
           <button
-            onClick={() => onChange("scan")}
-            className={`flex flex-col items-center justify-center gap-1 transition-colors ${active === "scan" ? "text-[#C97062]" : "text-stone-400"}`}>
+            onClick={onScanNew}
+            className={`flex flex-col items-center justify-center gap-0.5 transition-colors ${active === "scan" ? "text-[#C97062]" : "text-stone-400"}`}>
             <Camera className="w-5 h-5" />
             <span className="text-[10px] font-semibold">AI 스캔</span>
           </button>
+          {btn("report", <FileText className="w-5 h-5" />, "리포트")}
           <a
             href="https://fonday.replit.app/"
             target="_blank"
             rel="noopener noreferrer"
-            className="flex flex-col items-center justify-center gap-0.5 transition-opacity active:opacity-70 -mt-3">
+            className="flex flex-col items-center justify-center gap-0.5 active:opacity-70 -mt-3">
             <div className="w-12 h-12 rounded-full flex items-center justify-center shadow-lg"
               style={{ background: "linear-gradient(135deg, #E09882, #C97062)" }}>
               <Zap className="w-5 h-5 text-white" />
             </div>
             <span className="text-[11px] font-black" style={{ color: "#C97062" }}>Fonday</span>
           </a>
+          {btn("magazine", <BookOpen className="w-5 h-5" />, "매거진")}
           <button
-            onClick={() => onChange("magazine")}
-            className={`flex flex-col items-center justify-center gap-1 transition-colors ${active === "magazine" ? "text-[#C97062]" : "text-stone-400"}`}>
-            <BookOpen className="w-5 h-5" />
-            <span className="text-[10px] font-semibold">매거진</span>
+            onClick={onInstall}
+            className="flex flex-col items-center justify-center gap-0.5 text-stone-400 transition-colors active:text-[#C97062]">
+            <SmartphoneNfc className="w-5 h-5" />
+            <span className="text-[10px] font-semibold">앱 추가</span>
           </button>
         </div>
       </div>
@@ -1506,6 +1524,173 @@ function MagazineTab() {
   );
 }
 
+// ─── 리포트 탭 ────────────────────────────────────────────────────
+function ReportTab({ user }: { user: any }) {
+  const [lastScan, setLastScan] = useState<any | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!user) { setLoading(false); return; }
+    fetch("/api/scans")
+      .then(res => res.json())
+      .then(data => { if (Array.isArray(data) && data.length > 0) setLastScan(data[0]); })
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, [user]);
+
+  if (!user) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[calc(100dvh-64px)] px-6 text-center gap-5">
+        <div className="w-16 h-16 rounded-2xl flex items-center justify-center"
+          style={{ background: `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})` }}>
+          <FileText className="w-8 h-8 text-white" />
+        </div>
+        <div>
+          <h2 className="text-xl font-black mb-1" style={{ color: DEEP_GREEN }}>내 피부 리포트</h2>
+          <p className="text-sm text-stone-400">로그인하면 지난 분석 결과를 확인할 수 있어요.</p>
+        </div>
+        <div className="w-full space-y-2">
+          <Button onClick={() => { window.location.href = "/auth/kakao"; }}
+            className="w-full h-12 rounded-xl font-bold gap-2 border-0 text-[#3C1E1E]" style={{ background: "#FEE500" }}>
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+              <path fillRule="evenodd" clipRule="evenodd" d="M9 1C4.582 1 1 3.79 1 7.222c0 2.154 1.386 4.045 3.484 5.14L3.62 15.5a.25.25 0 0 0 .368.274L7.9 13.39A9.63 9.63 0 0 0 9 13.444c4.418 0 8-2.791 8-6.222C17 3.79 13.418 1 9 1Z" fill="#3C1E1E"/>
+            </svg>
+            카카오로 로그인
+          </Button>
+          <Button onClick={() => { window.location.href = "/auth/google"; }}
+            className="w-full h-12 rounded-xl bg-white hover:bg-stone-50 font-bold text-zinc-700 gap-2 border border-stone-200 shadow-sm">
+            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" className="w-4 h-4" />
+            Google로 로그인
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[calc(100dvh-64px)]">
+        <div className="w-8 h-8 rounded-full border-2 border-stone-200 border-t-[#C97062] animate-spin" />
+      </div>
+    );
+  }
+
+  if (!lastScan) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[calc(100dvh-64px)] px-6 text-center gap-4">
+        <FileText className="w-12 h-12 text-stone-200" />
+        <p className="text-stone-400 text-sm">아직 분석 기록이 없어요.<br />AI 스캔을 먼저 해보세요!</p>
+      </div>
+    );
+  }
+
+  const date = new Date(lastScan.createdAt);
+  const baumannLetters = lastScan.baumannType ? lastScan.baumannType.split("") : [];
+
+  return (
+    <div className="h-[calc(100dvh-64px)] overflow-y-auto">
+      <motion.div className="px-5 pt-6 pb-24 space-y-4" variants={stagger} initial="initial" animate="animate">
+        <motion.div variants={fadeChild} className="flex items-center justify-between">
+          <h2 className="text-xl font-black" style={{ color: DEEP_GREEN }}>내 피부 리포트</h2>
+          <span className="text-[11px] text-stone-400">
+            {date.toLocaleDateString("ko-KR", { month: "long", day: "numeric", hour: "2-digit", minute: "2-digit" })}
+          </span>
+        </motion.div>
+
+        {/* 요약 */}
+        <motion.div variants={fadeChild}>
+          <Card className="border-none shadow-md rounded-3xl">
+            <CardContent className="p-5">
+              <div className="flex items-center gap-3">
+                <div className="w-[72px] h-[72px] rounded-2xl flex flex-col items-center justify-center text-white shadow-lg shrink-0"
+                  style={{ background: `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})` }}>
+                  <span className="text-3xl font-black leading-none">{lastScan.overallScore}</span>
+                  <span className="text-[9px] font-bold opacity-80 mt-1">종합점수</span>
+                </div>
+                {lastScan.skinAge && (
+                  <div className="w-[72px] h-[72px] rounded-2xl flex flex-col items-center justify-center text-white shadow-lg shrink-0"
+                    style={{ background: "linear-gradient(135deg, #A78BFA, #7C3AED)" }}>
+                    <span className="text-3xl font-black leading-none">{lastScan.skinAge}</span>
+                    <span className="text-[9px] font-bold opacity-80 mt-1">피부나이</span>
+                  </div>
+                )}
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-baseline gap-1 mb-1.5">
+                    <span className="text-[13px] text-stone-500">바우만</span>
+                    <span className="text-xl font-black" style={{ color: SCAN_TO }}>{lastScan.baumannType}</span>
+                    <span className="text-[13px] text-stone-500">형</span>
+                  </div>
+                  <div className="flex gap-1 flex-wrap">
+                    {baumannLetters.map((letter: string, i: number) => {
+                      const info = BAUMANN_DESC[letter];
+                      if (!info) return null;
+                      return <span key={i} className="text-[10px] font-bold px-2 py-0.5 rounded-full"
+                        style={{ background: `${info.color}18`, color: info.color }}>{info.name}</span>;
+                    })}
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+
+        {/* AI 총평 */}
+        {lastScan.aiComment && (
+          <motion.div variants={fadeChild}>
+            <Card className="border-none shadow-md rounded-3xl">
+              <CardContent className="p-5">
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0"
+                    style={{ background: `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})` }}>
+                    <Sparkles className="w-4 h-4 text-white" />
+                  </div>
+                  <p className="text-[13px] font-black" style={{ color: DEEP_GREEN }}>FondayAI 의 피부 총평</p>
+                </div>
+                <p className="text-[13px] text-stone-600 leading-relaxed">{lastScan.aiComment}</p>
+              </CardContent>
+            </Card>
+          </motion.div>
+        )}
+
+        {/* 항목별 점수 */}
+        {lastScan.scores?.length > 0 && (
+          <motion.div variants={fadeChild}>
+            <Card className="border-none shadow-md rounded-3xl">
+              <CardHeader className="pb-1 pt-5 px-5">
+                <p className="text-[13px] font-black" style={{ color: DEEP_GREEN }}>10가지 항목별 점수</p>
+              </CardHeader>
+              <CardContent className="px-5 pb-5 space-y-4">
+                {lastScan.scores.map((item: any, i: number) => {
+                  const Icon = SCORE_ICONS[i] || Zap;
+                  const color = SCORE_COLORS[i] || DEEP_GREEN;
+                  return (
+                    <div key={i} className="space-y-1.5">
+                      <div className="flex items-center justify-between text-[13px] font-bold">
+                        <div className="flex items-center gap-2">
+                          <div className="w-6 h-6 rounded-full flex items-center justify-center bg-stone-50 shadow-sm">
+                            <Icon className="w-3.5 h-3.5" style={{ color }} />
+                          </div>
+                          <span className="text-stone-700">{item.label}</span>
+                        </div>
+                        <span style={{ color }}>{item.score}점</span>
+                      </div>
+                      <div className="h-1.5 rounded-full overflow-hidden bg-stone-100">
+                        <motion.div className="h-full rounded-full" style={{ background: color }}
+                          initial={{ width: "0%" }} animate={{ width: `${item.score}%` }}
+                          transition={{ duration: 0.8, delay: 0.2 + i * 0.05 }} />
+                      </div>
+                    </div>
+                  );
+                })}
+              </CardContent>
+            </Card>
+          </motion.div>
+        )}
+      </motion.div>
+    </div>
+  );
+}
+
 // ─── 루트 페이지 ──────────────────────────────────────────────────
 export default function SkinScanPage() {
   const [activeTab, setActiveTab] = useState<TabId>("scan");
@@ -1516,7 +1701,30 @@ export default function SkinScanPage() {
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imageSrc, setImageSrc] = useState<string | null>(null);
   const [imageBase64, setImageBase64] = useState<string | null>(null);
-  const [user, setUser] = useState<any>(undefined); // undefined=로딩중, null=미로그인
+  const [user, setUser] = useState<any>(undefined);
+  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+  const [showInstallGuide, setShowInstallGuide] = useState(false);
+
+  useEffect(() => {
+    const handler = (e: any) => { e.preventDefault(); setDeferredPrompt(e); };
+    window.addEventListener("beforeinstallprompt", handler);
+    return () => window.removeEventListener("beforeinstallprompt", handler);
+  }, []);
+
+  const handleInstall = async () => {
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      await deferredPrompt.userChoice;
+      setDeferredPrompt(null);
+    } else {
+      setShowInstallGuide(true);
+    }
+  };
+
+  const handleScanNew = () => {
+    setActiveTab("scan");
+    setScanState("idle");
+  };
 
   useEffect(() => {
     fetch("/api/user")
@@ -1614,10 +1822,60 @@ export default function SkinScanPage() {
               )}
             </motion.div>
           )}
-          {activeTab === "magazine" && <MagazineTab />}
+          {activeTab === "report" && (
+            <motion.div key="report" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+              <ReportTab user={user} />
+            </motion.div>
+          )}
+          {activeTab === "magazine" && (
+            <motion.div key="magazine" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+              <MagazineTab />
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* 앱 추가 안내 모달 (iOS) */}
+        <AnimatePresence>
+          {showInstallGuide && (
+            <motion.div className="fixed inset-0 z-[200] flex items-end justify-center"
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+              <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setShowInstallGuide(false)} />
+              <motion.div className="relative bg-white rounded-t-3xl w-full max-w-sm shadow-xl p-7"
+                initial={{ y: "100%" }} animate={{ y: 0 }} exit={{ y: "100%" }}
+                transition={{ type: "spring", damping: 30, stiffness: 300 }}>
+                <div className="w-10 h-1 rounded-full bg-stone-200 mx-auto mb-6" />
+                <div className="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-4"
+                  style={{ background: "linear-gradient(135deg, #E09882, #C97062)" }}>
+                  <SmartphoneNfc className="w-7 h-7 text-white" />
+                </div>
+                <h3 className="text-center text-lg font-black mb-2" style={{ color: "#2D5F4F" }}>홈 화면에 추가하기</h3>
+                <p className="text-center text-sm text-stone-400 mb-6">Safari에서 아래 단계를 따라 앱을 추가하세요.</p>
+                <div className="space-y-3 mb-6">
+                  <div className="flex items-start gap-3 p-3 rounded-2xl bg-stone-50">
+                    <span className="w-6 h-6 rounded-full bg-[#C97062] text-white text-[11px] font-black flex items-center justify-center shrink-0 mt-0.5">1</span>
+                    <p className="text-[13px] text-stone-600">하단 <strong>공유 버튼(□↑)</strong>을 탭해요.</p>
+                  </div>
+                  <div className="flex items-start gap-3 p-3 rounded-2xl bg-stone-50">
+                    <span className="w-6 h-6 rounded-full bg-[#C97062] text-white text-[11px] font-black flex items-center justify-center shrink-0 mt-0.5">2</span>
+                    <p className="text-[13px] text-stone-600"><strong>"홈 화면에 추가"</strong>를 선택해요.</p>
+                  </div>
+                  <div className="flex items-start gap-3 p-3 rounded-2xl bg-stone-50">
+                    <span className="w-6 h-6 rounded-full bg-[#C97062] text-white text-[11px] font-black flex items-center justify-center shrink-0 mt-0.5">3</span>
+                    <p className="text-[13px] text-stone-600">오른쪽 위 <strong>"추가"</strong>를 탭하면 완료!</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setShowInstallGuide(false)}
+                  className="w-full h-12 rounded-2xl font-bold text-white"
+                  style={{ background: "linear-gradient(135deg, #E09882, #C97062)" }}>
+                  확인
+                </button>
+              </motion.div>
+            </motion.div>
+          )}
         </AnimatePresence>
       </div>
-      <BottomNav active={activeTab} onChange={setActiveTab} />
+      <BottomNav active={activeTab} onChange={setActiveTab} onScanNew={handleScanNew} onInstall={handleInstall} />
     </div>
   );
 }
