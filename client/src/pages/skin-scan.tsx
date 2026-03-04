@@ -511,30 +511,39 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, onBack, onGoMagazi
     sessionStorage.setItem("pendingResult", JSON.stringify({ analysisResult, surveyData }));
     window.location.href = "/auth/google";
   };
+  const handleKakaoLogin = () => {
+    sessionStorage.setItem("pendingResult", JSON.stringify({ analysisResult, surveyData }));
+    window.location.href = "/auth/kakao";
+  };
   const [isSuccess, setIsSuccess] = useState(false);
 
+  // 히스토리 로드 (로그인 시)
   useEffect(() => {
-    if (user) {
-      fetch("/api/scans").then(res => res.json()).then(data => {
-        if (Array.isArray(data)) setHistory(data.slice(0, 10));
-      });
-      if (!isSaved && analysisResult) {
-        const overallScore = analysisResult.scores.find((s: any) => s.label === "종합 컨디션")?.score || 0;
-        fetch("/api/scans", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            overallScore,
-            skinAge: analysisResult.skinAge ?? null,
-            baumannType: finalType,
-            scores: analysisResult.scores,
-            hotspots: analysisResult.hotspots,
-            aiComment: analysisResult.aiComment,
-          })
-        }).then(() => setIsSaved(true));
-      }
-    }
+    if (!user) return;
+    fetch("/api/scans").then(res => res.json()).then(data => {
+      if (Array.isArray(data)) setHistory(data);
+    });
   }, [user]);
+
+  // 스캔 저장 (로그인 + 분석결과 둘 다 준비됐을 때)
+  useEffect(() => {
+    if (!user || !analysisResult || isSaved) return;
+    const overallScore = analysisResult.scores.find((s: any) => s.label === "종합 컨디션")?.score || 0;
+    fetch("/api/scans", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        overallScore,
+        skinAge: analysisResult.skinAge ?? null,
+        baumannType: finalType,
+        scores: analysisResult.scores,
+        hotspots: analysisResult.hotspots,
+        aiComment: analysisResult.aiComment,
+        improvements: analysisResult.improvements ?? [],
+        cosmetics: analysisResult.cosmetics ?? [],
+      })
+    }).then(() => setIsSaved(true));
+  }, [user, analysisResult]);
 
   // 모달 열릴 때 배경 스크롤 잠금
   useEffect(() => {
@@ -821,7 +830,15 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, onBack, onGoMagazi
               <CardTitle className="text-lg font-bold" style={{ color: DEEP_GREEN }}>변화 과정을 기록하세요</CardTitle>
               <CardDescription className="text-xs">로그인으로 내 피부 일기를 시작하세요.</CardDescription>
             </CardHeader>
-            <CardContent className="p-0">
+            <CardContent className="p-0 space-y-2">
+              <Button onClick={handleKakaoLogin}
+                className="w-full h-12 rounded-xl font-bold gap-2 border-0 shadow-sm text-[#3C1E1E]"
+                style={{ background: "#FEE500" }}>
+                <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                  <path fillRule="evenodd" clipRule="evenodd" d="M9 1C4.582 1 1 3.79 1 7.222c0 2.154 1.386 4.045 3.484 5.14L3.62 15.5a.25.25 0 0 0 .368.274L7.9 13.39A9.63 9.63 0 0 0 9 13.444c4.418 0 8-2.791 8-6.222C17 3.79 13.418 1 9 1Z" fill="#3C1E1E"/>
+                </svg>
+                카카오로 계속하기
+              </Button>
               <Button onClick={handleGoogleLogin}
                 className="w-full h-12 rounded-xl bg-white hover:bg-stone-50 font-bold text-zinc-700 gap-2 border border-stone-200 shadow-sm">
                 <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" className="w-4 h-4" />

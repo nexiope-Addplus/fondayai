@@ -47,6 +47,8 @@ export const onRequest = async (context: any) => {
       aiComment: body.aiComment ?? "",
       scores: body.scores ?? [],
       hotspots: body.hotspots ?? [],
+      improvements: body.improvements ?? [],
+      cosmetics: body.cosmetics ?? [],
     };
 
     if (env.SCANS_KV) {
