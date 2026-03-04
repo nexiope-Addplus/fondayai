@@ -307,55 +307,77 @@ function BottomNav({ active, onChange }: { active: TabId; onChange: (t: TabId) =
   );
 }
 
-// ─── 페이스 메시 오버레이 ─────────────────────────────────────────
-function FaceMeshOverlay() {
-  const pts: [number, number][] = [
-    [50, 13], [34, 18], [66, 18],          // 0-2  이마
-    [28, 27], [37, 24], [44, 26],          // 3-5  왼눈썹
-    [56, 26], [63, 24], [72, 27],          // 6-8  오른눈썹
-    [37, 33],                              // 9    왼눈
-    [63, 33],                              // 10   오른눈
-    [50, 30], [50, 52],                    // 11-12 코 브릿지·끝
-    [44, 57], [56, 57],                    // 13-14 콧방울
-    [38, 65], [50, 62], [62, 65], [50, 71],// 15-18 입
-    [21, 43], [79, 43],                    // 19-20 볼
-    [20, 60], [80, 60],                    // 21-22 턱선 상
-    [31, 77], [69, 77], [50, 84],          // 23-25 턱
-  ];
-  const edges: [number, number][] = [
-    [0,1],[0,2],[1,3],[2,8],
-    [3,4],[4,5],[6,7],[7,8],
-    [5,11],[6,11],[0,11],
-    [9,11],[10,11],[9,5],[10,6],
-    [11,12],[12,13],[12,14],[13,14],
-    [3,9],[4,9],[8,10],[7,10],
-    [9,19],[10,20],
-    [13,15],[14,17],[12,16],
-    [15,16],[16,17],[15,18],[17,18],
-    [1,19],[2,20],
-    [19,21],[20,22],
-    [21,23],[22,24],[23,25],[24,25],
-    [9,15],[10,17],
-    [19,23],[20,24],
-  ];
+// ─── 페이스 메시 오버레이 (실제 얼굴 인식) ──────────────────────
+import type { NormalizedLandmark, LandmarkConnectionArray } from '@mediapipe/face_mesh';
+
+function FaceMeshOverlay({ imageSrc }: { imageSrc: string }) {
+  const [landmarks, setLandmarks] = useState<NormalizedLandmark[] | null>(null);
+  const [connections, setConnections] = useState<{ contours: LandmarkConnectionArray; tess: LandmarkConnectionArray } | null>(null);
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const mp = await import('@mediapipe/face_mesh');
+        const { FaceMesh, FACEMESH_CONTOURS, FACEMESH_TESSELATION } = mp;
+
+        const faceMesh = new FaceMesh({
+          locateFile: (file: string) =>
+            `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh@0.4/${file}`,
+        });
+        faceMesh.setOptions({ maxNumFaces: 1, refineLandmarks: false, minDetectionConfidence: 0.5, minTrackingConfidence: 0.5 });
+
+        await new Promise<void>((resolve) => {
+          faceMesh.onResults((results: any) => {
+            if (cancelled) return;
+            if (results.multiFaceLandmarks?.[0]) {
+              setLandmarks(results.multiFaceLandmarks[0]);
+              setConnections({ contours: FACEMESH_CONTOURS, tess: FACEMESH_TESSELATION });
+              setTimeout(() => setVisible(true), 50);
+            }
+            resolve();
+          });
+          const img = new Image();
+          img.onload = () => faceMesh.send({ image: img });
+          img.src = imageSrc;
+        });
+
+        faceMesh.close();
+      } catch (e) {
+        console.warn('Face mesh detection failed:', e);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [imageSrc]);
+
+  if (!landmarks || !connections) return null;
 
   return (
-    <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice">
-      <defs>
-        <style>{`
-          @keyframes mLine { from { opacity:0 } to { opacity:0.55 } }
-          @keyframes mDot  { 0%,100%{opacity:.9;r:.75} 50%{opacity:1;r:1.2} }
-        `}</style>
-      </defs>
-      {edges.map(([a, b], i) => (
-        <line key={i}
-          x1={pts[a][0]} y1={pts[a][1]} x2={pts[b][0]} y2={pts[b][1]}
-          stroke="white" strokeWidth="0.35"
-          style={{ animation: `mLine .4s ease-out ${i * 0.025}s forwards`, opacity: 0 }} />
+    <svg
+      className="absolute inset-0 w-full h-full pointer-events-none"
+      viewBox="0 0 1 1"
+      preserveAspectRatio="xMidYMid slice"
+      style={{ opacity: visible ? 1 : 0, transition: 'opacity 0.6s ease' }}
+    >
+      {/* 테셀레이션 (촘촘한 메시) */}
+      {connections.tess.map(([a, b], i) => (
+        <line key={`t${i}`}
+          x1={landmarks[a].x} y1={landmarks[a].y}
+          x2={landmarks[b].x} y2={landmarks[b].y}
+          stroke="rgba(255,255,255,0.18)" strokeWidth="0.002" />
       ))}
-      {pts.map(([x, y], i) => (
-        <circle key={i} cx={x} cy={y} r={0.75} fill="white"
-          style={{ animation: `mLine .3s ease-out ${i * 0.04 + .3}s forwards, mDot 2.2s ease-in-out ${i * 0.04 + .3}s infinite`, opacity: 0 }} />
+      {/* 외곽선 + 눈/코/입 강조 */}
+      {connections.contours.map(([a, b], i) => (
+        <line key={`c${i}`}
+          x1={landmarks[a].x} y1={landmarks[a].y}
+          x2={landmarks[b].x} y2={landmarks[b].y}
+          stroke="rgba(255,255,255,0.75)" strokeWidth="0.004" />
+      ))}
+      {/* 랜드마크 점 (주요 포인트만) */}
+      {landmarks.filter((_, i) => i % 12 === 0).map((pt, i) => (
+        <circle key={`p${i}`} cx={pt.x} cy={pt.y} r={0.007}
+          fill="white" opacity={0.9} />
       ))}
     </svg>
   );
@@ -543,7 +565,7 @@ function ScanningScreen({ imageSrc }: { imageSrc: string | null }) {
         {imageSrc ? (
           <>
             <img src={imageSrc} className="w-full h-full object-cover" />
-            <FaceMeshOverlay />
+            <FaceMeshOverlay imageSrc={imageSrc} />
           </>
         ) : (
           <Camera className="w-16 h-16 opacity-10" />
