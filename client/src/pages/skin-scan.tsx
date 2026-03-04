@@ -644,47 +644,80 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
   return (
     <>
     {/* 공유용 카드 (화면 밖, html2canvas 캡처용) */}
-    <div ref={shareCardRef} style={{ display: "none", position: "fixed", left: "-9999px", top: 0, width: "390px", background: "#FAF9F6", fontFamily: "system-ui, -apple-system, sans-serif" }}>
-      <div style={{ background: `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})`, padding: "20px 24px 18px" }}>
-        <div style={{ color: "white", fontSize: "11px", fontWeight: 700, letterSpacing: "2px", opacity: 0.85 }}>FONDAYAI</div>
-        <div style={{ color: "white", fontSize: "22px", fontWeight: 900, marginTop: "2px" }}>피부 분석 리포트</div>
-        <div style={{ color: "white", fontSize: "11px", opacity: 0.75, marginTop: "2px" }}>
-          {new Date().toLocaleDateString("ko-KR", { year: "numeric", month: "long", day: "numeric" })}
+    <div ref={shareCardRef} style={{ display: "none", position: "fixed", left: "-9999px", top: 0, width: "390px", background: "#FAF9F6", fontFamily: "system-ui, -apple-system, sans-serif", padding: "20px 20px 24px" }}>
+      {/* 헤더 */}
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }}>
+        <span style={{ fontSize: "20px", fontWeight: 900, color: DEEP_GREEN }}>FondayAI 피부 리포트</span>
+        <span style={{ fontSize: "11px", color: TEXT_SECONDARY }}>{new Date().toLocaleDateString("ko-KR", { month: "long", day: "numeric" })}</span>
+      </div>
+
+      {/* 요약 카드 */}
+      <div style={{ background: "white", borderRadius: "24px", padding: "20px", marginBottom: "12px", boxShadow: "0 2px 12px rgba(0,0,0,0.06)" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+          {/* 종합점수 */}
+          <div style={{ width: "72px", height: "72px", borderRadius: "16px", background: `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})`, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+            <span style={{ fontSize: "30px", fontWeight: 900, color: "white", lineHeight: 1 }}>{overallScore}</span>
+            <span style={{ fontSize: "9px", fontWeight: 700, color: "rgba(255,255,255,0.85)", marginTop: "3px" }}>종합점수</span>
+          </div>
+          {/* 피부나이 */}
+          {analysisResult?.skinAge != null && analysisResult.skinAge > 0 && (
+            <div style={{ width: "72px", height: "72px", borderRadius: "16px", background: "linear-gradient(135deg, #A78BFA, #7C3AED)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+              <span style={{ fontSize: "30px", fontWeight: 900, color: "white", lineHeight: 1 }}>{analysisResult.skinAge}</span>
+              <span style={{ fontSize: "9px", fontWeight: 700, color: "rgba(255,255,255,0.85)", marginTop: "3px" }}>피부나이</span>
+            </div>
+          )}
+          {/* 바우만 타입 */}
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ fontSize: "11px", color: TEXT_SECONDARY, marginBottom: "4px" }}>{surveyData?.age} {surveyData?.gender}</div>
+            <div style={{ display: "flex", alignItems: "baseline", gap: "4px", marginBottom: "6px" }}>
+              <span style={{ fontSize: "13px", color: "#78716C" }}>바우만</span>
+              <span style={{ fontSize: "22px", fontWeight: 900, color: SCAN_TO }}>{finalType}</span>
+              <span style={{ fontSize: "13px", color: "#78716C" }}>형</span>
+            </div>
+            <div style={{ display: "flex", gap: "4px", flexWrap: "wrap" }}>
+              {finalType.split("").map((letter, i) => {
+                const info = BAUMANN_DESC[letter];
+                if (!info) return null;
+                return (
+                  <span key={i} style={{ fontSize: "10px", fontWeight: 700, padding: "2px 8px", borderRadius: "999px", background: `${info.color}18`, color: info.color }}>{info.name}</span>
+                );
+              })}
+            </div>
+          </div>
         </div>
       </div>
-      {(imageSrc || imageBase64) && (
-        <div style={{ padding: "16px 24px 0" }}>
-          <img src={imageSrc || imageBase64 || ""} style={{ width: "100%", height: "200px", objectFit: "cover", borderRadius: "16px", display: "block" }} />
+
+      {/* AI 피부 총평 */}
+      {analysisResult?.aiComment && (
+        <div style={{ background: "white", borderRadius: "24px", padding: "18px 20px", marginBottom: "12px", boxShadow: "0 2px 12px rgba(0,0,0,0.06)" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "10px" }}>
+            <div style={{ width: "30px", height: "30px", borderRadius: "10px", background: `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+              <span style={{ color: "white", fontSize: "14px" }}>✦</span>
+            </div>
+            <span style={{ fontSize: "13px", fontWeight: 900, color: DEEP_GREEN }}>FondayAI 의 피부 총평</span>
+          </div>
+          <p style={{ fontSize: "13px", color: "#57534E", lineHeight: 1.65, margin: 0 }}>{analysisResult.aiComment}</p>
         </div>
       )}
-      <div style={{ padding: "18px 24px 8px", textAlign: "center" }}>
-        <div style={{ fontSize: "76px", fontWeight: 900, color: SCAN_TO, lineHeight: 1 }}>{overallScore}</div>
-        <div style={{ fontSize: "13px", color: TEXT_SECONDARY, marginTop: "4px" }}>종합 피부 점수</div>
-        <div style={{ display: "inline-block", marginTop: "8px", padding: "4px 14px", background: `${SCAN_FROM}25`, borderRadius: "20px", fontSize: "13px", fontWeight: 700, color: SCAN_TO }}>
-          바우만 {finalType}형
-        </div>
-      </div>
-      <div style={{ margin: "0 24px 16px", padding: "14px 16px", background: "#F0EDE8", borderRadius: "12px" }}>
-        <div style={{ fontSize: "10px", fontWeight: 700, color: DEEP_GREEN, marginBottom: "6px", textTransform: "uppercase", letterSpacing: "1px" }}>AI 피부 총평</div>
-        <div style={{ fontSize: "12px", color: "#5C5548", lineHeight: 1.65 }}>{analysisResult?.aiComment}</div>
-      </div>
-      <div style={{ padding: "0 24px 8px" }}>
-        <div style={{ fontSize: "10px", fontWeight: 700, color: DEEP_GREEN, marginBottom: "10px", textTransform: "uppercase", letterSpacing: "1px" }}>항목별 분석</div>
+
+      {/* 10가지 항목별 점수 */}
+      <div style={{ background: "white", borderRadius: "24px", padding: "18px 20px", boxShadow: "0 2px 12px rgba(0,0,0,0.06)" }}>
+        <p style={{ fontSize: "13px", fontWeight: 900, color: DEEP_GREEN, marginBottom: "14px" }}>10가지 항목별 점수</p>
         {analysisResult?.scores.map((s: any, i: number) => (
-          <div key={i} style={{ marginBottom: "9px" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "3px" }}>
-              <span style={{ fontSize: "11px", color: "#5C5548" }}>{s.label}</span>
-              <span style={{ fontSize: "11px", fontWeight: 700, color: SCORE_COLORS[i] }}>{s.score}점</span>
+          <div key={i} style={{ marginBottom: i < (analysisResult.scores.length - 1) ? "12px" : 0 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "5px" }}>
+              <span style={{ fontSize: "13px", fontWeight: 700, color: "#44403C" }}>{s.label}</span>
+              <span style={{ fontSize: "13px", fontWeight: 700, color: SCORE_COLORS[i] }}>{s.score}점</span>
             </div>
-            <div style={{ height: "4px", background: "#E8E5E0", borderRadius: "2px", overflow: "hidden" }}>
-              <div style={{ height: "100%", width: `${s.score}%`, background: SCORE_COLORS[i], borderRadius: "2px" }} />
+            <div style={{ height: "6px", background: "#F5F4F2", borderRadius: "999px", overflow: "hidden" }}>
+              <div style={{ height: "100%", width: `${s.score}%`, background: SCORE_COLORS[i], borderRadius: "999px" }} />
             </div>
           </div>
         ))}
       </div>
-      <div style={{ padding: "12px 24px 20px", textAlign: "center", color: "#C0B8B0", fontSize: "10px" }}>
-        fondayai.pages.dev
-      </div>
+
+      {/* 푸터 */}
+      <div style={{ textAlign: "center", marginTop: "14px", fontSize: "10px", color: "#C0B8B0" }}>fondayai.pages.dev</div>
     </div>
 
     <div ref={resultScrollRef} className="h-[calc(100dvh-60px)] overflow-y-auto">
