@@ -622,12 +622,13 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
       canvas.toBlob(async (blob) => {
         if (!blob) return;
         const file = new File([blob], "fonday-skin-report.png", { type: "image/png" });
+        const shareText = `오늘 내 피부 점수는 ${overallScore}점! 바우만 타입은 ${finalType}형이 나왔어요.\n#Fonday #AI피부분석 #FondayAI`;
         if (navigator.canShare?.({ files: [file] })) {
-          await navigator.share({ files: [file], title: "Fonday AI 피부 분석 리포트" });
+          await navigator.share({ files: [file], title: "Fonday AI 피부 분석 리포트", text: shareText });
         } else if (navigator.share) {
           await navigator.share({
             title: "Fonday AI 피부 분석 리포트",
-            text: `내 피부 점수 ${overallScore}점! 바우만 ${finalType}형 #Fonday #피부분석`,
+            text: shareText,
             url: window.location.href,
           });
         } else {
@@ -703,17 +704,26 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
       {/* 10가지 항목별 점수 */}
       <div style={{ background: "white", borderRadius: "24px", padding: "18px 20px", boxShadow: "0 2px 12px rgba(0,0,0,0.06)" }}>
         <p style={{ fontSize: "13px", fontWeight: 900, color: DEEP_GREEN, marginBottom: "14px" }}>10가지 항목별 점수</p>
-        {analysisResult?.scores.map((s: any, i: number) => (
-          <div key={i} style={{ marginBottom: i < (analysisResult.scores.length - 1) ? "12px" : 0 }}>
-            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "5px" }}>
-              <span style={{ fontSize: "13px", fontWeight: 700, color: "#44403C" }}>{s.label}</span>
-              <span style={{ fontSize: "13px", fontWeight: 700, color: SCORE_COLORS[i] }}>{s.score}점</span>
+        {analysisResult?.scores.map((s: any, i: number) => {
+          const Icon = SCORE_ICONS[i] || Zap;
+          const color = SCORE_COLORS[i] || DEEP_GREEN;
+          return (
+            <div key={i} style={{ marginBottom: i < (analysisResult.scores.length - 1) ? "14px" : 0 }}>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "6px" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                  <div style={{ width: "24px", height: "24px", borderRadius: "999px", background: "#F5F4F2", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                    <Icon size={14} style={{ color }} />
+                  </div>
+                  <span style={{ fontSize: "13px", fontWeight: 700, color: "#44403C" }}>{s.label}</span>
+                </div>
+                <span style={{ fontSize: "13px", fontWeight: 700, color }}>{s.score}점</span>
+              </div>
+              <div style={{ height: "6px", background: "#F5F4F2", borderRadius: "999px", overflow: "hidden" }}>
+                <div style={{ height: "100%", width: `${s.score}%`, background: color, borderRadius: "999px" }} />
+              </div>
             </div>
-            <div style={{ height: "6px", background: "#F5F4F2", borderRadius: "999px", overflow: "hidden" }}>
-              <div style={{ height: "100%", width: `${s.score}%`, background: SCORE_COLORS[i], borderRadius: "999px" }} />
-            </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       {/* 푸터 */}
