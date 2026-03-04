@@ -277,18 +277,31 @@ function BottomNav({ active, onChange }: { active: TabId; onChange: (t: TabId) =
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-2xl border-t border-stone-100">
       <div className="max-w-md mx-auto px-6">
-        <Tabs value={active} onValueChange={(v) => onChange(v as TabId)} className="w-full">
-          <TabsList className="grid w-full grid-cols-2 h-[60px] bg-transparent">
-            <TabsTrigger value="scan" className="data-[state=active]:text-[#C97062] data-[state=active]:bg-transparent flex flex-col gap-1">
-              <Camera className="w-5 h-5" />
-              <span className="text-[10px] font-semibold">AI 스캔</span>
-            </TabsTrigger>
-            <TabsTrigger value="magazine" className="data-[state=active]:text-[#C97062] data-[state=active]:bg-transparent flex flex-col gap-1">
-              <BookOpen className="w-5 h-5" />
-              <span className="text-[10px] font-semibold">매거진</span>
-            </TabsTrigger>
-          </TabsList>
-        </Tabs>
+        <div className="grid grid-cols-3 h-[60px]">
+          <button
+            onClick={() => onChange("scan")}
+            className={`flex flex-col items-center justify-center gap-1 transition-colors ${active === "scan" ? "text-[#C97062]" : "text-stone-400"}`}>
+            <Camera className="w-5 h-5" />
+            <span className="text-[10px] font-semibold">AI 스캔</span>
+          </button>
+          <button
+            onClick={() => onChange("magazine")}
+            className={`flex flex-col items-center justify-center gap-1 transition-colors ${active === "magazine" ? "text-[#C97062]" : "text-stone-400"}`}>
+            <BookOpen className="w-5 h-5" />
+            <span className="text-[10px] font-semibold">매거진</span>
+          </button>
+          <a
+            href="https://fonday.replit.app/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex flex-col items-center justify-center gap-1 transition-opacity active:opacity-70">
+            <div className="w-7 h-7 rounded-full flex items-center justify-center shadow-md"
+              style={{ background: "linear-gradient(135deg, #E09882, #C97062)" }}>
+              <Zap className="w-3.5 h-3.5 text-white" />
+            </div>
+            <span className="text-[10px] font-bold" style={{ color: "#C97062" }}>Fonday</span>
+          </a>
+        </div>
       </div>
     </nav>
   );
