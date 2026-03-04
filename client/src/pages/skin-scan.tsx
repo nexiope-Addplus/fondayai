@@ -450,10 +450,23 @@ function SurveyScreen({ onSubmit, onBack }: { onSubmit: (data: SurveyData) => vo
 // ─── 분석 중 화면 ─────────────────────────────────────────────────
 function ScanningScreen({ imageSrc }: { imageSrc: string | null }) {
   const [textIdx, setTextIdx] = useState(0);
+  const [progress, setProgress] = useState(0);
   const texts = ["사진 데이터 최적화 중...", "AI 피부 고민 부위 탐색 중...", "수분 및 유분 정밀 분석 중...", "리포트 결과 요약 중..."];
+  const progressTargets = [20, 45, 68, 88];
 
   useEffect(() => {
-    const interval = setInterval(() => setTextIdx(prev => (prev + 1) % texts.length), 1500);
+    const t = setTimeout(() => setProgress(12), 200);
+    return () => clearTimeout(t);
+  }, []);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setTextIdx(prev => {
+        const next = (prev + 1) % texts.length;
+        setProgress(progressTargets[next]);
+        return next;
+      });
+    }, 1500);
     return () => clearInterval(interval);
   }, []);
 
@@ -488,12 +501,25 @@ function ScanningScreen({ imageSrc }: { imageSrc: string | null }) {
         </AnimatePresence>
         <p className="text-sm text-stone-400 italic">전문적인 피부 분석 리포트를 생성하고 있습니다.</p>
       </div>
+      {/* 진행 바 */}
+      <div className="mt-8 w-full max-w-xs">
+        <div className="flex justify-between text-[10px] text-stone-400 mb-1.5">
+          <span>분석 진행 중</span>
+          <span>{progress}%</span>
+        </div>
+        <div className="h-1.5 bg-stone-200 rounded-full overflow-hidden">
+          <div
+            className="h-full rounded-full transition-all duration-1000 ease-out"
+            style={{ width: `${progress}%`, background: `linear-gradient(90deg, ${SCAN_FROM}, ${SCAN_TO})` }}
+          />
+        </div>
+      </div>
     </div>
   );
 }
 
 // ─── 결과 화면 ────────────────────────────────────────────────────
-function ResultScreen({ surveyData, analysisResult, imageSrc, onBack, onGoMagazine, user }: any) {
+function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBack, onGoMagazine, user }: any) {
   const [history, setHistory] = useState<any[]>([]);
   const [isSaved, setIsSaved] = useState(false);
   const [showWaitlist, setShowWaitlist] = useState(false);
@@ -502,17 +528,18 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, onBack, onGoMagazi
   const [email, setEmail] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const resultScrollRef = useRef<HTMLDivElement>(null);
+  const shareCardRef = useRef<HTMLDivElement>(null);
   const analysisDrag = useDragControls();
   const improvementsDrag = useDragControls();
   const diaryDrag = useDragControls();
   const [showDiary, setShowDiary] = useState(false);
 
   const handleGoogleLogin = () => {
-    sessionStorage.setItem("pendingResult", JSON.stringify({ analysisResult, surveyData }));
+    sessionStorage.setItem("pendingResult", JSON.stringify({ analysisResult, surveyData, imageBase64 }));
     window.location.href = "/auth/google";
   };
   const handleKakaoLogin = () => {
-    sessionStorage.setItem("pendingResult", JSON.stringify({ analysisResult, surveyData }));
+    sessionStorage.setItem("pendingResult", JSON.stringify({ analysisResult, surveyData, imageBase64 }));
     window.location.href = "/auth/kakao";
   };
   const [isSuccess, setIsSuccess] = useState(false);
@@ -580,21 +607,86 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, onBack, onGoMagazi
   const finalType = `${isOily ? "O" : "D"}${isSens ? "S" : "R"}${isPig ? "P" : "N"}${isWrink ? "W" : "T"}`;
 
   const handleShare = async () => {
-    if (navigator.share) {
-      try {
-        await navigator.share({
-          title: "Fonday AI 피부 분석 리포트",
-          text: `오늘 내 피부 점수는 ${overallScore}점! 바우만 타입은 ${finalType}형이 나왔어요. #Fonday #피부분석`,
-          url: window.location.href,
-        });
-      } catch { /* 취소 */ }
-    } else {
-      alert("리포트를 캡처해서 공유해 주세요!");
-    }
+    try {
+      const html2canvas = (await import("html2canvas")).default;
+      const card = shareCardRef.current;
+      if (!card) return;
+      card.style.display = "block";
+      const canvas = await html2canvas(card, {
+        scale: 2,
+        useCORS: true,
+        backgroundColor: "#FAF9F6",
+        logging: false,
+      });
+      card.style.display = "none";
+      canvas.toBlob(async (blob) => {
+        if (!blob) return;
+        const file = new File([blob], "fonday-skin-report.png", { type: "image/png" });
+        if (navigator.canShare?.({ files: [file] })) {
+          await navigator.share({ files: [file], title: "Fonday AI 피부 분석 리포트" });
+        } else if (navigator.share) {
+          await navigator.share({
+            title: "Fonday AI 피부 분석 리포트",
+            text: `내 피부 점수 ${overallScore}점! 바우만 ${finalType}형 #Fonday #피부분석`,
+            url: window.location.href,
+          });
+        } else {
+          const a = document.createElement("a");
+          a.href = URL.createObjectURL(blob);
+          a.download = "fonday-skin-report.png";
+          a.click();
+        }
+      }, "image/png");
+    } catch { /* 취소 */ }
   };
 
 
   return (
+    <>
+    {/* 공유용 카드 (화면 밖, html2canvas 캡처용) */}
+    <div ref={shareCardRef} style={{ display: "none", position: "fixed", left: "-9999px", top: 0, width: "390px", background: "#FAF9F6", fontFamily: "system-ui, -apple-system, sans-serif" }}>
+      <div style={{ background: `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})`, padding: "20px 24px 18px" }}>
+        <div style={{ color: "white", fontSize: "11px", fontWeight: 700, letterSpacing: "2px", opacity: 0.85 }}>FONDAYAI</div>
+        <div style={{ color: "white", fontSize: "22px", fontWeight: 900, marginTop: "2px" }}>피부 분석 리포트</div>
+        <div style={{ color: "white", fontSize: "11px", opacity: 0.75, marginTop: "2px" }}>
+          {new Date().toLocaleDateString("ko-KR", { year: "numeric", month: "long", day: "numeric" })}
+        </div>
+      </div>
+      {(imageSrc || imageBase64) && (
+        <div style={{ padding: "16px 24px 0" }}>
+          <img src={imageSrc || imageBase64 || ""} style={{ width: "100%", height: "200px", objectFit: "cover", borderRadius: "16px", display: "block" }} />
+        </div>
+      )}
+      <div style={{ padding: "18px 24px 8px", textAlign: "center" }}>
+        <div style={{ fontSize: "76px", fontWeight: 900, color: SCAN_TO, lineHeight: 1 }}>{overallScore}</div>
+        <div style={{ fontSize: "13px", color: TEXT_SECONDARY, marginTop: "4px" }}>종합 피부 점수</div>
+        <div style={{ display: "inline-block", marginTop: "8px", padding: "4px 14px", background: `${SCAN_FROM}25`, borderRadius: "20px", fontSize: "13px", fontWeight: 700, color: SCAN_TO }}>
+          바우만 {finalType}형
+        </div>
+      </div>
+      <div style={{ margin: "0 24px 16px", padding: "14px 16px", background: "#F0EDE8", borderRadius: "12px" }}>
+        <div style={{ fontSize: "10px", fontWeight: 700, color: DEEP_GREEN, marginBottom: "6px", textTransform: "uppercase", letterSpacing: "1px" }}>AI 피부 총평</div>
+        <div style={{ fontSize: "12px", color: "#5C5548", lineHeight: 1.65 }}>{analysisResult?.aiComment}</div>
+      </div>
+      <div style={{ padding: "0 24px 8px" }}>
+        <div style={{ fontSize: "10px", fontWeight: 700, color: DEEP_GREEN, marginBottom: "10px", textTransform: "uppercase", letterSpacing: "1px" }}>항목별 분석</div>
+        {analysisResult?.scores.map((s: any, i: number) => (
+          <div key={i} style={{ marginBottom: "9px" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "3px" }}>
+              <span style={{ fontSize: "11px", color: "#5C5548" }}>{s.label}</span>
+              <span style={{ fontSize: "11px", fontWeight: 700, color: SCORE_COLORS[i] }}>{s.score}점</span>
+            </div>
+            <div style={{ height: "4px", background: "#E8E5E0", borderRadius: "2px", overflow: "hidden" }}>
+              <div style={{ height: "100%", width: `${s.score}%`, background: SCORE_COLORS[i], borderRadius: "2px" }} />
+            </div>
+          </div>
+        ))}
+      </div>
+      <div style={{ padding: "12px 24px 20px", textAlign: "center", color: "#C0B8B0", fontSize: "10px" }}>
+        fondayai.pages.dev
+      </div>
+    </div>
+
     <div ref={resultScrollRef} className="h-[calc(100dvh-60px)] overflow-y-auto">
       <motion.div className="px-5 pt-6 pb-24 space-y-6" variants={stagger} initial="initial" animate="animate">
         {/* 헤더 */}
@@ -1240,6 +1332,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, onBack, onGoMagazi
         )}
       </AnimatePresence>
     </div>
+    </>
   );
 }
 
@@ -1282,6 +1375,7 @@ export default function SkinScanPage() {
   const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imageSrc, setImageSrc] = useState<string | null>(null);
+  const [imageBase64, setImageBase64] = useState<string | null>(null);
   const [user, setUser] = useState<any>(undefined); // undefined=로딩중, null=미로그인
 
   useEffect(() => {
@@ -1297,10 +1391,10 @@ export default function SkinScanPage() {
     const saved = sessionStorage.getItem("pendingResult");
     if (!saved) return;
     try {
-      const { analysisResult: ar, surveyData: sd } = JSON.parse(saved);
+      const { analysisResult: ar, surveyData: sd, imageBase64: imgB64 } = JSON.parse(saved);
       setAnalysisResult(ar);
       setSurveyData(sd);
-      setImageSrc(null);
+      if (imgB64) setImageSrc(imgB64);
       setScanState("result");
     } catch { /* ignore */ }
     sessionStorage.removeItem("pendingResult");
@@ -1320,6 +1414,7 @@ export default function SkinScanPage() {
     const reader = new FileReader();
     reader.readAsDataURL(imageFile);
     reader.onload = async () => {
+      setImageBase64(reader.result as string);
       try {
         const response = await fetch("/api/analyze-skin", {
           method: "POST",
@@ -1371,6 +1466,7 @@ export default function SkinScanPage() {
                   surveyData={surveyData}
                   analysisResult={analysisResult}
                   imageSrc={imageSrc}
+                  imageBase64={imageBase64}
                   onBack={() => setScanState("idle")}
                   onGoMagazine={() => setActiveTab("magazine")}
                   user={user}
