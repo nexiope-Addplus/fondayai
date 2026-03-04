@@ -522,6 +522,7 @@ function ScanningScreen({ imageSrc }: { imageSrc: string | null }) {
 function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBack, onGoMagazine, user }: any) {
   const [history, setHistory] = useState<any[]>([]);
   const [isSaved, setIsSaved] = useState(false);
+  const [currentScanId, setCurrentScanId] = useState<string | null>(null);
   const [showWaitlist, setShowWaitlist] = useState(false);
   const [showImprovements, setShowImprovements] = useState(false);
   const [showAnalysis, setShowAnalysis] = useState(false);
@@ -569,7 +570,10 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
         improvements: analysisResult.improvements ?? [],
         cosmetics: analysisResult.cosmetics ?? [],
       })
-    }).then(() => setIsSaved(true));
+    }).then(res => res.json()).then(data => {
+      setIsSaved(true);
+      if (data?.id) setCurrentScanId(data.id);
+    });
   }, [user, analysisResult]);
 
   // 모달 열릴 때 배경 스크롤 잠금
@@ -1292,18 +1296,19 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
 
                     {/* 과거 기록 */}
                     {history.map((item: any, i: number) => {
+                      if (item.id === currentScanId) return null;
                       const date = new Date(item.createdAt);
                       const isToday = date.toDateString() === new Date().toDateString();
-                      if (isToday) return null;
+                      const dateLabel = isToday
+                        ? `오늘 ${date.toLocaleTimeString("ko-KR", { hour: "2-digit", minute: "2-digit" })}`
+                        : date.toLocaleDateString("ko-KR", { year: "numeric", month: "long", day: "numeric" });
                       return (
                         <motion.div key={item.id}
                           initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
                           transition={{ delay: i * 0.04 }}
                           className="p-4 rounded-2xl border border-stone-100 bg-white">
                           <div className="flex items-center justify-between mb-2">
-                            <span className="text-[11px] text-stone-400">
-                              {date.toLocaleDateString("ko-KR", { year: "numeric", month: "long", day: "numeric" })}
-                            </span>
+                            <span className="text-[11px] text-stone-400">{dateLabel}</span>
                             <div className="flex items-center gap-2">
                               <span className="text-[15px] font-black" style={{ color: DEEP_GREEN }}>{item.overallScore}점</span>
                               {item.skinAge && (
