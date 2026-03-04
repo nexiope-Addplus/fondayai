@@ -277,33 +277,87 @@ function BottomNav({ active, onChange }: { active: TabId; onChange: (t: TabId) =
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-2xl border-t border-stone-100">
       <div className="max-w-md mx-auto px-6">
-        <div className="grid grid-cols-3 h-[60px]">
+        <div className="grid grid-cols-3 h-[64px]">
           <button
             onClick={() => onChange("scan")}
             className={`flex flex-col items-center justify-center gap-1 transition-colors ${active === "scan" ? "text-[#C97062]" : "text-stone-400"}`}>
             <Camera className="w-5 h-5" />
             <span className="text-[10px] font-semibold">AI 스캔</span>
           </button>
+          <a
+            href="https://fonday.replit.app/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex flex-col items-center justify-center gap-0.5 transition-opacity active:opacity-70 -mt-3">
+            <div className="w-12 h-12 rounded-full flex items-center justify-center shadow-lg"
+              style={{ background: "linear-gradient(135deg, #E09882, #C97062)" }}>
+              <Zap className="w-5 h-5 text-white" />
+            </div>
+            <span className="text-[11px] font-black" style={{ color: "#C97062" }}>Fonday</span>
+          </a>
           <button
             onClick={() => onChange("magazine")}
             className={`flex flex-col items-center justify-center gap-1 transition-colors ${active === "magazine" ? "text-[#C97062]" : "text-stone-400"}`}>
             <BookOpen className="w-5 h-5" />
             <span className="text-[10px] font-semibold">매거진</span>
           </button>
-          <a
-            href="https://fonday.replit.app/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex flex-col items-center justify-center gap-1 transition-opacity active:opacity-70">
-            <div className="w-7 h-7 rounded-full flex items-center justify-center shadow-md"
-              style={{ background: "linear-gradient(135deg, #E09882, #C97062)" }}>
-              <Zap className="w-3.5 h-3.5 text-white" />
-            </div>
-            <span className="text-[10px] font-bold" style={{ color: "#C97062" }}>Fonday</span>
-          </a>
         </div>
       </div>
     </nav>
+  );
+}
+
+// ─── 페이스 메시 오버레이 ─────────────────────────────────────────
+function FaceMeshOverlay() {
+  const pts: [number, number][] = [
+    [50, 13], [34, 18], [66, 18],          // 0-2  이마
+    [28, 27], [37, 24], [44, 26],          // 3-5  왼눈썹
+    [56, 26], [63, 24], [72, 27],          // 6-8  오른눈썹
+    [37, 33],                              // 9    왼눈
+    [63, 33],                              // 10   오른눈
+    [50, 30], [50, 52],                    // 11-12 코 브릿지·끝
+    [44, 57], [56, 57],                    // 13-14 콧방울
+    [38, 65], [50, 62], [62, 65], [50, 71],// 15-18 입
+    [21, 43], [79, 43],                    // 19-20 볼
+    [20, 60], [80, 60],                    // 21-22 턱선 상
+    [31, 77], [69, 77], [50, 84],          // 23-25 턱
+  ];
+  const edges: [number, number][] = [
+    [0,1],[0,2],[1,3],[2,8],
+    [3,4],[4,5],[6,7],[7,8],
+    [5,11],[6,11],[0,11],
+    [9,11],[10,11],[9,5],[10,6],
+    [11,12],[12,13],[12,14],[13,14],
+    [3,9],[4,9],[8,10],[7,10],
+    [9,19],[10,20],
+    [13,15],[14,17],[12,16],
+    [15,16],[16,17],[15,18],[17,18],
+    [1,19],[2,20],
+    [19,21],[20,22],
+    [21,23],[22,24],[23,25],[24,25],
+    [9,15],[10,17],
+    [19,23],[20,24],
+  ];
+
+  return (
+    <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice">
+      <defs>
+        <style>{`
+          @keyframes mLine { from { opacity:0 } to { opacity:0.55 } }
+          @keyframes mDot  { 0%,100%{opacity:.9;r:.75} 50%{opacity:1;r:1.2} }
+        `}</style>
+      </defs>
+      {edges.map(([a, b], i) => (
+        <line key={i}
+          x1={pts[a][0]} y1={pts[a][1]} x2={pts[b][0]} y2={pts[b][1]}
+          stroke="white" strokeWidth="0.35"
+          style={{ animation: `mLine .4s ease-out ${i * 0.025}s forwards`, opacity: 0 }} />
+      ))}
+      {pts.map(([x, y], i) => (
+        <circle key={i} cx={x} cy={y} r={0.75} fill="white"
+          style={{ animation: `mLine .3s ease-out ${i * 0.04 + .3}s forwards, mDot 2.2s ease-in-out ${i * 0.04 + .3}s infinite`, opacity: 0 }} />
+      ))}
+    </svg>
   );
 }
 
@@ -487,7 +541,10 @@ function ScanningScreen({ imageSrc }: { imageSrc: string | null }) {
     <div className="flex flex-col items-center justify-center min-h-[calc(100dvh-60px)] bg-[#FAF9F6] px-6">
       <div className="relative w-64 h-80 rounded-3xl overflow-hidden bg-stone-100 flex items-center justify-center shadow-inner">
         {imageSrc ? (
-          <img src={imageSrc} className="w-full h-full object-cover" />
+          <>
+            <img src={imageSrc} className="w-full h-full object-cover" />
+            <FaceMeshOverlay />
+          </>
         ) : (
           <Camera className="w-16 h-16 opacity-10" />
         )}
