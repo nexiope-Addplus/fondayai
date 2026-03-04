@@ -1345,7 +1345,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
                           })), { date: "오늘", score: overallScore }]}>
                             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e7e5e4" />
                             <XAxis dataKey="date" axisLine={false} tickLine={false} style={{ fontSize: "9px" }} />
-                            <YAxis hide domain={[0, 100]} />
+                            <YAxis domain={[0, 100]} ticks={[0, 25, 50, 75, 100]} axisLine={false} tickLine={false} style={{ fontSize: "9px" }} tickFormatter={(v) => `${v}`} width={24} />
                             <Tooltip
                               contentStyle={{ fontSize: "11px", borderRadius: "8px", border: "none", boxShadow: "0 2px 8px rgba(0,0,0,0.1)" }}
                               formatter={(v: any) => [`${v}점`, "종합점수"]}
