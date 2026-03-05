@@ -1,0 +1,22 @@
+{
+  "name": "Fonday - AI 바우만 피부 타입 스캐너",
+  "short_name": "Fonday",
+  "description": "스마트폰 사진 한 장으로 나의 바우만 피부 타입을 AI가 즉시 진단",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#2D5F4F",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
