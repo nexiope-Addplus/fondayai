@@ -851,6 +851,10 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
   const [showWaitlist, setShowWaitlist] = useState(false);
   const [showImprovements, setShowImprovements] = useState(false);
   const [showAnalysis, setShowAnalysis] = useState(false);
+  const [showPartnership, setShowPartnership] = useState(false);
+  const [partnerForm, setPartnerForm] = useState({ name: "", company: "", email: "", message: "" });
+  const [isPartnerSubmitting, setIsPartnerSubmitting] = useState(false);
+  const [isPartnerSuccess, setIsPartnerSuccess] = useState(false);
   const [email, setEmail] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const resultScrollRef = useRef<HTMLDivElement>(null);
@@ -907,6 +911,23 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
     if (!el) return;
     el.style.overflow = (showAnalysis || showImprovements || showDiary) ? 'hidden' : 'auto';
   }, [showAnalysis, showImprovements, showDiary]);
+
+  const handlePartnershipSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsPartnerSubmitting(true);
+    try {
+      const res = await fetch("https://formspree.io/f/xzdjpden", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(partnerForm),
+      });
+      if (res.ok) {
+        setIsPartnerSuccess(true);
+        setTimeout(() => { setShowPartnership(false); setIsPartnerSuccess(false); setPartnerForm({ name: "", company: "", email: "", message: "" }); }, 2000);
+      }
+    } catch { alert("오류가 발생했습니다."); }
+    finally { setIsPartnerSubmitting(false); }
+  };
 
   const handleWaitlistSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -1322,6 +1343,13 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
           <span className="flex items-center gap-2">Fonday 얼리버드 알림 받기 <ArrowRight className="w-5 h-5" /></span>
         </Button>
 
+        {/* 제휴하기 */}
+        <Button onClick={() => setShowPartnership(true)}
+          className="w-full h-14 rounded-2xl font-bold shadow-lg hover:opacity-90 transition-opacity"
+          style={{ background: `linear-gradient(135deg, ${DEEP_GREEN}, ${DEEP_GREEN_LIGHT})`, color: "#fff" }}>
+          <span className="flex items-center gap-2">브랜드 제휴 문의하기 <ArrowRight className="w-5 h-5" /></span>
+        </Button>
+
         {/* 공유 */}
         <Button onClick={handleShare}
           className="w-full h-14 rounded-2xl text-white font-bold shadow-lg hover:opacity-90 transition-opacity bg-gradient-to-r from-[#f09433] via-[#bc1888] to-[#8a3ab9]">
@@ -1662,6 +1690,58 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
                   </div>
                 </div>
               </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* 제휴 문의 모달 */}
+      <AnimatePresence>
+        {showPartnership && (
+          <motion.div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center"
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            onClick={() => setShowPartnership(false)}>
+            <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" />
+            <motion.div className="relative bg-white rounded-t-3xl sm:rounded-3xl p-8 w-full max-w-sm shadow-xl"
+              initial={{ y: 100, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 100, opacity: 0 }}
+              onClick={e => e.stopPropagation()}>
+              <div className="w-10 h-1 rounded-full bg-stone-200 mx-auto mb-6" />
+              <div className="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-5"
+                style={{ background: `linear-gradient(135deg, ${DEEP_GREEN}, ${DEEP_GREEN_LIGHT})` }}>
+                <Sparkles className="w-7 h-7 text-white" />
+              </div>
+              {isPartnerSuccess ? (
+                <div className="py-10 text-center">
+                  <Sparkles className="w-12 h-12 mx-auto mb-4 text-amber-500" />
+                  <h3 className="font-bold text-lg" style={{ color: DEEP_GREEN }}>문의가 접수되었습니다!</h3>
+                  <p className="text-sm text-muted-foreground mt-2">빠르게 연락드릴게요.</p>
+                </div>
+              ) : (
+                <>
+                  <h3 className="text-center font-extrabold text-lg mb-1" style={{ color: DEEP_GREEN }}>브랜드 제휴 문의</h3>
+                  <p className="text-center text-sm leading-relaxed mb-6 text-muted-foreground">화장품 브랜드, 피부과, 뷰티 브랜드 등<br />다양한 제휴를 환영합니다.</p>
+                  <form onSubmit={handlePartnershipSubmit} className="space-y-3">
+                    <input type="text" required placeholder="담당자 이름" value={partnerForm.name}
+                      onChange={e => setPartnerForm(p => ({ ...p, name: e.target.value }))}
+                      className="w-full px-4 py-3.5 rounded-xl border border-stone-200 focus:outline-none focus:ring-2 text-sm" style={{ focusRingColor: DEEP_GREEN }} />
+                    <input type="text" required placeholder="회사명 / 브랜드명" value={partnerForm.company}
+                      onChange={e => setPartnerForm(p => ({ ...p, company: e.target.value }))}
+                      className="w-full px-4 py-3.5 rounded-xl border border-stone-200 focus:outline-none focus:ring-2 text-sm" />
+                    <input type="email" required placeholder="이메일" value={partnerForm.email}
+                      onChange={e => setPartnerForm(p => ({ ...p, email: e.target.value }))}
+                      className="w-full px-4 py-3.5 rounded-xl border border-stone-200 focus:outline-none focus:ring-2 text-sm" />
+                    <textarea required placeholder="문의 내용" value={partnerForm.message}
+                      onChange={e => setPartnerForm(p => ({ ...p, message: e.target.value }))}
+                      rows={3}
+                      className="w-full px-4 py-3.5 rounded-xl border border-stone-200 focus:outline-none focus:ring-2 text-sm resize-none" />
+                    <Button disabled={isPartnerSubmitting} type="submit"
+                      className="w-full h-14 rounded-2xl font-bold text-[15px] text-white"
+                      style={{ background: `linear-gradient(135deg, ${DEEP_GREEN}, ${DEEP_GREEN_LIGHT})` }}>
+                      {isPartnerSubmitting ? "전송 중..." : "문의 보내기"}
+                    </Button>
+                  </form>
+                </>
+              )}
             </motion.div>
           </motion.div>
         )}
