@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://fondayai.pages.dev/sitemap.xml
