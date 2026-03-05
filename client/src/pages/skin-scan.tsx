@@ -1,4 +1,6 @@
 import { useState, useRef, useCallback, useEffect } from "react";
+import { useTranslation } from "react-i18next";
+import i18n from "../i18n";
 import { motion, AnimatePresence, useDragControls } from "framer-motion";
 import {
   Camera,
@@ -67,15 +69,15 @@ interface AnalysisResult {
   cosmetics: { type: string; key: string; reason: string }[];
 }
 
-const BAUMANN_DESC: Record<string, { name: string; desc: string; color: string }> = {
-  O: { name: "지성", desc: "피지 분비가 활발해 번들거림이 나타나기 쉬워요.", color: "#F59E0B" },
-  D: { name: "건성", desc: "피지 분비가 적어 건조함과 당김이 느껴질 수 있어요.", color: "#3B82F6" },
-  S: { name: "민감성", desc: "외부 자극에 붉어지거나 트러블이 생기기 쉬워요.", color: "#EF4444" },
-  R: { name: "저항성", desc: "외부 자극에 강하고 트러블이 잘 생기지 않아요.", color: "#10B981" },
-  P: { name: "색소성", desc: "기미·잡티 등 색소침착이 생기기 쉬워요.", color: "#8B5CF6" },
-  N: { name: "비색소성", desc: "색소침착이 적고 피부톤이 균일한 편이에요.", color: "#06B6D4" },
-  W: { name: "주름성", desc: "탄력이 낮아 잔주름이 생기기 쉬운 상태예요.", color: "#6366F1" },
-  T: { name: "탄력성", desc: "피부 탄력이 좋아 주름이 적은 상태예요.", color: "#14B8A6" },
+const BAUMANN_COLORS: Record<string, string> = {
+  O: "#F59E0B",
+  D: "#3B82F6",
+  S: "#EF4444",
+  R: "#10B981",
+  P: "#8B5CF6",
+  N: "#06B6D4",
+  W: "#6366F1",
+  T: "#14B8A6",
 };
 
 const DEEP_GREEN = "#2D5F4F";
@@ -351,6 +353,7 @@ const MAGAZINE_ARTICLES: MagazineArticle[] = [
 
 // ─── 얼굴 가이드 카메라 ──────────────────────────────────────────
 function CameraCapture({ onCapture, onClose }: { onCapture: (file: File) => void; onClose: () => void }) {
+  const { t } = useTranslation();
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
@@ -414,11 +417,11 @@ function CameraCapture({ onCapture, onClose }: { onCapture: (file: File) => void
   if (useFile) {
     return (
       <div className="fixed inset-0 z-[200] bg-black flex flex-col items-center justify-center gap-6">
-        <p className="text-white text-sm">카메라를 사용할 수 없습니다. 사진으로 선택해 주세요.</p>
+        <p className="text-white text-sm">{t("camera.noCamera")}</p>
         <Button onClick={() => fileRef.current?.click()} className="bg-white text-black font-bold px-8 h-14 rounded-2xl">
-          사진 선택하기
+          {t("camera.selectPhoto")}
         </Button>
-        <Button variant="ghost" onClick={onClose} className="text-white/60">취소</Button>
+        <Button variant="ghost" onClick={onClose} className="text-white/60">{t("camera.cancel")}</Button>
         <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleFileChange} />
       </div>
     );
@@ -462,8 +465,8 @@ function CameraCapture({ onCapture, onClose }: { onCapture: (file: File) => void
 
         {/* 안내 문구 */}
         <div className="absolute top-[8%] left-0 right-0 text-center pointer-events-none px-6">
-          <p className="text-white text-sm font-semibold drop-shadow-lg">얼굴을 타원 안에 맞춰주세요</p>
-          <p className="text-white/60 text-xs mt-1">정면을 바라보고 자연광에서 촬영하면 좋아요</p>
+          <p className="text-white text-sm font-semibold drop-shadow-lg">{t("camera.guide1")}</p>
+          <p className="text-white/60 text-xs mt-1">{t("camera.guide2")}</p>
         </div>
 
         {/* 닫기 버튼 */}
@@ -489,6 +492,27 @@ function CameraCapture({ onCapture, onClose }: { onCapture: (file: File) => void
   );
 }
 
+// ─── 언어 선택 버튼 ──────────────────────────────────────────────
+function LangSwitcher() {
+  const { i18n: i18nHook } = useTranslation();
+  const langs = ["EN", "KO", "JA"];
+  const current = (i18nHook.language || "en").toUpperCase();
+  return (
+    <div className="fixed top-4 right-4 z-[60] flex items-center gap-0.5 bg-white/80 backdrop-blur-sm rounded-full px-2 py-1 shadow-sm border border-stone-100">
+      {langs.map((lang, idx) => (
+        <button
+          key={lang}
+          onClick={() => i18nHook.changeLanguage(lang.toLowerCase())}
+          className="text-[11px] font-bold px-1.5 py-0.5 rounded-full transition-all"
+          style={current === lang ? { color: SCAN_TO } : { color: "#B0A898" }}
+        >
+          {lang}
+        </button>
+      ))}
+    </div>
+  );
+}
+
 // ─── 하단 네비게이션 ──────────────────────────────────────────────
 function BottomNav({ active, onChange, onScanNew, onInstall }: {
   active: TabId;
@@ -496,6 +520,7 @@ function BottomNav({ active, onChange, onScanNew, onInstall }: {
   onScanNew: () => void;
   onInstall: () => void;
 }) {
+  const { t } = useTranslation();
   const btn = (tab: TabId, icon: React.ReactNode, label: string) => (
     <button
       onClick={() => onChange(tab)}
@@ -512,9 +537,9 @@ function BottomNav({ active, onChange, onScanNew, onInstall }: {
             onClick={onScanNew}
             className={`flex flex-col items-center justify-center gap-0.5 transition-colors ${active === "scan" ? "text-[#C97062]" : "text-stone-400"}`}>
             <Camera className="w-5 h-5" />
-            <span className="text-[10px] font-semibold">AI 스캔</span>
+            <span className="text-[10px] font-semibold">{t("nav.scan")}</span>
           </button>
-          {btn("report", <FileText className="w-5 h-5" />, "리포트")}
+          {btn("report", <FileText className="w-5 h-5" />, t("nav.report"))}
           <a
             href="https://fonday.replit.app/"
             target="_blank"
@@ -526,12 +551,12 @@ function BottomNav({ active, onChange, onScanNew, onInstall }: {
             </div>
             <span className="text-[11px] font-black" style={{ color: "#C97062" }}>Fonday</span>
           </a>
-          {btn("magazine", <BookOpen className="w-5 h-5" />, "매거진")}
+          {btn("magazine", <BookOpen className="w-5 h-5" />, t("nav.magazine"))}
           <button
             onClick={onInstall}
             className="flex flex-col items-center justify-center gap-0.5 text-stone-400 transition-colors active:text-[#C97062]">
             <SmartphoneNfc className="w-5 h-5" />
-            <span className="text-[10px] font-semibold">앱 추가</span>
+            <span className="text-[10px] font-semibold">{t("nav.install")}</span>
           </button>
         </div>
       </div>
@@ -617,6 +642,7 @@ function FaceMeshOverlay({ imageSrc }: { imageSrc: string }) {
 
 // ─── 메인 스캔 화면 ───────────────────────────────────────────────
 function ScanIdleScreen({ onScan }: { onScan: () => void }) {
+  const { t } = useTranslation();
   return (
     <motion.div
       className="flex flex-col items-center justify-center px-6 text-center"
@@ -626,15 +652,15 @@ function ScanIdleScreen({ onScan }: { onScan: () => void }) {
       <motion.div variants={fadeChild} className="mb-4">
         <Badge variant="outline" className="px-3 py-1 font-bold tracking-widest uppercase text-[10px]"
           style={{ borderColor: SCAN_FROM, color: SCAN_TO }}>
-          AI Skin Scanner
+          {t("idle.badge")}
         </Badge>
       </motion.div>
 
       <motion.div variants={fadeChild} className="mb-12">
-        <h1 className="text-2xl font-bold mb-2 tracking-tight text-stone-800">피부의 목소리를 들어보세요</h1>
+        <h1 className="text-2xl font-bold mb-2 tracking-tight text-stone-800">{t("idle.title")}</h1>
         <p className="text-[15px] font-medium leading-relaxed text-stone-500">
-          지금 내 피부 상태,<br />
-          AI가 <span className="font-bold" style={{ color: SCAN_TO }}>3초</span>만에 알려줄게요.
+          {t("idle.subtitle2")}<br />
+          {t("idle.subtitle3")}
         </p>
       </motion.div>
 
@@ -681,8 +707,8 @@ function ScanIdleScreen({ onScan }: { onScan: () => void }) {
           >
             <ScanLine className="w-12 h-12 drop-shadow" />
           </motion.div>
-          <span className="text-[14px] font-bold leading-snug px-6">
-            내 피부 상태<br />AI로 스캔하기
+          <span className="text-[14px] font-bold leading-snug px-6 whitespace-pre-line">
+            {t("idle.scanBtn")}
           </span>
         </motion.button>
       </motion.div>
@@ -690,7 +716,7 @@ function ScanIdleScreen({ onScan }: { onScan: () => void }) {
       <motion.div variants={fadeChild} className="mt-10 flex items-center gap-2">
         <Sparkles className="w-3.5 h-3.5" style={{ color: SCAN_FROM }} />
         <span className="text-[11px] font-medium" style={{ color: TEXT_SECONDARY }}>
-          카메라로 셀카를 찍으면 분석 준비가 시작돼요
+          {t("idle.hint")}
         </span>
       </motion.div>
 
@@ -700,12 +726,13 @@ function ScanIdleScreen({ onScan }: { onScan: () => void }) {
 
 // ─── 설문 화면 ────────────────────────────────────────────────────
 function SurveyScreen({ onSubmit, onBack }: { onSubmit: (data: SurveyData) => void; onBack: () => void }) {
-  const [gender, setGender] = useState("여성");
-  const [age, setAge] = useState("20대 후반");
-  const ageGroups = ["10대", "20대 초반", "20대 후반", "30대 초반", "30대 후반", "40대 초반", "40대 후반", "50대+"];
-  const skinConcerns = ["모공/피지", "주름/탄력", "트러블/민감", "기미/잡티", "다크서클", "건조함"];
-  const [concerns, setConcerns] = useState<string[]>([]);
-  const toggleConcern = (c: string) => setConcerns(prev => prev.includes(c) ? prev.filter(x => x !== c) : [...prev, c]);
+  const { t } = useTranslation();
+  const [genderIdx, setGenderIdx] = useState(0); // 0=female, 1=male
+  const [ageIdx, setAgeIdx] = useState(2);
+  const ageGroups = t("survey.ageGroups", { returnObjects: true }) as string[];
+  const skinConcerns = t("survey.skinConcerns", { returnObjects: true }) as string[];
+  const [concernIdxs, setConcernIdxs] = useState<number[]>([]);
+  const toggleConcern = (i: number) => setConcernIdxs(prev => prev.includes(i) ? prev.filter(x => x !== i) : [...prev, i]);
 
   return (
     <motion.div className="flex flex-col h-[calc(100dvh-60px)]" variants={stagger} initial="initial" animate="animate">
@@ -714,19 +741,19 @@ function SurveyScreen({ onSubmit, onBack }: { onSubmit: (data: SurveyData) => vo
           <Button variant="ghost" size="icon" onClick={onBack} className="-ml-2">
             <ChevronLeft className="w-6 h-6" />
           </Button>
-          <h2 className="text-xl font-bold" style={{ color: DEEP_GREEN }}>피부 분석 기초 정보</h2>
+          <h2 className="text-xl font-bold" style={{ color: DEEP_GREEN }}>{t("survey.title")}</h2>
         </div>
-        <p className="text-[13px] text-muted-foreground ml-10">정확한 분석을 위해 현재 상태를 선택해 주세요.</p>
+        <p className="text-[13px] text-muted-foreground ml-10">{t("survey.subtitle")}</p>
       </motion.div>
 
       <div className="flex-1 overflow-y-auto overscroll-contain px-6">
         <div className="space-y-8 pb-4">
           <div className="space-y-3">
-            <label className="text-[12px] font-bold ml-1 uppercase tracking-wider" style={{ color: DEEP_GREEN_LIGHT }}>성별</label>
+            <label className="text-[12px] font-bold ml-1 uppercase tracking-wider" style={{ color: DEEP_GREEN_LIGHT }}>{t("survey.gender")}</label>
             <div className="flex gap-2">
-              {["여성", "남성"].map(item => (
-                <Button key={item} onClick={() => setGender(item)} variant={gender === item ? "default" : "outline"}
-                  className={`flex-1 h-14 rounded-xl text-[14px] font-bold ${gender === item ? "bg-[#2D5F4F] hover:bg-[#2D5F4F]" : ""}`}>
+              {[t("survey.female"), t("survey.male")].map((item, idx) => (
+                <Button key={idx} onClick={() => setGenderIdx(idx)} variant={genderIdx === idx ? "default" : "outline"}
+                  className={`flex-1 h-14 rounded-xl text-[14px] font-bold ${genderIdx === idx ? "bg-[#2D5F4F] hover:bg-[#2D5F4F]" : ""}`}>
                   {item}
                 </Button>
               ))}
@@ -734,11 +761,11 @@ function SurveyScreen({ onSubmit, onBack }: { onSubmit: (data: SurveyData) => vo
           </div>
 
           <div className="space-y-3">
-            <label className="text-[12px] font-bold ml-1 uppercase tracking-wider" style={{ color: DEEP_GREEN_LIGHT }}>나이대</label>
+            <label className="text-[12px] font-bold ml-1 uppercase tracking-wider" style={{ color: DEEP_GREEN_LIGHT }}>{t("survey.age")}</label>
             <div className="grid grid-cols-2 gap-2">
-              {ageGroups.map(item => (
-                <Button key={item} onClick={() => setAge(item)} variant={age === item ? "default" : "outline"}
-                  className={`h-12 rounded-xl text-[13px] font-bold ${age === item ? "bg-[#2D5F4F] hover:bg-[#2D5F4F]" : ""}`}>
+              {ageGroups.map((item, idx) => (
+                <Button key={idx} onClick={() => setAgeIdx(idx)} variant={ageIdx === idx ? "default" : "outline"}
+                  className={`h-12 rounded-xl text-[13px] font-bold ${ageIdx === idx ? "bg-[#2D5F4F] hover:bg-[#2D5F4F]" : ""}`}>
                   {item}
                 </Button>
               ))}
@@ -746,11 +773,11 @@ function SurveyScreen({ onSubmit, onBack }: { onSubmit: (data: SurveyData) => vo
           </div>
 
           <div className="space-y-3">
-            <label className="text-[12px] font-bold ml-1 uppercase tracking-wider" style={{ color: DEEP_GREEN_LIGHT }}>피부 고민 (다중)</label>
+            <label className="text-[12px] font-bold ml-1 uppercase tracking-wider" style={{ color: DEEP_GREEN_LIGHT }}>{t("survey.concerns")}</label>
             <div className="grid grid-cols-3 gap-2">
-              {skinConcerns.map(item => (
-                <Button key={item} onClick={() => toggleConcern(item)} variant={concerns.includes(item) ? "secondary" : "outline"}
-                  className={`h-12 rounded-xl text-[12px] font-bold ${concerns.includes(item) ? "bg-[#3D7A66] text-white hover:bg-[#3D7A66]" : ""}`}>
+              {skinConcerns.map((item, idx) => (
+                <Button key={idx} onClick={() => toggleConcern(idx)} variant={concernIdxs.includes(idx) ? "secondary" : "outline"}
+                  className={`h-12 rounded-xl text-[12px] font-bold ${concernIdxs.includes(idx) ? "bg-[#3D7A66] text-white hover:bg-[#3D7A66]" : ""}`}>
                   {item}
                 </Button>
               ))}
@@ -760,9 +787,15 @@ function SurveyScreen({ onSubmit, onBack }: { onSubmit: (data: SurveyData) => vo
       </div>
 
       <motion.div variants={fadeChild} className="px-6 py-4 shrink-0 bg-white border-t border-stone-100">
-        <Button onClick={() => onSubmit({ gender, age, skinType: "복합성", concerns, condition: "맨얼굴" })}
+        <Button onClick={() => onSubmit({
+          gender: genderIdx === 0 ? t("survey.female") : t("survey.male"),
+          age: ageGroups[ageIdx],
+          skinType: "복합성",
+          concerns: concernIdxs.map(i => skinConcerns[i]),
+          condition: "맨얼굴"
+        })}
           className="w-full h-14 rounded-2xl font-bold text-white shadow-xl bg-[#2D5F4F] hover:bg-[#3D7A66] text-lg">
-          AI 분석 시작
+          {t("survey.startBtn")}
         </Button>
       </motion.div>
     </motion.div>
@@ -771,9 +804,10 @@ function SurveyScreen({ onSubmit, onBack }: { onSubmit: (data: SurveyData) => vo
 
 // ─── 분석 중 화면 ─────────────────────────────────────────────────
 function ScanningScreen({ imageSrc }: { imageSrc: string | null }) {
+  const { t } = useTranslation();
   const [textIdx, setTextIdx] = useState(0);
   const [progress, setProgress] = useState(0);
-  const texts = ["사진 데이터 최적화 중...", "AI 피부 고민 부위 탐색 중...", "수분 및 유분 정밀 분석 중...", "리포트 결과 요약 중..."];
+  const texts = t("scanning.texts", { returnObjects: true }) as string[];
   const progressTargets = [20, 45, 68, 88];
 
   useEffect(() => {
@@ -824,12 +858,12 @@ function ScanningScreen({ imageSrc }: { imageSrc: string | null }) {
             {texts[textIdx]}
           </motion.p>
         </AnimatePresence>
-        <p className="text-sm text-stone-400 italic">전문적인 피부 분석 리포트를 생성하고 있습니다.</p>
+        <p className="text-sm text-stone-400 italic">{t("scanning.subtitle")}</p>
       </div>
       {/* 진행 바 */}
       <div className="mt-8 w-full max-w-xs">
         <div className="flex justify-between text-[10px] text-stone-400 mb-1.5">
-          <span>분석 진행 중</span>
+          <span>{t("scanning.progress")}</span>
           <span>{progress}%</span>
         </div>
         <div className="h-1.5 bg-stone-200 rounded-full overflow-hidden">
@@ -845,6 +879,7 @@ function ScanningScreen({ imageSrc }: { imageSrc: string | null }) {
 
 // ─── 결과 화면 ────────────────────────────────────────────────────
 function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBack, onGoMagazine, user }: any) {
+  const { t } = useTranslation();
   const [history, setHistory] = useState<any[]>([]);
   const [isSaved, setIsSaved] = useState(false);
   const [currentScanId, setCurrentScanId] = useState<string | null>(null);
@@ -948,12 +983,12 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
   };
 
   const scores = analysisResult?.scores || [];
-  const overallScore = scores.find((s: any) => s.label === "종합 컨디션")?.score || scores[0]?.score || 0;
-
-  const isOily  = (scores.find((s: any) => s.label === "모공 상태")?.score ?? 100) < 50;
-  const isSens  = (scores.find((s: any) => s.label === "붉은기 수준")?.score ?? 0) > 50;
-  const isPig   = (scores.find((s: any) => s.label === "잡티/색소침착")?.score ?? 0) > 50;
-  const isWrink = (scores.find((s: any) => s.label === "주름 및 탄력")?.score ?? 100) < 60;
+  // Labels from server are always Korean (REQUIRED_LABELS), so we match by Korean label OR by index
+  const overallScore = scores[0]?.score || 0;
+  const isOily  = (scores[3]?.score ?? 100) < 50;  // index 3 = 모공 상태
+  const isSens  = (scores[2]?.score ?? 0) > 50;    // index 2 = 붉은기 수준
+  const isPig   = (scores[5]?.score ?? 0) > 50;    // index 5 = 잡티/색소침착
+  const isWrink = (scores[4]?.score ?? 100) < 60;  // index 4 = 주름 및 탄력
   const finalType = `${isOily ? "O" : "D"}${isSens ? "S" : "R"}${isPig ? "P" : "N"}${isWrink ? "W" : "T"}`;
 
   const handleShare = async () => {
@@ -972,7 +1007,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
       canvas.toBlob(async (blob) => {
         if (!blob) return;
         const file = new File([blob], "fonday-skin-report.png", { type: "image/png" });
-        const shareText = `오늘 내 피부 점수는 ${overallScore}점! 바우만 타입은 ${finalType}형이 나왔어요.\n#Fonday #AI피부분석 #FondayAI`;
+        const shareText = t("result.shareText", { score: overallScore, type: finalType });
         if (navigator.canShare?.({ files: [file] })) {
           await navigator.share({ files: [file], title: "Fonday AI 피부 분석 리포트", text: shareText });
         } else if (navigator.share) {
@@ -998,7 +1033,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
     <div ref={shareCardRef} style={{ display: "none", position: "fixed", left: "-9999px", top: 0, width: "390px", background: "#FAF9F6", fontFamily: "system-ui, -apple-system, sans-serif", padding: "20px 20px 24px" }}>
       {/* 헤더 */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }}>
-        <span style={{ fontSize: "20px", fontWeight: 900, color: DEEP_GREEN }}>FondayAI 피부 리포트</span>
+        <span style={{ fontSize: "20px", fontWeight: 900, color: DEEP_GREEN }}>{t("result.title")}</span>
         <span style={{ fontSize: "11px", color: TEXT_SECONDARY }}>{new Date().toLocaleDateString("ko-KR", { month: "long", day: "numeric" })}</span>
       </div>
 
@@ -1008,29 +1043,29 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
           {/* 종합점수 */}
           <div style={{ width: "72px", height: "72px", borderRadius: "16px", background: `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})`, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
             <span style={{ fontSize: "30px", fontWeight: 900, color: "white", lineHeight: 1 }}>{overallScore}</span>
-            <span style={{ fontSize: "9px", fontWeight: 700, color: "rgba(255,255,255,0.85)", marginTop: "3px" }}>종합점수</span>
+            <span style={{ fontSize: "9px", fontWeight: 700, color: "rgba(255,255,255,0.85)", marginTop: "3px" }}>{t("result.overall")}</span>
           </div>
           {/* 피부나이 */}
           {analysisResult?.skinAge != null && analysisResult.skinAge > 0 && (
             <div style={{ width: "72px", height: "72px", borderRadius: "16px", background: "linear-gradient(135deg, #A78BFA, #7C3AED)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
               <span style={{ fontSize: "30px", fontWeight: 900, color: "white", lineHeight: 1 }}>{analysisResult.skinAge}</span>
-              <span style={{ fontSize: "9px", fontWeight: 700, color: "rgba(255,255,255,0.85)", marginTop: "3px" }}>피부나이</span>
+              <span style={{ fontSize: "9px", fontWeight: 700, color: "rgba(255,255,255,0.85)", marginTop: "3px" }}>{t("result.skinAge")}</span>
             </div>
           )}
           {/* 바우만 타입 */}
           <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{ fontSize: "11px", color: TEXT_SECONDARY, marginBottom: "4px" }}>{surveyData?.age} {surveyData?.gender}</div>
             <div style={{ display: "flex", alignItems: "baseline", gap: "4px", marginBottom: "6px" }}>
-              <span style={{ fontSize: "13px", color: "#78716C" }}>바우만</span>
+              <span style={{ fontSize: "13px", color: "#78716C" }}>{t("result.baumannLabel")}</span>
               <span style={{ fontSize: "22px", fontWeight: 900, color: SCAN_TO }}>{finalType}</span>
-              <span style={{ fontSize: "13px", color: "#78716C" }}>형</span>
+              <span style={{ fontSize: "13px", color: "#78716C" }}>{t("result.baumannSuffix")}</span>
             </div>
             <div style={{ display: "flex", gap: "4px", flexWrap: "wrap" }}>
               {finalType.split("").map((letter, i) => {
-                const info = BAUMANN_DESC[letter];
-                if (!info) return null;
+                const color = BAUMANN_COLORS[letter];
+                if (!color) return null;
                 return (
-                  <span key={i} style={{ fontSize: "10px", fontWeight: 700, padding: "2px 8px", borderRadius: "999px", background: `${info.color}18`, color: info.color }}>{info.name}</span>
+                  <span key={i} style={{ fontSize: "10px", fontWeight: 700, padding: "2px 8px", borderRadius: "999px", background: `${color}18`, color }}>{t(`baumann.${letter}.name`)}</span>
                 );
               })}
             </div>
@@ -1045,7 +1080,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
             <div style={{ width: "30px", height: "30px", borderRadius: "10px", background: `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
               <span style={{ color: "white", fontSize: "14px" }}>✦</span>
             </div>
-            <span style={{ fontSize: "13px", fontWeight: 900, color: DEEP_GREEN }}>FondayAI 의 피부 총평</span>
+            <span style={{ fontSize: "13px", fontWeight: 900, color: DEEP_GREEN }}>{t("result.aiComment")}</span>
           </div>
           <p style={{ fontSize: "13px", color: "#57534E", lineHeight: 1.65, margin: 0 }}>{analysisResult.aiComment}</p>
         </div>
@@ -1053,7 +1088,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
 
       {/* 10가지 항목별 점수 */}
       <div style={{ background: "white", borderRadius: "24px", padding: "18px 20px", boxShadow: "0 2px 12px rgba(0,0,0,0.06)" }}>
-        <p style={{ fontSize: "13px", fontWeight: 900, color: DEEP_GREEN, marginBottom: "14px" }}>10가지 항목별 점수</p>
+        <p style={{ fontSize: "13px", fontWeight: 900, color: DEEP_GREEN, marginBottom: "14px" }}>{t("result.scores")}</p>
         {analysisResult?.scores.map((s: any, i: number) => {
           const Icon = SCORE_ICONS[i] || Zap;
           const color = SCORE_COLORS[i] || DEEP_GREEN;
@@ -1064,9 +1099,9 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
                   <div style={{ width: "24px", height: "24px", borderRadius: "999px", background: "#F5F4F2", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                     <Icon size={14} style={{ color }} />
                   </div>
-                  <span style={{ fontSize: "13px", fontWeight: 700, color: "#44403C" }}>{s.label}</span>
+                  <span style={{ fontSize: "13px", fontWeight: 700, color: "#44403C" }}>{t(`scores.${i}`)}</span>
                 </div>
-                <span style={{ fontSize: "13px", fontWeight: 700, color }}>{s.score}점</span>
+                <span style={{ fontSize: "13px", fontWeight: 700, color }}>{s.score}{t("result.scoreSuffix")}</span>
               </div>
               <div style={{ height: "6px", background: "#F5F4F2", borderRadius: "999px", overflow: "hidden" }}>
                 <div style={{ height: "100%", width: `${s.score}%`, background: color, borderRadius: "999px" }} />
@@ -1086,9 +1121,9 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
         <div className="flex justify-between items-center">
           <Button variant="outline" size="sm" onClick={onBack} className="rounded-full gap-1.5 hover:bg-rose-50"
             style={{ borderColor: SCAN_TO, color: SCAN_TO }}>
-            <Camera className="w-4 h-4" /> 다시 촬영
+            <Camera className="w-4 h-4" /> {t("result.back")}
           </Button>
-          <h2 className="text-xl font-black tracking-tight" style={{ color: DEEP_GREEN }}>FondayAI 피부 리포트</h2>
+          <h2 className="text-xl font-black tracking-tight" style={{ color: DEEP_GREEN }}>{t("result.title")}</h2>
         </div>
 
         {/* 이미지 + 핫스팟 */}
@@ -1128,32 +1163,32 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
               <div className="w-[72px] h-[72px] rounded-2xl flex flex-col items-center justify-center text-white shadow-lg shrink-0"
                 style={{ background: `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})` }}>
                 <span className="text-3xl font-black leading-none">{overallScore}</span>
-                <span className="text-[9px] font-bold opacity-80 mt-1">종합점수</span>
+                <span className="text-[9px] font-bold opacity-80 mt-1">{t("result.overall")}</span>
               </div>
               {/* 피부나이 */}
               {analysisResult?.skinAge != null && analysisResult.skinAge > 0 && (
                 <div className="w-[72px] h-[72px] rounded-2xl flex flex-col items-center justify-center text-white shadow-lg shrink-0"
                   style={{ background: "linear-gradient(135deg, #A78BFA, #7C3AED)" }}>
                   <span className="text-3xl font-black leading-none">{analysisResult.skinAge}</span>
-                  <span className="text-[9px] font-bold opacity-80 mt-1">피부나이</span>
+                  <span className="text-[9px] font-bold opacity-80 mt-1">{t("result.skinAge")}</span>
                 </div>
               )}
               {/* 바우만 타입 */}
               <div className="min-w-0 flex-1">
                 <p className="text-[11px] text-stone-400 mb-1">{surveyData?.age} {surveyData?.gender}</p>
                 <div className="flex items-baseline gap-1 mb-1.5">
-                  <span className="text-[13px] text-stone-500">바우만</span>
+                  <span className="text-[13px] text-stone-500">{t("result.baumannLabel")}</span>
                   <span className="text-xl font-black" style={{ color: SCAN_TO }}>{finalType}</span>
-                  <span className="text-[13px] text-stone-500">형</span>
+                  <span className="text-[13px] text-stone-500">{t("result.baumannSuffix")}</span>
                 </div>
                 <div className="flex gap-1 flex-wrap">
                   {finalType.split("").map((letter, i) => {
-                    const info = BAUMANN_DESC[letter];
-                    if (!info) return null;
+                    const color = BAUMANN_COLORS[letter];
+                    if (!color) return null;
                     return (
                       <span key={i} className="text-[10px] font-bold px-2 py-0.5 rounded-full"
-                        style={{ background: `${info.color}18`, color: info.color }}>
-                        {info.name}
+                        style={{ background: `${color}18`, color }}>
+                        {t(`baumann.${letter}.name`)}
                       </span>
                     );
                   })}
@@ -1172,7 +1207,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
                   style={{ background: `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})` }}>
                   <Sparkles className="w-4 h-4 text-white" />
                 </div>
-                <p className="text-[13px] font-black" style={{ color: DEEP_GREEN }}>FondayAI 의 피부 총평</p>
+                <p className="text-[13px] font-black" style={{ color: DEEP_GREEN }}>{t("result.aiComment")}</p>
               </div>
               <p className="text-[13px] text-stone-600 leading-relaxed">{analysisResult.aiComment}</p>
             </CardContent>
@@ -1182,7 +1217,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
         {/* 10가지 점수 */}
         <Card className="border-none shadow-md rounded-3xl bg-white">
           <CardHeader className="pb-1 pt-5 px-5">
-            <p className="text-[13px] font-black" style={{ color: DEEP_GREEN }}>10가지 항목별 점수</p>
+            <p className="text-[13px] font-black" style={{ color: DEEP_GREEN }}>{t("result.scores")}</p>
           </CardHeader>
           <CardContent className="px-5 pb-5 space-y-4">
             {scores.map((item: any, i: number) => {
@@ -1195,11 +1230,11 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
                       <div className="w-6 h-6 rounded-full flex items-center justify-center bg-stone-50 shadow-sm">
                         <Icon className="w-3.5 h-3.5" style={{ color }} />
                       </div>
-                      <span className="text-stone-700">{item.label}</span>
+                      <span className="text-stone-700">{t(`scores.${i}`)}</span>
                     </div>
                     <motion.span style={{ color }} initial={{ scale: 0 }} animate={{ scale: 1 }}
                       transition={{ delay: 0.3 + i * 0.08, type: "spring" }}>
-                      {item.score}점
+                      {item.score}{t("result.scoreSuffix")}
                     </motion.span>
                   </div>
                   <div className="h-1.5 rounded-full overflow-hidden bg-stone-100">
@@ -1219,10 +1254,10 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
             {/* 배경: 블러 처리된 가상 수치 */}
             <div className="grid grid-cols-2 gap-3 blur-sm opacity-40 pointer-events-none select-none">
               {[
-                { label: "피부 온도", value: "36.2°C", icon: Thermometer, color: "#E09882" },
-                { label: "수분도", value: "68%", icon: Droplets, color: "#3B82C4" },
-                { label: "유분도", value: "42%", icon: Flame, color: "#F59E0B" },
-                { label: "피부 장벽", value: "B+", icon: Shield, color: "#10B981" },
+                { label: t("result.locked.skinTemp"), value: "36.2°C", icon: Thermometer, color: "#E09882" },
+                { label: t("result.locked.moisture"), value: "68%", icon: Droplets, color: "#3B82C4" },
+                { label: t("result.locked.oil"), value: "42%", icon: Flame, color: "#F59E0B" },
+                { label: t("result.locked.barrier"), value: "B+", icon: Shield, color: "#10B981" },
               ].map((item, i) => {
                 const Icon = item.icon;
                 return (
@@ -1242,10 +1277,10 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
             <div className="w-12 h-12 rounded-2xl bg-stone-200 flex items-center justify-center mb-3 shadow-inner">
               <Lock className="w-6 h-6 text-stone-500" />
             </div>
-            <p className="text-[14px] font-black text-stone-700 mb-2">피부 속 진피층 수분 장벽 측정 불가</p>
+            <p className="text-[14px] font-black text-stone-700 mb-2">{t("result.locked.title")}</p>
             <p className="text-[12px] text-stone-500 leading-relaxed">
-              스마트폰 카메라로는 피부 속을 볼 수 없습니다.<br />
-              <span className="font-bold" style={{ color: SCAN_TO }}>Fonday 정밀 스캐너</span>로 진짜 피부 속 상태를 확인하세요.
+              {t("result.locked.desc")}<br />
+              <span className="font-bold" style={{ color: SCAN_TO }}>{t("result.locked.device")}</span>{t("result.locked.deviceDesc")}
             </p>
           </div>
         </Card>
@@ -1256,13 +1291,13 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
             className="h-16 rounded-2xl flex-col gap-1.5 font-bold text-white shadow-md"
             style={{ background: `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})` }}>
             <LayoutGrid className="w-5 h-5" />
-            <span className="text-[12px]">주요 분석결과</span>
+            <span className="text-[12px]">{t("result.analysis")}</span>
           </Button>
           <Button onClick={() => setShowImprovements(true)}
             className="h-16 rounded-2xl flex-col gap-1.5 font-bold text-white shadow-md"
             style={{ background: `linear-gradient(135deg, ${DEEP_GREEN_LIGHT}, ${DEEP_GREEN})` }}>
             <Leaf className="w-5 h-5" />
-            <span className="text-[12px]">맞춤솔루션</span>
+            <span className="text-[12px]">{t("result.solutions")}</span>
           </Button>
         </div>
 
@@ -1282,9 +1317,11 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
                     <LineChartIcon className="w-5 h-5 text-white" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-[13px] font-black" style={{ color: DEEP_GREEN }}>피부 일기</p>
+                    <p className="text-[13px] font-black" style={{ color: DEEP_GREEN }}>{t("result.diary.title")}</p>
                     <p className="text-[11px] text-stone-400">
-                      {history.length > 0 ? `${history.length + 1}번의 기록 · 오늘 ${overallScore}점` : "오늘 첫 번째 기록"}
+                      {history.length > 0
+                        ? t("result.diary.history", { count: history.length + 1, score: overallScore })
+                        : t("result.diary.firstRecord")}
                     </p>
                   </div>
                   {user.avatar && <img src={user.avatar} className="w-7 h-7 rounded-full border border-stone-100 shrink-0" />}
@@ -1312,8 +1349,8 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
         ) : (
           <Card className="border-2 border-dashed rounded-3xl p-6 text-center" style={{ borderColor: "#F5D5CC", background: "#FDF8F7" }}>
             <CardHeader className="p-0 mb-4">
-              <CardTitle className="text-lg font-bold" style={{ color: DEEP_GREEN }}>변화 과정을 기록하세요</CardTitle>
-              <CardDescription className="text-xs">로그인으로 내 피부 일기를 시작하세요.</CardDescription>
+              <CardTitle className="text-lg font-bold" style={{ color: DEEP_GREEN }}>{t("result.login.title")}</CardTitle>
+              <CardDescription className="text-xs">{t("result.login.desc")}</CardDescription>
             </CardHeader>
             <CardContent className="p-0 space-y-2">
               <Button onClick={handleKakaoLogin}
@@ -1322,12 +1359,12 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
                 <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
                   <path fillRule="evenodd" clipRule="evenodd" d="M9 1C4.582 1 1 3.79 1 7.222c0 2.154 1.386 4.045 3.484 5.14L3.62 15.5a.25.25 0 0 0 .368.274L7.9 13.39A9.63 9.63 0 0 0 9 13.444c4.418 0 8-2.791 8-6.222C17 3.79 13.418 1 9 1Z" fill="#3C1E1E"/>
                 </svg>
-                카카오로 계속하기
+                {t("result.login.kakao")}
               </Button>
               <Button onClick={handleGoogleLogin}
                 className="w-full h-12 rounded-xl bg-white hover:bg-stone-50 font-bold text-zinc-700 gap-2 border border-stone-200 shadow-sm">
                 <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" className="w-4 h-4" />
-                Google로 계속하기
+                {t("result.login.google")}
               </Button>
             </CardContent>
           </Card>
@@ -1340,20 +1377,20 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
         <Button onClick={() => setShowWaitlist(true)}
           className="w-full h-14 rounded-2xl text-white font-bold shadow-lg"
           style={{ background: `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})` }}>
-          <span className="flex items-center gap-2">Fonday 얼리버드 알림 받기 <ArrowRight className="w-5 h-5" /></span>
+          <span className="flex items-center gap-2">{t("result.earlybird")} <ArrowRight className="w-5 h-5" /></span>
         </Button>
 
         {/* 공유 */}
         <Button onClick={handleShare}
           className="w-full h-14 rounded-2xl text-white font-bold shadow-lg hover:opacity-90 transition-opacity bg-gradient-to-r from-[#f09433] via-[#bc1888] to-[#8a3ab9]">
-          <Share2 className="w-5 h-5 mr-2" /> 결과 공유하기
+          <Share2 className="w-5 h-5 mr-2" /> {t("result.share")}
         </Button>
 
         {/* 제휴하기 */}
         <Button onClick={() => setShowPartnership(true)}
           className="w-full h-14 rounded-2xl font-bold shadow-lg hover:opacity-90 transition-opacity"
           style={{ background: `linear-gradient(135deg, ${DEEP_GREEN}, ${DEEP_GREEN_LIGHT})`, color: "#fff" }}>
-          <span className="flex items-center gap-2">브랜드 제휴 문의하기 <ArrowRight className="w-5 h-5" /></span>
+          <span className="flex items-center gap-2">{t("result.partnership")} <ArrowRight className="w-5 h-5" /></span>
         </Button>
       </motion.div>
 
@@ -1380,8 +1417,8 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
                       <LayoutGrid className="w-4 h-4 text-white" />
                     </div>
                     <div>
-                      <h3 className="font-bold text-base" style={{ color: DEEP_GREEN }}>주요 분석결과</h3>
-                      <p className="text-[11px] text-stone-400">10가지 항목 상세 분석</p>
+                      <h3 className="font-bold text-base" style={{ color: DEEP_GREEN }}>{t("modal.analysis.title")}</h3>
+                      <p className="text-[11px] text-stone-400">{t("modal.analysis.sub")}</p>
                     </div>
                   </div>
                   <button onClick={() => setShowAnalysis(false)} className="w-7 h-7 rounded-full bg-stone-100 flex items-center justify-center">
@@ -1404,8 +1441,8 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
                           <div className="w-6 h-6 rounded-full flex items-center justify-center bg-white shadow-sm shrink-0">
                             <Icon className="w-3 h-3" style={{ color }} />
                           </div>
-                          <span className="text-[12px] font-black" style={{ color }}>{item.label}</span>
-                          <span className="ml-auto text-[12px] font-black" style={{ color }}>{item.score}점</span>
+                          <span className="text-[12px] font-black" style={{ color }}>{t(`scores.${i}`)}</span>
+                          <span className="ml-auto text-[12px] font-black" style={{ color }}>{item.score}{t("result.scoreSuffix")}</span>
                         </div>
                         <p className="text-[13px] text-stone-600 leading-relaxed">{item.comment || "-"}</p>
                       </motion.div>
@@ -1416,7 +1453,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
                     <div className="pt-1">
                       <div className="flex items-center gap-2 mb-3">
                         <Activity className="w-4 h-4" style={{ color: DEEP_GREEN }} />
-                        <p className="text-[13px] font-black" style={{ color: DEEP_GREEN }}>피부 부위별 소견</p>
+                        <p className="text-[13px] font-black" style={{ color: DEEP_GREEN }}>{t("modal.analysis.skinReport")}</p>
                       </div>
                       <div className="grid grid-cols-2 gap-2">
                         {(analysisResult!.skinReport as { area: string; finding: string }[]).map((item, i) => (
@@ -1433,21 +1470,21 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
                     <div className="flex items-center gap-2 mb-3">
                       <Shield className="w-4 h-4" style={{ color: DEEP_GREEN }} />
                       <p className="text-[13px] font-black" style={{ color: DEEP_GREEN }}>
-                        바우만 <span style={{ color: SCAN_TO }}>{finalType}</span>형 상세
+                        {t("modal.analysis.baumannDetail", { type: finalType })}
                       </p>
                     </div>
                     <div className="grid grid-cols-2 gap-2">
                       {finalType.split("").map((letter, i) => {
-                        const info = BAUMANN_DESC[letter];
-                        if (!info) return null;
+                        const color = BAUMANN_COLORS[letter];
+                        if (!color) return null;
                         return (
                           <div key={i} className="p-3 rounded-2xl border"
-                            style={{ background: `${info.color}10`, borderColor: `${info.color}30` }}>
+                            style={{ background: `${color}10`, borderColor: `${color}30` }}>
                             <div className="flex items-center gap-1.5 mb-1">
-                              <span className="text-[17px] font-black" style={{ color: info.color }}>{letter}</span>
-                              <span className="text-[12px] font-bold text-stone-700">{info.name}</span>
+                              <span className="text-[17px] font-black" style={{ color }}>{letter}</span>
+                              <span className="text-[12px] font-bold text-stone-700">{t(`baumann.${letter}.name`)}</span>
                             </div>
-                            <p className="text-[11px] text-stone-500 leading-snug">{info.desc}</p>
+                            <p className="text-[11px] text-stone-500 leading-snug">{t(`baumann.${letter}.desc`)}</p>
                           </div>
                         );
                       })}
@@ -1483,8 +1520,8 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
                       <Leaf className="w-4 h-4 text-white" />
                     </div>
                     <div>
-                      <h3 className="font-bold text-base" style={{ color: DEEP_GREEN }}>맞춤솔루션</h3>
-                      <p className="text-[11px] text-stone-400">AI가 분석 결과를 바탕으로 제안합니다</p>
+                      <h3 className="font-bold text-base" style={{ color: DEEP_GREEN }}>{t("modal.improvements.title")}</h3>
+                      <p className="text-[11px] text-stone-400">{t("modal.improvements.sub")}</p>
                     </div>
                   </div>
                   <button onClick={() => setShowImprovements(false)} className="w-7 h-7 rounded-full bg-stone-100 flex items-center justify-center">
@@ -1518,7 +1555,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
                     </motion.div>
                   ))}
                   {(analysisResult?.improvements ?? []).length === 0 && (
-                    <p className="text-center text-sm text-stone-400 py-6">개선 방안을 불러오는 중...</p>
+                    <p className="text-center text-sm text-stone-400 py-6">{t("modal.improvements.loading")}</p>
                   )}
 
                   {/* 추천 화장품 */}
@@ -1526,7 +1563,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
                     <>
                       <div className="flex items-center gap-2 pt-2 pb-1">
                         <Sparkles className="w-4 h-4" style={{ color: SCAN_TO }} />
-                        <p className="text-[13px] font-black" style={{ color: DEEP_GREEN }}>추천 화장품</p>
+                        <p className="text-[13px] font-black" style={{ color: DEEP_GREEN }}>{t("modal.improvements.cosmetics")}</p>
                       </div>
                       {(analysisResult.cosmetics as { type: string; key: string; reason: string }[]).map((item, i) => (
                         <motion.div key={`c-${i}`}
@@ -1579,15 +1616,15 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
                       <LineChartIcon className="w-4 h-4 text-white" />
                     </div>
                     <div>
-                      <h3 className="font-bold text-base" style={{ color: DEEP_GREEN }}>피부 일기</h3>
-                      <p className="text-[11px] text-stone-400">{history.length + 1}번의 기록</p>
+                      <h3 className="font-bold text-base" style={{ color: DEEP_GREEN }}>{t("modal.diary.title")}</h3>
+                      <p className="text-[11px] text-stone-400">{t("modal.diary.countLabel", { count: history.length + 1 })}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
                     {user?.avatar && <img src={user.avatar} className="w-7 h-7 rounded-full border border-stone-100" />}
                     <button
                       onClick={() => fetch("/api/logout", { method: "POST" }).then(() => window.location.reload())}
-                      className="text-[10px] text-stone-400 underline px-1">로그아웃</button>
+                      className="text-[10px] text-stone-400 underline px-1">{t("modal.diary.logout")}</button>
                     <button onClick={() => setShowDiary(false)} className="w-7 h-7 rounded-full bg-stone-100 flex items-center justify-center">
                       <X className="w-3.5 h-3.5 text-stone-500" />
                     </button>
@@ -1600,7 +1637,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
                   {/* 점수 변화 그래프 */}
                   {history.length >= 1 && (
                     <div>
-                      <p className="text-[11px] font-bold text-stone-400 mb-2">종합점수 변화 추이</p>
+                      <p className="text-[11px] font-bold text-stone-400 mb-2">{t("modal.diary.graphTitle")}</p>
                       <div className="h-44 rounded-2xl bg-stone-50 px-2 pt-2">
                         <ResponsiveContainer width="100%" height="100%">
                           <LineChart data={[...history.slice().reverse().map((item: any) => ({
@@ -1630,23 +1667,23 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
                       <div className="flex items-center justify-between mb-2">
                         <div className="flex items-center gap-1.5">
                           <span className="text-[10px] font-black px-2 py-0.5 rounded-full text-white"
-                            style={{ background: `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})` }}>오늘</span>
+                            style={{ background: `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})` }}>{t("modal.diary.today")}</span>
                           <span className="text-[11px] text-stone-400">
-                            {new Date().toLocaleDateString("ko-KR", { month: "long", day: "numeric" })}
+                            {new Date().toLocaleDateString(i18n.language === "ko" ? "ko-KR" : i18n.language === "ja" ? "ja-JP" : "en-US", { month: "long", day: "numeric" })}
                           </span>
                         </div>
                         <div className="flex items-center gap-2">
-                          <span className="text-[15px] font-black" style={{ color: SCAN_TO }}>{overallScore}점</span>
+                          <span className="text-[15px] font-black" style={{ color: SCAN_TO }}>{overallScore}{t("result.scoreSuffix")}</span>
                           {analysisResult?.skinAge && (
                             <span className="text-[10px] px-1.5 py-0.5 rounded-full font-bold"
                               style={{ background: "#A78BFA20", color: "#7C3AED" }}>
-                              피부나이 {analysisResult.skinAge}세
+                              {t("modal.diary.skinAgeLabel", { age: analysisResult.skinAge })}
                             </span>
                           )}
                         </div>
                       </div>
                       <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full inline-block mb-2"
-                        style={{ background: `${SCAN_FROM}20`, color: SCAN_TO }}>바우만 {finalType}형</span>
+                        style={{ background: `${SCAN_FROM}20`, color: SCAN_TO }}>{t("modal.diary.baumannLabel", { type: finalType })}</span>
                       <p className="text-[12px] text-stone-600 leading-relaxed">{analysisResult?.aiComment}</p>
                     </div>
 
@@ -1655,9 +1692,10 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
                       if (item.id === currentScanId) return null;
                       const date = new Date(item.createdAt);
                       const isToday = date.toDateString() === new Date().toDateString();
+                      const locale = i18n.language === "ko" ? "ko-KR" : i18n.language === "ja" ? "ja-JP" : "en-US";
                       const dateLabel = isToday
-                        ? `오늘 ${date.toLocaleTimeString("ko-KR", { hour: "2-digit", minute: "2-digit" })}`
-                        : date.toLocaleDateString("ko-KR", { year: "numeric", month: "long", day: "numeric" });
+                        ? `${t("modal.diary.today")} ${date.toLocaleTimeString(locale, { hour: "2-digit", minute: "2-digit" })}`
+                        : date.toLocaleDateString(locale, { year: "numeric", month: "long", day: "numeric" });
                       return (
                         <motion.div key={item.id}
                           initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
@@ -1666,11 +1704,11 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
                           <div className="flex items-center justify-between mb-2">
                             <span className="text-[11px] text-stone-400">{dateLabel}</span>
                             <div className="flex items-center gap-2">
-                              <span className="text-[15px] font-black" style={{ color: DEEP_GREEN }}>{item.overallScore}점</span>
+                              <span className="text-[15px] font-black" style={{ color: DEEP_GREEN }}>{item.overallScore}{t("result.scoreSuffix")}</span>
                               {item.skinAge && (
                                 <span className="text-[10px] px-1.5 py-0.5 rounded-full font-bold"
                                   style={{ background: "#A78BFA20", color: "#7C3AED" }}>
-                                  피부나이 {item.skinAge}세
+                                  {t("modal.diary.skinAgeLabel", { age: item.skinAge })}
                                 </span>
                               )}
                             </div>
@@ -1678,7 +1716,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
                           {item.baumannType && (
                             <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full inline-block mb-2"
                               style={{ background: `${DEEP_GREEN}15`, color: DEEP_GREEN }}>
-                              바우만 {item.baumannType}형
+                              {t("modal.diary.baumannLabel", { type: item.baumannType })}
                             </span>
                           )}
                           {item.aiComment && (
@@ -1713,31 +1751,31 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
               {isPartnerSuccess ? (
                 <div className="py-10 text-center">
                   <Sparkles className="w-12 h-12 mx-auto mb-4 text-amber-500" />
-                  <h3 className="font-bold text-lg" style={{ color: DEEP_GREEN }}>문의가 접수되었습니다!</h3>
-                  <p className="text-sm text-muted-foreground mt-2">빠르게 연락드릴게요.</p>
+                  <h3 className="font-bold text-lg" style={{ color: DEEP_GREEN }}>{t("modal.partnership.success")}</h3>
+                  <p className="text-sm text-muted-foreground mt-2">{t("modal.partnership.successDesc")}</p>
                 </div>
               ) : (
                 <>
-                  <h3 className="text-center font-extrabold text-lg mb-1" style={{ color: DEEP_GREEN }}>브랜드 제휴 문의</h3>
-                  <p className="text-center text-sm leading-relaxed mb-6 text-muted-foreground">화장품 브랜드, 피부과, 뷰티 브랜드 등<br />다양한 제휴를 환영합니다.</p>
+                  <h3 className="text-center font-extrabold text-lg mb-1" style={{ color: DEEP_GREEN }}>{t("modal.partnership.title")}</h3>
+                  <p className="text-center text-sm leading-relaxed mb-6 text-muted-foreground" style={{ whiteSpace: "pre-line" }}>{t("modal.partnership.desc")}</p>
                   <form onSubmit={handlePartnershipSubmit} className="space-y-3">
-                    <input type="text" required placeholder="담당자 이름" value={partnerForm.name}
+                    <input type="text" required placeholder={t("modal.partnership.name")} value={partnerForm.name}
                       onChange={e => setPartnerForm(p => ({ ...p, name: e.target.value }))}
-                      className="w-full px-4 py-3.5 rounded-xl border border-stone-200 focus:outline-none focus:ring-2 text-sm" style={{ focusRingColor: DEEP_GREEN }} />
-                    <input type="text" required placeholder="회사명 / 브랜드명" value={partnerForm.company}
+                      className="w-full px-4 py-3.5 rounded-xl border border-stone-200 focus:outline-none focus:ring-2 text-sm" />
+                    <input type="text" required placeholder={t("modal.partnership.company")} value={partnerForm.company}
                       onChange={e => setPartnerForm(p => ({ ...p, company: e.target.value }))}
                       className="w-full px-4 py-3.5 rounded-xl border border-stone-200 focus:outline-none focus:ring-2 text-sm" />
-                    <input type="email" required placeholder="이메일" value={partnerForm.email}
+                    <input type="email" required placeholder={t("modal.partnership.email")} value={partnerForm.email}
                       onChange={e => setPartnerForm(p => ({ ...p, email: e.target.value }))}
                       className="w-full px-4 py-3.5 rounded-xl border border-stone-200 focus:outline-none focus:ring-2 text-sm" />
-                    <textarea required placeholder="문의 내용" value={partnerForm.message}
+                    <textarea required placeholder={t("modal.partnership.message")} value={partnerForm.message}
                       onChange={e => setPartnerForm(p => ({ ...p, message: e.target.value }))}
                       rows={3}
                       className="w-full px-4 py-3.5 rounded-xl border border-stone-200 focus:outline-none focus:ring-2 text-sm resize-none" />
                     <Button disabled={isPartnerSubmitting} type="submit"
                       className="w-full h-14 rounded-2xl font-bold text-[15px] text-white"
                       style={{ background: `linear-gradient(135deg, ${DEEP_GREEN}, ${DEEP_GREEN_LIGHT})` }}>
-                      {isPartnerSubmitting ? "전송 중..." : "문의 보내기"}
+                      {isPartnerSubmitting ? t("modal.partnership.submitting") : t("modal.partnership.submit")}
                     </Button>
                   </form>
                 </>
@@ -1765,20 +1803,20 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
               {isSuccess ? (
                 <div className="py-10 text-center">
                   <Sparkles className="w-12 h-12 mx-auto mb-4 text-amber-500" />
-                  <h3 className="font-bold text-lg" style={{ color: DEEP_GREEN }}>등록이 완료되었습니다!</h3>
+                  <h3 className="font-bold text-lg" style={{ color: DEEP_GREEN }}>{t("modal.waitlist.success")}</h3>
                 </div>
               ) : (
                 <>
-                  <h3 className="text-center font-extrabold text-lg mb-2" style={{ color: DEEP_GREEN }}>얼리버드 등록</h3>
-                  <p className="text-center text-sm leading-relaxed mb-6 text-muted-foreground">특별한 혜택을 드립니다!</p>
+                  <h3 className="text-center font-extrabold text-lg mb-2" style={{ color: DEEP_GREEN }}>{t("modal.waitlist.title")}</h3>
+                  <p className="text-center text-sm leading-relaxed mb-6 text-muted-foreground">{t("modal.waitlist.desc")}</p>
                   <form onSubmit={handleWaitlistSubmit} className="space-y-4">
-                    <input type="email" required placeholder="이메일을 입력해 주세요" value={email}
+                    <input type="email" required placeholder={t("modal.waitlist.email")} value={email}
                       onChange={e => setEmail(e.target.value)}
                       className="w-full px-4 py-3.5 rounded-xl border border-stone-200 focus:outline-none focus:ring-2 focus:ring-rose-200" />
                     <Button disabled={isSubmitting} type="submit"
                       className="w-full h-14 rounded-2xl font-bold text-[15px] text-white"
                       style={{ background: `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})` }}>
-                      {isSubmitting ? "등록 중..." : "등록할게요!"}
+                      {isSubmitting ? t("modal.waitlist.submitting") : t("modal.waitlist.submit")}
                     </Button>
                   </form>
                 </>
@@ -1795,8 +1833,17 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
 // ─── 매거진 탭 ────────────────────────────────────────────────────
 const CATEGORY_FILTERS = ["전체", "성분", "루틴", "타입", "케어", "전문가"] as const;
 type CategoryFilter = typeof CATEGORY_FILTERS[number];
+const CATEGORY_I18N_KEYS: Record<CategoryFilter, string> = {
+  "전체": "magazine.categories.all",
+  "성분": "magazine.categories.ingredients",
+  "루틴": "magazine.categories.routine",
+  "타입": "magazine.categories.type",
+  "케어": "magazine.categories.care",
+  "전문가": "magazine.categories.expert",
+};
 
 function ArticleModal({ article, onClose }: { article: MagazineArticle; onClose: () => void }) {
+  const { t } = useTranslation();
   const dragControls = useDragControls();
   return (
     <motion.div
@@ -1841,7 +1888,7 @@ function ArticleModal({ article, onClose }: { article: MagazineArticle; onClose:
           </div>
           <div className="absolute bottom-3 right-3 flex items-center gap-1">
             <Clock className="w-3 h-3 text-white/80" />
-            <span className="text-[10px] text-white/80 font-medium">{article.readTime} 읽기</span>
+            <span className="text-[10px] text-white/80 font-medium">{t("magazine.readTime", { time: article.readTime })}</span>
           </div>
         </div>
 
@@ -1880,6 +1927,7 @@ function ArticleModal({ article, onClose }: { article: MagazineArticle; onClose:
 }
 
 function MagazineTab() {
+  const { t } = useTranslation();
   const [filter, setFilter] = useState<CategoryFilter>("전체");
   const [selectedArticle, setSelectedArticle] = useState<MagazineArticle | null>(null);
 
@@ -1897,9 +1945,9 @@ function MagazineTab() {
 
           {/* 헤더 */}
           <motion.div variants={fadeChild} className="px-5 pt-6 pb-4">
-            <p className="text-[11px] font-bold tracking-widest uppercase mb-1" style={{ color: SCAN_TO }}>Beauty Insight</p>
-            <h1 className="text-[26px] font-black tracking-tight leading-tight" style={{ color: DEEP_GREEN }}>
-              피부 전문가의<br />뷰티 인사이트
+            <p className="text-[11px] font-bold tracking-widest uppercase mb-1" style={{ color: SCAN_TO }}>{t("magazine.subtitle")}</p>
+            <h1 className="text-[26px] font-black tracking-tight leading-tight whitespace-pre-line" style={{ color: DEEP_GREEN }}>
+              {t("magazine.title")}
             </h1>
           </motion.div>
 
@@ -1916,7 +1964,7 @@ function MagazineTab() {
                     : { background: "#F3F1EE", color: "#8C8070" }
                   }
                 >
-                  {cat}
+                  {t(CATEGORY_I18N_KEYS[cat])}
                 </button>
               ))}
             </div>
@@ -1957,7 +2005,7 @@ function MagazineTab() {
                       {featured.tag}
                     </span>
                     <span className="text-[10px] text-stone-400">·</span>
-                    <span className="text-[10px] text-stone-400">{featured.readTime} 읽기</span>
+                    <span className="text-[10px] text-stone-400">{t("magazine.readTime", { time: featured.readTime })}</span>
                   </div>
                   <h2 className="text-[16px] font-black leading-snug mb-2" style={{ color: DEEP_GREEN }}>
                     {featured.title}
@@ -1973,7 +2021,7 @@ function MagazineTab() {
                       <span className="text-[10px] text-stone-300">{featured.authorRole}</span>
                     </div>
                     <div className="flex items-center gap-1" style={{ color: featured.bgTo }}>
-                      <span className="text-[11px] font-bold">읽기</span>
+                      <span className="text-[11px] font-bold">{t("magazine.read")}</span>
                       <ChevronRight className="w-3.5 h-3.5" />
                     </div>
                   </div>
@@ -2060,6 +2108,7 @@ function MagazineTab() {
 
 // ─── 리포트 탭 ────────────────────────────────────────────────────
 function ReportTab({ user }: { user: any }) {
+  const { t } = useTranslation();
   const [lastScan, setLastScan] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -2080,8 +2129,8 @@ function ReportTab({ user }: { user: any }) {
           <FileText className="w-8 h-8 text-white" />
         </div>
         <div>
-          <h2 className="text-xl font-black mb-1" style={{ color: DEEP_GREEN }}>내 피부 리포트</h2>
-          <p className="text-sm text-stone-400">로그인하면 지난 분석 결과를 확인할 수 있어요.</p>
+          <h2 className="text-xl font-black mb-1" style={{ color: DEEP_GREEN }}>{t("report.title")}</h2>
+          <p className="text-sm text-stone-400">{t("report.loginRequired")}</p>
         </div>
         <div className="w-full space-y-2">
           <Button onClick={() => { window.location.href = "/auth/kakao"; }}
@@ -2089,12 +2138,12 @@ function ReportTab({ user }: { user: any }) {
             <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
               <path fillRule="evenodd" clipRule="evenodd" d="M9 1C4.582 1 1 3.79 1 7.222c0 2.154 1.386 4.045 3.484 5.14L3.62 15.5a.25.25 0 0 0 .368.274L7.9 13.39A9.63 9.63 0 0 0 9 13.444c4.418 0 8-2.791 8-6.222C17 3.79 13.418 1 9 1Z" fill="#3C1E1E"/>
             </svg>
-            카카오로 로그인
+            {t("report.kakaoLogin")}
           </Button>
           <Button onClick={() => { window.location.href = "/auth/google"; }}
             className="w-full h-12 rounded-xl bg-white hover:bg-stone-50 font-bold text-zinc-700 gap-2 border border-stone-200 shadow-sm">
             <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" className="w-4 h-4" />
-            Google로 로그인
+            {t("report.googleLogin")}
           </Button>
         </div>
       </div>
@@ -2113,7 +2162,7 @@ function ReportTab({ user }: { user: any }) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[calc(100dvh-64px)] px-6 text-center gap-4">
         <FileText className="w-12 h-12 text-stone-200" />
-        <p className="text-stone-400 text-sm">아직 분석 기록이 없어요.<br />AI 스캔을 먼저 해보세요!</p>
+        <p className="text-stone-400 text-sm whitespace-pre-line">{t("report.noRecord")}</p>
       </div>
     );
   }
@@ -2125,9 +2174,9 @@ function ReportTab({ user }: { user: any }) {
     <div className="h-[calc(100dvh-64px)] overflow-y-auto">
       <motion.div className="px-5 pt-6 pb-24 space-y-4" variants={stagger} initial="initial" animate="animate">
         <motion.div variants={fadeChild} className="flex items-center justify-between">
-          <h2 className="text-xl font-black" style={{ color: DEEP_GREEN }}>내 피부 리포트</h2>
+          <h2 className="text-xl font-black" style={{ color: DEEP_GREEN }}>{t("report.title")}</h2>
           <span className="text-[11px] text-stone-400">
-            {date.toLocaleDateString("ko-KR", { month: "long", day: "numeric", hour: "2-digit", minute: "2-digit" })}
+            {date.toLocaleDateString(i18n.language === "ko" ? "ko-KR" : i18n.language === "ja" ? "ja-JP" : "en-US", { month: "long", day: "numeric", hour: "2-digit", minute: "2-digit" })}
           </span>
         </motion.div>
 
@@ -2139,27 +2188,27 @@ function ReportTab({ user }: { user: any }) {
                 <div className="w-[72px] h-[72px] rounded-2xl flex flex-col items-center justify-center text-white shadow-lg shrink-0"
                   style={{ background: `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})` }}>
                   <span className="text-3xl font-black leading-none">{lastScan.overallScore}</span>
-                  <span className="text-[9px] font-bold opacity-80 mt-1">종합점수</span>
+                  <span className="text-[9px] font-bold opacity-80 mt-1">{t("report.overall")}</span>
                 </div>
                 {lastScan.skinAge && (
                   <div className="w-[72px] h-[72px] rounded-2xl flex flex-col items-center justify-center text-white shadow-lg shrink-0"
                     style={{ background: "linear-gradient(135deg, #A78BFA, #7C3AED)" }}>
                     <span className="text-3xl font-black leading-none">{lastScan.skinAge}</span>
-                    <span className="text-[9px] font-bold opacity-80 mt-1">피부나이</span>
+                    <span className="text-[9px] font-bold opacity-80 mt-1">{t("report.skinAge")}</span>
                   </div>
                 )}
                 <div className="flex-1 min-w-0">
                   <div className="flex items-baseline gap-1 mb-1.5">
-                    <span className="text-[13px] text-stone-500">바우만</span>
+                    <span className="text-[13px] text-stone-500">{t("report.baumannLabel")}</span>
                     <span className="text-xl font-black" style={{ color: SCAN_TO }}>{lastScan.baumannType}</span>
-                    <span className="text-[13px] text-stone-500">형</span>
+                    <span className="text-[13px] text-stone-500">{t("report.baumannSuffix")}</span>
                   </div>
                   <div className="flex gap-1 flex-wrap">
                     {baumannLetters.map((letter: string, i: number) => {
-                      const info = BAUMANN_DESC[letter];
-                      if (!info) return null;
+                      const color = BAUMANN_COLORS[letter];
+                      if (!color) return null;
                       return <span key={i} className="text-[10px] font-bold px-2 py-0.5 rounded-full"
-                        style={{ background: `${info.color}18`, color: info.color }}>{info.name}</span>;
+                        style={{ background: `${color}18`, color }}>{t(`baumann.${letter}.name`)}</span>;
                     })}
                   </div>
                 </div>
@@ -2178,7 +2227,7 @@ function ReportTab({ user }: { user: any }) {
                     style={{ background: `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})` }}>
                     <Sparkles className="w-4 h-4 text-white" />
                   </div>
-                  <p className="text-[13px] font-black" style={{ color: DEEP_GREEN }}>FondayAI 의 피부 총평</p>
+                  <p className="text-[13px] font-black" style={{ color: DEEP_GREEN }}>{t("report.aiComment")}</p>
                 </div>
                 <p className="text-[13px] text-stone-600 leading-relaxed">{lastScan.aiComment}</p>
               </CardContent>
@@ -2191,7 +2240,7 @@ function ReportTab({ user }: { user: any }) {
           <motion.div variants={fadeChild}>
             <Card className="border-none shadow-md rounded-3xl">
               <CardHeader className="pb-1 pt-5 px-5">
-                <p className="text-[13px] font-black" style={{ color: DEEP_GREEN }}>10가지 항목별 점수</p>
+                <p className="text-[13px] font-black" style={{ color: DEEP_GREEN }}>{t("result.scores")}</p>
               </CardHeader>
               <CardContent className="px-5 pb-5 space-y-4">
                 {lastScan.scores.map((item: any, i: number) => {
@@ -2204,9 +2253,9 @@ function ReportTab({ user }: { user: any }) {
                           <div className="w-6 h-6 rounded-full flex items-center justify-center bg-stone-50 shadow-sm">
                             <Icon className="w-3.5 h-3.5" style={{ color }} />
                           </div>
-                          <span className="text-stone-700">{item.label}</span>
+                          <span className="text-stone-700">{t(`scores.${i}`)}</span>
                         </div>
-                        <span style={{ color }}>{item.score}점</span>
+                        <span style={{ color }}>{item.score}{t("result.scoreSuffix")}</span>
                       </div>
                       <div className="h-1.5 rounded-full overflow-hidden bg-stone-100">
                         <motion.div className="h-full rounded-full" style={{ background: color }}
@@ -2227,6 +2276,7 @@ function ReportTab({ user }: { user: any }) {
 
 // ─── 루트 페이지 ──────────────────────────────────────────────────
 export default function SkinScanPage() {
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState<TabId>("scan");
   const [scanState, setScanState] = useState<ScanState>("idle");
   const [showCamera, setShowCamera] = useState(false);
@@ -2301,7 +2351,7 @@ export default function SkinScanPage() {
         const response = await fetch("/api/analyze-skin", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ image: reader.result, surveyData: data }),
+          body: JSON.stringify({ image: reader.result, surveyData: data, lang: i18n.language || "en" }),
         });
         const rawText = await response.text();
         console.log("[API 응답]", response.status, rawText.slice(0, 300));
@@ -2327,6 +2377,7 @@ export default function SkinScanPage() {
 
   return (
     <div className="min-h-[100dvh] bg-[#FAF9F6] text-stone-900">
+      <LangSwitcher />
       <div className="max-w-md mx-auto relative min-h-[100dvh]">
 
         {/* 얼굴 가이드 카메라 */}
@@ -2382,27 +2433,27 @@ export default function SkinScanPage() {
                   style={{ background: "linear-gradient(135deg, #E09882, #C97062)" }}>
                   <SmartphoneNfc className="w-7 h-7 text-white" />
                 </div>
-                <h3 className="text-center text-lg font-black mb-2" style={{ color: "#2D5F4F" }}>홈 화면에 추가하기</h3>
-                <p className="text-center text-sm text-stone-400 mb-6">Safari에서 아래 단계를 따라 앱을 추가하세요.</p>
+                <h3 className="text-center text-lg font-black mb-2" style={{ color: "#2D5F4F" }}>{t("install.title")}</h3>
+                <p className="text-center text-sm text-stone-400 mb-6">{t("install.desc")}</p>
                 <div className="space-y-3 mb-6">
                   <div className="flex items-start gap-3 p-3 rounded-2xl bg-stone-50">
                     <span className="w-6 h-6 rounded-full bg-[#C97062] text-white text-[11px] font-black flex items-center justify-center shrink-0 mt-0.5">1</span>
-                    <p className="text-[13px] text-stone-600">하단 <strong>공유 버튼(□↑)</strong>을 탭해요.</p>
+                    <p className="text-[13px] text-stone-600" dangerouslySetInnerHTML={{ __html: t("install.step1") }} />
                   </div>
                   <div className="flex items-start gap-3 p-3 rounded-2xl bg-stone-50">
                     <span className="w-6 h-6 rounded-full bg-[#C97062] text-white text-[11px] font-black flex items-center justify-center shrink-0 mt-0.5">2</span>
-                    <p className="text-[13px] text-stone-600"><strong>"홈 화면에 추가"</strong>를 선택해요.</p>
+                    <p className="text-[13px] text-stone-600" dangerouslySetInnerHTML={{ __html: t("install.step2") }} />
                   </div>
                   <div className="flex items-start gap-3 p-3 rounded-2xl bg-stone-50">
                     <span className="w-6 h-6 rounded-full bg-[#C97062] text-white text-[11px] font-black flex items-center justify-center shrink-0 mt-0.5">3</span>
-                    <p className="text-[13px] text-stone-600">오른쪽 위 <strong>"추가"</strong>를 탭하면 완료!</p>
+                    <p className="text-[13px] text-stone-600" dangerouslySetInnerHTML={{ __html: t("install.step3") }} />
                   </div>
                 </div>
                 <button
                   onClick={() => setShowInstallGuide(false)}
                   className="w-full h-12 rounded-2xl font-bold text-white"
                   style={{ background: "linear-gradient(135deg, #E09882, #C97062)" }}>
-                  확인
+                  {t("install.close")}
                 </button>
               </motion.div>
             </motion.div>

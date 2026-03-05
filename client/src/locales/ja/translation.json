@@ -1,0 +1,187 @@
+{
+  "nav": {
+    "scan": "AIスキャン",
+    "report": "レポート",
+    "magazine": "マガジン",
+    "install": "アプリ追加"
+  },
+  "idle": {
+    "badge": "AI Skin Scanner",
+    "title": "肌の声に耳を傾けましょう",
+    "subtitle1": "今の肌状態を",
+    "subtitle2": "今の肌状態を",
+    "subtitle3": "AIが3秒で教えてくれます。",
+    "scanBtn": "自分の肌を\nAIでスキャン",
+    "hint": "カメラでセルフィーを撮ると分析がスタートします"
+  },
+  "camera": {
+    "noCamera": "カメラが使えません。写真を選んでください。",
+    "selectPhoto": "写真を選ぶ",
+    "cancel": "キャンセル",
+    "guide1": "顔を楕円の中に合わせてください",
+    "guide2": "正面を向いて自然光の下で撮影するとより正確です"
+  },
+  "survey": {
+    "title": "肌プロフィール入力",
+    "subtitle": "正確な分析のために現在の状態を選択してください。",
+    "gender": "性別",
+    "female": "女性",
+    "male": "男性",
+    "age": "年代",
+    "ageGroups": ["10代", "20代前半", "20代後半", "30代前半", "30代後半", "40代前半", "40代後半", "50代以上"],
+    "concerns": "肌の悩み（複数可）",
+    "skinConcerns": ["毛穴・皮脂", "しわ・弾力", "ニキビ・敏感肌", "シミ・色素沈着", "クマ", "乾燥"],
+    "startBtn": "AI分析スタート"
+  },
+  "scanning": {
+    "texts": [
+      "写真データを最適化中...",
+      "AIで肌の悩み箇所を探索中...",
+      "水分・皮脂バランスを精密分析中...",
+      "レポートをまとめています..."
+    ],
+    "progress": "分析中",
+    "subtitle": "プロフェッショナルな肌分析レポートを生成しています。"
+  },
+  "result": {
+    "back": "撮り直す",
+    "title": "FondayAI 肌レポート",
+    "overall": "総合スコア",
+    "skinAge": "肌年齢",
+    "baumannLabel": "バウマン",
+    "baumannSuffix": "タイプ",
+    "aiComment": "FondayAI 肌総評",
+    "scores": "10項目別スコア",
+    "scoreSuffix": "点",
+    "locked": {
+      "title": "真皮層の水分バリア測定不可",
+      "desc": "スマートフォンのカメラでは肌の内部を見ることができません。",
+      "device": "Fonday精密スキャナー",
+      "deviceDesc": "で本当の肌内部の状態を確認してください。",
+      "skinTemp": "肌温度",
+      "moisture": "水分量",
+      "oil": "皮脂量",
+      "barrier": "肌バリア"
+    },
+    "analysis": "主要分析結果",
+    "analysisSub": "10項目詳細分析",
+    "solutions": "カスタムソリューション",
+    "solutionsSub": "AIが分析結果をもとに提案します",
+    "diary": {
+      "title": "肌日記",
+      "firstRecord": "今日初めての記録",
+      "history": "{{count}}件の記録 · 今日 {{score}}点"
+    },
+    "login": {
+      "title": "変化の記録を残しましょう",
+      "desc": "ログインして肌日記を始めましょう。",
+      "kakao": "Kakaoで続ける",
+      "google": "Googleで続ける"
+    },
+    "earlybird": "Fondayアーリーバード登録",
+    "share": "結果をシェア",
+    "partnership": "ブランド提携のお問い合わせ",
+    "shareText": "今日の肌スコアは{{score}}点！バウマンタイプは{{type}}でした。\n#Fonday #AI肌分析 #FondayAI"
+  },
+  "modal": {
+    "analysis": {
+      "title": "主要分析結果",
+      "sub": "10項目詳細分析",
+      "skinReport": "部位別肌所見",
+      "baumannDetail": "バウマン{{type}}タイプ詳細"
+    },
+    "improvements": {
+      "title": "カスタムソリューション",
+      "sub": "AIが分析結果をもとに提案します",
+      "loading": "改善案を読み込み中...",
+      "cosmetics": "おすすめスキンケア"
+    },
+    "diary": {
+      "title": "肌日記",
+      "logout": "ログアウト",
+      "graphTitle": "総合スコア推移",
+      "today": "今日",
+      "baumannLabel": "バウマン{{type}}",
+      "skinAgeLabel": "肌年齢{{age}}歳",
+      "countLabel": "{{count}}件の記録"
+    },
+    "partnership": {
+      "title": "ブランド提携のお問い合わせ",
+      "desc": "化粧品ブランド、皮膚科クリニック、ビューティーブランドなど\n様々な提携を歓迎します。",
+      "success": "お問い合わせを受け付けました！",
+      "successDesc": "すぐにご連絡いたします。",
+      "name": "担当者名",
+      "company": "会社名 / ブランド名",
+      "email": "メールアドレス",
+      "message": "お問い合わせ内容",
+      "submit": "送信する",
+      "submitting": "送信中..."
+    },
+    "waitlist": {
+      "title": "アーリーバード登録",
+      "desc": "特別な特典をご用意しています！",
+      "success": "登録が完了しました！",
+      "email": "メールアドレスを入力してください",
+      "submit": "登録する！",
+      "submitting": "登録中..."
+    }
+  },
+  "install": {
+    "title": "ホーム画面に追加",
+    "desc": "Safariで以下の手順に従ってアプリを追加してください。",
+    "step1": "下部の<b>共有ボタン（□↑）</b>をタップ",
+    "step2": "<b>「ホーム画面に追加」</b>を選択",
+    "step3": "右上の<b>「追加」</b>をタップして完了！",
+    "close": "閉じる"
+  },
+  "report": {
+    "title": "肌レポート",
+    "loginRequired": "ログインすると過去の分析結果を確認できます。",
+    "kakaoLogin": "Kakaoでログイン",
+    "googleLogin": "Googleでログイン",
+    "noRecord": "まだ分析記録がありません。\nAIスキャンをやってみましょう！",
+    "scores": "10項目別スコア",
+    "baumannLabel": "バウマン",
+    "baumannSuffix": "タイプ",
+    "aiComment": "FondayAI 肌総評",
+    "overall": "総合スコア",
+    "skinAge": "肌年齢"
+  },
+  "magazine": {
+    "subtitle": "Beauty Insight",
+    "title": "皮膚科専門家による\nビューティーインサイト",
+    "readTime": "{{time}}で読める",
+    "read": "読む",
+    "featured": "★ FEATURED",
+    "categories": {
+      "all": "すべて",
+      "ingredients": "成分",
+      "routine": "ルーティン",
+      "type": "タイプ",
+      "care": "ケア",
+      "expert": "専門家"
+    }
+  },
+  "scores": {
+    "0": "総合コンディション",
+    "1": "水分バランス",
+    "2": "赤み度合",
+    "3": "毛穴状態",
+    "4": "しわと弾力",
+    "5": "シミ・色素沈着",
+    "6": "ニキビリスク",
+    "7": "クマ",
+    "8": "肌のツヤ",
+    "9": "肌の均一さ"
+  },
+  "baumann": {
+    "O": { "name": "油性", "desc": "皮脂分泌が盛んでテカリやすい肌質です。" },
+    "D": { "name": "乾燥性", "desc": "皮脂分泌が少なく乾燥やつっぱりを感じやすいです。" },
+    "S": { "name": "敏感性", "desc": "外部刺激で赤みやニキビができやすい肌質です。" },
+    "R": { "name": "耐性", "desc": "外部刺激に強くトラブルが起きにくい肌質です。" },
+    "P": { "name": "色素沈着性", "desc": "シミやそばかすなどの色素沈着が起きやすいです。" },
+    "N": { "name": "非色素沈着性", "desc": "色素沈着が少なく肌トーンが均一な傾向があります。" },
+    "W": { "name": "しわ性", "desc": "弾力が低下し細かいしわができやすい状態です。" },
+    "T": { "name": "弾力性", "desc": "肌の弾力があり、しわが少ない状態です。" }
+  }
+}

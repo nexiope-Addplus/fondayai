@@ -1,0 +1,187 @@
+{
+  "nav": {
+    "scan": "AI Scan",
+    "report": "Report",
+    "magazine": "Magazine",
+    "install": "Add App"
+  },
+  "idle": {
+    "badge": "AI Skin Scanner",
+    "title": "Listen to Your Skin",
+    "subtitle1": "Your current skin condition,",
+    "subtitle2": "Your skin condition,",
+    "subtitle3": "revealed by AI in just 3 seconds.",
+    "scanBtn": "Scan My Skin\nwith AI",
+    "hint": "Take a selfie with your camera to start the analysis"
+  },
+  "camera": {
+    "noCamera": "Camera unavailable. Please select a photo instead.",
+    "selectPhoto": "Select Photo",
+    "cancel": "Cancel",
+    "guide1": "Align your face inside the oval",
+    "guide2": "Face forward in natural light for best results"
+  },
+  "survey": {
+    "title": "Skin Profile",
+    "subtitle": "Select your current status for accurate analysis.",
+    "gender": "Gender",
+    "female": "Female",
+    "male": "Male",
+    "age": "Age Group",
+    "ageGroups": ["Teens", "Early 20s", "Late 20s", "Early 30s", "Late 30s", "Early 40s", "Late 40s", "50s+"],
+    "concerns": "Skin Concerns (multiple)",
+    "skinConcerns": ["Pores/Oil", "Wrinkles/Elasticity", "Acne/Sensitivity", "Spots/Pigmentation", "Dark Circles", "Dryness"],
+    "startBtn": "Start AI Analysis"
+  },
+  "scanning": {
+    "texts": [
+      "Optimizing photo data...",
+      "AI scanning skin concern areas...",
+      "Analyzing moisture & sebum levels...",
+      "Generating report summary..."
+    ],
+    "progress": "Analysis in progress",
+    "subtitle": "Generating your professional skin analysis report."
+  },
+  "result": {
+    "back": "Retake",
+    "title": "FondayAI Skin Report",
+    "overall": "Overall",
+    "skinAge": "Skin Age",
+    "baumannLabel": "Baumann",
+    "baumannSuffix": "Type",
+    "aiComment": "FondayAI Skin Assessment",
+    "scores": "10-Point Skin Score",
+    "scoreSuffix": "pts",
+    "locked": {
+      "title": "Dermal Moisture Barrier Measurement Unavailable",
+      "desc": "A smartphone camera cannot see beneath the skin's surface.",
+      "device": "Fonday Precision Scanner",
+      "deviceDesc": " to reveal your true inner skin condition.",
+      "skinTemp": "Skin Temp",
+      "moisture": "Moisture",
+      "oil": "Sebum",
+      "barrier": "Skin Barrier"
+    },
+    "analysis": "Key Analysis",
+    "analysisSub": "10-item detailed analysis",
+    "solutions": "Custom Solutions",
+    "solutionsSub": "AI-powered recommendations based on your results",
+    "diary": {
+      "title": "Skin Diary",
+      "firstRecord": "Your first entry today",
+      "history": "{{count}} records · Today {{score}} pts"
+    },
+    "login": {
+      "title": "Track Your Progress",
+      "desc": "Log in to start your personal skin diary.",
+      "kakao": "Continue with Kakao",
+      "google": "Continue with Google"
+    },
+    "earlybird": "Get Fonday Early Bird Updates",
+    "share": "Share Results",
+    "partnership": "Brand Partnership Inquiry",
+    "shareText": "My skin score today is {{score}} pts! My Baumann type is {{type}}.\n#Fonday #AISkinAnalysis #FondayAI"
+  },
+  "modal": {
+    "analysis": {
+      "title": "Key Analysis",
+      "sub": "10-item detailed analysis",
+      "skinReport": "Area-by-Area Skin Findings",
+      "baumannDetail": "Baumann {{type}} Type Details"
+    },
+    "improvements": {
+      "title": "Custom Solutions",
+      "sub": "AI-powered recommendations based on your results",
+      "loading": "Loading recommendations...",
+      "cosmetics": "Recommended Skincare"
+    },
+    "diary": {
+      "title": "Skin Diary",
+      "logout": "Log out",
+      "graphTitle": "Overall Score Trend",
+      "today": "Today",
+      "baumannLabel": "Baumann {{type}}",
+      "skinAgeLabel": "Skin Age {{age}}",
+      "countLabel": "{{count}} records"
+    },
+    "partnership": {
+      "title": "Brand Partnership Inquiry",
+      "desc": "Cosmetic brands, dermatology clinics, and beauty brands —\nall partnerships welcome.",
+      "success": "Your inquiry has been submitted!",
+      "successDesc": "We will get back to you shortly.",
+      "name": "Contact Name",
+      "company": "Company / Brand Name",
+      "email": "Email",
+      "message": "Message",
+      "submit": "Send Inquiry",
+      "submitting": "Sending..."
+    },
+    "waitlist": {
+      "title": "Early Bird Sign-Up",
+      "desc": "Exclusive benefits await!",
+      "success": "Registration complete!",
+      "email": "Enter your email",
+      "submit": "Sign Me Up!",
+      "submitting": "Registering..."
+    }
+  },
+  "install": {
+    "title": "Add to Home Screen",
+    "desc": "Follow the steps below in Safari to add the app.",
+    "step1": "Tap the <b>Share button (□↑)</b> at the bottom.",
+    "step2": "Select <b>\"Add to Home Screen\"</b>.",
+    "step3": "Tap <b>\"Add\"</b> in the top right — done!",
+    "close": "Close"
+  },
+  "report": {
+    "title": "My Skin Report",
+    "loginRequired": "Log in to view your past analysis results.",
+    "kakaoLogin": "Log in with Kakao",
+    "googleLogin": "Log in with Google",
+    "noRecord": "No records yet.\nTry an AI Scan first!",
+    "scores": "10-Point Skin Score",
+    "baumannLabel": "Baumann",
+    "baumannSuffix": "Type",
+    "aiComment": "FondayAI Skin Assessment",
+    "overall": "Overall",
+    "skinAge": "Skin Age"
+  },
+  "magazine": {
+    "subtitle": "Beauty Insight",
+    "title": "Beauty Insights\nfrom Skin Experts",
+    "readTime": "{{time}} read",
+    "read": "Read",
+    "featured": "★ FEATURED",
+    "categories": {
+      "all": "All",
+      "ingredients": "Ingredients",
+      "routine": "Routine",
+      "type": "Type",
+      "care": "Care",
+      "expert": "Expert"
+    }
+  },
+  "scores": {
+    "0": "Overall Condition",
+    "1": "Moisture Balance",
+    "2": "Redness Level",
+    "3": "Pore Condition",
+    "4": "Wrinkles & Elasticity",
+    "5": "Spots & Pigmentation",
+    "6": "Acne Risk",
+    "7": "Dark Circles",
+    "8": "Skin Radiance",
+    "9": "Skin Texture"
+  },
+  "baumann": {
+    "O": { "name": "Oily", "desc": "Active sebum production makes skin prone to shine and greasiness." },
+    "D": { "name": "Dry", "desc": "Low sebum production leads to tightness and dry patches." },
+    "S": { "name": "Sensitive", "desc": "Skin is prone to redness and breakouts from external irritants." },
+    "R": { "name": "Resistant", "desc": "Skin barrier is strong and resists external irritants well." },
+    "P": { "name": "Pigmented", "desc": "Prone to hyperpigmentation such as dark spots and melasma." },
+    "N": { "name": "Non-pigmented", "desc": "Low tendency for hyperpigmentation; even skin tone." },
+    "W": { "name": "Wrinkle-prone", "desc": "Reduced elasticity makes skin prone to fine lines." },
+    "T": { "name": "Tight", "desc": "Good skin elasticity with fewer visible wrinkles." }
+  }
+}

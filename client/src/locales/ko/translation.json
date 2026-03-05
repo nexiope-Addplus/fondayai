@@ -1,0 +1,187 @@
+{
+  "nav": {
+    "scan": "AI 스캔",
+    "report": "리포트",
+    "magazine": "매거진",
+    "install": "앱 추가"
+  },
+  "idle": {
+    "badge": "AI Skin Scanner",
+    "title": "피부의 목소리를 들어보세요",
+    "subtitle1": "지금 내 피부 상태,",
+    "subtitle2": "지금 내 피부 상태,",
+    "subtitle3": "AI가 3초만에 알려줄게요.",
+    "scanBtn": "내 피부 상태\nAI로 스캔하기",
+    "hint": "카메라로 셀카를 찍으면 분석 준비가 시작돼요"
+  },
+  "camera": {
+    "noCamera": "카메라를 사용할 수 없습니다. 사진으로 선택해 주세요.",
+    "selectPhoto": "사진 선택하기",
+    "cancel": "취소",
+    "guide1": "얼굴을 타원 안에 맞춰주세요",
+    "guide2": "정면을 바라보고 자연광에서 촬영하면 좋아요"
+  },
+  "survey": {
+    "title": "피부 분석 기초 정보",
+    "subtitle": "정확한 분석을 위해 현재 상태를 선택해 주세요.",
+    "gender": "성별",
+    "female": "여성",
+    "male": "남성",
+    "age": "나이대",
+    "ageGroups": ["10대", "20대 초반", "20대 후반", "30대 초반", "30대 후반", "40대 초반", "40대 후반", "50대+"],
+    "concerns": "피부 고민 (다중)",
+    "skinConcerns": ["모공/피지", "주름/탄력", "트러블/민감", "기미/잡티", "다크서클", "건조함"],
+    "startBtn": "AI 분석 시작"
+  },
+  "scanning": {
+    "texts": [
+      "사진 데이터 최적화 중...",
+      "AI 피부 고민 부위 탐색 중...",
+      "수분 및 유분 정밀 분석 중...",
+      "리포트 결과 요약 중..."
+    ],
+    "progress": "분석 진행 중",
+    "subtitle": "전문적인 피부 분석 리포트를 생성하고 있습니다."
+  },
+  "result": {
+    "back": "다시 촬영",
+    "title": "FondayAI 피부 리포트",
+    "overall": "종합점수",
+    "skinAge": "피부나이",
+    "baumannLabel": "바우만",
+    "baumannSuffix": "형",
+    "aiComment": "FondayAI 의 피부 총평",
+    "scores": "10가지 항목별 점수",
+    "scoreSuffix": "점",
+    "locked": {
+      "title": "피부 속 진피층 수분 장벽 측정 불가",
+      "desc": "스마트폰 카메라로는 피부 속을 볼 수 없습니다.",
+      "device": "Fonday 정밀 스캐너",
+      "deviceDesc": "로 진짜 피부 속 상태를 확인하세요.",
+      "skinTemp": "피부 온도",
+      "moisture": "수분도",
+      "oil": "유분도",
+      "barrier": "피부 장벽"
+    },
+    "analysis": "주요 분석결과",
+    "analysisSub": "10가지 항목 상세 분석",
+    "solutions": "맞춤솔루션",
+    "solutionsSub": "AI가 분석 결과를 바탕으로 제안합니다",
+    "diary": {
+      "title": "피부 일기",
+      "firstRecord": "오늘 첫 번째 기록",
+      "history": "{{count}}번의 기록 · 오늘 {{score}}점"
+    },
+    "login": {
+      "title": "변화 과정을 기록하세요",
+      "desc": "로그인으로 내 피부 일기를 시작하세요.",
+      "kakao": "카카오로 계속하기",
+      "google": "Google로 계속하기"
+    },
+    "earlybird": "Fonday 얼리버드 알림 받기",
+    "share": "결과 공유하기",
+    "partnership": "브랜드 제휴 문의하기",
+    "shareText": "오늘 내 피부 점수는 {{score}}점! 바우만 타입은 {{type}}형이 나왔어요.\n#Fonday #AI피부분석 #FondayAI"
+  },
+  "modal": {
+    "analysis": {
+      "title": "주요 분석결과",
+      "sub": "10가지 항목 상세 분석",
+      "skinReport": "피부 부위별 소견",
+      "baumannDetail": "바우만 {{type}}형 상세"
+    },
+    "improvements": {
+      "title": "맞춤솔루션",
+      "sub": "AI가 분석 결과를 바탕으로 제안합니다",
+      "loading": "개선 방안을 불러오는 중...",
+      "cosmetics": "추천 화장품"
+    },
+    "diary": {
+      "title": "피부 일기",
+      "logout": "로그아웃",
+      "graphTitle": "종합점수 변화 추이",
+      "today": "오늘",
+      "baumannLabel": "바우만 {{type}}형",
+      "skinAgeLabel": "피부나이 {{age}}세",
+      "countLabel": "{{count}}번의 기록"
+    },
+    "partnership": {
+      "title": "브랜드 제휴 문의",
+      "desc": "화장품 브랜드, 피부과, 뷰티 브랜드 등\n다양한 제휴를 환영합니다.",
+      "success": "문의가 접수되었습니다!",
+      "successDesc": "빠르게 연락드릴게요.",
+      "name": "담당자 이름",
+      "company": "회사명 / 브랜드명",
+      "email": "이메일",
+      "message": "문의 내용",
+      "submit": "문의 보내기",
+      "submitting": "전송 중..."
+    },
+    "waitlist": {
+      "title": "얼리버드 등록",
+      "desc": "특별한 혜택을 드립니다!",
+      "success": "등록이 완료되었습니다!",
+      "email": "이메일을 입력해 주세요",
+      "submit": "등록할게요!",
+      "submitting": "등록 중..."
+    }
+  },
+  "install": {
+    "title": "홈 화면에 추가하기",
+    "desc": "Safari에서 아래 단계를 따라 앱을 추가하세요.",
+    "step1": "하단 <b>공유 버튼(□↑)</b>을 탭해요.",
+    "step2": "<b>\"홈 화면에 추가\"</b>를 선택해요.",
+    "step3": "오른쪽 위 <b>\"추가\"</b>를 탭하면 완료!",
+    "close": "닫기"
+  },
+  "report": {
+    "title": "내 피부 리포트",
+    "loginRequired": "로그인하면 지난 분석 결과를 확인할 수 있어요.",
+    "kakaoLogin": "카카오로 로그인",
+    "googleLogin": "Google로 로그인",
+    "noRecord": "아직 분석 기록이 없어요.\nAI 스캔을 먼저 해보세요!",
+    "scores": "10가지 항목별 점수",
+    "baumannLabel": "바우만",
+    "baumannSuffix": "형",
+    "aiComment": "FondayAI 의 피부 총평",
+    "overall": "종합점수",
+    "skinAge": "피부나이"
+  },
+  "magazine": {
+    "subtitle": "Beauty Insight",
+    "title": "피부 전문가의\n뷰티 인사이트",
+    "readTime": "{{time}} 읽기",
+    "read": "읽기",
+    "featured": "★ FEATURED",
+    "categories": {
+      "all": "전체",
+      "ingredients": "성분",
+      "routine": "루틴",
+      "type": "타입",
+      "care": "케어",
+      "expert": "전문가"
+    }
+  },
+  "scores": {
+    "0": "종합 컨디션",
+    "1": "수분 밸런스",
+    "2": "붉은기 수준",
+    "3": "모공 상태",
+    "4": "주름 및 탄력",
+    "5": "잡티/색소침착",
+    "6": "트러블 위험",
+    "7": "다크서클",
+    "8": "피부 광채",
+    "9": "피부결 균일도"
+  },
+  "baumann": {
+    "O": { "name": "지성", "desc": "피지 분비가 활발해 번들거림이 나타나기 쉬워요." },
+    "D": { "name": "건성", "desc": "피지 분비가 적어 건조함과 당김이 느껴질 수 있어요." },
+    "S": { "name": "민감성", "desc": "외부 자극에 붉어지거나 트러블이 생기기 쉬워요." },
+    "R": { "name": "저항성", "desc": "외부 자극에 강하고 트러블이 잘 생기지 않아요." },
+    "P": { "name": "색소성", "desc": "기미·잡티 등 색소침착이 생기기 쉬워요." },
+    "N": { "name": "비색소성", "desc": "색소침착이 적고 피부톤이 균일한 편이에요." },
+    "W": { "name": "주름성", "desc": "탄력이 낮아 잔주름이 생기기 쉬운 상태예요." },
+    "T": { "name": "탄력성", "desc": "피부 탄력이 좋아 주름이 적은 상태예요." }
+  }
+}
