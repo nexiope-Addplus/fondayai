@@ -1343,17 +1343,17 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
           <span className="flex items-center gap-2">Fonday 얼리버드 알림 받기 <ArrowRight className="w-5 h-5" /></span>
         </Button>
 
+        {/* 공유 */}
+        <Button onClick={handleShare}
+          className="w-full h-14 rounded-2xl text-white font-bold shadow-lg hover:opacity-90 transition-opacity bg-gradient-to-r from-[#f09433] via-[#bc1888] to-[#8a3ab9]">
+          <Share2 className="w-5 h-5 mr-2" /> 결과 공유하기
+        </Button>
+
         {/* 제휴하기 */}
         <Button onClick={() => setShowPartnership(true)}
           className="w-full h-14 rounded-2xl font-bold shadow-lg hover:opacity-90 transition-opacity"
           style={{ background: `linear-gradient(135deg, ${DEEP_GREEN}, ${DEEP_GREEN_LIGHT})`, color: "#fff" }}>
           <span className="flex items-center gap-2">브랜드 제휴 문의하기 <ArrowRight className="w-5 h-5" /></span>
-        </Button>
-
-        {/* 공유 */}
-        <Button onClick={handleShare}
-          className="w-full h-14 rounded-2xl text-white font-bold shadow-lg hover:opacity-90 transition-opacity bg-gradient-to-r from-[#f09433] via-[#bc1888] to-[#8a3ab9]">
-          <Share2 className="w-5 h-5 mr-2" /> 결과 공유하기
         </Button>
       </motion.div>
 
