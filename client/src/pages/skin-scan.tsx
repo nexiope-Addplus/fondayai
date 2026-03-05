@@ -694,9 +694,6 @@ function ScanIdleScreen({ onScan }: { onScan: () => void }) {
         </span>
       </motion.div>
 
-      <motion.div variants={fadeChild} className="mt-6 w-full max-w-sm">
-        <AdBanner slot="6349940752" />
-      </motion.div>
     </motion.div>
   );
 }
