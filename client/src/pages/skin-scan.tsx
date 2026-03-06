@@ -1143,14 +1143,8 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
         <span style={{ fontSize: "24px", fontWeight: 900, color: DEEP_GREEN, letterSpacing: "-0.5px" }}>FONDAY AI</span>
         <span style={{ fontSize: "13px", color: TEXT_SECONDARY }}>{new Date().toLocaleDateString(undefined, { month: "long", day: "numeric" })}</span>
       </div>
-      {/* 얼굴 사진 */}
-      <div style={{ display: "flex", justifyContent: "center", marginTop: "28px" }}>
-        <div style={{ width: "300px", height: "340px", borderRadius: "36px", overflow: "hidden", boxShadow: "0 24px 64px rgba(0,0,0,0.22)" }}>
-          {imageBase64 && <img src={imageBase64} style={{ width: "100%", height: "100%", objectFit: "cover" }} />}
-        </div>
-      </div>
       {/* 스코어 카드 */}
-      <div style={{ margin: "24px 28px 0", background: "white", borderRadius: "32px", padding: "24px 24px 20px", boxShadow: "0 12px 40px rgba(180,130,110,0.18)" }}>
+      <div style={{ margin: "80px 28px 0", background: "white", borderRadius: "32px", padding: "32px 28px 28px", boxShadow: "0 12px 40px rgba(180,130,110,0.18)" }}>
         {/* 종합 + 피부나이 + 바우만 */}
         <div style={{ display: "flex", gap: "12px", marginBottom: "18px" }}>
           <div style={{ width: "90px", background: `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})`, borderRadius: "20px", padding: "14px 0", textAlign: "center", flexShrink: 0 }}>
