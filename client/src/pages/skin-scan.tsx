@@ -565,11 +565,8 @@ function BottomNav({ active, onChange, onScanNew, onInstall }: {
 }
 
 // ─── 페이스 메시 오버레이 (실제 얼굴 인식) ──────────────────────
-import type { NormalizedLandmark, LandmarkConnectionArray } from '@mediapipe/face_mesh';
-
 function FaceMeshOverlay({ imageSrc }: { imageSrc: string }) {
-  const [landmarks, setLandmarks] = useState<NormalizedLandmark[] | null>(null);
-  const [connections, setConnections] = useState<{ contours: LandmarkConnectionArray; tess: LandmarkConnectionArray } | null>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
@@ -579,28 +576,91 @@ function FaceMeshOverlay({ imageSrc }: { imageSrc: string }) {
         const mp = await import('@mediapipe/face_mesh');
         const { FaceMesh, FACEMESH_CONTOURS, FACEMESH_TESSELATION } = mp;
 
+        const img = new Image();
+        img.src = imageSrc;
+        await new Promise<void>(r => { img.onload = () => r(); });
+
         const faceMesh = new FaceMesh({
           locateFile: (file: string) =>
             `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh@0.4/${file}`,
         });
-        faceMesh.setOptions({ maxNumFaces: 1, refineLandmarks: false, minDetectionConfidence: 0.5, minTrackingConfidence: 0.5 });
+        faceMesh.setOptions({
+          maxNumFaces: 1,
+          refineLandmarks: true,
+          minDetectionConfidence: 0.3,
+          minTrackingConfidence: 0.3,
+        });
 
+        let lms: any[] = [];
         await new Promise<void>((resolve) => {
           faceMesh.onResults((results: any) => {
-            if (cancelled) return;
-            if (results.multiFaceLandmarks?.[0]) {
-              setLandmarks(results.multiFaceLandmarks[0]);
-              setConnections({ contours: FACEMESH_CONTOURS, tess: FACEMESH_TESSELATION });
-              setTimeout(() => setVisible(true), 50);
+            if (!cancelled && results.multiFaceLandmarks?.[0]) {
+              lms = results.multiFaceLandmarks[0];
             }
             resolve();
           });
-          const img = new Image();
-          img.onload = () => faceMesh.send({ image: img });
-          img.src = imageSrc;
+          faceMesh.send({ image: img });
         });
-
         faceMesh.close();
+
+        if (cancelled || !lms.length) return;
+
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+
+        // 실제 표시 크기 (CSS pixel)
+        const cW = canvas.offsetWidth || 256;
+        const cH = canvas.offsetHeight || 320;
+        canvas.width = cW;
+        canvas.height = cH;
+
+        // object-cover 와 동일한 좌표 변환: 이미지 비율 유지하며 컨테이너를 꽉 채움
+        const iW = img.naturalWidth;
+        const iH = img.naturalHeight;
+        const scale = Math.max(cW / iW, cH / iH);
+        const ox = (cW - iW * scale) / 2;
+        const oy = (cH - iH * scale) / 2;
+        const toXY = (lm: any): [number, number] => [
+          lm.x * iW * scale + ox,
+          lm.y * iH * scale + oy,
+        ];
+
+        const ctx = canvas.getContext('2d')!;
+
+        // 테셀레이션 (촘촘한 메시)
+        ctx.strokeStyle = 'rgba(255,255,255,0.18)';
+        ctx.lineWidth = 0.6;
+        for (const [a, b] of FACEMESH_TESSELATION) {
+          const [ax, ay] = toXY(lms[a]);
+          const [bx, by] = toXY(lms[b]);
+          ctx.beginPath();
+          ctx.moveTo(ax, ay);
+          ctx.lineTo(bx, by);
+          ctx.stroke();
+        }
+
+        // 외곽선 + 눈/코/입 강조
+        ctx.strokeStyle = 'rgba(255,255,255,0.85)';
+        ctx.lineWidth = 1.5;
+        for (const [a, b] of FACEMESH_CONTOURS) {
+          const [ax, ay] = toXY(lms[a]);
+          const [bx, by] = toXY(lms[b]);
+          ctx.beginPath();
+          ctx.moveTo(ax, ay);
+          ctx.lineTo(bx, by);
+          ctx.stroke();
+        }
+
+        // 랜드마크 점 (8개마다 1개)
+        ctx.fillStyle = 'rgba(255,255,255,0.9)';
+        for (let i = 0; i < lms.length; i += 8) {
+          const [x, y] = toXY(lms[i]);
+          ctx.beginPath();
+          ctx.arc(x, y, 1.5, 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        if (!cancelled) setVisible(true);
       } catch (e) {
         console.warn('Face mesh detection failed:', e);
       }
@@ -608,35 +668,12 @@ function FaceMeshOverlay({ imageSrc }: { imageSrc: string }) {
     return () => { cancelled = true; };
   }, [imageSrc]);
 
-  if (!landmarks || !connections) return null;
-
   return (
-    <svg
+    <canvas
+      ref={canvasRef}
       className="absolute inset-0 w-full h-full pointer-events-none"
-      viewBox="0 0 1 1"
-      preserveAspectRatio="xMidYMid slice"
       style={{ opacity: visible ? 1 : 0, transition: 'opacity 0.6s ease' }}
-    >
-      {/* 테셀레이션 (촘촘한 메시) */}
-      {connections.tess.map(([a, b], i) => (
-        <line key={`t${i}`}
-          x1={landmarks[a].x} y1={landmarks[a].y}
-          x2={landmarks[b].x} y2={landmarks[b].y}
-          stroke="rgba(255,255,255,0.18)" strokeWidth="0.002" />
-      ))}
-      {/* 외곽선 + 눈/코/입 강조 */}
-      {connections.contours.map(([a, b], i) => (
-        <line key={`c${i}`}
-          x1={landmarks[a].x} y1={landmarks[a].y}
-          x2={landmarks[b].x} y2={landmarks[b].y}
-          stroke="rgba(255,255,255,0.75)" strokeWidth="0.004" />
-      ))}
-      {/* 랜드마크 점 (주요 포인트만) */}
-      {landmarks.filter((_, i) => i % 12 === 0).map((pt, i) => (
-        <circle key={`p${i}`} cx={pt.x} cy={pt.y} r={0.007}
-          fill="white" opacity={0.9} />
-      ))}
-    </svg>
+    />
   );
 }
 
