@@ -677,86 +677,152 @@ function FaceMeshOverlay({ imageSrc }: { imageSrc: string }) {
   );
 }
 
+// ─── idle 미리보기 점수 바 ────────────────────────────────────────
+function MiniScoreBarIdle({ label, score, color, delay }: { label: string; score: number; color: string; delay: number }) {
+  const [animated, setAnimated] = useState(false);
+  useEffect(() => {
+    const timer = setTimeout(() => setAnimated(true), delay);
+    return () => clearTimeout(timer);
+  }, [delay]);
+  return (
+    <div className="flex items-center gap-2">
+      <span className="text-[10px] flex-shrink-0 w-[52px]" style={{ color: TEXT_SECONDARY }}>{label}</span>
+      <div className="flex-1 h-[5px] rounded-full overflow-hidden" style={{ background: "#E8E0D8" }}>
+        <div
+          className="h-full rounded-full"
+          style={{
+            width: animated ? `${score}%` : "0%",
+            background: `linear-gradient(90deg, ${color}99, ${color})`,
+            transition: "width 0.8s cubic-bezier(0.22, 1, 0.36, 1)",
+          }}
+        />
+      </div>
+      <span className="text-[11px] font-bold flex-shrink-0 w-6 text-right" style={{ color }}>{score}</span>
+    </div>
+  );
+}
+
 // ─── 메인 스캔 화면 ───────────────────────────────────────────────
 function ScanIdleScreen({ onScan }: { onScan: () => void }) {
   const { t } = useTranslation();
+
+  const PREVIEW_SCORES = [
+    { idx: 0, score: 82, color: SCORE_COLORS[0] },
+    { idx: 1, score: 68, color: SCORE_COLORS[1] },
+    { idx: 2, score: 74, color: SCORE_COLORS[2] },
+    { idx: 3, score: 91, color: SCORE_COLORS[3] },
+  ];
+
+  const STEPS = [
+    { icon: "📋", title: t("idle.step1"), sub: t("idle.step1Sub"), active: true },
+    { icon: "📸", title: t("idle.step2"), sub: t("idle.step2Sub"), active: false },
+    { icon: "🧬", title: t("idle.step3"), sub: t("idle.step3Sub"), active: false },
+  ];
+
   return (
     <motion.div
-      className="flex flex-col items-center justify-center px-6 text-center"
-      style={{ minHeight: "calc(100dvh - 60px)", background: "linear-gradient(180deg, #FDF6F3 0%, #FAF9F6 100%)" }}
+      className="flex flex-col px-5 pb-8"
+      style={{ minHeight: "calc(100dvh - 60px)", background: "linear-gradient(180deg, #FDF6F3 0%, #FAF9F6 100%)", paddingTop: 28 }}
       variants={stagger} initial="initial" animate="animate"
     >
-      <motion.div variants={fadeChild} className="mb-4">
+      {/* Badge + Title */}
+      <motion.div variants={fadeChild} className="text-center mb-4">
         <Badge variant="outline" className="px-3 py-1 font-bold tracking-widest uppercase text-[10px]"
           style={{ borderColor: SCAN_FROM, color: SCAN_TO }}>
           {t("idle.badge")}
         </Badge>
+        <h1 className="text-[22px] font-bold text-stone-800 leading-snug mt-3 mb-1.5">{t("idle.title")}</h1>
+        <p className="text-[13.5px] text-stone-500">{t("idle.subtitle4")}</p>
       </motion.div>
 
-      <motion.div variants={fadeChild} className="mb-12">
-        <h1 className="text-2xl font-bold mb-2 tracking-tight text-stone-800">{t("idle.title")}</h1>
-        <p className="text-[15px] font-medium leading-relaxed text-stone-500">
-          {t("idle.subtitle2")}<br />
-          {t("idle.subtitle3")}
-        </p>
+      {/* 결과 미리보기 카드 */}
+      <motion.div variants={fadeChild} className="mb-4">
+        <div className="bg-white rounded-2xl p-4 border border-stone-100"
+          style={{ boxShadow: "0 4px 24px rgba(180,130,110,0.12), 0 1px 4px rgba(0,0,0,0.05)" }}>
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2">
+              <div className="w-7 h-7 rounded-full flex items-center justify-center text-sm flex-shrink-0"
+                style={{ background: `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})` }}>✨</div>
+              <div>
+                <div className="text-[11px] font-bold text-stone-700">{t("idle.previewTitle")}</div>
+                <div className="text-[9px] text-stone-400">{t("idle.previewSub")}</div>
+              </div>
+            </div>
+            <div className="px-2.5 py-0.5 rounded-full text-[12px] font-black text-white flex-shrink-0"
+              style={{ background: `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})` }}>
+              82{t("result.scoreSuffix")}
+            </div>
+          </div>
+          <div className="flex flex-col gap-1.5">
+            {PREVIEW_SCORES.map(({ idx, score, color }, i) => (
+              <MiniScoreBarIdle key={idx} label={t(`scores.${idx}`)} score={score} color={color} delay={500 + i * 100} />
+            ))}
+          </div>
+        </div>
       </motion.div>
 
-      {/* 애니메이션 스캔 버튼 */}
-      <motion.div variants={fadeChild} className="relative flex items-center justify-center">
-        {/* 바깥 파동 2 */}
-        <motion.div
-          className="absolute rounded-full"
-          style={{ width: 220, height: 220, border: `2px solid ${SCAN_FROM}` }}
-          animate={{ scale: [1, 1.35, 1], opacity: [0.5, 0, 0.5] }}
-          transition={{ duration: 2.8, repeat: Infinity, ease: "easeOut", delay: 0.5 }}
-        />
-        {/* 바깥 파동 1 */}
-        <motion.div
-          className="absolute rounded-full"
-          style={{ width: 220, height: 220, border: `2px solid ${SCAN_FROM}` }}
-          animate={{ scale: [1, 1.18, 1], opacity: [0.6, 0, 0.6] }}
-          transition={{ duration: 2.8, repeat: Infinity, ease: "easeOut" }}
-        />
-        {/* 메인 버튼 */}
+      {/* 단계 표시 */}
+      <motion.div variants={fadeChild} className="mb-4">
+        <div className="bg-white rounded-2xl px-4 py-3.5 border border-stone-100"
+          style={{ boxShadow: "0 2px 12px rgba(180,130,110,0.08)" }}>
+          <p className="text-[10px] font-semibold text-stone-400 text-center mb-3 tracking-widest uppercase">
+            {t("idle.stepsTitle")}
+          </p>
+          <div className="flex items-start justify-between">
+            {STEPS.map((step, i) => (
+              <div key={i} className="flex items-start" style={{ flex: 1 }}>
+                <div className="flex flex-col items-center gap-1.5 flex-1">
+                  <div className="w-10 h-10 rounded-full flex items-center justify-center text-lg"
+                    style={step.active
+                      ? { background: `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})`, boxShadow: `0 4px 14px ${SCAN_FROM}44` }
+                      : { background: "#EDE6DE" }}>
+                    {step.icon}
+                  </div>
+                  <div className="text-center">
+                    <div className="text-[11px] font-bold text-stone-700">{step.title}</div>
+                    <div className="text-[9.5px] text-stone-400 mt-0.5">{step.sub}</div>
+                  </div>
+                </div>
+                {i < 2 && <div className="text-stone-200 text-sm pt-3 flex-shrink-0">›</div>}
+              </div>
+            ))}
+          </div>
+        </div>
+      </motion.div>
+
+      {/* 개인정보 보호 배지 */}
+      <motion.div variants={fadeChild} className="mb-5">
+        <div className="flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl border"
+          style={{ background: "#F0FAF6", borderColor: "#C5E5DA" }}>
+          <Lock className="w-3.5 h-3.5 flex-shrink-0" style={{ color: DEEP_GREEN }} />
+          <span className="text-[11px] font-semibold" style={{ color: DEEP_GREEN }}>{t("idle.privacy")}</span>
+        </div>
+      </motion.div>
+
+      {/* CTA 버튼 */}
+      <motion.div variants={fadeChild} className="mt-auto">
         <motion.button
           onClick={onScan}
-          className="relative w-52 h-52 rounded-full flex flex-col items-center justify-center gap-3 text-white shadow-2xl"
-          style={{
-            background: `radial-gradient(circle at 35% 35%, ${SCAN_FROM}, ${SCAN_TO})`,
-            boxShadow: `0 24px 60px rgba(201,112,98,0.45), 0 8px 20px rgba(201,112,98,0.25), inset 0 1px 0 rgba(255,255,255,0.2)`,
-          }}
-          whileHover={{ scale: 1.04 }}
-          whileTap={{ scale: 0.94 }}
+          className="w-full py-[18px] rounded-[18px] text-white text-[16px] font-bold tracking-tight"
+          style={{ background: `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})` }}
+          whileHover={{ scale: 1.01 }}
+          whileTap={{ scale: 0.97 }}
           animate={{
             boxShadow: [
-              `0 24px 60px rgba(201,112,98,0.40), 0 8px 20px rgba(201,112,98,0.2)`,
-              `0 28px 72px rgba(201,112,98,0.55), 0 10px 28px rgba(201,112,98,0.3)`,
-              `0 24px 60px rgba(201,112,98,0.40), 0 8px 20px rgba(201,112,98,0.2)`,
+              `0 8px 28px ${SCAN_FROM}44`,
+              `0 12px 40px ${SCAN_FROM}70`,
+              `0 8px 28px ${SCAN_FROM}44`,
             ],
           }}
-          transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+          transition={{ duration: 2.5, repeat: Infinity }}
         >
-          {/* 내부 글로우 링 */}
-          <div className="absolute inset-0 rounded-full" style={{ border: "1.5px solid rgba(255,255,255,0.2)" }} />
-          <motion.div
-            animate={{ rotate: 360 }}
-            transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
-          >
-            <ScanLine className="w-12 h-12 drop-shadow" />
-          </motion.div>
-          <span className="text-[14px] font-bold leading-snug px-6 whitespace-pre-line">
-            {t("idle.scanBtn")}
-          </span>
+          {t("idle.ctaBtn")}
         </motion.button>
+        <p className="text-center text-[11px] mt-2.5" style={{ color: TEXT_SECONDARY }}>
+          <Sparkles className="w-3 h-3 inline mr-1" style={{ color: SCAN_FROM }} />
+          {t("idle.ctaHint")}
+        </p>
       </motion.div>
-
-      <motion.div variants={fadeChild} className="mt-10 flex items-center gap-2">
-        <Sparkles className="w-3.5 h-3.5" style={{ color: SCAN_FROM }} />
-        <span className="text-[11px] font-medium" style={{ color: TEXT_SECONDARY }}>
-          {t("idle.hint")}
-        </span>
-      </motion.div>
-
     </motion.div>
   );
 }

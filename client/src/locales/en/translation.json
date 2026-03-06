@@ -11,8 +11,21 @@
     "subtitle1": "Your current skin condition,",
     "subtitle2": "Your skin condition,",
     "subtitle3": "revealed by AI in just 3 seconds.",
+    "subtitle4": "Diagnose your Baumann skin type with one selfie",
     "scanBtn": "Scan My Skin\nwith AI",
-    "hint": "Take a selfie with your camera to start the analysis"
+    "hint": "Take a selfie with your camera to start the analysis",
+    "previewTitle": "AI Analysis Preview",
+    "previewSub": "Baumann Type · OSNT",
+    "stepsTitle": "How it works",
+    "step1": "Survey 30s",
+    "step1Sub": "Enter skin concerns",
+    "step2": "Take Selfie",
+    "step2Sub": "Front camera",
+    "step3": "AI Analysis",
+    "step3Sub": "16-type diagnosis",
+    "privacy": "Photo deleted after analysis · Never stored",
+    "ctaBtn": "Get My Free Skin Type Analysis →",
+    "ctaHint": "~30 sec · Completely Free"
   },
   "camera": {
     "noCamera": "Camera unavailable. Please select a photo instead.",
