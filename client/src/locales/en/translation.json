@@ -202,6 +202,60 @@
     "pushDenied": "Notification permission is blocked. Please allow it in browser settings.",
     "lunchTitle": "🥗 Fonday Lunch Pick",
     "dinnerTitle": "🍽️ Fonday Dinner Pick",
+    "avoidTitle": "Foods to Avoid Today",
+    "avoidLunch": "Lunch",
+    "avoidDinner": "Dinner",
+    "avoidWhy": "Why",
+    "avoidFoods": {
+      "O": {
+        "lunch": "Fried food · Cream pasta · White rice bowl",
+        "lunchWhy": "High-GI & saturated fat spikes sebum production",
+        "dinner": "BBQ pork · Fried chicken · Beer",
+        "dinnerWhy": "Saturated fat & alcohol triggers pore enlargement"
+      },
+      "D": {
+        "lunch": "Coffee · Salty soups · Dry crackers",
+        "lunchWhy": "Draws moisture out, worsening dryness and flaking",
+        "dinner": "Instant noodles · Soju · Salty snacks",
+        "dinnerWhy": "Sodium & alcohol rapidly dehydrate the skin barrier"
+      },
+      "S": {
+        "lunch": "Spicy stew · Curry · Carbonated drinks",
+        "lunchWhy": "Irritants cause vasodilation and redness flare-ups",
+        "dinner": "Alcohol · Spicy late-night snacks · Instant noodles",
+        "dinnerWhy": "Alcohol & capsaicin intensify skin inflammation"
+      },
+      "R": {
+        "lunch": "Sugary drinks · Fast food",
+        "lunchWhy": "Excess sugar gradually weakens skin over time",
+        "dinner": "Late-night overeating",
+        "dinnerWhy": "Digestive load during sleep disrupts skin repair"
+      },
+      "P": {
+        "lunch": "Processed meat (ham · sausage) · Oxidized fried food",
+        "lunchWhy": "Free radicals accelerate melanin synthesis",
+        "dinner": "Alcohol · Sugary drinks · Sweet desserts",
+        "dinnerWhy": "Glycation reaction deepens existing pigmentation"
+      },
+      "N": {
+        "lunch": "Sugary drinks · Instant food",
+        "lunchWhy": "Blood sugar spikes may trigger skin breakouts",
+        "dinner": "Late-night snacks · Overeating",
+        "dinnerWhy": "Blood sugar instability can dull skin tone"
+      },
+      "W": {
+        "lunch": "Sugary drinks · White bread · Snacks",
+        "lunchWhy": "Glycation damages collagen fibers in the dermis",
+        "dinner": "Alcohol · Sweet snacks · Carbonated drinks",
+        "dinnerWhy": "Interferes with overnight collagen regeneration"
+      },
+      "T": {
+        "lunch": "High-sugar drinks · Fast food",
+        "lunchWhy": "Sugar control is key to maintaining current elasticity",
+        "dinner": "Late-night overeating",
+        "dinnerWhy": "Overeating at night disrupts skin repair hormone release"
+      }
+    },
     "O": [
       { "name": "Zinc", "foods": "Oysters · Pumpkin seeds · Brown rice · Tofu", "why": "Regulates sebum-producing enzymes to reduce shine and pore enlargement." },
       { "name": "Vitamin B2 (Riboflavin)", "foods": "Eggs · Almonds · Dark leafy greens", "why": "Prevents over-activation of sebaceous glands and reduces oxidative stress." },

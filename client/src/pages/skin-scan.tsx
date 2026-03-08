@@ -2025,6 +2025,64 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
                       </motion.div>
                     );
                   })}
+                  {/* 오늘 피해야 할 음식 */}
+                  <div className="pt-1">
+                    <div className="flex items-center gap-2 mb-3 pt-2 border-t border-stone-100">
+                      <span className="text-base">⚠️</span>
+                      <p className="text-[13px] font-black" style={{ color: "#D97706" }}>{t("nutrients.avoidTitle")}</p>
+                    </div>
+                    {/* 점심 */}
+                    <div className="rounded-2xl p-4 mb-3" style={{ background: "#FFF7ED", border: "1px solid #FED7AA" }}>
+                      <div className="flex items-center gap-1.5 mb-2.5">
+                        <span className="text-sm">☀️</span>
+                        <span className="text-[12px] font-black text-orange-700">{t("nutrients.avoidLunch")}</span>
+                      </div>
+                      <div className="space-y-2">
+                        {finalType.split("").filter(l => {
+                          const data = t(`nutrients.avoidFoods.${l}`, { returnObjects: true }) as any;
+                          return data?.lunch;
+                        }).map((letter) => {
+                          const data = t(`nutrients.avoidFoods.${letter}`, { returnObjects: true }) as any;
+                          const color = NUTRIENT_COLORS[letter];
+                          return (
+                            <div key={letter} className="flex gap-2 items-start">
+                              <span className="text-[10px] font-black px-1.5 py-0.5 rounded-full shrink-0 mt-0.5" style={{ background: `${color}22`, color }}>{letter}</span>
+                              <div>
+                                <p className="text-[12px] font-bold text-stone-700">{data.lunch}</p>
+                                <p className="text-[11px] text-stone-400">{data.lunchWhy}</p>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                    {/* 저녁 */}
+                    <div className="rounded-2xl p-4" style={{ background: "#F5F3FF", border: "1px solid #DDD6FE" }}>
+                      <div className="flex items-center gap-1.5 mb-2.5">
+                        <span className="text-sm">🌙</span>
+                        <span className="text-[12px] font-black text-violet-700">{t("nutrients.avoidDinner")}</span>
+                      </div>
+                      <div className="space-y-2">
+                        {finalType.split("").filter(l => {
+                          const data = t(`nutrients.avoidFoods.${l}`, { returnObjects: true }) as any;
+                          return data?.dinner;
+                        }).map((letter) => {
+                          const data = t(`nutrients.avoidFoods.${letter}`, { returnObjects: true }) as any;
+                          const color = NUTRIENT_COLORS[letter];
+                          return (
+                            <div key={letter} className="flex gap-2 items-start">
+                              <span className="text-[10px] font-black px-1.5 py-0.5 rounded-full shrink-0 mt-0.5" style={{ background: `${color}22`, color }}>{letter}</span>
+                              <div>
+                                <p className="text-[12px] font-bold text-stone-700">{data.dinner}</p>
+                                <p className="text-[11px] text-stone-400">{data.dinnerWhy}</p>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  </div>
+
                   {/* 푸시 알림 구독 */}
                   <div className="pt-2 space-y-2">
                     <button
