@@ -34,6 +34,7 @@ import {
   Clock,
   User,
   ChevronRight,
+  Utensils,
 } from "lucide-react";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { Button } from "@/components/ui/button";
@@ -1060,6 +1061,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
   const reels1Ref = useRef<HTMLDivElement>(null);
   const reels2Ref = useRef<HTMLDivElement>(null);
   const reels3Ref = useRef<HTMLDivElement>(null);
+  const reels4Ref = useRef<HTMLDivElement>(null);
   const analysisDrag = useDragControls();
   const improvementsDrag = useDragControls();
   const nutrientsDrag = useDragControls();
@@ -1211,7 +1213,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
   const handleShare = async () => {
     try {
       const html2canvas = (await import("html2canvas")).default;
-      const refs = [reels1Ref, reels2Ref, reels3Ref];
+      const refs = [reels1Ref, reels2Ref, reels3Ref, reels4Ref];
       const files: File[] = [];
 
       // 모든 슬라이드를 미리 DOM에 표시 (렌더 보장)
@@ -1271,7 +1273,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
       // AbortError는 사용자가 취소한 것 — 그 외는 콘솔에 출력
       if (e instanceof Error && e.name !== "AbortError") console.error("[share]", e);
       // 숨기기 보장
-      [reels1Ref, reels2Ref, reels3Ref].forEach(r => {
+      [reels1Ref, reels2Ref, reels3Ref, reels4Ref].forEach(r => {
         if (r.current) r.current.style.display = "none";
       });
     }
@@ -1288,7 +1290,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
         <span style={{ fontSize: "13px", color: TEXT_SECONDARY }}>{new Date().toLocaleDateString(undefined, { month: "long", day: "numeric" })}</span>
       </div>
       {/* 스코어 카드 */}
-      <div style={{ margin: "80px 28px 0", background: "white", borderRadius: "32px", padding: "32px 28px 28px", boxShadow: "0 12px 40px rgba(180,130,110,0.18)" }}>
+      <div style={{ margin: "28px 28px 0", background: "white", borderRadius: "32px", padding: "28px 28px 24px", boxShadow: "0 12px 40px rgba(180,130,110,0.18)" }}>
         {/* 종합 + 피부나이 + 바우만 */}
         <div style={{ display: "flex", gap: "12px", marginBottom: "18px" }}>
           <div style={{ width: "90px", background: `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})`, borderRadius: "20px", padding: "14px 0", textAlign: "center", flexShrink: 0 }}>
@@ -1413,6 +1415,46 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
           </div>
         </div>
       )}
+      <div style={{ position: "absolute", bottom: "32px", left: 0, right: 0, textAlign: "center", fontSize: "13px", color: "#C0B8B0", fontWeight: 600, letterSpacing: "0.5px" }}>fondayai.pages.dev</div>
+    </div>
+
+    {/* ── 릴스 슬라이드 4: 피부 맞춤 영양 성분 (540×960 = 9:16) ── */}
+    <div ref={reels4Ref} style={{ display: "none", position: "fixed", left: 0, top: 0, width: "540px", height: "960px", overflow: "hidden", zIndex: -1, pointerEvents: "none", background: "linear-gradient(160deg, #FFFBEB 0%, #FEF3C7 55%, #FDE68A 100%)", fontFamily: "system-ui,-apple-system,sans-serif" }}>
+      {/* 헤더 */}
+      <div style={{ padding: "40px 40px 0", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <span style={{ fontSize: "24px", fontWeight: 900, color: DEEP_GREEN, letterSpacing: "-0.5px" }}>FONDAY AI</span>
+        <div style={{ background: "#D97706", borderRadius: "999px", padding: "6px 16px" }}>
+          <span style={{ fontSize: "13px", fontWeight: 800, color: "white" }}>{t("nutrients.sectionTitle")}</span>
+        </div>
+      </div>
+      {/* 바우만 타입 표시 */}
+      <div style={{ margin: "20px 40px 0", display: "flex", alignItems: "center", gap: "10px" }}>
+        <span style={{ fontSize: "13px", color: "#92400E", fontWeight: 700 }}>{t("result.baumannLabel")}</span>
+        <span style={{ fontSize: "22px", fontWeight: 900, color: "#D97706" }}>{finalType}</span>
+        <span style={{ fontSize: "12px", color: "#92400E" }}>{t("nutrients.sectionSub")}</span>
+      </div>
+      {/* 영양소 4개 카드 */}
+      <div style={{ margin: "16px 28px 0", display: "flex", flexDirection: "column", gap: "14px" }}>
+        {finalType.split("").filter(l => l in NUTRIENT_COLORS).map((letter) => {
+          const arr = t(`nutrients.${letter}`, { returnObjects: true }) as { name: string; foods: string; why: string }[];
+          const nutrient = arr?.[0];
+          if (!nutrient) return null;
+          const color = NUTRIENT_COLORS[letter];
+          return (
+            <div key={letter} style={{ background: "white", borderRadius: "20px", padding: "18px 20px", boxShadow: "0 4px 16px rgba(0,0,0,0.06)", borderLeft: `5px solid ${color}` }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "8px" }}>
+                <span style={{ fontSize: "18px" }}>{NUTRIENT_ICONS[letter]}</span>
+                <span style={{ fontSize: "16px", fontWeight: 800, color }}>{nutrient.name}</span>
+                <span style={{ fontSize: "10px", fontWeight: 700, padding: "2px 8px", borderRadius: "999px", background: `${color}22`, color }}>{letter}</span>
+              </div>
+              <p style={{ fontSize: "12px", color: "#57534E", lineHeight: 1.6, margin: "0 0 6px" }}>{nutrient.why}</p>
+              <p style={{ fontSize: "11px", color: "#A8A29E", margin: 0 }}>
+                <span style={{ fontWeight: 700, color }}>{t("nutrients.foodLabel")} </span>{nutrient.foods}
+              </p>
+            </div>
+          );
+        })}
+      </div>
       <div style={{ position: "absolute", bottom: "32px", left: 0, right: 0, textAlign: "center", fontSize: "13px", color: "#C0B8B0", fontWeight: 600, letterSpacing: "0.5px" }}>fondayai.pages.dev</div>
     </div>
 
@@ -1603,7 +1645,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
           <Button onClick={() => setShowNutrients(true)}
             className="h-16 rounded-2xl flex-col gap-1.5 font-bold text-white shadow-md"
             style={{ background: "linear-gradient(135deg, #F59E0B, #D97706)" }}>
-            <span className="text-lg leading-none">🥦</span>
+            <Utensils className="w-4 h-4" />
             <span className="text-[11px]">{t("nutrients.sectionTitle")}</span>
           </Button>
         </div>
@@ -1918,9 +1960,9 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
                 <div className="w-10 h-1 rounded-full bg-stone-200 mx-auto mb-5" />
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-2">
-                    <div className="w-9 h-9 rounded-xl flex items-center justify-center text-xl"
+                    <div className="w-9 h-9 rounded-xl flex items-center justify-center"
                       style={{ background: "linear-gradient(135deg, #F59E0B, #D97706)" }}>
-                      🥦
+                      <Utensils className="w-4 h-4 text-white" />
                     </div>
                     <div>
                       <h3 className="font-bold text-base" style={{ color: "#D97706" }}>{t("nutrients.sectionTitle")}</h3>
