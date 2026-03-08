@@ -87,18 +87,25 @@ const SCAN_FROM = "#E09882";
 const SCAN_TO = "#C97062";
 
 // ─── Google AdSense 배너 ──────────────────────────────────────────
-// AdSense 대시보드에서 광고 단위 생성 후 data-ad-slot 값을 교체하세요.
+// 주의: AdSense 대시보드에서 각 위치별로 별도 광고 단위를 생성 후 data-ad-slot 값을 개별 교체하세요.
+// 동일한 slot ID를 여러 위치에 쓰면 정책 위반이 될 수 있습니다.
 function AdBanner({ slot }: { slot: string }) {
-  const ref = useRef<HTMLModElement>(null);
+  const [loaded, setLoaded] = useState(false);
   useEffect(() => {
-    try {
-      ((window as any).adsbygoogle = (window as any).adsbygoogle || []).push({});
-    } catch {}
+    // 광고는 실제 콘텐츠가 로드된 후에만 삽입
+    const timer = setTimeout(() => {
+      try {
+        ((window as any).adsbygoogle = (window as any).adsbygoogle || []).push({});
+        setLoaded(true);
+      } catch {}
+    }, 300);
+    return () => clearTimeout(timer);
   }, []);
   return (
-    <div className="w-full overflow-hidden my-1">
+    <div className="w-full overflow-hidden my-2">
+      {/* 광고 레이블 - AdSense 정책 준수 (광고임을 명시) */}
+      <p className="text-[10px] text-center text-stone-300 mb-1 tracking-widest uppercase font-medium">광고</p>
       <ins
-        ref={ref}
         className="adsbygoogle"
         style={{ display: "block" }}
         data-ad-client="ca-pub-5928664043346684"
@@ -823,6 +830,58 @@ function ScanIdleScreen({ onScan }: { onScan: () => void }) {
           {t("idle.ctaHint")}
         </p>
       </motion.div>
+
+      {/* ── 교육용 콘텐츠 섹션 (AdSense 정책: 퍼블리셔 콘텐츠 제공) ── */}
+      <motion.div variants={fadeChild} className="mt-8 border-t border-stone-100 pt-6 space-y-5">
+        <h2 className="text-[14px] font-black tracking-tight" style={{ color: DEEP_GREEN }}>바우만 피부 타입이란?</h2>
+        <p className="text-[12.5px] leading-relaxed text-stone-500">
+          피부과 전문의 레슬리 바우만 박사가 개발한 <strong>바우만 스킨 타입 지수(BSTI)</strong>는 피부를 4가지 축으로 분류합니다.
+          유수분 균형(O/D), 민감도(S/R), 색소침착(P/N), 노화 경향(W/T) — 각 축의 조합으로 16가지 피부 타입이 결정됩니다.
+          단순히 "건성/지성"으로만 구분하던 시대는 끝났습니다.
+        </p>
+
+        <div className="grid grid-cols-2 gap-2.5">
+          {[
+            { icon: "💧", label: "수분 밸런스", desc: "O 지성 · D 건성" },
+            { icon: "🌡️", label: "민감도", desc: "S 민감 · R 저항성" },
+            { icon: "🌅", label: "색소침착", desc: "P 색소성 · N 비색소성" },
+            { icon: "⏳", label: "노화 경향", desc: "W 주름성 · T 탄력성" },
+          ].map(item => (
+            <div key={item.label} className="bg-white rounded-xl p-3 border border-stone-100">
+              <span className="text-lg">{item.icon}</span>
+              <p className="text-[11px] font-bold text-stone-700 mt-1">{item.label}</p>
+              <p className="text-[10px] text-stone-400">{item.desc}</p>
+            </div>
+          ))}
+        </div>
+
+        <div className="bg-white rounded-2xl p-4 border border-stone-100">
+          <h3 className="text-[13px] font-black mb-2" style={{ color: DEEP_GREEN }}>AI 피부 분석, 어떻게 작동하나요?</h3>
+          <ul className="space-y-1.5">
+            {[
+              "셀카 사진의 피부 색조, 모공, 광채, 잡티를 멀티스펙트럼 분석",
+              "Gemini AI가 10가지 피부 지표를 0~100점으로 정량화",
+              "바우만 4가지 축 점수 기반으로 개인 피부 타입 결정",
+              "바우만 타입에 맞춘 성분·루틴·제품 유형 맞춤 추천",
+            ].map((item, i) => (
+              <li key={i} className="flex items-start gap-2 text-[11.5px] text-stone-500">
+                <span className="text-[10px] font-black mt-0.5 shrink-0" style={{ color: SCAN_TO }}>{i + 1}</span>
+                {item}
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <div className="text-center pt-1 pb-4">
+          <a href="/privacy.html" className="text-[10px] underline" style={{ color: TEXT_SECONDARY }}>
+            개인정보처리방침
+          </a>
+          <span className="text-[10px] text-stone-200 mx-2">·</span>
+          <a href="/terms.html" className="text-[10px] underline" style={{ color: TEXT_SECONDARY }}>
+            이용약관
+          </a>
+        </div>
+      </motion.div>
     </motion.div>
   );
 }
@@ -1102,10 +1161,22 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
       const html2canvas = (await import("html2canvas")).default;
       const refs = [reels1Ref, reels2Ref, reels3Ref];
       const files: File[] = [];
+
+      // 모든 슬라이드를 미리 DOM에 표시 (렌더 보장)
+      refs.forEach(r => {
+        if (r.current) {
+          r.current.style.display = "block";
+          r.current.style.zIndex = "-1";
+          r.current.style.pointerEvents = "none";
+        }
+      });
+
+      // 브라우저 렌더 사이클 대기
+      await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+
       for (let i = 0; i < refs.length; i++) {
         const el = refs[i].current;
         if (!el) continue;
-        el.style.display = "block";
         const canvas = await html2canvas(el, {
           scale: 2,
           useCORS: true,
@@ -1114,30 +1185,51 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
           logging: false,
           width: 540,
           height: 960,
+          windowWidth: 540,
+          windowHeight: 960,
+          x: 0,
+          y: 0,
+          scrollX: 0,
+          scrollY: 0,
         });
-        el.style.display = "none";
         const blob = await new Promise<Blob | null>(r => canvas.toBlob(r, "image/png"));
         if (blob) files.push(new File([blob], `fonday-reels-${i + 1}.png`, { type: "image/png" }));
       }
+
+      // 캡처 후 숨기기
+      refs.forEach(r => {
+        if (r.current) r.current.style.display = "none";
+      });
+
+      if (files.length === 0) return;
+
       const shareText = t("result.shareText", { score: overallScore, type: finalType });
       if (navigator.canShare?.({ files })) {
         await navigator.share({ files, title: "Fonday AI 피부 분석", text: shareText });
       } else {
-        files.forEach(file => {
+        for (const file of files) {
           const a = document.createElement("a");
           a.href = URL.createObjectURL(file);
           a.download = file.name;
           a.click();
-        });
+          await new Promise(r => setTimeout(r, 200));
+        }
       }
-    } catch { /* 취소 */ }
+    } catch (e) {
+      // AbortError는 사용자가 취소한 것 — 그 외는 콘솔에 출력
+      if (e instanceof Error && e.name !== "AbortError") console.error("[share]", e);
+      // 숨기기 보장
+      [reels1Ref, reels2Ref, reels3Ref].forEach(r => {
+        if (r.current) r.current.style.display = "none";
+      });
+    }
   };
 
 
   return (
     <>
     {/* ── 릴스 슬라이드 1: 표지 (540×960 = 9:16) ── */}
-    <div ref={reels1Ref} style={{ display: "none", position: "fixed", left: "-9999px", top: 0, width: "540px", height: "960px", overflow: "hidden", background: "linear-gradient(160deg, #FDF6F3 0%, #F5E8E0 55%, #EDD8CC 100%)", fontFamily: "system-ui,-apple-system,sans-serif" }}>
+    <div ref={reels1Ref} style={{ display: "none", position: "fixed", left: 0, top: 0, width: "540px", height: "960px", overflow: "hidden", zIndex: -1, pointerEvents: "none", background: "linear-gradient(160deg, #FDF6F3 0%, #F5E8E0 55%, #EDD8CC 100%)", fontFamily: "system-ui,-apple-system,sans-serif" }}>
       {/* 브랜드 헤더 */}
       <div style={{ padding: "40px 40px 0", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <span style={{ fontSize: "24px", fontWeight: 900, color: DEEP_GREEN, letterSpacing: "-0.5px" }}>FONDAY AI</span>
@@ -1181,7 +1273,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
     </div>
 
     {/* ── 릴스 슬라이드 2: 10가지 피부 점수 (540×960 = 9:16) ── */}
-    <div ref={reels2Ref} style={{ display: "none", position: "fixed", left: "-9999px", top: 0, width: "540px", height: "960px", overflow: "hidden", background: "#FFFFFF", fontFamily: "system-ui,-apple-system,sans-serif" }}>
+    <div ref={reels2Ref} style={{ display: "none", position: "fixed", left: 0, top: 0, width: "540px", height: "960px", overflow: "hidden", zIndex: -1, pointerEvents: "none", background: "#FFFFFF", fontFamily: "system-ui,-apple-system,sans-serif" }}>
       {/* 헤더 */}
       <div style={{ padding: "40px 40px 0", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <span style={{ fontSize: "24px", fontWeight: 900, color: DEEP_GREEN, letterSpacing: "-0.5px" }}>FONDAY AI</span>
@@ -1220,7 +1312,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
     </div>
 
     {/* ── 릴스 슬라이드 3: AI 맞춤 솔루션 (540×960 = 9:16) ── */}
-    <div ref={reels3Ref} style={{ display: "none", position: "fixed", left: "-9999px", top: 0, width: "540px", height: "960px", overflow: "hidden", background: "linear-gradient(160deg, #F5F0EB 0%, #FAF9F6 100%)", fontFamily: "system-ui,-apple-system,sans-serif" }}>
+    <div ref={reels3Ref} style={{ display: "none", position: "fixed", left: 0, top: 0, width: "540px", height: "960px", overflow: "hidden", zIndex: -1, pointerEvents: "none", background: "linear-gradient(160deg, #F5F0EB 0%, #FAF9F6 100%)", fontFamily: "system-ui,-apple-system,sans-serif" }}>
       {/* 헤더 */}
       <div style={{ padding: "40px 40px 0", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <span style={{ fontSize: "24px", fontWeight: 900, color: DEEP_GREEN, letterSpacing: "-0.5px" }}>FONDAY AI</span>
