@@ -126,100 +126,6 @@ const NUTRIENT_ICONS: Record<string, string> = {
   O: "🧴", D: "💧", S: "🌿", R: "🛡️", P: "🍋", N: "✨", W: "⏳", T: "💪",
 };
 
-function NutrientSection({ finalType, onPushToggle, pushSubscribed, pushLoading }: {
-  finalType: string;
-  onPushToggle: () => void;
-  pushSubscribed: boolean;
-  pushLoading: boolean;
-}) {
-  const { t } = useTranslation();
-  const [open, setOpen] = useState(false);
-
-  // finalType의 각 글자(O/D/S/R/P/N/W/T)에 맞는 영양소를 통합
-  const letters = finalType.split("").filter(l => l in NUTRIENT_COLORS);
-  // 각 글자별 대표 영양소 1개씩 (총 4개)
-  const items = letters.map(letter => {
-    const arr = t(`nutrients.${letter}`, { returnObjects: true }) as { name: string; foods: string; why: string }[];
-    return { letter, nutrient: arr?.[0] };
-  }).filter(x => x.nutrient);
-
-  return (
-    <div className="rounded-3xl overflow-hidden border border-stone-100 shadow-sm bg-white">
-      {/* 헤더 (항상 표시) */}
-      <button
-        className="w-full flex items-center justify-between px-5 py-4 text-left"
-        onClick={() => setOpen(v => !v)}
-      >
-        <div>
-          <div className="flex items-center gap-2 mb-0.5">
-            <span className="text-base">🥦</span>
-            <span className="text-[13px] font-black" style={{ color: DEEP_GREEN }}>{t("nutrients.sectionTitle")}</span>
-          </div>
-          <p className="text-[11px] text-stone-400">{t("nutrients.sectionSub")}</p>
-        </div>
-        <ChevronRight className={`w-4 h-4 text-stone-300 transition-transform ${open ? "rotate-90" : ""}`} />
-      </button>
-
-      {/* 펼쳐지는 영양소 목록 */}
-      {open && (
-        <div className="px-4 pb-5 space-y-3 border-t border-stone-50 pt-3">
-          {items.map(({ letter, nutrient }) => {
-            const color = NUTRIENT_COLORS[letter];
-            return (
-              <div key={letter} className="rounded-2xl p-3.5" style={{ background: `${color}0D`, border: `1px solid ${color}22` }}>
-                <div className="flex items-center gap-2 mb-1.5">
-                  <span className="text-base">{NUTRIENT_ICONS[letter]}</span>
-                  <span className="text-[12px] font-black" style={{ color }}>{nutrient.name}</span>
-                  <span className="text-[10px] px-2 py-0.5 rounded-full font-bold" style={{ background: `${color}22`, color }}>
-                    {letter === "O" || letter === "D" ? t("baumann.O.name").split(" ")[0] : ""}
-                    {letter}
-                  </span>
-                </div>
-                <p className="text-[11px] text-stone-500 leading-relaxed mb-1.5">{nutrient.why}</p>
-                <div className="flex items-start gap-1.5">
-                  <span className="text-[10px] font-bold shrink-0 mt-0.5" style={{ color }}>{t("nutrients.foodLabel")}</span>
-                  <span className="text-[10px] text-stone-400">{nutrient.foods}</span>
-                </div>
-              </div>
-            );
-          })}
-          {/* 상세보기 - 전체 영양소 */}
-          <div className="space-y-2 pt-1">
-            {items.map(({ letter, nutrient: _ }) => {
-              const arr = t(`nutrients.${letter}`, { returnObjects: true }) as { name: string; foods: string; why: string }[];
-              const color = NUTRIENT_COLORS[letter];
-              return arr.slice(1).map((n, idx) => (
-                <div key={`${letter}-${idx}`} className="rounded-xl p-3 bg-stone-50 border border-stone-100">
-                  <div className="flex items-center gap-1.5 mb-1">
-                    <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full" style={{ background: `${color}18`, color }}>{letter}</span>
-                    <span className="text-[11px] font-bold text-stone-700">{n.name}</span>
-                  </div>
-                  <p className="text-[10.5px] text-stone-500 leading-relaxed mb-1">{n.why}</p>
-                  <p className="text-[10px] text-stone-400"><span className="font-bold" style={{ color }}>{t("nutrients.foodLabel")} </span>{n.foods}</p>
-                </div>
-              ));
-            })}
-          </div>
-
-          {/* 식단 푸시 알림 구독 버튼 */}
-          <button
-            onClick={onPushToggle}
-            disabled={pushLoading}
-            className="w-full py-3 rounded-2xl font-bold text-[13px] transition-all flex items-center justify-center gap-2"
-            style={pushSubscribed
-              ? { background: `${DEEP_GREEN}18`, color: DEEP_GREEN, border: `1px solid ${DEEP_GREEN}33` }
-              : { background: `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})`, color: "white" }
-            }
-          >
-            <span>{pushSubscribed ? "🔔" : "🍽️"}</span>
-            {pushLoading ? "..." : pushSubscribed ? t("nutrients.pushBtnOn") : t("nutrients.pushBtn")}
-          </button>
-          <p className="text-[10px] text-center text-stone-400">점심 12:00 · 저녁 18:00 (KST)</p>
-        </div>
-      )}
-    </div>
-  );
-}
 
 // 인덱스 기반 아이콘/색상 (AI label 매칭 불필요, 순서 보장)
 const SCORE_ICONS = [Sparkles, Droplets, Sun, LayoutGrid, Activity, Target, Flame, Eye, Star, Waves];
@@ -1156,7 +1062,9 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
   const reels3Ref = useRef<HTMLDivElement>(null);
   const analysisDrag = useDragControls();
   const improvementsDrag = useDragControls();
+  const nutrientsDrag = useDragControls();
   const diaryDrag = useDragControls();
+  const [showNutrients, setShowNutrients] = useState(false);
   const [showDiary, setShowDiary] = useState(false);
 
   const handleGoogleLogin = () => {
@@ -1678,19 +1586,25 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
           </div>
         </Card>
 
-        {/* 액션 버튼 2개 */}
-        <div className="grid grid-cols-2 gap-3">
+        {/* 액션 버튼 3개 */}
+        <div className="grid grid-cols-3 gap-2.5">
           <Button onClick={() => setShowAnalysis(true)}
             className="h-16 rounded-2xl flex-col gap-1.5 font-bold text-white shadow-md"
             style={{ background: `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})` }}>
-            <LayoutGrid className="w-5 h-5" />
-            <span className="text-[12px]">{t("result.analysis")}</span>
+            <LayoutGrid className="w-4 h-4" />
+            <span className="text-[11px]">{t("result.analysis")}</span>
           </Button>
           <Button onClick={() => setShowImprovements(true)}
             className="h-16 rounded-2xl flex-col gap-1.5 font-bold text-white shadow-md"
             style={{ background: `linear-gradient(135deg, ${DEEP_GREEN_LIGHT}, ${DEEP_GREEN})` }}>
-            <Leaf className="w-5 h-5" />
-            <span className="text-[12px]">{t("result.solutions")}</span>
+            <Leaf className="w-4 h-4" />
+            <span className="text-[11px]">{t("result.solutions")}</span>
+          </Button>
+          <Button onClick={() => setShowNutrients(true)}
+            className="h-16 rounded-2xl flex-col gap-1.5 font-bold text-white shadow-md"
+            style={{ background: "linear-gradient(135deg, #F59E0B, #D97706)" }}>
+            <span className="text-lg leading-none">🥦</span>
+            <span className="text-[11px]">{t("nutrients.sectionTitle")}</span>
           </Button>
         </div>
 
@@ -1762,9 +1676,6 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
             </CardContent>
           </Card>
         )}
-
-        {/* ── 피부 맞춤 영양 성분 섹션 ── */}
-        <NutrientSection finalType={finalType} onPushToggle={handlePushToggle} pushSubscribed={pushSubscribed} pushLoading={pushLoading} />
 
         {/* 광고 */}
         <AdBanner slot="6349940752" />
@@ -1982,6 +1893,92 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
                       ))}
                     </>
                   )}
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* 영양성분 모달 */}
+      <AnimatePresence>
+        {showNutrients && (
+          <motion.div className="fixed inset-0 z-[100] flex items-end justify-center"
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+            <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" onClick={() => setShowNutrients(false)} />
+            <motion.div className="relative bg-white rounded-t-3xl w-full max-w-sm shadow-xl max-h-[90dvh] flex flex-col"
+              initial={{ y: "100%" }} animate={{ y: 0 }} exit={{ y: "100%" }}
+              transition={{ type: "spring", damping: 30, stiffness: 300 }}
+              drag="y" dragControls={nutrientsDrag} dragListener={false}
+              dragConstraints={{ top: 0, bottom: 0 }}
+              dragElastic={{ top: 0, bottom: 0.3 }}
+              onDragEnd={(_, info) => { if (info.offset.y > 80 || info.velocity.y > 400) setShowNutrients(false); }}>
+              <div className="p-6 pb-2 shrink-0 touch-none cursor-grab active:cursor-grabbing"
+                onPointerDown={(e) => nutrientsDrag.start(e)}>
+                <div className="w-10 h-1 rounded-full bg-stone-200 mx-auto mb-5" />
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-2">
+                    <div className="w-9 h-9 rounded-xl flex items-center justify-center text-xl"
+                      style={{ background: "linear-gradient(135deg, #F59E0B, #D97706)" }}>
+                      🥦
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-base" style={{ color: "#D97706" }}>{t("nutrients.sectionTitle")}</h3>
+                      <p className="text-[11px] text-stone-400">{t("nutrients.sectionSub")}</p>
+                    </div>
+                  </div>
+                  <button onClick={() => setShowNutrients(false)} className="w-7 h-7 rounded-full bg-stone-100 flex items-center justify-center">
+                    <X className="w-3.5 h-3.5 text-stone-500" />
+                  </button>
+                </div>
+              </div>
+              <div className="flex-1 overflow-y-auto overscroll-contain">
+                <div className="px-6 pb-8 space-y-3">
+                  {finalType.split("").filter(l => l in NUTRIENT_COLORS).map((letter, i) => {
+                    const arr = t(`nutrients.${letter}`, { returnObjects: true }) as { name: string; foods: string; why: string }[];
+                    const nutrient = arr?.[0];
+                    if (!nutrient) return null;
+                    const color = NUTRIENT_COLORS[letter];
+                    return (
+                      <motion.div key={letter}
+                        initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: i * 0.08 }}
+                        className="flex gap-3 p-4 rounded-2xl border"
+                        style={{ background: `${color}0D`, borderColor: `${color}33` }}>
+                        <div className="shrink-0">
+                          <div className="w-8 h-8 rounded-full flex items-center justify-center text-base"
+                            style={{ background: `${color}22` }}>
+                            {NUTRIENT_ICONS[letter]}
+                          </div>
+                          <p className="text-[9px] font-black text-center mt-0.5" style={{ color }}>{letter}</p>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-[13px] font-bold mb-0.5" style={{ color }}>{nutrient.name}</p>
+                          <p className="text-[12px] text-stone-500 leading-relaxed mb-1.5">{nutrient.why}</p>
+                          <p className="text-[11px] text-stone-400">
+                            <span className="font-bold" style={{ color }}>{t("nutrients.foodLabel")} </span>
+                            {nutrient.foods}
+                          </p>
+                        </div>
+                      </motion.div>
+                    );
+                  })}
+                  {/* 푸시 알림 구독 */}
+                  <div className="pt-2 space-y-2">
+                    <button
+                      onClick={handlePushToggle}
+                      disabled={pushLoading}
+                      className="w-full py-3 rounded-2xl font-bold text-[13px] transition-all flex items-center justify-center gap-2"
+                      style={pushSubscribed
+                        ? { background: `${DEEP_GREEN}18`, color: DEEP_GREEN, border: `1px solid ${DEEP_GREEN}33` }
+                        : { background: "linear-gradient(135deg, #F59E0B, #D97706)", color: "white" }
+                      }
+                    >
+                      <span>{pushSubscribed ? "🔔" : "🍽️"}</span>
+                      {pushLoading ? "..." : pushSubscribed ? t("nutrients.pushBtnOn") : t("nutrients.pushBtn")}
+                    </button>
+                    <p className="text-[10px] text-center text-stone-400">점심 12:00 · 저녁 18:00 (KST)</p>
+                  </div>
                 </div>
               </div>
             </motion.div>
