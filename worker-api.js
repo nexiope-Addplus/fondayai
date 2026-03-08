@@ -178,5 +178,220 @@ export default {
     }
 
     return new Response("Fonday AI API Worker is running.", { status: 200 });
+  },
+
+  // ── Cron 스케줄러: KST 12:00 (UTC 03:00) 점심 / KST 18:00 (UTC 09:00) 저녁 ──
+  async scheduled(event, env, ctx) {
+    const hour = new Date().getUTCHours();
+    const isLunch = (hour === 3);  // UTC 03:00 = KST 12:00
+    const isDinner = (hour === 9); // UTC 09:00 = KST 18:00
+    if (!isLunch && !isDinner) return;
+
+    const meal = isLunch ? "lunch" : "dinner";
+    ctx.waitUntil(sendMealPushToAll(env, meal));
   }
 };
+
+// ─── 식단 푸시 데이터 (피부 타입 × 언어 × 식사) ─────────────────
+const MEAL_TIPS = {
+  ko: {
+    lunch: {
+      O: { menu: "현미밥 + 구운 연어 + 시금치 샐러드", tip: "저GI 식단으로 피지 분비를 조절해요. 아연이 풍부한 연어가 모공을 정화합니다." },
+      D: { menu: "아보카도 통곡물 토스트 + 달걀", tip: "오메가3와 비타민E가 피부 지질막을 강화해 건조함을 줄여요." },
+      S: { menu: "강황 닭가슴살 + 브로콜리 찜", tip: "강황의 커큐민이 염증을 억제해 민감성 붉은기를 진정시켜요." },
+      P: { menu: "딸기 요거트 볼 + 피망 볶음밥", tip: "비타민C가 멜라닌 합성 효소를 억제해 기미 예방에 효과적이에요." },
+      W: { menu: "달걀찜 + 블루베리 + 견과류", tip: "항산화물질이 콜라겐 분해 효소를 억제해 주름을 예방해요." },
+      default: { menu: "균형 잡힌 한식 정식 (밥 + 국 + 반찬 3가지)", tip: "다양한 영양소가 건강한 피부를 유지하는 데 도움이 돼요." },
+    },
+    dinner: {
+      O: { menu: "두부 야채볶음 + 된장국", tip: "프로바이오틱스가 풍부한 된장이 장-피부 축을 강화해요." },
+      D: { menu: "연어 스테이크 + 올리브오일 샐러드", tip: "건강한 지방이 피부 장벽을 복구하고 수분을 잡아줘요." },
+      S: { menu: "고등어 구이 + 김치 + 나물", tip: "오메가3와 프로바이오틱스가 피부 면역을 안정시켜요." },
+      P: { menu: "토마토 달걀볶음 + 시금치나물", tip: "토마토의 리코펜과 시금치의 엽산이 색소 회복을 도와요." },
+      W: { menu: "닭날개 조림 + 석류 주스", tip: "콜라겐 원료(닭날개)와 레스베라트롤(석류)이 탄력을 높여요." },
+      default: { menu: "생선 + 제철 채소 중심 저녁", tip: "가벼운 저녁으로 피부 야간 재생을 도와요." },
+    },
+  },
+  en: {
+    lunch: {
+      O: { menu: "Brown rice + Grilled salmon + Spinach salad", tip: "Low-GI diet controls sebum. Zinc-rich salmon cleanses pores." },
+      D: { menu: "Avocado whole-grain toast + Eggs", tip: "Omega-3 & Vitamin E strengthen the skin lipid barrier to fight dryness." },
+      S: { menu: "Turmeric chicken + Steamed broccoli", tip: "Curcumin in turmeric suppresses inflammation and calms redness." },
+      P: { menu: "Strawberry yogurt bowl + Bell pepper rice", tip: "Vitamin C inhibits melanin synthesis enzymes to prevent dark spots." },
+      W: { menu: "Steamed egg + Blueberries + Mixed nuts", tip: "Antioxidants inhibit collagen-degrading enzymes to prevent wrinkles." },
+      default: { menu: "Balanced meal with protein, veggies & whole grains", tip: "A variety of nutrients helps maintain healthy, glowing skin." },
+    },
+    dinner: {
+      O: { menu: "Tofu stir-fry + Miso soup", tip: "Probiotic-rich miso strengthens the gut-skin axis." },
+      D: { menu: "Salmon steak + Olive oil salad", tip: "Healthy fats repair the skin barrier and lock in moisture." },
+      S: { menu: "Grilled mackerel + Kimchi + Seasoned greens", tip: "Omega-3 & probiotics stabilize skin immunity." },
+      P: { menu: "Tomato egg stir-fry + Sautéed spinach", tip: "Lycopene (tomato) & folate (spinach) aid pigmentation recovery." },
+      W: { menu: "Braised chicken wings + Pomegranate juice", tip: "Collagen from chicken wings + resveratrol from pomegranate boost elasticity." },
+      default: { menu: "Light fish & seasonal vegetables for dinner", tip: "A light dinner supports skin overnight regeneration." },
+    },
+  },
+  ja: {
+    lunch: {
+      O: { menu: "玄米 + 焼きサーモン + ほうれん草サラダ", tip: "低GI食で皮脂分泌を調節。亜鉛豊富なサーモンが毛穴を清潔に保ちます。" },
+      D: { menu: "アボカド全粒粉トースト + 卵", tip: "オメガ3とビタミンEが肌の脂質バリアを強化し乾燥を改善します。" },
+      S: { menu: "ターメリックチキン + ブロッコリー蒸し", tip: "クルクミンが炎症を抑え、敏感肌の赤みを鎮めます。" },
+      P: { menu: "いちごヨーグルトボウル + パプリカ炒め飯", tip: "ビタミンCがメラニン合成酵素を阻害し、シミを予防します。" },
+      W: { menu: "茶碗蒸し + ブルーベリー + ナッツ", tip: "抗酸化物質がコラーゲン分解酵素を阻害し、しわを予防します。" },
+      default: { menu: "栄養バランスの取れた和定食", tip: "さまざまな栄養素が健康的な肌を維持するのに役立ちます。" },
+    },
+    dinner: {
+      O: { menu: "豆腐野菜炒め + 味噌汁", tip: "プロバイオティクス豊富な味噌が腸-皮膚軸を強化します。" },
+      D: { menu: "サーモンステーキ + オリーブオイルサラダ", tip: "良質な脂肪が肌バリアを修復し、潤いを閉じ込めます。" },
+      S: { menu: "サバの塩焼き + キムチ + 和え物", tip: "オメガ3とプロバイオティクスが肌の免疫を安定させます。" },
+      P: { menu: "トマト卵炒め + ほうれん草のおひたし", tip: "リコペン(トマト)と葉酸(ほうれん草)が色素沈着の回復を助けます。" },
+      W: { menu: "手羽先の煮込み + ザクロジュース", tip: "コラーゲン(手羽先)とレスベラトロール(ザクロ)が弾力を高めます。" },
+      default: { menu: "魚と旬の野菜中心の夕食", tip: "軽い夕食が肌の夜間再生をサポートします。" },
+    },
+  },
+};
+
+function getMealTip(baumannType, lang, meal) {
+  const langData = MEAL_TIPS[lang] || MEAL_TIPS.ko;
+  const mealData = langData[meal];
+  // 첫 번째 매칭 글자로 선택 (O/D > P/N > S/R > W/T 우선순위)
+  for (const letter of ["O", "D", "P", "S", "W"]) {
+    if (baumannType?.includes(letter) && mealData[letter]) {
+      return mealData[letter];
+    }
+  }
+  return mealData.default;
+}
+
+// ─── VAPID 서명 (Web Crypto API) ──────────────────────────────────
+async function signVapid(privateKeyB64u, audience, subject) {
+  const header = { alg: "ES256", typ: "JWT" };
+  const now = Math.floor(Date.now() / 1000);
+  const payload = { aud: audience, exp: now + 43200, sub: subject };
+
+  const encode = obj => btoa(JSON.stringify(obj)).replace(/\+/g, "-").replace(/\//g, "_").replace(/=/g, "");
+  const signingInput = `${encode(header)}.${encode(payload)}`;
+
+  const keyBytes = Uint8Array.from(atob(privateKeyB64u.replace(/-/g, "+").replace(/_/g, "/")), c => c.charCodeAt(0));
+  const key = await crypto.subtle.importKey(
+    "pkcs8", keyBytes,
+    { name: "ECDSA", namedCurve: "P-256" },
+    false, ["sign"]
+  );
+  const sig = await crypto.subtle.sign(
+    { name: "ECDSA", hash: "SHA-256" },
+    key,
+    new TextEncoder().encode(signingInput)
+  );
+  const sigB64u = btoa(String.fromCharCode(...new Uint8Array(sig))).replace(/\+/g, "-").replace(/\//g, "_").replace(/=/g, "");
+  return `${signingInput}.${sigB64u}`;
+}
+
+// ─── 단일 Push 전송 ───────────────────────────────────────────────
+async function sendPush(subscription, payload, env) {
+  const { endpoint, keys: { p256dh, auth } } = subscription;
+  const url = new URL(endpoint);
+  const audience = `${url.protocol}//${url.host}`;
+
+  const VAPID_PRIVATE = env.VAPID_PRIVATE_KEY;
+  const VAPID_PUBLIC = env.VAPID_PUBLIC_KEY;
+  const VAPID_SUB = env.VAPID_SUBJECT || "mailto:nexiope@gmail.com";
+
+  if (!VAPID_PRIVATE || !VAPID_PUBLIC) {
+    console.error("[push] VAPID keys not configured");
+    return;
+  }
+
+  const jwt = await signVapid(VAPID_PRIVATE, audience, VAPID_SUB);
+
+  // 페이로드 암호화 (Web Push Protocol - aesgcm)
+  const payloadStr = JSON.stringify(payload);
+  const encoder = new TextEncoder();
+  const salt = crypto.getRandomValues(new Uint8Array(16));
+
+  // p256dh 키 import
+  const receiverKey = await crypto.subtle.importKey(
+    "raw",
+    Uint8Array.from(atob(p256dh.replace(/-/g, "+").replace(/_/g, "/")), c => c.charCodeAt(0)),
+    { name: "ECDH", namedCurve: "P-256" },
+    true, []
+  );
+  // 임시 키 쌍 생성
+  const senderKeys = await crypto.subtle.generateKey({ name: "ECDH", namedCurve: "P-256" }, true, ["deriveKey", "deriveBits"]);
+  const senderPublicRaw = new Uint8Array(await crypto.subtle.exportKey("raw", senderKeys.publicKey));
+
+  // shared secret 도출
+  const sharedBits = await crypto.subtle.deriveBits(
+    { name: "ECDH", public: receiverKey },
+    senderKeys.privateKey, 256
+  );
+
+  // auth secret
+  const authBytes = Uint8Array.from(atob(auth.replace(/-/g, "+").replace(/_/g, "/")), c => c.charCodeAt(0));
+
+  // PRK (HKDF-Extract)
+  const prk = await crypto.subtle.importKey("raw", sharedBits, { name: "HKDF" }, false, ["deriveBits"]);
+  const prkInfo = new Uint8Array([...encoder.encode("Content-Encoding: auth\0"), ...authBytes]);
+  const pseudoKey = await crypto.subtle.deriveBits(
+    { name: "HKDF", hash: "SHA-256", salt: authBytes, info: prkInfo },
+    prk, 256
+  );
+
+  const cek = await crypto.subtle.importKey("raw", new Uint8Array(pseudoKey).slice(0, 16), "AES-GCM", false, ["encrypt"]);
+
+  // 암호화
+  const contentIV = new Uint8Array(12);
+  crypto.getRandomValues(contentIV);
+  const encrypted = await crypto.subtle.encrypt(
+    { name: "AES-GCM", iv: contentIV },
+    cek,
+    encoder.encode(payloadStr)
+  );
+
+  // 전송
+  const body = new Uint8Array([...salt, ...senderPublicRaw, ...new Uint8Array(encrypted)]);
+  await fetch(endpoint, {
+    method: "POST",
+    headers: {
+      "Authorization": `vapid t=${jwt},k=${VAPID_PUBLIC}`,
+      "Content-Type": "application/octet-stream",
+      "Content-Encoding": "aesgcm",
+      "Encryption": `salt=${btoa(String.fromCharCode(...salt)).replace(/\+/g, "-").replace(/\//g, "_").replace(/=/g, "")}`,
+      "Crypto-Key": `dh=${btoa(String.fromCharCode(...senderPublicRaw)).replace(/\+/g, "-").replace(/\//g, "_").replace(/=/g, "")};vapid`,
+    },
+    body,
+  });
+}
+
+// ─── 전체 구독자에게 식단 푸시 ────────────────────────────────────
+async function sendMealPushToAll(env, meal) {
+  const kv = env.PUSH_KV;
+  if (!kv) { console.log("[push] PUSH_KV not bound"); return; }
+
+  const allIdsRaw = await kv.get("push:all_ids");
+  if (!allIdsRaw) return;
+  const allIds = JSON.parse(allIdsRaw);
+
+  for (const id of allIds) {
+    try {
+      const raw = await kv.get(`push:sub:${id}`);
+      if (!raw) continue;
+      const { subscription, baumannType, lang } = JSON.parse(raw);
+      const tip = getMealTip(baumannType, lang, meal);
+      const langData = MEAL_TIPS[lang] || MEAL_TIPS.ko;
+      const title = meal === "lunch"
+        ? (langData.lunch.default ? "🥗 Fonday 점심 추천" : "🥗 Fonday Lunch")
+        : (langData.dinner.default ? "🍽️ Fonday 저녁 추천" : "🍽️ Fonday Dinner");
+      // 언어별 타이틀
+      const titles = { ko: meal === "lunch" ? "🥗 Fonday 점심 추천" : "🍽️ Fonday 저녁 추천",
+                       en: meal === "lunch" ? "🥗 Fonday Lunch Pick" : "🍽️ Fonday Dinner Pick",
+                       ja: meal === "lunch" ? "🥗 Fondayランチおすすめ" : "🍽️ Fondayディナーおすすめ" };
+      await sendPush(subscription, {
+        title: titles[lang] || titles.ko,
+        body: `${tip.menu}\n${tip.tip}`,
+        url: "/",
+      }, env);
+    } catch (e) {
+      console.error(`[push] id=${id} error:`, e.message);
+    }
+  }
+}

@@ -192,6 +192,57 @@
       "expert": "Expert"
     }
   },
+  "nutrients": {
+    "sectionTitle": "Skin-Matched Nutrients",
+    "sectionSub": "Key nutrients for your skin type",
+    "foodLabel": "Foods",
+    "pushBtn": "Get Meal Reminders",
+    "pushBtnOn": "Reminders On ✓",
+    "pushUnsupported": "Push notifications are not supported in this browser.",
+    "pushDenied": "Notification permission is blocked. Please allow it in browser settings.",
+    "lunchTitle": "🥗 Fonday Lunch Pick",
+    "dinnerTitle": "🍽️ Fonday Dinner Pick",
+    "O": [
+      { "name": "Zinc", "foods": "Oysters · Pumpkin seeds · Brown rice · Tofu", "why": "Regulates sebum-producing enzymes to reduce shine and pore enlargement." },
+      { "name": "Vitamin B2 (Riboflavin)", "foods": "Eggs · Almonds · Dark leafy greens", "why": "Prevents over-activation of sebaceous glands and reduces oxidative stress." },
+      { "name": "Omega-3 Fatty Acids", "foods": "Salmon · Mackerel · Flaxseeds", "why": "Suppresses inflammatory sebum production to lower acne risk." }
+    ],
+    "D": [
+      { "name": "Omega-3 Fatty Acids", "foods": "Salmon · Tuna · Avocado · Walnuts", "why": "Strengthens the skin lipid barrier to prevent transepidermal water loss (TEWL)." },
+      { "name": "Vitamin E (Tocopherol)", "foods": "Almonds · Olive oil · Sunflower seeds", "why": "Prevents cell membrane oxidation, improving dryness and flakiness." },
+      { "name": "Ceramide Precursors", "foods": "Sweet potato · Soy · Oats · Rice bran", "why": "Supplies lipid building blocks essential for skin barrier construction." }
+    ],
+    "S": [
+      { "name": "Omega-3 Fatty Acids", "foods": "Salmon · Herring · Flaxseeds · Chia seeds", "why": "Inhibits pro-inflammatory prostaglandins to reduce redness." },
+      { "name": "Vitamin C", "foods": "Bell pepper · Strawberries · Broccoli · Kiwi", "why": "Antioxidant action calms skin irritation and histamine release." },
+      { "name": "Probiotics", "foods": "Yogurt · Kimchi · Miso · Kefir", "why": "Strengthens the gut-skin axis to reduce immune hypersensitivity." }
+    ],
+    "R": [
+      { "name": "Vitamin C", "foods": "Kiwi · Lemon · Bell pepper · Broccoli", "why": "Even resistant skin benefits from collagen synthesis support for long-term health." },
+      { "name": "Zinc", "foods": "Nuts · Whole grains · Tofu · Beef", "why": "A key mineral that maintains skin immunity and aids wound healing." },
+      { "name": "Antioxidant Complex", "foods": "Berries · Green tea · Dark chocolate", "why": "Protects skin cells from environmental stress and UV damage." }
+    ],
+    "P": [
+      { "name": "Vitamin C", "foods": "Strawberries · Kiwi · Bell pepper · Lemon", "why": "Inhibits the tyrosinase enzyme to reduce melanin production and prevent dark spots." },
+      { "name": "Folic Acid (Vitamin B9)", "foods": "Spinach · Broccoli · Lentils · Asparagus", "why": "Promotes cell turnover to accelerate pigmentation recovery." },
+      { "name": "Vitamin E", "foods": "Almonds · Sunflower seeds · Olive oil", "why": "Prevents UV-induced oxidative damage that triggers spot formation." }
+    ],
+    "N": [
+      { "name": "Vitamin A (Beta-Carotene)", "foods": "Carrots · Sweet potato · Spinach · Eggs", "why": "Normalizes skin cell turnover for even skin tone." },
+      { "name": "Zinc", "foods": "Oysters · Beef · Pumpkin seeds · Cashews", "why": "Regulates cell growth and division to maintain even skin texture." },
+      { "name": "Selenium", "foods": "Brazil nuts · Tuna · Eggs · Brown rice", "why": "Promotes glutathione production to neutralize free radicals." }
+    ],
+    "W": [
+      { "name": "Vitamin C", "foods": "Lemon · Bell pepper · Broccoli · Strawberries", "why": "Directly stimulates collagen synthesis to reduce fine lines and boost elasticity." },
+      { "name": "Collagen Peptides", "foods": "Bone broth · Chicken wings · Fish skin · Pork skin", "why": "Increases dermal collagen density to restore firmness and skin thickness." },
+      { "name": "Resveratrol (Antioxidant)", "foods": "Blueberries · Grapes · Dark chocolate · Pomegranate", "why": "Inhibits collagen-degrading MMP enzymes to slow aging." }
+    ],
+    "T": [
+      { "name": "Coenzyme Q10", "foods": "Oily fish · Nuts · Broccoli · Spinach", "why": "Boosts mitochondrial energy to maintain current elasticity and firmness." },
+      { "name": "Antioxidant Complex", "foods": "Berries · Pomegranate · Green tea · Dark chocolate", "why": "Fortifies the cellular defense barrier that keeps skin elastic." },
+      { "name": "Omega-3 Fatty Acids", "foods": "Salmon · Avocado · Flaxseeds · Walnuts", "why": "Maintains a healthy skin lipid barrier and prevents premature aging." }
+    ]
+  },
   "scores": {
     "0": "Overall Condition",
     "1": "Moisture Balance",

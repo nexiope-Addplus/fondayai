@@ -117,6 +117,110 @@ function AdBanner({ slot }: { slot: string }) {
   );
 }
 
+// ─── 피부 맞춤 영양 성분 카드 ────────────────────────────────────
+const NUTRIENT_COLORS: Record<string, string> = {
+  O: "#4A7C6E", D: "#3B82C4", S: "#E05A3A", R: "#10B981",
+  P: "#F59E0B", N: "#8B5CF6", W: "#C97062", T: "#10B981",
+};
+const NUTRIENT_ICONS: Record<string, string> = {
+  O: "🧴", D: "💧", S: "🌿", R: "🛡️", P: "🍋", N: "✨", W: "⏳", T: "💪",
+};
+
+function NutrientSection({ finalType, onPushToggle, pushSubscribed, pushLoading }: {
+  finalType: string;
+  onPushToggle: () => void;
+  pushSubscribed: boolean;
+  pushLoading: boolean;
+}) {
+  const { t } = useTranslation();
+  const [open, setOpen] = useState(false);
+
+  // finalType의 각 글자(O/D/S/R/P/N/W/T)에 맞는 영양소를 통합
+  const letters = finalType.split("").filter(l => l in NUTRIENT_COLORS);
+  // 각 글자별 대표 영양소 1개씩 (총 4개)
+  const items = letters.map(letter => {
+    const arr = t(`nutrients.${letter}`, { returnObjects: true }) as { name: string; foods: string; why: string }[];
+    return { letter, nutrient: arr?.[0] };
+  }).filter(x => x.nutrient);
+
+  return (
+    <div className="rounded-3xl overflow-hidden border border-stone-100 shadow-sm bg-white">
+      {/* 헤더 (항상 표시) */}
+      <button
+        className="w-full flex items-center justify-between px-5 py-4 text-left"
+        onClick={() => setOpen(v => !v)}
+      >
+        <div>
+          <div className="flex items-center gap-2 mb-0.5">
+            <span className="text-base">🥦</span>
+            <span className="text-[13px] font-black" style={{ color: DEEP_GREEN }}>{t("nutrients.sectionTitle")}</span>
+          </div>
+          <p className="text-[11px] text-stone-400">{t("nutrients.sectionSub")}</p>
+        </div>
+        <ChevronRight className={`w-4 h-4 text-stone-300 transition-transform ${open ? "rotate-90" : ""}`} />
+      </button>
+
+      {/* 펼쳐지는 영양소 목록 */}
+      {open && (
+        <div className="px-4 pb-5 space-y-3 border-t border-stone-50 pt-3">
+          {items.map(({ letter, nutrient }) => {
+            const color = NUTRIENT_COLORS[letter];
+            return (
+              <div key={letter} className="rounded-2xl p-3.5" style={{ background: `${color}0D`, border: `1px solid ${color}22` }}>
+                <div className="flex items-center gap-2 mb-1.5">
+                  <span className="text-base">{NUTRIENT_ICONS[letter]}</span>
+                  <span className="text-[12px] font-black" style={{ color }}>{nutrient.name}</span>
+                  <span className="text-[10px] px-2 py-0.5 rounded-full font-bold" style={{ background: `${color}22`, color }}>
+                    {letter === "O" || letter === "D" ? t("baumann.O.name").split(" ")[0] : ""}
+                    {letter}
+                  </span>
+                </div>
+                <p className="text-[11px] text-stone-500 leading-relaxed mb-1.5">{nutrient.why}</p>
+                <div className="flex items-start gap-1.5">
+                  <span className="text-[10px] font-bold shrink-0 mt-0.5" style={{ color }}>{t("nutrients.foodLabel")}</span>
+                  <span className="text-[10px] text-stone-400">{nutrient.foods}</span>
+                </div>
+              </div>
+            );
+          })}
+          {/* 상세보기 - 전체 영양소 */}
+          <div className="space-y-2 pt-1">
+            {items.map(({ letter, nutrient: _ }) => {
+              const arr = t(`nutrients.${letter}`, { returnObjects: true }) as { name: string; foods: string; why: string }[];
+              const color = NUTRIENT_COLORS[letter];
+              return arr.slice(1).map((n, idx) => (
+                <div key={`${letter}-${idx}`} className="rounded-xl p-3 bg-stone-50 border border-stone-100">
+                  <div className="flex items-center gap-1.5 mb-1">
+                    <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full" style={{ background: `${color}18`, color }}>{letter}</span>
+                    <span className="text-[11px] font-bold text-stone-700">{n.name}</span>
+                  </div>
+                  <p className="text-[10.5px] text-stone-500 leading-relaxed mb-1">{n.why}</p>
+                  <p className="text-[10px] text-stone-400"><span className="font-bold" style={{ color }}>{t("nutrients.foodLabel")} </span>{n.foods}</p>
+                </div>
+              ));
+            })}
+          </div>
+
+          {/* 식단 푸시 알림 구독 버튼 */}
+          <button
+            onClick={onPushToggle}
+            disabled={pushLoading}
+            className="w-full py-3 rounded-2xl font-bold text-[13px] transition-all flex items-center justify-center gap-2"
+            style={pushSubscribed
+              ? { background: `${DEEP_GREEN}18`, color: DEEP_GREEN, border: `1px solid ${DEEP_GREEN}33` }
+              : { background: `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})`, color: "white" }
+            }
+          >
+            <span>{pushSubscribed ? "🔔" : "🍽️"}</span>
+            {pushLoading ? "..." : pushSubscribed ? t("nutrients.pushBtnOn") : t("nutrients.pushBtn")}
+          </button>
+          <p className="text-[10px] text-center text-stone-400">점심 12:00 · 저녁 18:00 (KST)</p>
+        </div>
+      )}
+    </div>
+  );
+}
+
 // 인덱스 기반 아이콘/색상 (AI label 매칭 불필요, 순서 보장)
 const SCORE_ICONS = [Sparkles, Droplets, Sun, LayoutGrid, Activity, Target, Flame, Eye, Star, Waves];
 const SCORE_COLORS = [
@@ -1065,6 +1169,55 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
   };
   const [isSuccess, setIsSuccess] = useState(false);
 
+  // ── 푸시 알림 구독 상태 ──────────────────────────────────────
+  const [pushSubscribed, setPushSubscribed] = useState(false);
+  const [pushLoading, setPushLoading] = useState(false);
+
+  useEffect(() => {
+    // 이미 구독 중인지 확인
+    if ("serviceWorker" in navigator && "PushManager" in window) {
+      navigator.serviceWorker.ready.then(reg => reg.pushManager.getSubscription()).then(sub => {
+        if (sub) setPushSubscribed(true);
+      });
+    }
+  }, []);
+
+  const handlePushToggle = async () => {
+    if (!("serviceWorker" in navigator) || !("PushManager" in window)) {
+      alert(t("nutrients.pushUnsupported")); return;
+    }
+    if (Notification.permission === "denied") {
+      alert(t("nutrients.pushDenied")); return;
+    }
+    setPushLoading(true);
+    try {
+      const reg = await navigator.serviceWorker.register("/sw.js");
+      const existing = await reg.pushManager.getSubscription();
+      if (existing && pushSubscribed) {
+        // 구독 해제
+        await fetch("/api/push-subscribe", { method: "DELETE", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ endpoint: existing.endpoint }) });
+        await existing.unsubscribe();
+        setPushSubscribed(false);
+      } else {
+        // 권한 요청 + 구독
+        const perm = await Notification.requestPermission();
+        if (perm !== "granted") { setPushLoading(false); return; }
+        const VAPID_PUBLIC = import.meta.env.VITE_VAPID_PUBLIC_KEY || "";
+        const sub = await reg.pushManager.subscribe({
+          userVisibleOnly: true,
+          applicationServerKey: VAPID_PUBLIC,
+        });
+        await fetch("/api/push-subscribe", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ subscription: sub.toJSON(), baumannType: finalType, lang: i18n.language || "ko" }),
+        });
+        setPushSubscribed(true);
+      }
+    } catch (e) { console.error("[push]", e); }
+    setPushLoading(false);
+  };
+
   // 히스토리 로드 (로그인 시)
   useEffect(() => {
     if (!user) return;
@@ -1609,6 +1762,9 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
             </CardContent>
           </Card>
         )}
+
+        {/* ── 피부 맞춤 영양 성분 섹션 ── */}
+        <NutrientSection finalType={finalType} onPushToggle={handlePushToggle} pushSubscribed={pushSubscribed} pushLoading={pushLoading} />
 
         {/* 광고 */}
         <AdBanner slot="6349940752" />
