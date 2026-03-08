@@ -13,7 +13,7 @@ crons = ["0 3 * * *", "0 9 * * *"]
 # 생성 명령: wrangler kv:namespace create PUSH_KV
 [[kv_namespaces]]
 binding = "PUSH_KV"
-id = "REPLACE_WITH_YOUR_KV_NAMESPACE_ID"
+id = "9ef421f3bbbc4ba7a97f3a7cfb73fc8e"
 
 # ── Secrets (wrangler secret put 명령으로 등록) ───────────────────
 # wrangler secret put VAPID_PUBLIC_KEY
