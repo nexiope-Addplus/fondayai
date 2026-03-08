@@ -833,37 +833,28 @@ function ScanIdleScreen({ onScan }: { onScan: () => void }) {
 
       {/* ── 교육용 콘텐츠 섹션 (AdSense 정책: 퍼블리셔 콘텐츠 제공) ── */}
       <motion.div variants={fadeChild} className="mt-8 border-t border-stone-100 pt-6 space-y-5">
-        <h2 className="text-[14px] font-black tracking-tight" style={{ color: DEEP_GREEN }}>바우만 피부 타입이란?</h2>
+        <h2 className="text-[14px] font-black tracking-tight" style={{ color: DEEP_GREEN }}>{t("idle.baumannSectionTitle")}</h2>
         <p className="text-[12.5px] leading-relaxed text-stone-500">
-          피부과 전문의 레슬리 바우만 박사가 개발한 <strong>바우만 스킨 타입 지수(BSTI)</strong>는 피부를 4가지 축으로 분류합니다.
-          유수분 균형(O/D), 민감도(S/R), 색소침착(P/N), 노화 경향(W/T) — 각 축의 조합으로 16가지 피부 타입이 결정됩니다.
-          단순히 "건성/지성"으로만 구분하던 시대는 끝났습니다.
+          {t("idle.baumannSectionDesc")}
         </p>
 
         <div className="grid grid-cols-2 gap-2.5">
-          {[
-            { icon: "💧", label: "수분 밸런스", desc: "O 지성 · D 건성" },
-            { icon: "🌡️", label: "민감도", desc: "S 민감 · R 저항성" },
-            { icon: "🌅", label: "색소침착", desc: "P 색소성 · N 비색소성" },
-            { icon: "⏳", label: "노화 경향", desc: "W 주름성 · T 탄력성" },
-          ].map(item => (
-            <div key={item.label} className="bg-white rounded-xl p-3 border border-stone-100">
-              <span className="text-lg">{item.icon}</span>
-              <p className="text-[11px] font-bold text-stone-700 mt-1">{item.label}</p>
-              <p className="text-[10px] text-stone-400">{item.desc}</p>
-            </div>
-          ))}
+          {(t("idle.baumannAxes", { returnObjects: true }) as { label: string; desc: string }[]).map((item, i) => {
+            const icons = ["💧", "🌡️", "🌅", "⏳"];
+            return (
+              <div key={i} className="bg-white rounded-xl p-3 border border-stone-100">
+                <span className="text-lg">{icons[i]}</span>
+                <p className="text-[11px] font-bold text-stone-700 mt-1">{item.label}</p>
+                <p className="text-[10px] text-stone-400">{item.desc}</p>
+              </div>
+            );
+          })}
         </div>
 
         <div className="bg-white rounded-2xl p-4 border border-stone-100">
-          <h3 className="text-[13px] font-black mb-2" style={{ color: DEEP_GREEN }}>AI 피부 분석, 어떻게 작동하나요?</h3>
+          <h3 className="text-[13px] font-black mb-2" style={{ color: DEEP_GREEN }}>{t("idle.howTitle")}</h3>
           <ul className="space-y-1.5">
-            {[
-              "셀카 사진의 피부 색조, 모공, 광채, 잡티를 멀티스펙트럼 분석",
-              "Gemini AI가 10가지 피부 지표를 0~100점으로 정량화",
-              "바우만 4가지 축 점수 기반으로 개인 피부 타입 결정",
-              "바우만 타입에 맞춘 성분·루틴·제품 유형 맞춤 추천",
-            ].map((item, i) => (
+            {(t("idle.howSteps", { returnObjects: true }) as string[]).map((item, i) => (
               <li key={i} className="flex items-start gap-2 text-[11.5px] text-stone-500">
                 <span className="text-[10px] font-black mt-0.5 shrink-0" style={{ color: SCAN_TO }}>{i + 1}</span>
                 {item}
@@ -874,11 +865,11 @@ function ScanIdleScreen({ onScan }: { onScan: () => void }) {
 
         <div className="text-center pt-1 pb-4">
           <a href="/privacy.html" className="text-[10px] underline" style={{ color: TEXT_SECONDARY }}>
-            개인정보처리방침
+            {t("idle.privacyLink")}
           </a>
           <span className="text-[10px] text-stone-200 mx-2">·</span>
           <a href="/terms.html" className="text-[10px] underline" style={{ color: TEXT_SECONDARY }}>
-            이용약관
+            {t("idle.termsLink")}
           </a>
         </div>
       </motion.div>

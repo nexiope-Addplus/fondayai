@@ -25,7 +25,24 @@
     "step3Sub": "16-type diagnosis",
     "privacy": "Photo deleted after analysis · Never stored",
     "ctaBtn": "Get My Free Skin Type Analysis →",
-    "ctaHint": "~30 sec · Completely Free"
+    "ctaHint": "~30 sec · Completely Free",
+    "baumannSectionTitle": "What is Baumann Skin Type?",
+    "baumannSectionDesc": "The Baumann Skin Type Indicator (BSTI), developed by dermatologist Dr. Leslie Baumann, classifies skin along 4 axes: Oily/Dry (O/D), Sensitive/Resistant (S/R), Pigmented/Non-pigmented (P/N), and Wrinkle-prone/Tight (W/T). The combination of each axis defines one of 16 distinct skin types. The era of simply calling skin \"dry\" or \"oily\" is over.",
+    "baumannAxes": [
+      { "label": "Moisture Balance", "desc": "O Oily · D Dry" },
+      { "label": "Sensitivity", "desc": "S Sensitive · R Resistant" },
+      { "label": "Pigmentation", "desc": "P Pigmented · N Non-pigmented" },
+      { "label": "Aging Tendency", "desc": "W Wrinkle-prone · T Tight" }
+    ],
+    "howTitle": "How does AI skin analysis work?",
+    "howSteps": [
+      "Analyzes skin tone, pores, radiance & spots in your selfie using multi-spectrum analysis",
+      "Gemini AI quantifies 10 skin indicators on a 0–100 scale",
+      "Determines your personal skin type based on Baumann's 4-axis scores",
+      "Delivers personalized ingredient, routine & product recommendations for your Baumann type"
+    ],
+    "privacyLink": "Privacy Policy",
+    "termsLink": "Terms of Use"
   },
   "camera": {
     "noCamera": "Camera unavailable. Please select a photo instead.",
