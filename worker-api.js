@@ -253,13 +253,20 @@ const MEAL_TIPS = {
 function getMealTip(baumannType, lang, meal) {
   const langData = MEAL_TIPS[lang] || MEAL_TIPS.ko;
   const mealData = langData[meal];
-  // 첫 번째 매칭 글자로 선택 (O/D > P/N > S/R > W/T 우선순위)
-  for (const letter of ["O", "D", "P", "S", "W"]) {
-    if (baumannType?.includes(letter) && mealData[letter]) {
-      return mealData[letter];
-    }
-  }
-  return mealData.default;
+
+  // 바우만 4글자 전체 매칭 (우선순위: O/D → S/R → P/N → W/T)
+  const priority = ["O", "D", "S", "R", "P", "N", "W", "T"];
+  const matched = priority.filter(l => baumannType?.includes(l) && mealData[l]);
+
+  if (matched.length === 0) return mealData.default;
+
+  // 메뉴는 최우선 글자 기준
+  const menu = mealData[matched[0]].menu;
+
+  // 팁은 상위 2개 글자 조합 (4글자 모두 반영)
+  const tips = matched.slice(0, 2).map(l => mealData[l].tip).join(" ");
+
+  return { menu, tip: tips };
 }
 
 // ─── VAPID 서명 (Web Crypto API) ──────────────────────────────────
@@ -385,9 +392,10 @@ async function sendMealPushToAll(env, meal) {
       const titles = { ko: meal === "lunch" ? "🥗 Fonday 점심 추천" : "🍽️ Fonday 저녁 추천",
                        en: meal === "lunch" ? "🥗 Fonday Lunch Pick" : "🍽️ Fonday Dinner Pick",
                        ja: meal === "lunch" ? "🥗 Fondayランチおすすめ" : "🍽️ Fondayディナーおすすめ" };
+      const typeLabel = baumannType ? `[${baumannType}] ` : "";
       await sendPush(subscription, {
         title: titles[lang] || titles.ko,
-        body: `${tip.menu}\n${tip.tip}`,
+        body: `${typeLabel}${tip.menu}\n${tip.tip}`,
         url: "/",
       }, env);
     } catch (e) {
