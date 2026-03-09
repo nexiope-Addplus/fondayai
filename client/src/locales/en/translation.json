@@ -133,7 +133,10 @@
       "today": "Today",
       "baumannLabel": "Baumann {{type}}",
       "skinAgeLabel": "Skin Age {{age}}",
-      "countLabel": "{{count}} records"
+      "countLabel": "{{count}} records",
+      "historyTab": "History",
+      "compareTab": "Compare",
+      "rankingTab": "Ranking"
     },
     "partnership": {
       "title": "Brand Partnership Inquiry",
@@ -302,6 +305,24 @@
       { "name": "Antioxidant Complex", "foods": "Berries · Pomegranate · Green tea · Dark chocolate", "why": "Fortifies the cellular defense barrier that keeps skin elastic." },
       { "name": "Omega-3 Fatty Acids", "foods": "Salmon · Avocado · Flaxseeds · Walnuts", "why": "Maintains a healthy skin lipid barrier and prevents premature aging." }
     ]
+  },
+  "ranking": {
+    "myPercentile": "Top {{percent}}%",
+    "myRankLabel": "My Skin Rank",
+    "totalData": "Based on {{count}} total scans",
+    "avgScore": "Avg Score",
+    "topScore": "Top Score",
+    "distribution": "Score Distribution",
+    "topBaumann": "Popular Baumann Types TOP3",
+    "loginForRank": "Log in to see your rank"
+  },
+  "compare": {
+    "prev": "Previous",
+    "current": "Current",
+    "noHistory": "No previous scans to compare yet",
+    "noHistoryDesc": "Check back after your next scan",
+    "baumannChange": "Baumann Type Change",
+    "summary": "{{improved}} improved · {{declined}} declined"
   },
   "scores": {
     "0": "Overall Condition",

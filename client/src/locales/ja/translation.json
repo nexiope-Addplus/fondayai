@@ -133,7 +133,10 @@
       "today": "今日",
       "baumannLabel": "バウマン{{type}}",
       "skinAgeLabel": "肌年齢{{age}}歳",
-      "countLabel": "{{count}}件の記録"
+      "countLabel": "{{count}}件の記録",
+      "historyTab": "履歴",
+      "compareTab": "比較",
+      "rankingTab": "ランキング"
     },
     "partnership": {
       "title": "ブランド提携のお問い合わせ",
@@ -302,6 +305,24 @@
       { "name": "抗酸化複合物", "foods": "ベリー類・ザクロ・緑茶・ダークチョコ", "why": "弾力性肌を維持する細胞防御バリアを強化します。" },
       { "name": "オメガ-3脂肪酸", "foods": "サーモン・アボカド・亜麻仁・くるみ", "why": "健康な肌脂質バリアを維持し、早期老化を防ぎます。" }
     ]
+  },
+  "ranking": {
+    "myPercentile": "上位{{percent}}%",
+    "myRankLabel": "肌ランキング",
+    "totalData": "全{{count}}件のデータ基準",
+    "avgScore": "平均スコア",
+    "topScore": "最高スコア",
+    "distribution": "スコア分布",
+    "topBaumann": "人気バウマンタイプ TOP3",
+    "loginForRank": "ログインでランキングを確認できます"
+  },
+  "compare": {
+    "prev": "前回",
+    "current": "今回",
+    "noHistory": "まだ比較できるスキャンがありません",
+    "noHistoryDesc": "次回のスキャン後に変化を確認できます",
+    "baumannChange": "バウマンタイプの変化",
+    "summary": "{{improved}}項目改善 · {{declined}}項目注意"
   },
   "scores": {
     "0": "総合コンディション",

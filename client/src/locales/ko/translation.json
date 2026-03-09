@@ -133,7 +133,10 @@
       "today": "오늘",
       "baumannLabel": "바우만 {{type}}형",
       "skinAgeLabel": "피부나이 {{age}}세",
-      "countLabel": "{{count}}번의 기록"
+      "countLabel": "{{count}}번의 기록",
+      "historyTab": "히스토리",
+      "compareTab": "비교",
+      "rankingTab": "랭킹"
     },
     "partnership": {
       "title": "브랜드 제휴 문의",
@@ -302,6 +305,24 @@
       { "name": "항산화 복합물", "foods": "베리류·석류·녹차·다크초콜릿", "why": "탄력성 피부를 유지하는 세포 방어막을 강화해요." },
       { "name": "오메가-3 지방산", "foods": "연어·아보카도·아마씨·호두", "why": "건강한 피부막 상태를 유지하고 노화를 예방해요." }
     ]
+  },
+  "ranking": {
+    "myPercentile": "상위 {{percent}}%",
+    "myRankLabel": "내 피부 순위",
+    "totalData": "전체 {{count}}개 데이터 기준",
+    "avgScore": "평균 점수",
+    "topScore": "최고 점수",
+    "distribution": "점수 분포",
+    "topBaumann": "인기 바우만 타입 TOP3",
+    "loginForRank": "로그인 시 내 순위를 확인할 수 있어요"
+  },
+  "compare": {
+    "prev": "이전 스캔",
+    "current": "현재 스캔",
+    "noHistory": "아직 비교할 이전 스캔이 없어요",
+    "noHistoryDesc": "다음 스캔 후 변화를 확인하세요",
+    "baumannChange": "바우만 타입 변화",
+    "summary": "{{improved}}개 항목 개선 · {{declined}}개 항목 주의"
   },
   "scores": {
     "0": "종합 컨디션",

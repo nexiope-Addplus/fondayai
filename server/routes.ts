@@ -180,18 +180,68 @@ export async function registerRoutes(
   app.post("/api/scans", async (req, res) => {
     if (!req.isAuthenticated()) return res.status(401).send("로그인이 필요합니다.");
     try {
-      const { overallScore, scores, hotspots, aiComment, imageSrc } = req.body;
+      const { overallScore, scores, hotspots, aiComment, imageSrc, baumannType, skinAge } = req.body;
       const scan = await storage.createScan({
         userId: (req.user as any).id,
         overallScore: overallScore.toString(),
         scores: JSON.stringify(scores),
         hotspots: JSON.stringify(hotspots),
         aiComment,
-        imageSrc
+        imageSrc,
+        baumannType: baumannType || null,
+        skinAge: skinAge != null ? skinAge.toString() : null,
       });
       res.json(scan);
     } catch (error: any) {
       res.status(500).json({ message: "기록 저장 실패", error: error.message });
+    }
+  });
+
+  app.get("/api/ranking", async (req, res) => {
+    try {
+      const myScore = req.query.myScore ? parseInt(req.query.myScore as string) : null;
+      const allScans = await storage.getAllScans();
+      const dbScores = allScans.map(s => parseInt(s.overallScore) || 0).filter(s => s > 0);
+
+      // Include the current user's score in the pool (handles fresh scans not yet saved)
+      const scorePool = (myScore && myScore > 0) ? [...dbScores, myScore] : dbScores;
+
+      const totalScans = scorePool.length;
+      const avgScore = scorePool.length ? Math.round(scorePool.reduce((a, b) => a + b, 0) / scorePool.length) : 0;
+      const topScore = scorePool.length ? Math.max(...scorePool) : 0;
+
+      const scoreDistribution = [
+        { label: "0-20", count: 0 },
+        { label: "21-40", count: 0 },
+        { label: "41-60", count: 0 },
+        { label: "61-80", count: 0 },
+        { label: "81-100", count: 0 },
+      ];
+      scorePool.forEach(s => {
+        if (s <= 20) scoreDistribution[0].count++;
+        else if (s <= 40) scoreDistribution[1].count++;
+        else if (s <= 60) scoreDistribution[2].count++;
+        else if (s <= 80) scoreDistribution[3].count++;
+        else scoreDistribution[4].count++;
+      });
+
+      const baumannDistribution: Record<string, number> = {};
+      allScans.forEach(s => {
+        if (s.baumannType) {
+          baumannDistribution[s.baumannType] = (baumannDistribution[s.baumannType] || 0) + 1;
+        }
+      });
+
+      const result: any = { totalScans, avgScore, topScore, scoreDistribution, baumannDistribution };
+
+      if (myScore && myScore > 0 && scorePool.length > 0) {
+        const scoresBelow = scorePool.filter(s => s < myScore).length;
+        result.myPercentile = Math.max(1, Math.round((1 - scoresBelow / scorePool.length) * 100));
+      }
+
+      res.json(result);
+    } catch (error: any) {
+      res.status(500).json({ message: "랭킹 조회 실패", error: error.message });
     }
   });
 

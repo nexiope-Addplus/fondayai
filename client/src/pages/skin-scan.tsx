@@ -70,6 +70,15 @@ interface AnalysisResult {
   cosmetics: { type: string; key: string; reason: string }[];
 }
 
+interface RankingData {
+  totalScans: number;
+  avgScore: number;
+  topScore: number;
+  scoreDistribution: { label: string; count: number }[];
+  baumannDistribution: Record<string, number>;
+  myPercentile?: number;
+}
+
 const BAUMANN_COLORS: Record<string, string> = {
   O: "#F59E0B",
   D: "#3B82F6",
@@ -1069,6 +1078,8 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
   const diaryDrag = useDragControls();
   const [showNutrients, setShowNutrients] = useState(false);
   const [showDiary, setShowDiary] = useState(false);
+  const [rankingData, setRankingData] = useState<RankingData | null>(null);
+  const [diaryTab, setDiaryTab] = useState<"history" | "compare" | "ranking">("history");
 
   const handleGoogleLogin = () => {
     sessionStorage.setItem("pendingResult", JSON.stringify({ analysisResult, surveyData, imageBase64 }));
@@ -1136,6 +1147,15 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
       if (Array.isArray(data)) setHistory(data);
     });
   }, [user]);
+
+  // 랭킹 데이터 로드
+  useEffect(() => {
+    const score = analysisResult?.scores?.[0]?.score || 0;
+    fetch(`/api/ranking?myScore=${score}`)
+      .then(res => res.json())
+      .then(data => setRankingData(data))
+      .catch(() => {});
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // 스캔 저장 (로그인 + 분석결과 둘 다 준비됐을 때)
   useEffect(() => {
@@ -1619,6 +1639,21 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
                     );
                   })}
                 </div>
+                {rankingData && rankingData.totalScans > 0 && (
+                  <div className="mt-1.5">
+                    {rankingData.myPercentile !== undefined ? (
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full inline-flex items-center gap-0.5"
+                        style={{ background: "#D9770615", color: "#D97706" }}>
+                        <Star className="w-2.5 h-2.5" />
+                        {t("ranking.myPercentile", { percent: rankingData.myPercentile })}
+                      </span>
+                    ) : (
+                      <span className="text-[10px] text-stone-400">
+                        {t("ranking.totalData", { count: rankingData.totalScans })}
+                      </span>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
           </CardContent>
@@ -2194,101 +2229,275 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
                 </div>
               </div>
 
-              <div className="flex-1 overflow-y-auto overscroll-contain">
-                <div className="px-6 pb-8 space-y-4">
-                  {/* 점수 변화 그래프 */}
-                  {history.length >= 1 && (
-                    <div>
-                      <p className="text-[11px] font-bold text-stone-400 mb-2">{t("modal.diary.graphTitle")}</p>
-                      <div className="h-44 rounded-2xl bg-stone-50 px-2 pt-2">
-                        <ResponsiveContainer width="100%" height="100%">
-                          <LineChart data={[...history.slice().reverse().map((item: any) => ({
-                            date: new Date(item.createdAt).toLocaleDateString("ko-KR", { month: "numeric", day: "numeric" }),
-                            score: parseInt(item.overallScore),
-                          })), { date: "오늘", score: overallScore }]}>
-                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e7e5e4" />
-                            <XAxis dataKey="date" axisLine={false} tickLine={false} style={{ fontSize: "9px" }} />
-                            <YAxis domain={[0, 100]} ticks={[0, 25, 50, 75, 100]} axisLine={false} tickLine={false} style={{ fontSize: "9px" }} tickFormatter={(v) => `${v}`} width={24} />
-                            <Tooltip
-                              contentStyle={{ fontSize: "11px", borderRadius: "8px", border: "none", boxShadow: "0 2px 8px rgba(0,0,0,0.1)" }}
-                              formatter={(v: any) => [`${v}점`, "종합점수"]}
-                            />
-                            <Line type="monotone" dataKey="score" stroke={SCAN_TO} strokeWidth={2.5}
-                              dot={{ r: 4, fill: SCAN_TO, strokeWidth: 2, stroke: "#fff" }} activeDot={{ r: 6 }} />
-                          </LineChart>
-                        </ResponsiveContainer>
-                      </div>
-                    </div>
-                  )}
+              {/* 탭 바 */}
+              <div className="px-6 pb-3 shrink-0 flex gap-1.5 border-b border-stone-100">
+                {(["history", "compare", "ranking"] as const).map(tab => (
+                  <button key={tab}
+                    onClick={() => setDiaryTab(tab)}
+                    className={`flex-1 py-1.5 rounded-xl text-[11px] font-bold transition-all ${diaryTab === tab ? "text-white shadow-sm" : "text-stone-400 bg-stone-50"}`}
+                    style={diaryTab === tab ? { background: `linear-gradient(135deg, ${DEEP_GREEN_LIGHT}, ${DEEP_GREEN})` } : {}}>
+                    {tab === "history" ? t("modal.diary.historyTab") : tab === "compare" ? t("modal.diary.compareTab") : t("modal.diary.rankingTab")}
+                  </button>
+                ))}
+              </div>
 
-                  {/* 일기 목록 */}
-                  <div className="space-y-3">
-                    {/* 오늘 기록 */}
-                    <div className="p-4 rounded-2xl border-2 bg-stone-50"
-                      style={{ borderColor: `${SCAN_FROM}60` }}>
-                      <div className="flex items-center justify-between mb-2">
-                        <div className="flex items-center gap-1.5">
-                          <span className="text-[10px] font-black px-2 py-0.5 rounded-full text-white"
-                            style={{ background: `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})` }}>{t("modal.diary.today")}</span>
-                          <span className="text-[11px] text-stone-400">
-                            {new Date().toLocaleDateString(i18n.language === "ko" ? "ko-KR" : i18n.language === "ja" ? "ja-JP" : "en-US", { month: "long", day: "numeric" })}
-                          </span>
+              <div className="flex-1 overflow-y-auto overscroll-contain">
+                {/* 히스토리 탭 */}
+                {diaryTab === "history" && (
+                  <div className="px-6 pb-8 space-y-4">
+                    {/* 점수 변화 그래프 */}
+                    {history.length >= 1 && (
+                      <div>
+                        <p className="text-[11px] font-bold text-stone-400 mb-2">{t("modal.diary.graphTitle")}</p>
+                        <div className="h-44 rounded-2xl bg-stone-50 px-2 pt-2">
+                          <ResponsiveContainer width="100%" height="100%">
+                            <LineChart data={[...history.slice().reverse().map((item: any) => ({
+                              date: new Date(item.createdAt).toLocaleDateString("ko-KR", { month: "numeric", day: "numeric" }),
+                              score: parseInt(item.overallScore),
+                            })), { date: "오늘", score: overallScore }]}>
+                              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e7e5e4" />
+                              <XAxis dataKey="date" axisLine={false} tickLine={false} style={{ fontSize: "9px" }} />
+                              <YAxis domain={[0, 100]} ticks={[0, 25, 50, 75, 100]} axisLine={false} tickLine={false} style={{ fontSize: "9px" }} tickFormatter={(v) => `${v}`} width={24} />
+                              <Tooltip
+                                contentStyle={{ fontSize: "11px", borderRadius: "8px", border: "none", boxShadow: "0 2px 8px rgba(0,0,0,0.1)" }}
+                                formatter={(v: any) => [`${v}점`, "종합점수"]}
+                              />
+                              <Line type="monotone" dataKey="score" stroke={SCAN_TO} strokeWidth={2.5}
+                                dot={{ r: 4, fill: SCAN_TO, strokeWidth: 2, stroke: "#fff" }} activeDot={{ r: 6 }} />
+                            </LineChart>
+                          </ResponsiveContainer>
                         </div>
-                        <div className="flex items-center gap-2">
-                          <span className="text-[15px] font-black" style={{ color: SCAN_TO }}>{overallScore}{t("result.scoreSuffix")}</span>
-                          {analysisResult?.skinAge && (
-                            <span className="text-[10px] px-1.5 py-0.5 rounded-full font-bold"
-                              style={{ background: "#A78BFA20", color: "#7C3AED" }}>
-                              {t("modal.diary.skinAgeLabel", { age: analysisResult.skinAge })}
+                      </div>
+                    )}
+                    {/* 일기 목록 */}
+                    <div className="space-y-3">
+                      {/* 오늘 기록 */}
+                      <div className="p-4 rounded-2xl border-2 bg-stone-50"
+                        style={{ borderColor: `${SCAN_FROM}60` }}>
+                        <div className="flex items-center justify-between mb-2">
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-[10px] font-black px-2 py-0.5 rounded-full text-white"
+                              style={{ background: `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})` }}>{t("modal.diary.today")}</span>
+                            <span className="text-[11px] text-stone-400">
+                              {new Date().toLocaleDateString(i18n.language === "ko" ? "ko-KR" : i18n.language === "ja" ? "ja-JP" : "en-US", { month: "long", day: "numeric" })}
                             </span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="text-[15px] font-black" style={{ color: SCAN_TO }}>{overallScore}{t("result.scoreSuffix")}</span>
+                            {analysisResult?.skinAge && (
+                              <span className="text-[10px] px-1.5 py-0.5 rounded-full font-bold"
+                                style={{ background: "#A78BFA20", color: "#7C3AED" }}>
+                                {t("modal.diary.skinAgeLabel", { age: analysisResult.skinAge })}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                        <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full inline-block mb-2"
+                          style={{ background: `${SCAN_FROM}20`, color: SCAN_TO }}>{t("modal.diary.baumannLabel", { type: finalType })}</span>
+                        <p className="text-[12px] text-stone-600 leading-relaxed">{analysisResult?.aiComment}</p>
+                      </div>
+                      {/* 과거 기록 */}
+                      {history.map((item: any, i: number) => {
+                        if (item.id === currentScanId) return null;
+                        const date = new Date(item.createdAt);
+                        const isToday = date.toDateString() === new Date().toDateString();
+                        const locale = i18n.language === "ko" ? "ko-KR" : i18n.language === "ja" ? "ja-JP" : "en-US";
+                        const dateLabel = isToday
+                          ? `${t("modal.diary.today")} ${date.toLocaleTimeString(locale, { hour: "2-digit", minute: "2-digit" })}`
+                          : date.toLocaleDateString(locale, { year: "numeric", month: "long", day: "numeric" });
+                        return (
+                          <motion.div key={item.id}
+                            initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: i * 0.04 }}
+                            className="p-4 rounded-2xl border border-stone-100 bg-white">
+                            <div className="flex items-center justify-between mb-2">
+                              <span className="text-[11px] text-stone-400">{dateLabel}</span>
+                              <div className="flex items-center gap-2">
+                                <span className="text-[15px] font-black" style={{ color: DEEP_GREEN }}>{item.overallScore}{t("result.scoreSuffix")}</span>
+                                {item.skinAge && (
+                                  <span className="text-[10px] px-1.5 py-0.5 rounded-full font-bold"
+                                    style={{ background: "#A78BFA20", color: "#7C3AED" }}>
+                                    {t("modal.diary.skinAgeLabel", { age: item.skinAge })}
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                            {item.baumannType && (
+                              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full inline-block mb-2"
+                                style={{ background: `${DEEP_GREEN}15`, color: DEEP_GREEN }}>
+                                {t("modal.diary.baumannLabel", { type: item.baumannType })}
+                              </span>
+                            )}
+                            {item.aiComment && (
+                              <p className="text-[12px] text-stone-600 leading-relaxed">{item.aiComment}</p>
+                            )}
+                          </motion.div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+
+                {/* 비교 탭 */}
+                {diaryTab === "compare" && (
+                  <div className="px-6 pb-8 space-y-4 pt-4">
+                    {history.length === 0 ? (
+                      <div className="py-12 text-center">
+                        <Activity className="w-12 h-12 mx-auto mb-3 text-stone-200" />
+                        <p className="font-bold text-stone-500 text-[14px]">{t("compare.noHistory")}</p>
+                        <p className="text-[12px] text-stone-400 mt-1">{t("compare.noHistoryDesc")}</p>
+                      </div>
+                    ) : (() => {
+                      const prevScan = history[0];
+                      const prevScores = (() => { try { return JSON.parse(prevScan.scores || "[]"); } catch { return []; } })();
+                      const currentScores = analysisResult?.scores || [];
+                      const improved = currentScores.filter((s: any, idx: number) => s.score > (prevScores[idx]?.score || 0)).length;
+                      const declined = currentScores.filter((s: any, idx: number) => s.score < (prevScores[idx]?.score || 0)).length;
+                      const cmpLocale = i18n.language === "ko" ? "ko-KR" : i18n.language === "ja" ? "ja-JP" : "en-US";
+                      const prevDate = new Date(prevScan.createdAt).toLocaleDateString(cmpLocale, { month: "short", day: "numeric" });
+                      return (
+                        <div className="space-y-3">
+                          {/* 요약 배지 */}
+                          <div className="p-3 rounded-2xl" style={{ background: `${DEEP_GREEN}10` }}>
+                            <p className="text-[12px] font-bold text-center" style={{ color: DEEP_GREEN }}>
+                              {t("compare.summary", { improved, declined })}
+                            </p>
+                          </div>
+                          {/* 헤더 */}
+                          <div className="grid grid-cols-[1fr_auto_1fr] gap-2 items-center text-center">
+                            <div>
+                              <p className="text-[11px] font-bold text-stone-400">{t("compare.prev")}</p>
+                              <p className="text-[9px] text-stone-300">{prevDate}</p>
+                            </div>
+                            <ChevronRight className="w-4 h-4 text-stone-300" />
+                            <p className="text-[11px] font-bold" style={{ color: SCAN_TO }}>{t("compare.current")}</p>
+                          </div>
+                          {/* 점수 비교 */}
+                          {currentScores.map((s: any, idx: number) => {
+                            const prevScore = prevScores[idx]?.score ?? null;
+                            const delta = prevScore !== null ? s.score - prevScore : null;
+                            const deltaColor = delta === null ? "#8C8070" : delta > 0 ? "#10B981" : delta < 0 ? "#EF4444" : "#8C8070";
+                            return (
+                              <div key={idx} className="grid grid-cols-[1fr_auto_1fr] gap-1 items-center py-1.5 border-b border-stone-50">
+                                <span className="text-[13px] font-bold text-stone-400 text-center">
+                                  {prevScore !== null ? prevScore : "—"}
+                                </span>
+                                <span className="text-[9px] text-stone-300 w-20 text-center">{t(`scores.${idx}`)}</span>
+                                <div className="flex items-center gap-1 justify-center">
+                                  <span className="text-[13px] font-black" style={{ color: SCAN_TO }}>{s.score}</span>
+                                  {delta !== null && delta !== 0 && (
+                                    <span className="text-[10px] font-bold" style={{ color: deltaColor }}>
+                                      {delta > 0 ? `+${delta}` : delta}
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+                            );
+                          })}
+                          {/* 바우만 타입 변화 */}
+                          {prevScan.baumannType && (
+                            <div className="p-3 rounded-xl bg-stone-50">
+                              <p className="text-[10px] text-stone-400 mb-2 text-center">{t("compare.baumannChange")}</p>
+                              <div className="flex items-center justify-center gap-3">
+                                <span className="text-[20px] font-black text-stone-400">{prevScan.baumannType}</span>
+                                <ChevronRight className="w-4 h-4 text-stone-300" />
+                                <span className="text-[20px] font-black" style={{ color: SCAN_TO }}>{finalType}</span>
+                              </div>
+                            </div>
                           )}
                         </div>
-                      </div>
-                      <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full inline-block mb-2"
-                        style={{ background: `${SCAN_FROM}20`, color: SCAN_TO }}>{t("modal.diary.baumannLabel", { type: finalType })}</span>
-                      <p className="text-[12px] text-stone-600 leading-relaxed">{analysisResult?.aiComment}</p>
-                    </div>
+                      );
+                    })()}
+                  </div>
+                )}
 
-                    {/* 과거 기록 */}
-                    {history.map((item: any, i: number) => {
-                      if (item.id === currentScanId) return null;
-                      const date = new Date(item.createdAt);
-                      const isToday = date.toDateString() === new Date().toDateString();
-                      const locale = i18n.language === "ko" ? "ko-KR" : i18n.language === "ja" ? "ja-JP" : "en-US";
-                      const dateLabel = isToday
-                        ? `${t("modal.diary.today")} ${date.toLocaleTimeString(locale, { hour: "2-digit", minute: "2-digit" })}`
-                        : date.toLocaleDateString(locale, { year: "numeric", month: "long", day: "numeric" });
-                      return (
-                        <motion.div key={item.id}
-                          initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
-                          transition={{ delay: i * 0.04 }}
-                          className="p-4 rounded-2xl border border-stone-100 bg-white">
-                          <div className="flex items-center justify-between mb-2">
-                            <span className="text-[11px] text-stone-400">{dateLabel}</span>
-                            <div className="flex items-center gap-2">
-                              <span className="text-[15px] font-black" style={{ color: DEEP_GREEN }}>{item.overallScore}{t("result.scoreSuffix")}</span>
-                              {item.skinAge && (
-                                <span className="text-[10px] px-1.5 py-0.5 rounded-full font-bold"
-                                  style={{ background: "#A78BFA20", color: "#7C3AED" }}>
-                                  {t("modal.diary.skinAgeLabel", { age: item.skinAge })}
-                                </span>
-                              )}
+                {/* 랭킹 탭 */}
+                {diaryTab === "ranking" && (
+                  <div className="px-6 pb-8 space-y-4 pt-4">
+                    {!rankingData ? (
+                      <div className="py-12 text-center">
+                        <p className="text-[12px] text-stone-400">...</p>
+                      </div>
+                    ) : (
+                      <>
+                        {/* 내 백분위 */}
+                        {rankingData.myPercentile !== undefined ? (
+                          <div className="p-5 rounded-2xl text-center"
+                            style={{ background: `linear-gradient(135deg, ${SCAN_FROM}25, ${SCAN_TO}15)` }}>
+                            <p className="text-[11px] text-stone-500 mb-1">{t("ranking.myRankLabel")}</p>
+                            <p className="text-4xl font-black" style={{ color: SCAN_TO }}>
+                              {t("ranking.myPercentile", { percent: rankingData.myPercentile })}
+                            </p>
+                            <p className="text-[11px] text-stone-400 mt-1">{t("ranking.totalData", { count: rankingData.totalScans })}</p>
+                          </div>
+                        ) : (
+                          <div className="p-4 rounded-2xl text-center bg-stone-50">
+                            <p className="text-[12px] text-stone-500">{t("ranking.loginForRank")}</p>
+                            <p className="text-[11px] text-stone-300 mt-1">{t("ranking.totalData", { count: rankingData.totalScans })}</p>
+                          </div>
+                        )}
+                        {/* 점수 분포 차트 */}
+                        <div>
+                          <p className="text-[11px] font-bold text-stone-400 mb-3">{t("ranking.distribution")}</p>
+                          <div className="space-y-2">
+                            {rankingData.scoreDistribution.map((band, bi) => {
+                              const maxCount = Math.max(...rankingData.scoreDistribution.map(d => d.count), 1);
+                              const barPct = Math.round((band.count / maxCount) * 100);
+                              const [bMin, bMax] = band.label.split("-").map(Number);
+                              const isMyBand = overallScore >= bMin && overallScore <= bMax;
+                              return (
+                                <div key={bi} className="flex items-center gap-2">
+                                  <span className="text-[10px] text-stone-400 w-14 shrink-0">{band.label}</span>
+                                  <div className="flex-1 h-5 rounded-full bg-stone-100 overflow-hidden">
+                                    <div className="h-full rounded-full transition-all duration-700"
+                                      style={{ width: `${Math.max(barPct, band.count > 0 ? 6 : 0)}%`, background: isMyBand ? `linear-gradient(90deg, ${SCAN_FROM}, ${SCAN_TO})` : "#D1D5DB" }} />
+                                  </div>
+                                  <span className="text-[10px] text-stone-400 w-5 text-right">{band.count}</span>
+                                  {isMyBand && (
+                                    <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full shrink-0"
+                                      style={{ background: `${SCAN_FROM}30`, color: SCAN_TO }}>나</span>
+                                  )}
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </div>
+                        {/* 인기 바우만 타입 TOP3 */}
+                        {Object.keys(rankingData.baumannDistribution).length > 0 && (
+                          <div>
+                            <p className="text-[11px] font-bold text-stone-400 mb-2">{t("ranking.topBaumann")}</p>
+                            <div className="flex gap-2">
+                              {Object.entries(rankingData.baumannDistribution)
+                                .sort(([, a], [, b]) => (b as number) - (a as number))
+                                .slice(0, 3)
+                                .map(([type, count], ri) => {
+                                  const medals = ["🥇", "🥈", "🥉"];
+                                  return (
+                                    <div key={type} className="flex-1 p-3 rounded-2xl text-center bg-stone-50">
+                                      <span className="text-[13px]">{medals[ri]}</span>
+                                      <p className="text-[18px] font-black mt-0.5" style={{ color: SCAN_TO }}>{type}</p>
+                                      <p className="text-[10px] text-stone-400">{count as number}건</p>
+                                    </div>
+                                  );
+                                })}
                             </div>
                           </div>
-                          {item.baumannType && (
-                            <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full inline-block mb-2"
-                              style={{ background: `${DEEP_GREEN}15`, color: DEEP_GREEN }}>
-                              {t("modal.diary.baumannLabel", { type: item.baumannType })}
-                            </span>
-                          )}
-                          {item.aiComment && (
-                            <p className="text-[12px] text-stone-600 leading-relaxed">{item.aiComment}</p>
-                          )}
-                        </motion.div>
-                      );
-                    })}
+                        )}
+                        {/* 통계 */}
+                        <div className="grid grid-cols-2 gap-2">
+                          <div className="p-3 rounded-2xl bg-stone-50 text-center">
+                            <p className="text-[11px] text-stone-400">{t("ranking.avgScore")}</p>
+                            <p className="text-xl font-black" style={{ color: DEEP_GREEN }}>{rankingData.avgScore}</p>
+                          </div>
+                          <div className="p-3 rounded-2xl bg-stone-50 text-center">
+                            <p className="text-[11px] text-stone-400">{t("ranking.topScore")}</p>
+                            <p className="text-xl font-black" style={{ color: "#D97706" }}>{rankingData.topScore}</p>
+                          </div>
+                        </div>
+                      </>
+                    )}
                   </div>
-                </div>
+                )}
               </div>
             </motion.div>
           </motion.div>

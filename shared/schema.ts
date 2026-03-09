@@ -21,6 +21,8 @@ export const scans = pgTable("scans", {
   hotspots: text("hotspots").notNull(), // JSON string
   aiComment: text("ai_comment"),
   imageSrc: text("image_src"),
+  baumannType: text("baumann_type"),
+  skinAge: text("skin_age"),
   createdAt: text("created_at").default(sql`CURRENT_TIMESTAMP`),
 });
 

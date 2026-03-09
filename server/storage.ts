@@ -10,6 +10,7 @@ export interface IStorage {
 
   createScan(scan: InsertScan): Promise<Scan>;
   getScansByUserId(userId: string): Promise<Scan[]>;
+  getAllScans(): Promise<Scan[]>;
 }
 
 export class MemStorage implements IStorage {
@@ -62,6 +63,8 @@ export class MemStorage implements IStorage {
       hotspots: insertScan.hotspots,
       aiComment: insertScan.aiComment || null,
       imageSrc: insertScan.imageSrc || null,
+      baumannType: insertScan.baumannType || null,
+      skinAge: insertScan.skinAge || null,
       createdAt: new Date().toISOString(),
     };
     this.scans.set(id, scan);
@@ -72,6 +75,10 @@ export class MemStorage implements IStorage {
     return Array.from(this.scans.values())
       .filter((scan) => scan.userId === userId)
       .sort((a, b) => new Date(b.createdAt!).getTime() - new Date(a.createdAt!).getTime());
+  }
+
+  async getAllScans(): Promise<Scan[]> {
+    return Array.from(this.scans.values());
   }
 }
 
