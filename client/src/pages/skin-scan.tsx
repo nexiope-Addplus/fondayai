@@ -3084,6 +3084,31 @@ function ReportTab({ user }: { user: any }) {
             </Card>
           </motion.div>
         )}
+
+        {/* 배틀 모드 초대 버튼 */}
+        {lastScan.shareToken && (
+          <motion.div variants={fadeChild}>
+            <Button
+              className="w-full h-14 text-lg font-bold bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white shadow-lg flex items-center justify-center gap-2 rounded-2xl transition-all"
+              onClick={() => {
+                const shareUrl = `${window.location.origin}/battle/${lastScan.shareToken}`;
+                if (navigator.share) {
+                  navigator.share({
+                    title: 'Fonday AI 피부 배틀 대결!',
+                    text: `내 피부 점수(${lastScan.overallScore}점, ${lastScan.baumannType})를 확인하고 나와 대결해 보세요!`,
+                    url: shareUrl,
+                  }).catch(console.error);
+                } else {
+                  navigator.clipboard.writeText(shareUrl).then(() => {
+                    alert("배틀 링크가 복사되었습니다! 친구에게 링크를 보내 대결해보세요.");
+                  });
+                }
+              }}
+            >
+              <span className="text-2xl">👑</span> 친구에게 배틀 도전장 보내기
+            </Button>
+          </motion.div>
+        )}
       </motion.div>
     </div>
   );

@@ -23,6 +23,7 @@ export const scans = pgTable("scans", {
   imageSrc: text("image_src"),
   baumannType: text("baumann_type"),
   skinAge: text("skin_age"),
+  shareToken: varchar("share_token").unique(),
   createdAt: text("created_at").default(sql`CURRENT_TIMESTAMP`),
 });
 

@@ -1,0 +1,315 @@
+import { useEffect, useState } from "react";
+import { useRoute, useLocation } from "wouter";
+import { useTranslation } from "react-i18next";
+import { motion } from "framer-motion";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer, Legend } from "recharts";
+import { Shield, Sparkles, ChevronLeft, Zap, ArrowRight, Activity, FileText } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+
+const SCAN_FROM = "#E5B9A8";
+const SCAN_TO = "#C97062";
+const DEEP_GREEN = "#2C3E36";
+const DEEP_GREEN_LIGHT = "#3A4A43";
+
+// Map baumann letters to colors
+const BAUMANN_COLORS: Record<string, string> = { 
+  O: "#F59E0B", D: "#3B82F6", S: "#EF4444", R: "#10B981", 
+  P: "#A855F7", N: "#6366F1", W: "#EC4899", T: "#14B8A6" 
+};
+
+type ScanData = {
+  overallScore: string | number;
+  scores: { label: string; score: number }[];
+  baumannType?: string;
+  skinAge?: number | string;
+  aiComment?: string;
+  createdAt: string;
+};
+
+export default function BattlePage() {
+  const [, params] = useRoute("/battle/:token");
+  const [, setLocation] = useLocation();
+  const { t, i18n } = useTranslation();
+  const { toast } = useToast();
+
+  const [friendScan, setFriendScan] = useState<ScanData | null>(null);
+  const [myScan, setMyScan] = useState<ScanData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function fetchData() {
+      if (!params?.token) return;
+
+      try {
+        setLoading(true);
+        // 1. Fetch friend's scan using token (matching Cloudflare API route)
+        let res = await fetch(`/api/shared-scan?token=${params.token}`);
+        
+        // Fallback for local Express if needed
+        if (res.status === 404) {
+           res = await fetch(`/api/scans/shared/${params.token}`);
+        }
+
+        if (!res.ok) {
+          throw new Error(res.status === 404 ? "배틀 정보를 찾을 수 없습니다." : "데이터를 불러오는데 실패했습니다.");
+        }
+        const data = await res.json();
+        setFriendScan(data);
+
+        // 2. Fetch my latest scan (if logged in and has one)
+        const myRes = await fetch("/api/scans");
+        if (myRes.ok) {
+          const myData = await myRes.json();
+          if (Array.isArray(myData) && myData.length > 0) {
+            setMyScan(myData[0]); // latest scan
+          }
+        }
+      } catch (err: any) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchData();
+  }, [params?.token]);
+
+  // Handle taking a scan (redirect to home to scan)
+  const handleTakeScan = () => {
+    setLocation("/");
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[100dvh]">
+        <div className="w-8 h-8 rounded-full border-2 border-stone-200 border-t-[#C97062] animate-spin" />
+      </div>
+    );
+  }
+
+  if (error || !friendScan) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[100dvh] px-6 text-center gap-4 bg-stone-50/50">
+        <div className="w-16 h-16 rounded-full bg-stone-100 flex items-center justify-center mb-2">
+          <Shield className="w-8 h-8 text-stone-300" />
+        </div>
+        <h2 className="text-xl font-black text-stone-800">배틀 정보를 불러올 수 없어요</h2>
+        <p className="text-stone-500 text-sm">{error || "유효하지 않은 링크입니다."}</p>
+        <Button onClick={() => setLocation("/")} className="mt-4 rounded-xl px-6" variant="outline">
+          홈으로 돌아가기
+        </Button>
+      </div>
+    );
+  }
+
+  // Animation variants
+  const stagger = { animate: { transition: { staggerChildren: 0.1 } } };
+  const fadeChild = { 
+    initial: { opacity: 0, y: 20 }, 
+    animate: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 25 } } 
+  };
+
+  // Process data for Radar Chart
+  const friendScores = friendScan.scores || [];
+  const myScores = myScan?.scores || [];
+  
+  const chartData = friendScores.map((fScore, idx) => {
+    const matchingMyScore = myScores.find((m) => m.label === fScore.label);
+    const mScoreVal = matchingMyScore ? Number(matchingMyScore.score) : 0;
+    
+    // Use short labels for the chart
+    const shortLabel = t(`scores.${idx}`, fScore.label);
+    
+    return {
+      subject: shortLabel,
+      friend: Number(fScore.score),
+      me: mScoreVal,
+      fullMyScore: matchingMyScore,
+    };
+  });
+
+  const friendScoreVal = Number(friendScan.overallScore);
+  const myScoreVal = myScan ? Number(myScan.overallScore) : 0;
+  const isWinner = myScan && (myScoreVal >= friendScoreVal);
+
+  return (
+    <div className="min-h-[100dvh] bg-stone-50/30 flex flex-col">
+      {/* Header */}
+      <div className="h-14 flex items-center justify-between px-4 shrink-0 bg-white/80 backdrop-blur-md sticky top-0 z-50 border-b border-stone-100">
+        <button onClick={() => setLocation("/")} className="w-10 h-10 flex items-center justify-center -ml-2 rounded-full hover:bg-stone-100 active:bg-stone-200 transition-colors">
+          <ChevronLeft className="w-6 h-6 text-stone-600" />
+        </button>
+        <h1 className="text-lg font-black" style={{ color: DEEP_GREEN }}>피부 배틀 ⚔️</h1>
+        <div className="w-10 hidden sm:block" />
+      </div>
+
+      <div className="flex-1 overflow-y-auto pb-24">
+        <motion.div className="px-5 pt-6 space-y-6 max-w-md mx-auto" variants={stagger} initial="initial" animate="animate">
+          
+          {/* Main Battle Banner */}
+          <motion.div variants={fadeChild} className="text-center pt-2 pb-4">
+            <h2 className="text-2xl font-black mb-2" style={{ color: DEEP_GREEN }}>
+              {myScan ? (isWinner ? "승리! 🎉" : "아쉽네요! 다음 기회에 😅") : "친구가 배틀을 신청했어요!"}
+            </h2>
+            <p className="text-sm text-stone-500">
+              {myScan ? "나와 친구의 피부 상태를 비교해보세요." : "지금 바로 내 피부를 스캔하고 친구와 대결해보세요."}
+            </p>
+          </motion.div>
+
+          {/* Versus Cards */}
+          <motion.div variants={fadeChild} className="grid grid-cols-[1fr_auto_1fr] gap-3 items-center">
+            {/* Friend Card */}
+            <div className="relative p-4 rounded-3xl bg-white shadow-lg border border-stone-100/50 flex flex-col items-center justify-center text-center overflow-hidden h-[160px]">
+              <div className="absolute top-0 right-0 w-16 h-16 bg-gradient-to-bl from-stone-100 to-transparent rounded-bl-full opacity-50" />
+              <p className="text-[11px] font-bold text-stone-400 mb-2">친구</p>
+              <span className="text-4xl font-black leading-none mb-1" style={{ color: SCAN_TO }}>{friendScan.overallScore}</span>
+              <p className="text-[10px] font-bold text-stone-400 mb-2">종합점수</p>
+              
+              {friendScan.baumannType && (
+                <div className="flex items-center justify-center gap-[2px]">
+                  {friendScan.baumannType.split('').map((letter, i) => (
+                    <span key={i} className="text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center text-white" style={{ background: BAUMANN_COLORS[letter] || "#ccc" }}>
+                      {letter}
+                    </span>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* VS Badge */}
+            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-rose-500 to-pink-500 shadow-md flex items-center justify-center text-white font-black italic text-lg z-10 shrink-0 border-2 border-white ring-4 ring-rose-50">
+              VS
+            </div>
+
+            {/* My Card */}
+            <div className="relative p-4 rounded-3xl shadow-lg flex flex-col items-center justify-center text-center overflow-hidden h-[160px]"
+                 style={{ 
+                   background: myScan ? "white" : `linear-gradient(135deg, ${DEEP_GREEN_LIGHT}, ${DEEP_GREEN})`,
+                   border: myScan ? "1px solid rgba(0,0,0,0.05)" : "none"
+                 }}>
+              <div className="absolute top-0 right-0 w-16 h-16 bg-gradient-to-bl from-white/10 to-transparent rounded-bl-full" />
+              
+              {myScan ? (
+                <>
+                  <p className="text-[11px] font-bold text-stone-400 mb-2">나</p>
+                  <span className="text-4xl font-black leading-none mb-1" style={{ color: DEEP_GREEN }}>{myScan.overallScore}</span>
+                  <p className="text-[10px] font-bold text-stone-400 mb-2">종합점수</p>
+                  
+                  {myScan.baumannType && (
+                    <div className="flex items-center justify-center gap-[2px]">
+                      {myScan.baumannType.split('').map((letter, i) => (
+                        <span key={i} className="text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center text-white" style={{ background: BAUMANN_COLORS[letter] || "#ccc" }}>
+                          {letter}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </>
+              ) : (
+                <div className="flex flex-col items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center">
+                    <Activity className="w-5 h-5 text-emerald-400" />
+                  </div>
+                  <p className="text-xs font-bold text-white/90">아직 측정 전이에요</p>
+                </div>
+              )}
+            </div>
+          </motion.div>
+
+          {/* Comparison Radar Chart */}
+          {myScan && (
+            <motion.div variants={fadeChild}>
+              <Card className="border-none shadow-md rounded-3xl overflow-hidden box-border">
+                <div className="p-5 pb-0">
+                  <h3 className="text-[14px] font-black" style={{ color: DEEP_GREEN }}>전격 비교 분석</h3>
+                  <p className="text-xs text-stone-400 mt-1">방사형 차트를 통해 스킨케어 밸런스를 확인해보세요.</p>
+                </div>
+                <div className="w-full h-72 pt-4 box-border">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <RadarChart cx="50%" cy="50%" outerRadius="65%" data={chartData}>
+                      <PolarGrid stroke="#e5e5e5" />
+                      <PolarAngleAxis dataKey="subject" tick={{ fill: "#78716c", fontSize: 10, fontWeight: 600 }} />
+                      <PolarRadiusAxis angle={90} domain={[0, 100]} tick={false} axisLine={false} />
+                      
+                      <Radar name="친구" dataKey="friend" stroke={SCAN_TO} fill={SCAN_TO} fillOpacity={0.2} strokeWidth={2} />
+                      <Radar name="나" dataKey="me" stroke={DEEP_GREEN} fill={DEEP_GREEN} fillOpacity={0.4} strokeWidth={2} />
+                      
+                      <Legend 
+                        iconType="circle" 
+                        wrapperStyle={{ fontSize: '12px', fontWeight: 600, color: '#444', paddingTop: '10px' }} 
+                      />
+                    </RadarChart>
+                  </ResponsiveContainer>
+                </div>
+              </Card>
+            </motion.div>
+          )}
+
+          {/* Detailed Scores List (Only if user has scanned) */}
+          {myScan && chartData.length > 0 && (
+            <motion.div variants={fadeChild} className="space-y-3 pt-2">
+              <h3 className="text-[14px] font-black px-1" style={{ color: DEEP_GREEN }}>세부 항목 비교</h3>
+              {chartData.map((item, i) => {
+                const diff = item.me - item.friend;
+                const iWon = diff > 0;
+                const isTie = diff === 0;
+
+                return (
+                  <div key={i} className="bg-white p-4 rounded-2xl shadow-sm border border-stone-100 flex items-center justify-between">
+                    <div className="flex items-center gap-3 w-[80px] shrink-0">
+                      <div className="w-8 h-8 rounded-full bg-stone-50 flex items-center justify-center">
+                        <Zap className="w-4 h-4 text-stone-400" />
+                      </div>
+                      <span className="text-[12px] font-bold text-stone-700">{item.subject}</span>
+                    </div>
+
+                    <div className="flex-1 flex justify-center px-4">
+                      {isTie ? (
+                        <span className="text-xs font-bold text-stone-400 px-3 py-1 bg-stone-100 rounded-full">무승부</span>
+                      ) : iWon ? (
+                        <span className="text-xs font-bold text-emerald-600 px-3 py-1 bg-emerald-50 rounded-full border border-emerald-100">나의 승! +{diff}</span>
+                      ) : (
+                        <span className="text-xs font-bold text-rose-600 px-3 py-1 bg-rose-50 rounded-full border border-rose-100">친구 승 +{Math.abs(diff)}</span>
+                      )}
+                    </div>
+
+                    <div className="flex flex-col items-end w-[60px] shrink-0 text-[10px]">
+                      <div className="flex items-center gap-1.5 mb-1 text-stone-500">
+                        <span>친구</span>
+                        <span className="font-black text-[12px] text-stone-800">{item.friend}</span>
+                      </div>
+                      <div className="flex items-center gap-1.5" style={{ color: DEEP_GREEN }}>
+                        <span>나</span>
+                        <span className="font-black text-[12px]">{item.me}</span>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </motion.div>
+          )}
+
+          {/* Action Button */}
+          {!myScan && (
+            <motion.div variants={fadeChild} className="pt-4">
+               <Button 
+                onClick={handleTakeScan}
+                className="w-full h-16 rounded-2xl text-lg font-black text-white shadow-xl shadow-emerald-900/20 gap-2 overflow-hidden relative group"
+                style={{ background: `linear-gradient(135deg, ${DEEP_GREEN_LIGHT}, ${DEEP_GREEN})` }}
+               >
+                 <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 pointer-events-none" />
+                 <Sparkles className="w-5 h-5" />
+                 나도 피부 스캔하고 대결하기
+                 <ArrowRight className="w-5 h-5 ml-1" />
+               </Button>
+            </motion.div>
+          )}
+
+        </motion.div>
+      </div>
+    </div>
+  );
+}

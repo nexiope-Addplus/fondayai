@@ -2,6 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from "@google/generative-ai";
+import { randomUUID } from "crypto";
 
 function buildPrompt(surveyData: any, lang: string): string {
   const surveyJson = JSON.stringify(surveyData);
@@ -181,6 +182,7 @@ export async function registerRoutes(
     if (!req.isAuthenticated()) return res.status(401).send("로그인이 필요합니다.");
     try {
       const { overallScore, scores, hotspots, aiComment, imageSrc, baumannType, skinAge } = req.body;
+      const shareToken = randomUUID(); // Create a unique share token
       const scan = await storage.createScan({
         userId: (req.user as any).id,
         overallScore: overallScore.toString(),
@@ -190,10 +192,36 @@ export async function registerRoutes(
         imageSrc,
         baumannType: baumannType || null,
         skinAge: skinAge != null ? skinAge.toString() : null,
+        shareToken,
       });
       res.json(scan);
     } catch (error: any) {
       res.status(500).json({ message: "기록 저장 실패", error: error.message });
+    }
+  });
+
+  app.get("/api/scans/shared/:token", async (req, res) => {
+    try {
+      const token = req.params.token;
+      if (!token) return res.status(400).json({ message: "토큰이 필요합니다." });
+
+      const scan = await storage.getScanByShareToken(token);
+      if (!scan) return res.status(404).json({ message: "공유된 스캔 결과를 찾을 수 없습니다." });
+
+      // Only return non-sensitive fields to the public
+      const publicScanData = {
+        overallScore: scan.overallScore,
+        scores: typeof scan.scores === 'string' ? JSON.parse(scan.scores) : scan.scores,
+        baumannType: scan.baumannType,
+        skinAge: scan.skinAge,
+        aiComment: scan.aiComment,
+        shareToken: scan.shareToken,
+        createdAt: scan.createdAt
+      };
+
+      res.json(publicScanData);
+    } catch (error: any) {
+      res.status(500).json({ message: "공유 데이터 조회 실패", error: error.message });
     }
   });
 

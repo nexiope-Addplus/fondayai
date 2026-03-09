@@ -5,11 +5,13 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import SkinScanPage from "@/pages/skin-scan";
+import BattlePage from "@/pages/battle";
 
 function Router() {
   return (
     <Switch>
       <Route path="/" component={SkinScanPage} />
+      <Route path="/battle/:token" component={BattlePage} />
     </Switch>
   );
 }

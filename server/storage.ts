@@ -11,6 +11,7 @@ export interface IStorage {
   createScan(scan: InsertScan): Promise<Scan>;
   getScansByUserId(userId: string): Promise<Scan[]>;
   getAllScans(): Promise<Scan[]>;
+  getScanByShareToken(shareToken: string): Promise<Scan | undefined>;
 }
 
 export class MemStorage implements IStorage {
@@ -65,6 +66,7 @@ export class MemStorage implements IStorage {
       imageSrc: insertScan.imageSrc || null,
       baumannType: insertScan.baumannType || null,
       skinAge: insertScan.skinAge || null,
+      shareToken: insertScan.shareToken || null,
       createdAt: new Date().toISOString(),
     };
     this.scans.set(id, scan);
@@ -79,6 +81,10 @@ export class MemStorage implements IStorage {
 
   async getAllScans(): Promise<Scan[]> {
     return Array.from(this.scans.values());
+  }
+
+  async getScanByShareToken(shareToken: string): Promise<Scan | undefined> {
+    return Array.from(this.scans.values()).find(s => s.shareToken === shareToken);
   }
 }
 
