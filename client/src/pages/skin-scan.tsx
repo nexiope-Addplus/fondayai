@@ -1315,232 +1315,263 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
 
   return (
     <>
+    {/* ── 공유 슬라이드 공통 날짜 ── */}
+    {(() => {
+      const slideDate = new Date().toLocaleDateString(i18n.language === "ko" ? "ko-KR" : i18n.language === "ja" ? "ja-JP" : "en-US", { month: "long", day: "numeric" });
+      const slideHeader = (label?: string) => (
+        <div style={{ padding: "50px 44px 0", display: "flex", justifyContent: "space-between", alignItems: "center", flexShrink: 0 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "9px" }}>
+            <div style={{ width: "28px", height: "28px", borderRadius: "9px", background: `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "14px", color: "white" }}>✦</div>
+            <span style={{ color: DEEP_GREEN, fontSize: "18px", fontWeight: 800, letterSpacing: "0.3px" }}>FondayAI</span>
+          </div>
+          <span style={{ color: "#B0A898", fontSize: "13px" }}>{label ?? slideDate}</span>
+        </div>
+      );
+      const slideFooter = (
+        <div style={{ padding: "0 0 34px", textAlign: "center", fontSize: "12px", color: "#C0B8B0", fontWeight: 600, letterSpacing: "1px", flexShrink: 0 }}>fondayai.pages.dev</div>
+      );
+      const deco = (
+        <>
+          <div style={{ position: "absolute", top: "-80px", right: "-80px", width: "320px", height: "320px", borderRadius: "50%", background: `radial-gradient(circle, ${SCAN_FROM}22, transparent 65%)` }} />
+          <div style={{ position: "absolute", bottom: "-60px", left: "-60px", width: "260px", height: "260px", borderRadius: "50%", background: `radial-gradient(circle, ${DEEP_GREEN}14, transparent 65%)` }} />
+        </>
+      );
+      return null;
+    })()}
+
     {/* ── 릴스 슬라이드 1: 표지 (540×960 = 9:16) ── */}
     <div ref={reels1Ref} style={{ display: "none", position: "fixed", left: 0, top: 0, width: "540px", height: "960px", overflow: "hidden", zIndex: -1, pointerEvents: "none", background: "linear-gradient(160deg, #FDF6F3 0%, #F0EBE5 60%, #E8EFF0 100%)", fontFamily: "system-ui,-apple-system,sans-serif" }}>
       <div style={{ position: "absolute", top: "-80px", right: "-80px", width: "320px", height: "320px", borderRadius: "50%", background: `radial-gradient(circle, ${SCAN_FROM}22, transparent 65%)` }} />
       <div style={{ position: "absolute", bottom: "-60px", left: "-60px", width: "260px", height: "260px", borderRadius: "50%", background: `radial-gradient(circle, ${DEEP_GREEN}14, transparent 65%)` }} />
-      {/* 헤더 */}
-      <div style={{ padding: "44px 40px 0", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-          <div style={{ width: "26px", height: "26px", borderRadius: "8px", background: `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "13px", color: "white" }}>✦</div>
-          <span style={{ color: DEEP_GREEN, fontSize: "17px", fontWeight: 700, letterSpacing: "1px", fontFamily: "Georgia, serif" }}>fonday</span>
-        </div>
-        <span style={{ color: "#B0A898", fontSize: "10px", letterSpacing: "2px", textTransform: "uppercase" }}>AI Skin Report</span>
-      </div>
-      {/* 바우만 타입 대형 */}
-      <div style={{ textAlign: "center", padding: "36px 36px 0" }}>
-        <div style={{ fontSize: "11px", color: "#B0A898", letterSpacing: "3px", textTransform: "uppercase", marginBottom: "10px" }}>Baumann Skin Type</div>
-        <div style={{ fontSize: "100px", fontWeight: 900, color: SCAN_TO, fontFamily: "Georgia, serif", lineHeight: 1, letterSpacing: "-4px", marginBottom: "18px" }}>{finalType}</div>
-        <div style={{ display: "flex", gap: "8px", justifyContent: "center", flexWrap: "wrap" }}>
-          {finalType.split("").map((letter, i) => {
-            const color = BAUMANN_COLORS[letter];
-            if (!color) return null;
-            return <span key={i} style={{ fontSize: "13px", fontWeight: 600, padding: "5px 16px", borderRadius: "999px", background: `${color}18`, border: `1px solid ${color}44`, color }}>{t(`baumann.${letter}.name`)}</span>;
-          })}
-        </div>
-      </div>
-      {/* 종합점수 + 피부나이 카드 */}
-      <div style={{ margin: "28px 36px 0", display: "flex", gap: "12px" }}>
-        <div style={{ flex: 1, background: "white", borderRadius: "22px", padding: "20px", textAlign: "center", boxShadow: "0 4px 24px rgba(180,130,110,0.12)", border: "1px solid rgba(220,200,185,0.4)" }}>
-          <div style={{ fontSize: "52px", fontWeight: 900, color: SCAN_TO, fontFamily: "Georgia, serif", lineHeight: 1 }}>{overallScore}</div>
-          <div style={{ fontSize: "11px", color: "#B0A898", letterSpacing: "1px", textTransform: "uppercase", marginTop: "6px" }}>{t("result.overall")}</div>
-        </div>
-        {analysisResult?.skinAge != null && analysisResult.skinAge > 0 && (
-          <div style={{ flex: 1, background: "white", borderRadius: "22px", padding: "20px", textAlign: "center", boxShadow: "0 4px 24px rgba(180,130,110,0.12)", border: "1px solid rgba(220,200,185,0.4)" }}>
-            <div style={{ fontSize: "52px", fontWeight: 900, color: "#8B5CF6", fontFamily: "Georgia, serif", lineHeight: 1 }}>{analysisResult.skinAge}</div>
-            <div style={{ fontSize: "11px", color: "#B0A898", letterSpacing: "1px", textTransform: "uppercase", marginTop: "6px" }}>{t("result.skinAge")}</div>
+      <div style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0, display: "flex", flexDirection: "column" }}>
+        {/* 헤더 */}
+        <div style={{ padding: "50px 44px 0", display: "flex", justifyContent: "space-between", alignItems: "center", flexShrink: 0 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "9px" }}>
+            <div style={{ width: "28px", height: "28px", borderRadius: "9px", background: `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "14px", color: "white" }}>✦</div>
+            <span style={{ color: DEEP_GREEN, fontSize: "18px", fontWeight: 800 }}>FondayAI</span>
           </div>
-        )}
-      </div>
-      {/* AI 총평 */}
-      {analysisResult?.aiComment && (
-        <div style={{ margin: "18px 36px 0", background: "white", borderRadius: "22px", padding: "20px 24px", boxShadow: "0 4px 24px rgba(180,130,110,0.12)", border: "1px solid rgba(220,200,185,0.4)", borderLeft: `4px solid ${DEEP_GREEN}` }}>
-          <div style={{ fontSize: "10px", color: DEEP_GREEN, fontWeight: 700, letterSpacing: "1.5px", textTransform: "uppercase", marginBottom: "8px" }}>FondayAI 총평</div>
-          <p style={{ fontSize: "16px", color: "#3A3028", lineHeight: 1.7, margin: 0 }}>{analysisResult.aiComment}</p>
+          <span style={{ color: "#B0A898", fontSize: "13px" }}>{new Date().toLocaleDateString(i18n.language === "ko" ? "ko-KR" : i18n.language === "ja" ? "ja-JP" : "en-US", { month: "long", day: "numeric" })}</span>
         </div>
-      )}
-      <div style={{ position: "absolute", bottom: "28px", left: 0, right: 0, textAlign: "center", fontSize: "12px", color: "#C0B8B0", fontWeight: 600, letterSpacing: "1px" }}>fondayai.pages.dev</div>
+        {/* 메인 콘텐츠 균등 배분 */}
+        <div style={{ flex: 1, padding: "0 40px", display: "flex", flexDirection: "column", justifyContent: "space-evenly" }}>
+          {/* 바우만 타입 */}
+          <div style={{ textAlign: "center" }}>
+            <div style={{ fontSize: "11px", color: "#B0A898", letterSpacing: "3px", textTransform: "uppercase", marginBottom: "14px" }}>Baumann Skin Type</div>
+            <div style={{ fontSize: "84px", fontWeight: 900, color: SCAN_TO, fontFamily: "Georgia, serif", lineHeight: 1, letterSpacing: "-3px", marginBottom: "18px" }}>{finalType}</div>
+            <div style={{ display: "flex", gap: "8px", justifyContent: "center", flexWrap: "wrap" }}>
+              {finalType.split("").map((letter, i) => {
+                const color = BAUMANN_COLORS[letter];
+                if (!color) return null;
+                return <span key={i} style={{ fontSize: "14px", fontWeight: 600, padding: "6px 18px", borderRadius: "999px", background: `${color}18`, border: `1px solid ${color}44`, color }}>{t(`baumann.${letter}.name`)}</span>;
+              })}
+            </div>
+          </div>
+          {/* 종합점수 + 피부나이 */}
+          <div style={{ display: "flex", gap: "14px" }}>
+            <div style={{ flex: 1, background: "white", borderRadius: "24px", padding: "28px 20px", textAlign: "center", boxShadow: "0 4px 24px rgba(180,130,110,0.12)", border: "1px solid rgba(220,200,185,0.4)" }}>
+              <div style={{ fontSize: "58px", fontWeight: 900, color: SCAN_TO, fontFamily: "Georgia, serif", lineHeight: 1 }}>{overallScore}</div>
+              <div style={{ fontSize: "13px", color: "#B0A898", marginTop: "10px" }}>{t("result.overall")}</div>
+            </div>
+            {analysisResult?.skinAge != null && analysisResult.skinAge > 0 && (
+              <div style={{ flex: 1, background: "white", borderRadius: "24px", padding: "28px 20px", textAlign: "center", boxShadow: "0 4px 24px rgba(180,130,110,0.12)", border: "1px solid rgba(220,200,185,0.4)" }}>
+                <div style={{ fontSize: "58px", fontWeight: 900, color: "#8B5CF6", fontFamily: "Georgia, serif", lineHeight: 1 }}>{analysisResult.skinAge}</div>
+                <div style={{ fontSize: "13px", color: "#B0A898", marginTop: "10px" }}>{t("result.skinAge")}</div>
+              </div>
+            )}
+          </div>
+          {/* AI 총평 */}
+          {analysisResult?.aiComment && (
+            <div style={{ background: "white", borderRadius: "24px", padding: "24px 26px", boxShadow: "0 4px 24px rgba(180,130,110,0.12)", border: "1px solid rgba(220,200,185,0.4)", borderLeft: `4px solid ${DEEP_GREEN}` }}>
+              <div style={{ fontSize: "11px", color: DEEP_GREEN, fontWeight: 700, letterSpacing: "1px", textTransform: "uppercase", marginBottom: "10px" }}>FondayAI 총평</div>
+              <p style={{ fontSize: "17px", color: "#3A3028", lineHeight: 1.75, margin: 0 }}>{analysisResult.aiComment}</p>
+            </div>
+          )}
+        </div>
+        <div style={{ padding: "0 0 34px", textAlign: "center", fontSize: "12px", color: "#C0B8B0", fontWeight: 600, letterSpacing: "1px", flexShrink: 0 }}>fondayai.pages.dev</div>
+      </div>
     </div>
 
     {/* ── 릴스 슬라이드 2: 10가지 피부 점수 (540×960 = 9:16) ── */}
     <div ref={reels2Ref} style={{ display: "none", position: "fixed", left: 0, top: 0, width: "540px", height: "960px", overflow: "hidden", zIndex: -1, pointerEvents: "none", background: "linear-gradient(160deg, #FDF6F3 0%, #F0EBE5 60%, #E8EFF0 100%)", fontFamily: "system-ui,-apple-system,sans-serif" }}>
       <div style={{ position: "absolute", top: "-80px", right: "-80px", width: "320px", height: "320px", borderRadius: "50%", background: `radial-gradient(circle, ${SCAN_FROM}22, transparent 65%)` }} />
       <div style={{ position: "absolute", bottom: "-60px", left: "-60px", width: "260px", height: "260px", borderRadius: "50%", background: `radial-gradient(circle, ${DEEP_GREEN}14, transparent 65%)` }} />
-      {/* 헤더 */}
-      <div style={{ padding: "44px 40px 0", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-          <div style={{ width: "26px", height: "26px", borderRadius: "8px", background: `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "13px", color: "white" }}>✦</div>
-          <span style={{ color: DEEP_GREEN, fontSize: "17px", fontWeight: 700, letterSpacing: "1px", fontFamily: "Georgia, serif" }}>fonday</span>
+      <div style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0, display: "flex", flexDirection: "column" }}>
+        <div style={{ padding: "50px 44px 0", display: "flex", justifyContent: "space-between", alignItems: "center", flexShrink: 0 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "9px" }}>
+            <div style={{ width: "28px", height: "28px", borderRadius: "9px", background: `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "14px", color: "white" }}>✦</div>
+            <span style={{ color: DEEP_GREEN, fontSize: "18px", fontWeight: 800 }}>FondayAI</span>
+          </div>
+          <span style={{ color: "#B0A898", fontSize: "13px" }}>{new Date().toLocaleDateString(i18n.language === "ko" ? "ko-KR" : i18n.language === "ja" ? "ja-JP" : "en-US", { month: "long", day: "numeric" })}</span>
         </div>
-        <span style={{ fontSize: "10px", color: "#B0A898", letterSpacing: "2px", textTransform: "uppercase" }}>Skin Score</span>
+        <div style={{ padding: "20px 44px 0", flexShrink: 0 }}>
+          <div style={{ fontSize: "22px", fontWeight: 900, color: DEEP_GREEN, marginBottom: "4px" }}>{t("result.scores")}</div>
+          <div style={{ fontSize: "13px", color: "#B0A898" }}>{t("result.baumannLabel")} <strong style={{ color: SCAN_TO }}>{finalType}</strong> · {overallScore}{t("result.scoreSuffix")}</div>
+        </div>
+        <div style={{ flex: 1, padding: "16px 40px 0", display: "flex", flexDirection: "column" }}>
+          <div style={{ background: "white", borderRadius: "24px", padding: "24px 26px", boxShadow: "0 4px 24px rgba(180,130,110,0.12)", border: "1px solid rgba(220,200,185,0.4)", flex: 1, display: "flex", flexDirection: "column", justifyContent: "space-evenly" }}>
+            {(analysisResult?.scores || []).map((s: any, i: number) => {
+              const color = SCORE_COLORS[i] || DEEP_GREEN;
+              return (
+                <div key={i}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "7px" }}>
+                    <span style={{ fontSize: "14px", fontWeight: 600, color: "#44403C" }}>{t(`scores.${i}`)}</span>
+                    <span style={{ fontSize: "15px", fontWeight: 800, color, fontFamily: "Georgia, serif" }}>{s.score}</span>
+                  </div>
+                  <div style={{ height: "6px", background: "#F0EBE6", borderRadius: "999px", overflow: "hidden" }}>
+                    <div style={{ height: "100%", width: `${s.score}%`, background: `linear-gradient(90deg, ${color}88, ${color})`, borderRadius: "999px" }} />
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+        <div style={{ padding: "0 0 34px", textAlign: "center", fontSize: "12px", color: "#C0B8B0", fontWeight: 600, letterSpacing: "1px", flexShrink: 0, marginTop: "16px" }}>fondayai.pages.dev</div>
       </div>
-      {/* 서브 헤더 */}
-      <div style={{ padding: "18px 40px 0" }}>
-        <div style={{ fontSize: "22px", fontWeight: 900, color: DEEP_GREEN, marginBottom: "4px" }}>{t("result.scores")}</div>
-        <div style={{ fontSize: "13px", color: "#B0A898" }}>{t("result.baumannLabel")} <strong style={{ color: SCAN_TO }}>{finalType}</strong> · {overallScore}{t("result.scoreSuffix")}</div>
-      </div>
-      {/* 점수 카드 */}
-      <div style={{ margin: "16px 36px 0", background: "white", borderRadius: "24px", padding: "22px 26px", boxShadow: "0 4px 24px rgba(180,130,110,0.12)", border: "1px solid rgba(220,200,185,0.4)" }}>
-        {(analysisResult?.scores || []).map((s: any, i: number) => {
-          const color = SCORE_COLORS[i] || DEEP_GREEN;
-          return (
-            <div key={i} style={{ marginBottom: i < 9 ? "15px" : 0 }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "6px" }}>
-                <span style={{ fontSize: "14px", fontWeight: 600, color: "#44403C" }}>{t(`scores.${i}`)}</span>
-                <span style={{ fontSize: "15px", fontWeight: 800, color, fontFamily: "Georgia, serif" }}>{s.score}</span>
-              </div>
-              <div style={{ height: "6px", background: "#F0EBE6", borderRadius: "999px", overflow: "hidden" }}>
-                <div style={{ height: "100%", width: `${s.score}%`, background: `linear-gradient(90deg, ${color}88, ${color})`, borderRadius: "999px" }} />
-              </div>
-            </div>
-          );
-        })}
-      </div>
-      <div style={{ position: "absolute", bottom: "28px", left: 0, right: 0, textAlign: "center", fontSize: "12px", color: "#C0B8B0", fontWeight: 600, letterSpacing: "1px" }}>fondayai.pages.dev</div>
     </div>
 
     {/* ── 릴스 슬라이드 3: AI 맞춤 솔루션 (540×960 = 9:16) ── */}
     <div ref={reels3Ref} style={{ display: "none", position: "fixed", left: 0, top: 0, width: "540px", height: "960px", overflow: "hidden", zIndex: -1, pointerEvents: "none", background: "linear-gradient(160deg, #FDF6F3 0%, #F0EBE5 60%, #E8EFF0 100%)", fontFamily: "system-ui,-apple-system,sans-serif" }}>
       <div style={{ position: "absolute", top: "-80px", right: "-80px", width: "320px", height: "320px", borderRadius: "50%", background: `radial-gradient(circle, ${SCAN_FROM}22, transparent 65%)` }} />
       <div style={{ position: "absolute", bottom: "-60px", left: "-60px", width: "260px", height: "260px", borderRadius: "50%", background: `radial-gradient(circle, ${DEEP_GREEN}14, transparent 65%)` }} />
-      {/* 헤더 */}
-      <div style={{ padding: "44px 40px 0", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-          <div style={{ width: "26px", height: "26px", borderRadius: "8px", background: `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "13px", color: "white" }}>✦</div>
-          <span style={{ color: DEEP_GREEN, fontSize: "17px", fontWeight: 700, letterSpacing: "1px", fontFamily: "Georgia, serif" }}>fonday</span>
-        </div>
-        <span style={{ fontSize: "10px", color: "#B0A898", letterSpacing: "2px", textTransform: "uppercase" }}>My Solution</span>
-      </div>
-      {/* 서브 헤더 */}
-      <div style={{ padding: "18px 40px 0" }}>
-        <div style={{ fontSize: "22px", fontWeight: 900, color: DEEP_GREEN }}>AI 맞춤 솔루션</div>
-      </div>
-      {/* 개선 방안 3단계 */}
-      <div style={{ margin: "18px 36px 0" }}>
-        {([
-          { color: SCAN_FROM, bg: `${SCAN_FROM}18` },
-          { color: DEEP_GREEN, bg: "#E8F4F0" },
-          { color: "#8B5CF6", bg: "#EDE9FE" },
-        ] as const).map((st, i) => {
-          const imp = analysisResult?.improvements?.[i];
-          if (!imp) return null;
-          return (
-            <div key={i} style={{ background: "white", borderRadius: "22px", padding: "20px 22px", marginBottom: "14px", boxShadow: "0 4px 20px rgba(180,130,110,0.10)", border: "1px solid rgba(220,200,185,0.4)", borderLeft: `5px solid ${st.color}` }}>
-              <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "8px" }}>
-                <span style={{ fontSize: "11px", fontWeight: 800, color: st.color, background: st.bg, padding: "3px 10px", borderRadius: "999px", letterSpacing: "1px" }}>STEP {i + 1}</span>
-                <span style={{ fontSize: "16px", fontWeight: 800, color: "#3A3028" }}>{imp.title}</span>
-              </div>
-              <p style={{ fontSize: "13px", color: "#57534E", lineHeight: 1.65, margin: 0 }}>{imp.desc.length > 80 ? imp.desc.slice(0, 77) + "..." : imp.desc}</p>
-            </div>
-          );
-        })}
-      </div>
-      {/* 추천 성분 */}
-      {(analysisResult?.cosmetics?.length ?? 0) > 0 && (
-        <div style={{ margin: "0 36px" }}>
-          <div style={{ fontSize: "12px", fontWeight: 800, color: DEEP_GREEN, marginBottom: "10px", letterSpacing: "0.5px" }}>추천 성분</div>
-          <div style={{ display: "flex", gap: "12px" }}>
-            {(analysisResult?.cosmetics || []).slice(0, 2).map((c: any, i: number) => (
-              <div key={i} style={{ flex: 1, background: "white", borderRadius: "18px", padding: "14px 16px", boxShadow: "0 4px 20px rgba(180,130,110,0.10)", border: "1px solid rgba(220,200,185,0.4)" }}>
-                <div style={{ fontSize: "11px", color: "#B0A898", marginBottom: "4px" }}>{c.type}</div>
-                <div style={{ fontSize: "15px", fontWeight: 800, color: SCAN_TO, marginBottom: "6px" }}>{c.key}</div>
-                <div style={{ fontSize: "11px", color: "#78716C", lineHeight: 1.5 }}>{c.reason.length > 45 ? c.reason.slice(0, 42) + "..." : c.reason}</div>
-              </div>
-            ))}
+      <div style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0, display: "flex", flexDirection: "column" }}>
+        <div style={{ padding: "50px 44px 0", display: "flex", justifyContent: "space-between", alignItems: "center", flexShrink: 0 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "9px" }}>
+            <div style={{ width: "28px", height: "28px", borderRadius: "9px", background: `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "14px", color: "white" }}>✦</div>
+            <span style={{ color: DEEP_GREEN, fontSize: "18px", fontWeight: 800 }}>FondayAI</span>
           </div>
+          <span style={{ color: "#B0A898", fontSize: "13px" }}>{new Date().toLocaleDateString(i18n.language === "ko" ? "ko-KR" : i18n.language === "ja" ? "ja-JP" : "en-US", { month: "long", day: "numeric" })}</span>
         </div>
-      )}
-      <div style={{ position: "absolute", bottom: "28px", left: 0, right: 0, textAlign: "center", fontSize: "12px", color: "#C0B8B0", fontWeight: 600, letterSpacing: "1px" }}>fondayai.pages.dev</div>
+        <div style={{ flex: 1, padding: "0 40px", display: "flex", flexDirection: "column", justifyContent: "space-evenly" }}>
+          <div>
+            <div style={{ fontSize: "22px", fontWeight: 900, color: DEEP_GREEN, marginBottom: "16px" }}>AI 맞춤 솔루션</div>
+            {([
+              { color: SCAN_FROM, bg: `${SCAN_FROM}18` },
+              { color: DEEP_GREEN, bg: "#E8F4F0" },
+              { color: "#8B5CF6", bg: "#EDE9FE" },
+            ] as const).map((st, i) => {
+              const imp = analysisResult?.improvements?.[i];
+              if (!imp) return null;
+              return (
+                <div key={i} style={{ background: "white", borderRadius: "22px", padding: "20px 22px", marginBottom: "14px", boxShadow: "0 4px 20px rgba(180,130,110,0.10)", border: "1px solid rgba(220,200,185,0.4)", borderLeft: `5px solid ${st.color}` }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "8px" }}>
+                    <span style={{ fontSize: "11px", fontWeight: 800, color: st.color, background: st.bg, padding: "3px 10px", borderRadius: "999px", letterSpacing: "1px" }}>STEP {i + 1}</span>
+                    <span style={{ fontSize: "16px", fontWeight: 800, color: "#3A3028" }}>{imp.title}</span>
+                  </div>
+                  <p style={{ fontSize: "13px", color: "#57534E", lineHeight: 1.65, margin: 0 }}>{imp.desc.length > 80 ? imp.desc.slice(0, 77) + "..." : imp.desc}</p>
+                </div>
+              );
+            })}
+          </div>
+          {(analysisResult?.cosmetics?.length ?? 0) > 0 && (
+            <div>
+              <div style={{ fontSize: "13px", fontWeight: 800, color: DEEP_GREEN, marginBottom: "12px", letterSpacing: "0.5px" }}>추천 성분</div>
+              <div style={{ display: "flex", gap: "12px" }}>
+                {(analysisResult?.cosmetics || []).slice(0, 2).map((c: any, i: number) => (
+                  <div key={i} style={{ flex: 1, background: "white", borderRadius: "18px", padding: "16px 18px", boxShadow: "0 4px 20px rgba(180,130,110,0.10)", border: "1px solid rgba(220,200,185,0.4)" }}>
+                    <div style={{ fontSize: "11px", color: "#B0A898", marginBottom: "5px" }}>{c.type}</div>
+                    <div style={{ fontSize: "16px", fontWeight: 800, color: SCAN_TO, marginBottom: "6px" }}>{c.key}</div>
+                    <div style={{ fontSize: "12px", color: "#78716C", lineHeight: 1.5 }}>{c.reason.length > 45 ? c.reason.slice(0, 42) + "..." : c.reason}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+        <div style={{ padding: "0 0 34px", textAlign: "center", fontSize: "12px", color: "#C0B8B0", fontWeight: 600, letterSpacing: "1px", flexShrink: 0 }}>fondayai.pages.dev</div>
+      </div>
     </div>
 
     {/* ── 릴스 슬라이드 4: 피부 맞춤 영양 성분 (540×960 = 9:16) ── */}
     <div ref={reels4Ref} style={{ display: "none", position: "fixed", left: 0, top: 0, width: "540px", height: "960px", overflow: "hidden", zIndex: -1, pointerEvents: "none", background: "linear-gradient(160deg, #FDF6F3 0%, #F0EBE5 60%, #E8EFF0 100%)", fontFamily: "system-ui,-apple-system,sans-serif" }}>
       <div style={{ position: "absolute", top: "-80px", right: "-80px", width: "320px", height: "320px", borderRadius: "50%", background: "radial-gradient(circle, #F59E0B22, transparent 65%)" }} />
       <div style={{ position: "absolute", bottom: "-60px", left: "-60px", width: "260px", height: "260px", borderRadius: "50%", background: `radial-gradient(circle, ${DEEP_GREEN}14, transparent 65%)` }} />
-      {/* 헤더 */}
-      <div style={{ padding: "44px 40px 0", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-          <div style={{ width: "26px", height: "26px", borderRadius: "8px", background: `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "13px", color: "white" }}>✦</div>
-          <span style={{ color: DEEP_GREEN, fontSize: "17px", fontWeight: 700, letterSpacing: "1px", fontFamily: "Georgia, serif" }}>fonday</span>
+      <div style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0, display: "flex", flexDirection: "column" }}>
+        <div style={{ padding: "50px 44px 0", display: "flex", justifyContent: "space-between", alignItems: "center", flexShrink: 0 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "9px" }}>
+            <div style={{ width: "28px", height: "28px", borderRadius: "9px", background: `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "14px", color: "white" }}>✦</div>
+            <span style={{ color: DEEP_GREEN, fontSize: "18px", fontWeight: 800 }}>FondayAI</span>
+          </div>
+          <span style={{ color: "#B0A898", fontSize: "13px" }}>{new Date().toLocaleDateString(i18n.language === "ko" ? "ko-KR" : i18n.language === "ja" ? "ja-JP" : "en-US", { month: "long", day: "numeric" })}</span>
         </div>
-        <span style={{ fontSize: "10px", color: "#B0A898", letterSpacing: "2px", textTransform: "uppercase" }}>Nutrients</span>
+        <div style={{ flex: 1, padding: "0 40px", display: "flex", flexDirection: "column", justifyContent: "space-evenly" }}>
+          <div>
+            <div style={{ fontSize: "22px", fontWeight: 900, color: DEEP_GREEN, marginBottom: "4px" }}>{t("nutrients.sectionTitle")}</div>
+            <div style={{ fontSize: "13px", color: "#B0A898" }}>{t("result.baumannLabel")} <strong style={{ color: "#D97706" }}>{finalType}</strong></div>
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
+            {finalType.split("").filter(l => l in NUTRIENT_COLORS).map((letter) => {
+              const arr = t(`nutrients.${letter}`, { returnObjects: true }) as { name: string; foods: string; why: string }[];
+              const nutrient = arr?.[0];
+              if (!nutrient) return null;
+              const color = NUTRIENT_COLORS[letter];
+              return (
+                <div key={letter} style={{ background: "white", borderRadius: "20px", padding: "18px 20px", boxShadow: "0 4px 20px rgba(180,130,110,0.10)", border: "1px solid rgba(220,200,185,0.4)", borderLeft: `5px solid ${color}` }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "8px" }}>
+                    <span style={{ fontSize: "18px" }}>{NUTRIENT_ICONS[letter]}</span>
+                    <span style={{ fontSize: "15px", fontWeight: 800, color }}>{nutrient.name}</span>
+                  </div>
+                  <p style={{ fontSize: "12px", color: "#57534E", lineHeight: 1.6, margin: "0 0 6px" }}>{nutrient.why}</p>
+                  <p style={{ fontSize: "11px", color: "#A8A29E", margin: 0 }}><span style={{ fontWeight: 700, color }}>{t("nutrients.foodLabel")} </span>{nutrient.foods}</p>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+        <div style={{ padding: "0 0 34px", textAlign: "center", fontSize: "12px", color: "#C0B8B0", fontWeight: 600, letterSpacing: "1px", flexShrink: 0 }}>fondayai.pages.dev</div>
       </div>
-      {/* 서브 헤더 */}
-      <div style={{ padding: "18px 40px 0" }}>
-        <div style={{ fontSize: "22px", fontWeight: 900, color: DEEP_GREEN, marginBottom: "4px" }}>{t("nutrients.sectionTitle")}</div>
-        <div style={{ fontSize: "13px", color: "#B0A898" }}>{t("result.baumannLabel")} <strong style={{ color: "#D97706" }}>{finalType}</strong></div>
-      </div>
-      {/* 영양소 카드 */}
-      <div style={{ margin: "18px 36px 0", display: "flex", flexDirection: "column", gap: "14px" }}>
-        {finalType.split("").filter(l => l in NUTRIENT_COLORS).map((letter) => {
-          const arr = t(`nutrients.${letter}`, { returnObjects: true }) as { name: string; foods: string; why: string }[];
-          const nutrient = arr?.[0];
-          if (!nutrient) return null;
-          const color = NUTRIENT_COLORS[letter];
-          return (
-            <div key={letter} style={{ background: "white", borderRadius: "20px", padding: "18px 20px", boxShadow: "0 4px 20px rgba(180,130,110,0.10)", border: "1px solid rgba(220,200,185,0.4)", borderLeft: `5px solid ${color}` }}>
-              <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "8px" }}>
-                <span style={{ fontSize: "18px" }}>{NUTRIENT_ICONS[letter]}</span>
-                <span style={{ fontSize: "15px", fontWeight: 800, color }}>{nutrient.name}</span>
-              </div>
-              <p style={{ fontSize: "12px", color: "#57534E", lineHeight: 1.6, margin: "0 0 6px" }}>{nutrient.why}</p>
-              <p style={{ fontSize: "11px", color: "#A8A29E", margin: 0 }}><span style={{ fontWeight: 700, color }}>{t("nutrients.foodLabel")} </span>{nutrient.foods}</p>
-            </div>
-          );
-        })}
-      </div>
-      <div style={{ position: "absolute", bottom: "28px", left: 0, right: 0, textAlign: "center", fontSize: "12px", color: "#C0B8B0", fontWeight: 600, letterSpacing: "1px" }}>fondayai.pages.dev</div>
     </div>
 
     {/* ── 릴스 슬라이드 5: 오늘 피해야 할 음식 (540×960 = 9:16) ── */}
     <div ref={reels5Ref} style={{ display: "none", position: "fixed", left: 0, top: 0, width: "540px", height: "960px", overflow: "hidden", zIndex: -1, pointerEvents: "none", background: "linear-gradient(160deg, #FDF6F3 0%, #F0EBE5 60%, #E8EFF0 100%)", fontFamily: "system-ui,-apple-system,sans-serif" }}>
       <div style={{ position: "absolute", top: "-80px", right: "-80px", width: "320px", height: "320px", borderRadius: "50%", background: "radial-gradient(circle, #F59E0B22, transparent 65%)" }} />
       <div style={{ position: "absolute", bottom: "-60px", left: "-60px", width: "260px", height: "260px", borderRadius: "50%", background: `radial-gradient(circle, ${DEEP_GREEN}14, transparent 65%)` }} />
-      {/* 헤더 */}
-      <div style={{ padding: "44px 40px 0", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-          <div style={{ width: "26px", height: "26px", borderRadius: "8px", background: `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "13px", color: "white" }}>✦</div>
-          <span style={{ color: DEEP_GREEN, fontSize: "17px", fontWeight: 700, letterSpacing: "1px", fontFamily: "Georgia, serif" }}>fonday</span>
-        </div>
-        <span style={{ fontSize: "10px", color: "#B0A898", letterSpacing: "2px", textTransform: "uppercase" }}>Food Guide</span>
-      </div>
-      {/* 서브 헤더 */}
-      <div style={{ padding: "18px 40px 0" }}>
-        <div style={{ fontSize: "22px", fontWeight: 900, color: DEEP_GREEN }}>⚠️ {t("nutrients.avoidTitle")}</div>
-      </div>
-      {/* 점심 카드 */}
-      <div style={{ margin: "20px 36px 0", background: "white", borderRadius: "22px", padding: "20px 22px", boxShadow: "0 4px 20px rgba(180,130,110,0.10)", border: "1px solid rgba(220,200,185,0.4)", borderLeft: "5px solid #F59E0B" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "14px" }}>
-          <span style={{ fontSize: "16px" }}>☀️</span>
-          <span style={{ fontSize: "15px", fontWeight: 800, color: "#D97706" }}>{t("nutrients.avoidLunch")}</span>
-        </div>
-        {avoidLunch.map(({ food, why }, idx) => (
-          <div key={idx} style={{ display: "flex", gap: "10px", marginBottom: idx < avoidLunch.length - 1 ? "10px" : 0, alignItems: "flex-start" }}>
-            <span style={{ fontSize: "11px", fontWeight: 800, color: "#F59E0B", flexShrink: 0, marginTop: "2px" }}>✕</span>
-            <div>
-              <p style={{ fontSize: "13px", fontWeight: 700, color: "#3A3028", margin: "0 0 2px" }}>{food}</p>
-              <p style={{ fontSize: "11px", color: "#A8A29E", margin: 0 }}>{why}</p>
-            </div>
+      <div style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0, display: "flex", flexDirection: "column" }}>
+        <div style={{ padding: "50px 44px 0", display: "flex", justifyContent: "space-between", alignItems: "center", flexShrink: 0 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "9px" }}>
+            <div style={{ width: "28px", height: "28px", borderRadius: "9px", background: `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "14px", color: "white" }}>✦</div>
+            <span style={{ color: DEEP_GREEN, fontSize: "18px", fontWeight: 800 }}>FondayAI</span>
           </div>
-        ))}
-      </div>
-      {/* 저녁 카드 */}
-      <div style={{ margin: "14px 36px 0", background: "white", borderRadius: "22px", padding: "20px 22px", boxShadow: "0 4px 20px rgba(180,130,110,0.10)", border: "1px solid rgba(220,200,185,0.4)", borderLeft: "5px solid #8B5CF6" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "14px" }}>
-          <span style={{ fontSize: "16px" }}>🌙</span>
-          <span style={{ fontSize: "15px", fontWeight: 800, color: "#7C3AED" }}>{t("nutrients.avoidDinner")}</span>
+          <span style={{ color: "#B0A898", fontSize: "13px" }}>{new Date().toLocaleDateString(i18n.language === "ko" ? "ko-KR" : i18n.language === "ja" ? "ja-JP" : "en-US", { month: "long", day: "numeric" })}</span>
         </div>
-        {avoidDinner.map(({ food, why }, idx) => (
-          <div key={idx} style={{ display: "flex", gap: "10px", marginBottom: idx < avoidDinner.length - 1 ? "10px" : 0, alignItems: "flex-start" }}>
-            <span style={{ fontSize: "11px", fontWeight: 800, color: "#7C3AED", flexShrink: 0, marginTop: "2px" }}>✕</span>
-            <div>
-              <p style={{ fontSize: "13px", fontWeight: 700, color: "#3A3028", margin: "0 0 2px" }}>{food}</p>
-              <p style={{ fontSize: "11px", color: "#A8A29E", margin: 0 }}>{why}</p>
-            </div>
+        <div style={{ flex: 1, padding: "0 40px", display: "flex", flexDirection: "column", justifyContent: "space-evenly" }}>
+          <div>
+            <div style={{ fontSize: "22px", fontWeight: 900, color: DEEP_GREEN }}>⚠️ {t("nutrients.avoidTitle")}</div>
           </div>
-        ))}
+          {/* 점심 카드 */}
+          <div style={{ background: "white", borderRadius: "22px", padding: "22px 24px", boxShadow: "0 4px 20px rgba(180,130,110,0.10)", border: "1px solid rgba(220,200,185,0.4)", borderLeft: "5px solid #F59E0B" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "16px" }}>
+              <span style={{ fontSize: "18px" }}>☀️</span>
+              <span style={{ fontSize: "16px", fontWeight: 800, color: "#D97706" }}>{t("nutrients.avoidLunch")}</span>
+            </div>
+            {avoidLunch.map(({ food, why }, idx) => (
+              <div key={idx} style={{ display: "flex", gap: "10px", marginBottom: idx < avoidLunch.length - 1 ? "12px" : 0, alignItems: "flex-start" }}>
+                <span style={{ fontSize: "12px", fontWeight: 800, color: "#F59E0B", flexShrink: 0, marginTop: "2px" }}>✕</span>
+                <div>
+                  <p style={{ fontSize: "14px", fontWeight: 700, color: "#3A3028", margin: "0 0 3px" }}>{food}</p>
+                  <p style={{ fontSize: "12px", color: "#A8A29E", margin: 0 }}>{why}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+          {/* 저녁 카드 */}
+          <div style={{ background: "white", borderRadius: "22px", padding: "22px 24px", boxShadow: "0 4px 20px rgba(180,130,110,0.10)", border: "1px solid rgba(220,200,185,0.4)", borderLeft: "5px solid #8B5CF6" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "16px" }}>
+              <span style={{ fontSize: "18px" }}>🌙</span>
+              <span style={{ fontSize: "16px", fontWeight: 800, color: "#7C3AED" }}>{t("nutrients.avoidDinner")}</span>
+            </div>
+            {avoidDinner.map(({ food, why }, idx) => (
+              <div key={idx} style={{ display: "flex", gap: "10px", marginBottom: idx < avoidDinner.length - 1 ? "12px" : 0, alignItems: "flex-start" }}>
+                <span style={{ fontSize: "12px", fontWeight: 800, color: "#7C3AED", flexShrink: 0, marginTop: "2px" }}>✕</span>
+                <div>
+                  <p style={{ fontSize: "14px", fontWeight: 700, color: "#3A3028", margin: "0 0 3px" }}>{food}</p>
+                  <p style={{ fontSize: "12px", color: "#A8A29E", margin: 0 }}>{why}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+        <div style={{ padding: "0 0 34px", textAlign: "center", fontSize: "12px", color: "#C0B8B0", fontWeight: 600, letterSpacing: "1px", flexShrink: 0 }}>fondayai.pages.dev</div>
       </div>
-      <div style={{ position: "absolute", bottom: "28px", left: 0, right: 0, textAlign: "center", fontSize: "12px", color: "#C0B8B0", fontWeight: 600, letterSpacing: "1px" }}>fondayai.pages.dev</div>
     </div>
 
     <div ref={resultScrollRef} className="h-[calc(100dvh-60px)] overflow-y-auto">
