@@ -1211,11 +1211,37 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
   const isWrink = (scores[4]?.score ?? 100) < 60;  // index 4 = 주름 및 탄력
   const finalType = `${isOily ? "O" : "D"}${isSens ? "S" : "R"}${isPig ? "P" : "N"}${isWrink ? "W" : "T"}`;
 
-  // 오늘 피해야 할 음식 3가지 (바우만 각 글자 점심 첫 번째 메뉴)
-  const avoidMenuItems = finalType.split("").filter(l => l in NUTRIENT_COLORS).map((letter) => {
-    const data = t(`nutrients.avoidFoods.${letter}`, { returnObjects: true }) as any;
-    return { food: data?.lunch?.split("·")[0]?.trim() ?? "", why: data?.lunchWhy ?? "", letter, color: NUTRIENT_COLORS[letter] };
-  }).filter(item => item.food).slice(0, 3);
+  // 점수 기반 피해야 할 음식 키 (바우만 외 추가 항목)
+  const scoreAvoidKeys: string[] = [];
+  if ((scores[1]?.score ?? 100) < 50) scoreAvoidKeys.push("hydration");
+  if ((scores[6]?.score ?? 0) > 60)   scoreAvoidKeys.push("trouble");
+  if ((scores[7]?.score ?? 0) > 60)   scoreAvoidKeys.push("darkCircle");
+  if ((scores[8]?.score ?? 100) < 50) scoreAvoidKeys.push("glow");
+
+  // 점심 피해야 할 음식 (바우만 4글자 + 점수 기반 통합)
+  const avoidLunch: { food: string; why: string }[] = [
+    ...finalType.split("").filter(l => l in NUTRIENT_COLORS).map(l => {
+      const d = t(`nutrients.avoidFoods.${l}`, { returnObjects: true }) as any;
+      return d?.lunch ? { food: d.lunch.split("·")[0].trim(), why: d.lunchWhy } : null;
+    }).filter(Boolean) as { food: string; why: string }[],
+    ...scoreAvoidKeys.map(key => {
+      const d = t(`nutrients.scoreAvoid.${key}`, { returnObjects: true }) as any;
+      return d?.foods ? { food: d.foods.split("·")[0].trim(), why: d.why } : null;
+    }).filter(Boolean) as { food: string; why: string }[],
+  ];
+
+  // 저녁 피해야 할 음식 (바우만 4글자 + 점수 기반 통합)
+  const avoidDinner: { food: string; why: string }[] = [
+    ...finalType.split("").filter(l => l in NUTRIENT_COLORS).map(l => {
+      const d = t(`nutrients.avoidFoods.${l}`, { returnObjects: true }) as any;
+      return d?.dinner ? { food: d.dinner.split("·")[0].trim(), why: d.dinnerWhy } : null;
+    }).filter(Boolean) as { food: string; why: string }[],
+    ...scoreAvoidKeys.map(key => {
+      const d = t(`nutrients.scoreAvoid.${key}`, { returnObjects: true }) as any;
+      const foods = d?.foods?.split("·");
+      return foods ? { food: (foods[1] ?? foods[0]).trim(), why: d.why } : null;
+    }).filter(Boolean) as { food: string; why: string }[],
+  ];
 
   const handleShare = async () => {
     try {
@@ -1494,31 +1520,34 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
           <span style={{ fontSize: "13px", fontWeight: 800, color: "white" }}>⚠️ {t("nutrients.avoidTitle")}</span>
         </div>
       </div>
-      {/* 바우만 타입 + 종합점수 통합 뱃지 */}
-      <div style={{ margin: "16px 40px 0", display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: "6px", background: `${SCAN_TO}18`, borderRadius: "999px", padding: "5px 14px", border: `1px solid ${SCAN_TO}33` }}>
-          <span style={{ fontSize: "11px", color: "#92400E", fontWeight: 700 }}>{t("result.baumannLabel")}</span>
-          <span style={{ fontSize: "16px", fontWeight: 900, color: SCAN_TO }}>{finalType}</span>
+      {/* 점심 */}
+      <div style={{ margin: "18px 28px 0", background: "white", borderRadius: "22px", padding: "20px 22px", boxShadow: "0 4px 16px rgba(0,0,0,0.06)" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "14px" }}>
+          <span style={{ fontSize: "16px" }}>☀️</span>
+          <span style={{ fontSize: "14px", fontWeight: 800, color: "#D97706" }}>{t("nutrients.avoidLunch")}</span>
         </div>
-        <div style={{ display: "flex", alignItems: "center", gap: "5px", background: "#FEF3C7", borderRadius: "999px", padding: "5px 14px", border: "1px solid #FDE68A" }}>
-          <span style={{ fontSize: "11px", color: "#92400E", fontWeight: 700 }}>{t("result.overall")}</span>
-          <span style={{ fontSize: "16px", fontWeight: 900, color: "#D97706" }}>{overallScore}</span>
-          <span style={{ fontSize: "11px", color: "#92400E", fontWeight: 600 }}>{t("result.scoreSuffix")}</span>
-        </div>
-      </div>
-      {/* 오늘 피해야 할 음식 3가지 */}
-      <div style={{ margin: "20px 28px 0", display: "flex", flexDirection: "column", gap: "14px" }}>
-        {avoidMenuItems.map(({ food, why, letter, color }, idx) => (
-          <div key={letter} style={{ display: "flex", gap: "16px", alignItems: "flex-start", background: "white", borderRadius: "20px", padding: "18px 20px", boxShadow: "0 4px 16px rgba(0,0,0,0.06)" }}>
-            <div style={{ width: "32px", height: "32px", borderRadius: "50%", background: `${color}22`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-              <span style={{ fontSize: "16px", fontWeight: 900, color }}>{idx + 1}</span>
+        {avoidLunch.map(({ food, why }, idx) => (
+          <div key={idx} style={{ display: "flex", gap: "10px", marginBottom: idx < avoidLunch.length - 1 ? "10px" : 0, alignItems: "flex-start" }}>
+            <span style={{ fontSize: "11px", fontWeight: 800, color: "#D97706", flexShrink: 0, marginTop: "2px" }}>✕</span>
+            <div>
+              <p style={{ fontSize: "13px", fontWeight: 700, color: "#3A3028", margin: "0 0 2px" }}>{food}</p>
+              <p style={{ fontSize: "11px", color: "#A8A29E", margin: 0 }}>{why}</p>
             </div>
-            <div style={{ flex: 1 }}>
-              <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "4px" }}>
-                <p style={{ fontSize: "18px", fontWeight: 900, color: "#3A3028", margin: 0 }}>{food}</p>
-                <span style={{ fontSize: "10px", fontWeight: 800, padding: "2px 7px", borderRadius: "999px", background: `${color}22`, color }}>{letter}</span>
-              </div>
-              <p style={{ fontSize: "12px", color: "#A8A29E", margin: 0 }}>{why}</p>
+          </div>
+        ))}
+      </div>
+      {/* 저녁 */}
+      <div style={{ margin: "12px 28px 0", background: "white", borderRadius: "22px", padding: "20px 22px", boxShadow: "0 4px 16px rgba(0,0,0,0.06)" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "14px" }}>
+          <span style={{ fontSize: "16px" }}>🌙</span>
+          <span style={{ fontSize: "14px", fontWeight: 800, color: "#7C3AED" }}>{t("nutrients.avoidDinner")}</span>
+        </div>
+        {avoidDinner.map(({ food, why }, idx) => (
+          <div key={idx} style={{ display: "flex", gap: "10px", marginBottom: idx < avoidDinner.length - 1 ? "10px" : 0, alignItems: "flex-start" }}>
+            <span style={{ fontSize: "11px", fontWeight: 800, color: "#7C3AED", flexShrink: 0, marginTop: "2px" }}>✕</span>
+            <div>
+              <p style={{ fontSize: "13px", fontWeight: 700, color: "#3A3028", margin: "0 0 2px" }}>{food}</p>
+              <p style={{ fontSize: "11px", color: "#A8A29E", margin: 0 }}>{why}</p>
             </div>
           </div>
         ))}
@@ -2075,36 +2104,45 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
                   })}
                   {/* 오늘 피해야 할 음식 */}
                   <div className="pt-1">
-                    <div className="pt-2 border-t border-stone-100 mb-3">
-                      <div className="flex items-center gap-2 mb-2">
-                        <span className="text-base">⚠️</span>
-                        <p className="text-[13px] font-black" style={{ color: "#D97706" }}>{t("nutrients.avoidTitle")}</p>
+                    <div className="flex items-center gap-2 mb-3 pt-2 border-t border-stone-100">
+                      <span className="text-base">⚠️</span>
+                      <p className="text-[13px] font-black" style={{ color: "#D97706" }}>{t("nutrients.avoidTitle")}</p>
+                    </div>
+                    {/* 점심 */}
+                    <div className="rounded-2xl p-4 mb-2.5" style={{ background: "#FFF7ED", border: "1px solid #FED7AA" }}>
+                      <div className="flex items-center gap-1.5 mb-2.5">
+                        <span className="text-sm">☀️</span>
+                        <span className="text-[12px] font-black text-orange-700">{t("nutrients.avoidLunch")}</span>
                       </div>
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <span className="text-[11px] font-bold px-2.5 py-1 rounded-full" style={{ background: `${SCAN_TO}18`, color: SCAN_TO, border: `1px solid ${SCAN_TO}33` }}>
-                          {t("result.baumannLabel")} <span className="font-black">{finalType}</span>
-                        </span>
-                        <span className="text-[11px] font-bold px-2.5 py-1 rounded-full" style={{ background: "#FEF3C7", color: "#D97706", border: "1px solid #FDE68A" }}>
-                          {t("result.overall")} <span className="font-black">{overallScore}</span>{t("result.scoreSuffix")}
-                        </span>
+                      <div className="space-y-2">
+                        {avoidLunch.map(({ food, why }, idx) => (
+                          <div key={idx} className="flex gap-2 items-start">
+                            <span className="text-[11px] font-black text-orange-400 shrink-0 mt-0.5">✕</span>
+                            <div>
+                              <p className="text-[12px] font-bold text-stone-700">{food}</p>
+                              <p className="text-[11px] text-stone-400">{why}</p>
+                            </div>
+                          </div>
+                        ))}
                       </div>
                     </div>
-                    {/* 오늘 피해야 할 음식 3가지 */}
-                    <div className="space-y-2.5">
-                      {avoidMenuItems.map(({ food, why, letter, color }, idx) => (
-                        <div key={letter} className="flex gap-3 items-center p-3.5 rounded-2xl" style={{ background: `${color}08`, border: `1px solid ${color}22` }}>
-                          <div className="w-8 h-8 rounded-full flex items-center justify-center shrink-0" style={{ background: `${color}22` }}>
-                            <span className="text-[15px] font-black" style={{ color }}>{idx + 1}</span>
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-1.5 mb-0.5">
-                              <p className="text-[15px] font-black text-stone-800">{food}</p>
-                              <span className="text-[9px] font-black px-1.5 py-0.5 rounded-full" style={{ background: `${color}22`, color }}>{letter}</span>
+                    {/* 저녁 */}
+                    <div className="rounded-2xl p-4" style={{ background: "#F5F3FF", border: "1px solid #DDD6FE" }}>
+                      <div className="flex items-center gap-1.5 mb-2.5">
+                        <span className="text-sm">🌙</span>
+                        <span className="text-[12px] font-black text-violet-700">{t("nutrients.avoidDinner")}</span>
+                      </div>
+                      <div className="space-y-2">
+                        {avoidDinner.map(({ food, why }, idx) => (
+                          <div key={idx} className="flex gap-2 items-start">
+                            <span className="text-[11px] font-black text-violet-400 shrink-0 mt-0.5">✕</span>
+                            <div>
+                              <p className="text-[12px] font-bold text-stone-700">{food}</p>
+                              <p className="text-[11px] text-stone-400">{why}</p>
                             </div>
-                            <p className="text-[11px] text-stone-400">{why}</p>
                           </div>
-                        </div>
-                      ))}
+                        ))}
+                      </div>
                     </div>
                   </div>
 
