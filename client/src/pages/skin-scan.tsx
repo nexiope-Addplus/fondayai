@@ -1352,10 +1352,10 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
           </div>
           <span style={{ color: "#B0A898", fontSize: "13px" }}>{new Date().toLocaleDateString(i18n.language === "ko" ? "ko-KR" : i18n.language === "ja" ? "ja-JP" : "en-US", { month: "long", day: "numeric" })}</span>
         </div>
-        {/* 메인 콘텐츠 균등 배분 */}
-        <div style={{ flex: 1, padding: "0 40px", display: "flex", flexDirection: "column", justifyContent: "space-evenly" }}>
+        {/* 메인 콘텐츠 */}
+        <div style={{ flex: 1, padding: "36px 40px 0", display: "flex", flexDirection: "column", gap: "28px" }}>
           {/* 바우만 타입 */}
-          <div style={{ textAlign: "center" }}>
+          <div style={{ textAlign: "center", flexShrink: 0 }}>
             <div style={{ fontSize: "11px", color: "#B0A898", letterSpacing: "3px", textTransform: "uppercase", marginBottom: "14px" }}>Baumann Skin Type</div>
             <div style={{ fontSize: "84px", fontWeight: 900, color: SCAN_TO, fontFamily: "Georgia, serif", lineHeight: 1, letterSpacing: "-3px", marginBottom: "18px" }}>{finalType}</div>
             <div style={{ display: "flex", gap: "8px", justifyContent: "center", flexWrap: "wrap" }}>
@@ -1367,23 +1367,23 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
             </div>
           </div>
           {/* 종합점수 + 피부나이 */}
-          <div style={{ display: "flex", gap: "14px" }}>
-            <div style={{ flex: 1, background: "white", borderRadius: "24px", padding: "28px 20px", textAlign: "center", boxShadow: "0 4px 24px rgba(180,130,110,0.12)", border: "1px solid rgba(220,200,185,0.4)" }}>
-              <div style={{ fontSize: "58px", fontWeight: 900, color: SCAN_TO, fontFamily: "Georgia, serif", lineHeight: 1 }}>{overallScore}</div>
+          <div style={{ display: "flex", gap: "14px", flexShrink: 0 }}>
+            <div style={{ flex: 1, background: "white", borderRadius: "24px", padding: "24px 20px", textAlign: "center", boxShadow: "0 4px 24px rgba(180,130,110,0.12)", border: "1px solid rgba(220,200,185,0.4)" }}>
+              <div style={{ fontSize: "54px", fontWeight: 900, color: SCAN_TO, fontFamily: "Georgia, serif", lineHeight: 1 }}>{overallScore}</div>
               <div style={{ fontSize: "13px", color: "#B0A898", marginTop: "10px" }}>{t("result.overall")}</div>
             </div>
             {analysisResult?.skinAge != null && analysisResult.skinAge > 0 && (
-              <div style={{ flex: 1, background: "white", borderRadius: "24px", padding: "28px 20px", textAlign: "center", boxShadow: "0 4px 24px rgba(180,130,110,0.12)", border: "1px solid rgba(220,200,185,0.4)" }}>
-                <div style={{ fontSize: "58px", fontWeight: 900, color: "#8B5CF6", fontFamily: "Georgia, serif", lineHeight: 1 }}>{analysisResult.skinAge}</div>
+              <div style={{ flex: 1, background: "white", borderRadius: "24px", padding: "24px 20px", textAlign: "center", boxShadow: "0 4px 24px rgba(180,130,110,0.12)", border: "1px solid rgba(220,200,185,0.4)" }}>
+                <div style={{ fontSize: "54px", fontWeight: 900, color: "#8B5CF6", fontFamily: "Georgia, serif", lineHeight: 1 }}>{analysisResult.skinAge}</div>
                 <div style={{ fontSize: "13px", color: "#B0A898", marginTop: "10px" }}>{t("result.skinAge")}</div>
               </div>
             )}
           </div>
-          {/* AI 총평 */}
+          {/* AI 총평 — 남은 공간 전부 차지 */}
           {analysisResult?.aiComment && (
-            <div style={{ background: "white", borderRadius: "24px", padding: "24px 26px", boxShadow: "0 4px 24px rgba(180,130,110,0.12)", border: "1px solid rgba(220,200,185,0.4)", borderLeft: `4px solid ${DEEP_GREEN}` }}>
+            <div style={{ flex: 1, background: "white", borderRadius: "24px", padding: "24px 26px", boxShadow: "0 4px 24px rgba(180,130,110,0.12)", border: "1px solid rgba(220,200,185,0.4)", borderLeft: `4px solid ${DEEP_GREEN}` }}>
               <div style={{ fontSize: "11px", color: DEEP_GREEN, fontWeight: 700, letterSpacing: "1px", textTransform: "uppercase", marginBottom: "10px" }}>FondayAI 총평</div>
-              <p style={{ fontSize: "17px", color: "#3A3028", lineHeight: 1.75, margin: 0 }}>{analysisResult.aiComment}</p>
+              <p style={{ fontSize: "16px", color: "#3A3028", lineHeight: 1.75, margin: 0 }}>{analysisResult.aiComment}</p>
             </div>
           )}
         </div>
@@ -1441,29 +1441,27 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
           </div>
           <span style={{ color: "#B0A898", fontSize: "13px" }}>{new Date().toLocaleDateString(i18n.language === "ko" ? "ko-KR" : i18n.language === "ja" ? "ja-JP" : "en-US", { month: "long", day: "numeric" })}</span>
         </div>
-        <div style={{ flex: 1, padding: "0 40px", display: "flex", flexDirection: "column", justifyContent: "space-evenly" }}>
-          <div>
-            <div style={{ fontSize: "22px", fontWeight: 900, color: DEEP_GREEN, marginBottom: "16px" }}>AI 맞춤 솔루션</div>
-            {([
-              { color: SCAN_FROM, bg: `${SCAN_FROM}18` },
-              { color: DEEP_GREEN, bg: "#E8F4F0" },
-              { color: "#8B5CF6", bg: "#EDE9FE" },
-            ] as const).map((st, i) => {
-              const imp = analysisResult?.improvements?.[i];
-              if (!imp) return null;
-              return (
-                <div key={i} style={{ background: "white", borderRadius: "22px", padding: "20px 22px", marginBottom: "14px", boxShadow: "0 4px 20px rgba(180,130,110,0.10)", border: "1px solid rgba(220,200,185,0.4)", borderLeft: `5px solid ${st.color}` }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "8px" }}>
-                    <span style={{ fontSize: "11px", fontWeight: 800, color: st.color, background: st.bg, padding: "3px 10px", borderRadius: "999px", letterSpacing: "1px" }}>STEP {i + 1}</span>
-                    <span style={{ fontSize: "16px", fontWeight: 800, color: "#3A3028" }}>{imp.title}</span>
-                  </div>
-                  <p style={{ fontSize: "13px", color: "#57534E", lineHeight: 1.65, margin: 0 }}>{imp.desc.length > 80 ? imp.desc.slice(0, 77) + "..." : imp.desc}</p>
+        <div style={{ flex: 1, padding: "32px 40px 0", display: "flex", flexDirection: "column", gap: "20px" }}>
+          <div style={{ fontSize: "22px", fontWeight: 900, color: DEEP_GREEN, flexShrink: 0 }}>AI 맞춤 솔루션</div>
+          {([
+            { color: SCAN_FROM, bg: `${SCAN_FROM}18` },
+            { color: DEEP_GREEN, bg: "#E8F4F0" },
+            { color: "#8B5CF6", bg: "#EDE9FE" },
+          ] as const).map((st, i) => {
+            const imp = analysisResult?.improvements?.[i];
+            if (!imp) return null;
+            return (
+              <div key={i} style={{ flex: 1, background: "white", borderRadius: "22px", padding: "20px 22px", boxShadow: "0 4px 20px rgba(180,130,110,0.10)", border: "1px solid rgba(220,200,185,0.4)", borderLeft: `5px solid ${st.color}` }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "8px" }}>
+                  <span style={{ fontSize: "11px", fontWeight: 800, color: st.color, background: st.bg, padding: "3px 10px", borderRadius: "999px", letterSpacing: "1px" }}>STEP {i + 1}</span>
+                  <span style={{ fontSize: "16px", fontWeight: 800, color: "#3A3028" }}>{imp.title}</span>
                 </div>
-              );
-            })}
-          </div>
+                <p style={{ fontSize: "13px", color: "#57534E", lineHeight: 1.65, margin: 0 }}>{imp.desc.length > 80 ? imp.desc.slice(0, 77) + "..." : imp.desc}</p>
+              </div>
+            );
+          })}
           {(analysisResult?.cosmetics?.length ?? 0) > 0 && (
-            <div>
+            <div style={{ flexShrink: 0 }}>
               <div style={{ fontSize: "13px", fontWeight: 800, color: DEEP_GREEN, marginBottom: "12px", letterSpacing: "0.5px" }}>추천 성분</div>
               <div style={{ display: "flex", gap: "12px" }}>
                 {(analysisResult?.cosmetics || []).slice(0, 2).map((c: any, i: number) => (
@@ -1493,12 +1491,12 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
           </div>
           <span style={{ color: "#B0A898", fontSize: "13px" }}>{new Date().toLocaleDateString(i18n.language === "ko" ? "ko-KR" : i18n.language === "ja" ? "ja-JP" : "en-US", { month: "long", day: "numeric" })}</span>
         </div>
-        <div style={{ flex: 1, padding: "0 40px", display: "flex", flexDirection: "column", justifyContent: "space-evenly" }}>
-          <div>
+        <div style={{ flex: 1, padding: "32px 40px 0", display: "flex", flexDirection: "column", gap: "20px" }}>
+          <div style={{ flexShrink: 0 }}>
             <div style={{ fontSize: "22px", fontWeight: 900, color: DEEP_GREEN, marginBottom: "4px" }}>{t("nutrients.sectionTitle")}</div>
             <div style={{ fontSize: "13px", color: "#B0A898" }}>{t("result.baumannLabel")} <strong style={{ color: "#D97706" }}>{finalType}</strong></div>
           </div>
-          <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
+          <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: "14px" }}>
             {finalType.split("").filter(l => l in NUTRIENT_COLORS).map((letter) => {
               const arr = t(`nutrients.${letter}`, { returnObjects: true }) as { name: string; foods: string; why: string }[];
               const nutrient = arr?.[0];
@@ -1533,12 +1531,12 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
           </div>
           <span style={{ color: "#B0A898", fontSize: "13px" }}>{new Date().toLocaleDateString(i18n.language === "ko" ? "ko-KR" : i18n.language === "ja" ? "ja-JP" : "en-US", { month: "long", day: "numeric" })}</span>
         </div>
-        <div style={{ flex: 1, padding: "0 40px", display: "flex", flexDirection: "column", justifyContent: "space-evenly" }}>
-          <div>
+        <div style={{ flex: 1, padding: "32px 40px 0", display: "flex", flexDirection: "column", gap: "20px" }}>
+          <div style={{ flexShrink: 0 }}>
             <div style={{ fontSize: "22px", fontWeight: 900, color: DEEP_GREEN }}>⚠️ {t("nutrients.avoidTitle")}</div>
           </div>
           {/* 점심 카드 */}
-          <div style={{ background: "white", borderRadius: "22px", padding: "22px 24px", boxShadow: "0 4px 20px rgba(180,130,110,0.10)", border: "1px solid rgba(220,200,185,0.4)", borderLeft: "5px solid #F59E0B" }}>
+          <div style={{ flex: 1, background: "white", borderRadius: "22px", padding: "22px 24px", boxShadow: "0 4px 20px rgba(180,130,110,0.10)", border: "1px solid rgba(220,200,185,0.4)", borderLeft: "5px solid #F59E0B" }}>
             <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "16px" }}>
               <span style={{ fontSize: "18px" }}>☀️</span>
               <span style={{ fontSize: "16px", fontWeight: 800, color: "#D97706" }}>{t("nutrients.avoidLunch")}</span>
@@ -1554,7 +1552,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
             ))}
           </div>
           {/* 저녁 카드 */}
-          <div style={{ background: "white", borderRadius: "22px", padding: "22px 24px", boxShadow: "0 4px 20px rgba(180,130,110,0.10)", border: "1px solid rgba(220,200,185,0.4)", borderLeft: "5px solid #8B5CF6" }}>
+          <div style={{ flex: 1, background: "white", borderRadius: "22px", padding: "22px 24px", boxShadow: "0 4px 20px rgba(180,130,110,0.10)", border: "1px solid rgba(220,200,185,0.4)", borderLeft: "5px solid #8B5CF6" }}>
             <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "16px" }}>
               <span style={{ fontSize: "18px" }}>🌙</span>
               <span style={{ fontSize: "16px", fontWeight: 800, color: "#7C3AED" }}>{t("nutrients.avoidDinner")}</span>
