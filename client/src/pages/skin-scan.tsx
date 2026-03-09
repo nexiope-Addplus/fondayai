@@ -1062,6 +1062,8 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
   const reels2Ref = useRef<HTMLDivElement>(null);
   const reels3Ref = useRef<HTMLDivElement>(null);
   const reels4Ref = useRef<HTMLDivElement>(null);
+  const reels5Ref = useRef<HTMLDivElement>(null);
+  const reels6Ref = useRef<HTMLDivElement>(null);
   const analysisDrag = useDragControls();
   const improvementsDrag = useDragControls();
   const nutrientsDrag = useDragControls();
@@ -1210,10 +1212,17 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
   const isWrink = (scores[4]?.score ?? 100) < 60;  // index 4 = 주름 및 탄력
   const finalType = `${isOily ? "O" : "D"}${isSens ? "S" : "R"}${isPig ? "P" : "N"}${isWrink ? "W" : "T"}`;
 
+  // 점수 기반 추가 피해야 할 음식
+  const scoreAvoidItems: { key: string; label: string }[] = [];
+  if ((scores[1]?.score ?? 100) < 50) scoreAvoidItems.push({ key: "hydration", label: "💧" });
+  if ((scores[6]?.score ?? 0) > 60)   scoreAvoidItems.push({ key: "trouble",   label: "⚡" });
+  if ((scores[7]?.score ?? 0) > 60)   scoreAvoidItems.push({ key: "darkCircle",label: "🌑" });
+  if ((scores[8]?.score ?? 100) < 50) scoreAvoidItems.push({ key: "glow",      label: "✨" });
+
   const handleShare = async () => {
     try {
       const html2canvas = (await import("html2canvas")).default;
-      const refs = [reels1Ref, reels2Ref, reels3Ref, reels4Ref];
+      const refs = [reels1Ref, reels2Ref, reels3Ref, reels4Ref, reels5Ref, reels6Ref];
       const files: File[] = [];
 
       // 모든 슬라이드를 미리 DOM에 표시 (렌더 보장)
@@ -1273,7 +1282,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
       // AbortError는 사용자가 취소한 것 — 그 외는 콘솔에 출력
       if (e instanceof Error && e.name !== "AbortError") console.error("[share]", e);
       // 숨기기 보장
-      [reels1Ref, reels2Ref, reels3Ref, reels4Ref].forEach(r => {
+      [reels1Ref, reels2Ref, reels3Ref, reels4Ref, reels5Ref, reels6Ref].forEach(r => {
         if (r.current) r.current.style.display = "none";
       });
     }
@@ -1476,6 +1485,139 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
         })}
       </div>
       <div style={{ position: "absolute", bottom: "32px", left: 0, right: 0, textAlign: "center", fontSize: "13px", color: "#C0B8B0", fontWeight: 600, letterSpacing: "0.5px" }}>fondayai.pages.dev</div>
+    </div>
+
+    {/* ── 릴스 슬라이드 5: 오늘 피해야 할 음식 (540×960 = 9:16) ── */}
+    <div ref={reels5Ref} style={{ display: "none", position: "fixed", left: 0, top: 0, width: "540px", height: "960px", overflow: "hidden", zIndex: -1, pointerEvents: "none", background: "linear-gradient(160deg, #FFF7F5 0%, #FFF0EB 50%, #FFE8E0 100%)", fontFamily: "system-ui,-apple-system,sans-serif" }}>
+      {/* 헤더 */}
+      <div style={{ padding: "40px 40px 0", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <span style={{ fontSize: "24px", fontWeight: 900, color: DEEP_GREEN, letterSpacing: "-0.5px" }}>FONDAY AI</span>
+        <div style={{ background: "#D97706", borderRadius: "999px", padding: "6px 16px" }}>
+          <span style={{ fontSize: "13px", fontWeight: 800, color: "white" }}>⚠️ {t("nutrients.avoidTitle")}</span>
+        </div>
+      </div>
+      {/* 바우만 타입 + 종합점수 통합 뱃지 */}
+      <div style={{ margin: "16px 40px 0", display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "6px", background: `${SCAN_TO}18`, borderRadius: "999px", padding: "5px 14px", border: `1px solid ${SCAN_TO}33` }}>
+          <span style={{ fontSize: "11px", color: "#92400E", fontWeight: 700 }}>{t("result.baumannLabel")}</span>
+          <span style={{ fontSize: "16px", fontWeight: 900, color: SCAN_TO }}>{finalType}</span>
+        </div>
+        <div style={{ display: "flex", alignItems: "center", gap: "5px", background: "#FEF3C7", borderRadius: "999px", padding: "5px 14px", border: "1px solid #FDE68A" }}>
+          <span style={{ fontSize: "11px", color: "#92400E", fontWeight: 700 }}>{t("result.overall")}</span>
+          <span style={{ fontSize: "16px", fontWeight: 900, color: "#D97706" }}>{overallScore}</span>
+          <span style={{ fontSize: "11px", color: "#92400E", fontWeight: 600 }}>{t("result.scoreSuffix")}</span>
+        </div>
+      </div>
+      {/* 점심 */}
+      <div style={{ margin: "16px 28px 0", background: "white", borderRadius: "24px", padding: "22px 24px", boxShadow: "0 4px 20px rgba(0,0,0,0.06)" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "14px" }}>
+          <span style={{ fontSize: "18px" }}>☀️</span>
+          <span style={{ fontSize: "15px", fontWeight: 800, color: "#D97706" }}>{t("nutrients.avoidLunch")}</span>
+        </div>
+        {finalType.split("").map((letter) => {
+          const data = t(`nutrients.avoidFoods.${letter}`, { returnObjects: true }) as any;
+          if (!data?.lunch) return null;
+          const color = NUTRIENT_COLORS[letter];
+          return (
+            <div key={letter} style={{ display: "flex", gap: "10px", marginBottom: "10px", alignItems: "flex-start" }}>
+              <span style={{ fontSize: "10px", fontWeight: 800, padding: "2px 7px", borderRadius: "999px", background: `${color}22`, color, flexShrink: 0, marginTop: "2px" }}>{letter}</span>
+              <div>
+                <p style={{ fontSize: "13px", fontWeight: 700, color: "#3A3028", margin: "0 0 2px" }}>{data.lunch}</p>
+                <p style={{ fontSize: "11px", color: "#A8A29E", margin: 0 }}>{data.lunchWhy}</p>
+              </div>
+            </div>
+          );
+        })}
+        {scoreAvoidItems.map(({ key, label }) => {
+          const data = t(`nutrients.scoreAvoid.${key}`, { returnObjects: true }) as any;
+          return (
+            <div key={key} style={{ display: "flex", gap: "10px", marginBottom: "10px", alignItems: "flex-start" }}>
+              <span style={{ fontSize: "12px", flexShrink: 0, marginTop: "1px" }}>{label}</span>
+              <div>
+                <p style={{ fontSize: "13px", fontWeight: 700, color: "#3A3028", margin: "0 0 2px" }}>{data.foods}</p>
+                <p style={{ fontSize: "11px", color: "#A8A29E", margin: 0 }}>{data.why}</p>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+      {/* 저녁 */}
+      <div style={{ margin: "14px 28px 0", background: "white", borderRadius: "24px", padding: "22px 24px", boxShadow: "0 4px 20px rgba(0,0,0,0.06)" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "14px" }}>
+          <span style={{ fontSize: "18px" }}>🌙</span>
+          <span style={{ fontSize: "15px", fontWeight: 800, color: "#7C3AED" }}>{t("nutrients.avoidDinner")}</span>
+        </div>
+        {finalType.split("").map((letter) => {
+          const data = t(`nutrients.avoidFoods.${letter}`, { returnObjects: true }) as any;
+          if (!data?.dinner) return null;
+          const color = NUTRIENT_COLORS[letter];
+          return (
+            <div key={letter} style={{ display: "flex", gap: "10px", marginBottom: "10px", alignItems: "flex-start" }}>
+              <span style={{ fontSize: "10px", fontWeight: 800, padding: "2px 7px", borderRadius: "999px", background: `${color}22`, color, flexShrink: 0, marginTop: "2px" }}>{letter}</span>
+              <div>
+                <p style={{ fontSize: "13px", fontWeight: 700, color: "#3A3028", margin: "0 0 2px" }}>{data.dinner}</p>
+                <p style={{ fontSize: "11px", color: "#A8A29E", margin: 0 }}>{data.dinnerWhy}</p>
+              </div>
+            </div>
+          );
+        })}
+        {scoreAvoidItems.map(({ key, label }) => {
+          const data = t(`nutrients.scoreAvoid.${key}`, { returnObjects: true }) as any;
+          return (
+            <div key={key} style={{ display: "flex", gap: "10px", marginBottom: "10px", alignItems: "flex-start" }}>
+              <span style={{ fontSize: "12px", flexShrink: 0, marginTop: "1px" }}>{label}</span>
+              <div>
+                <p style={{ fontSize: "13px", fontWeight: 700, color: "#3A3028", margin: "0 0 2px" }}>{data.foods}</p>
+                <p style={{ fontSize: "11px", color: "#A8A29E", margin: 0 }}>{data.why}</p>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+      <div style={{ position: "absolute", bottom: "28px", left: 0, right: 0, textAlign: "center", fontSize: "13px", color: "#C0B8B0", fontWeight: 600, letterSpacing: "0.5px" }}>fondayai.pages.dev</div>
+    </div>
+
+    {/* ── 릴스 슬라이드 6: 피부 맞춤 영양 성분 카드 (540×960 = 9:16) ── */}
+    <div ref={reels6Ref} style={{ display: "none", position: "fixed", left: 0, top: 0, width: "540px", height: "960px", overflow: "hidden", zIndex: -1, pointerEvents: "none", background: "#FFFFFF", fontFamily: "system-ui,-apple-system,sans-serif" }}>
+      {/* 상단 컬러 배너 */}
+      <div style={{ background: "linear-gradient(135deg, #F59E0B, #D97706)", padding: "36px 36px 28px" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+          <div>
+            <span style={{ fontSize: "13px", fontWeight: 700, color: "rgba(255,255,255,0.75)", letterSpacing: "1px", display: "block", marginBottom: "4px" }}>FONDAY AI</span>
+            <span style={{ fontSize: "22px", fontWeight: 900, color: "white", letterSpacing: "-0.5px", display: "block" }}>{t("nutrients.sectionTitle")}</span>
+            <span style={{ fontSize: "13px", color: "rgba(255,255,255,0.8)", display: "block", marginTop: "4px" }}>{t("nutrients.sectionSub")}</span>
+          </div>
+          <div style={{ background: "rgba(255,255,255,0.2)", borderRadius: "16px", padding: "8px 14px", textAlign: "center" }}>
+            <span style={{ fontSize: "11px", color: "rgba(255,255,255,0.8)", fontWeight: 600, display: "block" }}>{t("result.baumannLabel")}</span>
+            <span style={{ fontSize: "22px", fontWeight: 900, color: "white" }}>{finalType}</span>
+          </div>
+        </div>
+      </div>
+      {/* 영양소 카드 목록 */}
+      <div style={{ padding: "20px 28px 0", display: "flex", flexDirection: "column", gap: "14px" }}>
+        {finalType.split("").filter(l => l in NUTRIENT_COLORS).map((letter) => {
+          const arr = t(`nutrients.${letter}`, { returnObjects: true }) as { name: string; foods: string; why: string }[];
+          const nutrient = arr?.[0];
+          if (!nutrient) return null;
+          const color = NUTRIENT_COLORS[letter];
+          return (
+            <div key={letter} style={{ display: "flex", gap: "14px", padding: "16px 18px", borderRadius: "20px", border: `1px solid ${color}33`, background: `${color}08`, alignItems: "flex-start" }}>
+              <div style={{ flexShrink: 0, textAlign: "center" }}>
+                <div style={{ width: "40px", height: "40px", borderRadius: "50%", background: `${color}22`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "18px" }}>{NUTRIENT_ICONS[letter]}</div>
+                <span style={{ fontSize: "10px", fontWeight: 900, color, display: "block", marginTop: "4px" }}>{letter}</span>
+              </div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <p style={{ fontSize: "14px", fontWeight: 800, color, margin: "0 0 4px" }}>{nutrient.name}</p>
+                <p style={{ fontSize: "11px", color: "#78716C", lineHeight: 1.55, margin: "0 0 6px" }}>{nutrient.why}</p>
+                <p style={{ fontSize: "11px", color: "#A8A29E", margin: 0 }}>
+                  <span style={{ fontWeight: 700, color }}>{t("nutrients.foodLabel")} </span>{nutrient.foods}
+                </p>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+      <div style={{ position: "absolute", bottom: "28px", left: 0, right: 0, textAlign: "center", fontSize: "13px", color: "#C0B8B0", fontWeight: 600, letterSpacing: "0.5px" }}>fondayai.pages.dev</div>
     </div>
 
     <div ref={resultScrollRef} className="h-[calc(100dvh-60px)] overflow-y-auto">
@@ -2027,9 +2169,19 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
                   })}
                   {/* 오늘 피해야 할 음식 */}
                   <div className="pt-1">
-                    <div className="flex items-center gap-2 mb-3 pt-2 border-t border-stone-100">
-                      <span className="text-base">⚠️</span>
-                      <p className="text-[13px] font-black" style={{ color: "#D97706" }}>{t("nutrients.avoidTitle")}</p>
+                    <div className="pt-2 border-t border-stone-100 mb-3">
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className="text-base">⚠️</span>
+                        <p className="text-[13px] font-black" style={{ color: "#D97706" }}>{t("nutrients.avoidTitle")}</p>
+                      </div>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="text-[11px] font-bold px-2.5 py-1 rounded-full" style={{ background: `${SCAN_TO}18`, color: SCAN_TO, border: `1px solid ${SCAN_TO}33` }}>
+                          {t("result.baumannLabel")} <span className="font-black">{finalType}</span>
+                        </span>
+                        <span className="text-[11px] font-bold px-2.5 py-1 rounded-full" style={{ background: "#FEF3C7", color: "#D97706", border: "1px solid #FDE68A" }}>
+                          {t("result.overall")} <span className="font-black">{overallScore}</span>{t("result.scoreSuffix")}
+                        </span>
+                      </div>
                     </div>
                     {/* 점심 */}
                     <div className="rounded-2xl p-4 mb-3" style={{ background: "#FFF7ED", border: "1px solid #FED7AA" }}>
@@ -2050,6 +2202,18 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
                               <div>
                                 <p className="text-[12px] font-bold text-stone-700">{data.lunch}</p>
                                 <p className="text-[11px] text-stone-400">{data.lunchWhy}</p>
+                              </div>
+                            </div>
+                          );
+                        })}
+                        {scoreAvoidItems.map(({ key, label }) => {
+                          const data = t(`nutrients.scoreAvoid.${key}`, { returnObjects: true }) as any;
+                          return (
+                            <div key={key} className="flex gap-2 items-start">
+                              <span className="text-[10px] font-black px-1.5 py-0.5 rounded-full shrink-0 mt-0.5 bg-stone-100 text-stone-500">{label}</span>
+                              <div>
+                                <p className="text-[12px] font-bold text-stone-700">{data.foods}</p>
+                                <p className="text-[11px] text-stone-400">{data.why}</p>
                               </div>
                             </div>
                           );
@@ -2075,6 +2239,18 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
                               <div>
                                 <p className="text-[12px] font-bold text-stone-700">{data.dinner}</p>
                                 <p className="text-[11px] text-stone-400">{data.dinnerWhy}</p>
+                              </div>
+                            </div>
+                          );
+                        })}
+                        {scoreAvoidItems.map(({ key, label }) => {
+                          const data = t(`nutrients.scoreAvoid.${key}`, { returnObjects: true }) as any;
+                          return (
+                            <div key={key} className="flex gap-2 items-start">
+                              <span className="text-[10px] font-black px-1.5 py-0.5 rounded-full shrink-0 mt-0.5 bg-stone-100 text-stone-500">{label}</span>
+                              <div>
+                                <p className="text-[12px] font-bold text-stone-700">{data.foods}</p>
+                                <p className="text-[11px] text-stone-400">{data.why}</p>
                               </div>
                             </div>
                           );

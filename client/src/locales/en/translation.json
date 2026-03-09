@@ -206,6 +206,12 @@
     "avoidLunch": "Lunch",
     "avoidDinner": "Dinner",
     "avoidWhy": "Why",
+    "scoreAvoid": {
+      "hydration": { "foods": "Alcohol · Coffee · Salty soups", "why": "Low hydration — avoid foods that strip moisture from skin" },
+      "trouble": { "foods": "Dairy · Fast food · High-sugar foods", "why": "High trouble risk — avoid inflammation-triggering foods" },
+      "darkCircle": { "foods": "Alcohol · Caffeine · Salty snacks", "why": "Severe dark circles — avoid foods that impair circulation" },
+      "glow": { "foods": "Processed food · White rice · Refined carbs", "why": "Low skin glow — avoid foods that increase oxidative stress" }
+    },
     "avoidFoods": {
       "O": {
         "lunch": "Fried food · Cream pasta · White rice bowl",
