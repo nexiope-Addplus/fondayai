@@ -1056,6 +1056,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
   const [history, setHistory] = useState<any[]>([]);
   const [isSaved, setIsSaved] = useState(false);
   const [currentScanId, setCurrentScanId] = useState<string | null>(null);
+  const [currentShareToken, setCurrentShareToken] = useState<string | null>(null);
   const [showWaitlist, setShowWaitlist] = useState(false);
   const [showImprovements, setShowImprovements] = useState(false);
   const [showAnalysis, setShowAnalysis] = useState(false);
@@ -1177,6 +1178,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
     }).then(res => res.json()).then(data => {
       setIsSaved(true);
       if (data?.id) setCurrentScanId(data.id);
+      if (data?.shareToken) setCurrentShareToken(data.shareToken);
     });
   }, [user, analysisResult]);
 
@@ -1811,6 +1813,31 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
             <span className="text-[11px]">{t("nutrients.sectionTitle")}</span>
           </Button>
         </div>
+
+        {/* 피부 챌린지 초대 버튼 */}
+        {currentShareToken && (
+          <motion.div variants={fadeChild}>
+            <Button
+              className="w-full h-14 text-lg font-bold bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white shadow-lg flex items-center justify-center gap-2 rounded-2xl transition-all"
+              onClick={() => {
+                const shareUrl = `${window.location.origin}/battle/${currentShareToken}`;
+                if (navigator.share) {
+                  navigator.share({
+                    title: 'Fonday AI 피부 챌린지!',
+                    text: `내 피부 점수(${overallScore}점, ${finalType})를 확인하고 나와 겨뤄보세요!`,
+                    url: shareUrl,
+                  }).catch(console.error);
+                } else {
+                  navigator.clipboard.writeText(shareUrl).then(() => {
+                    alert("챌린지 링크가 복사되었습니다! 친구에게 보내서 겨뤄보세요.");
+                  });
+                }
+              }}
+            >
+              <span className="text-2xl">👑</span> 친구에게 피부 챌린지 보내기
+            </Button>
+          </motion.div>
+        )}
 
         {/* 피부 일기 카드 버튼 / 로그인 카드 */}
         {user === undefined ? (
@@ -3085,7 +3112,7 @@ function ReportTab({ user }: { user: any }) {
           </motion.div>
         )}
 
-        {/* 배틀 모드 초대 버튼 */}
+        {/* 피부 챌린지 초대 버튼 */}
         {lastScan.shareToken && (
           <motion.div variants={fadeChild}>
             <Button
@@ -3094,18 +3121,18 @@ function ReportTab({ user }: { user: any }) {
                 const shareUrl = `${window.location.origin}/battle/${lastScan.shareToken}`;
                 if (navigator.share) {
                   navigator.share({
-                    title: 'Fonday AI 피부 배틀 대결!',
-                    text: `내 피부 점수(${lastScan.overallScore}점, ${lastScan.baumannType})를 확인하고 나와 대결해 보세요!`,
+                    title: 'Fonday AI 피부 챌린지!',
+                    text: `내 피부 점수(${lastScan.overallScore}점, ${lastScan.baumannType})를 확인하고 나와 겨뤄보세요!`,
                     url: shareUrl,
                   }).catch(console.error);
                 } else {
                   navigator.clipboard.writeText(shareUrl).then(() => {
-                    alert("배틀 링크가 복사되었습니다! 친구에게 링크를 보내 대결해보세요.");
+                    alert("챌린지 링크가 복사되었습니다! 친구에게 보내서 겨뤄보세요.");
                   });
                 }
               }}
             >
-              <span className="text-2xl">👑</span> 친구에게 배틀 도전장 보내기
+              <span className="text-2xl">👑</span> 친구에게 피부 챌린지 보내기
             </Button>
           </motion.div>
         )}

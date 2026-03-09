@@ -54,7 +54,7 @@ export default function BattlePage() {
         }
 
         if (!res.ok) {
-          throw new Error(res.status === 404 ? "배틀 정보를 찾을 수 없습니다." : "데이터를 불러오는데 실패했습니다.");
+          throw new Error(res.status === 404 ? "챌린지 정보를 찾을 수 없습니다." : "데이터를 불러오는데 실패했습니다.");
         }
         const data = await res.json();
         setFriendScan(data);
@@ -96,7 +96,7 @@ export default function BattlePage() {
         <div className="w-16 h-16 rounded-full bg-stone-100 flex items-center justify-center mb-2">
           <Shield className="w-8 h-8 text-stone-300" />
         </div>
-        <h2 className="text-xl font-black text-stone-800">배틀 정보를 불러올 수 없어요</h2>
+        <h2 className="text-xl font-black text-stone-800">챌린지 정보를 불러올 수 없어요</h2>
         <p className="text-stone-500 text-sm">{error || "유효하지 않은 링크입니다."}</p>
         <Button onClick={() => setLocation("/")} className="mt-4 rounded-xl px-6" variant="outline">
           홈으로 돌아가기
@@ -142,7 +142,7 @@ export default function BattlePage() {
         <button onClick={() => setLocation("/")} className="w-10 h-10 flex items-center justify-center -ml-2 rounded-full hover:bg-stone-100 active:bg-stone-200 transition-colors">
           <ChevronLeft className="w-6 h-6 text-stone-600" />
         </button>
-        <h1 className="text-lg font-black" style={{ color: DEEP_GREEN }}>피부 배틀 ⚔️</h1>
+        <h1 className="text-lg font-black" style={{ color: DEEP_GREEN }}>피부 챌린지 ⚔️</h1>
         <div className="w-10 hidden sm:block" />
       </div>
 
@@ -152,10 +152,10 @@ export default function BattlePage() {
           {/* Main Battle Banner */}
           <motion.div variants={fadeChild} className="text-center pt-2 pb-4">
             <h2 className="text-2xl font-black mb-2" style={{ color: DEEP_GREEN }}>
-              {myScan ? (isWinner ? "승리! 🎉" : "아쉽네요! 다음 기회에 😅") : "친구가 배틀을 신청했어요!"}
+              {myScan ? (isWinner ? "승리! 🎉" : "아쉽네요! 다음 기회에 😅") : "친구가 챌린지를 보냈어요!"}
             </h2>
             <p className="text-sm text-stone-500">
-              {myScan ? "나와 친구의 피부 상태를 비교해보세요." : "지금 바로 내 피부를 스캔하고 친구와 대결해보세요."}
+              {myScan ? "나와 친구의 피부 상태를 비교해보세요." : "지금 바로 내 피부를 스캔하고 친구와 겨뤄보세요."}
             </p>
           </motion.div>
 
@@ -302,7 +302,7 @@ export default function BattlePage() {
                >
                  <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 pointer-events-none" />
                  <Sparkles className="w-5 h-5" />
-                 나도 피부 스캔하고 대결하기
+                 나도 피부 스캔하고 챌린지 참여하기
                  <ArrowRight className="w-5 h-5 ml-1" />
                </Button>
             </motion.div>

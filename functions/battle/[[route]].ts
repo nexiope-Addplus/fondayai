@@ -15,8 +15,8 @@ export const onRequest = async (context: any) => {
     return response;
   }
 
-  let ogTitle = "Fonday AI - 피부 분석 대결!";
-  let ogDescription = "내 피부 점수를 확인하고 친구와 대결해보세요.";
+  let ogTitle = "Fonday AI - 피부 챌린지!";
+  let ogDescription = "내 피부 점수를 확인하고 친구와 겨뤄보세요.";
   let ogImage = "https://fonday.ai/og-default.png"; // Fallback image
 
   try {
@@ -36,7 +36,7 @@ export const onRequest = async (context: any) => {
         const encodedText = encodeURIComponent(`${baumann} vs ?`);
         ogImage = `https://placehold.co/1200x630/1e1e2f/ffffff.png?text=${encodedText}&font=Montserrat`;
 
-        ogTitle = `[Fonday 피부 대결] 내 타입은 ${baumann}(${score}점)! 당신은?`;
+        ogTitle = `[Fonday 피부 챌린지] 내 타입은 ${baumann}(${score}점)! 당신은?`;
         ogDescription = "상대방의 점수와 비교해서 누가 피부 미인인지 겨뤄보세요!";
       }
     }
