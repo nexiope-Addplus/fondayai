@@ -1327,12 +1327,12 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
   // ── 공유 슬라이드 공통 ──
   const slideDate = new Date().toLocaleDateString(i18n.language === "ko" ? "ko-KR" : i18n.language === "ja" ? "ja-JP" : "en-US", { month: "long", day: "numeric" });
   const slideHeader = (label?: string) => (
-    <div style={{ padding: "60px 44px 0", display: "flex", justifyContent: "space-between", alignItems: "baseline", flexShrink: 0 }}>
-      <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-        <div style={{ width: "30px", height: "30px", borderRadius: "10px", background: `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "15px", color: "white" }}>✦</div>
-        <span style={{ color: DEEP_GREEN, fontSize: "20px", fontWeight: 800, letterSpacing: "-0.5px" }}>FondayAI</span>
+    <div style={{ padding: "50px 44px 0", display: "flex", justifyContent: "space-between", alignItems: "center", flexShrink: 0 }}>
+      <div style={{ display: "flex", alignItems: "center", gap: "9px" }}>
+        <div style={{ width: "28px", height: "28px", borderRadius: "9px", background: `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "14px", color: "white" }}>✦</div>
+        <span style={{ color: DEEP_GREEN, fontSize: "18px", fontWeight: 800, letterSpacing: "0.3px" }}>FondayAI</span>
       </div>
-      <span style={{ color: "#B0A898", fontSize: "14px", fontWeight: 500 }}>{label ?? slideDate}</span>
+      <span style={{ color: "#B0A898", fontSize: "13px", fontWeight: 500 }}>{label ?? slideDate}</span>
     </div>
   );
   const slideFooter = (
@@ -1353,39 +1353,39 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
       {slideHeader()}
       
       {/* 메인 콘텐츠 */}
-      <div style={{ flex: 1, padding: "0 44px", display: "flex", flexDirection: "column", justifyContent: "center", gap: "30px" }}>
+      <div style={{ flex: 1, padding: "20px 44px 0", display: "flex", flexDirection: "column", justifyContent: "center", gap: "24px" }}>
         {/* 바우만 타입 */}
-        <div style={{ textAlign: "center" }}>
-          <div style={{ fontSize: "12px", color: "#B0A898", letterSpacing: "4px", textTransform: "uppercase", marginBottom: "16px", fontWeight: 700 }}>Baumann Skin Type</div>
-          <div style={{ fontSize: "84px", fontWeight: 900, color: SCAN_TO, fontFamily: "Georgia, serif", lineHeight: "1.1", letterSpacing: "-4px", marginBottom: "20px" }}>{finalType}</div>
+        <div style={{ textAlign: "center", flexShrink: 0 }}>
+          <div style={{ fontSize: "11px", color: "#B0A898", letterSpacing: "3px", textTransform: "uppercase", marginBottom: "12px", fontWeight: 700 }}>Baumann Skin Type</div>
+          <div style={{ fontSize: "72px", fontWeight: 900, color: SCAN_TO, fontFamily: "Georgia, serif", lineHeight: "1", letterSpacing: "-3px", marginBottom: "14px" }}>{finalType}</div>
           <div style={{ display: "flex", gap: "8px", justifyContent: "center", flexWrap: "wrap" }}>
             {finalType.split("").map((letter, i) => {
               const color = BAUMANN_COLORS[letter];
               if (!color) return null;
-              return <span key={i} style={{ fontSize: "14px", fontWeight: 700, padding: "6px 18px", borderRadius: "99px", background: `${color}15`, border: `1px solid ${color}30`, color }}>{t(`baumann.${letter}.name`)}</span>;
+              return <span key={i} style={{ fontSize: "13px", fontWeight: 700, padding: "5px 16px", borderRadius: "99px", background: `${color}15`, border: `1px solid ${color}30`, color }}>{t(`baumann.${letter}.name`)}</span>;
             })}
           </div>
         </div>
 
         {/* 종합점수 + 피부나이 */}
-        <div style={{ display: "flex", gap: "16px" }}>
-          <div style={{ flex: 1, background: "white", borderRadius: "28px", padding: "28px 16px", textAlign: "center", boxShadow: "0 10px 30px rgba(180,130,110,0.08)", border: "1px solid rgba(220,200,185,0.3)" }}>
-            <div style={{ fontSize: "64px", fontWeight: 900, color: SCAN_TO, fontFamily: "Georgia, serif", lineHeight: "1", marginBottom: "8px" }}>{overallScore}</div>
-            <div style={{ fontSize: "14px", color: "#B0A898", fontWeight: 700, letterSpacing: "0.5px" }}>{t("result.overall")}</div>
+        <div style={{ display: "flex", gap: "14px", flexShrink: 0 }}>
+          <div style={{ flex: 1, background: "white", borderRadius: "24px", padding: "24px 16px", textAlign: "center", boxShadow: "0 10px 30px rgba(180,130,110,0.08)", border: "1px solid rgba(220,200,185,0.3)", display: "flex", flexDirection: "column", justifyContent: "center" }}>
+            <div style={{ fontSize: "58px", fontWeight: 900, color: SCAN_TO, fontFamily: "Georgia, serif", lineHeight: "1", width: "100%", marginBottom: "4px" }}>{overallScore}</div>
+            <div style={{ fontSize: "13px", color: "#B0A898", fontWeight: 700, letterSpacing: "0.5px" }}>{t("result.overall")}</div>
           </div>
           {analysisResult?.skinAge != null && analysisResult.skinAge > 0 && (
-            <div style={{ flex: 1, background: "white", borderRadius: "28px", padding: "28px 16px", textAlign: "center", boxShadow: "0 10px 30px rgba(180,130,110,0.08)", border: "1px solid rgba(220,200,185,0.3)" }}>
-              <div style={{ fontSize: "64px", fontWeight: 900, color: "#8B5CF6", fontFamily: "Georgia, serif", lineHeight: "1", marginBottom: "8px" }}>{analysisResult.skinAge}</div>
-              <div style={{ fontSize: "14px", color: "#B0A898", fontWeight: 700, letterSpacing: "0.5px" }}>{t("result.skinAge")}</div>
+            <div style={{ flex: 1, background: "white", borderRadius: "24px", padding: "24px 16px", textAlign: "center", boxShadow: "0 10px 30px rgba(180,130,110,0.08)", border: "1px solid rgba(220,200,185,0.3)", display: "flex", flexDirection: "column", justifyContent: "center" }}>
+              <div style={{ fontSize: "58px", fontWeight: 900, color: "#8B5CF6", fontFamily: "Georgia, serif", lineHeight: "1", width: "100%", marginBottom: "4px" }}>{analysisResult.skinAge}</div>
+              <div style={{ fontSize: "13px", color: "#B0A898", fontWeight: 700, letterSpacing: "0.5px" }}>{t("result.skinAge")}</div>
             </div>
           )}
         </div>
 
         {/* AI 총평 */}
         {analysisResult?.aiComment && (
-          <div style={{ background: "white", borderRadius: "28px", padding: "24px 28px", boxShadow: "0 10px 30px rgba(180,130,110,0.08)", border: "1px solid rgba(220,200,185,0.3)", borderLeft: `6px solid ${DEEP_GREEN}` }}>
-            <div style={{ fontSize: "12px", color: DEEP_GREEN, fontWeight: 800, letterSpacing: "1px", textTransform: "uppercase", marginBottom: "12px" }}>FondayAI 분석 총평</div>
-            <p style={{ fontSize: "15px", color: "#44403C", lineHeight: "1.75", margin: 0, wordBreak: "keep-all", fontWeight: 500 }}>{analysisResult.aiComment}</p>
+          <div style={{ background: "white", borderRadius: "24px", padding: "20px 24px", boxShadow: "0 10px 30px rgba(180,130,110,0.08)", border: "1px solid rgba(220,200,185,0.3)", borderLeft: `5px solid ${DEEP_GREEN}` }}>
+            <div style={{ fontSize: "12px", color: DEEP_GREEN, fontWeight: 800, letterSpacing: "1px", textTransform: "uppercase", marginBottom: "10px" }}>FondayAI 분석 총평</div>
+            <p style={{ fontSize: "14px", color: "#44403C", lineHeight: "1.7", margin: 0, wordBreak: "keep-all", fontWeight: 500 }}>{analysisResult.aiComment}</p>
           </div>
         )}
       </div>
