@@ -308,6 +308,7 @@
   },
   "ranking": {
     "myPercentile": "상위 {{percent}}%",
+    "topLabel": "상위",
     "myRankLabel": "내 피부 순위",
     "totalData": "전체 {{count}}개 데이터 기준",
     "avgScore": "평균 점수",

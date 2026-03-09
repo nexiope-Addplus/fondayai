@@ -308,6 +308,7 @@
   },
   "ranking": {
     "myPercentile": "Top {{percent}}%",
+    "topLabel": "Top",
     "myRankLabel": "My Skin Rank",
     "totalData": "Based on {{count}} total scans",
     "avgScore": "Avg Score",

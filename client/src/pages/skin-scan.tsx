@@ -1601,61 +1601,105 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
           </div>
         </Card>
 
-        {/* 요약 카드 */}
-        <Card className="border-none shadow-md rounded-3xl bg-white">
-          <CardContent className="p-5">
-            <div className="flex items-center gap-3">
+        {/* 요약 카드 — 통합 */}
+        <Card className="border-none shadow-md rounded-3xl bg-white overflow-hidden">
+          <CardContent className="p-0">
+            {/* 바우만 타입 헤더 */}
+            <div className="text-center pt-5 pb-3">
+              <p className="text-[11px] text-stone-400 mb-1">{surveyData?.age} {surveyData?.gender}</p>
+              <span className="text-4xl font-black tracking-tight" style={{ color: SCAN_TO }}>{finalType}</span>
+              <div className="flex gap-1.5 justify-center mt-2">
+                {finalType.split("").map((letter, i) => {
+                  const color = BAUMANN_COLORS[letter];
+                  if (!color) return null;
+                  return (
+                    <span key={i} className="text-[10px] font-bold px-2.5 py-0.5 rounded-full"
+                      style={{ background: `${color}15`, color }}>
+                      {t(`baumann.${letter}.name`)}
+                    </span>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* 3열 수치 */}
+            <div className="grid grid-cols-3 gap-px mx-5 mb-4 rounded-2xl overflow-hidden border border-stone-100">
               {/* 종합점수 */}
-              <div className="w-[72px] h-[72px] rounded-2xl flex flex-col items-center justify-center text-white shadow-lg shrink-0"
-                style={{ background: `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})` }}>
-                <span className="text-3xl font-black leading-none">{overallScore}</span>
-                <span className="text-[9px] font-bold opacity-80 mt-1">{t("result.overall")}</span>
+              <div className="flex flex-col items-center justify-center py-3 bg-stone-50/60">
+                <span className="text-2xl font-black" style={{ color: SCAN_TO }}>{overallScore}</span>
+                <span className="text-[9px] font-bold text-stone-400 mt-0.5">{t("result.overall")}</span>
               </div>
               {/* 피부나이 */}
-              {analysisResult?.skinAge != null && analysisResult.skinAge > 0 && (
-                <div className="w-[72px] h-[72px] rounded-2xl flex flex-col items-center justify-center text-white shadow-lg shrink-0"
-                  style={{ background: "linear-gradient(135deg, #A78BFA, #7C3AED)" }}>
-                  <span className="text-3xl font-black leading-none">{analysisResult.skinAge}</span>
-                  <span className="text-[9px] font-bold opacity-80 mt-1">{t("result.skinAge")}</span>
+              <div className="flex flex-col items-center justify-center py-3 bg-stone-50/60 border-x border-stone-100">
+                <span className="text-2xl font-black" style={{ color: "#7C3AED" }}>
+                  {analysisResult?.skinAge && analysisResult.skinAge > 0 ? analysisResult.skinAge : "—"}
+                </span>
+                <span className="text-[9px] font-bold text-stone-400 mt-0.5">{t("result.skinAge")}</span>
+              </div>
+              {/* 랭킹 */}
+              <div className="flex flex-col items-center justify-center py-3 bg-stone-50/60">
+                {rankingData && rankingData.myPercentile !== undefined ? (
+                  <>
+                    <span className="text-2xl font-black" style={{ color: "#D97706" }}>
+                      {rankingData.myPercentile}%
+                    </span>
+                    <span className="text-[9px] font-bold text-stone-400 mt-0.5 flex items-center gap-0.5">
+                      <Star className="w-2.5 h-2.5 text-amber-500" />
+                      {t("ranking.topLabel")}
+                    </span>
+                  </>
+                ) : (
+                  <>
+                    <span className="text-2xl font-black text-stone-300">—</span>
+                    <span className="text-[9px] font-bold text-stone-400 mt-0.5">Rank</span>
+                  </>
+                )}
+              </div>
+            </div>
+
+            {/* 점수 분포 미니 바 */}
+            {rankingData && rankingData.totalScans > 0 && (
+              <div className="mx-5 mb-4 p-3 rounded-xl bg-stone-50">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-[10px] font-bold text-stone-400">{t("ranking.distribution")}</span>
+                  <span className="text-[9px] text-stone-300">
+                    {t("ranking.totalData", { count: rankingData.totalScans })}
+                  </span>
                 </div>
-              )}
-              {/* 바우만 타입 */}
-              <div className="min-w-0 flex-1">
-                <p className="text-[11px] text-stone-400 mb-1">{surveyData?.age} {surveyData?.gender}</p>
-                <div className="flex items-baseline gap-1 mb-1.5">
-                  <span className="text-[13px] text-stone-500">{t("result.baumannLabel")}</span>
-                  <span className="text-xl font-black" style={{ color: SCAN_TO }}>{finalType}</span>
-                  <span className="text-[13px] text-stone-500">{t("result.baumannSuffix")}</span>
-                </div>
-                <div className="flex gap-1 flex-wrap">
-                  {finalType.split("").map((letter, i) => {
-                    const color = BAUMANN_COLORS[letter];
-                    if (!color) return null;
+                <div className="flex gap-1 items-end h-8">
+                  {rankingData.scoreDistribution.map((band, bi) => {
+                    const maxCount = Math.max(...rankingData.scoreDistribution.map(d => d.count), 1);
+                    const barH = Math.max(Math.round((band.count / maxCount) * 100), band.count > 0 ? 12 : 4);
+                    const [bMin, bMax] = band.label.split("-").map(Number);
+                    const isMyBand = overallScore >= bMin && overallScore <= bMax;
                     return (
-                      <span key={i} className="text-[10px] font-bold px-2 py-0.5 rounded-full"
-                        style={{ background: `${color}18`, color }}>
-                        {t(`baumann.${letter}.name`)}
+                      <div key={bi} className="flex-1 flex flex-col items-center gap-0.5">
+                        <div className="w-full rounded-sm transition-all duration-700"
+                          style={{
+                            height: `${barH}%`,
+                            background: isMyBand
+                              ? `linear-gradient(180deg, ${SCAN_FROM}, ${SCAN_TO})`
+                              : "#D6D3D1",
+                            boxShadow: isMyBand ? `0 0 6px ${SCAN_FROM}60` : "none",
+                          }} />
+                      </div>
+                    );
+                  })}
+                </div>
+                <div className="flex gap-1 mt-1">
+                  {rankingData.scoreDistribution.map((band, bi) => {
+                    const [bMin, bMax] = band.label.split("-").map(Number);
+                    const isMyBand = overallScore >= bMin && overallScore <= bMax;
+                    return (
+                      <span key={bi} className={`flex-1 text-center text-[8px] ${isMyBand ? "font-bold" : "text-stone-300"}`}
+                        style={isMyBand ? { color: SCAN_TO } : {}}>
+                        {band.label}
                       </span>
                     );
                   })}
                 </div>
-                {rankingData && rankingData.totalScans > 0 && (
-                  <div className="mt-1.5">
-                    {rankingData.myPercentile !== undefined ? (
-                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full inline-flex items-center gap-0.5"
-                        style={{ background: "#D9770615", color: "#D97706" }}>
-                        <Star className="w-2.5 h-2.5" />
-                        {t("ranking.myPercentile", { percent: rankingData.myPercentile })}
-                      </span>
-                    ) : (
-                      <span className="text-[10px] text-stone-400">
-                        {t("ranking.totalData", { count: rankingData.totalScans })}
-                      </span>
-                    )}
-                  </div>
-                )}
               </div>
-            </div>
+            )}
           </CardContent>
         </Card>
 
