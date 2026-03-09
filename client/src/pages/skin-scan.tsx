@@ -1273,12 +1273,13 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
           logging: false,
           width: 540,
           height: 675,
-          windowWidth: 540,
-          windowHeight: 675,
-          x: 0,
-          y: 0,
-          scrollX: 0,
-          scrollY: 0,
+          onclone: (_doc: Document, clonedEl: HTMLElement) => {
+            clonedEl.style.position = "relative";
+            clonedEl.style.left = "0";
+            clonedEl.style.top = "0";
+            clonedEl.style.display = "flex";
+            clonedEl.style.flexDirection = "column";
+          },
         });
         const blob = await new Promise<Blob | null>(r => canvas.toBlob(r, "image/png"));
         if (blob) files.push(new File([blob], `fonday-reels-${i + 1}.png`, { type: "image/png" }));
@@ -1371,21 +1372,21 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
         </div>
         {/* 종합점수 + 피부나이 */}
         <div style={{ display: "flex", gap: "12px", flexShrink: 0 }}>
-          <div style={{ flex: 1, background: "white", borderRadius: "20px", padding: "18px 16px", textAlign: "center", boxShadow: "0 4px 24px rgba(180,130,110,0.12)", border: "1px solid rgba(220,200,185,0.4)" }}>
+          <div style={{ flex: 1, background: "white", borderRadius: "20px", padding: "18px 16px", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", boxShadow: "0 4px 24px rgba(180,130,110,0.12)", border: "1px solid rgba(220,200,185,0.4)" }}>
             <div style={{ fontSize: "44px", fontWeight: 900, color: SCAN_TO, fontFamily: "Georgia, serif", lineHeight: 1 }}>{overallScore}</div>
             <div style={{ fontSize: "12px", color: "#B0A898", marginTop: "8px" }}>{t("result.overall")}</div>
           </div>
           {analysisResult?.skinAge != null && analysisResult.skinAge > 0 && (
-            <div style={{ flex: 1, background: "white", borderRadius: "20px", padding: "18px 16px", textAlign: "center", boxShadow: "0 4px 24px rgba(180,130,110,0.12)", border: "1px solid rgba(220,200,185,0.4)" }}>
+            <div style={{ flex: 1, background: "white", borderRadius: "20px", padding: "18px 16px", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", boxShadow: "0 4px 24px rgba(180,130,110,0.12)", border: "1px solid rgba(220,200,185,0.4)" }}>
               <div style={{ fontSize: "44px", fontWeight: 900, color: "#8B5CF6", fontFamily: "Georgia, serif", lineHeight: 1 }}>{analysisResult.skinAge}</div>
               <div style={{ fontSize: "12px", color: "#B0A898", marginTop: "8px" }}>{t("result.skinAge")}</div>
             </div>
           )}
         </div>
-        {/* AI 총평 — 남은 공간 전부 차지 */}
+        {/* AI 총평 */}
         {analysisResult?.aiComment && (
-          <div style={{ flex: 1, background: "white", borderRadius: "20px", padding: "18px 22px", boxShadow: "0 4px 24px rgba(180,130,110,0.12)", border: "1px solid rgba(220,200,185,0.4)", borderLeft: `4px solid ${DEEP_GREEN}`, overflow: "hidden" }}>
-            <div style={{ fontSize: "10px", color: DEEP_GREEN, fontWeight: 700, letterSpacing: "1px", textTransform: "uppercase", marginBottom: "8px" }}>FondayAI 총평</div>
+          <div style={{ flex: 1, background: "white", borderRadius: "20px", padding: "18px 22px", boxShadow: "0 4px 24px rgba(180,130,110,0.12)", border: "1px solid rgba(220,200,185,0.4)", borderLeft: `4px solid ${DEEP_GREEN}`, overflow: "hidden", display: "flex", flexDirection: "column" }}>
+            <div style={{ fontSize: "10px", color: DEEP_GREEN, fontWeight: 700, letterSpacing: "1px", textTransform: "uppercase", marginBottom: "8px", flexShrink: 0 }}>FondayAI 총평</div>
             <p style={{ fontSize: "14px", color: "#3A3028", lineHeight: 1.7, margin: 0 }}>{analysisResult.aiComment}</p>
           </div>
         )}
