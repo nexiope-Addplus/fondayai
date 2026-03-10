@@ -1352,73 +1352,73 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
     }
   };
 
-  // ── 공유 슬라이드 (Premium Glassmorphism - Skin Challenge) ──
+  // ── 공유 슬라이드 (HTML2Canvas Safe - Flat Premium) ──
   const slideHeader = () => (
     <div style={{ padding: "40px 40px 0", display: "flex", justifyContent: "space-between", alignItems: "center", flexShrink: 0, zIndex: 10 }}>
       <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-        <div style={{ width: "24px", height: "24px", borderRadius: "8px", background: `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})`, color: "white", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "12px" }}>✦</div>
-        <span style={{ color: "#1E293B", fontSize: "16px", fontWeight: 800, letterSpacing: "-0.5px" }}>FondayAI</span>
+        <div style={{ width: "24px", height: "24px", borderRadius: "8px", background: DEEP_GREEN, color: "white", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "12px" }}>✦</div>
+        <span style={{ color: "#1E293B", fontSize: "18px", fontWeight: 800, letterSpacing: "-0.5px" }}>FondayAI</span>
       </div>
-      <div style={{ display: "flex", alignItems: "center", gap: "6px", background: "rgba(255,255,255,0.7)", padding: "4px 10px", borderRadius: "20px", backdropFilter: "blur(10px)" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: "6px", background: "#E2E8F0", padding: "6px 12px", borderRadius: "20px" }}>
         <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#10B981" }}></span>
-        <span style={{ color: "#64748B", fontSize: "11px", fontWeight: 700, letterSpacing: "0.5px" }}>AI SCAN ACTIVE</span>
+        <span style={{ color: "#475569", fontSize: "12px", fontWeight: 800, letterSpacing: "0.5px" }}>AI SCAN ACTIVE</span>
       </div>
     </div>
   );
 
   const slideFooter = (
     <div style={{ padding: "0 40px 40px", flexShrink: 0, zIndex: 10 }}>
-      <div style={{ background: "rgba(255, 255, 255, 0.8)", backdropFilter: "blur(16px)", border: "1px solid rgba(255,255,255,0.9)", borderRadius: "100px", padding: "16px 24px", display: "flex", justifyContent: "space-between", alignItems: "center", boxShadow: "0 8px 32px rgba(0,0,0,0.05)" }}>
-        <span style={{ fontSize: "14px", fontWeight: 800, color: "#1E293B" }}>🔥 나랑 <span style={{ color: SCAN_TO }}>피부 챌린지</span> 뜰 사람?</span>
+      <div style={{ background: "white", border: "1px solid #E2E8F0", borderRadius: "100px", padding: "18px 24px", display: "flex", justifyContent: "space-between", alignItems: "center", boxShadow: "0 10px 25px rgba(0,0,0,0.05)" }}>
+        <span style={{ fontSize: "15px", fontWeight: 800, color: "#1E293B" }}>🔥 나랑 <span style={{ color: SCAN_TO }}>피부 챌린지</span> 뜰 사람?</span>
         <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-          <span style={{ fontSize: "11px", fontWeight: 700, color: "#64748B", background: "#F1F5F9", padding: "4px 8px", borderRadius: "12px" }}>검색창 Fonday AI</span>
+          <span style={{ fontSize: "12px", fontWeight: 700, color: "#64748B", background: "#F1F5F9", padding: "6px 10px", borderRadius: "12px" }}>검색창 Fonday AI</span>
         </div>
       </div>
     </div>
   );
 
-  const auraBg = (
+  const solidBg = (
     <div style={{ position: "absolute", inset: 0, background: "#F8FAFC", overflow: "hidden", zIndex: 0 }}>
-      <div style={{ position: "absolute", top: "-15%", right: "-10%", width: "65%", height: "55%", borderRadius: "50%", background: `radial-gradient(circle, ${SCAN_FROM}55, transparent 70%)`, filter: "blur(60px)" }} />
-      <div style={{ position: "absolute", bottom: "-10%", left: "-15%", width: "70%", height: "60%", borderRadius: "50%", background: `radial-gradient(circle, #E0E7FF88, transparent 70%)`, filter: "blur(60px)" }} />
-      <div style={{ position: "absolute", top: "30%", left: "10%", width: "40%", height: "40%", borderRadius: "50%", background: `radial-gradient(circle, ${DEEP_GREEN}1A, transparent 70%)`, filter: "blur(60px)" }} />
+      <div style={{ position: "absolute", top: "-100px", right: "-100px", width: "400px", height: "400px", borderRadius: "50%", background: `${SCAN_FROM}1A`, pointerEvents: "none" }} />
+      <div style={{ position: "absolute", bottom: "-100px", left: "-100px", width: "300px", height: "300px", borderRadius: "50%", background: `#E0E7FF88`, pointerEvents: "none" }} />
     </div>
   );
 
-  const glassStyle: React.CSSProperties = {
-    background: "rgba(255, 255, 255, 0.55)", backdropFilter: "blur(24px)", WebkitBackdropFilter: "blur(24px)",
-    border: "1px solid rgba(255,255,255,0.8)", boxShadow: "0 20px 40px rgba(0,0,0,0.05), inset 0 1px 0 rgba(255,255,255,1)",
-    borderRadius: "32px", display: "flex", flexDirection: "column", position: "relative", zIndex: 10, overflow: "hidden"
+  const cardStyle: React.CSSProperties = {
+    background: "white",
+    border: "1px solid #F1F5F9",
+    boxShadow: "0 12px 36px rgba(0,0,0,0.06)",
+    borderRadius: "28px", display: "flex", flexDirection: "column", position: "relative", zIndex: 10, overflow: "hidden"
   };
 
   return (
     <>
     {/* ── 릴스 슬라이드 1: 메인 표지 ── */}
     <div ref={reels1Ref} style={{ display: "none", position: "fixed", left: 0, top: 0, width: "540px", height: "675px", zIndex: -1, pointerEvents: "none", fontFamily: "system-ui,-apple-system,sans-serif" }}>
-      {auraBg}
+      {solidBg}
       {slideHeader()}
       <div style={{ flex: 1, padding: "20px 40px", display: "flex", flexDirection: "column", justifyContent: "center", gap: "20px", zIndex: 10 }}>
         
-        {/* 바우만 + 종합점수 메인 글래스 카드 */}
-        <div style={{ ...glassStyle, padding: "40px", alignItems: "center", textAlign: "center" }}>
-          <div style={{ background: "linear-gradient(135deg, #1E293B, #334155)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", fontSize: "14px", fontWeight: 900, letterSpacing: "3px", marginBottom: "8px" }}>SKIN ANALYSIS</div>
-          <div style={{ fontSize: "72px", fontWeight: 900, color: SCAN_TO, fontFamily: "system-ui", letterSpacing: "-3px", lineHeight: "1", marginBottom: "16px", textShadow: "0 4px 20px rgba(201,112,98,0.3)" }}>{finalType}</div>
-          <div style={{ display: "flex", gap: "6px", flexWrap: "wrap", justifyContent: "center", marginBottom: "32px" }}>
+        {/* 바우만 + 종합점수 메인 카드 */}
+        <div style={{ ...cardStyle, padding: "40px", alignItems: "center", textAlign: "center" }}>
+          <div style={{ color: "#334155", fontSize: "14px", fontWeight: 900, letterSpacing: "3px", marginBottom: "8px" }}>SKIN ANALYSIS</div>
+          <div style={{ fontSize: "76px", fontWeight: 900, color: SCAN_TO, fontFamily: "system-ui", letterSpacing: "-3px", lineHeight: "1", marginBottom: "16px" }}>{finalType}</div>
+          <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", justifyContent: "center", marginBottom: "32px" }}>
             {finalType.split("").map((letter, i) => {
               const color = BAUMANN_COLORS[letter] || "#000";
-              return <span key={i} style={{ fontSize: "12px", fontWeight: 700, padding: "6px 14px", borderRadius: "100px", background: "rgba(255,255,255,0.8)", border: `1px solid ${color}30`, color, boxShadow: "0 2px 8px rgba(0,0,0,0.04)" }}>{t(`baumann.${letter}.name`)}</span>;
+              return <span key={i} style={{ fontSize: "13px", fontWeight: 800, padding: "6px 14px", borderRadius: "100px", background: `${color}15`, border: `1px solid ${color}30`, color }}>{t(`baumann.${letter}.name`)}</span>;
             })}
           </div>
           
           <div style={{ display: "flex", width: "100%", gap: "16px" }}>
-            <div style={{ flex: 1, background: "rgba(255,255,255,0.6)", borderRadius: "24px", padding: "20px", border: "1px solid rgba(255,255,255,0.9)" }}>
-              <div style={{ fontSize: "42px", fontWeight: 900, color: SCAN_TO, lineHeight: "1", marginBottom: "4px" }}>{overallScore}<span style={{ fontSize: "16px", color: "#94A3B8" }}>{t("result.scoreSuffix")}</span></div>
-              <div style={{ fontSize: "11px", color: "#64748B", fontWeight: 800 }}>종합 스코어</div>
+            <div style={{ flex: 1, background: "#F8FAFC", borderRadius: "20px", padding: "24px 20px" }}>
+              <div style={{ fontSize: "44px", fontWeight: 900, color: SCAN_TO, lineHeight: "1", marginBottom: "6px" }}>{overallScore}<span style={{ fontSize: "16px", color: "#94A3B8" }}>{t("result.scoreSuffix")}</span></div>
+              <div style={{ fontSize: "13px", color: "#64748B", fontWeight: 800 }}>종합 스코어</div>
             </div>
             {analysisResult?.skinAge != null && analysisResult.skinAge > 0 && (
-              <div style={{ flex: 1, background: "rgba(255,255,255,0.6)", borderRadius: "24px", padding: "20px", border: "1px solid rgba(255,255,255,0.9)" }}>
-                <div style={{ fontSize: "42px", fontWeight: 900, color: "#8B5CF6", lineHeight: "1", marginBottom: "4px" }}>{analysisResult.skinAge}<span style={{ fontSize: "16px", color: "#94A3B8" }}>세</span></div>
-                <div style={{ fontSize: "11px", color: "#64748B", fontWeight: 800 }}>피부 나이</div>
+              <div style={{ flex: 1, background: "#F8FAFC", borderRadius: "20px", padding: "24px 20px" }}>
+                <div style={{ fontSize: "44px", fontWeight: 900, color: "#8B5CF6", lineHeight: "1", marginBottom: "6px" }}>{analysisResult.skinAge}<span style={{ fontSize: "16px", color: "#94A3B8" }}>세</span></div>
+                <div style={{ fontSize: "13px", color: "#64748B", fontWeight: 800 }}>피부 나이</div>
               </div>
             )}
           </div>
@@ -1426,9 +1426,9 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
 
         {/* AI 코멘트 카드 */}
         {analysisResult?.aiComment && (
-          <div style={{ ...glassStyle, padding: "24px", flexDirection: "row", gap: "16px", alignItems: "center" }}>
+          <div style={{ ...cardStyle, padding: "24px", flexDirection: "row", gap: "16px", alignItems: "center" }}>
             <div style={{ fontSize: "32px" }}>✨</div>
-            <p style={{ fontSize: "14px", color: "#334155", lineHeight: "1.6", margin: 0, fontWeight: 600, wordBreak: "keep-all" }}>"{analysisResult.aiComment}"</p>
+            <p style={{ fontSize: "15px", color: "#334155", lineHeight: "1.6", margin: 0, fontWeight: 600, wordBreak: "keep-all" }}>"{analysisResult.aiComment}"</p>
           </div>
         )}
       </div>
@@ -1437,24 +1437,24 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
 
     {/* ── 릴스 슬라이드 2: 10가지 상세 지표 ── */}
     <div ref={reels2Ref} style={{ display: "none", position: "fixed", left: 0, top: 0, width: "540px", height: "675px", zIndex: -1, pointerEvents: "none", fontFamily: "system-ui,-apple-system,sans-serif" }}>
-      {auraBg}
+      {solidBg}
       {slideHeader()}
       <div style={{ padding: "10px 40px 0", flexShrink: 0, zIndex: 10, position: "relative" }}>
         <div style={{ fontSize: "28px", fontWeight: 900, color: "#1E293B", letterSpacing: "-1px", marginBottom: "4px" }}>SKIN SPECS 📊</div>
-        <div style={{ fontSize: "14px", color: "#64748B", fontWeight: 600 }}>10가지 세부 스펙 분석</div>
+        <div style={{ fontSize: "15px", color: "#64748B", fontWeight: 700 }}>10가지 세부 스펙 분석</div>
       </div>
       <div style={{ flex: 1, padding: "20px 40px", display: "flex", flexDirection: "column", zIndex: 10 }}>
-        <div style={{ ...glassStyle, padding: "28px 32px", flex: 1, justifyContent: "center", gap: "10px" }}>
+        <div style={{ ...cardStyle, padding: "32px", flex: 1, justifyContent: "center", gap: "12px" }}>
           {(analysisResult?.scores || []).map((s: any, i: number) => {
             const color = SCORE_COLORS[i] || DEEP_GREEN;
             return (
               <div key={i} style={{ width: "100%" }}>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: "6px" }}>
-                  <span style={{ fontSize: "13px", fontWeight: 800, color: "#475569" }}>{t(`scores.${i}`)}</span>
-                  <span style={{ fontSize: "15px", fontWeight: 900, color }}>{s.score}</span>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: "8px" }}>
+                  <span style={{ fontSize: "14px", fontWeight: 800, color: "#475569" }}>{t(`scores.${i}`)}</span>
+                  <span style={{ fontSize: "16px", fontWeight: 900, color }}>{s.score}</span>
                 </div>
-                <div style={{ height: "6px", background: "rgba(255,255,255,0.6)", borderRadius: "99px", overflow: "hidden", border: "1px solid rgba(255,255,255,0.8)" }}>
-                  <div style={{ height: "100%", width: `${s.score}%`, background: `linear-gradient(90deg, ${color}99, ${color})`, borderRadius: "99px", boxShadow: "inset 0 1px 0 rgba(255,255,255,0.5)" }} />
+                <div style={{ height: "8px", background: "#F1F5F9", borderRadius: "99px", overflow: "hidden" }}>
+                  <div style={{ height: "100%", width: `${s.score}%`, background: color, borderRadius: "99px" }} />
                 </div>
               </div>
             );
@@ -1466,11 +1466,11 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
 
     {/* ── 릴스 슬라이드 3: AI 맞춤 솔루션 ── */}
     <div ref={reels3Ref} style={{ display: "none", position: "fixed", left: 0, top: 0, width: "540px", height: "675px", zIndex: -1, pointerEvents: "none", fontFamily: "system-ui,-apple-system,sans-serif" }}>
-      {auraBg}
+      {solidBg}
       {slideHeader()}
       <div style={{ padding: "10px 40px 0", flexShrink: 0, zIndex: 10, position: "relative" }}>
         <div style={{ fontSize: "28px", fontWeight: 900, color: "#1E293B", letterSpacing: "-1px", marginBottom: "4px" }}>AI SOLUTION 💡</div>
-        <div style={{ fontSize: "14px", color: "#64748B", fontWeight: 600 }}>나만을 위한 초프리미엄 처방</div>
+        <div style={{ fontSize: "15px", color: "#64748B", fontWeight: 700 }}>나만을 위한 맞춤 스킨케어 처방</div>
       </div>
       <div style={{ flex: 1, padding: "20px 40px", display: "flex", flexDirection: "column", gap: "14px", zIndex: 10 }}>
         {([
@@ -1481,22 +1481,22 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
           const imp = analysisResult?.improvements?.[i];
           if (!imp) return null;
           return (
-            <div key={i} style={{ ...glassStyle, flex: 1, padding: "18px 24px", justifyContent: "center", borderLeft: `6px solid ${st.color}` }}>
-              <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
-                <span style={{ fontSize: "16px" }}>{st.emoji}</span>
-                <span style={{ fontSize: "15px", fontWeight: 900, color: "#1E293B" }}>{imp.title}</span>
+            <div key={i} style={{ ...cardStyle, flex: 1, padding: "20px 24px", justifyContent: "center", borderLeft: `6px solid ${st.color}` }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "8px" }}>
+                <span style={{ fontSize: "18px" }}>{st.emoji}</span>
+                <span style={{ fontSize: "16px", fontWeight: 900, color: "#1E293B" }}>{imp.title}</span>
               </div>
-              <p style={{ fontSize: "13px", color: "#475569", lineHeight: 1.5, margin: 0, wordBreak: "keep-all", fontWeight: 500 }}>{imp.desc}</p>
+              <p style={{ fontSize: "14px", color: "#475569", lineHeight: 1.5, margin: 0, wordBreak: "keep-all", fontWeight: 600 }}>{imp.desc}</p>
             </div>
           );
         })}
         {(analysisResult?.cosmetics?.length ?? 0) > 0 && (
-          <div style={{ ...glassStyle, padding: "16px 24px", flexDirection: "row", gap: "12px", alignItems: "center", background: "linear-gradient(135deg, rgba(255,255,255,0.8), rgba(255,255,255,0.4))" }}>
+          <div style={{ ...cardStyle, padding: "16px 24px", flexDirection: "row", gap: "14px", alignItems: "center", background: "#F8FAFC" }}>
             <div style={{ fontSize: "24px" }}>🧪</div>
             <div style={{ flex: 1 }}>
-              <div style={{ fontSize: "11px", fontWeight: 800, color: "#64748B", marginBottom: "2px" }}>RECOMMENDED INGREDIENT</div>
-              <div style={{ fontSize: "15px", fontWeight: 900, color: SCAN_TO, marginBottom: "2px" }}>{analysisResult!.cosmetics[0].key}</div>
-              <div style={{ fontSize: "12px", color: "#475569", fontWeight: 500, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{analysisResult!.cosmetics[0].reason}</div>
+              <div style={{ fontSize: "11px", fontWeight: 800, color: "#64748B", marginBottom: "4px" }}>RECOMMENDED INGREDIENT</div>
+              <div style={{ fontSize: "16px", fontWeight: 900, color: SCAN_TO, marginBottom: "4px" }}>{analysisResult!.cosmetics[0].key}</div>
+              <div style={{ fontSize: "13px", color: "#475569", fontWeight: 600, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{analysisResult!.cosmetics[0].reason}</div>
             </div>
           </div>
         )}
@@ -1506,11 +1506,11 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
 
     {/* ── 릴스 슬라이드 4: 피부 맞춤 영양 성분 ── */}
     <div ref={reels4Ref} style={{ display: "none", position: "fixed", left: 0, top: 0, width: "540px", height: "675px", zIndex: -1, pointerEvents: "none", fontFamily: "system-ui,-apple-system,sans-serif" }}>
-      {auraBg}
+      {solidBg}
       {slideHeader()}
       <div style={{ padding: "10px 40px 0", flexShrink: 0, zIndex: 10, position: "relative" }}>
         <div style={{ fontSize: "28px", fontWeight: 900, color: "#1E293B", letterSpacing: "-1px", marginBottom: "4px" }}>INNER BEAUTY 🥗</div>
-        <div style={{ fontSize: "14px", color: "#64748B", fontWeight: 600 }}><strong style={{ color: SCAN_TO }}>{finalType}</strong> 맞춤 먹는 스킨케어</div>
+        <div style={{ fontSize: "15px", color: "#64748B", fontWeight: 700 }}><strong style={{ color: SCAN_TO }}>{finalType}</strong> 맞춤 이너뷰티 솔루션</div>
       </div>
       <div style={{ flex: 1, padding: "20px 40px", display: "flex", flexDirection: "column", gap: "14px", zIndex: 10 }}>
         {finalType.split("").filter(l => l in NUTRIENT_COLORS).map((letter) => {
@@ -1519,15 +1519,15 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
           if (!nutrient) return null;
           const color = NUTRIENT_COLORS[letter];
           return (
-            <div key={letter} style={{ ...glassStyle, flex: 1, padding: "16px 24px", justifyContent: "center" }}>
-              <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "6px" }}>
-                <div style={{ width: "32px", height: "32px", borderRadius: "10px", background: "rgba(255,255,255,0.8)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "18px", boxShadow: "0 2px 8px rgba(0,0,0,0.05)" }}>{NUTRIENT_ICONS[letter]}</div>
+            <div key={letter} style={{ ...cardStyle, flex: 1, padding: "20px 24px", justifyContent: "center" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "8px" }}>
+                <div style={{ width: "36px", height: "36px", borderRadius: "10px", background: "#F1F5F9", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "18px" }}>{NUTRIENT_ICONS[letter]}</div>
                 <div style={{ flex: 1 }}>
-                  <span style={{ fontSize: "15px", fontWeight: 900, color }}>{nutrient.name}</span>
-                  <div style={{ fontSize: "11px", color: "#64748B", fontWeight: 700, marginTop: "2px" }}>{nutrient.foods}</div>
+                  <span style={{ fontSize: "16px", fontWeight: 900, color }}>{nutrient.name}</span>
+                  <div style={{ fontSize: "12px", color: "#64748B", fontWeight: 700, marginTop: "2px" }}>{nutrient.foods}</div>
                 </div>
               </div>
-              <p style={{ fontSize: "12px", color: "#475569", lineHeight: 1.5, margin: 0, wordBreak: "keep-all", fontWeight: 500 }}>{nutrient.why}</p>
+              <p style={{ fontSize: "13px", color: "#475569", lineHeight: 1.5, margin: 0, wordBreak: "keep-all", fontWeight: 600 }}>{nutrient.why}</p>
             </div>
           );
         })}
@@ -1537,44 +1537,44 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
 
     {/* ── 릴스 슬라이드 5: 오늘 피해야 할 음식 ── */}
     <div ref={reels5Ref} style={{ display: "none", position: "fixed", left: 0, top: 0, width: "540px", height: "675px", zIndex: -1, pointerEvents: "none", fontFamily: "system-ui,-apple-system,sans-serif" }}>
-      {auraBg}
+      {solidBg}
       {slideHeader()}
       <div style={{ padding: "10px 40px 0", flexShrink: 0, zIndex: 10, position: "relative" }}>
         <div style={{ fontSize: "28px", fontWeight: 900, color: "#1E293B", letterSpacing: "-1px", marginBottom: "4px" }}>DANGER ZONE 🚫</div>
-        <div style={{ fontSize: "14px", color: "#64748B", fontWeight: 600 }}>오늘은 이거 딱 참아보자!</div>
+        <div style={{ fontSize: "15px", color: "#64748B", fontWeight: 700 }}>오늘은 이거 딱 참아보자!</div>
       </div>
       <div style={{ flex: 1, padding: "20px 40px", display: "flex", flexDirection: "column", gap: "16px", zIndex: 10 }}>
         {/* 점심 카드 */}
-        <div style={{ ...glassStyle, flex: 1, padding: "24px", background: "linear-gradient(135deg, rgba(255,255,255,0.7), rgba(253,230,138,0.2))" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "16px", borderBottom: "1px solid rgba(255,255,255,0.5)", paddingBottom: "12px" }}>
+        <div style={{ ...cardStyle, flex: 1, padding: "24px", borderTop: "6px solid #F59E0B" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "20px", borderBottom: "1px solid #E2E8F0", paddingBottom: "12px" }}>
             <span style={{ fontSize: "20px" }}>☀️</span>
             <span style={{ fontSize: "16px", fontWeight: 900, color: "#D97706" }}>DAYTIME AVOID</span>
           </div>
           <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
             {avoidLunch.map(({ food, why }, idx) => (
-              <div key={idx} style={{ display: "flex", gap: "10px" }}>
-                <span style={{ fontSize: "14px", marginTop: "2px" }}>❌</span>
+              <div key={idx} style={{ display: "flex", gap: "12px", alignItems: "center" }}>
+                <span style={{ fontSize: "14px", fontWeight: 900, color: "#EF4444" }}>❌</span>
                 <div>
-                  <p style={{ fontSize: "14px", fontWeight: 800, color: "#1E293B", margin: "0 0 2px" }}>{food}</p>
-                  <p style={{ fontSize: "12px", color: "#64748B", margin: 0, fontWeight: 500 }}>{why}</p>
+                  <p style={{ fontSize: "15px", fontWeight: 900, color: "#1E293B", margin: "0 0 2px" }}>{food}</p>
+                  <p style={{ fontSize: "13px", color: "#64748B", margin: 0, fontWeight: 600 }}>{why}</p>
                 </div>
               </div>
             ))}
           </div>
         </div>
         {/* 저녁 카드 */}
-        <div style={{ ...glassStyle, flex: 1, padding: "24px", background: "linear-gradient(135deg, rgba(255,255,255,0.7), rgba(167,139,250,0.2))" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "16px", borderBottom: "1px solid rgba(255,255,255,0.5)", paddingBottom: "12px" }}>
+        <div style={{ ...cardStyle, flex: 1, padding: "24px", borderTop: "6px solid #8B5CF6" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "20px", borderBottom: "1px solid #E2E8F0", paddingBottom: "12px" }}>
             <span style={{ fontSize: "20px" }}>🌙</span>
             <span style={{ fontSize: "16px", fontWeight: 900, color: "#7C3AED" }}>NIGHTTIME AVOID</span>
           </div>
           <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
             {avoidDinner.map(({ food, why }, idx) => (
-              <div key={idx} style={{ display: "flex", gap: "10px" }}>
-                <span style={{ fontSize: "14px", marginTop: "2px" }}>❌</span>
+              <div key={idx} style={{ display: "flex", gap: "12px", alignItems: "center" }}>
+                <span style={{ fontSize: "14px", fontWeight: 900, color: "#EF4444" }}>❌</span>
                 <div>
-                  <p style={{ fontSize: "14px", fontWeight: 800, color: "#1E293B", margin: "0 0 2px" }}>{food}</p>
-                  <p style={{ fontSize: "12px", color: "#64748B", margin: 0, fontWeight: 500 }}>{why}</p>
+                  <p style={{ fontSize: "15px", fontWeight: 900, color: "#1E293B", margin: "0 0 2px" }}>{food}</p>
+                  <p style={{ fontSize: "13px", color: "#64748B", margin: 0, fontWeight: 600 }}>{why}</p>
                 </div>
               </div>
             ))}
