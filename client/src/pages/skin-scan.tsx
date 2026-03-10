@@ -1358,7 +1358,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
   const dateStr = `${today.getFullYear()}.${String(today.getMonth() + 1).padStart(2, '0')}.${String(today.getDate()).padStart(2, '0')}`;
 
   const slideHeader = () => (
-    <div style={{ padding: "30px 40px 0", display: "flex", justifyContent: "space-between", alignItems: "center", flexShrink: 0, zIndex: 10 }}>
+    <div style={{ padding: "30px 40px 0", display: "flex", justifyContent: "space-between", alignItems: "center", flexShrink: 0, position: "relative", zIndex: 10 }}>
       <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
         <div style={{ width: "24px", height: "24px", borderRadius: "8px", background: `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})`, color: "white", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "14px" }}>✦</div>
         <span style={{ color: "#1E293B", fontSize: "18px", fontWeight: 800, letterSpacing: "-0.5px" }}>FondayAI</span>
@@ -1370,7 +1370,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
   );
 
   const slideFooter = (
-    <div style={{ padding: "0 40px 30px", flexShrink: 0, zIndex: 10 }}>
+    <div style={{ padding: "0 40px 30px", flexShrink: 0, position: "relative", zIndex: 10 }}>
       <div style={{ background: "white", border: "1px solid #E2E8F0", borderRadius: "100px", padding: "14px 24px", display: "flex", justifyContent: "space-between", alignItems: "center", boxShadow: "0 8px 24px rgba(0,0,0,0.06)" }}>
         <span style={{ fontSize: "14px", fontWeight: 900, color: "#1E293B" }}>🔥 나랑 <span style={{ color: SCAN_TO }}>피부 챌린지</span> 뜰 사람?</span>
         <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
@@ -1394,7 +1394,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
   return (
     <>
     {/* ── 릴스 슬라이드 1: 메인 표지 ── */}
-    <div ref={reels1Ref} style={{ display: "none", position: "fixed", left: 0, top: 0, width: "540px", height: "675px", zIndex: -1, pointerEvents: "none", fontFamily: "system-ui,-apple-system,sans-serif" }}>
+    <div ref={reels1Ref} style={{ display: "none", flexDirection: "column", position: "fixed", left: 0, top: 0, width: "540px", height: "675px", zIndex: -1, pointerEvents: "none", fontFamily: "system-ui,-apple-system,sans-serif", overflow: "hidden" }}>
       {solidBg}
       {/* 장식용 코너 그라데이션 원형들 (html2canvas safe) */}
       <div style={{ position: "absolute", top: "-50px", right: "-50px", width: "250px", height: "250px", borderRadius: "50%", background: `linear-gradient(135deg, ${SCAN_FROM}22, ${SCAN_TO}00)`, pointerEvents: "none", zIndex: 0 }} />
@@ -1449,7 +1449,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
     </div>
 
     {/* ── 릴스 슬라이드 2: 10가지 상세 지표 ── */}
-    <div ref={reels2Ref} style={{ display: "none", position: "fixed", left: 0, top: 0, width: "540px", height: "675px", zIndex: -1, pointerEvents: "none", fontFamily: "system-ui,-apple-system,sans-serif" }}>
+    <div ref={reels2Ref} style={{ display: "none", flexDirection: "column", position: "fixed", left: 0, top: 0, width: "540px", height: "675px", zIndex: -1, pointerEvents: "none", fontFamily: "system-ui,-apple-system,sans-serif", overflow: "hidden" }}>
       {solidBg}
       {slideHeader()}
       <div style={{ padding: "14px 40px 0", flexShrink: 0, zIndex: 10, position: "relative" }}>
@@ -1478,7 +1478,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
     </div>
 
     {/* ── 릴스 슬라이드 3: AI 맞춤 솔루션 ── */}
-    <div ref={reels3Ref} style={{ display: "none", position: "fixed", left: 0, top: 0, width: "540px", height: "675px", zIndex: -1, pointerEvents: "none", fontFamily: "system-ui,-apple-system,sans-serif" }}>
+    <div ref={reels3Ref} style={{ display: "none", flexDirection: "column", position: "fixed", left: 0, top: 0, width: "540px", height: "675px", zIndex: -1, pointerEvents: "none", fontFamily: "system-ui,-apple-system,sans-serif", overflow: "hidden" }}>
       {solidBg}
       {slideHeader()}
       <div style={{ padding: "14px 40px 0", flexShrink: 0, zIndex: 10, position: "relative" }}>
@@ -1518,7 +1518,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
     </div>
 
     {/* ── 릴스 슬라이드 4: 피부 맞춤 영양 성분 ── */}
-    <div ref={reels4Ref} style={{ display: "none", position: "fixed", left: 0, top: 0, width: "540px", height: "675px", zIndex: -1, pointerEvents: "none", fontFamily: "system-ui,-apple-system,sans-serif" }}>
+    <div ref={reels4Ref} style={{ display: "none", flexDirection: "column", position: "fixed", left: 0, top: 0, width: "540px", height: "675px", zIndex: -1, pointerEvents: "none", fontFamily: "system-ui,-apple-system,sans-serif", overflow: "hidden" }}>
       {solidBg}
       {slideHeader()}
       <div style={{ padding: "14px 40px 0", flexShrink: 0, zIndex: 10, position: "relative" }}>
@@ -1549,7 +1549,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
     </div>
 
     {/* ── 릴스 슬라이드 5: 오늘 피해야 할 음식 ── */}
-    <div ref={reels5Ref} style={{ display: "none", position: "fixed", left: 0, top: 0, width: "540px", height: "675px", zIndex: -1, pointerEvents: "none", fontFamily: "system-ui,-apple-system,sans-serif" }}>
+    <div ref={reels5Ref} style={{ display: "none", flexDirection: "column", position: "fixed", left: 0, top: 0, width: "540px", height: "675px", zIndex: -1, pointerEvents: "none", fontFamily: "system-ui,-apple-system,sans-serif", overflow: "hidden" }}>
       {solidBg}
       {slideHeader()}
       <div style={{ padding: "14px 40px 0", flexShrink: 0, zIndex: 10, position: "relative" }}>
