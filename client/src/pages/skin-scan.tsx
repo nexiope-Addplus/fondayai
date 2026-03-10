@@ -1366,7 +1366,10 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
         }
       }
     } catch (e) {
-      if (e instanceof Error && e.name !== "AbortError") console.error("[share]", e);
+      if (e instanceof Error && e.name !== "AbortError") {
+        console.error("[share]", e);
+        alert(`공유 실패: ${e.message}`);
+      }
     } finally {
       setShareLoading(false);
     }
