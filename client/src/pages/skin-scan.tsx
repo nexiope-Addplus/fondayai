@@ -1340,6 +1340,19 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
       const today = new Date();
       const dateStr = `${today.getFullYear()}.${String(today.getMonth() + 1).padStart(2, "0")}.${String(today.getDate()).padStart(2, "0")}`;
 
+      const i18nTexts = {
+        rankLabel: t("share.rankLabel"),
+        overallScoreLabel: t("share.overallScoreLabel"),
+        skinAgeLabel: t("share.skinAgeLabel"),
+        skinAgeSuffix: t("share.skinAgeSuffix"),
+        slide2Sub: t("share.slide2Sub"),
+        slide3Sub: t("share.slide3Sub"),
+        recIngredient: t("share.recIngredient"),
+        slide4Sub: t("share.slide4Sub"),
+        slide5Sub: t("share.slide5Sub"),
+        footerText: t("share.footerText"),
+      };
+
       const body = {
         lang: i18n.language,
         finalType,
@@ -1357,6 +1370,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
         baumannNames,
         scoreSuffix: t("result.scoreSuffix"),
         dateStr,
+        i18nTexts,
       };
 
       const res = await fetch("/api/generate-share", {

@@ -337,6 +337,18 @@
     "8": "肌のツヤ",
     "9": "肌の均一さ"
   },
+  "share": {
+    "rankLabel": "ランカー",
+    "overallScoreLabel": "総合スコア",
+    "skinAgeLabel": "肌年齢",
+    "skinAgeSuffix": "歳",
+    "slide2Sub": "10項目の肌スペック分析",
+    "slide3Sub": "あなただけのスキンケア処方",
+    "recIngredient": "おすすめ成分",
+    "slide4Sub": "インナービューティー",
+    "slide5Sub": "今日は控えてみよう！",
+    "footerText": "友達と肌チャレンジ！検索 > Fonday AI"
+  },
   "baumann": {
     "O": { "name": "油性", "desc": "皮脂分泌が盛んでテカリやすい肌質です。" },
     "D": { "name": "乾燥性", "desc": "皮脂分泌が少なく乾燥やつっぱりを感じやすいです。" },

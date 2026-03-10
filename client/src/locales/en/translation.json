@@ -337,6 +337,18 @@
     "8": "Skin Radiance",
     "9": "Skin Texture"
   },
+  "share": {
+    "rankLabel": "Ranker",
+    "overallScoreLabel": "Overall Score",
+    "skinAgeLabel": "Skin Age",
+    "skinAgeSuffix": " yrs",
+    "slide2Sub": "10-item skin spec analysis",
+    "slide3Sub": "Custom skincare prescription just for you",
+    "recIngredient": "RECOMMENDED INGREDIENT",
+    "slide4Sub": "Inner Beauty Solution",
+    "slide5Sub": "Skip these today!",
+    "footerText": "Challenge your friends! Search > Fonday AI"
+  },
   "baumann": {
     "O": { "name": "Oily", "desc": "Active sebum production makes skin prone to shine and greasiness." },
     "D": { "name": "Dry", "desc": "Low sebum production leads to tightness and dry patches." },

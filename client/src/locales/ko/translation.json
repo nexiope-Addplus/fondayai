@@ -337,6 +337,18 @@
     "8": "피부 광채",
     "9": "피부결 균일도"
   },
+  "share": {
+    "rankLabel": "랭커",
+    "overallScoreLabel": "종합 스코어",
+    "skinAgeLabel": "피부 나이",
+    "skinAgeSuffix": "세",
+    "slide2Sub": "10가지 세부 스펙 분석",
+    "slide3Sub": "나만을 위한 맞춤 스킨케어 처방",
+    "recIngredient": "RECOMMENDED INGREDIENT",
+    "slide4Sub": "맞춤 이너뷰티 솔루션",
+    "slide5Sub": "오늘은 이거 딱 참아보자!",
+    "footerText": "피부 챌린지 같이 할 사람? 검색 > Fonday AI"
+  },
   "baumann": {
     "O": { "name": "지성", "desc": "피지 분비가 활발해 번들거림이 나타나기 쉬워요." },
     "D": { "name": "건성", "desc": "피지 분비가 적어 건조함과 당김이 느껴질 수 있어요." },
