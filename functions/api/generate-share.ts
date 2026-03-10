@@ -93,6 +93,11 @@ function h(tag: string, props: Record<string, any> | null, ...rawChildren: any[]
   if (children.length > 0) {
     p.children = children.length === 1 ? children[0] : children;
   }
+  // Satori requires explicit display on any element with 2+ children.
+  // Auto-add display:flex + flexDirection:column (block-like) when missing.
+  if (children.length > 1 && !p.style?.display) {
+    p.style = { ...(p.style ?? {}), display: "flex", flexDirection: "column" };
+  }
   return { type: tag, props: p };
 }
 
