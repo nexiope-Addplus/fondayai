@@ -59,12 +59,20 @@ export default function BattlePage() {
         const data = await res.json();
         setFriendScan(data);
 
-        // 2. Fetch my latest scan (if logged in and has one)
+        // 2. Fetch my latest scan (logged in) or fallback to sessionStorage (after challenge scan)
+        let myFound = false;
         const myRes = await fetch("/api/scans");
         if (myRes.ok) {
           const myData = await myRes.json();
           if (Array.isArray(myData) && myData.length > 0) {
-            setMyScan(myData[0]); // latest scan
+            setMyScan(myData[0]);
+            myFound = true;
+          }
+        }
+        if (!myFound) {
+          const stored = sessionStorage.getItem('battleMyResult');
+          if (stored) {
+            try { setMyScan(JSON.parse(stored)); } catch {}
           }
         }
       } catch (err: any) {
@@ -77,8 +85,9 @@ export default function BattlePage() {
     fetchData();
   }, [params?.token]);
 
-  // Handle taking a scan (redirect to home to scan)
+  // Handle taking a scan (redirect to home to scan, preserving challenge token)
   const handleTakeScan = () => {
+    if (params?.token) sessionStorage.setItem('battleChallengeToken', params.token);
     setLocation("/");
   };
 

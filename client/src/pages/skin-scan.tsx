@@ -1082,6 +1082,30 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
   const [showDiary, setShowDiary] = useState(false);
   const [rankingData, setRankingData] = useState<RankingData | null>(null);
   const [diaryTab, setDiaryTab] = useState<"history" | "compare" | "ranking">("history");
+  const [pendingChallengeToken, setPendingChallengeToken] = useState<string | null>(null);
+
+  // 챌린지 참여 후 내 결과 저장 (비로그인도 작동)
+  useEffect(() => {
+    const token = sessionStorage.getItem('battleChallengeToken');
+    if (!token) return;
+    setPendingChallengeToken(token);
+    const sc = analysisResult?.scores ?? [];
+    const ov = sc[0]?.score ?? 0;
+    const isOilyCh = (sc[1]?.score ?? 0) > 50;
+    const isSensCh = (sc[3]?.score ?? 100) < 60;
+    const isPigCh  = (sc[5]?.score ?? 0) > 50;
+    const isWrinkCh = (sc[4]?.score ?? 100) < 60;
+    const bt = `${isOilyCh?"O":"D"}${isSensCh?"S":"R"}${isPigCh?"P":"N"}${isWrinkCh?"W":"T"}`;
+    sessionStorage.setItem('battleMyResult', JSON.stringify({
+      overallScore: String(ov),
+      scores: sc,
+      baumannType: bt,
+      skinAge: analysisResult?.skinAge,
+      aiComment: analysisResult?.aiComment ?? "",
+      createdAt: new Date().toISOString(),
+    }));
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleGoogleLogin = () => {
     sessionStorage.setItem("pendingResult", JSON.stringify({ analysisResult, surveyData, imageBase64 }));
@@ -1657,6 +1681,24 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
               }}
             >
               <span className="text-2xl">👑</span> 친구에게 피부 챌린지 보내기
+            </Button>
+          </motion.div>
+        )}
+
+        {/* 챌린지 참여 후: 결과 확인 버튼 */}
+        {pendingChallengeToken && (
+          <motion.div variants={fadeChild}>
+            <Button
+              className="w-full h-14 text-lg font-bold text-white shadow-xl flex items-center justify-center gap-2 rounded-2xl"
+              style={{ background: "linear-gradient(135deg, #7C3AED, #6D28D9)" }}
+              onClick={() => {
+                sessionStorage.removeItem('battleChallengeToken');
+                window.location.href = `/battle/${pendingChallengeToken}`;
+              }}
+            >
+              <Trophy className="w-5 h-5" />
+              챌린지 결과 확인하기
+              <ArrowRight className="w-5 h-5 ml-1" />
             </Button>
           </motion.div>
         )}
