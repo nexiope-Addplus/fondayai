@@ -710,6 +710,103 @@ function FaceMeshOverlay({ imageSrc }: { imageSrc: string }) {
 }
 
 // ─── idle 미리보기 점수 바 ────────────────────────────────────────
+// ─── 날씨 연동 데일리 팁 카드 ─────────────────────────────────────
+type WeatherData = {
+  temp: number;
+  humidity: number;
+  weatherId: number;
+  weatherMain: string;
+  cityName: string;
+  aqi: number | null;
+};
+
+type WeatherTipKey = "polluted" | "snowy" | "rainy" | "foggy" | "cold" | "sunny_hot" | "sunny" | "dry" | "humid" | "cloudy";
+
+function getWeatherTipKey(d: WeatherData): WeatherTipKey {
+  if (d.aqi !== null && d.aqi >= 3) return "polluted";
+  const id = d.weatherId;
+  if (id >= 600 && id < 700) return "snowy";
+  if ((id >= 200 && id < 400) || (id >= 500 && id < 600)) return "rainy";
+  if (id >= 700 && id < 800) return "foggy";
+  if (d.temp < 5) return "cold";
+  if ((id === 800 || id === 801) && d.temp >= 28) return "sunny_hot";
+  if (id === 800 || id === 801) return "sunny";
+  if (d.humidity < 35) return "dry";
+  if (d.humidity > 80) return "humid";
+  return "cloudy";
+}
+
+function WeatherTipCard() {
+  const { t } = useTranslation();
+  const [weather, setWeather] = useState<WeatherData | null>(null);
+  const [denied, setDenied] = useState(false);
+
+  useEffect(() => {
+    if (!navigator.geolocation) return;
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const { latitude: lat, longitude: lon } = pos.coords;
+        fetch(`/api/weather?lat=${lat}&lon=${lon}`)
+          .then((r) => r.ok ? r.json() : null)
+          .then((data) => { if (data && !data.error) setWeather(data as WeatherData); })
+          .catch(() => {});
+      },
+      () => setDenied(true),
+      { timeout: 8000 }
+    );
+  }, []);
+
+  if (denied || !weather) return null;
+
+  const tipKey = getWeatherTipKey(weather);
+  const tip = t(`weather.tips.${tipKey}`, { returnObjects: true }) as { emoji: string; title: string; body: string };
+  const aqiLabel = weather.aqi ? t(`weather.aqi${weather.aqi}`) : null;
+
+  return (
+    <motion.div variants={fadeChild} className="mb-4">
+      <div
+        className="rounded-2xl p-4 border border-stone-100 overflow-hidden relative"
+        style={{ background: "linear-gradient(135deg, #EAF4F0 0%, #F0FAF6 100%)", boxShadow: "0 2px 12px rgba(45,95,79,0.08)" }}
+      >
+        <div className="absolute top-0 right-0 w-20 h-20 rounded-bl-full opacity-20"
+          style={{ background: `linear-gradient(135deg, ${DEEP_GREEN_LIGHT}, ${DEEP_GREEN})` }} />
+        <div className="flex items-center gap-1.5 mb-2.5">
+          <div className="w-4 h-4 rounded-full flex items-center justify-center"
+            style={{ background: DEEP_GREEN }}>
+            <Sun className="w-2.5 h-2.5 text-white" />
+          </div>
+          <span className="text-[10px] font-bold tracking-widest uppercase" style={{ color: DEEP_GREEN }}>
+            {t("weather.cardTitle")}
+          </span>
+        </div>
+
+        <div className="flex items-start gap-3">
+          <span className="text-3xl leading-none flex-shrink-0">{tip.emoji}</span>
+          <div className="flex-1 min-w-0">
+            <p className="text-[13px] font-black text-stone-800 mb-1 leading-tight">{tip.title}</p>
+            <p className="text-[11.5px] text-stone-500 leading-relaxed">{tip.body}</p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2 mt-3 flex-wrap">
+          <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full text-white"
+            style={{ background: DEEP_GREEN }}>
+            {weather.temp}°C
+          </span>
+          <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-white/70 text-stone-600 border border-stone-200">
+            {t("weather.humidity", { val: weather.humidity })}
+          </span>
+          {aqiLabel && (
+            <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-white/70 text-stone-600 border border-stone-200">
+              {aqiLabel}
+            </span>
+          )}
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
 function MiniScoreBarIdle({ label, score, color, delay }: { label: string; score: number; color: string; delay: number }) {
   const [animated, setAnimated] = useState(false);
   useEffect(() => {
@@ -792,6 +889,9 @@ function ScanIdleScreen({ onScan }: { onScan: () => void }) {
           </div>
         </div>
       </motion.div>
+
+      {/* 날씨 데일리 팁 카드 */}
+      <WeatherTipCard />
 
       {/* 단계 표시 */}
       <motion.div variants={fadeChild} className="mb-4">

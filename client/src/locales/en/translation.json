@@ -341,6 +341,27 @@
     "8": "Skin Radiance",
     "9": "Skin Texture"
   },
+  "weather": {
+    "cardTitle": "Today's Skin Weather Tip",
+    "humidity": "Humidity {{val}}%",
+    "aqi1": "Air Quality Good",
+    "aqi2": "Air Quality Fair",
+    "aqi3": "Air Quality Moderate",
+    "aqi4": "Air Quality Poor",
+    "aqi5": "Air Quality Very Poor",
+    "tips": {
+      "polluted": { "emoji": "😷", "title": "High Pollution — Double Cleanse", "body": "Fine particles clog pores. Use an oil cleanser first, then a foam cleanser, and follow with an antioxidant serum." },
+      "snowy":    { "emoji": "❄️", "title": "Winter Skin Intensive Care",     "body": "Snow reflects UV rays strongly. Strengthen your skin barrier with ceramide cream and don't skip sunscreen." },
+      "rainy":    { "emoji": "🌧️", "title": "Rainy Day Light Moisture",       "body": "High humidity can increase sebum. Swap heavy creams for a light gel moisturizer to keep skin balanced." },
+      "foggy":    { "emoji": "🌫️", "title": "Foggy Day — Cleanse Well",       "body": "Atmospheric particles can irritate pores. Do a thorough but gentle cleanse when you get home." },
+      "cold":     { "emoji": "🧣", "title": "Cold Wind — Protect Your Barrier","body": "Cold air strips moisture fast. Apply a ceramide-rich cream before heading out to shield your skin barrier." },
+      "sunny_hot":{ "emoji": "🌞", "title": "Intense UV — Reapply Sunscreen!","body": "Reapply SPF 50+ every 2 hours. Add a vitamin C serum in the morning for extra antioxidant defense." },
+      "sunny":    { "emoji": "☀️", "title": "Don't Skip Sunscreen",           "body": "Clear days mean UVA/UVB exposure. Layer vitamin C serum under sunscreen for dual protection." },
+      "dry":      { "emoji": "🌵", "title": "Low Humidity — Layer Moisture",  "body": "Air is dry! Layer essence → serum → cream to lock in hydration throughout the day." },
+      "humid":    { "emoji": "💦", "title": "High Humidity — Go Light",       "body": "Skip heavy creams and opt for a gel moisturizer or hydrating mist to keep skin comfortable." },
+      "cloudy":   { "emoji": "☁️", "title": "Cloudy Still Means UV",          "body": "Clouds let through up to 80% of UV rays. Sunscreen is still essential on overcast days." }
+    }
+  },
   "battle": {
     "title": "Skin Challenge ⚔️",
     "win": "You Win! 🎉",
