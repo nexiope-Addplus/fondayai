@@ -419,8 +419,11 @@ function CameraCapture({ onCapture, onClose }: { onCapture: (file: File) => void
     const cropX = (vw - cropW) / 2;
     const cropY = Math.max(0, (vh - cropH) * 0.25);
 
-    canvas.width = cropW;
-    canvas.height = cropH;
+    // max 1024px로 제한하여 전송 크기 최적화
+    const MAX_DIM = 1024;
+    const scale = Math.min(1, MAX_DIM / Math.max(cropW, cropH));
+    canvas.width = Math.round(cropW * scale);
+    canvas.height = Math.round(cropH * scale);
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
@@ -435,7 +438,7 @@ function CameraCapture({ onCapture, onClose }: { onCapture: (file: File) => void
       if (!blob) return;
       streamRef.current?.getTracks().forEach(t => t.stop());
       onCapture(new File([blob], "selfie.jpg", { type: "image/jpeg" }));
-    }, "image/jpeg", 0.9);
+    }, "image/jpeg", 0.82);
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -3204,43 +3207,54 @@ export default function SkinScanPage() {
     setImageSrc(URL.createObjectURL(file));
     setShowCamera(false);
     setScanState("survey");
+    // 설문 중에 미리 base64 변환 시작
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => setImageBase64(reader.result as string);
   }, []);
 
   const handleSurveySubmit = useCallback(async (data: SurveyData) => {
     setSurveyData(data);
     setScanState("scanning");
     if (!imageFile) return;
-    const reader = new FileReader();
-    reader.readAsDataURL(imageFile);
-    reader.onload = async () => {
-      setImageBase64(reader.result as string);
-      try {
-        const response = await fetch("/api/analyze-skin", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ image: reader.result, surveyData: data, lang: i18n.language || "en" }),
-        });
-        const rawText = await response.text();
-        console.log("[API 응답]", response.status, rawText.slice(0, 300));
-        if (!response.ok) {
-          let msg = `HTTP ${response.status}`;
-          try {
-            const errJson = JSON.parse(rawText);
-            msg = errJson.detail || errJson.message || errJson.error || JSON.stringify(errJson);
-          } catch { msg += ": " + rawText.slice(0, 100); }
-          alert(`분석 실패: ${msg}`);
-          setScanState("idle");
-          return;
-        }
-        const result = JSON.parse(rawText);
-        setAnalysisResult(result);
-        setScanState("result");
-      } catch (err: any) {
-        alert(`분석 실패: ${err.message || "네트워크 오류"}`);
+
+    // base64가 아직 준비되지 않았으면 대기
+    let b64 = imageBase64;
+    if (!b64) {
+      b64 = await new Promise<string>((resolve) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(imageFile);
+        reader.onload = () => resolve(reader.result as string);
+      });
+      setImageBase64(b64);
+    }
+
+    try {
+      const response = await fetch("/api/analyze-skin", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ image: b64, surveyData: data, lang: i18n.language || "en" }),
+      });
+      const rawText = await response.text();
+      console.log("[API 응답]", response.status, rawText.slice(0, 300));
+      if (!response.ok) {
+        let msg = `HTTP ${response.status}`;
+        try {
+          const errJson = JSON.parse(rawText);
+          msg = errJson.detail || errJson.message || errJson.error || JSON.stringify(errJson);
+        } catch { msg += ": " + rawText.slice(0, 100); }
+        alert(`분석 실패: ${msg}`);
         setScanState("idle");
+        return;
       }
-    };
-  }, [imageFile]);
+      const result = JSON.parse(rawText);
+      setAnalysisResult(result);
+      setScanState("result");
+    } catch (err: any) {
+      alert(`분석 실패: ${err.message || "네트워크 오류"}`);
+      setScanState("idle");
+    }
+  }, [imageFile, imageBase64]);
 
   return (
     <div className="min-h-[100dvh] bg-[#FAF9F6] text-stone-900">

@@ -111,6 +111,11 @@ export const onRequest = async (context: any) => {
       const genAI = new GoogleGenerativeAI(env.GOOGLE_API_KEY);
       const model = genAI.getGenerativeModel({
         model: "gemini-2.5-flash",
+        generationConfig: {
+          responseMimeType: "application/json",
+          // @ts-ignore — thinkingConfig is supported by gemini-2.5-flash
+          thinkingConfig: { thinkingBudget: 1024 },
+        },
         safetySettings: [
           { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_NONE },
           { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_NONE },
