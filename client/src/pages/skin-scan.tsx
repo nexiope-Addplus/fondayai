@@ -1340,7 +1340,10 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
       });
-      if (!res.ok) throw new Error(`generate-share failed: ${res.status}`);
+      if (!res.ok) {
+        const errBody = await res.json().catch(() => ({})) as any;
+        throw new Error(`generate-share failed: ${res.status} | ${errBody?.error ?? ""}: ${errBody?.detail ?? ""}`);
+      }
 
       const { slides } = await res.json() as { slides: string[] };
       if (!slides?.length) throw new Error("no slides returned");
