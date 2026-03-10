@@ -575,17 +575,38 @@ export const onRequest = async (context: any) => {
     return new Response(JSON.stringify({ error: "init failed", detail: String(e?.message ?? e) }), { status: 500, headers: CORS });
   }
 
+  // Tree traversal: find first div with multiple children but no display
+  function findBadNode(el: any, path = "root"): string | null {
+    if (!el || typeof el !== "object" || !el.type) return null;
+    const ch = el.props?.children;
+    const arr = Array.isArray(ch) ? ch : ch !== undefined ? [ch] : [];
+    const valid = arr.filter((c: any) => c !== null && c !== undefined && c !== false && c !== "");
+    if (valid.length > 1 && !el.props?.style?.display) {
+      return `${path} <${el.type}> children=${valid.length} style=${JSON.stringify(el.props?.style ?? {})}`;
+    }
+    for (let j = 0; j < arr.length; j++) {
+      const r = findBadNode(arr[j], `${path}>${el.type}[${j}]`);
+      if (r) return r;
+    }
+    return null;
+  }
+
   const satoriOpts = { width: 540, height: 675, fonts };
   const builders = [buildSlide1, buildSlide2, buildSlide3, buildSlide4, buildSlide5];
   const slides: string[] = [];
 
   for (let i = 0; i < builders.length; i++) {
     try {
-      const svg = await satori(builders[i](body), satoriOpts);
+      const element = builders[i](body);
+      const badNode = findBadNode(element);
+      if (badNode) {
+        return new Response(JSON.stringify({ error: `slide${i + 1} pre-check`, detail: badNode }), { status: 500, headers: CORS });
+      }
+      const svg = await satori(element, satoriOpts);
       const png = await svgToPng(svg);
       slides.push(png);
     } catch (e: any) {
-      return new Response(JSON.stringify({ error: `slide${i + 1} failed`, detail: String(e?.message ?? e) }), { status: 500, headers: CORS });
+      return new Response(JSON.stringify({ error: `slide${i + 1} satori`, detail: String(e?.message ?? e) }), { status: 500, headers: CORS });
     }
   }
 
