@@ -67,11 +67,12 @@ async function ensureResvg(): Promise<void> {
 
 async function getFonts() {
   if (fontsCache) return fontsCache;
-  const BASE = "https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static";
+  // npm CDN + OTF format (satori requires TTF/OTF, not WOFF)
+  const BASE = "https://cdn.jsdelivr.net/npm/pretendard@1.3.9/dist/public/static";
   const [regular, bold, black] = await Promise.all([
-    fetch(`${BASE}/pretendard-Regular.woff`).then((r) => r.arrayBuffer()),
-    fetch(`${BASE}/pretendard-Bold.woff`).then((r) => r.arrayBuffer()),
-    fetch(`${BASE}/pretendard-Black.woff`).then((r) => r.arrayBuffer()),
+    fetch(`${BASE}/Pretendard-Regular.otf`).then((r) => r.arrayBuffer()),
+    fetch(`${BASE}/Pretendard-Bold.otf`).then((r) => r.arrayBuffer()),
+    fetch(`${BASE}/Pretendard-Black.otf`).then((r) => r.arrayBuffer()),
   ]);
   fontsCache = [
     { name: "Pretendard", data: regular, weight: 400, style: "normal" },
