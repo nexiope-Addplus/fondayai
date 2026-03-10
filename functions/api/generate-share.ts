@@ -556,17 +556,26 @@ export const onRequest = async (context: any) => {
     return new Response(JSON.stringify({ error: "Invalid JSON" }), { status: 400, headers: CORS });
   }
 
-  // Initialize WASM and fonts in parallel
-  const [fonts] = await Promise.all([getFonts(), ensureYoga(), ensureResvg()]);
+  let fonts: any;
+  try {
+    // Initialize WASM and fonts in parallel
+    [fonts] = await Promise.all([getFonts(), ensureYoga(), ensureResvg()]);
+  } catch (e: any) {
+    return new Response(JSON.stringify({ error: "init failed", detail: String(e?.message ?? e) }), { status: 500, headers: CORS });
+  }
 
   const satoriOpts = { width: 540, height: 675, fonts };
   const builders = [buildSlide1, buildSlide2, buildSlide3, buildSlide4, buildSlide5];
   const slides: string[] = [];
 
-  for (const build of builders) {
-    const svg = await satori(build(body), satoriOpts);
-    const png = await svgToPng(svg);
-    slides.push(png);
+  for (let i = 0; i < builders.length; i++) {
+    try {
+      const svg = await satori(builders[i](body), satoriOpts);
+      const png = await svgToPng(svg);
+      slides.push(png);
+    } catch (e: any) {
+      return new Response(JSON.stringify({ error: `slide${i + 1} failed`, detail: String(e?.message ?? e) }), { status: 500, headers: CORS });
+    }
   }
 
   return new Response(JSON.stringify({ slides }), { headers: CORS });
