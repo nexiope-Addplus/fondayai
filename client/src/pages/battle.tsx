@@ -47,14 +47,14 @@ export default function BattlePage() {
         setLoading(true);
         // 1. Fetch friend's scan using token (matching Cloudflare API route)
         let res = await fetch(`/api/shared-scan?token=${params.token}`);
-        
+
         // Fallback for local Express if needed
         if (res.status === 404) {
            res = await fetch(`/api/scans/shared/${params.token}`);
         }
 
         if (!res.ok) {
-          throw new Error(res.status === 404 ? "챌린지 정보를 찾을 수 없습니다." : "데이터를 불러오는데 실패했습니다.");
+          throw new Error(res.status === 404 ? t("battle.notFound") : t("battle.loadError"));
         }
         const data = await res.json();
         setFriendScan(data);
@@ -105,10 +105,10 @@ export default function BattlePage() {
         <div className="w-16 h-16 rounded-full bg-stone-100 flex items-center justify-center mb-2">
           <Shield className="w-8 h-8 text-stone-300" />
         </div>
-        <h2 className="text-xl font-black text-stone-800">챌린지 정보를 불러올 수 없어요</h2>
-        <p className="text-stone-500 text-sm">{error || "유효하지 않은 링크입니다."}</p>
+        <h2 className="text-xl font-black text-stone-800">{t("battle.errorTitle")}</h2>
+        <p className="text-stone-500 text-sm">{error || t("battle.errorDesc")}</p>
         <Button onClick={() => setLocation("/")} className="mt-4 rounded-xl px-6" variant="outline">
-          홈으로 돌아가기
+          {t("battle.homeBtn")}
         </Button>
       </div>
     );
@@ -151,7 +151,7 @@ export default function BattlePage() {
         <button onClick={() => setLocation("/")} className="w-10 h-10 flex items-center justify-center -ml-2 rounded-full hover:bg-stone-100 active:bg-stone-200 transition-colors">
           <ChevronLeft className="w-6 h-6 text-stone-600" />
         </button>
-        <h1 className="text-lg font-black" style={{ color: DEEP_GREEN }}>피부 챌린지 ⚔️</h1>
+        <h1 className="text-lg font-black" style={{ color: DEEP_GREEN }}>{t("battle.title")}</h1>
         <div className="w-10 hidden sm:block" />
       </div>
 
@@ -161,10 +161,10 @@ export default function BattlePage() {
           {/* Main Battle Banner */}
           <motion.div variants={fadeChild} className="text-center pt-2 pb-4">
             <h2 className="text-2xl font-black mb-2" style={{ color: DEEP_GREEN }}>
-              {myScan ? (isWinner ? "승리! 🎉" : "아쉽네요! 다음 기회에 😅") : "친구가 챌린지를 보냈어요!"}
+              {myScan ? (isWinner ? t("battle.win") : t("battle.lose")) : t("battle.friendSent")}
             </h2>
             <p className="text-sm text-stone-500">
-              {myScan ? "나와 친구의 피부 상태를 비교해보세요." : "지금 바로 내 피부를 스캔하고 친구와 겨뤄보세요."}
+              {myScan ? t("battle.compareSub") : t("battle.scanSub")}
             </p>
           </motion.div>
 
@@ -173,9 +173,9 @@ export default function BattlePage() {
             {/* Friend Card */}
             <div className="relative p-4 rounded-3xl bg-white shadow-lg border border-stone-100/50 flex flex-col items-center justify-center text-center overflow-hidden h-[160px]">
               <div className="absolute top-0 right-0 w-16 h-16 bg-gradient-to-bl from-stone-100 to-transparent rounded-bl-full opacity-50" />
-              <p className="text-[11px] font-bold text-stone-400 mb-2">친구</p>
+              <p className="text-[11px] font-bold text-stone-400 mb-2">{t("battle.friend")}</p>
               <span className="text-4xl font-black leading-none mb-1" style={{ color: SCAN_TO }}>{friendScan.overallScore}</span>
-              <p className="text-[10px] font-bold text-stone-400 mb-2">종합점수</p>
+              <p className="text-[10px] font-bold text-stone-400 mb-2">{t("battle.totalScore")}</p>
               
               {friendScan.baumannType && (
                 <div className="flex items-center justify-center gap-[2px]">
@@ -203,9 +203,9 @@ export default function BattlePage() {
               
               {myScan ? (
                 <>
-                  <p className="text-[11px] font-bold text-stone-400 mb-2">나</p>
+                  <p className="text-[11px] font-bold text-stone-400 mb-2">{t("battle.me")}</p>
                   <span className="text-4xl font-black leading-none mb-1" style={{ color: DEEP_GREEN }}>{myScan.overallScore}</span>
-                  <p className="text-[10px] font-bold text-stone-400 mb-2">종합점수</p>
+                  <p className="text-[10px] font-bold text-stone-400 mb-2">{t("battle.totalScore")}</p>
                   
                   {myScan.baumannType && (
                     <div className="flex items-center justify-center gap-[2px]">
@@ -222,7 +222,7 @@ export default function BattlePage() {
                   <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center">
                     <Activity className="w-5 h-5 text-emerald-400" />
                   </div>
-                  <p className="text-xs font-bold text-white/90">아직 측정 전이에요</p>
+                  <p className="text-xs font-bold text-white/90">{t("battle.noScanYet")}</p>
                 </div>
               )}
             </div>
@@ -233,8 +233,8 @@ export default function BattlePage() {
             <motion.div variants={fadeChild}>
               <Card className="border-none shadow-md rounded-3xl overflow-hidden box-border">
                 <div className="p-5 pb-0">
-                  <h3 className="text-[14px] font-black" style={{ color: DEEP_GREEN }}>전격 비교 분석</h3>
-                  <p className="text-xs text-stone-400 mt-1">방사형 차트를 통해 스킨케어 밸런스를 확인해보세요.</p>
+                  <h3 className="text-[14px] font-black" style={{ color: DEEP_GREEN }}>{t("battle.compareTitle")}</h3>
+                  <p className="text-xs text-stone-400 mt-1">{t("battle.compareChartSub")}</p>
                 </div>
                 <div className="w-full h-72 pt-4 box-border">
                   <ResponsiveContainer width="100%" height="100%">
@@ -260,7 +260,7 @@ export default function BattlePage() {
           {/* Detailed Scores List (Only if user has scanned) */}
           {myScan && chartData.length > 0 && (
             <motion.div variants={fadeChild} className="space-y-3 pt-2">
-              <h3 className="text-[14px] font-black px-1" style={{ color: DEEP_GREEN }}>세부 항목 비교</h3>
+              <h3 className="text-[14px] font-black px-1" style={{ color: DEEP_GREEN }}>{t("battle.detailTitle")}</h3>
               {chartData.map((item, i) => {
                 const diff = item.me - item.friend;
                 const iWon = diff > 0;
@@ -277,21 +277,21 @@ export default function BattlePage() {
 
                     <div className="flex-1 flex justify-center px-4">
                       {isTie ? (
-                        <span className="text-xs font-bold text-stone-400 px-3 py-1 bg-stone-100 rounded-full">무승부</span>
+                        <span className="text-xs font-bold text-stone-400 px-3 py-1 bg-stone-100 rounded-full">{t("battle.tie")}</span>
                       ) : iWon ? (
-                        <span className="text-xs font-bold text-emerald-600 px-3 py-1 bg-emerald-50 rounded-full border border-emerald-100">나의 승! +{diff}</span>
+                        <span className="text-xs font-bold text-emerald-600 px-3 py-1 bg-emerald-50 rounded-full border border-emerald-100">{t("battle.winLabel", { diff })}</span>
                       ) : (
-                        <span className="text-xs font-bold text-rose-600 px-3 py-1 bg-rose-50 rounded-full border border-rose-100">친구 승 +{Math.abs(diff)}</span>
+                        <span className="text-xs font-bold text-rose-600 px-3 py-1 bg-rose-50 rounded-full border border-rose-100">{t("battle.loseLabel", { diff: Math.abs(diff) })}</span>
                       )}
                     </div>
 
                     <div className="flex flex-col items-end w-[60px] shrink-0 text-[10px]">
                       <div className="flex items-center gap-1.5 mb-1 text-stone-500">
-                        <span>친구</span>
+                        <span>{t("battle.friend")}</span>
                         <span className="font-black text-[12px] text-stone-800">{item.friend}</span>
                       </div>
                       <div className="flex items-center gap-1.5" style={{ color: DEEP_GREEN }}>
-                        <span>나</span>
+                        <span>{t("battle.me")}</span>
                         <span className="font-black text-[12px]">{item.me}</span>
                       </div>
                     </div>
@@ -311,7 +311,7 @@ export default function BattlePage() {
                >
                  <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 pointer-events-none" />
                  <Sparkles className="w-5 h-5" />
-                 나도 피부 스캔하고 챌린지 참여하기
+                 {t("battle.scanBtn")}
                  <ArrowRight className="w-5 h-5 ml-1" />
                </Button>
             </motion.div>

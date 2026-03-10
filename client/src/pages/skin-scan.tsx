@@ -1684,17 +1684,17 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
                 if (navigator.share) {
                   navigator.share({
                     title: 'Fonday AI 피부 챌린지!',
-                    text: `내 피부 점수(${overallScore}점, ${finalType})를 확인하고 나와 겨뤄보세요!`,
+                    text: t("result.shareText", { score: overallScore, type: finalType }),
                     url: shareUrl,
                   }).catch(console.error);
                 } else {
                   navigator.clipboard.writeText(shareUrl).then(() => {
-                    alert("챌린지 링크가 복사되었습니다! 친구에게 보내서 겨뤄보세요.");
+                    alert(t("result.challengeLinkCopied"));
                   });
                 }
               }}
             >
-              <span className="text-2xl">👑</span> 친구에게 피부 챌린지 보내기
+              <span className="text-2xl">👑</span> {t("result.challengeBtn")}
             </Button>
           </motion.div>
         )}
@@ -1711,7 +1711,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
               }}
             >
               <Trophy className="w-5 h-5" />
-              챌린지 결과 확인하기
+              {t("result.challengeResult")}
               <ArrowRight className="w-5 h-5 ml-1" />
             </Button>
           </motion.div>
@@ -1793,7 +1793,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
         <Button onClick={handleShare} disabled={shareLoading}
           className="w-full h-14 rounded-2xl text-white font-bold shadow-lg hover:opacity-90 transition-opacity bg-gradient-to-r from-[#f09433] via-[#bc1888] to-[#8a3ab9]">
           {shareLoading
-            ? <><div className="w-5 h-5 mr-2 border-2 border-white/40 border-t-white rounded-full animate-spin" /> 이미지 생성 중…</>
+            ? <><div className="w-5 h-5 mr-2 border-2 border-white/40 border-t-white rounded-full animate-spin" /> {t("result.shareLoading")}</>
             : <><Share2 className="w-5 h-5 mr-2" /> {t("result.share")}</>
           }
         </Button>

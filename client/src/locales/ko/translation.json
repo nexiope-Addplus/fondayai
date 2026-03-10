@@ -110,8 +110,12 @@
     },
     "earlybird": "Fonday 얼리버드 알림 받기",
     "share": "결과 공유하기",
+    "shareLoading": "이미지 생성 중…",
     "partnership": "브랜드 제휴 문의하기",
-    "shareText": "오늘 내 피부 점수는 {{score}}점! 바우만 타입은 {{type}}형이 나왔어요.\n#Fonday #AI피부분석 #FondayAI"
+    "shareText": "오늘 내 피부 점수는 {{score}}점! 바우만 타입은 {{type}}형이 나왔어요.\n#Fonday #AI피부분석 #FondayAI",
+    "challengeBtn": "친구에게 피부 챌린지 보내기",
+    "challengeResult": "챌린지 결과 확인하기",
+    "challengeLinkCopied": "챌린지 링크가 복사되었습니다! 친구에게 보내서 겨뤄보세요."
   },
   "modal": {
     "analysis": {
@@ -336,6 +340,30 @@
     "7": "다크서클",
     "8": "피부 광채",
     "9": "피부결 균일도"
+  },
+  "battle": {
+    "title": "피부 챌린지 ⚔️",
+    "win": "승리! 🎉",
+    "lose": "아쉽네요! 다음 기회에 😅",
+    "friendSent": "친구가 챌린지를 보냈어요!",
+    "compareSub": "나와 친구의 피부 상태를 비교해보세요.",
+    "scanSub": "지금 바로 내 피부를 스캔하고 친구와 겨뤄보세요.",
+    "friend": "친구",
+    "me": "나",
+    "totalScore": "종합점수",
+    "noScanYet": "아직 측정 전이에요",
+    "compareTitle": "전격 비교 분석",
+    "compareChartSub": "방사형 차트를 통해 스킨케어 밸런스를 확인해보세요.",
+    "detailTitle": "세부 항목 비교",
+    "scanBtn": "나도 피부 스캔하고 챌린지 참여하기",
+    "winLabel": "나의 승! +{{diff}}",
+    "loseLabel": "친구 승 +{{diff}}",
+    "tie": "무승부",
+    "errorTitle": "챌린지 정보를 불러올 수 없어요",
+    "errorDesc": "유효하지 않은 링크입니다.",
+    "homeBtn": "홈으로 돌아가기",
+    "loadError": "데이터를 불러오는데 실패했습니다.",
+    "notFound": "챌린지 정보를 찾을 수 없습니다."
   },
   "share": {
     "rankLabel": "랭커",

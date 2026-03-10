@@ -110,8 +110,12 @@
     },
     "earlybird": "Get Fonday Early Bird Updates",
     "share": "Share Results",
+    "shareLoading": "Generating images…",
     "partnership": "Brand Partnership Inquiry",
-    "shareText": "My skin score today is {{score}} pts! My Baumann type is {{type}}.\n#Fonday #AISkinAnalysis #FondayAI"
+    "shareText": "My skin score today is {{score}} pts! My Baumann type is {{type}}.\n#Fonday #AISkinAnalysis #FondayAI",
+    "challengeBtn": "Challenge a Friend",
+    "challengeResult": "View Challenge Result",
+    "challengeLinkCopied": "Challenge link copied! Send it to your friend to compete."
   },
   "modal": {
     "analysis": {
@@ -336,6 +340,30 @@
     "7": "Dark Circles",
     "8": "Skin Radiance",
     "9": "Skin Texture"
+  },
+  "battle": {
+    "title": "Skin Challenge ⚔️",
+    "win": "You Win! 🎉",
+    "lose": "So close! Next time 😅",
+    "friendSent": "A friend sent you a challenge!",
+    "compareSub": "Compare your skin with your friend's.",
+    "scanSub": "Scan your skin now and compete with your friend.",
+    "friend": "Friend",
+    "me": "Me",
+    "totalScore": "Total Score",
+    "noScanYet": "Not scanned yet",
+    "compareTitle": "Head-to-Head Analysis",
+    "compareChartSub": "Check your skincare balance on the radar chart.",
+    "detailTitle": "Detailed Comparison",
+    "scanBtn": "Scan My Skin & Join Challenge",
+    "winLabel": "I Win! +{{diff}}",
+    "loseLabel": "Friend Wins +{{diff}}",
+    "tie": "Tie",
+    "errorTitle": "Couldn't load challenge info",
+    "errorDesc": "Invalid link.",
+    "homeBtn": "Back to Home",
+    "loadError": "Failed to load data.",
+    "notFound": "Challenge info not found."
   },
   "share": {
     "rankLabel": "Ranker",

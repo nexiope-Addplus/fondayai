@@ -110,8 +110,12 @@
     },
     "earlybird": "Fondayアーリーバード登録",
     "share": "結果をシェア",
+    "shareLoading": "画像生成中…",
     "partnership": "ブランド提携のお問い合わせ",
-    "shareText": "今日の肌スコアは{{score}}点！バウマンタイプは{{type}}でした。\n#Fonday #AI肌分析 #FondayAI"
+    "shareText": "今日の肌スコアは{{score}}点！バウマンタイプは{{type}}でした。\n#Fonday #AI肌分析 #FondayAI",
+    "challengeBtn": "友達に肌チャレンジを送る",
+    "challengeResult": "チャレンジ結果を確認",
+    "challengeLinkCopied": "チャレンジリンクをコピーしました！友達に送って競いましょう。"
   },
   "modal": {
     "analysis": {
@@ -336,6 +340,30 @@
     "7": "クマ",
     "8": "肌のツヤ",
     "9": "肌の均一さ"
+  },
+  "battle": {
+    "title": "肌チャレンジ ⚔️",
+    "win": "勝利！🎉",
+    "lose": "惜しい！次回に😅",
+    "friendSent": "友達がチャレンジを送ってきた！",
+    "compareSub": "友達との肌状態を比べてみましょう。",
+    "scanSub": "今すぐ肌をスキャンして友達と競いましょう。",
+    "friend": "友達",
+    "me": "自分",
+    "totalScore": "総合点",
+    "noScanYet": "まだ未測定",
+    "compareTitle": "徹底比較分析",
+    "compareChartSub": "レーダーチャートでスキンケアバランスを確認。",
+    "detailTitle": "詳細項目比較",
+    "scanBtn": "肌をスキャンしてチャレンジ参加",
+    "winLabel": "自分の勝ち！+{{diff}}",
+    "loseLabel": "友達の勝ち！+{{diff}}",
+    "tie": "引き分け",
+    "errorTitle": "チャレンジ情報を読み込めません",
+    "errorDesc": "無効なリンクです。",
+    "homeBtn": "ホームへ戻る",
+    "loadError": "データの読み込みに失敗しました。",
+    "notFound": "チャレンジ情報が見つかりません。"
   },
   "share": {
     "rankLabel": "ランカー",

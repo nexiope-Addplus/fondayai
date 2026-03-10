@@ -62,7 +62,17 @@ async function ensureResvg() {
 }
 
 const PRETENDARD = "https://cdn.jsdelivr.net/npm/pretendard@1.3.9/dist/public/static";
-const NOTO_JP    = "https://cdn.jsdelivr.net/npm/@fontsource/noto-sans-jp@5.0.5/files";
+// No version pin — always resolves to latest published @fontsource/noto-sans-jp
+const NOTO_JP    = "https://cdn.jsdelivr.net/npm/@fontsource/noto-sans-jp/files";
+
+async function loadPretendard(): Promise<Uint8Array[]> {
+  const [r, b, bk] = await Promise.all([
+    fetch(`${PRETENDARD}/Pretendard-Regular.otf`).then(x => x.arrayBuffer()),
+    fetch(`${PRETENDARD}/Pretendard-Bold.otf`).then(x => x.arrayBuffer()),
+    fetch(`${PRETENDARD}/Pretendard-Black.otf`).then(x => x.arrayBuffer()),
+  ]);
+  return [r, b, bk].map(b => new Uint8Array(b));
+}
 
 async function getFonts(lang: string): Promise<Uint8Array[]> {
   const key = lang === "ja" ? "ja" : "default";
@@ -70,21 +80,19 @@ async function getFonts(lang: string): Promise<Uint8Array[]> {
 
   let buffers: Uint8Array[];
   if (lang === "ja") {
-    // Noto Sans JP: Japanese subset + Latin supplement (covers hiragana, katakana, kanji, ASCII)
-    const [jp400, jp700, la400, la700] = await Promise.all([
-      fetch(`${NOTO_JP}/noto-sans-jp-japanese-400-normal.woff2`).then(x => x.arrayBuffer()),
-      fetch(`${NOTO_JP}/noto-sans-jp-japanese-700-normal.woff2`).then(x => x.arrayBuffer()),
-      fetch(`${NOTO_JP}/noto-sans-jp-latin-400-normal.woff2`).then(x => x.arrayBuffer()),
-      fetch(`${NOTO_JP}/noto-sans-jp-latin-700-normal.woff2`).then(x => x.arrayBuffer()),
-    ]);
-    buffers = [jp400, jp700, la400, la700].map(b => new Uint8Array(b));
+    try {
+      // Load only 2 files (japanese subset includes basic Latin glyphs)
+      const [jp400, jp700] = await Promise.all([
+        fetch(`${NOTO_JP}/noto-sans-jp-japanese-400-normal.woff2`).then(x => x.arrayBuffer()),
+        fetch(`${NOTO_JP}/noto-sans-jp-japanese-700-normal.woff2`).then(x => x.arrayBuffer()),
+      ]);
+      buffers = [new Uint8Array(jp400), new Uint8Array(jp700)];
+    } catch {
+      // Fallback: use Pretendard so Korean/Latin at least renders
+      buffers = await loadPretendard();
+    }
   } else {
-    const [r, b, bk] = await Promise.all([
-      fetch(`${PRETENDARD}/Pretendard-Regular.otf`).then(x => x.arrayBuffer()),
-      fetch(`${PRETENDARD}/Pretendard-Bold.otf`).then(x => x.arrayBuffer()),
-      fetch(`${PRETENDARD}/Pretendard-Black.otf`).then(x => x.arrayBuffer()),
-    ]);
-    buffers = [r, b, bk].map(b => new Uint8Array(b));
+    buffers = await loadPretendard();
   }
   fontCache[key] = buffers;
   return buffers;
