@@ -119,6 +119,7 @@ function solidBg() {
       top: 0, left: 0, right: 0, bottom: 0,
       background: "linear-gradient(180deg, #F8FAFC 0%, #F1F5F9 100%)",
       overflow: "hidden",
+      display: "flex",
     },
   },
     h("div", { style: { position: "absolute", top: -100, right: -100, width: 350, height: 350, borderRadius: 175, background: `${SCAN_FROM}1A` } }),
@@ -176,10 +177,10 @@ function slideFooter() {
         alignItems: "center", boxShadow: "0 8px 24px rgba(0,0,0,0.06)",
       },
     },
-      h("div", { style: { fontSize: 14, fontWeight: 900, color: "#1E293B", lineHeight: 1 } },
-        "\u{1F525} 나랑 같이 ",
+      h("div", { style: { display: "flex", fontSize: 14, fontWeight: 900, color: "#1E293B", lineHeight: 1 } },
+        h("span", null, "\u{1F525} 나랑 같이 "),
         h("span", { style: { color: SCAN_TO } }, "피부 챌린지"),
-        " 할 사람?",
+        h("span", null, " 할 사람?"),
       ),
       h("div", { style: { background: "#F1F5F9", padding: "6px 12px", borderRadius: 100 } },
         h("div", { style: { fontSize: 12, fontWeight: 800, color: "#64748B", lineHeight: 1 } }, "검색창 Fonday AI"),
@@ -327,7 +328,7 @@ function buildSlide2(d: SlideData): any {
   const scoreRows = scores.map((s, i) => {
     const color = SCORE_COLORS[i] || DEEP_GREEN;
     const label = scoreLabels[i] || s.label;
-    return h("div", { style: { width: "100%" } },
+    return h("div", { style: { width: "100%", display: "flex", flexDirection: "column" } },
       h("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: 6 } },
         h("span", { style: { fontSize: 13, fontWeight: 800, color: "#475569", lineHeight: 1 } }, label),
         h("span", { style: { fontSize: 15, fontWeight: 900, color, lineHeight: 1 } }, `${s.score}`),
@@ -402,7 +403,7 @@ function buildSlide3(d: SlideData): any {
             },
           },
             h("div", { style: { fontSize: 24, lineHeight: 1 } }, "\u{1F9EA}"),
-            h("div", { style: { flex: 1 } },
+            h("div", { style: { flex: 1, display: "flex", flexDirection: "column" } },
               h("div", { style: { fontSize: 10, fontWeight: 900, color: "#64748B", marginBottom: 4, letterSpacing: 0.5, lineHeight: 1 } }, "RECOMMENDED INGREDIENT"),
               h("div", { style: { fontSize: 15, fontWeight: 900, color: SCAN_TO, marginBottom: 4, lineHeight: 1 } }, cosmetics[0].key),
               h("div", { style: { fontSize: 12, color: "#475569", fontWeight: 600, lineHeight: 1.2 } }, cosmetics[0].reason),
@@ -433,7 +434,7 @@ function buildSlide4(d: SlideData): any {
         background: "linear-gradient(135deg, white, #F8FAFC)",
       },
     },
-      h("div", null,
+      h("div", { style: { display: "flex", flexDirection: "column" } },
         h("div", {
           style: {
             width: 36, height: 36, borderRadius: 12,
@@ -485,7 +486,7 @@ function buildSlide5(d: SlideData): any {
     return items.map((item) =>
       h("div", { style: { display: "flex", gap: 10, alignItems: "flex-start" } },
         h("div", { style: { fontSize: 13, fontWeight: 900, color: "#EF4444", lineHeight: 1, marginTop: 2 } }, "✕"),
-        h("div", null,
+        h("div", { style: { display: "flex", flexDirection: "column" } },
           h("p", { style: { fontSize: 14, fontWeight: 900, color: "#1E293B", margin: "0 0 4px", lineHeight: 1 } }, item.food),
           h("p", { style: { fontSize: 12, color: "#64748B", margin: 0, fontWeight: 600, lineHeight: 1.3 } }, item.why),
         ),
