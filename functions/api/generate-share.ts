@@ -1,5 +1,9 @@
 import satori, { init as initYoga } from "satori/standalone";
 import { initWasm, Resvg } from "@resvg/resvg-wasm";
+// @ts-ignore – wasm modules imported as WebAssembly.Module by Cloudflare Pages bundler
+import yogaWasm from "./yoga.wasm";
+// @ts-ignore
+import resvgWasm from "./resvg.wasm";
 
 // ── Request / Response types ──────────────────────────────────────────────────
 
@@ -51,13 +55,13 @@ let fontsCache: { name: string; data: ArrayBuffer; weight: number; style: string
 
 async function ensureYoga(): Promise<void> {
   if (yogaInitialized) return;
-  await initYoga(fetch("https://cdn.jsdelivr.net/npm/satori@0.25.0/yoga.wasm"));
+  await initYoga(yogaWasm);
   yogaInitialized = true;
 }
 
 async function ensureResvg(): Promise<void> {
   if (resvgInitialized) return;
-  await initWasm(fetch("https://cdn.jsdelivr.net/npm/@resvg/resvg-wasm/index_bg.wasm"));
+  await initWasm(resvgWasm);
   resvgInitialized = true;
 }
 
