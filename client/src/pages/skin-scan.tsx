@@ -1239,6 +1239,32 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
   const isWrink = (scores[4]?.score ?? 100) < 60;  // index 4 = 주름 및 탄력
   const finalType = `${isOily ? "O" : "D"}${isSens ? "S" : "R"}${isPig ? "P" : "N"}${isWrink ? "W" : "T"}`;
 
+  const parseFoodOptions = (value?: string): string[] => {
+    if (!value) return [];
+    const delimiter = value.includes("|") ? "|" : "·";
+    return value
+      .split(delimiter)
+      .map((item) => item.trim())
+      .filter(Boolean);
+  };
+
+  const pickFoodOption = (value: string | undefined, seed: number, fallbackIndex = 0): string | null => {
+    const options = parseFoodOptions(value);
+    if (options.length === 0) return null;
+    const normalizedSeed = Math.abs(Math.round(seed));
+    return options[normalizedSeed % options.length] ?? options[Math.min(fallbackIndex, options.length - 1)] ?? null;
+  };
+
+  const dedupeFoods = (items: ({ food: string; why: string } | null)[]) => {
+    const seen = new Set<string>();
+    return items.filter((item): item is { food: string; why: string } => {
+      if (!item?.food) return false;
+      if (seen.has(item.food)) return false;
+      seen.add(item.food);
+      return true;
+    });
+  };
+
   // 점수 기반 피해야 할 음식 키 (바우만 외 추가 항목)
   const scoreAvoidKeys: string[] = [];
   if ((scores[1]?.score ?? 100) < 50) scoreAvoidKeys.push("hydration");
@@ -1247,29 +1273,34 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
   if ((scores[8]?.score ?? 100) < 50) scoreAvoidKeys.push("glow");
 
   // 점심 피해야 할 음식 (바우만 4글자 + 점수 기반 통합)
-  const avoidLunch: { food: string; why: string }[] = [
-    ...finalType.split("").filter(l => l in NUTRIENT_COLORS).map(l => {
+  const avoidLunch: { food: string; why: string }[] = dedupeFoods([
+    ...finalType.split("").filter(l => l in NUTRIENT_COLORS).map((l, idx) => {
       const d = t(`nutrients.avoidFoods.${l}`, { returnObjects: true }) as any;
-      return d?.lunch ? { food: d.lunch.split("·")[0].trim(), why: d.lunchWhy } : null;
+      const food = pickFoodOption(d?.lunch, overallScore + idx + l.charCodeAt(0));
+      return food ? { food, why: d.lunchWhy } : null;
     }).filter(Boolean) as { food: string; why: string }[],
-    ...scoreAvoidKeys.map(key => {
+    ...scoreAvoidKeys.map((key, idx) => {
       const d = t(`nutrients.scoreAvoid.${key}`, { returnObjects: true }) as any;
-      return d?.foods ? { food: d.foods.split("·")[0].trim(), why: d.why } : null;
+      const relatedScore = scores[idx + 1]?.score ?? overallScore;
+      const food = pickFoodOption(d?.foods, relatedScore + idx + key.length);
+      return food ? { food, why: d.why } : null;
     }).filter(Boolean) as { food: string; why: string }[],
-  ].slice(0, 4);
+  ]).slice(0, 4);
 
   // 저녁 피해야 할 음식 (바우만 4글자 + 점수 기반 통합)
-  const avoidDinner: { food: string; why: string }[] = [
-    ...finalType.split("").filter(l => l in NUTRIENT_COLORS).map(l => {
+  const avoidDinner: { food: string; why: string }[] = dedupeFoods([
+    ...finalType.split("").filter(l => l in NUTRIENT_COLORS).map((l, idx) => {
       const d = t(`nutrients.avoidFoods.${l}`, { returnObjects: true }) as any;
-      return d?.dinner ? { food: d.dinner.split("·")[0].trim(), why: d.dinnerWhy } : null;
+      const food = pickFoodOption(d?.dinner, overallScore + idx + l.charCodeAt(0) + 5, 1);
+      return food ? { food, why: d.dinnerWhy } : null;
     }).filter(Boolean) as { food: string; why: string }[],
-    ...scoreAvoidKeys.map(key => {
+    ...scoreAvoidKeys.map((key, idx) => {
       const d = t(`nutrients.scoreAvoid.${key}`, { returnObjects: true }) as any;
-      const foods = d?.foods?.split("·");
-      return foods ? { food: (foods[1] ?? foods[0]).trim(), why: d.why } : null;
+      const relatedScore = scores[idx + 5]?.score ?? overallScore;
+      const food = pickFoodOption(d?.foods, relatedScore + idx + key.length + 7, 1);
+      return food ? { food, why: d.why } : null;
     }).filter(Boolean) as { food: string; why: string }[],
-  ].slice(0, 4);
+  ]).slice(0, 4);
 
   const handleShare = async () => {
     try {
