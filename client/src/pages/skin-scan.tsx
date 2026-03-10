@@ -34,7 +34,9 @@ import {
   Clock,
   User,
   ChevronRight,
+  ChevronDown,
   Utensils,
+  Trophy,
 } from "lucide-react";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { Button } from "@/components/ui/button";
@@ -1078,6 +1080,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
   const nutrientsDrag = useDragControls();
   const diaryDrag = useDragControls();
   const [showNutrients, setShowNutrients] = useState(false);
+  const [expandedScore, setExpandedScore] = useState<number | null>(null);
   const [showDiary, setShowDiary] = useState(false);
   const [rankingData, setRankingData] = useState<RankingData | null>(null);
   const [diaryTab, setDiaryTab] = useState<"history" | "compare" | "ranking">("history");
@@ -1624,84 +1627,56 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
               </div>
             </div>
 
-            {/* 3열 수치 */}
-            <div className="grid grid-cols-3 gap-px mx-5 mb-4 rounded-2xl overflow-hidden border border-stone-100">
+            {/* 3열 수치 — 프리미엄 */}
+            <div className="grid grid-cols-3 gap-2.5 mx-5 mb-4">
               {/* 종합점수 */}
-              <div className="flex flex-col items-center justify-center py-3 bg-stone-50/60">
-                <span className="text-2xl font-black" style={{ color: SCAN_TO }}>{overallScore}</span>
-                <span className="text-[9px] font-bold text-stone-400 mt-0.5">{t("result.overall")}</span>
+              <div className="relative flex flex-col items-center justify-center py-4 rounded-2xl overflow-hidden"
+                style={{ background: `linear-gradient(135deg, ${SCAN_FROM}18, ${SCAN_TO}22)` }}>
+                <div className="absolute inset-0 backdrop-blur-sm" />
+                <div className="relative z-10 flex flex-col items-center">
+                  <div className="relative">
+                    <span className="text-4xl font-black" style={{ color: SCAN_TO }}>{overallScore}</span>
+                    <div className="absolute -inset-2 rounded-full opacity-20 blur-md"
+                      style={{ background: SCAN_FROM }} />
+                  </div>
+                  <span className="text-[9px] font-bold text-stone-400 mt-1">{t("result.overall")}</span>
+                </div>
               </div>
               {/* 피부나이 */}
-              <div className="flex flex-col items-center justify-center py-3 bg-stone-50/60 border-x border-stone-100">
-                <span className="text-2xl font-black" style={{ color: "#7C3AED" }}>
-                  {analysisResult?.skinAge && analysisResult.skinAge > 0 ? analysisResult.skinAge : "—"}
-                </span>
-                <span className="text-[9px] font-bold text-stone-400 mt-0.5">{t("result.skinAge")}</span>
+              <div className="relative flex flex-col items-center justify-center py-4 rounded-2xl overflow-hidden"
+                style={{ background: "linear-gradient(135deg, #7C3AED12, #7C3AED1A)" }}>
+                <div className="absolute inset-0 backdrop-blur-sm" />
+                <div className="relative z-10 flex flex-col items-center">
+                  <span className="text-4xl font-black" style={{ color: "#7C3AED" }}>
+                    {analysisResult?.skinAge && analysisResult.skinAge > 0 ? analysisResult.skinAge : "—"}
+                  </span>
+                  <span className="text-[9px] font-bold text-stone-400 mt-1">{t("result.skinAge")}</span>
+                </div>
               </div>
               {/* 랭킹 */}
-              <div className="flex flex-col items-center justify-center py-3 bg-stone-50/60">
-                {rankingData && rankingData.myPercentile !== undefined ? (
-                  <>
-                    <span className="text-2xl font-black" style={{ color: "#D97706" }}>
-                      {rankingData.myPercentile}%
-                    </span>
-                    <span className="text-[9px] font-bold text-stone-400 mt-0.5 flex items-center gap-0.5">
-                      <Star className="w-2.5 h-2.5 text-amber-500" />
-                      {t("ranking.topLabel")}
-                    </span>
-                  </>
-                ) : (
-                  <>
-                    <span className="text-2xl font-black text-stone-300">—</span>
-                    <span className="text-[9px] font-bold text-stone-400 mt-0.5">Rank</span>
-                  </>
-                )}
+              <div className="relative flex flex-col items-center justify-center py-4 rounded-2xl overflow-hidden"
+                style={{ background: "linear-gradient(135deg, #F59E0B12, #D9770622)" }}>
+                <div className="absolute inset-0 backdrop-blur-sm" />
+                <div className="relative z-10 flex flex-col items-center">
+                  {rankingData && rankingData.myPercentile !== undefined ? (
+                    <>
+                      <Trophy className="w-4 h-4 text-amber-500 mb-0.5" />
+                      <span className="text-4xl font-black" style={{ color: "#D97706" }}>
+                        {rankingData.myPercentile}<span className="text-lg">%</span>
+                      </span>
+                      <span className="text-[9px] font-bold text-stone-400 mt-0.5">{t("ranking.topLabel")}</span>
+                    </>
+                  ) : (
+                    <>
+                      <Trophy className="w-4 h-4 text-stone-300 mb-0.5" />
+                      <span className="text-4xl font-black text-stone-300">—</span>
+                      <span className="text-[9px] font-bold text-stone-400 mt-0.5">Rank</span>
+                    </>
+                  )}
+                </div>
               </div>
             </div>
 
-            {/* 점수 분포 미니 바 */}
-            {rankingData && rankingData.totalScans > 0 && (
-              <div className="mx-5 mb-4 p-3 rounded-xl bg-stone-50">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-[10px] font-bold text-stone-400">{t("ranking.distribution")}</span>
-                  <span className="text-[9px] text-stone-300">
-                    {t("ranking.totalData", { count: rankingData.totalScans })}
-                  </span>
-                </div>
-                <div className="flex gap-1 items-end h-8">
-                  {rankingData.scoreDistribution.map((band, bi) => {
-                    const maxCount = Math.max(...rankingData.scoreDistribution.map(d => d.count), 1);
-                    const barH = Math.max(Math.round((band.count / maxCount) * 100), band.count > 0 ? 12 : 4);
-                    const [bMin, bMax] = band.label.split("-").map(Number);
-                    const isMyBand = overallScore >= bMin && overallScore <= bMax;
-                    return (
-                      <div key={bi} className="flex-1 flex flex-col items-center gap-0.5">
-                        <div className="w-full rounded-sm transition-all duration-700"
-                          style={{
-                            height: `${barH}%`,
-                            background: isMyBand
-                              ? `linear-gradient(180deg, ${SCAN_FROM}, ${SCAN_TO})`
-                              : "#D6D3D1",
-                            boxShadow: isMyBand ? `0 0 6px ${SCAN_FROM}60` : "none",
-                          }} />
-                      </div>
-                    );
-                  })}
-                </div>
-                <div className="flex gap-1 mt-1">
-                  {rankingData.scoreDistribution.map((band, bi) => {
-                    const [bMin, bMax] = band.label.split("-").map(Number);
-                    const isMyBand = overallScore >= bMin && overallScore <= bMax;
-                    return (
-                      <span key={bi} className={`flex-1 text-center text-[8px] ${isMyBand ? "font-bold" : "text-stone-300"}`}
-                        style={isMyBand ? { color: SCAN_TO } : {}}>
-                        {band.label}
-                      </span>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
           </CardContent>
         </Card>
 
@@ -1721,34 +1696,61 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
           </Card>
         )}
 
-        {/* 10가지 점수 */}
+        {/* 10가지 점수 — 아코디언 */}
         <Card className="border-none shadow-md rounded-3xl bg-white">
           <CardHeader className="pb-1 pt-5 px-5">
             <p className="text-[13px] font-black" style={{ color: DEEP_GREEN }}>{t("result.scores")}</p>
           </CardHeader>
-          <CardContent className="px-5 pb-5 space-y-4">
+          <CardContent className="px-5 pb-5 space-y-3">
             {scores.map((item: any, i: number) => {
               const Icon = SCORE_ICONS[i] || Zap;
               const color = SCORE_COLORS[i] || DEEP_GREEN;
+              const isExpanded = expandedScore === i;
               return (
-                <div key={i} className="space-y-1.5">
-                  <div className="flex items-center justify-between text-[13px] font-bold">
-                    <div className="flex items-center gap-2">
-                      <div className="w-6 h-6 rounded-full flex items-center justify-center bg-stone-50 shadow-sm">
-                        <Icon className="w-3.5 h-3.5" style={{ color }} />
+                <div key={i}
+                  className="rounded-2xl transition-colors cursor-pointer"
+                  style={{ background: isExpanded ? `${color}08` : "transparent" }}
+                  onClick={() => setExpandedScore(isExpanded ? null : i)}>
+                  <div className="space-y-1.5 px-1 pt-1">
+                    <div className="flex items-center justify-between text-[13px] font-bold">
+                      <div className="flex items-center gap-2">
+                        <div className="w-6 h-6 rounded-full flex items-center justify-center bg-stone-50 shadow-sm">
+                          <Icon className="w-3.5 h-3.5" style={{ color }} />
+                        </div>
+                        <span className="text-stone-700">{t(`scores.${i}`)}</span>
                       </div>
-                      <span className="text-stone-700">{t(`scores.${i}`)}</span>
+                      <div className="flex items-center gap-1.5">
+                        <motion.span style={{ color }} initial={{ scale: 0 }} animate={{ scale: 1 }}
+                          transition={{ delay: 0.3 + i * 0.08, type: "spring" }}>
+                          {item.score}{t("result.scoreSuffix")}
+                        </motion.span>
+                        <motion.div
+                          animate={{ rotate: isExpanded ? 180 : 0 }}
+                          transition={{ duration: 0.2 }}>
+                          <ChevronDown className="w-3.5 h-3.5 text-stone-300" />
+                        </motion.div>
+                      </div>
                     </div>
-                    <motion.span style={{ color }} initial={{ scale: 0 }} animate={{ scale: 1 }}
-                      transition={{ delay: 0.3 + i * 0.08, type: "spring" }}>
-                      {item.score}{t("result.scoreSuffix")}
-                    </motion.span>
+                    <div className="h-1.5 rounded-full overflow-hidden bg-stone-100">
+                      <motion.div className="h-full rounded-full" style={{ background: color }}
+                        initial={{ width: "0%" }} animate={{ width: `${item.score}%` }}
+                        transition={{ delay: 0.3 + i * 0.08, duration: 0.9 }} />
+                    </div>
                   </div>
-                  <div className="h-1.5 rounded-full overflow-hidden bg-stone-100">
-                    <motion.div className="h-full rounded-full" style={{ background: color }}
-                      initial={{ width: "0%" }} animate={{ width: `${item.score}%` }}
-                      transition={{ delay: 0.3 + i * 0.08, duration: 0.9 }} />
-                  </div>
+                  <AnimatePresence>
+                    {isExpanded && item.comment && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: "auto", opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.25, ease: "easeInOut" }}
+                        className="overflow-hidden">
+                        <p className="text-[12px] text-stone-500 leading-relaxed px-1 pb-3 pt-2">
+                          {item.comment}
+                        </p>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </div>
               );
             })}
@@ -1785,10 +1787,15 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
               <Lock className="w-6 h-6 text-stone-500" />
             </div>
             <p className="text-[14px] font-black text-stone-700 mb-2">{t("result.locked.title")}</p>
-            <p className="text-[12px] text-stone-500 leading-relaxed">
+            <p className="text-[12px] text-stone-500 leading-relaxed mb-3">
               {t("result.locked.desc")}<br />
               <span className="font-bold" style={{ color: SCAN_TO }}>{t("result.locked.device")}</span>{t("result.locked.deviceDesc")}
             </p>
+            <Button onClick={() => setShowWaitlist(true)}
+              className="h-10 px-6 rounded-xl text-white text-[12px] font-bold shadow-md"
+              style={{ background: `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})` }}>
+              <span className="flex items-center gap-1.5">{t("result.earlybird")} <ArrowRight className="w-4 h-4" /></span>
+            </Button>
           </div>
         </Card>
 
@@ -1910,13 +1917,6 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
 
         {/* 광고 */}
         <AdBanner slot="6349940752" />
-
-        {/* 얼리버드 */}
-        <Button onClick={() => setShowWaitlist(true)}
-          className="w-full h-14 rounded-2xl text-white font-bold shadow-lg"
-          style={{ background: `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})` }}>
-          <span className="flex items-center gap-2">{t("result.earlybird")} <ArrowRight className="w-5 h-5" /></span>
-        </Button>
 
         {/* 공유 */}
         <Button onClick={handleShare}

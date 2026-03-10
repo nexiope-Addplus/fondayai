@@ -308,7 +308,7 @@
   },
   "ranking": {
     "myPercentile": "上位{{percent}}%",
-    "topLabel": "上位",
+    "topLabel": "順位",
     "myRankLabel": "肌ランキング",
     "totalData": "全{{count}}件のデータ基準",
     "avgScore": "平均スコア",
