@@ -1,4 +1,4 @@
-import satori from "satori";
+import satori, { init as initYoga } from "satori/standalone";
 import { initWasm, Resvg } from "@resvg/resvg-wasm";
 
 // ── Request / Response types ──────────────────────────────────────────────────
@@ -45,8 +45,15 @@ const NUTRIENT_COLORS: Record<string, string> = {
 
 // ── Module-level cache ────────────────────────────────────────────────────────
 
+let yogaInitialized = false;
 let resvgInitialized = false;
 let fontsCache: { name: string; data: ArrayBuffer; weight: number; style: string }[] | null = null;
+
+async function ensureYoga(): Promise<void> {
+  if (yogaInitialized) return;
+  await initYoga(fetch("https://cdn.jsdelivr.net/npm/satori@0.25.0/yoga.wasm"));
+  yogaInitialized = true;
+}
 
 async function ensureResvg(): Promise<void> {
   if (resvgInitialized) return;
@@ -550,7 +557,7 @@ export const onRequest = async (context: any) => {
   }
 
   // Initialize WASM and fonts in parallel
-  const [fonts] = await Promise.all([getFonts(), ensureResvg()]);
+  const [fonts] = await Promise.all([getFonts(), ensureYoga(), ensureResvg()]);
 
   const satoriOpts = { width: 540, height: 675, fonts };
   const builders = [buildSlide1, buildSlide2, buildSlide3, buildSlide4, buildSlide5];
