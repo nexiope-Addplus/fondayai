@@ -1631,6 +1631,27 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
       .catch(() => {});
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // 비로그인 챌린지 토큰 생성 (로그인 여부 확정 후 즉시)
+  const [guestTokenFetched, setGuestTokenFetched] = useState(false);
+  useEffect(() => {
+    if (!analysisResult || user !== null || guestTokenFetched) return;
+    setGuestTokenFetched(true);
+    fetch("/api/challenge-token", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        overallScore: analysisResult.scores?.[0]?.score || 0,
+        baumannType: finalType,
+        scores: analysisResult.scores,
+        skinAge: analysisResult.skinAge,
+        aiComment: analysisResult.aiComment,
+      }),
+    }).then(res => res.json()).then(data => {
+      if (data?.shareToken) setCurrentShareToken(data.shareToken);
+    }).catch(() => {});
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user, analysisResult]);
+
   // 스캔 저장 (로그인 + 분석결과 둘 다 준비됐을 때)
   useEffect(() => {
     if (!user || !analysisResult || isSaved) return;
