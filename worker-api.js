@@ -97,8 +97,34 @@ export default {
 
     // 테스트 엔드포인트: GET /test-push
     if (request.method === "GET" && new URL(request.url).pathname === "/test-push") {
-      await sendScanReminderToAll(env);
-      return new Response("✅ 테스트 푸시 전송 완료!", { headers: corsHeaders });
+      const logs: string[] = [];
+      try {
+        const kv = env.PUSH_KV;
+        if (!kv) { return new Response("❌ PUSH_KV not bound", { headers: corsHeaders }); }
+        const allIdsRaw = await kv.get("push:all_ids");
+        if (!allIdsRaw) { return new Response("❌ push:all_ids 없음 (구독자 없음)", { headers: corsHeaders }); }
+        const allIds = JSON.parse(allIdsRaw);
+        logs.push(`구독자 수: ${allIds.length}`);
+        for (const id of allIds) {
+          const raw = await kv.get(`push:sub:${id}`);
+          if (!raw) { logs.push(`❌ ${id}: 구독 데이터 없음`); continue; }
+          const { subscription, lang } = JSON.parse(raw);
+          logs.push(`📤 ${id} 전송 시도 (lang: ${lang})`);
+          try {
+            await sendPush(subscription, {
+              title: "🌟 Fonday 테스트 알림",
+              body: "푸시 알림이 정상 동작합니다! 🎉",
+              url: "/",
+            }, env);
+            logs.push(`✅ ${id} 전송 성공`);
+          } catch (e: any) {
+            logs.push(`❌ ${id} 전송 실패: ${e.message}`);
+          }
+        }
+      } catch (e: any) {
+        logs.push(`❌ 오류: ${e.message}`);
+      }
+      return new Response(logs.join("\n"), { headers: corsHeaders });
     }
 
     if (request.method === "POST") {
