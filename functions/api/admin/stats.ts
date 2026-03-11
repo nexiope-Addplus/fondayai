@@ -4,11 +4,15 @@ export const onRequest = async (context: any) => {
   const { request, env } = context;
   const url = new URL(request.url);
 
-  // 간단한 키 인증
-  const key = url.searchParams.get("key");
-  if (!env.ADMIN_KEY || key !== env.ADMIN_KEY) {
-    return new Response("Unauthorized", { status: 401 });
-  }
+  // HTTP Basic Auth
+  const authHeader = request.headers.get("Authorization");
+  const unauthorized = new Response("Unauthorized", {
+    status: 401,
+    headers: { "WWW-Authenticate": 'Basic realm="Fonday Admin"' },
+  });
+  if (!authHeader || !authHeader.startsWith("Basic ")) return unauthorized;
+  const [, password] = atob(authHeader.slice(6)).split(":");
+  if (!env.ADMIN_KEY || password !== env.ADMIN_KEY) return unauthorized;
 
   if (!env.FONDAY_DB) {
     return new Response("DB not configured", { status: 500 });
