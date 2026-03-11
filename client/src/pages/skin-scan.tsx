@@ -1645,6 +1645,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
         scores: analysisResult.scores,
         skinAge: analysisResult.skinAge,
         aiComment: analysisResult.aiComment,
+        lang: i18n.language || "ko",
       }),
     }).then(res => res.json()).then(data => {
       if (data?.shareToken) setCurrentShareToken(data.shareToken);
@@ -1673,6 +1674,19 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
       setIsSaved(true);
       if (data?.id) setCurrentScanId(data.id);
       if (data?.shareToken) setCurrentShareToken(data.shareToken);
+      // D1에도 저장 (관리자 통계용)
+      fetch("/api/challenge-token", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          overallScore,
+          baumannType: finalType,
+          scores: analysisResult.scores,
+          skinAge: analysisResult.skinAge,
+          aiComment: analysisResult.aiComment,
+          lang: i18n.language || "ko",
+        }),
+      }).catch(() => {});
     });
   }, [user, analysisResult]);
 
