@@ -22,7 +22,7 @@ export const onRequest = async (context: any) => {
 
     try {
       const body = await request.json();
-      const { overallScore, baumannType, scores, skinAge, aiComment, lang } = body;
+      const { overallScore, baumannType, scores, skinAge, aiComment, lang, isGuest } = body;
 
       const shareToken = crypto.randomUUID();
       const createdAt = new Date().toISOString();
@@ -44,8 +44,8 @@ export const onRequest = async (context: any) => {
       // D1 저장 (관리자 조회용, 영구)
       if (env.FONDAY_DB) {
         await env.FONDAY_DB.prepare(
-          `INSERT OR IGNORE INTO scans (id, overall_score, baumann_type, skin_age, ai_comment, scores, share_token, lang, created_at)
-           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
+          `INSERT OR IGNORE INTO scans (id, overall_score, baumann_type, skin_age, ai_comment, scores, share_token, lang, is_guest, created_at)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
         ).bind(
           crypto.randomUUID(),
           overallScore ?? 0,
@@ -55,6 +55,7 @@ export const onRequest = async (context: any) => {
           JSON.stringify(scores ?? []),
           shareToken,
           lang ?? "ko",
+          isGuest !== false ? 1 : 0,
           createdAt
         ).run();
       }

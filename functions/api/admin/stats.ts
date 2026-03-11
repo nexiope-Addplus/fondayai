@@ -51,16 +51,32 @@ export const onRequest = async (context: any) => {
     return new Response("DB not configured", { status: 500 });
   }
 
-  const [totalResult, todayResult, baumannResult, recentResult] = await Promise.all([
-    // 전체 스캔 수
+  // 푸시 구독자 수 (PUSH_KV)
+  let pushCount = 0;
+  if (env.PUSH_KV) {
+    const allIds = await env.PUSH_KV.get("push:all_ids");
+    pushCount = allIds ? JSON.parse(allIds).length : 0;
+  }
+
+  const [totalResult, todayResult, weekResult, guestResult, langResult, baumannResult, dailyResult, recentResult] = await Promise.all([
     env.FONDAY_DB.prepare("SELECT COUNT(*) as total, AVG(overall_score) as avg_score FROM scans").first(),
-    // 오늘 스캔 수
-    env.FONDAY_DB.prepare("SELECT COUNT(*) as today FROM scans WHERE created_at >= date('now')").first(),
-    // 바우만 타입 분포
-    env.FONDAY_DB.prepare("SELECT baumann_type, COUNT(*) as cnt FROM scans GROUP BY baumann_type ORDER BY cnt DESC LIMIT 10").all(),
-    // 최근 10개 스캔
-    env.FONDAY_DB.prepare("SELECT overall_score, baumann_type, skin_age, lang, created_at FROM scans ORDER BY created_at DESC LIMIT 10").all(),
+    env.FONDAY_DB.prepare("SELECT COUNT(*) as today FROM scans WHERE date(created_at) = date('now')").first(),
+    env.FONDAY_DB.prepare("SELECT COUNT(*) as week FROM scans WHERE created_at >= datetime('now', '-7 days')").first(),
+    env.FONDAY_DB.prepare("SELECT SUM(is_guest) as guest, SUM(1-is_guest) as loggedin FROM scans").first(),
+    env.FONDAY_DB.prepare("SELECT lang, COUNT(*) as cnt FROM scans GROUP BY lang ORDER BY cnt DESC").all(),
+    env.FONDAY_DB.prepare("SELECT baumann_type, COUNT(*) as cnt FROM scans GROUP BY baumann_type ORDER BY cnt DESC LIMIT 8").all(),
+    env.FONDAY_DB.prepare("SELECT date(created_at) as day, COUNT(*) as cnt FROM scans WHERE created_at >= datetime('now', '-14 days') GROUP BY day ORDER BY day").all(),
+    env.FONDAY_DB.prepare("SELECT overall_score, baumann_type, skin_age, lang, is_guest, created_at FROM scans ORDER BY created_at DESC LIMIT 20").all(),
   ]);
+
+  const total = (totalResult as any)?.total ?? 0;
+  const avgScore = Math.round((totalResult as any)?.avg_score ?? 0);
+  const today = (todayResult as any)?.today ?? 0;
+  const week = (weekResult as any)?.week ?? 0;
+  const guest = (guestResult as any)?.guest ?? 0;
+  const loggedin = (guestResult as any)?.loggedin ?? 0;
+  const dailyRows: any[] = (dailyResult as any)?.results ?? [];
+  const maxDaily = Math.max(...dailyRows.map((r: any) => r.cnt), 1);
 
   const html = `<!DOCTYPE html>
 <html lang="ko">
@@ -69,58 +85,124 @@ export const onRequest = async (context: any) => {
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Fonday Admin</title>
   <style>
-    body { font-family: -apple-system, sans-serif; max-width: 800px; margin: 40px auto; padding: 0 20px; background: #faf9f6; color: #1c1917; }
-    h1 { font-size: 24px; font-weight: 900; color: #2D5F4F; }
-    h2 { font-size: 16px; font-weight: 700; color: #57534e; margin-top: 32px; }
-    .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin: 24px 0; }
-    .card { background: white; border-radius: 16px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
-    .card .num { font-size: 36px; font-weight: 900; color: #2D5F4F; }
-    .card .label { font-size: 13px; color: #a8a29e; margin-top: 4px; }
-    table { width: 100%; border-collapse: collapse; background: white; border-radius: 16px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
-    th { background: #f5f5f4; padding: 10px 14px; text-align: left; font-size: 12px; color: #78716c; font-weight: 600; }
-    td { padding: 10px 14px; font-size: 13px; border-top: 1px solid #f5f5f4; }
+    * { box-sizing: border-box; }
+    body { font-family: -apple-system, sans-serif; max-width: 860px; margin: 0 auto; padding: 24px 20px 60px; background: #faf9f6; color: #1c1917; }
+    h1 { font-size: 22px; font-weight: 900; color: #2D5F4F; margin: 0 0 4px; }
+    h2 { font-size: 14px; font-weight: 700; color: #78716c; margin: 28px 0 10px; text-transform: uppercase; letter-spacing: .05em; }
+    .cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 20px 0; }
+    .card { background: white; border-radius: 16px; padding: 18px 16px; box-shadow: 0 1px 6px rgba(0,0,0,0.06); }
+    .card .num { font-size: 30px; font-weight: 900; color: #2D5F4F; line-height: 1; }
+    .card .label { font-size: 12px; color: #a8a29e; margin-top: 5px; }
+    .card2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .panel { background: white; border-radius: 16px; padding: 18px; box-shadow: 0 1px 6px rgba(0,0,0,0.06); }
+    table { width: 100%; border-collapse: collapse; background: white; border-radius: 16px; overflow: hidden; box-shadow: 0 1px 6px rgba(0,0,0,0.06); }
+    th { background: #f5f5f4; padding: 9px 14px; text-align: left; font-size: 11px; color: #78716c; font-weight: 600; text-transform: uppercase; }
+    td { padding: 9px 14px; font-size: 13px; border-top: 1px solid #f5f5f4; }
     .badge { display: inline-block; padding: 2px 8px; border-radius: 20px; font-size: 11px; font-weight: 700; background: #ecfdf5; color: #2D5F4F; }
+    .badge-guest { background: #fef3c7; color: #92400e; }
+    .bar-wrap { display: flex; flex-direction: column; gap: 6px; }
+    .bar-row { display: flex; align-items: center; gap: 8px; font-size: 12px; }
+    .bar-label { width: 36px; text-align: right; color: #78716c; font-weight: 600; }
+    .bar-bg { flex: 1; background: #f5f5f4; border-radius: 99px; height: 10px; }
+    .bar-fill { height: 10px; border-radius: 99px; background: #2D5F4F; }
+    .bar-val { width: 28px; font-weight: 700; color: #2D5F4F; }
+    .chart { display: flex; align-items: flex-end; gap: 4px; height: 80px; margin-top: 8px; }
+    .chart-col { display: flex; flex-direction: column; align-items: center; flex: 1; gap: 4px; }
+    .chart-bar { width: 100%; background: #2D5F4F; border-radius: 4px 4px 0 0; min-height: 2px; }
+    .chart-label { font-size: 9px; color: #a8a29e; white-space: nowrap; }
+    .pie { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
+    .pie-item { display: flex; align-items: center; gap: 6px; font-size: 12px; }
+    .dot { width: 10px; height: 10px; border-radius: 50%; }
+    @media(max-width:600px) { .cards { grid-template-columns: repeat(2,1fr); } .card2 { grid-template-columns: 1fr; } }
   </style>
 </head>
 <body>
   <h1>🌿 Fonday Admin</h1>
-  <p style="color:#a8a29e;font-size:13px">${new Date().toLocaleString("ko-KR")}</p>
+  <p style="color:#a8a29e;font-size:12px;margin:0 0 4px">${new Date().toLocaleString("ko-KR")} · <a href="" style="color:#2D5F4F">새로고침</a></p>
 
   <div class="cards">
     <div class="card">
-      <div class="num">${(totalResult as any)?.total ?? 0}</div>
-      <div class="label">전체 스캔 수</div>
+      <div class="num">${total}</div>
+      <div class="label">전체 스캔</div>
     </div>
     <div class="card">
-      <div class="num">${(todayResult as any)?.today ?? 0}</div>
-      <div class="label">오늘 스캔 수</div>
+      <div class="num">${today}</div>
+      <div class="label">오늘 스캔</div>
     </div>
     <div class="card">
-      <div class="num">${Math.round((totalResult as any)?.avg_score ?? 0)}</div>
+      <div class="num">${week}</div>
+      <div class="label">7일 스캔</div>
+    </div>
+    <div class="card">
+      <div class="num">${pushCount}</div>
+      <div class="label">푸시 구독자</div>
+    </div>
+    <div class="card">
+      <div class="num">${avgScore}</div>
       <div class="label">평균 점수</div>
+    </div>
+    <div class="card">
+      <div class="num">${loggedin}</div>
+      <div class="label">로그인 스캔</div>
+    </div>
+    <div class="card">
+      <div class="num">${guest}</div>
+      <div class="label">비로그인 스캔</div>
+    </div>
+    <div class="card">
+      <div class="num">${total > 0 ? Math.round(loggedin / total * 100) : 0}%</div>
+      <div class="label">로그인 전환율</div>
     </div>
   </div>
 
-  <h2>바우만 타입 분포</h2>
-  <table>
-    <tr><th>타입</th><th>스캔 수</th></tr>
-    ${((baumannResult as any)?.results ?? []).map((r: any) =>
-      `<tr><td><span class="badge">${r.baumann_type || "??"}</span></td><td>${r.cnt}</td></tr>`
-    ).join("")}
-  </table>
+  <h2>최근 14일 스캔 추이</h2>
+  <div class="panel">
+    <div class="chart">
+      ${dailyRows.map((r: any) => `
+        <div class="chart-col">
+          <div class="chart-bar" style="height:${Math.round(r.cnt / maxDaily * 72)}px" title="${r.cnt}건"></div>
+          <div class="chart-label">${r.day?.slice(5) ?? ""}</div>
+        </div>`).join("")}
+    </div>
+  </div>
 
-  <h2>최근 스캔 10건</h2>
+  <div class="card2" style="margin-top:12px">
+    <div class="panel">
+      <h2 style="margin-top:0">언어 분포</h2>
+      <div class="pie">
+        ${((langResult as any)?.results ?? []).map((r: any, i: number) => {
+          const colors = ["#2D5F4F","#F59E0B","#6366F1","#EF4444"];
+          return `<div class="pie-item"><div class="dot" style="background:${colors[i % colors.length]}"></div>${r.lang?.toUpperCase()} ${r.cnt}건</div>`;
+        }).join("")}
+      </div>
+    </div>
+    <div class="panel">
+      <h2 style="margin-top:0">바우만 타입 TOP</h2>
+      <div class="bar-wrap">
+        ${((baumannResult as any)?.results ?? []).slice(0, 5).map((r: any) => {
+          const pct = total > 0 ? Math.round(r.cnt / total * 100) : 0;
+          return `<div class="bar-row">
+            <div class="bar-label">${r.baumann_type || "??"}</div>
+            <div class="bar-bg"><div class="bar-fill" style="width:${pct}%"></div></div>
+            <div class="bar-val">${r.cnt}</div>
+          </div>`;
+        }).join("")}
+      </div>
+    </div>
+  </div>
+
+  <h2>최근 스캔 20건</h2>
   <table>
-    <tr><th>점수</th><th>바우만</th><th>피부나이</th><th>언어</th><th>시간</th></tr>
-    ${((recentResult as any)?.results ?? []).map((r: any) =>
-      `<tr>
+    <tr><th>점수</th><th>바우만</th><th>피부나이</th><th>언어</th><th>유형</th><th>시간(KST)</th></tr>
+    ${((recentResult as any)?.results ?? []).map((r: any) => `
+      <tr>
         <td><strong>${r.overall_score}</strong></td>
         <td><span class="badge">${r.baumann_type || "?"}</span></td>
         <td>${r.skin_age ?? "-"}</td>
-        <td>${r.lang}</td>
+        <td>${(r.lang ?? "ko").toUpperCase()}</td>
+        <td><span class="badge ${r.is_guest ? 'badge-guest' : ''}">${r.is_guest ? "비로그인" : "로그인"}</span></td>
         <td style="color:#a8a29e">${r.created_at?.slice(0, 16) ?? ""}</td>
-      </tr>`
-    ).join("")}
+      </tr>`).join("")}
   </table>
 </body>
 </html>`;

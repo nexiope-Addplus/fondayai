@@ -1685,6 +1685,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
           skinAge: analysisResult.skinAge,
           aiComment: analysisResult.aiComment,
           lang: i18n.language || "ko",
+          isGuest: false,
         }),
       }).catch(() => {});
     });
