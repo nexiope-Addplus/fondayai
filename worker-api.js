@@ -95,6 +95,12 @@ export default {
       return new Response(null, { headers: corsHeaders });
     }
 
+    // 테스트 엔드포인트: GET /test-push
+    if (request.method === "GET" && new URL(request.url).pathname === "/test-push") {
+      await sendScanReminderToAll(env);
+      return new Response("✅ 테스트 푸시 전송 완료!", { headers: corsHeaders });
+    }
+
     if (request.method === "POST") {
       try {
         const body = await request.json();
