@@ -3,6 +3,25 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from "@google/generative-ai";
 import { randomUUID } from "crypto";
+import { isConfigured, d1Query } from "./d1";
+import type { Scan } from "@shared/schema";
+
+/** D1 row → Scan 타입 변환 */
+function mapD1Scan(row: any): Scan {
+  return {
+    id: row.id,
+    userId: row.user_id || "",
+    overallScore: String(row.overall_score ?? 0),
+    scores: row.scores || "[]",
+    hotspots: "[]",
+    aiComment: row.ai_comment || null,
+    imageSrc: null,
+    baumannType: row.baumann_type || null,
+    skinAge: row.skin_age != null ? String(row.skin_age) : null,
+    shareToken: row.share_token || null,
+    createdAt: row.created_at || null,
+  };
+}
 
 function buildPrompt(surveyData: any, lang: string): string {
   const surveyJson = JSON.stringify(surveyData);
@@ -186,10 +205,11 @@ export async function registerRoutes(
   app.post("/api/scans", async (req, res) => {
     if (!req.isAuthenticated()) return res.status(401).send("로그인이 필요합니다.");
     try {
-      const { overallScore, scores, hotspots, aiComment, imageSrc, baumannType, skinAge } = req.body;
-      const shareToken = randomUUID(); // Create a unique share token
+      const { overallScore, scores, hotspots, aiComment, imageSrc, baumannType, skinAge, lang } = req.body;
+      const shareToken = randomUUID();
+      const userId = (req.user as any).id;
       const scan = await storage.createScan({
-        userId: (req.user as any).id,
+        userId,
         overallScore: overallScore.toString(),
         scores: JSON.stringify(scores),
         hotspots: JSON.stringify(hotspots),
@@ -199,6 +219,13 @@ export async function registerRoutes(
         skinAge: skinAge != null ? skinAge.toString() : null,
         shareToken,
       });
+      // D1에도 저장 (영구 보존, user_id 포함)
+      if (isConfigured()) {
+        await d1Query(
+          `INSERT OR IGNORE INTO scans (id, overall_score, baumann_type, skin_age, ai_comment, scores, share_token, lang, is_guest, user_id, created_at) VALUES (?,?,?,?,?,?,?,?,?,?,?)`,
+          [scan.id, parseInt(overallScore) || 0, baumannType || "", skinAge ?? null, aiComment || "", JSON.stringify(scores || []), shareToken, lang || "ko", 0, userId, scan.createdAt || new Date().toISOString()]
+        );
+      }
       res.json(scan);
     } catch (error: any) {
       res.status(500).json({ message: "기록 저장 실패", error: error.message });
@@ -233,7 +260,26 @@ export async function registerRoutes(
   app.get("/api/ranking", async (req, res) => {
     try {
       const myScore = req.query.myScore ? parseInt(req.query.myScore as string) : null;
-      const allScans = await storage.getAllScans();
+
+      // D1 우선 (더 많은 데이터), 실패 시 MemStorage 폴백
+      let rawScans: { overallScore: string; baumannType: string | null }[] = [];
+      if (isConfigured()) {
+        const result = await d1Query(
+          "SELECT overall_score, baumann_type FROM scans ORDER BY created_at DESC LIMIT 10000",
+          []
+        );
+        if (result?.results?.length) {
+          rawScans = result.results.map((r: any) => ({
+            overallScore: String(r.overall_score ?? 0),
+            baumannType: r.baumann_type || null,
+          }));
+        }
+      }
+      if (rawScans.length === 0) {
+        rawScans = await storage.getAllScans();
+      }
+
+      const allScans = rawScans;
       const dbScores = allScans.map(s => parseInt(s.overallScore) || 0).filter(s => s > 0);
 
       // Include the current user's score in the pool (handles fresh scans not yet saved)
@@ -281,7 +327,18 @@ export async function registerRoutes(
   app.get("/api/scans", async (req, res) => {
     if (!req.isAuthenticated()) return res.status(401).send("로그인이 필요합니다.");
     try {
-      const scans = await storage.getScansByUserId((req.user as any).id);
+      const userId = (req.user as any).id;
+      // D1 우선 (영구 저장 데이터), 실패 시 MemStorage 폴백
+      if (isConfigured()) {
+        const result = await d1Query(
+          "SELECT * FROM scans WHERE user_id = ? ORDER BY created_at DESC LIMIT 50",
+          [userId]
+        );
+        if (result?.results?.length) {
+          return res.json(result.results.map(mapD1Scan));
+        }
+      }
+      const scans = await storage.getScansByUserId(userId);
       res.json(scans);
     } catch (error: any) {
       res.status(500).json({ message: "기록 조회 실패", error: error.message });
