@@ -269,6 +269,104 @@ function checkAndCompleteMissions(streakCount: number, overallScore: number): st
   return newlyCompleted;
 }
 
+// ─── 푸시 프롬프트 유틸 ───────────────────────────────────────────
+function isIOS(): boolean {
+  return /iPhone|iPad|iPod/i.test(navigator.userAgent);
+}
+function isAndroid(): boolean {
+  return /Android/i.test(navigator.userAgent);
+}
+function isPWA(): boolean {
+  return window.matchMedia("(display-mode: standalone)").matches || !!(navigator as any).standalone;
+}
+function shouldShowPushPrompt(): boolean {
+  if (!("serviceWorker" in navigator) || !("PushManager" in window)) return false;
+  if (typeof Notification !== "undefined" && Notification.permission === "denied") return false;
+  try {
+    const raw = localStorage.getItem("fonday_push_prompt");
+    if (!raw) return true;
+    const { dismissed, lastDismissed } = JSON.parse(raw);
+    if (!dismissed) return true;
+    const daysSince = Math.floor((Date.now() - new Date(lastDismissed).getTime()) / 86400000);
+    return daysSince >= 7;
+  } catch { return true; }
+}
+function dismissPushPrompt() {
+  try {
+    localStorage.setItem("fonday_push_prompt", JSON.stringify({ dismissed: true, lastDismissed: todayStr() }));
+  } catch {}
+}
+
+// ─── 푸시 구독 유도 바텀시트 ─────────────────────────────────────
+function PushPromptSheet({ onAllow, onDismiss, isLoading }: { onAllow: () => void; onDismiss: () => void; isLoading: boolean }) {
+  const { t } = useTranslation();
+  const showIOSGuide = isIOS() && !isPWA();
+  return (
+    <>
+      {/* 딤 오버레이 */}
+      <motion.div
+        key="push-overlay"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="fixed inset-0 z-[980] bg-black/40"
+        onClick={onDismiss}
+      />
+      {/* 바텀시트 */}
+      <motion.div
+        key="push-sheet"
+        initial={{ y: "100%" }}
+        animate={{ y: 0 }}
+        exit={{ y: "100%" }}
+        transition={{ type: "spring", damping: 30, stiffness: 300 }}
+        className="fixed bottom-0 left-0 right-0 z-[990] bg-white rounded-t-3xl px-6 pt-4 pb-10 max-w-lg mx-auto"
+        style={{ boxShadow: "0 -8px 32px rgba(0,0,0,0.15)" }}
+      >
+        <div className="w-10 h-1 bg-stone-200 rounded-full mx-auto mb-5" />
+        {showIOSGuide ? (
+          <>
+            <div className="text-center mb-5">
+              <span className="text-4xl">📱</span>
+              <h3 className="font-black text-stone-800 text-[18px] mt-2">{t("pushPrompt.iosTitle")}</h3>
+              <p className="text-stone-500 text-[13px] mt-1.5 leading-relaxed">{t("pushPrompt.iosDesc")}</p>
+            </div>
+            <div className="space-y-2.5 mb-5">
+              {([1, 2, 3] as const).map(n => (
+                <div key={n} className="flex items-center gap-3 bg-stone-50 rounded-2xl px-4 py-3">
+                  <span className="w-6 h-6 rounded-full bg-stone-200 text-stone-600 text-[12px] font-bold flex items-center justify-center flex-shrink-0">{n}</span>
+                  <span className="text-[13px] text-stone-700">{t(`pushPrompt.iosStep${n}`)}</span>
+                </div>
+              ))}
+            </div>
+          </>
+        ) : (
+          <>
+            <div className="text-center mb-6">
+              <span className="text-4xl">🔔</span>
+              <h3 className="font-black text-stone-800 text-[18px] mt-2">{t("pushPrompt.title")}</h3>
+              <p className="text-stone-500 text-[13px] mt-1.5 leading-relaxed">{t("pushPrompt.desc")}</p>
+              {isAndroid() && (
+                <span className="inline-block mt-2 text-[11px] bg-emerald-50 text-emerald-600 px-2 py-0.5 rounded-full font-medium">Android</span>
+              )}
+            </div>
+            <button
+              onClick={onAllow}
+              disabled={isLoading}
+              className="w-full py-4 rounded-2xl font-bold text-white text-[15px] mb-2"
+              style={{ background: `linear-gradient(135deg, ${DEEP_GREEN}, ${DEEP_GREEN_LIGHT})` }}
+            >
+              {isLoading ? "..." : t("pushPrompt.allow")}
+            </button>
+          </>
+        )}
+        <button onClick={onDismiss} className="w-full py-3 text-stone-400 text-[14px]">
+          {t("pushPrompt.later")}
+        </button>
+      </motion.div>
+    </>
+  );
+}
+
 function markChallengeUsed() {
   const state = getMissions();
   if (!state.completed.includes("challenge")) {
@@ -1452,6 +1550,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
   // ── 푸시 알림 구독 상태 ──────────────────────────────────────
   const [pushSubscribed, setPushSubscribed] = useState(false);
   const [pushLoading, setPushLoading] = useState(false);
+  const [showPushPrompt, setShowPushPrompt] = useState(false);
 
   useEffect(() => {
     // 이미 구독 중인지 확인
@@ -1461,6 +1560,23 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
       });
     }
   }, []);
+
+  // 결과 화면 로드 후 2.5초 뒤 푸시 구독 유도
+  useEffect(() => {
+    if (!analysisResult) return;
+    const timer = setTimeout(() => {
+      if (!pushSubscribed && shouldShowPushPrompt()) {
+        setShowPushPrompt(true);
+      }
+    }, 2500);
+    return () => clearTimeout(timer);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [analysisResult]);
+
+  // 구독 성공 시 프롬프트 자동 닫기
+  useEffect(() => {
+    if (pushSubscribed) setShowPushPrompt(false);
+  }, [pushSubscribed]);
 
   const handlePushToggle = async () => {
     if (!("serviceWorker" in navigator) || !("PushManager" in window)) {
@@ -1783,6 +1899,24 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
           <p className="text-[12px] text-stone-500">{t(`mission.${missionPops[0]}`)}</p>
           <p className="text-[13px] font-bold text-amber-500">+{MISSION_POINTS[missionPops[0]] || 0}pt</p>
         </motion.div>
+      )}
+    </AnimatePresence>
+
+    {/* 푸시 구독 유도 바텀시트 */}
+    <AnimatePresence>
+      {showPushPrompt && (
+        <PushPromptSheet
+          isLoading={pushLoading}
+          onAllow={async () => {
+            await handlePushToggle();
+            dismissPushPrompt();
+            setShowPushPrompt(false);
+          }}
+          onDismiss={() => {
+            dismissPushPrompt();
+            setShowPushPrompt(false);
+          }}
+        />
       )}
     </AnimatePresence>
 

@@ -398,6 +398,17 @@
     "slide5Sub": "Skip these today!",
     "footerText": "Challenge your friends! Search > Fonday AI"
   },
+  "pushPrompt": {
+    "title": "Get Daily Skin Reminders",
+    "desc": "Stay consistent with your skin care routine with daily scan reminders",
+    "allow": "Allow Notifications",
+    "later": "Maybe Later",
+    "iosTitle": "Add to Home Screen First",
+    "iosDesc": "To receive notifications on iOS, you need to add Fonday to your home screen",
+    "iosStep1": "Tap the Share button in Safari (bottom bar)",
+    "iosStep2": "Select 'Add to Home Screen'",
+    "iosStep3": "Open the app and enable notifications"
+  },
   "streak": {
     "badge": "🔥 {{count}}-day streak",
     "comeback3": "🌿 You scanned {{days}} days ago. Ready to check your skin?",
