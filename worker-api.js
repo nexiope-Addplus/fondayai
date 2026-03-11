@@ -101,6 +101,7 @@ export default {
       const priv = env.VAPID_PRIVATE_KEY?.trim();
       if (!pub || !priv) return new Response("VAPID keys not set", { headers: corsHeaders });
       const b64url = s => Uint8Array.from(atob(s.replace(/-/g, "+").replace(/_/g, "/")), c => c.charCodeAt(0));
+      const toB64u = arr => btoa(String.fromCharCode(...arr)).replace(/\+/g,"-").replace(/\//g,"_").replace(/=/g,"");
       let pubBytes, privBytes;
       try { pubBytes = b64url(pub); } catch(e) { return new Response(`pubKey decode error: ${e.message}`, { headers: corsHeaders }); }
       try { privBytes = b64url(priv); } catch(e) { return new Response(`privKey decode error: ${e.message}`, { headers: corsHeaders }); }
@@ -110,9 +111,30 @@ export default {
         privKeyLen: privBytes.length,
         pubHasStdChars: /[+/=]/.test(pub),
         privHasStdChars: /[+/=]/.test(priv),
-        pubPreview: pub.slice(0, 16) + "...",
-        privPreview: priv.slice(0, 8) + "...",
       };
+      // 키쌍 매칭 검증
+      try {
+        const privKey = await crypto.subtle.importKey("jwk", {
+          kty:"EC", crv:"P-256",
+          d: priv,
+          x: toB64u(pubBytes.slice(1,33)),
+          y: toB64u(pubBytes.slice(33,65)),
+          key_ops:["sign"],
+        }, { name:"ECDSA", namedCurve:"P-256" }, false, ["sign"]);
+        const pubKey = await crypto.subtle.importKey("raw", pubBytes, { name:"ECDSA", namedCurve:"P-256" }, false, ["verify"]);
+        const testMsg = new TextEncoder().encode("fonday-test");
+        const sig = await crypto.subtle.sign({ name:"ECDSA", hash:"SHA-256" }, privKey, testMsg);
+        const valid = await crypto.subtle.verify({ name:"ECDSA", hash:"SHA-256" }, pubKey, sig, testMsg);
+        info.keypairMatches = valid;
+      } catch(e) {
+        info.keypairError = e.message;
+      }
+      // JWT 생성 후 반환 (jwt.io에서 검증용)
+      try {
+        info.sampleJwt = await signVapid(priv, "https://web.push.apple.com", env.VAPID_SUBJECT || "mailto:nexiope@gmail.com", pub);
+      } catch(e) {
+        info.jwtError = e.message;
+      }
       return new Response(JSON.stringify(info, null, 2), { headers: corsHeaders });
     }
 
