@@ -47,7 +47,7 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
-type TabId = "scan" | "report" | "magazine";
+type TabId = "scan" | "diary" | "my";
 type ScanState = "idle" | "survey" | "scanning" | "result";
 
 interface SurveyData {
@@ -948,13 +948,14 @@ function LangSwitcher() {
 }
 
 // ─── 하단 네비게이션 ──────────────────────────────────────────────
-function BottomNav({ active, onChange, onScanNew, onInstall }: {
+function BottomNav({ active, onChange, scanState }: {
   active: TabId;
   onChange: (t: TabId) => void;
-  onScanNew: () => void;
-  onInstall: () => void;
+  scanState: ScanState;
 }) {
   const { t } = useTranslation();
+  // 설문/스캔 중에는 숨김
+  if (scanState === "survey" || scanState === "scanning") return null;
   const btn = (tab: TabId, icon: React.ReactNode, label: string) => (
     <button
       onClick={() => onChange(tab)}
@@ -966,32 +967,10 @@ function BottomNav({ active, onChange, onScanNew, onInstall }: {
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-2xl border-t border-stone-100">
       <div className="max-w-md mx-auto px-2">
-        <div className="grid grid-cols-5 h-[64px]">
-          <button
-            onClick={onScanNew}
-            className={`flex flex-col items-center justify-center gap-0.5 transition-colors ${active === "scan" ? "text-[#C97062]" : "text-stone-400"}`}>
-            <Camera className="w-5 h-5" />
-            <span className="text-[10px] font-semibold">{t("nav.scan")}</span>
-          </button>
-          {btn("report", <FileText className="w-5 h-5" />, t("nav.report"))}
-          <a
-            href="https://fonday.replit.app/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex flex-col items-center justify-center gap-0.5 active:opacity-70 -mt-3">
-            <div className="w-12 h-12 rounded-full flex items-center justify-center shadow-lg"
-              style={{ background: "linear-gradient(135deg, #E09882, #C97062)" }}>
-              <Zap className="w-5 h-5 text-white" />
-            </div>
-            <span className="text-[11px] font-black" style={{ color: "#C97062" }}>Fonday</span>
-          </a>
-          {btn("magazine", <BookOpen className="w-5 h-5" />, t("nav.magazine"))}
-          <button
-            onClick={onInstall}
-            className="flex flex-col items-center justify-center gap-0.5 text-stone-400 transition-colors active:text-[#C97062]">
-            <SmartphoneNfc className="w-5 h-5" />
-            <span className="text-[10px] font-semibold">{t("nav.install")}</span>
-          </button>
+        <div className="grid grid-cols-3 h-[64px]">
+          {btn("scan", <Camera className="w-5 h-5" />, t("nav.scan"))}
+          {btn("diary", <BookOpen className="w-5 h-5" />, t("nav.diary"))}
+          {btn("my", <User className="w-5 h-5" />, t("nav.my"))}
         </div>
       </div>
     </nav>
@@ -2136,7 +2115,302 @@ function DiaryFullView({ history, analysisResult, overallScore, finalType, curre
 }
 
 // ─── 결과 화면 ────────────────────────────────────────────────────
-function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBack, onGoMagazine, user }: any) {
+// ─── 피부 일기 탭 (독립 데이터 페칭) ─────────────────────────────
+function DiaryTab({ user, analysisResult }: { user: any; analysisResult: AnalysisResult | null }) {
+  const { t } = useTranslation();
+  const [history, setHistory] = useState<any[]>([]);
+  const [rankingData, setRankingData] = useState<RankingData | null>(null);
+  const [tab, setTab] = useState<"timeline" | "calendar" | "ranking">("timeline");
+  const [loading, setLoading] = useState(true);
+
+  const scores = analysisResult?.scores || [];
+  const overallScore = scores[0]?.score || 0;
+  const isOily  = (scores[3]?.score ?? 100) < 50;
+  const isSens  = (scores[2]?.score ?? 0) > 50;
+  const isPig   = (scores[5]?.score ?? 0) > 50;
+  const isWrink = (scores[4]?.score ?? 100) < 60;
+  const finalType = analysisResult
+    ? `${isOily ? "O" : "D"}${isSens ? "S" : "R"}${isPig ? "P" : "N"}${isWrink ? "W" : "T"}`
+    : "";
+
+  useEffect(() => {
+    const load = async () => {
+      setLoading(true);
+      if (user) {
+        try {
+          const r = await fetch("/api/scans");
+          if (r.ok) { const d = await r.json(); if (Array.isArray(d)) setHistory(d); }
+        } catch {}
+      }
+      try {
+        const qs = overallScore > 0 ? `?myScore=${overallScore}` : "";
+        const r = await fetch(`/api/ranking${qs}`);
+        if (r.ok) setRankingData(await r.json());
+      } catch {}
+      setLoading(false);
+    };
+    load();
+  }, [user]);
+
+  const allEntries: { dateStr: string; score: number }[] = overallScore > 0
+    ? [
+        { dateStr: todayStr(), score: overallScore },
+        ...history
+          .filter((h: any) => new Date(h.createdAt).toISOString().slice(0, 10) !== todayStr())
+          .map((h: any) => ({ dateStr: new Date(h.createdAt).toISOString().slice(0, 10), score: parseInt(h.overallScore) })),
+      ]
+    : history.map((h: any) => ({
+        dateStr: new Date(h.createdAt).toISOString().slice(0, 10),
+        score: parseInt(h.overallScore),
+      }));
+
+  const tabs: { id: "timeline" | "calendar" | "ranking"; label: string }[] = [
+    { id: "timeline", label: t("modal.diary.timelineTab") },
+    { id: "calendar", label: t("modal.diary.calendarTab") },
+    { id: "ranking", label: t("modal.diary.rankingTab") },
+  ];
+
+  return (
+    <div className="flex flex-col" style={{ background: "#FBF9F7", minHeight: "calc(100dvh - 64px)" }}>
+      {/* 헤더 */}
+      <div className="shrink-0 px-5 pt-12 pb-0" style={{ borderBottom: "1px solid #F0EDE8" }}>
+        <div className="mb-4">
+          <p className="text-[11px] font-bold tracking-widest uppercase mb-1" style={{ color: SCAN_TO }}>FONDAY</p>
+          <h1 className="text-[22px] font-black" style={{ color: DEEP_GREEN }}>{t("modal.diary.title")} ✦</h1>
+        </div>
+        <div className="flex gap-0">
+          {tabs.map(({ id, label }) => (
+            <button key={id} onClick={() => setTab(id)}
+              className={`flex-1 py-2.5 text-[12px] font-bold transition-all border-b-2 ${
+                tab === id ? "border-[#C97062] text-[#C97062]" : "border-transparent text-stone-400"
+              }`}>
+              {label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* 콘텐츠 */}
+      <div className="flex-1 overflow-y-auto overscroll-contain pb-24">
+        <AnimatePresence mode="wait">
+          {tab === "timeline" && (
+            <motion.div key="tl" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+              {loading ? (
+                <div className="py-20 text-center"><p className="text-[12px] text-stone-400">...</p></div>
+              ) : (
+                <DiaryTimeline history={history} analysisResult={analysisResult}
+                  overallScore={overallScore} finalType={finalType} currentScanId={null} />
+              )}
+            </motion.div>
+          )}
+          {tab === "calendar" && (
+            <motion.div key="cal" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+              <DiaryCalendarView allEntries={allEntries} />
+            </motion.div>
+          )}
+          {tab === "ranking" && (
+            <motion.div key="rank" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+              <div className="px-5 pb-8 space-y-4 pt-4">
+                {!rankingData ? (
+                  <div className="py-12 text-center"><p className="text-[12px] text-stone-400">...</p></div>
+                ) : (
+                  <>
+                    {rankingData.myPercentile !== undefined ? (
+                      <div className="p-5 rounded-2xl text-center border border-[#F0EDE8]"
+                        style={{ background: `linear-gradient(135deg, ${SCAN_FROM}20, ${SCAN_TO}10)` }}>
+                        <p className="text-[11px] text-stone-500 mb-1">{t("ranking.myRankLabel")}</p>
+                        <p className="text-4xl font-black" style={{ color: SCAN_TO }}>
+                          {t("ranking.myPercentile", { percent: rankingData.myPercentile })}
+                        </p>
+                        <p className="text-[11px] text-stone-400 mt-1">{t("ranking.totalData", { count: rankingData.totalScans })}</p>
+                      </div>
+                    ) : (
+                      <div className="p-4 rounded-2xl text-center bg-stone-50">
+                        <p className="text-[12px] text-stone-500">{t("ranking.loginForRank")}</p>
+                        <p className="text-[11px] text-stone-300 mt-1">{t("ranking.totalData", { count: rankingData.totalScans })}</p>
+                      </div>
+                    )}
+                    <div>
+                      <p className="text-[11px] font-bold text-stone-400 mb-3">{t("ranking.distribution")}</p>
+                      <div className="space-y-2">
+                        {rankingData.scoreDistribution.map((band, bi) => {
+                          const maxCount = Math.max(...rankingData.scoreDistribution.map(d => d.count), 1);
+                          const barPct = Math.round((band.count / maxCount) * 100);
+                          const [bMin, bMax] = band.label.split("-").map(Number);
+                          const isMyBand = overallScore >= bMin && overallScore <= bMax;
+                          return (
+                            <div key={bi} className="flex items-center gap-2">
+                              <span className="text-[10px] text-stone-400 w-14 shrink-0">{band.label}</span>
+                              <div className="flex-1 h-5 rounded-full bg-stone-100 overflow-hidden">
+                                <div className="h-full rounded-full transition-all duration-700"
+                                  style={{ width: `${Math.max(barPct, band.count > 0 ? 6 : 0)}%`,
+                                    background: isMyBand ? `linear-gradient(90deg, ${SCAN_FROM}, ${SCAN_TO})` : "#D1D5DB" }} />
+                              </div>
+                              <span className="text-[10px] text-stone-400 w-5 text-right">{band.count}</span>
+                              {isMyBand && (
+                                <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full shrink-0"
+                                  style={{ background: `${SCAN_FROM}30`, color: SCAN_TO }}>나</span>
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                    {Object.keys(rankingData.baumannDistribution).length > 0 && (
+                      <div>
+                        <p className="text-[11px] font-bold text-stone-400 mb-3">{t("ranking.baumannTop")}</p>
+                        <div className="flex gap-2 flex-wrap">
+                          {Object.entries(rankingData.baumannDistribution)
+                            .sort(([,a],[,b]) => b - a).slice(0, 3)
+                            .map(([type, count]) => (
+                              <div key={type} className="flex items-center gap-2 px-3 py-2 rounded-xl border border-[#F0EDE8] bg-white">
+                                <span className="text-[14px] font-black" style={{ color: SCAN_TO }}>{type}</span>
+                                <span className="text-[11px] text-stone-400">{count}{t("ranking.people")}</span>
+                              </div>
+                            ))}
+                        </div>
+                      </div>
+                    )}
+                  </>
+                )}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+    </div>
+  );
+}
+
+// ─── 마이 페이지 ─────────────────────────────────────────────────
+function MyScreen({ user, onInstall }: { user: any; onInstall: () => void }) {
+  const { t, i18n } = useTranslation();
+  const [showCalendar, setShowCalendar] = useState(false);
+  const attendance = getAttendance();
+
+  const handleLogout = () => {
+    fetch('/api/logout', { method: 'POST' }).then(() => window.location.reload());
+  };
+
+  return (
+    <div className="min-h-[calc(100dvh-64px)] pb-28" style={{ background: "#FAF9F6" }}>
+      {/* 헤더 */}
+      <div className="px-5 pt-12 pb-6" style={{ borderBottom: "1px solid #F0EDE8" }}>
+        <p className="text-[11px] font-bold tracking-widest uppercase mb-1" style={{ color: SCAN_TO }}>FONDAY</p>
+        <h1 className="text-[22px] font-black" style={{ color: DEEP_GREEN }}>{t("nav.my")}</h1>
+      </div>
+
+      <div className="px-5 pt-5 space-y-3">
+        {/* 프로필 */}
+        {user ? (
+          <div className="flex items-center justify-between p-4 rounded-2xl bg-white border border-stone-100">
+            <div className="flex items-center gap-3">
+              {user.avatar
+                ? <img src={user.avatar} className="w-10 h-10 rounded-full border border-stone-100" />
+                : <div className="w-10 h-10 rounded-full flex items-center justify-center"
+                    style={{ background: `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})` }}>
+                    <User className="w-5 h-5 text-white" />
+                  </div>
+              }
+              <div>
+                <p className="text-[14px] font-bold text-stone-800">{user.username || user.email || "사용자"}</p>
+                <p className="text-[11px] text-stone-400">{user.email || ""}</p>
+              </div>
+            </div>
+            <button onClick={handleLogout}
+              className="text-[12px] font-semibold text-stone-400 px-3 py-1.5 rounded-xl bg-stone-100 active:opacity-70">
+              {t("modal.diary.logout")}
+            </button>
+          </div>
+        ) : (
+          <div className="p-5 rounded-2xl bg-white border border-stone-100 space-y-3">
+            <div className="text-center mb-2">
+              <p className="text-[14px] font-bold text-stone-700 mb-1">{t("report.loginRequired")}</p>
+              <p className="text-[12px] text-stone-400">{t("attendance.loginDesc")}</p>
+            </div>
+            <button onClick={() => { window.location.href = "/auth/kakao"; }}
+              className="w-full h-11 rounded-xl font-bold text-[13px] gap-2 flex items-center justify-center border-0 text-[#3C1E1E]"
+              style={{ background: "#FEE500" }}>
+              {t("attendance.kakao")}
+            </button>
+            <button onClick={() => { window.location.href = "/auth/google"; }}
+              className="w-full h-11 rounded-xl font-bold text-[13px] border border-stone-200 bg-white text-stone-700 flex items-center justify-center">
+              {t("attendance.google")}
+            </button>
+          </div>
+        )}
+
+        {/* 출석 달력 */}
+        <button onClick={() => setShowCalendar(true)}
+          className="w-full flex items-center justify-between p-4 rounded-2xl bg-white border border-stone-100 active:opacity-70">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-xl flex items-center justify-center"
+              style={{ background: `linear-gradient(135deg, ${SCAN_FROM}30, ${SCAN_TO}20)` }}>
+              <CalendarDays className="w-5 h-5" style={{ color: SCAN_TO }} />
+            </div>
+            <div className="text-left">
+              <p className="text-[14px] font-bold text-stone-800">{t("attendance.calendarTitle")}</p>
+              <p className="text-[11px] text-stone-400">{t("attendance.totalPoints", { n: attendance.totalPoints })}</p>
+            </div>
+          </div>
+          <ChevronRight className="w-4 h-4 text-stone-300" />
+        </button>
+
+        {/* 언어 설정 */}
+        <div className="flex items-center justify-between p-4 rounded-2xl bg-white border border-stone-100">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-xl bg-stone-50 flex items-center justify-center">
+              <span className="text-[16px]">🌐</span>
+            </div>
+            <p className="text-[14px] font-bold text-stone-800">{t("nav.language")}</p>
+          </div>
+          <div className="flex gap-1">
+            {(["en", "ko", "ja"] as const).map(lang => (
+              <button key={lang} onClick={() => i18n.changeLanguage(lang)}
+                className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all ${
+                  i18n.language === lang ? "text-white" : "text-stone-400 bg-stone-100"
+                }`}
+                style={i18n.language === lang ? { background: `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})` } : {}}>
+                {lang.toUpperCase()}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* 앱 설치 */}
+        <button onClick={onInstall}
+          className="w-full flex items-center justify-between p-4 rounded-2xl bg-white border border-stone-100 active:opacity-70">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-xl bg-stone-50 flex items-center justify-center">
+              <SmartphoneNfc className="w-5 h-5 text-stone-500" />
+            </div>
+            <p className="text-[14px] font-bold text-stone-800">{t("nav.install")}</p>
+          </div>
+          <ChevronRight className="w-4 h-4 text-stone-300" />
+        </button>
+
+        {/* 매거진 */}
+        <a href="https://fonday.replit.app/" target="_blank" rel="noopener noreferrer"
+          className="w-full flex items-center justify-between p-4 rounded-2xl bg-white border border-stone-100 active:opacity-70">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-xl bg-stone-50 flex items-center justify-center">
+              <BookOpen className="w-5 h-5 text-stone-500" />
+            </div>
+            <p className="text-[14px] font-bold text-stone-800">{t("nav.magazine")}</p>
+          </div>
+          <ChevronRight className="w-4 h-4 text-stone-300" />
+        </a>
+      </div>
+
+      {/* 출석 달력 모달 */}
+      <AnimatePresence>
+        {showCalendar && <AttendanceCalendarModal onClose={() => setShowCalendar(false)} />}
+      </AnimatePresence>
+    </div>
+  );
+}
+
+function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBack, onGoMagazine, onOpenDiary, user }: any) {
   const { t } = useTranslation();
   const [history, setHistory] = useState<any[]>([]);
   const [isSaved, setIsSaved] = useState(false);
@@ -2372,8 +2646,8 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
   useEffect(() => {
     const el = resultScrollRef.current;
     if (!el) return;
-    el.style.overflow = (showAnalysis || showImprovements || showDiary) ? 'hidden' : 'auto';
-  }, [showAnalysis, showImprovements, showDiary]);
+    el.style.overflow = (showAnalysis || showImprovements) ? 'hidden' : 'auto';
+  }, [showAnalysis, showImprovements]);
 
   const handlePartnershipSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -2959,7 +3233,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
         ) : user ? (
           <motion.div
             whileTap={{ scale: 0.98 }}
-            onClick={() => setShowDiary(true)}
+            onClick={() => onOpenDiary?.()}
             className="cursor-pointer">
             <Card className="border-none shadow-md rounded-3xl overflow-hidden">
               <CardContent className="p-4">
@@ -3368,23 +3642,6 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
               </div>
             </motion.div>
           </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* 피부 일기 풀스크린 뷰 */}
-      <AnimatePresence>
-        {showDiary && (
-          <DiaryFullView
-            history={history}
-            analysisResult={analysisResult}
-            overallScore={overallScore}
-            finalType={finalType}
-            currentScanId={currentScanId}
-            rankingData={rankingData}
-            user={user}
-            onClose={() => setShowDiary(false)}
-            onLogout={() => fetch('/api/logout', { method: 'POST' }).then(() => window.location.reload())}
-          />
         )}
       </AnimatePresence>
 
@@ -4092,20 +4349,21 @@ export default function SkinScanPage() {
                   imageSrc={imageSrc}
                   imageBase64={imageBase64}
                   onBack={() => setScanState("idle")}
-                  onGoMagazine={() => setActiveTab("magazine")}
+                  onGoMagazine={() => setActiveTab("my")}
+                  onOpenDiary={() => setActiveTab("diary")}
                   user={user}
                 />
               )}
             </motion.div>
           )}
-          {activeTab === "report" && (
-            <motion.div key="report" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-              <ReportTab user={user} />
+          {activeTab === "diary" && (
+            <motion.div key="diary" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+              <DiaryTab user={user} analysisResult={analysisResult} />
             </motion.div>
           )}
-          {activeTab === "magazine" && (
-            <motion.div key="magazine" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-              <MagazineTab />
+          {activeTab === "my" && (
+            <motion.div key="my" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+              <MyScreen user={user} onInstall={handleInstall} />
             </motion.div>
           )}
         </AnimatePresence>
@@ -4151,7 +4409,7 @@ export default function SkinScanPage() {
           )}
         </AnimatePresence>
       </div>
-      <BottomNav active={activeTab} onChange={setActiveTab} onScanNew={handleScanNew} onInstall={handleInstall} />
+      <BottomNav active={activeTab} onChange={setActiveTab} scanState={scanState} />
     </div>
   );
 }

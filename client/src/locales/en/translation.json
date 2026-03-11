@@ -1,9 +1,12 @@
 {
   "nav": {
-    "scan": "AI Scan",
+    "scan": "Home",
+    "diary": "Diary",
+    "my": "My",
     "report": "Report",
     "magazine": "Magazine",
-    "install": "Add App"
+    "install": "Add App",
+    "language": "Language"
   },
   "idle": {
     "badge": "AI Skin Scanner",

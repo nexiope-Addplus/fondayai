@@ -1,9 +1,12 @@
 {
   "nav": {
-    "scan": "AIスキャン",
+    "scan": "ホーム",
+    "diary": "日記",
+    "my": "マイ",
     "report": "レポート",
     "magazine": "マガジン",
-    "install": "アプリ追加"
+    "install": "アプリ追加",
+    "language": "言語設定"
   },
   "idle": {
     "badge": "AI Skin Scanner",
