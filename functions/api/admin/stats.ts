@@ -1,20 +1,51 @@
-// 간단한 어드민 통계 엔드포인트
-// 접근 제한: ADMIN_KEY 환경변수와 일치하는 ?key= 파라미터 필요
+const LOGIN_FORM = `<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Fonday Admin</title>
+  <style>
+    body { font-family: -apple-system, sans-serif; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; background: #faf9f6; }
+    .box { background: white; border-radius: 20px; padding: 40px; box-shadow: 0 4px 24px rgba(0,0,0,0.08); width: 320px; text-align: center; }
+    h1 { font-size: 22px; font-weight: 900; color: #2D5F4F; margin: 0 0 8px; }
+    p { color: #a8a29e; font-size: 13px; margin: 0 0 24px; }
+    input { width: 100%; padding: 12px 16px; border: 1.5px solid #e7e5e4; border-radius: 12px; font-size: 15px; box-sizing: border-box; outline: none; }
+    input:focus { border-color: #2D5F4F; }
+    button { width: 100%; margin-top: 12px; padding: 13px; background: #2D5F4F; color: white; border: none; border-radius: 12px; font-size: 15px; font-weight: 700; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <div class="box">
+    <h1>🌿 Fonday Admin</h1>
+    <p>관리자 비밀번호를 입력하세요</p>
+    <form method="POST">
+      <input type="password" name="key" placeholder="비밀번호" autofocus />
+      <button type="submit">로그인</button>
+    </form>
+  </div>
+</body>
+</html>`;
+
+// 간단한 어드민 통계 엔드포인트 (POST 폼 인증)
 export const onRequest = async (context: any) => {
   const { request, env } = context;
-  const url = new URL(request.url);
 
-  // HTTP Basic Auth
-  const unauthorized = new Response("Unauthorized", {
-    status: 401,
-    headers: { "WWW-Authenticate": 'Basic realm="Fonday Admin"' },
-  });
-  const authHeader = request.headers.get("Authorization");
-  if (!authHeader || !authHeader.startsWith("Basic ")) return unauthorized;
-  const decoded = atob(authHeader.slice(6));
-  const colonIdx = decoded.indexOf(":");
-  const password = colonIdx >= 0 ? decoded.slice(colonIdx + 1) : decoded;
-  if (!env.ADMIN_KEY || password !== env.ADMIN_KEY) return unauthorized;
+  // GET → 로그인 폼
+  if (request.method === "GET") {
+    return new Response(LOGIN_FORM, { headers: { "Content-Type": "text/html;charset=UTF-8" } });
+  }
+
+  // POST → 비밀번호 확인
+  if (request.method !== "POST") return new Response("Method Not Allowed", { status: 405 });
+
+  const formData = await request.formData();
+  const key = formData.get("key");
+  if (!env.ADMIN_KEY || key !== env.ADMIN_KEY) {
+    return new Response(LOGIN_FORM.replace("</form>", '<p style="color:#ef4444;font-size:13px">비밀번호가 틀렸습니다</p></form>'), {
+      status: 401,
+      headers: { "Content-Type": "text/html;charset=UTF-8" },
+    });
+  }
 
   if (!env.FONDAY_DB) {
     return new Response("DB not configured", { status: 500 });
