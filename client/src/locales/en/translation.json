@@ -37,7 +37,7 @@
     "howTitle": "How does AI skin analysis work?",
     "howSteps": [
       "Analyzes skin tone, pores, radiance & spots in your selfie using multi-spectrum analysis",
-      "Gemini AI quantifies 10 skin indicators on a 0–100 scale",
+      "AI quantifies 10 skin indicators on a 0–100 scale",
       "Determines your personal skin type based on Baumann's 4-axis scores",
       "Delivers personalized ingredient, routine & product recommendations for your Baumann type"
     ],
@@ -397,6 +397,30 @@
     "slide4Sub": "Inner Beauty Solution",
     "slide5Sub": "Skip these today!",
     "footerText": "Challenge your friends! Search > Fonday AI"
+  },
+  "streak": {
+    "badge": "🔥 {{count}}-day streak",
+    "comeback3": "🌿 You scanned {{days}} days ago. Ready to check your skin?",
+    "comeback7": "⚠️ {{days}} days since your last scan! A lot may have changed.",
+    "milestone": "🔥 {{count}}-day streak achieved!",
+    "deltaUp": "▲ +{{n}} pts improved",
+    "deltaDown": "▼ {{n}} pts declined"
+  },
+  "mission": {
+    "title": "🎯 Missions",
+    "points": "{{n}}pt",
+    "showAll": "Show All",
+    "hide": "Collapse",
+    "newAchieve": "Mission Complete!",
+    "daily_scan": "Complete today's scan",
+    "first_scan": "First skin scan",
+    "streak_3": "3-day scan streak",
+    "streak_7": "7-day scan streak",
+    "streak_30": "30-day scan streak",
+    "score_70": "Achieve skin score 70",
+    "score_80": "Achieve skin score 80",
+    "challenge": "First challenge sent",
+    "share": "First result shared"
   },
   "baumann": {
     "O": { "name": "Oily", "desc": "Active sebum production makes skin prone to shine and greasiness." },

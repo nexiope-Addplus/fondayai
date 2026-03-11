@@ -163,6 +163,130 @@ const stagger = {
   animate: { transition: { staggerChildren: 0.08, delayChildren: 0.06 } },
 };
 
+// ─── 스트릭 / 미션 시스템 ────────────────────────────────────────
+interface StreakData {
+  count: number;
+  lastScanDate: string;
+  longest: number;
+  lastScore: number;
+}
+
+interface MissionState {
+  completed: string[];
+  dailyDate: string;
+  dailyCompleted: boolean;
+  totalPoints: number;
+}
+
+const MISSION_POINTS: Record<string, number> = {
+  first_scan: 50, daily_scan: 10, streak_3: 100, streak_7: 200,
+  streak_30: 500, score_70: 150, score_80: 300, challenge: 100, share: 50,
+};
+
+function todayStr(): string {
+  return new Date().toISOString().slice(0, 10);
+}
+
+function getStreak(): StreakData {
+  try {
+    const raw = localStorage.getItem("fonday_streak");
+    if (raw) return JSON.parse(raw) as StreakData;
+  } catch {}
+  return { count: 0, lastScanDate: "", longest: 0, lastScore: 0 };
+}
+
+function updateStreak(newScore: number): { streak: StreakData; isNewMilestone: boolean; deltaScore: number } {
+  const prev = getStreak();
+  const today = todayStr();
+  const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
+
+  let newCount = 1;
+  if (prev.lastScanDate === today) {
+    newCount = prev.count; // 오늘 이미 스캔 — count 유지
+  } else if (prev.lastScanDate === yesterday) {
+    newCount = prev.count + 1; // 어제 스캔 — streak++
+  }
+  // else: 2일+ 경과 또는 첫 스캔 → reset to 1
+
+  const longest = Math.max(newCount, prev.longest);
+  const deltaScore = prev.lastScore > 0 ? newScore - prev.lastScore : 0;
+  const isNewMilestone = [3, 7, 30].includes(newCount) && prev.lastScanDate !== today;
+
+  const streak: StreakData = { count: newCount, lastScanDate: today, longest, lastScore: newScore };
+  try { localStorage.setItem("fonday_streak", JSON.stringify(streak)); } catch {}
+  return { streak, isNewMilestone, deltaScore };
+}
+
+function getDaysSinceLastScan(): number | null {
+  const { lastScanDate } = getStreak();
+  if (!lastScanDate) return null;
+  const diffMs = Date.now() - new Date(lastScanDate).getTime();
+  return Math.floor(diffMs / 86400000);
+}
+
+function getMissions(): MissionState {
+  try {
+    const raw = localStorage.getItem("fonday_missions");
+    if (raw) return JSON.parse(raw) as MissionState;
+  } catch {}
+  return { completed: [], dailyDate: "", dailyCompleted: false, totalPoints: 0 };
+}
+
+function checkAndCompleteMissions(streakCount: number, overallScore: number): string[] {
+  const state = getMissions();
+  const today = todayStr();
+  const newlyCompleted: string[] = [];
+
+  if (state.dailyDate !== today) {
+    state.dailyDate = today;
+    state.dailyCompleted = false;
+  }
+
+  if (!state.dailyCompleted) {
+    state.dailyCompleted = true;
+    state.totalPoints += MISSION_POINTS.daily_scan;
+    newlyCompleted.push("daily_scan");
+  }
+
+  const checks = [
+    { id: "first_scan", cond: true },
+    { id: "streak_3", cond: streakCount >= 3 },
+    { id: "streak_7", cond: streakCount >= 7 },
+    { id: "streak_30", cond: streakCount >= 30 },
+    { id: "score_70", cond: overallScore >= 70 },
+    { id: "score_80", cond: overallScore >= 80 },
+  ];
+
+  for (const { id, cond } of checks) {
+    if (cond && !state.completed.includes(id)) {
+      state.completed.push(id);
+      state.totalPoints += MISSION_POINTS[id] || 0;
+      newlyCompleted.push(id);
+    }
+  }
+
+  try { localStorage.setItem("fonday_missions", JSON.stringify(state)); } catch {}
+  return newlyCompleted;
+}
+
+function markChallengeUsed() {
+  const state = getMissions();
+  if (!state.completed.includes("challenge")) {
+    state.completed.push("challenge");
+    state.totalPoints += MISSION_POINTS.challenge;
+    try { localStorage.setItem("fonday_missions", JSON.stringify(state)); } catch {}
+  }
+}
+
+function markShareUsed() {
+  const state = getMissions();
+  if (!state.completed.includes("share")) {
+    state.completed.push("share");
+    state.totalPoints += MISSION_POINTS.share;
+    try { localStorage.setItem("fonday_missions", JSON.stringify(state)); } catch {}
+  }
+}
+
 interface MagazineArticle {
   id: number;
   featured?: boolean;
@@ -736,6 +860,65 @@ function getWeatherTipKey(d: WeatherData): WeatherTipKey {
   return "cloudy";
 }
 
+// ─── 미션 카드 (idle 화면) ────────────────────────────────────────
+function MissionCard() {
+  const { t } = useTranslation();
+  const [missions, setMissions] = useState<MissionState>(() => getMissions());
+  const [expanded, setExpanded] = useState(false);
+
+  // 오늘 날짜 기준으로 daily 미션 표시 여부 결정
+  const today = todayStr();
+  const isDailyCompleted = missions.dailyDate === today && missions.dailyCompleted;
+
+  const ALL_MISSION_IDS = ["daily_scan", "first_scan", "streak_3", "streak_7", "streak_30", "score_70", "score_80", "challenge", "share"];
+
+  const missionItems = ALL_MISSION_IDS.map(id => {
+    const isDaily = id === "daily_scan";
+    const done = isDaily ? isDailyCompleted : missions.completed.includes(id);
+    return { id, done, points: MISSION_POINTS[id] || 0 };
+  });
+
+  const incomplete = missionItems.filter(m => !m.done);
+  const complete = missionItems.filter(m => m.done);
+  const visible = expanded ? missionItems : [...incomplete.slice(0, 3), ...complete.slice(0, 1)].slice(0, 4);
+
+  return (
+    <motion.div variants={fadeChild} className="mb-4">
+      <div className="bg-white rounded-2xl px-4 py-3.5 border border-stone-100"
+        style={{ boxShadow: "0 2px 12px rgba(180,130,110,0.08)" }}>
+        <div className="flex items-center justify-between mb-3">
+          <p className="text-[13px] font-black" style={{ color: DEEP_GREEN }}>{t("mission.title")}</p>
+          <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full text-white"
+            style={{ background: "linear-gradient(135deg, #F59E0B, #D97706)" }}>
+            {t("mission.points", { n: missions.totalPoints })}
+          </span>
+        </div>
+        <div className="space-y-2">
+          {visible.map(({ id, done, points }) => (
+            <div key={id} className="flex items-center justify-between py-1.5 border-b border-stone-50 last:border-0">
+              <div className="flex items-center gap-2">
+                <span className="text-base">{done ? "✅" : "🔒"}</span>
+                <span className={`text-[12px] font-semibold ${done ? "text-stone-400 line-through" : "text-stone-700"}`}>
+                  {t(`mission.${id}`)}
+                </span>
+              </div>
+              <span className="text-[11px] font-bold text-amber-500">+{points}pt</span>
+            </div>
+          ))}
+        </div>
+        {missionItems.length > 4 && (
+          <button
+            onClick={() => setExpanded(e => !e)}
+            className="mt-2 w-full text-[11px] font-semibold text-stone-400 text-center py-1"
+          >
+            {expanded ? t("mission.hide") : t("mission.showAll")}
+          </button>
+        )}
+      </div>
+    </motion.div>
+  );
+}
+
 function WeatherTipCard() {
   const { t } = useTranslation();
   const [weather, setWeather] = useState<WeatherData | null>(null);
@@ -834,6 +1017,8 @@ function MiniScoreBarIdle({ label, score, color, delay }: { label: string; score
 // ─── 메인 스캔 화면 ───────────────────────────────────────────────
 function ScanIdleScreen({ onScan }: { onScan: () => void }) {
   const { t } = useTranslation();
+  const streak = getStreak();
+  const daysSince = getDaysSinceLastScan();
 
   const PREVIEW_SCORES = [
     { idx: 0, score: 82, color: SCORE_COLORS[0] },
@@ -854,6 +1039,20 @@ function ScanIdleScreen({ onScan }: { onScan: () => void }) {
       style={{ minHeight: "calc(100dvh - 60px)", background: "linear-gradient(180deg, #FDF6F3 0%, #FAF9F6 100%)", paddingTop: 28 }}
       variants={stagger} initial="initial" animate="animate"
     >
+      {/* 컴백 배너 (3일+ 경과 시) */}
+      {daysSince !== null && daysSince >= 3 && (
+        <motion.div variants={fadeChild} className="mb-3">
+          <div className="flex items-center gap-2 px-4 py-2.5 rounded-2xl text-[12px] font-semibold"
+            style={daysSince >= 7
+              ? { background: "#FFF7ED", color: "#C2410C", border: "1px solid #FED7AA" }
+              : { background: "#F0FAF6", color: "#166534", border: "1px solid #BBF7D0" }}>
+            {daysSince >= 7
+              ? t("streak.comeback7", { days: daysSince })
+              : t("streak.comeback3", { days: daysSince })}
+          </div>
+        </motion.div>
+      )}
+
       {/* Badge + Title */}
       <motion.div variants={fadeChild} className="text-center mb-4">
         <Badge variant="outline" className="px-3 py-1 font-bold tracking-widest uppercase text-[10px]"
@@ -892,6 +1091,9 @@ function ScanIdleScreen({ onScan }: { onScan: () => void }) {
 
       {/* 날씨 데일리 팁 카드 */}
       <WeatherTipCard />
+
+      {/* 미션 카드 */}
+      <MissionCard />
 
       {/* 단계 표시 */}
       <motion.div variants={fadeChild} className="mb-4">
@@ -933,6 +1135,15 @@ function ScanIdleScreen({ onScan }: { onScan: () => void }) {
 
       {/* CTA 버튼 */}
       <motion.div variants={fadeChild} className="mt-auto">
+        {/* 스트릭 배지 */}
+        {streak.count >= 2 && (
+          <div className="flex justify-center mb-3">
+            <span className="text-[13px] font-bold px-4 py-1.5 rounded-full"
+              style={{ background: "#FFF7ED", color: "#C2410C", border: "1px solid #FED7AA" }}>
+              {t("streak.badge", { count: streak.count })}
+            </span>
+          </div>
+        )}
         <motion.button
           onClick={onScan}
           className="w-full py-[18px] rounded-[18px] text-white text-[16px] font-bold tracking-tight"
@@ -1183,6 +1394,9 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
   const [rankingData, setRankingData] = useState<RankingData | null>(null);
   const [diaryTab, setDiaryTab] = useState<"history" | "compare" | "ranking">("history");
   const [pendingChallengeToken, setPendingChallengeToken] = useState<string | null>(null);
+  const [streakMilestone, setStreakMilestone] = useState<number | null>(null);
+  const [streakDelta, setStreakDelta] = useState<number>(0);
+  const [missionPops, setMissionPops] = useState<string[]>([]);
 
   // 챌린지 참여 후 내 결과 저장 (비로그인도 작동)
   useEffect(() => {
@@ -1204,6 +1418,24 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
       aiComment: analysisResult?.aiComment ?? "",
       createdAt: new Date().toISOString(),
     }));
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // 스캔 완료 → 스트릭 업데이트 + 미션 체크
+  useEffect(() => {
+    if (!analysisResult) return;
+    const overallScore = analysisResult.scores?.[0]?.score || 0;
+    const { streak, isNewMilestone, deltaScore } = updateStreak(overallScore);
+    setStreakDelta(deltaScore);
+    if (isNewMilestone) {
+      setStreakMilestone(streak.count);
+      setTimeout(() => setStreakMilestone(null), 3000);
+    }
+    const newMissions = checkAndCompleteMissions(streak.count, overallScore);
+    if (newMissions.length > 0) {
+      setMissionPops(newMissions);
+      setTimeout(() => setMissionPops([]), 3500);
+    }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -1423,6 +1655,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
 
   const handleShare = async () => {
     if (shareLoading) return;
+    markShareUsed();
     setShareLoading(true);
     try {
       // i18n 문자열 미리 resolve
@@ -1518,6 +1751,41 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
 
   return (
     <>
+    {/* 스트릭 마일스톤 팝업 */}
+    <AnimatePresence>
+      {streakMilestone && (
+        <motion.div
+          key="milestone"
+          initial={{ opacity: 0, y: -40 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -40 }}
+          className="fixed top-16 left-1/2 z-[999] -translate-x-1/2 px-6 py-3 rounded-2xl shadow-xl text-white font-bold text-[15px] text-center"
+          style={{ background: "linear-gradient(135deg, #F59E0B, #D97706)" }}
+        >
+          {t("streak.milestone", { count: streakMilestone })}
+        </motion.div>
+      )}
+    </AnimatePresence>
+
+    {/* 미션 달성 팝업 */}
+    <AnimatePresence>
+      {missionPops.length > 0 && (
+        <motion.div
+          key="missionpop"
+          initial={{ opacity: 0, y: 60, scale: 0.9 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          exit={{ opacity: 0, y: 60, scale: 0.9 }}
+          className="fixed bottom-24 left-1/2 z-[999] -translate-x-1/2 px-6 py-4 rounded-2xl shadow-xl bg-white border border-stone-100 flex flex-col items-center gap-1 min-w-[200px]"
+          style={{ boxShadow: "0 8px 32px rgba(0,0,0,0.18)" }}
+        >
+          <span className="text-2xl">🎯</span>
+          <p className="font-black text-stone-800 text-[14px]">{t("mission.newAchieve")}</p>
+          <p className="text-[12px] text-stone-500">{t(`mission.${missionPops[0]}`)}</p>
+          <p className="text-[13px] font-bold text-amber-500">+{MISSION_POINTS[missionPops[0]] || 0}pt</p>
+        </motion.div>
+      )}
+    </AnimatePresence>
+
     {/* ── 공유 슬라이드는 서버사이드(generate-share.ts)에서 생성됨 ── */}
     <div ref={resultScrollRef} className="h-[calc(100dvh-60px)] overflow-y-auto">
       <motion.div className="px-5 pt-6 pb-24 space-y-6" variants={stagger} initial="initial" animate="animate">
@@ -1593,6 +1861,14 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
                       style={{ background: SCAN_FROM }} />
                   </div>
                   <span className="text-[9px] font-bold text-stone-400 mt-1">{t("result.overall")}</span>
+                  {streakDelta !== 0 && (
+                    <span className="text-[9px] font-bold mt-0.5"
+                      style={{ color: streakDelta > 0 ? "#16A34A" : "#D97706" }}>
+                      {streakDelta > 0
+                        ? t("streak.deltaUp", { n: streakDelta })
+                        : t("streak.deltaDown", { n: Math.abs(streakDelta) })}
+                    </span>
+                  )}
                 </div>
               </div>
               {/* 피부나이 */}
@@ -1780,6 +2056,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
             <Button
               className="w-full h-14 text-lg font-bold bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white shadow-lg flex items-center justify-center gap-2 rounded-2xl transition-all"
               onClick={() => {
+                markChallengeUsed();
                 const shareUrl = `${window.location.origin}/battle/${currentShareToken}`;
                 if (navigator.share) {
                   navigator.share({

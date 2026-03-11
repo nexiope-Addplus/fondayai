@@ -180,15 +180,22 @@ export default {
     return new Response("Fonday AI API Worker is running.", { status: 200 });
   },
 
-  // ── Cron 스케줄러: KST 12:00 (UTC 03:00) 점심 / KST 18:00 (UTC 09:00) 저녁 ──
+  // ── Cron 스케줄러 ──────────────────────────────────────────────
+  // KST 09:00 (UTC 00:00) 스캔 리마인더
+  // KST 12:00 (UTC 03:00) 점심 식단 알림
+  // KST 18:00 (UTC 09:00) 저녁 식단 알림
   async scheduled(event, env, ctx) {
     const hour = new Date().getUTCHours();
-    const isLunch = (hour === 3);  // UTC 03:00 = KST 12:00
-    const isDinner = (hour === 9); // UTC 09:00 = KST 18:00
-    if (!isLunch && !isDinner) return;
+    const isScanReminder = (hour === 0); // UTC 00:00 = KST 09:00
+    const isLunch = (hour === 3);        // UTC 03:00 = KST 12:00
+    const isDinner = (hour === 9);       // UTC 09:00 = KST 18:00
 
-    const meal = isLunch ? "lunch" : "dinner";
-    ctx.waitUntil(sendMealPushToAll(env, meal));
+    if (isScanReminder) {
+      ctx.waitUntil(sendScanReminderToAll(env));
+    } else if (isLunch || isDinner) {
+      const meal = isLunch ? "lunch" : "dinner";
+      ctx.waitUntil(sendMealPushToAll(env, meal));
+    }
   }
 };
 
@@ -367,6 +374,34 @@ async function sendPush(subscription, payload, env) {
     },
     body,
   });
+}
+
+// ─── 전체 구독자에게 스캔 리마인더 푸시 ──────────────────────────
+async function sendScanReminderToAll(env) {
+  const kv = env.PUSH_KV;
+  if (!kv) { console.log("[push] PUSH_KV not bound"); return; }
+
+  const allIdsRaw = await kv.get("push:all_ids");
+  if (!allIdsRaw) return;
+  const allIds = JSON.parse(allIdsRaw);
+
+  const titles = { ko: "🌟 오늘 피부 스캔 잊지 마세요", en: "🌟 Don't forget today's skin scan!", ja: "🌟 今日の肌スキャンをお忘れなく" };
+  const bodies = { ko: "오늘의 피부 상태를 확인하고 스트릭을 이어가세요! 🔥", en: "Check your skin today and keep your streak going! 🔥", ja: "今日の肌状態を確認してストリークを続けましょう！🔥" };
+
+  for (const id of allIds) {
+    try {
+      const raw = await kv.get(`push:sub:${id}`);
+      if (!raw) continue;
+      const { subscription, lang } = JSON.parse(raw);
+      await sendPush(subscription, {
+        title: titles[lang] || titles.ko,
+        body: bodies[lang] || bodies.ko,
+        url: "/",
+      }, env);
+    } catch (e) {
+      console.error(`[push] scan reminder id=${id} error:`, e.message);
+    }
+  }
 }
 
 // ─── 전체 구독자에게 식단 푸시 ────────────────────────────────────
