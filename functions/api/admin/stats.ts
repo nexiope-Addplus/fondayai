@@ -5,13 +5,15 @@ export const onRequest = async (context: any) => {
   const url = new URL(request.url);
 
   // HTTP Basic Auth
-  const authHeader = request.headers.get("Authorization");
   const unauthorized = new Response("Unauthorized", {
     status: 401,
     headers: { "WWW-Authenticate": 'Basic realm="Fonday Admin"' },
   });
+  const authHeader = request.headers.get("Authorization");
   if (!authHeader || !authHeader.startsWith("Basic ")) return unauthorized;
-  const [, password] = atob(authHeader.slice(6)).split(":");
+  const decoded = atob(authHeader.slice(6));
+  const colonIdx = decoded.indexOf(":");
+  const password = colonIdx >= 0 ? decoded.slice(colonIdx + 1) : decoded;
   if (!env.ADMIN_KEY || password !== env.ADMIN_KEY) return unauthorized;
 
   if (!env.FONDAY_DB) {
