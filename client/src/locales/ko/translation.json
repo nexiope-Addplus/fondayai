@@ -140,7 +140,19 @@
       "countLabel": "{{count}}번의 기록",
       "historyTab": "히스토리",
       "compareTab": "비교",
-      "rankingTab": "랭킹"
+      "rankingTab": "랭킹",
+      "timelineTab": "타임라인",
+      "calendarTab": "달력",
+      "memoPlaceholder": "오늘 피부 상태나 루틴을 기록해보세요...",
+      "memoAdd": "✏️ 메모 남기기",
+      "memoSave": "저장",
+      "memoCancel": "취소",
+      "memoChars": "{{n}}/100",
+      "monthSection": "{{year}}년 {{month}}월",
+      "noEntry": "아직 기록이 없어요",
+      "noEntryDesc": "AI 스캔 후 첫 페이지가 채워져요 ✦",
+      "compareTitle": "이전 스캔과 비교",
+      "calendarScore": "{{score}}점"
     },
     "partnership": {
       "title": "브랜드 제휴 문의",

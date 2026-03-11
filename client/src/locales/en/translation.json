@@ -140,7 +140,19 @@
       "countLabel": "{{count}} records",
       "historyTab": "History",
       "compareTab": "Compare",
-      "rankingTab": "Ranking"
+      "rankingTab": "Ranking",
+      "timelineTab": "Timeline",
+      "calendarTab": "Calendar",
+      "memoPlaceholder": "Record today's skin condition or routine...",
+      "memoAdd": "✏️ Add a note",
+      "memoSave": "Save",
+      "memoCancel": "Cancel",
+      "memoChars": "{{n}}/100",
+      "monthSection": "{{month}} {{year}}",
+      "noEntry": "No entries yet",
+      "noEntryDesc": "Your first page will be filled after an AI scan ✦",
+      "compareTitle": "Compare with previous scan",
+      "calendarScore": "{{score}}pts"
     },
     "partnership": {
       "title": "Brand Partnership Inquiry",

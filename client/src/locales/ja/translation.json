@@ -140,7 +140,19 @@
       "countLabel": "{{count}}件の記録",
       "historyTab": "履歴",
       "compareTab": "比較",
-      "rankingTab": "ランキング"
+      "rankingTab": "ランキング",
+      "timelineTab": "タイムライン",
+      "calendarTab": "カレンダー",
+      "memoPlaceholder": "今日の肌状態やルーティンを記録しましょう...",
+      "memoAdd": "✏️ メモを残す",
+      "memoSave": "保存",
+      "memoCancel": "キャンセル",
+      "memoChars": "{{n}}/100",
+      "monthSection": "{{year}}年{{month}}月",
+      "noEntry": "まだ記録がありません",
+      "noEntryDesc": "AIスキャン後に最初のページが埋まります ✦",
+      "compareTitle": "前回スキャンと比較",
+      "calendarScore": "{{score}}点"
     },
     "partnership": {
       "title": "ブランド提携のお問い合わせ",
