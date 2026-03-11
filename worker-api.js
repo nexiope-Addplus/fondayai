@@ -97,7 +97,7 @@ export default {
 
     // 테스트 엔드포인트: GET /test-push
     if (request.method === "GET" && new URL(request.url).pathname === "/test-push") {
-      const logs: string[] = [];
+      const logs = [];
       try {
         const kv = env.PUSH_KV;
         if (!kv) { return new Response("❌ PUSH_KV not bound", { headers: corsHeaders }); }
