@@ -163,6 +163,20 @@
       "submitting": "등록 중..."
     }
   },
+  "attendance": {
+    "title": "출석 포인트 3pt 적립! 🎉",
+    "stored": "지금은 이 기기에만 저장돼요.",
+    "loginDesc": "로그인하면 포인트가 영구 보존되고\n어디서든 확인할 수 있어요.",
+    "kakao": "카카오로 저장하기",
+    "google": "구글로 저장하기",
+    "later": "나중에",
+    "totalPoints": "누적 {{n}}pt",
+    "calendarTitle": "출석 달력",
+    "thisMonth": "이번 달 {{n}}일 출석",
+    "calendarBadge": "🗓 {{n}}pt",
+    "alreadyChecked": "오늘 출석 완료 ✓",
+    "close": "닫기"
+  },
   "install": {
     "title": "홈 화면에 추가하기",
     "desc": "Safari에서 아래 단계를 따라 앱을 추가하세요.",

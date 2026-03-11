@@ -37,6 +37,8 @@ import {
   ChevronDown,
   Utensils,
   Trophy,
+  CalendarDays,
+  CheckCircle2,
 } from "lucide-react";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { Button } from "@/components/ui/button";
@@ -267,6 +269,184 @@ function checkAndCompleteMissions(streakCount: number, overallScore: number): st
 
   try { localStorage.setItem("fonday_missions", JSON.stringify(state)); } catch {}
   return newlyCompleted;
+}
+
+// ─── 출석 시스템 ──────────────────────────────────────────────────
+interface AttendanceData {
+  dates: string[];      // "2026-03-11" 형식
+  totalPoints: number;
+}
+
+function getAttendance(): AttendanceData {
+  try {
+    const raw = localStorage.getItem("fonday_attendance");
+    if (raw) return JSON.parse(raw) as AttendanceData;
+  } catch {}
+  return { dates: [], totalPoints: 0 };
+}
+
+function checkinToday(): boolean {
+  const data = getAttendance();
+  const today = todayStr();
+  if (data.dates.includes(today)) return false; // 이미 체크인
+  data.dates.push(today);
+  data.totalPoints += 3;
+  try { localStorage.setItem("fonday_attendance", JSON.stringify(data)); } catch {}
+  return true;
+}
+
+// ─── 달력 모달 ────────────────────────────────────────────────────
+function AttendanceCalendarModal({ onClose }: { onClose: () => void }) {
+  const { t } = useTranslation();
+  const data = getAttendance();
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = now.getMonth();
+
+  const firstDay = new Date(year, month, 1).getDay(); // 0=일
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const thisMonthCount = data.dates.filter(d => d.startsWith(`${year}-${String(month + 1).padStart(2, "0")}`)).length;
+  const cells: (number | null)[] = [
+    ...Array.from({ length: firstDay }, () => null),
+    ...Array.from({ length: daysInMonth }, (_, i) => i + 1),
+  ];
+
+  return (
+    <>
+      <motion.div key="att-overlay" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+        className="fixed inset-0 z-[980] bg-black/40" onClick={onClose} />
+      <motion.div key="att-sheet" initial={{ y: "100%" }} animate={{ y: 0 }} exit={{ y: "100%" }}
+        transition={{ type: "spring", damping: 30, stiffness: 300 }}
+        className="fixed bottom-0 left-0 right-0 z-[990] bg-white rounded-t-3xl shadow-2xl max-w-md mx-auto px-5 pb-10 pt-6">
+        {/* 핸들 */}
+        <div className="w-10 h-1 rounded-full bg-stone-200 mx-auto mb-5" />
+        {/* 헤더 */}
+        <div className="flex items-center justify-between mb-1">
+          <h2 className="text-[16px] font-black" style={{ color: DEEP_GREEN }}>{t("attendance.calendarTitle")}</h2>
+          <div className="flex items-center gap-1.5">
+            <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full text-white"
+              style={{ background: "linear-gradient(135deg, #F59E0B, #D97706)" }}>
+              {t("attendance.totalPoints", { n: data.totalPoints })}
+            </span>
+          </div>
+        </div>
+        <p className="text-[12px] text-stone-400 mb-4">{t("attendance.thisMonth", { n: thisMonthCount })}</p>
+
+        {/* 요일 헤더 */}
+        <div className="grid grid-cols-7 mb-1">
+          {["일","월","화","수","목","금","토"].map(d => (
+            <div key={d} className="text-center text-[10px] font-bold text-stone-400 py-1">{d}</div>
+          ))}
+        </div>
+
+        {/* 날짜 그리드 */}
+        <div className="grid grid-cols-7 gap-y-1">
+          {cells.map((day, i) => {
+            if (!day) return <div key={`e-${i}`} />;
+            const dateStr = `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+            const checked = data.dates.includes(dateStr);
+            const isToday = dateStr === todayStr();
+            return (
+              <div key={dateStr} className="flex flex-col items-center py-1">
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-[12px] font-bold transition-all
+                  ${checked ? "text-white" : isToday ? "text-[#C97062] border border-[#C97062]" : "text-stone-600"}`}
+                  style={checked ? { background: "linear-gradient(135deg, #E09882, #C97062)" } : {}}>
+                  {day}
+                </div>
+                {checked && <div className="w-1 h-1 rounded-full mt-0.5" style={{ background: SCAN_TO }} />}
+              </div>
+            );
+          })}
+        </div>
+
+        <button onClick={onClose}
+          className="mt-5 w-full py-3 rounded-2xl text-[14px] font-bold text-stone-500 bg-stone-100">
+          {t("attendance.close")}
+        </button>
+      </motion.div>
+    </>
+  );
+}
+
+// ─── 체크인 성공 팝업 ─────────────────────────────────────────────
+function CheckinSuccessSheet({ onKakao, onGoogle, onDismiss, user }: {
+  onKakao: () => void;
+  onGoogle: () => void;
+  onDismiss: () => void;
+  user: any;
+}) {
+  const { t } = useTranslation();
+  const data = getAttendance();
+
+  return (
+    <>
+      <motion.div key="ci-overlay" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+        className="fixed inset-0 z-[980] bg-black/40" onClick={onDismiss} />
+      <motion.div key="ci-sheet" initial={{ y: "100%" }} animate={{ y: 0 }} exit={{ y: "100%" }}
+        transition={{ type: "spring", damping: 30, stiffness: 300 }}
+        className="fixed bottom-0 left-0 right-0 z-[990] bg-white rounded-t-3xl shadow-2xl max-w-md mx-auto px-5 pb-10 pt-6">
+        <div className="w-10 h-1 rounded-full bg-stone-200 mx-auto mb-5" />
+
+        {/* 타이틀 */}
+        <div className="text-center mb-5">
+          <div className="w-14 h-14 rounded-full mx-auto mb-3 flex items-center justify-center"
+            style={{ background: "linear-gradient(135deg, #E09882, #C97062)" }}>
+            <CheckCircle2 className="w-7 h-7 text-white" />
+          </div>
+          <h2 className="text-[18px] font-black text-stone-800 mb-1">{t("attendance.title")}</h2>
+          <p className="text-[12px] font-bold text-amber-500">{t("attendance.totalPoints", { n: data.totalPoints })}</p>
+        </div>
+
+        {!user && (
+          <div className="bg-stone-50 rounded-2xl p-4 mb-4 text-center">
+            <p className="text-[13px] font-semibold text-stone-600 mb-0.5">{t("attendance.stored")}</p>
+            <p className="text-[12px] text-stone-400 whitespace-pre-line">{t("attendance.loginDesc")}</p>
+          </div>
+        )}
+
+        {!user ? (
+          <div className="flex flex-col gap-2.5">
+            <button onClick={onKakao}
+              className="w-full py-3.5 rounded-2xl text-[14px] font-black text-stone-800 flex items-center justify-center gap-2"
+              style={{ background: "#FEE500" }}>
+              <span>💬</span> {t("attendance.kakao")}
+            </button>
+            <button onClick={onGoogle}
+              className="w-full py-3.5 rounded-2xl text-[14px] font-black border border-stone-200 text-stone-700 flex items-center justify-center gap-2 bg-white">
+              <span>G</span> {t("attendance.google")}
+            </button>
+            <button onClick={onDismiss}
+              className="w-full py-2.5 text-[13px] font-semibold text-stone-400">
+              {t("attendance.later")}
+            </button>
+          </div>
+        ) : (
+          <button onClick={onDismiss}
+            className="w-full py-3.5 rounded-2xl text-[14px] font-bold text-white"
+            style={{ background: `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})` }}>
+            {t("attendance.close")}
+          </button>
+        )}
+      </motion.div>
+    </>
+  );
+}
+
+// ─── 출석 배지 버튼 (좌상단) ──────────────────────────────────────
+function AttendanceBadge({ onClick }: { onClick: () => void }) {
+  const { t } = useTranslation();
+  const data = getAttendance();
+  const today = todayStr();
+  const checkedToday = data.dates.includes(today);
+  return (
+    <button onClick={onClick}
+      className="fixed top-4 left-4 z-[60] flex items-center gap-1 bg-white/80 backdrop-blur-sm rounded-full px-2.5 py-1.5 shadow-sm border border-stone-100 transition-all active:scale-95">
+      <CalendarDays className="w-3.5 h-3.5" style={{ color: checkedToday ? SCAN_TO : "#B0A898" }} />
+      <span className="text-[11px] font-bold" style={{ color: checkedToday ? SCAN_TO : "#B0A898" }}>
+        {checkedToday ? t("attendance.alreadyChecked") : t("attendance.calendarBadge", { n: data.totalPoints })}
+      </span>
+    </button>
+  );
 }
 
 // ─── 푸시 프롬프트 유틸 ───────────────────────────────────────────
@@ -1117,6 +1297,7 @@ function ScanIdleScreen({ onScan }: { onScan: () => void }) {
   const { t } = useTranslation();
   const streak = getStreak();
   const daysSince = getDaysSinceLastScan();
+  const [showCalendar, setShowCalendar] = useState(false);
 
   const PREVIEW_SCORES = [
     { idx: 0, score: 82, color: SCORE_COLORS[0] },
@@ -1132,6 +1313,15 @@ function ScanIdleScreen({ onScan }: { onScan: () => void }) {
   ];
 
   return (
+    <>
+      {/* 출석 달력 배지 */}
+      <AttendanceBadge onClick={() => setShowCalendar(true)} />
+
+      {/* 출석 달력 모달 */}
+      <AnimatePresence>
+        {showCalendar && <AttendanceCalendarModal onClose={() => setShowCalendar(false)} />}
+      </AnimatePresence>
+
     <motion.div
       className="flex flex-col px-5 pb-8"
       style={{ minHeight: "calc(100dvh - 60px)", background: "linear-gradient(180deg, #FDF6F3 0%, #FAF9F6 100%)", paddingTop: 28 }}
@@ -1308,6 +1498,7 @@ function ScanIdleScreen({ onScan }: { onScan: () => void }) {
         </div>
       </motion.div>
     </motion.div>
+    </>
   );
 }
 
@@ -1495,6 +1686,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
   const [streakMilestone, setStreakMilestone] = useState<number | null>(null);
   const [streakDelta, setStreakDelta] = useState<number>(0);
   const [missionPops, setMissionPops] = useState<string[]>([]);
+  const [showCheckinSheet, setShowCheckinSheet] = useState(false);
 
   // 챌린지 참여 후 내 결과 저장 (비로그인도 작동)
   useEffect(() => {
@@ -1533,6 +1725,11 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
     if (newMissions.length > 0) {
       setMissionPops(newMissions);
       setTimeout(() => setMissionPops([]), 3500);
+    }
+    // 출석 체크인 (오늘 첫 스캔이면 팝업)
+    const isNew = checkinToday();
+    if (isNew) {
+      setTimeout(() => setShowCheckinSheet(true), 1200);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -1935,6 +2132,18 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
           <p className="text-[12px] text-stone-500">{t(`mission.${missionPops[0]}`)}</p>
           <p className="text-[13px] font-bold text-amber-500">+{MISSION_POINTS[missionPops[0]] || 0}pt</p>
         </motion.div>
+      )}
+    </AnimatePresence>
+
+    {/* 출석 체크인 팝업 */}
+    <AnimatePresence>
+      {showCheckinSheet && (
+        <CheckinSuccessSheet
+          user={user}
+          onKakao={() => { setShowCheckinSheet(false); handleKakaoLogin(); }}
+          onGoogle={() => { setShowCheckinSheet(false); handleGoogleLogin(); }}
+          onDismiss={() => setShowCheckinSheet(false)}
+        />
       )}
     </AnimatePresence>
 
@@ -3676,7 +3885,7 @@ export default function SkinScanPage() {
 
   return (
     <div className="min-h-[100dvh] bg-[#FAF9F6] text-stone-900">
-      <LangSwitcher />
+      {scanState === "idle" && <LangSwitcher />}
       <div className="max-w-md mx-auto relative min-h-[100dvh]">
 
         {/* 얼굴 가이드 카메라 */}

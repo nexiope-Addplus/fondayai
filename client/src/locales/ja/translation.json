@@ -163,6 +163,20 @@
       "submitting": "登録中..."
     }
   },
+  "attendance": {
+    "title": "出席ポイント3pt獲得！🎉",
+    "stored": "今はこの端末にのみ保存されています。",
+    "loginDesc": "ログインするとポイントが永久保存され\nどこでも確認できます。",
+    "kakao": "Kakaoで保存する",
+    "google": "Googleで保存する",
+    "later": "あとで",
+    "totalPoints": "累計 {{n}}pt",
+    "calendarTitle": "出席カレンダー",
+    "thisMonth": "今月 {{n}}日出席",
+    "calendarBadge": "🗓 {{n}}pt",
+    "alreadyChecked": "今日の出席完了 ✓",
+    "close": "閉じる"
+  },
   "install": {
     "title": "ホーム画面に追加",
     "desc": "Safariで以下の手順に従ってアプリを追加してください。",

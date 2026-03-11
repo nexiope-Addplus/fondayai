@@ -163,6 +163,20 @@
       "submitting": "Registering..."
     }
   },
+  "attendance": {
+    "title": "3pts Check-in Earned! 🎉",
+    "stored": "Right now, it's only saved on this device.",
+    "loginDesc": "Log in to keep your points permanently\nand access them anywhere.",
+    "kakao": "Save with Kakao",
+    "google": "Save with Google",
+    "later": "Later",
+    "totalPoints": "Total {{n}}pts",
+    "calendarTitle": "Attendance Calendar",
+    "thisMonth": "{{n}} days this month",
+    "calendarBadge": "🗓 {{n}}pts",
+    "alreadyChecked": "Checked in today ✓",
+    "close": "Close"
+  },
   "install": {
     "title": "Add to Home Screen",
     "desc": "Follow the steps below in Safari to add the app.",
