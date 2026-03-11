@@ -117,11 +117,11 @@ export default {
               url: "/",
             }, env);
             logs.push(`✅ ${id} 전송 성공`);
-          } catch (e: any) {
+          } catch (e) {
             logs.push(`❌ ${id} 전송 실패: ${e.message}`);
           }
         }
-      } catch (e: any) {
+      } catch (e) {
         logs.push(`❌ 오류: ${e.message}`);
       }
       return new Response(logs.join("\n"), { headers: corsHeaders });
