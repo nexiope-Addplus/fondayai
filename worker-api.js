@@ -95,6 +95,27 @@ export default {
       return new Response(null, { headers: corsHeaders });
     }
 
+    // 진단 엔드포인트: GET /debug-vapid
+    if (request.method === "GET" && new URL(request.url).pathname === "/debug-vapid") {
+      const pub = env.VAPID_PUBLIC_KEY?.trim();
+      const priv = env.VAPID_PRIVATE_KEY?.trim();
+      if (!pub || !priv) return new Response("VAPID keys not set", { headers: corsHeaders });
+      const b64url = s => Uint8Array.from(atob(s.replace(/-/g, "+").replace(/_/g, "/")), c => c.charCodeAt(0));
+      let pubBytes, privBytes;
+      try { pubBytes = b64url(pub); } catch(e) { return new Response(`pubKey decode error: ${e.message}`, { headers: corsHeaders }); }
+      try { privBytes = b64url(priv); } catch(e) { return new Response(`privKey decode error: ${e.message}`, { headers: corsHeaders }); }
+      const info = {
+        pubKeyLen: pubBytes.length,
+        pubKeyFirstByte: `0x${pubBytes[0].toString(16).padStart(2,"0")}`,
+        privKeyLen: privBytes.length,
+        pubHasStdChars: /[+/=]/.test(pub),
+        privHasStdChars: /[+/=]/.test(priv),
+        pubPreview: pub.slice(0, 16) + "...",
+        privPreview: priv.slice(0, 8) + "...",
+      };
+      return new Response(JSON.stringify(info, null, 2), { headers: corsHeaders });
+    }
+
     // 테스트 엔드포인트: GET /test-push
     if (request.method === "GET" && new URL(request.url).pathname === "/test-push") {
       const logs = [];
