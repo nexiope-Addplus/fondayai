@@ -341,7 +341,7 @@ async function signVapid(privateKeyB64u, audience, subject) {
   return `${signingInput}.${sigB64u}`;
 }
 
-// ─── 단일 Push 전송 ───────────────────────────────────────────────
+// ─── 단일 Push 전송 (RFC 8291 aes128gcm) ────────────────────────
 async function sendPush(subscription, payload, env) {
   const { endpoint, keys: { p256dh, auth } } = subscription;
   const url = new URL(endpoint);
@@ -358,63 +358,67 @@ async function sendPush(subscription, payload, env) {
 
   const jwt = await signVapid(VAPID_PRIVATE, audience, VAPID_SUB);
 
-  // 페이로드 암호화 (Web Push Protocol - aesgcm)
-  const payloadStr = JSON.stringify(payload);
-  const encoder = new TextEncoder();
+  const b64url = s => Uint8Array.from(atob(s.replace(/-/g, "+").replace(/_/g, "/")), c => c.charCodeAt(0));
+  const enc = new TextEncoder();
+
+  const receiverPublicBytes = b64url(p256dh);
+  const authSecret = b64url(auth);
   const salt = crypto.getRandomValues(new Uint8Array(16));
 
-  // p256dh 키 import
-  const receiverKey = await crypto.subtle.importKey(
-    "raw",
-    Uint8Array.from(atob(p256dh.replace(/-/g, "+").replace(/_/g, "/")), c => c.charCodeAt(0)),
-    { name: "ECDH", namedCurve: "P-256" },
-    true, []
-  );
   // 임시 키 쌍 생성
-  const senderKeys = await crypto.subtle.generateKey({ name: "ECDH", namedCurve: "P-256" }, true, ["deriveKey", "deriveBits"]);
+  const senderKeys = await crypto.subtle.generateKey({ name: "ECDH", namedCurve: "P-256" }, true, ["deriveBits"]);
   const senderPublicRaw = new Uint8Array(await crypto.subtle.exportKey("raw", senderKeys.publicKey));
 
-  // shared secret 도출
-  const sharedBits = await crypto.subtle.deriveBits(
-    { name: "ECDH", public: receiverKey },
-    senderKeys.privateKey, 256
-  );
+  // ECDH shared secret
+  const receiverKey = await crypto.subtle.importKey("raw", receiverPublicBytes, { name: "ECDH", namedCurve: "P-256" }, false, []);
+  const sharedSecret = await crypto.subtle.deriveBits({ name: "ECDH", public: receiverKey }, senderKeys.privateKey, 256);
 
-  // auth secret
-  const authBytes = Uint8Array.from(atob(auth.replace(/-/g, "+").replace(/_/g, "/")), c => c.charCodeAt(0));
+  // PRK = HKDF(salt=authSecret, IKM=sharedSecret, info="WebPush: info\0" + receiverPub + senderPub)
+  const prkIkm = await crypto.subtle.importKey("raw", sharedSecret, { name: "HKDF" }, false, ["deriveBits"]);
+  const prkInfo = new Uint8Array([...enc.encode("WebPush: info\0"), ...receiverPublicBytes, ...senderPublicRaw]);
+  const prkBits = await crypto.subtle.deriveBits({ name: "HKDF", hash: "SHA-256", salt: authSecret, info: prkInfo }, prkIkm, 256);
+  const prk = await crypto.subtle.importKey("raw", prkBits, { name: "HKDF" }, false, ["deriveBits"]);
 
-  // PRK (HKDF-Extract)
-  const prk = await crypto.subtle.importKey("raw", sharedBits, { name: "HKDF" }, false, ["deriveBits"]);
-  const prkInfo = new Uint8Array([...encoder.encode("Content-Encoding: auth\0"), ...authBytes]);
-  const pseudoKey = await crypto.subtle.deriveBits(
-    { name: "HKDF", hash: "SHA-256", salt: authBytes, info: prkInfo },
-    prk, 256
-  );
+  // CEK (16 bytes) + Nonce (12 bytes)
+  const cekBits = await crypto.subtle.deriveBits({ name: "HKDF", hash: "SHA-256", salt, info: enc.encode("Content-Encoding: aes128gcm\0") }, prk, 128);
+  const nonceBits = await crypto.subtle.deriveBits({ name: "HKDF", hash: "SHA-256", salt, info: enc.encode("Content-Encoding: nonce\0") }, prk, 96);
+  const cek = await crypto.subtle.importKey("raw", cekBits, "AES-GCM", false, ["encrypt"]);
+  const nonce = new Uint8Array(nonceBits);
 
-  const cek = await crypto.subtle.importKey("raw", new Uint8Array(pseudoKey).slice(0, 16), "AES-GCM", false, ["encrypt"]);
+  // 평문 + 레코드 구분자 \x02
+  const plaintext = enc.encode(JSON.stringify(payload));
+  const padded = new Uint8Array(plaintext.length + 1);
+  padded.set(plaintext);
+  padded[plaintext.length] = 0x02;
 
-  // 암호화
-  const contentIV = new Uint8Array(12);
-  crypto.getRandomValues(contentIV);
-  const encrypted = await crypto.subtle.encrypt(
-    { name: "AES-GCM", iv: contentIV },
-    cek,
-    encoder.encode(payloadStr)
-  );
+  const ciphertext = new Uint8Array(await crypto.subtle.encrypt({ name: "AES-GCM", iv: nonce }, cek, padded));
 
-  // 전송
-  const body = new Uint8Array([...salt, ...senderPublicRaw, ...new Uint8Array(encrypted)]);
-  await fetch(endpoint, {
+  // aes128gcm 바디: salt(16) + rs(4) + keyid_len(1) + senderPub(65) + ciphertext
+  const rs = 4096;
+  const body = new Uint8Array(16 + 4 + 1 + 65 + ciphertext.length);
+  let offset = 0;
+  body.set(salt, offset); offset += 16;
+  body[offset++] = (rs >> 24) & 0xff; body[offset++] = (rs >> 16) & 0xff;
+  body[offset++] = (rs >> 8) & 0xff;  body[offset++] = rs & 0xff;
+  body[offset++] = 65;
+  body.set(senderPublicRaw, offset); offset += 65;
+  body.set(ciphertext, offset);
+
+  const resp = await fetch(endpoint, {
     method: "POST",
     headers: {
       "Authorization": `vapid t=${jwt},k=${VAPID_PUBLIC}`,
       "Content-Type": "application/octet-stream",
-      "Content-Encoding": "aesgcm",
-      "Encryption": `salt=${btoa(String.fromCharCode(...salt)).replace(/\+/g, "-").replace(/\//g, "_").replace(/=/g, "")}`,
-      "Crypto-Key": `dh=${btoa(String.fromCharCode(...senderPublicRaw)).replace(/\+/g, "-").replace(/\//g, "_").replace(/=/g, "")};vapid`,
+      "Content-Encoding": "aes128gcm",
+      "TTL": "86400",
     },
     body,
   });
+
+  if (!resp.ok) {
+    const text = await resp.text();
+    throw new Error(`HTTP ${resp.status}: ${text}`);
+  }
 }
 
 // ─── 전체 구독자에게 스캔 리마인더 푸시 ──────────────────────────
