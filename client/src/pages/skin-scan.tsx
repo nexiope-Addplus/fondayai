@@ -47,7 +47,7 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
-type TabId = "scan" | "diary" | "my";
+type TabId = "scan" | "diary" | "magazine" | "my";
 type ScanState = "idle" | "survey" | "scanning" | "result";
 
 interface SurveyData {
@@ -954,7 +954,6 @@ function BottomNav({ active, onChange, scanState }: {
   scanState: ScanState;
 }) {
   const { t } = useTranslation();
-  // 설문/스캔 중에는 숨김
   if (scanState === "survey" || scanState === "scanning") return null;
   const btn = (tab: TabId, icon: React.ReactNode, label: string) => (
     <button
@@ -967,9 +966,22 @@ function BottomNav({ active, onChange, scanState }: {
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-2xl border-t border-stone-100">
       <div className="max-w-md mx-auto px-2">
-        <div className="grid grid-cols-3 h-[64px]">
+        <div className="grid grid-cols-5 h-[64px]">
           {btn("scan", <Camera className="w-5 h-5" />, t("nav.scan"))}
           {btn("diary", <BookOpen className="w-5 h-5" />, t("nav.diary"))}
+          {/* 중앙 Fonday 강조 버튼 */}
+          <a
+            href="https://fonday.replit.app/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex flex-col items-center justify-center gap-0.5 active:opacity-70 -mt-3">
+            <div className="w-12 h-12 rounded-full flex items-center justify-center shadow-lg"
+              style={{ background: "linear-gradient(135deg, #E09882, #C97062)" }}>
+              <Zap className="w-5 h-5 text-white" />
+            </div>
+            <span className="text-[11px] font-black" style={{ color: "#C97062" }}>Fonday</span>
+          </a>
+          {btn("magazine", <FileText className="w-5 h-5" />, t("nav.magazine"))}
           {btn("my", <User className="w-5 h-5" />, t("nav.my"))}
         </div>
       </div>
@@ -2283,7 +2295,7 @@ function DiaryTab({ user, analysisResult }: { user: any; analysisResult: Analysi
 }
 
 // ─── 마이 페이지 ─────────────────────────────────────────────────
-function MyScreen({ user, onInstall }: { user: any; onInstall: () => void }) {
+function MyScreen({ user, onInstall, onBack }: { user: any; onInstall: () => void; onBack: () => void }) {
   const { t, i18n } = useTranslation();
   const [showCalendar, setShowCalendar] = useState(false);
   const attendance = getAttendance();
@@ -2296,6 +2308,10 @@ function MyScreen({ user, onInstall }: { user: any; onInstall: () => void }) {
     <div className="min-h-[calc(100dvh-64px)] pb-28" style={{ background: "#FAF9F6" }}>
       {/* 헤더 */}
       <div className="px-5 pt-12 pb-6" style={{ borderBottom: "1px solid #F0EDE8" }}>
+        <button onClick={onBack} className="flex items-center gap-1.5 text-stone-400 mb-4 active:opacity-70">
+          <ChevronLeft className="w-5 h-5" />
+          <span className="text-[13px] font-semibold">{t("nav.scan")}</span>
+        </button>
         <p className="text-[11px] font-bold tracking-widest uppercase mb-1" style={{ color: SCAN_TO }}>FONDAY</p>
         <h1 className="text-[22px] font-black" style={{ color: DEEP_GREEN }}>{t("nav.my")}</h1>
       </div>
@@ -4349,7 +4365,7 @@ export default function SkinScanPage() {
                   imageSrc={imageSrc}
                   imageBase64={imageBase64}
                   onBack={() => setScanState("idle")}
-                  onGoMagazine={() => setActiveTab("my")}
+                  onGoMagazine={() => setActiveTab("magazine")}
                   onOpenDiary={() => setActiveTab("diary")}
                   user={user}
                 />
@@ -4361,9 +4377,14 @@ export default function SkinScanPage() {
               <DiaryTab user={user} analysisResult={analysisResult} />
             </motion.div>
           )}
+          {activeTab === "magazine" && (
+            <motion.div key="magazine" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+              <MagazineTab />
+            </motion.div>
+          )}
           {activeTab === "my" && (
             <motion.div key="my" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-              <MyScreen user={user} onInstall={handleInstall} />
+              <MyScreen user={user} onInstall={handleInstall} onBack={() => setActiveTab("scan")} />
             </motion.div>
           )}
         </AnimatePresence>
