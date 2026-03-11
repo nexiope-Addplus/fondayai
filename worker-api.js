@@ -317,9 +317,18 @@ async function signVapid(privateKeyB64u, audience, subject) {
   const encode = obj => btoa(JSON.stringify(obj)).replace(/\+/g, "-").replace(/\//g, "_").replace(/=/g, "");
   const signingInput = `${encode(header)}.${encode(payload)}`;
 
-  const keyBytes = Uint8Array.from(atob(privateKeyB64u.replace(/-/g, "+").replace(/_/g, "/")), c => c.charCodeAt(0));
+  const rawKeyBytes = Uint8Array.from(atob(privateKeyB64u.replace(/-/g, "+").replace(/_/g, "/")), c => c.charCodeAt(0));
+  // raw 32-byte EC key → PKCS8 DER 래핑 (Web Crypto API 요구사항)
+  const pkcs8Prefix = new Uint8Array([
+    0x30, 0x41, 0x02, 0x01, 0x00, 0x30, 0x13, 0x06, 0x07, 0x2a, 0x86, 0x48,
+    0xce, 0x3d, 0x02, 0x01, 0x06, 0x08, 0x2a, 0x86, 0x48, 0xce, 0x3d, 0x03,
+    0x01, 0x07, 0x04, 0x27, 0x30, 0x25, 0x02, 0x01, 0x01, 0x04, 0x20
+  ]);
+  const pkcs8Key = new Uint8Array(pkcs8Prefix.length + rawKeyBytes.length);
+  pkcs8Key.set(pkcs8Prefix);
+  pkcs8Key.set(rawKeyBytes, pkcs8Prefix.length);
   const key = await crypto.subtle.importKey(
-    "pkcs8", keyBytes,
+    "pkcs8", pkcs8Key,
     { name: "ECDSA", namedCurve: "P-256" },
     false, ["sign"]
   );
