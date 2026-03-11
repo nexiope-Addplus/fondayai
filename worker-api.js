@@ -308,8 +308,8 @@ function getMealTip(baumannType, lang, meal) {
   return { menu, tip: tips };
 }
 
-// ─── VAPID 서명 (Web Crypto API) ──────────────────────────────────
-async function signVapid(privateKeyB64u, audience, subject) {
+// ─── VAPID 서명 (JWK 방식, Web Crypto API) ───────────────────────
+async function signVapid(privateKeyB64u, audience, subject, publicKeyB64u) {
   const header = { alg: "ES256", typ: "JWT" };
   const now = Math.floor(Date.now() / 1000);
   const payload = { aud: audience, exp: now + 43200, sub: subject };
@@ -317,27 +317,25 @@ async function signVapid(privateKeyB64u, audience, subject) {
   const encode = obj => btoa(JSON.stringify(obj)).replace(/\+/g, "-").replace(/\//g, "_").replace(/=/g, "");
   const signingInput = `${encode(header)}.${encode(payload)}`;
 
-  const rawKeyBytes = Uint8Array.from(atob(privateKeyB64u.replace(/-/g, "+").replace(/_/g, "/")), c => c.charCodeAt(0));
-  // raw 32-byte EC key → PKCS8 DER 래핑 (Web Crypto API 요구사항)
-  const pkcs8Prefix = new Uint8Array([
-    0x30, 0x41, 0x02, 0x01, 0x00, 0x30, 0x13, 0x06, 0x07, 0x2a, 0x86, 0x48,
-    0xce, 0x3d, 0x02, 0x01, 0x06, 0x08, 0x2a, 0x86, 0x48, 0xce, 0x3d, 0x03,
-    0x01, 0x07, 0x04, 0x27, 0x30, 0x25, 0x02, 0x01, 0x01, 0x04, 0x20
-  ]);
-  const pkcs8Key = new Uint8Array(pkcs8Prefix.length + rawKeyBytes.length);
-  pkcs8Key.set(pkcs8Prefix);
-  pkcs8Key.set(rawKeyBytes, pkcs8Prefix.length);
-  const key = await crypto.subtle.importKey(
-    "pkcs8", pkcs8Key,
-    { name: "ECDSA", namedCurve: "P-256" },
-    false, ["sign"]
-  );
+  const b64u = s => Uint8Array.from(atob(s.replace(/-/g, "+").replace(/_/g, "/")), c => c.charCodeAt(0));
+  const toB64u = arr => btoa(String.fromCharCode(...arr)).replace(/\+/g, "-").replace(/\//g, "_").replace(/=/g, "");
+
+  // VAPID 공개키(비압축 65바이트: 0x04 || x || y)에서 x, y 추출 → JWK로 import
+  const pubBytes = b64u(publicKeyB64u);
+  const key = await crypto.subtle.importKey("jwk", {
+    kty: "EC", crv: "P-256",
+    d: privateKeyB64u,
+    x: toB64u(pubBytes.slice(1, 33)),
+    y: toB64u(pubBytes.slice(33, 65)),
+    key_ops: ["sign"],
+  }, { name: "ECDSA", namedCurve: "P-256" }, false, ["sign"]);
+
   const sig = await crypto.subtle.sign(
     { name: "ECDSA", hash: "SHA-256" },
     key,
     new TextEncoder().encode(signingInput)
   );
-  const sigB64u = btoa(String.fromCharCode(...new Uint8Array(sig))).replace(/\+/g, "-").replace(/\//g, "_").replace(/=/g, "");
+  const sigB64u = toB64u(new Uint8Array(sig));
   return `${signingInput}.${sigB64u}`;
 }
 
@@ -356,7 +354,7 @@ async function sendPush(subscription, payload, env) {
     return;
   }
 
-  const jwt = await signVapid(VAPID_PRIVATE, audience, VAPID_SUB);
+  const jwt = await signVapid(VAPID_PRIVATE, audience, VAPID_SUB, VAPID_PUBLIC);
 
   const b64url = s => Uint8Array.from(atob(s.replace(/-/g, "+").replace(/_/g, "/")), c => c.charCodeAt(0));
   const enc = new TextEncoder();
