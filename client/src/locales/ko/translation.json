@@ -115,7 +115,8 @@
       "daysAfter": "{{days}}일 후 예상",
       "routine": "추천 루틴",
       "risks": "주요 위험 요인",
-      "disclaimer": "AI 예측 · 참고용"
+      "disclaimer": "AI 예측 · 참고용",
+      "diaryHint": "일기 탭 달력에서 루틴을 체크리스트로 확인하세요"
     },
     "diary": {
       "title": "피부 일기",
@@ -136,6 +137,9 @@
     "challengeBtn": "친구에게 피부 챌린지 보내기",
     "challengeResult": "챌린지 결과 확인하기",
     "challengeLinkCopied": "챌린지 링크가 복사되었습니다! 친구에게 보내서 겨뤄보세요."
+  },
+  "diary": {
+    "routineTitle": "오늘의 루틴"
   },
   "modal": {
     "analysis": {

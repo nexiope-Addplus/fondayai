@@ -1758,6 +1758,59 @@ function saveDiaryMemo(dateStr: string, text: string) {
   } catch {}
 }
 
+// ─── 루틴 Todo 유틸 ──────────────────────────────────────────────
+interface TodoItem { text: string; done: boolean; }
+function getDiaryTodos(dateStr: string): TodoItem[] {
+  try { return JSON.parse(localStorage.getItem(`fonday_todos_${dateStr}`) || "[]"); } catch { return []; }
+}
+function saveDiaryTodos(dateStr: string, todos: TodoItem[]) {
+  try { localStorage.setItem(`fonday_todos_${dateStr}`, JSON.stringify(todos)); } catch {}
+}
+function initDiaryTodosFromRoutine(dateStr: string, routine: string[]) {
+  if (getDiaryTodos(dateStr).length === 0 && routine.length > 0) {
+    saveDiaryTodos(dateStr, routine.map(text => ({ text, done: false })));
+  }
+}
+
+// ─── 인라인 루틴 Todo ────────────────────────────────────────────
+function InlineTodos({ dateStr }: { dateStr: string }) {
+  const { t } = useTranslation();
+  const [todos, setTodos] = useState<TodoItem[]>(() => getDiaryTodos(dateStr));
+  if (todos.length === 0) return null;
+  const doneCount = todos.filter(td => td.done).length;
+  const toggle = (i: number) => {
+    const next = todos.map((td, idx) => idx === i ? { ...td, done: !td.done } : td);
+    setTodos(next);
+    saveDiaryTodos(dateStr, next);
+  };
+  return (
+    <div className="mb-3 pb-3 border-b border-[#F0EDE8]">
+      <div className="flex items-center justify-between mb-2">
+        <p className="text-[11px] font-bold text-stone-500">📋 {t("diary.routineTitle")}</p>
+        <span className="text-[10px] px-2 py-0.5 rounded-full"
+          style={{ background: doneCount === todos.length ? "#ECFDF5" : "#F9F9F9",
+            color: doneCount === todos.length ? "#059669" : "#B0A898" }}>
+          {doneCount}/{todos.length}
+        </span>
+      </div>
+      <div className="space-y-2">
+        {todos.map((todo, i) => (
+          <button key={i} onClick={() => toggle(i)} className="flex items-center gap-2.5 w-full text-left">
+            <div className={`w-4 h-4 rounded-[5px] border-2 flex items-center justify-center shrink-0 transition-all
+              ${todo.done ? "border-emerald-400 bg-emerald-400" : "border-stone-200 bg-white"}`}>
+              {todo.done && <CheckCircle2 className="w-3 h-3 text-white" strokeWidth={3} />}
+            </div>
+            <span className={`text-[12px] leading-snug transition-colors
+              ${todo.done ? "line-through text-stone-300" : "text-stone-600"}`}>
+              {todo.text}
+            </span>
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 // ─── 인라인 메모 ─────────────────────────────────────────────────
 function InlineMemo({ dateStr }: { dateStr: string }) {
   const { t } = useTranslation();
@@ -1885,10 +1938,11 @@ function DiaryCalendarView({ allEntries }: { allEntries: { dateStr: string; scor
       {selectedEntry && (
         <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
           className="mt-4 p-4 rounded-2xl border" style={{ background: "#FFFAF9", borderColor: "#F0EDE8" }}>
-          <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center justify-between mb-3">
             <span className="text-[11px] font-medium text-stone-400 tracking-wide">{selectedEntry.dateStr}</span>
             <span className="text-[20px] font-black" style={{ color: SCAN_TO }}>{selectedEntry.score}점</span>
           </div>
+          <InlineTodos dateStr={selectedEntry.dateStr} />
           <InlineMemo dateStr={selectedEntry.dateStr} />
         </motion.div>
       )}
@@ -2610,6 +2664,12 @@ function SkinPredictionCard({ prediction, currentScore }: {
             ))}
           </div>
         </div>
+
+        {/* 일기 탭 힌트 */}
+        <div className="mt-3 pt-3 border-t border-stone-100 flex items-center gap-2">
+          <span className="text-[12px]">📖</span>
+          <p className="text-[11px] text-stone-400">{t("result.prediction.diaryHint")}</p>
+        </div>
       </CardContent>
     </Card>
   );
@@ -2690,6 +2750,10 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
     const isNew = checkinToday();
     if (isNew) {
       setTimeout(() => setShowCheckinSheet(true), 1200);
+    }
+    // 예측 루틴 → 오늘 Todo로 자동 저장 (오늘 처음이면)
+    if (analysisResult?.prediction?.good?.routine) {
+      initDiaryTodosFromRoutine(todayStr(), analysisResult.prediction.good.routine);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

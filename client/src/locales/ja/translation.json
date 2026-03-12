@@ -114,7 +114,8 @@
       "daysAfter": "{{days}}日後の予測",
       "routine": "おすすめルーティン",
       "risks": "主なリスク要因",
-      "disclaimer": "AI予測 · 参考用"
+      "disclaimer": "AI予測 · 参考用",
+      "diaryHint": "日記タブのカレンダーでルーティンをチェックリストで確認"
     },
     "challengeShort": "チャレンジ",
     "diary": {
@@ -136,6 +137,9 @@
     "challengeBtn": "友達に肌チャレンジを送る",
     "challengeResult": "チャレンジ結果を確認",
     "challengeLinkCopied": "チャレンジリンクをコピーしました！友達に送って競いましょう。"
+  },
+  "diary": {
+    "routineTitle": "今日のルーティン"
   },
   "modal": {
     "analysis": {
