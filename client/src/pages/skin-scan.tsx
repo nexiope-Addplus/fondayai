@@ -1380,15 +1380,51 @@ function ScanIdleScreen({ onScan }: { onScan: () => void }) {
           <div className="absolute top-0 right-0 w-6 h-6 border-t-2 border-r-2" style={{ borderColor: SCAN_TO }} />
           <div className="absolute bottom-0 left-0 w-6 h-6 border-b-2 border-l-2" style={{ borderColor: SCAN_TO }} />
           <div className="absolute bottom-0 right-0 w-6 h-6 border-b-2 border-r-2" style={{ borderColor: SCAN_TO }} />
-          {/* 얼굴 실루엣 */}
+          {/* 얼굴 일러스트 (20대 여성) */}
           <div className="absolute inset-0 flex items-center justify-center">
-            <svg width="60" height="68" viewBox="0 0 60 68" fill="none">
-              <ellipse cx="30" cy="26" rx="17" ry="21" stroke={`${SCAN_TO}80`} strokeWidth="1.5" fill={`${SCAN_FROM}10`} />
-              <ellipse cx="22" cy="22" rx="2.5" ry="1.8" fill={`${SCAN_TO}60`} />
-              <ellipse cx="38" cy="22" rx="2.5" ry="1.8" fill={`${SCAN_TO}60`} />
-              <path d="M27 28 L25 35 L35 35" stroke={`${SCAN_TO}50`} strokeWidth="1" fill="none" strokeLinecap="round" strokeLinejoin="round" />
-              <path d="M23 40 Q30 44 37 40" stroke={`${SCAN_TO}60`} strokeWidth="1.2" fill="none" strokeLinecap="round" />
-              <path d="M24 47 L18 60 Q30 64 42 60 L36 47" stroke={`${SCAN_TO}40`} strokeWidth="1" fill="none" strokeLinecap="round" />
+            <svg width="88" height="100" viewBox="0 0 88 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+              {/* 머리카락 (뒤) */}
+              <ellipse cx="44" cy="34" rx="26" ry="31" fill="#3D2B1F" />
+              {/* 목 */}
+              <rect x="37" y="68" width="14" height="14" rx="4" fill="#F5C5A8" />
+              {/* 얼굴 */}
+              <ellipse cx="44" cy="44" rx="22" ry="27" fill="#F5C5A8" />
+              {/* 볼터치 */}
+              <ellipse cx="25" cy="51" rx="6" ry="3.5" fill="#F09090" fillOpacity="0.25" />
+              <ellipse cx="63" cy="51" rx="6" ry="3.5" fill="#F09090" fillOpacity="0.25" />
+              {/* 머리카락 (앞) */}
+              <path d="M22 36 Q18 18 44 14 Q70 18 66 36" fill="#3D2B1F" />
+              <path d="M22 36 Q20 28 26 24" fill="#3D2B1F" />
+              <path d="M66 36 Q68 28 62 24" fill="#3D2B1F" />
+              {/* 눈썹 왼쪽 */}
+              <path d="M28 36 Q33 33 38 35" stroke="#4A2F22" strokeWidth="1.8" strokeLinecap="round" fill="none" />
+              {/* 눈썹 오른쪽 */}
+              <path d="M50 35 Q55 33 60 36" stroke="#4A2F22" strokeWidth="1.8" strokeLinecap="round" fill="none" />
+              {/* 눈 왼쪽 */}
+              <ellipse cx="33" cy="42" rx="5" ry="3.5" fill="white" />
+              <circle cx="33" cy="42" r="2.5" fill="#4A2F22" />
+              <circle cx="34" cy="41" r="0.9" fill="white" />
+              <path d="M28 42 Q33 38.5 38 42" stroke="#4A2F22" strokeWidth="1" fill="none" strokeLinecap="round" />
+              {/* 눈 오른쪽 */}
+              <ellipse cx="55" cy="42" rx="5" ry="3.5" fill="white" />
+              <circle cx="55" cy="42" r="2.5" fill="#4A2F22" />
+              <circle cx="56" cy="41" r="0.9" fill="white" />
+              <path d="M50 42 Q55 38.5 60 42" stroke="#4A2F22" strokeWidth="1" fill="none" strokeLinecap="round" />
+              {/* 속눈썹 왼쪽 */}
+              <path d="M28 40 L26.5 38.5 M30 39 L29 37.5 M33 38.5 L33 36.8 M36 39 L37 37.5 M38 40 L39.5 38.5" stroke="#3D2B1F" strokeWidth="0.8" strokeLinecap="round" />
+              {/* 속눈썹 오른쪽 */}
+              <path d="M50 40 L48.5 38.5 M52 39 L51 37.5 M55 38.5 L55 36.8 M58 39 L59 37.5 M60 40 L61.5 38.5" stroke="#3D2B1F" strokeWidth="0.8" strokeLinecap="round" />
+              {/* 코 */}
+              <path d="M41 46 L39 54 Q44 56 49 54 L47 46" stroke="#D4956A" strokeWidth="1" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+              <ellipse cx="40" cy="54" rx="2.2" ry="1.2" fill="#D4956A" fillOpacity="0.4" />
+              <ellipse cx="48" cy="54" rx="2.2" ry="1.2" fill="#D4956A" fillOpacity="0.4" />
+              {/* 입술 */}
+              <path d="M35 60 Q44 56 53 60" stroke="#E07A7A" strokeWidth="1" fill="none" strokeLinecap="round" />
+              <path d="M35 60 Q44 66 53 60" fill="#E8A0A0" stroke="#E07A7A" strokeWidth="0.8" />
+              <path d="M38 60 Q44 57.5 50 60" stroke="#C96060" strokeWidth="0.6" fill="none" strokeLinecap="round" />
+              {/* 귀 */}
+              <ellipse cx="22" cy="46" rx="3" ry="4" fill="#F5C5A8" stroke="#D4956A" strokeWidth="0.6" />
+              <ellipse cx="66" cy="46" rx="3" ry="4" fill="#F5C5A8" stroke="#D4956A" strokeWidth="0.6" />
             </svg>
           </div>
           {/* 스캔 라인 */}
@@ -1663,21 +1699,23 @@ function ScanningScreen({ imageSrc }: { imageSrc: string | null }) {
   const [textIdx, setTextIdx] = useState(0);
   const [progress, setProgress] = useState(0);
   const texts = t("scanning.texts", { returnObjects: true }) as string[];
-  const progressTargets = [20, 45, 68, 88];
 
-  useEffect(() => {
-    const t = setTimeout(() => setProgress(12), 200);
-    return () => clearTimeout(t);
-  }, []);
-
+  // 텍스트 사이클 (진행바와 독립)
   useEffect(() => {
     const interval = setInterval(() => {
-      setTextIdx(prev => {
-        const next = (prev + 1) % texts.length;
-        setProgress(progressTargets[next]);
-        return next;
-      });
-    }, 1500);
+      setTextIdx(prev => (prev + 1) % texts.length);
+    }, 1800);
+    return () => clearInterval(interval);
+  }, []);
+
+  // 진행바: 0 → 95% 단방향 스무스 증가 (절대 감소 없음)
+  useEffect(() => {
+    let current = 0;
+    const interval = setInterval(() => {
+      current += 0.35;
+      if (current >= 95) { clearInterval(interval); current = 95; }
+      setProgress(current);
+    }, 80);
     return () => clearInterval(interval);
   }, []);
 
@@ -2214,7 +2252,7 @@ function DiaryFullView({ history, analysisResult, overallScore, finalType, curre
 
 // ─── 결과 화면 ────────────────────────────────────────────────────
 // ─── 피부 일기 탭 (독립 데이터 페칭) ─────────────────────────────
-function DiaryTab({ user, analysisResult }: { user: any; analysisResult: AnalysisResult | null }) {
+function DiaryTab({ user, analysisResult, onBack }: { user: any; analysisResult: AnalysisResult | null; onBack?: () => void }) {
   const { t } = useTranslation();
   const [history, setHistory] = useState<any[]>([]);
   const [rankingData, setRankingData] = useState<RankingData | null>(null);
@@ -2272,6 +2310,12 @@ function DiaryTab({ user, analysisResult }: { user: any; analysisResult: Analysi
     <div className="flex flex-col" style={{ background: "#FBF9F7", minHeight: "calc(100dvh - 64px)" }}>
       {/* 헤더 */}
       <div className="shrink-0 px-5 pt-12 pb-0" style={{ borderBottom: "1px solid #F0EDE8" }}>
+        {onBack && (
+          <button onClick={onBack} className="flex items-center gap-1.5 text-stone-400 mb-4 active:opacity-70">
+            <ChevronLeft className="w-4 h-4" />
+            <span className="text-[12px] font-semibold">{t("result.back")}</span>
+          </button>
+        )}
         <div className="mb-4">
           <p className="text-[11px] font-bold tracking-widest uppercase mb-1" style={{ color: SCAN_TO }}>FONDAY</p>
           <h1 className="text-[22px] font-black" style={{ color: DEEP_GREEN }}>{t("modal.diary.title")} ✦</h1>
@@ -3037,7 +3081,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
         {/* 이미지 + 핫스팟 */}
         <Card className="overflow-hidden border-none shadow-2xl rounded-3xl bg-zinc-900">
           <div className="relative w-full">
-            <img src={imageSrc} className="w-full max-h-80 object-contain" />
+            <img src={imageSrc} className="w-full object-cover" style={{ height: 320 }} />
             {analysisResult?.hotspots?.map((dot: any, i: number) => (
               <motion.div key={i}
                 className="absolute -translate-x-1/2 -translate-y-1/2"
@@ -3164,18 +3208,23 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
         )}
 
         {/* ── 3탭 네비게이션 ── */}
-        <div className="flex rounded-2xl bg-stone-100 p-1 gap-1">
+        <div className="flex gap-2 px-1">
           {(["analysis", "solution", "nutrition"] as const).map((tab) => {
             const labels = { analysis: t("result.tab.analysis"), solution: t("result.tab.solution"), nutrition: t("result.tab.nutrition") };
-            const icons = { analysis: <LayoutGrid className="w-3.5 h-3.5" />, solution: <Leaf className="w-3.5 h-3.5" />, nutrition: <Utensils className="w-3.5 h-3.5" /> };
+            const icons = {
+              analysis: <LayoutGrid className="w-4 h-4" />,
+              solution: <Leaf className="w-4 h-4" />,
+              nutrition: <Utensils className="w-4 h-4" />,
+            };
             const isActive = activeTab === tab;
             return (
               <button key={tab} onClick={() => setActiveTab(tab)}
-                className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-[12px] font-bold transition-all"
+                className="flex-1 flex flex-col items-center gap-1 py-3 rounded-2xl text-[13px] font-black transition-all"
                 style={isActive
-                  ? { background: "white", color: SCAN_TO, boxShadow: "0 2px 8px rgba(0,0,0,0.08)" }
-                  : { color: "#A8A29E" }}>
-                {icons[tab]}{labels[tab]}
+                  ? { background: `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})`, color: "white", boxShadow: `0 4px 14px ${SCAN_TO}55` }
+                  : { background: "#F5F2EF", color: "#A8A29E" }}>
+                {icons[tab]}
+                <span>{labels[tab]}</span>
               </button>
             );
           })}
@@ -4585,7 +4634,7 @@ export default function SkinScanPage() {
           )}
           {activeTab === "diary" && (
             <motion.div key="diary" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-              <DiaryTab user={user} analysisResult={analysisResult} />
+              <DiaryTab user={user} analysisResult={analysisResult} onBack={() => setActiveTab("scan")} />
             </motion.div>
           )}
           {activeTab === "magazine" && (
