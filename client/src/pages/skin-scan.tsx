@@ -1759,6 +1759,53 @@ function saveDiaryMemo(dateStr: string, text: string) {
   if (dateStr === todayStr()) window.dispatchEvent(new CustomEvent("fonday:diary-updated"));
 }
 
+const DIARY_CAUSE_TAGS = ["수면부족", "새 화장품", "생리주기", "식단", "스트레스", "야외활동"] as const;
+type DiaryCauseTag = typeof DIARY_CAUSE_TAGS[number];
+const CAUSE_TAG_KEYWORDS: Record<DiaryCauseTag, string[]> = {
+  "수면부족": ["피곤", "수면", "잠", "야근", "늦잠"],
+  "새 화장품": ["새", "화장품", "세럼", "크림", "토너", "제품"],
+  "생리주기": ["생리", "주기", "PMS"],
+  "식단": ["매운", "야식", "커피", "술", "밀가루", "단것", "식단"],
+  "스트레스": ["스트레스", "예민", "피로", "긴장"],
+  "야외활동": ["야외", "운동", "햇빛", "외출", "여행"],
+};
+
+interface ReminderSettings {
+  enabled: boolean;
+  hour: number;
+  minute: number;
+  lastNotifiedDate: string;
+}
+
+function getDiaryCauseTags(dateStr: string): DiaryCauseTag[] {
+  try { return JSON.parse(localStorage.getItem(`fonday_cause_tags_${dateStr}`) || "[]"); } catch { return []; }
+}
+
+function saveDiaryCauseTags(dateStr: string, tags: DiaryCauseTag[]) {
+  try {
+    if (tags.length > 0) localStorage.setItem(`fonday_cause_tags_${dateStr}`, JSON.stringify(tags));
+    else localStorage.removeItem(`fonday_cause_tags_${dateStr}`);
+  } catch {}
+  if (dateStr === todayStr()) window.dispatchEvent(new CustomEvent("fonday:diary-updated"));
+}
+
+function suggestCauseTags(text: string): DiaryCauseTag[] {
+  const normalized = text.toLowerCase();
+  return DIARY_CAUSE_TAGS.filter((tag) => CAUSE_TAG_KEYWORDS[tag].some((keyword) => normalized.includes(keyword.toLowerCase())));
+}
+
+function getReminderSettings(): ReminderSettings {
+  try {
+    const raw = localStorage.getItem("fonday_reminder_settings");
+    if (raw) return JSON.parse(raw) as ReminderSettings;
+  } catch {}
+  return { enabled: false, hour: 21, minute: 0, lastNotifiedDate: "" };
+}
+
+function saveReminderSettings(next: ReminderSettings) {
+  try { localStorage.setItem("fonday_reminder_settings", JSON.stringify(next)); } catch {}
+}
+
 // ─── 루틴 Todo 유틸 ──────────────────────────────────────────────
 interface TodoItem { text: string; done: boolean; }
 function getDiaryTodos(dateStr: string): TodoItem[] {
@@ -1779,6 +1826,90 @@ function initDiaryTodosFromRoutine(dateStr: string, routine: string[]) {
   if (getDiaryTodos(dateStr).length === 0 && routine.length > 0) {
     saveDiaryTodos(dateStr, routine.map(text => ({ text, done: false })));
   }
+}
+
+function getRecentDateStrings(days: number): string[] {
+  return Array.from({ length: days }, (_, index) => {
+    const date = new Date(Date.now() - index * 86400000);
+    return date.toISOString().slice(0, 10);
+  }).reverse();
+}
+
+function extractMemoKeywords(memos: string[]): string[] {
+  const stopwords = new Set(["오늘", "피부", "정도", "조금", "정말", "그냥", "그리고", "메모", "기록", "루틴"]);
+  const counts = new Map<string, number>();
+  memos.forEach((memo) => {
+    memo
+      .replace(/[^0-9A-Za-z가-힣\s]/g, " ")
+      .split(/\s+/)
+      .map((word) => word.trim())
+      .filter((word) => word.length >= 2 && !stopwords.has(word))
+      .forEach((word) => counts.set(word, (counts.get(word) || 0) + 1));
+  });
+  return Array.from(counts.entries())
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 3)
+    .map(([word]) => word);
+}
+
+function getWeeklyReport(entries: { dateStr: string; score: number }[], streakCount: number) {
+  const last7DateStrings = getRecentDateStrings(7);
+  const entryMap = new Map(entries.map((entry) => [entry.dateStr, entry]));
+  const weeklyEntries = last7DateStrings
+    .map((dateStr) => {
+      const entry = entryMap.get(dateStr);
+      const todos = getDiaryTodos(dateStr);
+      const memo = getDiaryMemo(dateStr);
+      const tags = getDiaryCauseTags(dateStr);
+      return {
+        dateStr,
+        score: entry?.score ?? null,
+        todos,
+        memo,
+        tags,
+        completion: todos.length > 0 ? todos.filter((todo) => todo.done).length / todos.length : 0,
+      };
+    });
+
+  const validScores = weeklyEntries.flatMap((entry) => entry.score === null ? [] : [entry.score]);
+  const averageScore = validScores.length > 0 ? Math.round(validScores.reduce((sum, score) => sum + score, 0) / validScores.length) : 0;
+  const bestDay = weeklyEntries.filter((entry) => entry.score !== null).sort((a, b) => (b.score || 0) - (a.score || 0))[0] ?? null;
+  const worstDay = weeklyEntries.filter((entry) => entry.score !== null).sort((a, b) => (a.score || 0) - (b.score || 0))[0] ?? null;
+  const routineStats = new Map<string, { done: number; total: number }>();
+  weeklyEntries.forEach((entry) => {
+    entry.todos.forEach((todo) => {
+      const stat = routineStats.get(todo.text) || { done: 0, total: 0 };
+      stat.total += 1;
+      if (todo.done) stat.done += 1;
+      routineStats.set(todo.text, stat);
+    });
+  });
+  const rankedRoutines = Array.from(routineStats.entries())
+    .filter(([, stat]) => stat.total > 0)
+    .map(([text, stat]) => ({ text, rate: stat.done / stat.total, done: stat.done, total: stat.total }))
+    .sort((a, b) => b.rate - a.rate);
+  const bestRoutine = rankedRoutines[0] ?? null;
+  const worstRoutine = rankedRoutines[rankedRoutines.length - 1] ?? null;
+  const memos = weeklyEntries.map((entry) => entry.memo).filter(Boolean);
+  const keywordSummary = extractMemoKeywords(memos);
+  const tagCounts = new Map<DiaryCauseTag, number>();
+  weeklyEntries.forEach((entry) => entry.tags.forEach((tag) => tagCounts.set(tag, (tagCounts.get(tag) || 0) + 1)));
+  const topCauseTags = Array.from(tagCounts.entries()).sort((a, b) => b[1] - a[1]).slice(0, 3);
+  const incompleteDays = weeklyEntries.filter((entry) => entry.todos.length > 0 && entry.todos.some((todo) => !todo.done)).length;
+
+  return {
+    unlocked: streakCount >= 7,
+    progress: Math.min(streakCount, 7),
+    averageScore,
+    bestDay,
+    worstDay,
+    bestRoutine,
+    worstRoutine,
+    keywordSummary,
+    topCauseTags,
+    incompleteDays,
+    memoCount: memos.length,
+  };
 }
 
 // ─── 인라인 루틴 Todo ────────────────────────────────────────────
@@ -1825,13 +1956,16 @@ function InlineMemo({ dateStr }: { dateStr: string }) {
   const { t } = useTranslation();
   const [editing, setEditing] = useState(false);
   const [text, setText] = useState(() => getDiaryMemo(dateStr));
+  const [tags, setTags] = useState<DiaryCauseTag[]>(() => getDiaryCauseTags(dateStr));
 
   const handleSave = () => {
     saveDiaryMemo(dateStr, text);
+    saveDiaryCauseTags(dateStr, tags);
     setEditing(false);
   };
 
   if (editing) {
+    const autoSuggestions = suggestCauseTags(text).filter((tag) => !tags.includes(tag));
     return (
       <div className="mt-3 pt-3 border-t border-[#F0EDE8]">
         <textarea
@@ -1840,10 +1974,44 @@ function InlineMemo({ dateStr }: { dateStr: string }) {
           placeholder={t("modal.diary.memoPlaceholder")}
           value={text} onChange={e => setText(e.target.value)} autoFocus
         />
+        <div className="flex flex-wrap gap-1.5 mt-2">
+          {DIARY_CAUSE_TAGS.map((tag) => {
+            const selected = tags.includes(tag);
+            return (
+              <button
+                key={tag}
+                onClick={() => setTags((prev) => selected ? prev.filter((item) => item !== tag) : [...prev, tag])}
+                className="px-2.5 py-1 rounded-full text-[10px] font-bold transition-colors"
+                style={selected
+                  ? { background: `${SCAN_FROM}20`, color: SCAN_TO, border: `1px solid ${SCAN_FROM}55` }
+                  : { background: "#F6F3EE", color: "#9A8F80", border: "1px solid #ECE4DC" }}
+              >
+                {tag}
+              </button>
+            );
+          })}
+        </div>
+        {autoSuggestions.length > 0 && (
+          <div className="mt-2 rounded-xl px-3 py-2" style={{ background: "#F6F3EE" }}>
+            <p className="text-[10px] font-bold text-stone-400 mb-1">AUTO TAG</p>
+            <div className="flex flex-wrap gap-1.5">
+              {autoSuggestions.map((tag) => (
+                <button
+                  key={tag}
+                  onClick={() => setTags((prev) => [...prev, tag])}
+                  className="px-2.5 py-1 rounded-full text-[10px] font-bold"
+                  style={{ background: "#FFFFFF", color: SCAN_TO, border: `1px solid ${SCAN_FROM}40` }}
+                >
+                  + {tag}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
         <div className="flex items-center justify-between mt-1.5">
           <span className="text-[10px] text-stone-300">{t("modal.diary.memoChars", { n: text.length })}</span>
           <div className="flex gap-2">
-            <button onClick={() => { setText(getDiaryMemo(dateStr)); setEditing(false); }}
+            <button onClick={() => { setText(getDiaryMemo(dateStr)); setTags(getDiaryCauseTags(dateStr)); setEditing(false); }}
               className="text-[11px] text-stone-400 px-2 py-1">{t("modal.diary.memoCancel")}</button>
             <button onClick={handleSave}
               className="text-[11px] font-bold px-3 py-1 rounded-lg text-white"
@@ -1859,7 +2027,19 @@ function InlineMemo({ dateStr }: { dateStr: string }) {
     return (
       <div className="mt-3 pt-3 border-t border-[#F0EDE8] flex gap-2 cursor-pointer" onClick={() => setEditing(true)}>
         <span className="text-sm shrink-0">📝</span>
-        <p className="text-[12px] text-stone-500 leading-relaxed flex-1">{text}</p>
+        <div className="flex-1 min-w-0">
+          <p className="text-[12px] text-stone-500 leading-relaxed">{text}</p>
+          {tags.length > 0 && (
+            <div className="flex flex-wrap gap-1.5 mt-2">
+              {tags.map((tag) => (
+                <span key={tag} className="px-2 py-0.5 rounded-full text-[10px] font-bold"
+                  style={{ background: "#F6F3EE", color: "#9A8F80" }}>
+                  {tag}
+                </span>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     );
   }
@@ -1924,6 +2104,8 @@ function DiaryCalendarView({ allEntries }: { allEntries: { dateStr: string; scor
           const dateStr = `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
           const score = scoreMap.get(dateStr);
           const todoProgress = getDiaryTodoProgress(dateStr);
+          const memo = getDiaryMemo(dateStr);
+          const tags = getDiaryCauseTags(dateStr);
           const isToday = dateStr === todayStr();
           const isSelected = selectedEntry?.dateStr === dateStr;
           return (
@@ -1954,6 +2136,12 @@ function DiaryCalendarView({ allEntries }: { allEntries: { dateStr: string; scor
                   {score !== undefined && <div className="mt-1 h-1.5 w-1.5 rounded-full" style={{ background: getScoreColor(score) }} />}
                 </div>
               )}
+              <div className="flex items-center gap-1 min-h-[10px]">
+                {score !== undefined && <span className="w-1.5 h-1.5 rounded-full" style={{ background: getScoreColor(score) }} />}
+                {todoProgress.total > 0 && <span className="w-1.5 h-1.5 rounded-full" style={{ background: todoProgress.done === todoProgress.total ? "#10B981" : "#D97706" }} />}
+                {memo && <span className="w-1.5 h-1.5 rounded-full" style={{ background: "#7C3AED" }} />}
+                {tags.length > 0 && <span className="w-1.5 h-1.5 rounded-full" style={{ background: "#2D5F4F" }} />}
+              </div>
             </button>
           );
         })}
@@ -1974,6 +2162,19 @@ function DiaryCalendarView({ allEntries }: { allEntries: { dateStr: string; scor
       <div className="mt-5 flex items-center gap-3 justify-center flex-wrap">
         {([{ label: "90+", color: SCAN_TO }, { label: "75~89", color: SCAN_FROM },
           { label: "60~74", color: "#F5C5B8" }, { label: "~59", color: "#FAE0DA" }]).map(({ label, color }) => (
+          <div key={label} className="flex items-center gap-1">
+            <div className="w-3 h-3 rounded-full" style={{ background: color }} />
+            <span className="text-[10px] text-stone-400">{label}</span>
+          </div>
+        ))}
+      </div>
+      <div className="mt-3 flex items-center gap-3 justify-center flex-wrap">
+        {[
+          { label: "루틴", color: "#10B981" },
+          { label: "미완료", color: "#D97706" },
+          { label: "메모", color: "#7C3AED" },
+          { label: "태그", color: "#2D5F4F" },
+        ].map(({ label, color }) => (
           <div key={label} className="flex items-center gap-1">
             <div className="w-3 h-3 rounded-full" style={{ background: color }} />
             <span className="text-[10px] text-stone-400">{label}</span>
@@ -2313,6 +2514,7 @@ function DiaryTab({ user, analysisResult, onBack }: { user: any; analysisResult:
   const [rankingData, setRankingData] = useState<RankingData | null>(null);
   const [tab, setTab] = useState<"timeline" | "calendar" | "ranking">("timeline");
   const [loading, setLoading] = useState(true);
+  const [reminderSettings, setReminderSettings] = useState<ReminderSettings>(() => getReminderSettings());
 
   const scores = analysisResult?.scores || [];
   const overallScore = scores[0]?.score || 0;
@@ -2359,12 +2561,99 @@ function DiaryTab({ user, analysisResult, onBack }: { user: any; analysisResult:
   const avgScore = recentScores.length > 0 ? Math.round(recentScores.reduce((sum, score) => sum + score, 0) / recentScores.length) : 0;
   const diaryTodoProgress = getDiaryTodoProgress(todayStr());
   const diaryMemoReady = Boolean(getDiaryMemo(todayStr()).trim());
+  const streakCount = getStreak().count;
+  const weeklyReport = getWeeklyReport(allEntries, streakCount);
+
+  useEffect(() => {
+    if (!reminderSettings.enabled) return;
+    if (typeof Notification === "undefined") return;
+    if (Notification.permission !== "granted") return;
+    const timer = window.setInterval(() => {
+      const now = new Date();
+      const currentDate = todayStr();
+      const progress = getDiaryTodoProgress(currentDate);
+      const incomplete = progress.total > 0 && progress.done < progress.total;
+      const shouldTrigger = incomplete
+        && now.getHours() === reminderSettings.hour
+        && now.getMinutes() >= reminderSettings.minute
+        && reminderSettings.lastNotifiedDate !== currentDate;
+      if (shouldTrigger) {
+        new Notification("Fonday 루틴 리마인드", {
+          body: `오늘 루틴이 ${progress.done}/${progress.total} 완료 상태예요. 남은 루틴을 체크해 보세요.`,
+          icon: "/icon-192.png",
+        });
+        const next = { ...reminderSettings, lastNotifiedDate: currentDate };
+        setReminderSettings(next);
+        saveReminderSettings(next);
+      }
+    }, 60000);
+    return () => window.clearInterval(timer);
+  }, [reminderSettings]);
 
   const tabs: { id: "timeline" | "calendar" | "ranking"; label: string }[] = [
     { id: "timeline", label: t("modal.diary.timelineTab") },
     { id: "calendar", label: t("modal.diary.calendarTab") },
     { id: "ranking", label: t("modal.diary.rankingTab") },
   ];
+
+  if (!user) {
+    return (
+      <div className="flex flex-col" style={{ background: "#FBF9F7", minHeight: "calc(100dvh - 64px)" }}>
+        <div className="shrink-0 px-5 pt-12 pb-0" style={{ borderBottom: "1px solid #F0EDE8" }}>
+          {onBack && (
+            <button onClick={onBack}
+              className="flex items-center justify-center w-9 h-9 rounded-full bg-stone-100 text-stone-500 mb-3 active:opacity-70">
+              <ChevronLeft className="w-5 h-5" />
+            </button>
+          )}
+          <div className="rounded-[28px] p-5 mb-4 text-white"
+            style={{ background: "linear-gradient(135deg, #2D5F4F 0%, #C97062 100%)" }}>
+            <p className="text-[11px] font-bold tracking-widest uppercase mb-1 text-white/70">FONDAY</p>
+            <h1 className="text-[24px] font-black">{t("modal.diary.title")} ✦</h1>
+            <p className="text-[12px] text-white/80 mt-2 text-kr-pretty">{t("result.login.desc")}</p>
+          </div>
+        </div>
+        <div className="flex-1 px-5 py-6">
+          <Card className="border-none rounded-[30px] shadow-md overflow-hidden"
+            style={{ background: "linear-gradient(180deg, #FFF8F4 0%, #FFFFFF 100%)" }}>
+            <CardContent className="p-6 text-center">
+              <div className="w-14 h-14 rounded-[20px] mx-auto flex items-center justify-center text-white"
+                style={{ background: `linear-gradient(135deg, ${DEEP_GREEN}, ${SCAN_TO})` }}>
+                <Lock className="w-6 h-6" />
+              </div>
+              <p className="text-[22px] font-black mt-4" style={{ color: DEEP_GREEN }}>{t("result.login.title")}</p>
+              <p className="text-[12px] text-stone-500 mt-2 leading-relaxed text-kr-pretty">{t("result.login.desc")}</p>
+              <div className="grid grid-cols-3 gap-2.5 mt-5 text-left">
+                <div className="rounded-2xl p-3" style={{ background: "#FFF1EC" }}>
+                  <p className="text-[10px] font-bold text-stone-500">7D AVG</p>
+                  <p className="text-[18px] font-black mt-1" style={{ color: SCAN_TO }}>--</p>
+                </div>
+                <div className="rounded-2xl p-3" style={{ background: "#F5F3FF" }}>
+                  <p className="text-[10px] font-bold text-stone-500">{t("modal.diary.timelineTab")}</p>
+                  <p className="text-[18px] font-black mt-1" style={{ color: "#7C3AED" }}>--</p>
+                </div>
+                <div className="rounded-2xl p-3" style={{ background: "#ECFDF5" }}>
+                  <p className="text-[10px] font-bold text-stone-500">{t("modal.diary.calendarTab")}</p>
+                  <p className="text-[18px] font-black mt-1" style={{ color: "#059669" }}>--</p>
+                </div>
+              </div>
+              <div className="space-y-2 mt-6">
+                <Button onClick={() => { window.location.href = "/auth/kakao"; }}
+                  className="w-full h-12 rounded-xl font-bold gap-2 border-0 shadow-sm text-[#3C1E1E]"
+                  style={{ background: "#FEE500" }}>
+                  {t("result.login.kakao")}
+                </Button>
+                <Button onClick={() => { window.location.href = "/auth/google"; }}
+                  className="w-full h-12 rounded-xl bg-white hover:bg-stone-50 font-bold text-zinc-700 gap-2 border border-stone-200 shadow-sm">
+                  {t("result.login.google")}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col" style={{ background: "#FBF9F7", minHeight: "calc(100dvh - 64px)" }}>
@@ -2413,6 +2702,154 @@ function DiaryTab({ user, analysisResult, onBack }: { user: any; analysisResult:
 
       {/* 콘텐츠 */}
       <div className="flex-1 overflow-y-auto overscroll-contain pb-24">
+        <div className="px-5 pt-4">
+          <Card className="border-none rounded-[28px] overflow-hidden shadow-sm"
+            style={{ background: weeklyReport.unlocked ? "linear-gradient(135deg, #FFF7F2 0%, #FFFFFF 100%)" : "linear-gradient(135deg, #F6F3EE 0%, #FFFFFF 100%)" }}>
+            <CardContent className="p-5">
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <p className="text-[10px] font-black tracking-[0.16em] uppercase" style={{ color: weeklyReport.unlocked ? SCAN_TO : "#9A8F80" }}>
+                    Weekly Report
+                  </p>
+                  <p className="text-[18px] font-black mt-1 text-kr-pretty" style={{ color: DEEP_GREEN }}>
+                    {weeklyReport.unlocked ? "7일 연속 측정 리포트가 열렸어요" : `7일 연속 측정까지 ${Math.max(7 - weeklyReport.progress, 0)}일 남았어요`}
+                  </p>
+                  <p className="text-[11px] text-stone-500 mt-1 leading-relaxed text-kr-pretty">
+                    {weeklyReport.unlocked
+                      ? "이번 주 점수 흐름과 루틴 패턴, 메모 요약을 한 번에 확인할 수 있습니다."
+                      : "스트릭을 채우면 이번 주 피부 흐름과 루틴 패턴을 리포트로 열어드립니다."}
+                  </p>
+                </div>
+                <div className="rounded-2xl px-3 py-2 text-right shrink-0"
+                  style={{ background: weeklyReport.unlocked ? "#FFF1EC" : "#FFFFFF", border: "1px solid #EDE3DB" }}>
+                  <p className="text-[10px] font-bold text-stone-500 whitespace-nowrap">STREAK</p>
+                  <p className="text-[20px] font-black leading-none" style={{ color: weeklyReport.unlocked ? SCAN_TO : DEEP_GREEN }}>{weeklyReport.progress}/7</p>
+                </div>
+              </div>
+              <div className="h-2 rounded-full bg-stone-100 overflow-hidden mt-3">
+                <motion.div
+                  className="h-full rounded-full"
+                  style={{ background: `linear-gradient(90deg, ${SCAN_FROM}, ${DEEP_GREEN})` }}
+                  initial={{ width: 0 }}
+                  animate={{ width: `${Math.round((weeklyReport.progress / 7) * 100)}%` }}
+                  transition={{ duration: 0.6, ease: "easeOut" }}
+                />
+              </div>
+              {weeklyReport.unlocked && (
+                <div className="grid gap-3 mt-4 md:grid-cols-2">
+                  <div className="rounded-[22px] p-4" style={{ background: "#FFFFFF", border: "1px solid #F1E6DE" }}>
+                    <p className="text-[10px] font-black uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>Score Flow</p>
+                    <p className="text-[22px] font-black mt-2" style={{ color: DEEP_GREEN }}>{weeklyReport.averageScore}</p>
+                    <p className="text-[11px] text-stone-500 mt-1">이번 주 평균 점수</p>
+                    <div className="grid grid-cols-2 gap-2 mt-3">
+                      <div className="rounded-2xl p-3" style={{ background: "#FFF8F4" }}>
+                        <p className="text-[10px] text-stone-400">BEST</p>
+                        <p className="text-[14px] font-black mt-1" style={{ color: DEEP_GREEN }}>{weeklyReport.bestDay?.score ?? "--"}점</p>
+                      </div>
+                      <div className="rounded-2xl p-3" style={{ background: "#F6F3EE" }}>
+                        <p className="text-[10px] text-stone-400">LOW</p>
+                        <p className="text-[14px] font-black mt-1" style={{ color: "#8C8070" }}>{weeklyReport.worstDay?.score ?? "--"}점</p>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="rounded-[22px] p-4" style={{ background: "#FFFFFF", border: "1px solid #F1E6DE" }}>
+                    <p className="text-[10px] font-black uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>Pattern</p>
+                    <div className="space-y-3 mt-3">
+                      <div>
+                        <p className="text-[10px] text-stone-400">베스트 루틴</p>
+                        <p className="text-[13px] font-black mt-1 text-kr-pretty" style={{ color: DEEP_GREEN }}>{weeklyReport.bestRoutine?.text ?? "데이터 수집 중"}</p>
+                      </div>
+                      <div>
+                        <p className="text-[10px] text-stone-400">가장 자주 놓친 루틴</p>
+                        <p className="text-[13px] font-black mt-1 text-kr-pretty" style={{ color: "#8C8070" }}>{weeklyReport.worstRoutine?.text ?? "데이터 수집 중"}</p>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="rounded-[22px] p-4" style={{ background: "#FFFFFF", border: "1px solid #F1E6DE" }}>
+                    <p className="text-[10px] font-black uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>Memo Signals</p>
+                    <div className="flex flex-wrap gap-1.5 mt-3">
+                      {(weeklyReport.keywordSummary.length > 0 ? weeklyReport.keywordSummary : ["메모 수집 중"]).map((keyword) => (
+                        <span key={keyword} className="px-2.5 py-1 rounded-full text-[10px] font-bold"
+                          style={{ background: "#FFF1EC", color: SCAN_TO }}>
+                          {keyword}
+                        </span>
+                      ))}
+                    </div>
+                    <p className="text-[11px] text-stone-500 mt-3">이번 주 메모 {weeklyReport.memoCount}회</p>
+                  </div>
+                  <div className="rounded-[22px] p-4" style={{ background: "#FFFFFF", border: "1px solid #F1E6DE" }}>
+                    <p className="text-[10px] font-black uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>Cause Tags</p>
+                    <div className="flex flex-wrap gap-1.5 mt-3">
+                      {(weeklyReport.topCauseTags.length > 0
+                        ? weeklyReport.topCauseTags.map(([tag, count]) => `${tag} ${count}`)
+                        : ["태그 수집 중"]).map((item) => (
+                        <span key={item} className="px-2.5 py-1 rounded-full text-[10px] font-bold"
+                          style={{ background: "#F5F3FF", color: "#7C3AED" }}>
+                          {item}
+                        </span>
+                      ))}
+                    </div>
+                    <p className="text-[11px] text-stone-500 mt-3">루틴 미완료일 {weeklyReport.incompleteDays}일</p>
+                  </div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+          <Card className="border-none rounded-[28px] overflow-hidden shadow-sm mt-3" style={{ background: "#FFFFFF" }}>
+            <CardContent className="p-5">
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <p className="text-[10px] font-black tracking-[0.16em] uppercase" style={{ color: SCAN_TO }}>Reminder</p>
+                  <p className="text-[16px] font-black mt-1 text-kr-pretty" style={{ color: DEEP_GREEN }}>루틴 미완료 리마인드</p>
+                  <p className="text-[11px] text-stone-500 mt-1 leading-relaxed text-kr-pretty">
+                    앱이 열려 있고 알림 권한이 허용된 상태에서 저녁 시간에 남은 루틴을 알려드립니다.
+                  </p>
+                </div>
+                <button
+                  onClick={async () => {
+                    if (!reminderSettings.enabled && typeof Notification !== "undefined" && Notification.permission !== "granted") {
+                      await Notification.requestPermission();
+                    }
+                    const next = { ...reminderSettings, enabled: !reminderSettings.enabled };
+                    setReminderSettings(next);
+                    saveReminderSettings(next);
+                  }}
+                  className="shrink-0 rounded-full px-3 py-1.5 text-[11px] font-black"
+                  style={reminderSettings.enabled
+                    ? { background: "#ECFDF5", color: "#059669" }
+                    : { background: "#F6F3EE", color: "#9A8F80" }}
+                >
+                  {reminderSettings.enabled ? "ON" : "OFF"}
+                </button>
+              </div>
+              <div className="flex items-center gap-2 mt-4">
+                {[
+                  { label: "20:00", hour: 20, minute: 0 },
+                  { label: "21:00", hour: 21, minute: 0 },
+                  { label: "22:00", hour: 22, minute: 0 },
+                ].map((option) => {
+                  const selected = reminderSettings.hour === option.hour && reminderSettings.minute === option.minute;
+                  return (
+                    <button
+                      key={option.label}
+                      onClick={() => {
+                        const next = { ...reminderSettings, hour: option.hour, minute: option.minute };
+                        setReminderSettings(next);
+                        saveReminderSettings(next);
+                      }}
+                      className="px-3 py-1.5 rounded-full text-[11px] font-bold"
+                      style={selected
+                        ? { background: `${SCAN_FROM}20`, color: SCAN_TO }
+                        : { background: "#F6F3EE", color: "#9A8F80" }}
+                    >
+                      {option.label}
+                    </button>
+                  );
+                })}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
         <AnimatePresence mode="wait">
           {tab === "timeline" && (
             <motion.div key="tl" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
@@ -2856,6 +3293,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
   const [todayTodoProgress, setTodayTodoProgress] = useState(() => getDiaryTodoProgress(todayStr()));
   const [missionState, setMissionState] = useState<MissionState>(() => getMissions());
   const [todayHasMemo, setTodayHasMemo] = useState(() => Boolean(getDiaryMemo(todayStr()).trim()));
+  const loginPromptRef = useRef<HTMLDivElement>(null);
 
   // 챌린지 참여 후 내 결과 저장 (비로그인도 작동)
   useEffect(() => {
@@ -2937,6 +3375,13 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
   const handleKakaoLogin = () => {
     sessionStorage.setItem("pendingResult", JSON.stringify({ analysisResult, surveyData, imageBase64 }));
     window.location.href = "/auth/kakao";
+  };
+  const handleDiaryEntry = () => {
+    if (user) {
+      onOpenDiary?.();
+      return;
+    }
+    loginPromptRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
   };
   const [isSuccess, setIsSuccess] = useState(false);
 
@@ -3588,14 +4033,15 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
 
             <div className="grid grid-cols-3 gap-2.5 mt-4">
               <div className="rounded-[22px] p-4" style={{ background: `linear-gradient(135deg, ${SCAN_FROM}16, ${SCAN_TO}20)` }}>
-                <p className="text-[10px] font-bold text-stone-500 whitespace-nowrap">{t("result.overall")}</p>
-                <p className="text-[30px] font-black mt-2 leading-none" style={{ color: SCAN_TO }}>{overallScore}</p>
-                {streakDelta !== 0 && (
-                  <p className="text-[10px] font-bold mt-2"
-                    style={{ color: streakDelta > 0 ? "#16A34A" : "#D97706" }}>
-                    {streakDelta > 0 ? t("streak.deltaUp", { n: streakDelta }) : t("streak.deltaDown", { n: Math.abs(streakDelta) })}
-                  </p>
-                )}
+                <p className="text-[10px] font-bold text-stone-500 whitespace-nowrap">{t("result.actionCard.streakLabel")}</p>
+                <p className="text-[30px] font-black mt-2 leading-none" style={{ color: SCAN_TO }}>{currentStreak.count || 1}</p>
+                <p className="text-[10px] font-bold mt-2" style={{ color: streakDelta > 0 ? "#16A34A" : streakDelta < 0 ? "#D97706" : "#8C8070" }}>
+                  {streakDelta > 0
+                    ? t("streak.deltaUp", { n: streakDelta })
+                    : streakDelta < 0
+                    ? t("streak.deltaDown", { n: Math.abs(streakDelta) })
+                    : t("result.actionCard.streakValue", { count: currentStreak.count || 1 })}
+                </p>
               </div>
               <div className="rounded-[22px] p-4" style={{ background: "linear-gradient(135deg, #7C3AED12, #7C3AED1F)" }}>
                 <p className="text-[10px] font-bold text-stone-500 whitespace-nowrap">{t("result.skinAge")}</p>
@@ -3862,7 +4308,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
                   <p className="text-[13px] font-black" style={{ color: DEEP_GREEN }}>{t("result.actionCard.diaryTitle")}</p>
                   <p className="text-[11px] text-stone-500 mt-1">{t("result.actionCard.diaryDesc")}</p>
                 </div>
-                <Button onClick={() => onOpenDiary?.()} className="rounded-full px-4 text-[12px] font-black shadow-none"
+                <Button onClick={handleDiaryEntry} className="rounded-full px-4 text-[12px] font-black shadow-none"
                   style={{ background: `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})` }}>
                   <BookOpen className="w-4 h-4 mr-1.5" />
                   {t("result.actionCard.diaryButton")}
@@ -3879,7 +4325,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
             currentScore={analysisResult.scores[0]?.score ?? 0}
             missionPhases={missionPhases.map(({ id, label, detail, done }) => ({ id, label, detail, done }))}
             missionProgressPct={missionPhaseProgressPct}
-            onOpenDiary={onOpenDiary}
+            onOpenDiary={handleDiaryEntry}
           />
         )}
 
@@ -4050,6 +4496,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
                 </Card>
               </motion.div>
             ) : (
+              <div ref={loginPromptRef}>
               <Card className="border-2 border-dashed rounded-3xl p-6 text-center" style={{ borderColor: "#F5D5CC", background: "#FDF8F7" }}>
                 <CardHeader className="p-0 mb-4">
                   <CardTitle className="text-lg font-bold" style={{ color: DEEP_GREEN }}>{t("result.login.title")}</CardTitle>
@@ -4071,6 +4518,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
                   </Button>
                 </CardContent>
               </Card>
+              </div>
             )}
             <AdBanner slot="6349940752" />
           </div>
