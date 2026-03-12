@@ -1330,7 +1330,7 @@ function ScanIdleScreen({ onScan }: { onScan: () => void }) {
       </AnimatePresence>
 
     <motion.div
-      className="flex flex-col px-5 pb-8 relative overflow-hidden"
+      className="flex flex-col px-3 pb-8 relative overflow-hidden"
       style={{ minHeight: "calc(100dvh - 60px)", background: "#FDFAF8", paddingTop: 28 }}
       variants={stagger} initial="initial" animate="animate"
     >
@@ -1366,76 +1366,30 @@ function ScanIdleScreen({ onScan }: { onScan: () => void }) {
 
       {/* ── AI 스캐너 비주얼 ── */}
       <motion.div variants={fadeChild} className="flex flex-col items-center mb-4 relative" style={{ zIndex: 1 }}>
-        <div className="relative" style={{ width: 180, height: 180 }}>
-          {/* 외부 회전 dashed 원 */}
-          <motion.div className="absolute inset-0 rounded-full border-2 border-dashed"
-            style={{ borderColor: `${SCAN_TO}55` }}
-            animate={{ rotate: 360 }}
-            transition={{ duration: 20, repeat: Infinity, ease: "linear" }} />
-          {/* 내부 반투명 원 */}
-          <div className="absolute inset-5 rounded-full"
-            style={{ background: `linear-gradient(135deg, ${SCAN_FROM}18, ${SCAN_TO}25)`, border: `1px solid ${SCAN_FROM}40` }} />
-          {/* 4 코너 AR 브라켓 */}
-          <div className="absolute top-0 left-0 w-6 h-6 border-t-2 border-l-2" style={{ borderColor: SCAN_TO }} />
-          <div className="absolute top-0 right-0 w-6 h-6 border-t-2 border-r-2" style={{ borderColor: SCAN_TO }} />
-          <div className="absolute bottom-0 left-0 w-6 h-6 border-b-2 border-l-2" style={{ borderColor: SCAN_TO }} />
-          <div className="absolute bottom-0 right-0 w-6 h-6 border-b-2 border-r-2" style={{ borderColor: SCAN_TO }} />
-          {/* 얼굴 일러스트 (20대 여성) */}
-          <div className="absolute inset-0 flex items-center justify-center">
-            <svg width="88" height="100" viewBox="0 0 88 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-              {/* 머리카락 (뒤) */}
-              <ellipse cx="44" cy="34" rx="26" ry="31" fill="#3D2B1F" />
-              {/* 목 */}
-              <rect x="37" y="68" width="14" height="14" rx="4" fill="#F5C5A8" />
-              {/* 얼굴 */}
-              <ellipse cx="44" cy="44" rx="22" ry="27" fill="#F5C5A8" />
-              {/* 볼터치 */}
-              <ellipse cx="25" cy="51" rx="6" ry="3.5" fill="#F09090" fillOpacity="0.25" />
-              <ellipse cx="63" cy="51" rx="6" ry="3.5" fill="#F09090" fillOpacity="0.25" />
-              {/* 머리카락 (앞) */}
-              <path d="M22 36 Q18 18 44 14 Q70 18 66 36" fill="#3D2B1F" />
-              <path d="M22 36 Q20 28 26 24" fill="#3D2B1F" />
-              <path d="M66 36 Q68 28 62 24" fill="#3D2B1F" />
-              {/* 눈썹 왼쪽 */}
-              <path d="M28 36 Q33 33 38 35" stroke="#4A2F22" strokeWidth="1.8" strokeLinecap="round" fill="none" />
-              {/* 눈썹 오른쪽 */}
-              <path d="M50 35 Q55 33 60 36" stroke="#4A2F22" strokeWidth="1.8" strokeLinecap="round" fill="none" />
-              {/* 눈 왼쪽 */}
-              <ellipse cx="33" cy="42" rx="5" ry="3.5" fill="white" />
-              <circle cx="33" cy="42" r="2.5" fill="#4A2F22" />
-              <circle cx="34" cy="41" r="0.9" fill="white" />
-              <path d="M28 42 Q33 38.5 38 42" stroke="#4A2F22" strokeWidth="1" fill="none" strokeLinecap="round" />
-              {/* 눈 오른쪽 */}
-              <ellipse cx="55" cy="42" rx="5" ry="3.5" fill="white" />
-              <circle cx="55" cy="42" r="2.5" fill="#4A2F22" />
-              <circle cx="56" cy="41" r="0.9" fill="white" />
-              <path d="M50 42 Q55 38.5 60 42" stroke="#4A2F22" strokeWidth="1" fill="none" strokeLinecap="round" />
-              {/* 속눈썹 왼쪽 */}
-              <path d="M28 40 L26.5 38.5 M30 39 L29 37.5 M33 38.5 L33 36.8 M36 39 L37 37.5 M38 40 L39.5 38.5" stroke="#3D2B1F" strokeWidth="0.8" strokeLinecap="round" />
-              {/* 속눈썹 오른쪽 */}
-              <path d="M50 40 L48.5 38.5 M52 39 L51 37.5 M55 38.5 L55 36.8 M58 39 L59 37.5 M60 40 L61.5 38.5" stroke="#3D2B1F" strokeWidth="0.8" strokeLinecap="round" />
-              {/* 코 */}
-              <path d="M41 46 L39 54 Q44 56 49 54 L47 46" stroke="#D4956A" strokeWidth="1" fill="none" strokeLinecap="round" strokeLinejoin="round" />
-              <ellipse cx="40" cy="54" rx="2.2" ry="1.2" fill="#D4956A" fillOpacity="0.4" />
-              <ellipse cx="48" cy="54" rx="2.2" ry="1.2" fill="#D4956A" fillOpacity="0.4" />
-              {/* 입술 */}
-              <path d="M35 60 Q44 56 53 60" stroke="#E07A7A" strokeWidth="1" fill="none" strokeLinecap="round" />
-              <path d="M35 60 Q44 66 53 60" fill="#E8A0A0" stroke="#E07A7A" strokeWidth="0.8" />
-              <path d="M38 60 Q44 57.5 50 60" stroke="#C96060" strokeWidth="0.6" fill="none" strokeLinecap="round" />
-              {/* 귀 */}
-              <ellipse cx="22" cy="46" rx="3" ry="4" fill="#F5C5A8" stroke="#D4956A" strokeWidth="0.6" />
-              <ellipse cx="66" cy="46" rx="3" ry="4" fill="#F5C5A8" stroke="#D4956A" strokeWidth="0.6" />
-            </svg>
-          </div>
+        {/* 세로 직사각형 프레임 (얼굴+어깨) */}
+        <div className="relative rounded-3xl overflow-hidden" style={{ width: 220, height: 280 }}>
+          {/* 실제 얼굴 이미지 */}
+          <img
+            src="/face-model.png"
+            alt="face"
+            className="w-full h-full object-cover"
+            style={{ objectPosition: "center top" }}
+          />
           {/* 스캔 라인 */}
-          <div className="absolute inset-5 rounded-full overflow-hidden">
-            <motion.div className="absolute left-0 right-0 h-[2px]"
-              style={{ background: `linear-gradient(90deg, transparent 0%, ${SCAN_TO}CC 40%, ${SCAN_FROM} 50%, ${SCAN_TO}CC 60%, transparent 100%)` }}
-              animate={{ y: [-85, 85] }}
-              transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut", repeatType: "reverse" }} />
-          </div>
+          <motion.div className="absolute left-0 right-0 h-[2px] z-10"
+            style={{ background: `linear-gradient(90deg, transparent 0%, ${SCAN_TO}CC 40%, ${SCAN_FROM} 50%, ${SCAN_TO}CC 60%, transparent 100%)` }}
+            animate={{ top: ["0%", "100%", "0%"] }}
+            transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }} />
+          {/* 하단 그라디언트 페이드 */}
+          <div className="absolute bottom-0 left-0 right-0 h-16 pointer-events-none"
+            style={{ background: "linear-gradient(to top, rgba(253,250,248,0.85), transparent)" }} />
+          {/* 4 코너 AR 브라켓 */}
+          <div className="absolute top-2 left-2 w-7 h-7 border-t-2 border-l-2 rounded-tl-lg" style={{ borderColor: SCAN_TO }} />
+          <div className="absolute top-2 right-2 w-7 h-7 border-t-2 border-r-2 rounded-tr-lg" style={{ borderColor: SCAN_TO }} />
+          <div className="absolute bottom-2 left-2 w-7 h-7 border-b-2 border-l-2 rounded-bl-lg" style={{ borderColor: SCAN_TO }} />
+          <div className="absolute bottom-2 right-2 w-7 h-7 border-b-2 border-r-2 rounded-br-lg" style={{ borderColor: SCAN_TO }} />
           {/* 회전 글로우 점 */}
-          <motion.div className="absolute inset-0"
+          <motion.div className="absolute inset-0 z-10"
             animate={{ rotate: 360 }}
             transition={{ duration: 6, repeat: Infinity, ease: "linear" }}>
             <div className="absolute top-1/2 right-0 w-2 h-2 rounded-full -translate-y-1/2"
