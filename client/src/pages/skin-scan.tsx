@@ -1961,7 +1961,7 @@ function DiaryCalendarView({ allEntries }: { allEntries: { dateStr: string; scor
 
       {selectedEntry && (
         <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
-          className="mt-4 p-4 rounded-2xl border" style={{ background: "#FFFAF9", borderColor: "#F0EDE8" }}>
+          className="mt-4 p-4 rounded-[24px] border shadow-sm" style={{ background: "linear-gradient(180deg, #FFFAF9 0%, #FFFFFF 100%)", borderColor: "#F0EDE8" }}>
           <div className="flex items-center justify-between mb-3">
             <span className="text-[11px] font-medium text-stone-400 tracking-wide">{selectedEntry.dateStr}</span>
             <span className="text-[20px] font-black" style={{ color: SCAN_TO }}>{selectedEntry.score}점</span>
@@ -2048,7 +2048,7 @@ function DiaryTimeline({ history, analysisResult, overallScore, finalType, curre
       {history.length >= 1 && (
         <div className="mb-5">
           <p className="text-[10px] font-bold text-stone-300 tracking-widest uppercase mb-2">{t("modal.diary.graphTitle")}</p>
-          <div className="h-36 rounded-2xl bg-white px-2 pt-2 border border-[#F0EDE8]"
+          <div className="h-36 rounded-[24px] bg-white px-2 pt-2 border border-[#F0EDE8]"
             style={{ boxShadow: "0 2px 12px rgba(180,130,110,0.06)" }}>
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={[...historyEntries.slice().reverse().map(e => ({
@@ -2106,7 +2106,7 @@ function DiaryTimeline({ history, analysisResult, overallScore, finalType, curre
                         style={{ background: entry.isToday ? SCAN_TO : "#D4C5BC",
                           boxShadow: `0 0 0 2px ${entry.isToday ? SCAN_TO + "30" : "#E8E0D820"}` }} />
                     </div>
-                    <div className="flex-1 rounded-2xl p-4 border"
+                    <div className="flex-1 rounded-[24px] p-4 border"
                       style={{
                         background: entry.isToday ? "#FFFAF9" : "#FFFFFF",
                         borderColor: entry.isToday ? `${SCAN_FROM}50` : "#F0EDE8",
@@ -2354,6 +2354,11 @@ function DiaryTab({ user, analysisResult, onBack }: { user: any; analysisResult:
         dateStr: new Date(h.createdAt).toISOString().slice(0, 10),
         score: parseInt(h.overallScore),
       }));
+  const totalRecords = allEntries.length;
+  const recentScores = allEntries.slice(0, 7).map((entry) => entry.score);
+  const avgScore = recentScores.length > 0 ? Math.round(recentScores.reduce((sum, score) => sum + score, 0) / recentScores.length) : 0;
+  const diaryTodoProgress = getDiaryTodoProgress(todayStr());
+  const diaryMemoReady = Boolean(getDiaryMemo(todayStr()).trim());
 
   const tabs: { id: "timeline" | "calendar" | "ranking"; label: string }[] = [
     { id: "timeline", label: t("modal.diary.timelineTab") },
@@ -2371,16 +2376,35 @@ function DiaryTab({ user, analysisResult, onBack }: { user: any; analysisResult:
             <ChevronLeft className="w-5 h-5" />
           </button>
         )}
-        <div className="mb-4">
-          <p className="text-[11px] font-bold tracking-widest uppercase mb-1" style={{ color: SCAN_TO }}>FONDAY</p>
-          <h1 className="text-[22px] font-black" style={{ color: DEEP_GREEN }}>{t("modal.diary.title")} ✦</h1>
+        <div className="rounded-[28px] p-5 mb-4 text-white"
+          style={{ background: "linear-gradient(135deg, #2D5F4F 0%, #C97062 100%)" }}>
+          <p className="text-[11px] font-bold tracking-widest uppercase mb-1 text-white/70">FONDAY</p>
+          <h1 className="text-[24px] font-black">{t("modal.diary.title")} ✦</h1>
+          <p className="text-[12px] text-white/80 mt-2 text-kr-pretty">
+            {finalType ? `${finalType} · ` : ""}{totalRecords > 0 ? `${t("modal.diary.countLabel", { count: totalRecords })}` : t("result.diary.firstRecord")}
+          </p>
+          <div className="grid grid-cols-3 gap-2.5 mt-4">
+            <div className="rounded-2xl p-3 bg-white/10 border border-white/12">
+              <p className="text-[10px] font-bold text-white/70 whitespace-nowrap">{t("result.overall")}</p>
+              <p className="text-[22px] font-black mt-1">{overallScore || "—"}</p>
+            </div>
+            <div className="rounded-2xl p-3 bg-white/10 border border-white/12">
+              <p className="text-[10px] font-bold text-white/70 whitespace-nowrap">AVG 7D</p>
+              <p className="text-[22px] font-black mt-1">{avgScore || "—"}</p>
+            </div>
+            <div className="rounded-2xl p-3 bg-white/10 border border-white/12">
+              <p className="text-[10px] font-bold text-white/70 whitespace-nowrap">{t("diary.routineTitle")}</p>
+              <p className="text-[22px] font-black mt-1">{diaryTodoProgress.total > 0 ? `${diaryTodoProgress.done}/${diaryTodoProgress.total}` : (diaryMemoReady ? "1/1" : "0/1")}</p>
+            </div>
+          </div>
         </div>
-        <div className="flex gap-0">
+        <div className="flex gap-2 p-2 rounded-[24px] mb-3" style={{ background: "#FFF8F4" }}>
           {tabs.map(({ id, label }) => (
             <button key={id} onClick={() => setTab(id)}
-              className={`flex-1 py-2.5 text-[12px] font-bold transition-all border-b-2 ${
-                tab === id ? "border-[#C97062] text-[#C97062]" : "border-transparent text-stone-400"
-              }`}>
+              className={`flex-1 py-2.5 text-[12px] font-bold transition-all rounded-[18px] ${
+                tab === id ? "text-white shadow-md" : "text-stone-400"
+              }`}
+              style={tab === id ? { background: `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})` } : { background: "transparent" }}>
               {label}
             </button>
           ))}
@@ -3496,7 +3520,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
         {/* 이미지 + 핫스팟 */}
         <Card className="overflow-hidden border-none shadow-2xl rounded-3xl bg-zinc-900">
           <div className="relative w-full">
-            <img src={imageSrc} className="w-full object-cover" style={{ height: 320 }} />
+            <img src={imageSrc} className="w-full object-cover" style={{ height: 280 }} />
             {analysisResult?.hotspots?.map((dot: any, i: number) => (
               <motion.div key={i}
                 className="absolute -translate-x-1/2 -translate-y-1/2"
@@ -3522,105 +3546,72 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
           </div>
         </Card>
 
-        {/* 요약 카드 — 통합 */}
-        <Card className="border-none shadow-md rounded-3xl bg-white overflow-hidden">
-          <CardContent className="p-0">
-            {/* 피부 MBTI 헤더 */}
-            <div className="text-center pt-5 pb-3">
-              <p className="text-[11px] text-stone-400 mb-1">{surveyData?.age} {surveyData?.gender}</p>
-              <p className="text-[10px] font-bold tracking-widest uppercase mb-1.5" style={{ color: SCAN_FROM }}>{t("result.baumannLabel")}</p>
-              <span className="text-4xl font-black tracking-tight" style={{ color: SCAN_TO }}>{finalType}</span>
-              <div className="flex gap-1.5 justify-center mt-2">
-                {finalType.split("").map((letter, i) => {
-                  const color = BAUMANN_COLORS[letter];
-                  if (!color) return null;
-                  return (
-                    <span key={i} className="text-[10px] font-bold px-2.5 py-0.5 rounded-full"
-                      style={{ background: `${color}15`, color }}>
-                      {t(`baumann.${letter}.name`)}
-                    </span>
-                  );
-                })}
-              </div>
-              <p className="text-[9px] text-stone-400 mt-1.5">{t("result.mbtiSub")}</p>
-            </div>
-
-            {/* 3열 수치 — 프리미엄 */}
-            <div className="grid grid-cols-3 gap-2.5 mx-5 mb-4">
-              {/* 종합점수 */}
-              <div className="relative flex flex-col items-center justify-center py-4 rounded-2xl overflow-hidden"
-                style={{ background: `linear-gradient(135deg, ${SCAN_FROM}18, ${SCAN_TO}22)` }}>
-                <div className="absolute inset-0 backdrop-blur-sm" />
-                <div className="relative z-10 flex flex-col items-center">
-                  <div className="relative">
-                    <span className="text-4xl font-black" style={{ color: SCAN_TO }}>{overallScore}</span>
-                    <div className="absolute -inset-2 rounded-full opacity-20 blur-md"
-                      style={{ background: SCAN_FROM }} />
+        <Card className="border-none shadow-md rounded-[32px] overflow-hidden"
+          style={{ background: "linear-gradient(180deg, #FFFCFA 0%, #FFFFFF 100%)" }}>
+          <CardContent className="p-5">
+            <div className="rounded-[28px] p-5 text-white"
+              style={{ background: "linear-gradient(135deg, #2D5F4F 0%, #C97062 100%)" }}>
+              <div className="flex items-start justify-between gap-4">
+                <div className="min-w-0">
+                  <p className="text-[10px] font-black tracking-[0.18em] uppercase text-white/70">{t("result.baumannLabel")}</p>
+                  <p className="text-[34px] font-black tracking-tight mt-1">{finalType}</p>
+                  <div className="flex flex-wrap gap-1.5 mt-2">
+                    {finalType.split("").map((letter, i) => {
+                      const color = BAUMANN_COLORS[letter];
+                      if (!color) return null;
+                      return (
+                        <span key={i} className="text-[10px] font-bold px-2.5 py-1 rounded-full text-white/90 border border-white/15 bg-white/10">
+                          {t(`baumann.${letter}.name`)}
+                        </span>
+                      );
+                    })}
                   </div>
-                  <span className="text-[9px] font-bold text-stone-400 mt-1">{t("result.overall")}</span>
-                  {streakDelta !== 0 && (
-                    <span className="text-[9px] font-bold mt-0.5"
-                      style={{ color: streakDelta > 0 ? "#16A34A" : "#D97706" }}>
-                      {streakDelta > 0
-                        ? t("streak.deltaUp", { n: streakDelta })
-                        : t("streak.deltaDown", { n: Math.abs(streakDelta) })}
-                    </span>
-                  )}
+                  <p className="text-[11px] text-white/72 mt-3 text-kr-pretty">{surveyData?.age} {surveyData?.gender} · {t("result.mbtiSub")}</p>
+                </div>
+                <div className="rounded-2xl px-3 py-2 bg-white/12 border border-white/15 shrink-0 text-right">
+                  <p className="text-[10px] font-bold text-white/70 whitespace-nowrap">{t("result.overall")}</p>
+                  <p className="text-[28px] font-black leading-none">{overallScore}</p>
                 </div>
               </div>
-              {/* 피부나이 */}
-              <div className="relative flex flex-col items-center justify-center py-4 rounded-2xl overflow-hidden"
-                style={{ background: "linear-gradient(135deg, #7C3AED12, #7C3AED1A)" }}>
-                <div className="absolute inset-0 backdrop-blur-sm" />
-                <div className="relative z-10 flex flex-col items-center">
-                  <span className="text-4xl font-black" style={{ color: "#7C3AED" }}>
-                    {analysisResult?.skinAge && analysisResult.skinAge > 0 ? analysisResult.skinAge : "—"}
-                  </span>
-                  <span className="text-[9px] font-bold text-stone-400 mt-1">{t("result.skinAge")}</span>
+              {analysisResult?.aiComment && (
+                <div className="mt-4 rounded-[22px] p-4 bg-white/10 border border-white/15">
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className="w-8 h-8 rounded-xl flex items-center justify-center bg-white/15 shrink-0">
+                      <Sparkles className="w-4 h-4 text-white" />
+                    </div>
+                    <p className="text-[12px] font-black text-white">{t("result.aiComment")}</p>
+                  </div>
+                  <p className="text-[12px] leading-relaxed text-white/88 text-kr-pretty">{analysisResult.aiComment}</p>
                 </div>
-              </div>
-              {/* 랭킹 */}
-              <div className="relative flex flex-col items-center justify-center py-4 rounded-2xl overflow-hidden"
-                style={{ background: "linear-gradient(135deg, #F59E0B12, #D9770622)" }}>
-                <div className="absolute inset-0 backdrop-blur-sm" />
-                <div className="relative z-10 flex flex-col items-center">
-                  {rankingData && rankingData.myPercentile !== undefined ? (
-                    <>
-                      <Trophy className="w-4 h-4 text-amber-500 mb-0.5" />
-                      <span className="text-4xl font-black" style={{ color: "#D97706" }}>
-                        {rankingData.myPercentile}<span className="text-lg">%</span>
-                      </span>
-                      <span className="text-[9px] font-bold text-stone-400 mt-0.5">{t("ranking.topLabel")}</span>
-                    </>
-                  ) : (
-                    <>
-                      <Trophy className="w-4 h-4 text-stone-300 mb-0.5" />
-                      <span className="text-4xl font-black text-stone-300">—</span>
-                      <span className="text-[9px] font-bold text-stone-400 mt-0.5">Rank</span>
-                    </>
-                  )}
-                </div>
-              </div>
+              )}
             </div>
 
+            <div className="grid grid-cols-3 gap-2.5 mt-4">
+              <div className="rounded-[22px] p-4" style={{ background: `linear-gradient(135deg, ${SCAN_FROM}16, ${SCAN_TO}20)` }}>
+                <p className="text-[10px] font-bold text-stone-500 whitespace-nowrap">{t("result.overall")}</p>
+                <p className="text-[30px] font-black mt-2 leading-none" style={{ color: SCAN_TO }}>{overallScore}</p>
+                {streakDelta !== 0 && (
+                  <p className="text-[10px] font-bold mt-2"
+                    style={{ color: streakDelta > 0 ? "#16A34A" : "#D97706" }}>
+                    {streakDelta > 0 ? t("streak.deltaUp", { n: streakDelta }) : t("streak.deltaDown", { n: Math.abs(streakDelta) })}
+                  </p>
+                )}
+              </div>
+              <div className="rounded-[22px] p-4" style={{ background: "linear-gradient(135deg, #7C3AED12, #7C3AED1F)" }}>
+                <p className="text-[10px] font-bold text-stone-500 whitespace-nowrap">{t("result.skinAge")}</p>
+                <p className="text-[30px] font-black mt-2 leading-none" style={{ color: "#7C3AED" }}>
+                  {analysisResult?.skinAge && analysisResult.skinAge > 0 ? analysisResult.skinAge : "—"}
+                </p>
+              </div>
+              <div className="rounded-[22px] p-4" style={{ background: "linear-gradient(135deg, #F59E0B12, #D9770620)" }}>
+                <p className="text-[10px] font-bold text-stone-500 whitespace-nowrap">{t("ranking.topLabel")}</p>
+                <p className="text-[30px] font-black mt-2 leading-none" style={{ color: "#D97706" }}>
+                  {rankingData && rankingData.myPercentile !== undefined ? `${rankingData.myPercentile}%` : "—"}
+                </p>
+              </div>
+            </div>
           </CardContent>
         </Card>
-
-        {/* AI 피부 총평 */}
-        {analysisResult?.aiComment && (
-          <Card className="border-none shadow-md rounded-3xl bg-white">
-            <CardContent className="p-5">
-              <div className="flex items-center gap-2 mb-3">
-                <div className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0"
-                  style={{ background: `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})` }}>
-                  <Sparkles className="w-4 h-4 text-white" />
-                </div>
-                <p className="text-[13px] font-black" style={{ color: DEEP_GREEN }}>{t("result.aiComment")}</p>
-              </div>
-              <p className="text-[13px] text-stone-600 leading-relaxed">{analysisResult.aiComment}</p>
-            </CardContent>
-          </Card>
-        )}
 
         <Card className="border-none rounded-3xl overflow-hidden shadow-[0_18px_40px_rgba(201,112,98,0.18)]"
           style={{ background: "linear-gradient(180deg, #FFF8F4 0%, #FFFFFF 100%)" }}>
@@ -3642,11 +3633,11 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
               </div>
               <div className="rounded-2xl px-3 py-2 text-right"
                 style={{ background: "#FFF1EC", border: "1px solid #F3DDD6" }}>
-                <p className="text-[10px] font-bold" style={{ color: SCAN_TO }}>{t("result.actionCard.rewardLabel")}</p>
+                <p className="text-[10px] font-bold whitespace-nowrap" style={{ color: SCAN_TO }}>{t("result.actionCard.rewardLabel")}</p>
                 <p className="text-[22px] font-black leading-none" style={{ color: SCAN_TO }}>
                   +{missionReward}
                 </p>
-                <p className="text-[9px] text-stone-400 mt-1">{t("result.actionCard.rewardSub")}</p>
+                <p className="text-[9px] text-stone-400 mt-1 whitespace-nowrap">{t("result.actionCard.rewardSub")}</p>
               </div>
             </div>
 
@@ -3663,7 +3654,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
                   </p>
                 </div>
                 <div className="rounded-2xl px-3 py-2 bg-white/14 border border-white/20">
-                  <p className="text-[10px] font-bold text-white/70">{t("result.actionCard.scoreLabel")}</p>
+                  <p className="text-[10px] font-bold text-white/70 whitespace-nowrap">{t("result.actionCard.scoreLabel")}</p>
                   <p className="text-[24px] font-black leading-none">{overallScore}</p>
                 </div>
               </div>
@@ -3893,7 +3884,9 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
         )}
 
         {/* ── 3탭 네비게이션 ── */}
-        <div className="flex gap-2 px-1">
+        <div className="rounded-[28px] p-2.5 border border-[#F0E6E0] sticky top-0 z-20 backdrop-blur-md"
+          style={{ background: "linear-gradient(180deg, rgba(255,249,246,0.96) 0%, rgba(255,255,255,0.96) 100%)" }}>
+          <div className="flex gap-2">
           {(["analysis", "solution", "nutrition"] as const).map((tab) => {
             const labels = { analysis: t("result.tab.analysis"), solution: t("result.tab.solution"), nutrition: t("result.tab.nutrition") };
             const icons = {
@@ -3904,15 +3897,16 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
             const isActive = activeTab === tab;
             return (
               <button key={tab} onClick={() => setActiveTab(tab)}
-                className="flex-1 flex flex-col items-center gap-1 py-3 rounded-2xl text-[13px] font-black transition-all"
+                className="flex-1 flex flex-col items-center gap-1 py-3 rounded-[20px] text-[13px] font-black transition-all"
                 style={isActive
                   ? { background: `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})`, color: "white", boxShadow: `0 4px 14px ${SCAN_TO}55` }
-                  : { background: "#F5F2EF", color: "#A8A29E" }}>
+                  : { background: "#FFF6F1", color: "#A8A29E" }}>
                 {icons[tab]}
                 <span>{labels[tab]}</span>
               </button>
             );
           })}
+          </div>
         </div>
 
         {/* ── 분석 탭 ── */}
