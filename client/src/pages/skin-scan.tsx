@@ -1211,7 +1211,10 @@ function WeatherTipCard() {
   if (denied || !weather) return null;
 
   const tipKey = getWeatherTipKey(weather);
-  const tip = t(`weather.tips.${tipKey}`, { returnObjects: true }) as { emoji: string; title: string; body: string };
+  const tipRaw = t(`weather.tips.${tipKey}`, { returnObjects: true });
+  const tipArr = Array.isArray(tipRaw) ? tipRaw : [tipRaw];
+  const dayIdx = Math.floor(Date.now() / 86400000) % tipArr.length;
+  const tip = tipArr[dayIdx] as { emoji: string; title: string; body: string };
   const aqiLabel = weather.aqi ? t(`weather.aqi${weather.aqi}`) : null;
 
   return (
@@ -1711,7 +1714,7 @@ function ScanningScreen({ imageSrc }: { imageSrc: string | null }) {
       <div className="mt-8 w-full max-w-xs">
         <div className="flex justify-between text-[10px] text-stone-400 mb-1.5">
           <span>{t("scanning.progress")}</span>
-          <span>{progress}%</span>
+          <span>{Math.round(progress)}%</span>
         </div>
         <div className="h-1.5 bg-stone-200 rounded-full overflow-hidden">
           <div
@@ -2177,7 +2180,7 @@ function DiaryFullView({ history, analysisResult, overallScore, finalType, curre
                               <div key={type} className="flex-1 p-3 rounded-2xl text-center bg-white border border-[#F0EDE8]">
                                 <span className="text-[13px]">{["🥇","🥈","🥉"][ri]}</span>
                                 <p className="text-[18px] font-black mt-0.5" style={{ color: SCAN_TO }}>{type}</p>
-                                <p className="text-[10px] text-stone-400">{count as number}건</p>
+                                <p className="text-[10px] text-stone-400">{count as number}{t("ranking.people")}</p>
                               </div>
                             ))}
                         </div>
@@ -2265,9 +2268,9 @@ function DiaryTab({ user, analysisResult, onBack }: { user: any; analysisResult:
       {/* 헤더 */}
       <div className="shrink-0 px-5 pt-12 pb-0" style={{ borderBottom: "1px solid #F0EDE8" }}>
         {onBack && (
-          <button onClick={onBack} className="flex items-center gap-1.5 text-stone-400 mb-4 active:opacity-70">
-            <ChevronLeft className="w-4 h-4" />
-            <span className="text-[12px] font-semibold">{t("result.back")}</span>
+          <button onClick={onBack}
+            className="flex items-center justify-center w-9 h-9 rounded-full bg-stone-100 text-stone-500 mb-3 active:opacity-70">
+            <ChevronLeft className="w-5 h-5" />
           </button>
         )}
         <div className="mb-4">
@@ -2354,7 +2357,7 @@ function DiaryTab({ user, analysisResult, onBack }: { user: any; analysisResult:
                     </div>
                     {Object.keys(rankingData.baumannDistribution).length > 0 && (
                       <div>
-                        <p className="text-[11px] font-bold text-stone-400 mb-3">{t("ranking.baumannTop")}</p>
+                        <p className="text-[11px] font-bold text-stone-400 mb-3">{t("ranking.topBaumann")}</p>
                         <div className="flex gap-2 flex-wrap">
                           {Object.entries(rankingData.baumannDistribution)
                             .sort(([,a],[,b]) => b - a).slice(0, 3)
@@ -3296,7 +3299,10 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
                         <p className="text-[13px] font-black" style={{ color: DEEP_GREEN }}>{t("result.diary.title")}</p>
                         <p className="text-[11px] text-stone-400">
                           {history.length > 0
-                            ? t("result.diary.history", { count: history.length + 1, score: overallScore })
+                            ? t("result.diary.history", {
+                                count: history.filter((h: any) => new Date(h.createdAt).toISOString().slice(0, 10) !== todayStr()).length + 1,
+                                score: overallScore
+                              })
                             : t("result.diary.firstRecord")}
                         </p>
                       </div>

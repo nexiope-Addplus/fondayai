@@ -357,6 +357,7 @@
     "topScore": "Top Score",
     "distribution": "Score Distribution",
     "topBaumann": "Popular Baumann Types TOP3",
+    "people": " users",
     "loginForRank": "Log in to see your rank"
   },
   "compare": {
@@ -388,16 +389,46 @@
     "aqi4": "Air Quality Poor",
     "aqi5": "Air Quality Very Poor",
     "tips": {
-      "polluted": { "emoji": "😷", "title": "High Pollution — Double Cleanse", "body": "Fine particles clog pores. Use an oil cleanser first, then a foam cleanser, and follow with an antioxidant serum." },
-      "snowy":    { "emoji": "❄️", "title": "Winter Skin Intensive Care",     "body": "Snow reflects UV rays strongly. Strengthen your skin barrier with ceramide cream and don't skip sunscreen." },
-      "rainy":    { "emoji": "🌧️", "title": "Rainy Day Light Moisture",       "body": "High humidity can increase sebum. Swap heavy creams for a light gel moisturizer to keep skin balanced." },
-      "foggy":    { "emoji": "🌫️", "title": "Foggy Day — Cleanse Well",       "body": "Atmospheric particles can irritate pores. Do a thorough but gentle cleanse when you get home." },
-      "cold":     { "emoji": "🧣", "title": "Cold Wind — Protect Your Barrier","body": "Cold air strips moisture fast. Apply a ceramide-rich cream before heading out to shield your skin barrier." },
-      "sunny_hot":{ "emoji": "🌞", "title": "Intense UV — Reapply Sunscreen!","body": "Reapply SPF 50+ every 2 hours. Add a vitamin C serum in the morning for extra antioxidant defense." },
-      "sunny":    { "emoji": "☀️", "title": "Don't Skip Sunscreen",           "body": "Clear days mean UVA/UVB exposure. Layer vitamin C serum under sunscreen for dual protection." },
-      "dry":      { "emoji": "🌵", "title": "Low Humidity — Layer Moisture",  "body": "Air is dry! Layer essence → serum → cream to lock in hydration throughout the day." },
-      "humid":    { "emoji": "💦", "title": "High Humidity — Go Light",       "body": "Skip heavy creams and opt for a gel moisturizer or hydrating mist to keep skin comfortable." },
-      "cloudy":   { "emoji": "☁️", "title": "Cloudy Still Means UV",          "body": "Clouds let through up to 80% of UV rays. Sunscreen is still essential on overcast days." }
+      "polluted": [
+        { "emoji": "😷", "title": "High Pollution — Double Cleanse", "body": "Fine particles clog pores. Use an oil cleanser first, then a foam cleanser, and follow with an antioxidant serum." },
+        { "emoji": "🫧", "title": "Shield Up Before Heading Out", "body": "On polluted days, apply a mineral sunscreen as a physical barrier. Cleanse immediately when you get home." }
+      ],
+      "snowy": [
+        { "emoji": "❄️", "title": "Winter Skin Intensive Care", "body": "Snow reflects UV rays strongly. Strengthen your skin barrier with ceramide cream and don't skip sunscreen." },
+        { "emoji": "🧴", "title": "Watch Out for Snowmelt Water", "body": "Melted snow can irritate skin. After coming inside, cleanse with lukewarm water and apply a thick moisturizer." }
+      ],
+      "rainy": [
+        { "emoji": "🌧️", "title": "Rainy Day Light Moisture", "body": "High humidity can increase sebum. Swap heavy creams for a light gel moisturizer to keep skin balanced." },
+        { "emoji": "🌂", "title": "Exfoliate on Wet Days", "body": "Humidity causes skin cells to swell. A gentle weekly exfoliation helps clear away buildup and keeps pores clear." }
+      ],
+      "foggy": [
+        { "emoji": "🌫️", "title": "Foggy Day — Cleanse Well", "body": "Atmospheric particles can irritate pores. Do a thorough but gentle cleanse when you get home." },
+        { "emoji": "🛡️", "title": "Barrier Protection in Fog", "body": "Fine particles settle on skin in foggy conditions. Use a non-comedogenic sunscreen as a shield before going out." }
+      ],
+      "cold": [
+        { "emoji": "🧣", "title": "Cold Wind — Protect Your Barrier", "body": "Cold air strips moisture fast. Apply a ceramide-rich cream before heading out to shield your skin barrier." },
+        { "emoji": "🔥", "title": "Indoor Heating Dries Skin Too", "body": "Heating drops indoor humidity fast. Keep a facial mist on your desk and spritz throughout the day." }
+      ],
+      "sunny_hot": [
+        { "emoji": "🌞", "title": "Intense UV — Reapply Sunscreen!", "body": "Reapply SPF 50+ every 2 hours. Add a vitamin C serum in the morning for extra antioxidant defense." },
+        { "emoji": "🧴", "title": "Choose Cooling Suncare Today", "body": "Opt for water-resistant SPF in the heat. Touch up with powder sunscreen and blotting paper for easy reapplication." }
+      ],
+      "sunny": [
+        { "emoji": "☀️", "title": "Don't Skip Sunscreen", "body": "Clear days mean UVA/UVB exposure. Layer vitamin C serum under sunscreen for dual protection." },
+        { "emoji": "🌤️", "title": "Check Your UV Index", "body": "Any UV reading above 3 means sunscreen is non-negotiable — even through windows indoors." }
+      ],
+      "dry": [
+        { "emoji": "🌵", "title": "Low Humidity — Layer Moisture", "body": "Air is dry! Layer essence → serum → cream to lock in hydration throughout the day." },
+        { "emoji": "💧", "title": "Boost Indoor Humidity", "body": "Dry outdoor air affects indoors too. Run a humidifier and layer hyaluronic acid serum under your moisturizer." }
+      ],
+      "humid": [
+        { "emoji": "💦", "title": "High Humidity — Go Light", "body": "Skip heavy creams and opt for a gel moisturizer or hydrating mist to keep skin comfortable." },
+        { "emoji": "🌿", "title": "Balance Oils with a BHA Toner", "body": "High humidity triggers excess sebum. A BHA toner helps manage shine — finish with a non-comedogenic SPF." }
+      ],
+      "cloudy": [
+        { "emoji": "☁️", "title": "Cloudy Still Means UV", "body": "Clouds let through up to 80% of UV rays. Sunscreen is still essential on overcast days." },
+        { "emoji": "🔆", "title": "UVA Penetrates Through Clouds", "body": "Overcast skies don't block UVA rays. An SPF-infused primer or BB cream gives quick lightweight protection." }
+      ]
     }
   },
   "battle": {
