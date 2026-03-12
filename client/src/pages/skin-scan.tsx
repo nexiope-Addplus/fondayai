@@ -2731,6 +2731,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
   const [activeTab, setActiveTab] = useState<"analysis" | "solution" | "nutrition">("analysis");
   const [currentStreak, setCurrentStreak] = useState<StreakData>(() => getStreak());
   const [todayTodoProgress, setTodayTodoProgress] = useState(() => getDiaryTodoProgress(todayStr()));
+  const [missionState, setMissionState] = useState<MissionState>(() => getMissions());
 
   // 챌린지 참여 후 내 결과 저장 (비로그인도 작동)
   useEffect(() => {
@@ -2767,6 +2768,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
       setTimeout(() => setStreakMilestone(null), 3000);
     }
     const newMissions = checkAndCompleteMissions(streak.count, overallScore);
+    setMissionState(getMissions());
     if (newMissions.length > 0) {
       setMissionPops(newMissions);
       setTimeout(() => setMissionPops([]), 3500);
@@ -2993,6 +2995,16 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
   const routineDone = todayTodoProgress.done;
   const routineTotal = todayTodoProgress.total || todayRoutine.length;
   const routineComplete = routineTotal > 0 && routineDone === routineTotal;
+  const weakestScores: { index: number; score: number }[] = scores
+    .slice(1)
+    .map((item: any, index: number) => ({ index: index + 1, score: item.score }))
+    .sort((a: { index: number; score: number }, b: { index: number; score: number }) => a.score - b.score)
+    .slice(0, 2);
+  const weakestSummary = weakestScores.map(({ index }: { index: number; score: number }) => t(`scores.${index}`)).join(" · ");
+  const nextStreakGoal = [3, 7, 30].find((goal) => goal > (currentStreak.count || 0)) ?? null;
+  const daysToGoal = nextStreakGoal ? Math.max(nextStreakGoal - (currentStreak.count || 0), 0) : 0;
+  const nextStreakReward = nextStreakGoal ? MISSION_POINTS[`streak_${nextStreakGoal}`] || 0 : 0;
+  const missionReward = routineComplete ? 0 : MISSION_POINTS.daily_scan;
 
   const parseFoodOptions = (value?: string): string[] => {
     if (!value) return [];
@@ -3345,60 +3357,102 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
           </CardContent>
         </Card>
 
-        <Card className="border-none rounded-3xl overflow-hidden shadow-[0_18px_40px_rgba(201,112,98,0.16)]"
-          style={{ background: "linear-gradient(180deg, #FFF7F3 0%, #FFFFFF 100%)" }}>
+        {/* AI 피부 총평 */}
+        {analysisResult?.aiComment && (
+          <Card className="border-none shadow-md rounded-3xl bg-white">
+            <CardContent className="p-5">
+              <div className="flex items-center gap-2 mb-3">
+                <div className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0"
+                  style={{ background: `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})` }}>
+                  <Sparkles className="w-4 h-4 text-white" />
+                </div>
+                <p className="text-[13px] font-black" style={{ color: DEEP_GREEN }}>{t("result.aiComment")}</p>
+              </div>
+              <p className="text-[13px] text-stone-600 leading-relaxed">{analysisResult.aiComment}</p>
+            </CardContent>
+          </Card>
+        )}
+
+        <Card className="border-none rounded-3xl overflow-hidden shadow-[0_18px_40px_rgba(201,112,98,0.18)]"
+          style={{ background: "linear-gradient(180deg, #FFF8F4 0%, #FFFFFF 100%)" }}>
           <CardContent className="p-5">
             <div className="flex items-start justify-between gap-3 mb-4">
               <div>
-                <p className="text-[12px] font-black tracking-[0.18em] uppercase" style={{ color: SCAN_TO }}>
+                <p className="text-[11px] font-black tracking-[0.18em] uppercase" style={{ color: SCAN_TO }}>
                   {t("result.actionCard.eyebrow")}
                 </p>
                 <p className="text-[20px] font-black mt-1" style={{ color: DEEP_GREEN }}>
                   {t("result.actionCard.title")}
                 </p>
                 <p className="text-[12px] text-stone-500 mt-1">
-                  {routineComplete ? t("result.actionCard.complete") : t("result.actionCard.subtitle")}
+                  {t("result.actionCard.reason", { focus: weakestSummary || t("result.actionCard.fallbackFocus") })}
                 </p>
               </div>
               <div className="rounded-2xl px-3 py-2 text-right"
-                style={{ background: "rgba(255,255,255,0.85)", border: "1px solid #F3DDD6" }}>
-                <p className="text-[10px] font-bold text-stone-400">{t("result.actionCard.scoreLabel")}</p>
-                <p className="text-[24px] font-black leading-none" style={{ color: SCAN_TO }}>{overallScore}</p>
+                style={{ background: "#FFF1EC", border: "1px solid #F3DDD6" }}>
+                <p className="text-[10px] font-bold" style={{ color: SCAN_TO }}>{t("result.actionCard.rewardLabel")}</p>
+                <p className="text-[22px] font-black leading-none" style={{ color: SCAN_TO }}>
+                  +{missionReward}
+                </p>
+                <p className="text-[9px] text-stone-400 mt-1">{t("result.actionCard.rewardSub")}</p>
               </div>
             </div>
 
-            <div className="grid grid-cols-3 gap-2.5 mb-4">
-              <div className="rounded-2xl p-3" style={{ background: "#FFFFFF", border: "1px solid #F4E4DE" }}>
-                <div className="flex items-center gap-2 mb-2">
-                  <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: "#FFF1EC" }}>
-                    <CheckCircle2 className="w-4 h-4" style={{ color: SCAN_TO }} />
-                  </div>
-                  <p className="text-[10px] font-bold text-stone-400">{t("result.actionCard.routineLabel")}</p>
+            <div className="rounded-[24px] p-4 mb-4 text-white"
+              style={{ background: "linear-gradient(135deg, #2D5F4F 0%, #C97062 100%)" }}>
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <p className="text-[12px] font-black uppercase tracking-[0.14em] text-white/80">{t("result.actionCard.missionEyebrow")}</p>
+                  <p className="text-[18px] font-black mt-1">
+                    {routineComplete ? t("result.actionCard.complete") : t("result.actionCard.missionTitle")}
+                  </p>
+                  <p className="text-[12px] text-white/80 mt-1">{todayFocus}</p>
                 </div>
-                <p className="text-[18px] font-black leading-none" style={{ color: DEEP_GREEN }}>{routineDone}/{routineTotal || 0}</p>
-                <p className="text-[10px] text-stone-500 mt-1">{t("result.actionCard.routineSub")}</p>
-              </div>
-              <div className="rounded-2xl p-3" style={{ background: "#FFFFFF", border: "1px solid #E7EFEA" }}>
-                <div className="flex items-center gap-2 mb-2">
-                  <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: "#ECFDF5" }}>
-                    <Flame className="w-4 h-4 text-emerald-600" />
-                  </div>
-                  <p className="text-[10px] font-bold text-stone-400">{t("result.actionCard.streakLabel")}</p>
+                <div className="rounded-2xl px-3 py-2 bg-white/14 border border-white/20">
+                  <p className="text-[10px] font-bold text-white/70">{t("result.actionCard.scoreLabel")}</p>
+                  <p className="text-[24px] font-black leading-none">{overallScore}</p>
                 </div>
-                <p className="text-[18px] font-black leading-none" style={{ color: DEEP_GREEN }}>
-                  {t("result.actionCard.streakValue", { count: currentStreak.count || 1 })}
-                </p>
-                <p className="text-[10px] text-stone-500 mt-1">{t("result.actionCard.streakSub", { count: currentStreak.longest || currentStreak.count || 1 })}</p>
               </div>
-              <div className="rounded-2xl p-3" style={{ background: "#FFFFFF", border: "1px solid #ECEAFB" }}>
-                <div className="flex items-center gap-2 mb-2">
-                  <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: "#F4F3FF" }}>
-                    <Target className="w-4 h-4 text-violet-600" />
+              <div className="grid grid-cols-2 gap-2.5 mt-4">
+                <div className="rounded-2xl bg-white/10 p-3 border border-white/12">
+                  <div className="flex items-center gap-2 mb-1.5">
+                    <CheckCircle2 className="w-4 h-4 text-white" />
+                    <p className="text-[10px] font-bold text-white/70">{t("result.actionCard.routineLabel")}</p>
                   </div>
+                  <p className="text-[20px] font-black">{routineDone}/{routineTotal || 0}</p>
+                  <p className="text-[10px] text-white/75">{t("result.actionCard.routineSub")}</p>
+                </div>
+                <div className="rounded-2xl bg-white/10 p-3 border border-white/12">
+                  <div className="flex items-center gap-2 mb-1.5">
+                    <Flame className="w-4 h-4 text-amber-200" />
+                    <p className="text-[10px] font-bold text-white/70">{t("result.actionCard.streakLabel")}</p>
+                  </div>
+                  <p className="text-[20px] font-black">{t("result.actionCard.streakValue", { count: currentStreak.count || 1 })}</p>
+                  <p className="text-[10px] text-white/75">
+                    {nextStreakGoal
+                      ? t("result.actionCard.streakGoal", { days: daysToGoal, goal: nextStreakGoal, reward: nextStreakReward })
+                      : t("result.actionCard.streakDone")}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-2.5 mb-4">
+              <div className="rounded-2xl p-3.5" style={{ background: "#FFFFFF", border: "1px solid #F4E4DE" }}>
+                <div className="flex items-center gap-2 mb-2">
+                  <Target className="w-4 h-4 text-violet-600" />
                   <p className="text-[10px] font-bold text-stone-400">{t("result.actionCard.focusLabel")}</p>
                 </div>
-                <p className="text-[12px] font-black leading-snug" style={{ color: DEEP_GREEN }}>{todayFocus}</p>
+                <p className="text-[13px] font-black leading-snug" style={{ color: DEEP_GREEN }}>{todayFocus}</p>
                 <p className="text-[10px] text-stone-500 mt-1">{t("result.actionCard.focusSub")}</p>
+              </div>
+              <div className="rounded-2xl p-3.5" style={{ background: "#FFFFFF", border: "1px solid #E8EFEA" }}>
+                <div className="flex items-center gap-2 mb-2">
+                  <Trophy className="w-4 h-4 text-amber-500" />
+                  <p className="text-[10px] font-bold text-stone-400">{t("result.actionCard.pointsLabel")}</p>
+                </div>
+                <p className="text-[20px] font-black leading-none" style={{ color: DEEP_GREEN }}>{missionState.totalPoints}</p>
+                <p className="text-[10px] text-stone-500 mt-1">{t("result.actionCard.pointsSub")}</p>
               </div>
             </div>
 
@@ -3428,22 +3482,6 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
             prediction={analysisResult.prediction}
             currentScore={analysisResult.scores[0]?.score ?? 0}
           />
-        )}
-
-        {/* AI 피부 총평 */}
-        {analysisResult?.aiComment && (
-          <Card className="border-none shadow-md rounded-3xl bg-white">
-            <CardContent className="p-5">
-              <div className="flex items-center gap-2 mb-3">
-                <div className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0"
-                  style={{ background: `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})` }}>
-                  <Sparkles className="w-4 h-4 text-white" />
-                </div>
-                <p className="text-[13px] font-black" style={{ color: DEEP_GREEN }}>{t("result.aiComment")}</p>
-              </div>
-              <p className="text-[13px] text-stone-600 leading-relaxed">{analysisResult.aiComment}</p>
-            </CardContent>
-          </Card>
         )}
 
         {/* ── 3탭 네비게이션 ── */}
