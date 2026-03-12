@@ -1766,6 +1766,13 @@ function getDiaryTodos(dateStr: string): TodoItem[] {
 function saveDiaryTodos(dateStr: string, todos: TodoItem[]) {
   try { localStorage.setItem(`fonday_todos_${dateStr}`, JSON.stringify(todos)); } catch {}
 }
+function getDiaryTodoProgress(dateStr: string) {
+  const todos = getDiaryTodos(dateStr);
+  return {
+    total: todos.length,
+    done: todos.filter((todo) => todo.done).length,
+  };
+}
 function initDiaryTodosFromRoutine(dateStr: string, routine: string[]) {
   if (getDiaryTodos(dateStr).length === 0 && routine.length > 0) {
     saveDiaryTodos(dateStr, routine.map(text => ({ text, done: false })));
@@ -1906,21 +1913,22 @@ function DiaryCalendarView({ allEntries }: { allEntries: { dateStr: string; scor
 
       <div className="grid grid-cols-7 mb-1">
         {["일","월","화","수","목","금","토"].map(d => (
-          <div key={d} className="text-center text-[10px] font-bold text-stone-300 py-1">{d}</div>
+          <div key={d} className="text-center text-[10px] font-bold text-stone-300 py-1.5">{d}</div>
         ))}
       </div>
-      <div className="grid grid-cols-7">
+      <div className="grid grid-cols-7 gap-y-1.5">
         {cells.map((day, i) => {
           if (!day) return <div key={`e-${i}`} />;
           const dateStr = `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
           const score = scoreMap.get(dateStr);
+          const todoProgress = getDiaryTodoProgress(dateStr);
           const isToday = dateStr === todayStr();
           const isSelected = selectedEntry?.dateStr === dateStr;
           return (
             <button key={dateStr}
               onClick={() => setSelectedEntry(score !== undefined ? { dateStr, score } : null)}
-              className="flex flex-col items-center py-1.5 gap-0.5">
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center text-[12px] font-bold transition-all
+              className="flex min-h-[60px] flex-col items-center justify-start py-1.5 gap-1">
+              <div className={`w-10 h-10 rounded-full flex items-center justify-center text-[13px] font-bold transition-all
                 ${isSelected ? "ring-2 ring-offset-1 ring-[#C97062]" : ""}`}
                 style={score !== undefined
                   ? { background: getScoreColor(score), color: getTextColor(score) }
@@ -1929,7 +1937,21 @@ function DiaryCalendarView({ allEntries }: { allEntries: { dateStr: string; scor
                   : { color: "#B0A898" }}>
                 {day}
               </div>
-              {score !== undefined && <div className="w-1 h-1 rounded-full" style={{ background: getScoreColor(score) }} />}
+              {todoProgress.total > 0 ? (
+                <div
+                  className="min-h-[14px] rounded-full px-1.5 text-[9px] font-bold leading-[14px]"
+                  style={{
+                    background: todoProgress.done === todoProgress.total ? "#ECFDF5" : "#F6F3EE",
+                    color: todoProgress.done === todoProgress.total ? "#059669" : "#9A8F80",
+                  }}
+                >
+                  {todoProgress.done}/{todoProgress.total}
+                </div>
+              ) : (
+                <div className="min-h-[14px]">
+                  {score !== undefined && <div className="mt-1 h-1.5 w-1.5 rounded-full" style={{ background: getScoreColor(score) }} />}
+                </div>
+              )}
             </button>
           );
         })}
