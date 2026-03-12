@@ -1289,6 +1289,22 @@ function ScanIdleScreen({ onScan }: { onScan: () => void }) {
   const streak = getStreak();
   const daysSince = getDaysSinceLastScan();
   const [showCalendar, setShowCalendar] = useState(false);
+  const [socialCount, setSocialCount] = useState(0);
+
+  useEffect(() => {
+    const today = new Date();
+    const seed = today.getFullYear() * 10000 + (today.getMonth() + 1) * 100 + today.getDate();
+    const target = Math.floor(2000 + Math.abs(Math.sin(seed) * 1500));
+    let current = 0;
+    const stepMs = 16;
+    const increment = target / (1500 / stepMs);
+    const timer = setInterval(() => {
+      current += increment;
+      if (current >= target) { setSocialCount(target); clearInterval(timer); }
+      else setSocialCount(Math.floor(current));
+    }, stepMs);
+    return () => clearInterval(timer);
+  }, []);
 
   const PREVIEW_SCORES = [
     { idx: 0, score: 82, color: SCORE_COLORS[0] },
@@ -1314,13 +1330,29 @@ function ScanIdleScreen({ onScan }: { onScan: () => void }) {
       </AnimatePresence>
 
     <motion.div
-      className="flex flex-col px-5 pb-8"
-      style={{ minHeight: "calc(100dvh - 60px)", background: "linear-gradient(180deg, #FDF6F3 0%, #FAF9F6 100%)", paddingTop: 28 }}
+      className="flex flex-col px-5 pb-8 relative overflow-hidden"
+      style={{ minHeight: "calc(100dvh - 60px)", background: "#FDFAF8", paddingTop: 28 }}
       variants={stagger} initial="initial" animate="animate"
     >
+      {/* ── Aurora 배경 blobs ── */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden" style={{ zIndex: 0 }}>
+        <motion.div className="absolute rounded-full"
+          style={{ width: 280, height: 280, background: `${SCAN_FROM}18`, filter: "blur(50px)", top: -60, left: -60 }}
+          animate={{ x: [0, 30, -10, 0], y: [0, 20, 40, 0] }}
+          transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }} />
+        <motion.div className="absolute rounded-full"
+          style={{ width: 200, height: 200, background: "#C084FC18", filter: "blur(40px)", top: 80, right: -40 }}
+          animate={{ x: [0, -20, 10, 0], y: [0, 30, -10, 0] }}
+          transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }} />
+        <motion.div className="absolute rounded-full"
+          style={{ width: 240, height: 240, background: `${SCAN_TO}12`, filter: "blur(50px)", bottom: 200, left: "20%" }}
+          animate={{ x: [0, -15, 20, 0], y: [0, -20, 15, 0] }}
+          transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }} />
+      </div>
+
       {/* 컴백 배너 (3일+ 경과 시) */}
       {daysSince !== null && daysSince >= 3 && (
-        <motion.div variants={fadeChild} className="mb-3">
+        <motion.div variants={fadeChild} className="mb-3 relative" style={{ zIndex: 1 }}>
           <div className="flex items-center gap-2 px-4 py-2.5 rounded-2xl text-[12px] font-semibold"
             style={daysSince >= 7
               ? { background: "#FFF7ED", color: "#C2410C", border: "1px solid #FED7AA" }
@@ -1332,20 +1364,74 @@ function ScanIdleScreen({ onScan }: { onScan: () => void }) {
         </motion.div>
       )}
 
-      {/* Badge + Title */}
-      <motion.div variants={fadeChild} className="text-center mb-4">
-        <Badge variant="outline" className="px-3 py-1 font-bold tracking-widest uppercase text-[10px]"
-          style={{ borderColor: SCAN_FROM, color: SCAN_TO }}>
-          {t("idle.badge")}
-        </Badge>
-        <h1 className="text-[22px] font-bold text-stone-800 leading-snug mt-3 mb-1.5">{t("idle.title")}</h1>
-        <p className="text-[13.5px] text-stone-500">{t("idle.subtitle4")}</p>
+      {/* ── AI 스캐너 비주얼 ── */}
+      <motion.div variants={fadeChild} className="flex flex-col items-center mb-4 relative" style={{ zIndex: 1 }}>
+        <div className="relative" style={{ width: 180, height: 180 }}>
+          {/* 외부 회전 dashed 원 */}
+          <motion.div className="absolute inset-0 rounded-full border-2 border-dashed"
+            style={{ borderColor: `${SCAN_TO}55` }}
+            animate={{ rotate: 360 }}
+            transition={{ duration: 20, repeat: Infinity, ease: "linear" }} />
+          {/* 내부 반투명 원 */}
+          <div className="absolute inset-5 rounded-full"
+            style={{ background: `linear-gradient(135deg, ${SCAN_FROM}18, ${SCAN_TO}25)`, border: `1px solid ${SCAN_FROM}40` }} />
+          {/* 4 코너 AR 브라켓 */}
+          <div className="absolute top-0 left-0 w-6 h-6 border-t-2 border-l-2" style={{ borderColor: SCAN_TO }} />
+          <div className="absolute top-0 right-0 w-6 h-6 border-t-2 border-r-2" style={{ borderColor: SCAN_TO }} />
+          <div className="absolute bottom-0 left-0 w-6 h-6 border-b-2 border-l-2" style={{ borderColor: SCAN_TO }} />
+          <div className="absolute bottom-0 right-0 w-6 h-6 border-b-2 border-r-2" style={{ borderColor: SCAN_TO }} />
+          {/* 얼굴 실루엣 */}
+          <div className="absolute inset-0 flex items-center justify-center">
+            <svg width="60" height="68" viewBox="0 0 60 68" fill="none">
+              <ellipse cx="30" cy="26" rx="17" ry="21" stroke={`${SCAN_TO}80`} strokeWidth="1.5" fill={`${SCAN_FROM}10`} />
+              <ellipse cx="22" cy="22" rx="2.5" ry="1.8" fill={`${SCAN_TO}60`} />
+              <ellipse cx="38" cy="22" rx="2.5" ry="1.8" fill={`${SCAN_TO}60`} />
+              <path d="M27 28 L25 35 L35 35" stroke={`${SCAN_TO}50`} strokeWidth="1" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+              <path d="M23 40 Q30 44 37 40" stroke={`${SCAN_TO}60`} strokeWidth="1.2" fill="none" strokeLinecap="round" />
+              <path d="M24 47 L18 60 Q30 64 42 60 L36 47" stroke={`${SCAN_TO}40`} strokeWidth="1" fill="none" strokeLinecap="round" />
+            </svg>
+          </div>
+          {/* 스캔 라인 */}
+          <div className="absolute inset-5 rounded-full overflow-hidden">
+            <motion.div className="absolute left-0 right-0 h-[2px]"
+              style={{ background: `linear-gradient(90deg, transparent 0%, ${SCAN_TO}CC 40%, ${SCAN_FROM} 50%, ${SCAN_TO}CC 60%, transparent 100%)` }}
+              animate={{ y: [-85, 85] }}
+              transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut", repeatType: "reverse" }} />
+          </div>
+          {/* 회전 글로우 점 */}
+          <motion.div className="absolute inset-0"
+            animate={{ rotate: 360 }}
+            transition={{ duration: 6, repeat: Infinity, ease: "linear" }}>
+            <div className="absolute top-1/2 right-0 w-2 h-2 rounded-full -translate-y-1/2"
+              style={{ background: SCAN_TO, boxShadow: `0 0 8px ${SCAN_TO}` }} />
+          </motion.div>
+        </div>
+        {/* AI ANALYZING 텍스트 */}
+        <motion.p className="text-[10px] font-bold tracking-[0.2em] uppercase mt-3"
+          style={{ color: SCAN_TO }}
+          animate={{ opacity: [0.4, 1, 0.4] }}
+          transition={{ duration: 1.8, repeat: Infinity }}>
+          AI ANALYZING...
+        </motion.p>
+        <h1 className="text-[20px] font-bold text-stone-800 text-center mt-2 leading-snug">{t("idle.title")}</h1>
+        <p className="text-[13px] text-stone-500 text-center mt-1">{t("idle.subtitle4")}</p>
+      </motion.div>
+
+      {/* ── 소셜 증명 카운터 ── */}
+      <motion.div variants={fadeChild} className="flex justify-center mb-4 relative" style={{ zIndex: 1 }}>
+        <div className="flex items-center gap-2 px-4 py-2 rounded-2xl"
+          style={{ background: "rgba(255,255,255,0.85)", backdropFilter: "blur(8px)", border: `1px solid ${SCAN_FROM}40`, boxShadow: `0 2px 12px ${SCAN_FROM}20` }}>
+          <span className="text-[16px]">🔥</span>
+          <span className="text-[12px] font-semibold text-stone-600">
+            {t("idle.socialCount", { n: socialCount.toLocaleString() })}
+          </span>
+        </div>
       </motion.div>
 
       {/* 결과 미리보기 카드 */}
-      <motion.div variants={fadeChild} className="mb-4">
-        <div className="bg-white rounded-2xl p-4 border border-stone-100"
-          style={{ boxShadow: "0 4px 24px rgba(180,130,110,0.12), 0 1px 4px rgba(0,0,0,0.05)" }}>
+      <motion.div variants={fadeChild} className="mb-4 relative" style={{ zIndex: 1 }}>
+        <div className="bg-white/90 rounded-2xl p-4 border border-stone-100"
+          style={{ boxShadow: "0 4px 24px rgba(180,130,110,0.12), 0 1px 4px rgba(0,0,0,0.05)", backdropFilter: "blur(8px)" }}>
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
               <div className="w-7 h-7 rounded-full flex items-center justify-center text-sm flex-shrink-0"
@@ -1369,15 +1455,15 @@ function ScanIdleScreen({ onScan }: { onScan: () => void }) {
       </motion.div>
 
       {/* 날씨 데일리 팁 카드 */}
-      <WeatherTipCard />
+      <div className="relative" style={{ zIndex: 1 }}><WeatherTipCard /></div>
 
       {/* 미션 카드 */}
-      <MissionCard />
+      <div className="relative" style={{ zIndex: 1 }}><MissionCard /></div>
 
       {/* 단계 표시 */}
-      <motion.div variants={fadeChild} className="mb-4">
-        <div className="bg-white rounded-2xl px-4 py-3.5 border border-stone-100"
-          style={{ boxShadow: "0 2px 12px rgba(180,130,110,0.08)" }}>
+      <motion.div variants={fadeChild} className="mb-4 relative" style={{ zIndex: 1 }}>
+        <div className="bg-white/90 rounded-2xl px-4 py-3.5 border border-stone-100"
+          style={{ boxShadow: "0 2px 12px rgba(180,130,110,0.08)", backdropFilter: "blur(8px)" }}>
           <p className="text-[10px] font-semibold text-stone-400 text-center mb-3 tracking-widest uppercase">
             {t("idle.stepsTitle")}
           </p>
@@ -1404,7 +1490,7 @@ function ScanIdleScreen({ onScan }: { onScan: () => void }) {
       </motion.div>
 
       {/* 개인정보 보호 배지 */}
-      <motion.div variants={fadeChild} className="mb-5">
+      <motion.div variants={fadeChild} className="mb-5 relative" style={{ zIndex: 1 }}>
         <div className="flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl border"
           style={{ background: "#F0FAF6", borderColor: "#C5E5DA" }}>
           <Lock className="w-3.5 h-3.5 flex-shrink-0" style={{ color: DEEP_GREEN }} />
@@ -1413,7 +1499,7 @@ function ScanIdleScreen({ onScan }: { onScan: () => void }) {
       </motion.div>
 
       {/* CTA 버튼 */}
-      <motion.div variants={fadeChild} className="mt-auto">
+      <motion.div variants={fadeChild} className="mt-auto relative" style={{ zIndex: 1 }}>
         {/* 스트릭 배지 */}
         {streak.count >= 2 && (
           <div className="flex justify-center mb-3">
@@ -1447,7 +1533,7 @@ function ScanIdleScreen({ onScan }: { onScan: () => void }) {
       </motion.div>
 
       {/* ── 교육용 콘텐츠 섹션 (AdSense 정책: 퍼블리셔 콘텐츠 제공) ── */}
-      <motion.div variants={fadeChild} className="mt-8 border-t border-stone-100 pt-6 space-y-5">
+      <motion.div variants={fadeChild} className="mt-8 border-t border-stone-100 pt-6 space-y-5 relative" style={{ zIndex: 1 }}>
         <h2 className="text-[14px] font-black tracking-tight" style={{ color: DEEP_GREEN }}>{t("idle.baumannSectionTitle")}</h2>
         <p className="text-[12.5px] leading-relaxed text-stone-500">
           {t("idle.baumannSectionDesc")}
@@ -2457,6 +2543,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
   const [streakDelta, setStreakDelta] = useState<number>(0);
   const [missionPops, setMissionPops] = useState<string[]>([]);
   const [showCheckinSheet, setShowCheckinSheet] = useState(false);
+  const [activeTab, setActiveTab] = useState<"analysis" | "solution" | "nutrition">("analysis");
 
   // 챌린지 참여 후 내 결과 저장 (비로그인도 작동)
   useEffect(() => {
@@ -2937,7 +3024,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
 
     {/* ── 공유 슬라이드는 서버사이드(generate-share.ts)에서 생성됨 ── */}
     <div ref={resultScrollRef} className="h-[calc(100dvh-60px)] overflow-y-auto">
-      <motion.div className="px-5 pt-6 pb-24 space-y-6" variants={stagger} initial="initial" animate="animate">
+      <motion.div className="px-5 pt-6 pb-40 space-y-6" variants={stagger} initial="initial" animate="animate">
         {/* 헤더 */}
         <div className="flex justify-between items-center">
           <Button variant="outline" size="sm" onClick={onBack} className="rounded-full gap-1.5 hover:bg-rose-50"
@@ -2979,9 +3066,10 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
         {/* 요약 카드 — 통합 */}
         <Card className="border-none shadow-md rounded-3xl bg-white overflow-hidden">
           <CardContent className="p-0">
-            {/* 바우만 타입 헤더 */}
+            {/* 피부 MBTI 헤더 */}
             <div className="text-center pt-5 pb-3">
               <p className="text-[11px] text-stone-400 mb-1">{surveyData?.age} {surveyData?.gender}</p>
+              <p className="text-[10px] font-bold tracking-widest uppercase mb-1.5" style={{ color: SCAN_FROM }}>{t("result.baumannLabel")}</p>
               <span className="text-4xl font-black tracking-tight" style={{ color: SCAN_TO }}>{finalType}</span>
               <div className="flex gap-1.5 justify-center mt-2">
                 {finalType.split("").map((letter, i) => {
@@ -2995,6 +3083,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
                   );
                 })}
               </div>
+              <p className="text-[9px] text-stone-400 mt-1.5">{t("result.mbtiSub")}</p>
             </div>
 
             {/* 3열 수치 — 프리미엄 */}
@@ -3074,263 +3163,385 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
           </Card>
         )}
 
-        {/* 10가지 점수 — 아코디언 */}
-        <Card className="border-none shadow-md rounded-3xl bg-white">
-          <CardHeader className="pb-1 pt-5 px-5">
-            <p className="text-[13px] font-black" style={{ color: DEEP_GREEN }}>{t("result.scores")}</p>
-          </CardHeader>
-          <CardContent className="px-5 pb-5 space-y-3">
-            {scores.map((item: any, i: number) => {
-              const Icon = SCORE_ICONS[i] || Zap;
-              const color = SCORE_COLORS[i] || DEEP_GREEN;
-              const isExpanded = expandedScore === i;
-              return (
-                <div key={i}
-                  className="rounded-2xl transition-colors cursor-pointer"
-                  style={{ background: isExpanded ? `${color}08` : "transparent" }}
-                  onClick={() => setExpandedScore(isExpanded ? null : i)}>
-                  <div className="space-y-1.5 px-1 pt-1">
-                    <div className="flex items-center justify-between text-[13px] font-bold">
-                      <div className="flex items-center gap-2">
-                        <div className="w-6 h-6 rounded-full flex items-center justify-center bg-stone-50 shadow-sm">
-                          <Icon className="w-3.5 h-3.5" style={{ color }} />
-                        </div>
-                        <span className="text-stone-700">{t(`scores.${i}`)}</span>
-                      </div>
-                      <div className="flex items-center gap-1.5">
-                        <motion.span style={{ color }} initial={{ scale: 0 }} animate={{ scale: 1 }}
-                          transition={{ delay: 0.3 + i * 0.08, type: "spring" }}>
-                          {item.score}{t("result.scoreSuffix")}
-                        </motion.span>
-                        <motion.div
-                          animate={{ rotate: isExpanded ? 180 : 0 }}
-                          transition={{ duration: 0.2 }}>
-                          <ChevronDown className="w-3.5 h-3.5 text-stone-300" />
-                        </motion.div>
-                      </div>
-                    </div>
-                    <div className="h-1.5 rounded-full overflow-hidden bg-stone-100">
-                      <motion.div className="h-full rounded-full" style={{ background: color }}
-                        initial={{ width: "0%" }} animate={{ width: `${item.score}%` }}
-                        transition={{ delay: 0.3 + i * 0.08, duration: 0.9 }} />
-                    </div>
-                  </div>
-                  <AnimatePresence>
-                    {isExpanded && item.comment && (
-                      <motion.div
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: "auto", opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
-                        transition={{ duration: 0.25, ease: "easeInOut" }}
-                        className="overflow-hidden">
-                        <p className="text-[12px] text-stone-500 leading-relaxed px-1 pb-3 pt-2">
-                          {item.comment}
-                        </p>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </div>
-              );
-            })}
-          </CardContent>
-        </Card>
-
-        {/* Fonday 잠금 섹션 */}
-        <Card className="border-none shadow-md rounded-3xl overflow-hidden relative bg-white">
-          <CardContent className="p-5">
-            {/* 배경: 블러 처리된 가상 수치 */}
-            <div className="grid grid-cols-2 gap-3 blur-sm opacity-40 pointer-events-none select-none">
-              {[
-                { label: t("result.locked.skinTemp"), value: "36.2°C", icon: Thermometer, color: "#E09882" },
-                { label: t("result.locked.moisture"), value: "68%", icon: Droplets, color: "#3B82C4" },
-                { label: t("result.locked.oil"), value: "42%", icon: Flame, color: "#F59E0B" },
-                { label: t("result.locked.barrier"), value: "B+", icon: Shield, color: "#10B981" },
-              ].map((item, i) => {
-                const Icon = item.icon;
-                return (
-                  <div key={i} className="p-3 rounded-2xl bg-stone-50 border border-stone-100">
-                    <div className="flex items-center gap-1.5 mb-1">
-                      <Icon className="w-3 h-3" style={{ color: item.color }} />
-                      <p className="text-[10px] text-stone-400">{item.label}</p>
-                    </div>
-                    <p className="text-2xl font-black" style={{ color: item.color }}>{item.value}</p>
-                  </div>
-                );
-              })}
-            </div>
-          </CardContent>
-          {/* 잠금 오버레이 */}
-          <div className="absolute inset-0 backdrop-blur-[2px] bg-white/75 flex flex-col items-center justify-center p-6 text-center">
-            <div className="w-12 h-12 rounded-2xl bg-stone-200 flex items-center justify-center mb-3 shadow-inner">
-              <Lock className="w-6 h-6 text-stone-500" />
-            </div>
-            <p className="text-[14px] font-black text-stone-700 mb-2">{t("result.locked.title")}</p>
-            <p className="text-[12px] text-stone-500 leading-relaxed mb-3">
-              {t("result.locked.desc")}<br />
-              <span className="font-bold" style={{ color: SCAN_TO }}>{t("result.locked.device")}</span>{t("result.locked.deviceDesc")}
-            </p>
-            <Button onClick={() => setShowWaitlist(true)}
-              className="h-10 px-6 rounded-xl text-white text-[12px] font-bold shadow-md"
-              style={{ background: `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})` }}>
-              <span className="flex items-center gap-1.5">{t("result.earlybird")} <ArrowRight className="w-4 h-4" /></span>
-            </Button>
-          </div>
-        </Card>
-
-        {/* 액션 버튼 3개 */}
-        <div className="grid grid-cols-3 gap-2.5">
-          <Button onClick={() => setShowAnalysis(true)}
-            className="h-16 rounded-2xl flex-col gap-1.5 font-bold text-white shadow-md"
-            style={{ background: `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})` }}>
-            <LayoutGrid className="w-4 h-4" />
-            <span className="text-[11px]">{t("result.analysis")}</span>
-          </Button>
-          <Button onClick={() => setShowImprovements(true)}
-            className="h-16 rounded-2xl flex-col gap-1.5 font-bold text-white shadow-md"
-            style={{ background: `linear-gradient(135deg, ${DEEP_GREEN_LIGHT}, ${DEEP_GREEN})` }}>
-            <Leaf className="w-4 h-4" />
-            <span className="text-[11px]">{t("result.solutions")}</span>
-          </Button>
-          <Button onClick={() => setShowNutrients(true)}
-            className="h-16 rounded-2xl flex-col gap-1.5 font-bold text-white shadow-md"
-            style={{ background: "linear-gradient(135deg, #F59E0B, #D97706)" }}>
-            <Utensils className="w-4 h-4" />
-            <span className="text-[11px]">{t("nutrients.sectionTitle")}</span>
-          </Button>
+        {/* ── 3탭 네비게이션 ── */}
+        <div className="flex rounded-2xl bg-stone-100 p-1 gap-1">
+          {(["analysis", "solution", "nutrition"] as const).map((tab) => {
+            const labels = { analysis: t("result.tab.analysis"), solution: t("result.tab.solution"), nutrition: t("result.tab.nutrition") };
+            const icons = { analysis: <LayoutGrid className="w-3.5 h-3.5" />, solution: <Leaf className="w-3.5 h-3.5" />, nutrition: <Utensils className="w-3.5 h-3.5" /> };
+            const isActive = activeTab === tab;
+            return (
+              <button key={tab} onClick={() => setActiveTab(tab)}
+                className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-[12px] font-bold transition-all"
+                style={isActive
+                  ? { background: "white", color: SCAN_TO, boxShadow: "0 2px 8px rgba(0,0,0,0.08)" }
+                  : { color: "#A8A29E" }}>
+                {icons[tab]}{labels[tab]}
+              </button>
+            );
+          })}
         </div>
 
-        {/* 피부 챌린지 초대 버튼 */}
-        {currentShareToken && (
-          <motion.div variants={fadeChild}>
-            <Button
-              className="w-full h-14 text-lg font-bold bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white shadow-lg flex items-center justify-center gap-2 rounded-2xl transition-all"
-              onClick={() => {
-                markChallengeUsed();
-                const shareUrl = `${window.location.origin}/battle/${currentShareToken}`;
-                if (navigator.share) {
-                  navigator.share({
-                    title: 'Fonday AI 피부 챌린지!',
-                    text: t("result.shareText", { score: overallScore, type: finalType }),
-                    url: shareUrl,
-                  }).catch(console.error);
-                } else {
-                  navigator.clipboard.writeText(shareUrl).then(() => {
-                    alert(t("result.challengeLinkCopied"));
-                  });
-                }
-              }}
-            >
-              <span className="text-2xl">👑</span> {t("result.challengeBtn")}
-            </Button>
-          </motion.div>
-        )}
-
-        {/* 챌린지 참여 후: 결과 확인 버튼 */}
-        {pendingChallengeToken && (
-          <motion.div variants={fadeChild}>
-            <Button
-              className="w-full h-14 text-lg font-bold text-white shadow-xl flex items-center justify-center gap-2 rounded-2xl"
-              style={{ background: "linear-gradient(135deg, #7C3AED, #6D28D9)" }}
-              onClick={() => {
-                sessionStorage.removeItem('battleChallengeToken');
-                window.location.href = `/battle/${pendingChallengeToken}`;
-              }}
-            >
-              <Trophy className="w-5 h-5" />
-              {t("result.challengeResult")}
-              <ArrowRight className="w-5 h-5 ml-1" />
-            </Button>
-          </motion.div>
-        )}
-
-        {/* 피부 일기 카드 버튼 / 로그인 카드 */}
-        {user === undefined ? (
-          <div className="h-16 rounded-3xl bg-stone-100 animate-pulse" />
-        ) : user ? (
-          <motion.div
-            whileTap={{ scale: 0.98 }}
-            onClick={() => onOpenDiary?.()}
-            className="cursor-pointer">
-            <Card className="border-none shadow-md rounded-3xl overflow-hidden">
-              <CardContent className="p-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-11 h-11 rounded-2xl flex items-center justify-center shrink-0"
-                    style={{ background: `linear-gradient(135deg, ${DEEP_GREEN_LIGHT}, ${DEEP_GREEN})` }}>
-                    <LineChartIcon className="w-5 h-5 text-white" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-[13px] font-black" style={{ color: DEEP_GREEN }}>{t("result.diary.title")}</p>
-                    <p className="text-[11px] text-stone-400">
-                      {history.length > 0
-                        ? t("result.diary.history", { count: history.length + 1, score: overallScore })
-                        : t("result.diary.firstRecord")}
-                    </p>
-                  </div>
-                  {user.avatar && <img src={user.avatar} className="w-7 h-7 rounded-full border border-stone-100 shrink-0" />}
-                  <ArrowRight className="w-4 h-4 text-stone-300 shrink-0" />
-                </div>
-                {/* 미니 스파크라인 */}
-                {history.length >= 1 && (
-                  <div className="h-16 mt-3 -mx-1">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <LineChart data={[...history.slice().reverse().map((item: any) => ({
-                        date: new Date(item.createdAt).toLocaleDateString("ko-KR", { month: "numeric", day: "numeric" }),
-                        score: parseInt(item.overallScore),
-                      })), { date: "오늘", score: overallScore }]}>
-                        <Line type="monotone" dataKey="score" stroke={SCAN_TO} strokeWidth={2}
-                          dot={{ r: 2.5, fill: SCAN_TO, strokeWidth: 0 }} activeDot={false} />
-                        <XAxis dataKey="date" axisLine={false} tickLine={false} style={{ fontSize: "8px" }} />
-                        <YAxis hide domain={[0, 100]} />
-                      </LineChart>
-                    </ResponsiveContainer>
-                  </div>
-                )}
+        {/* ── 분석 탭 ── */}
+        {activeTab === "analysis" && (
+          <div className="space-y-6">
+            {/* 10가지 점수 아코디언 */}
+            <Card className="border-none shadow-md rounded-3xl bg-white">
+              <CardHeader className="pb-1 pt-5 px-5">
+                <p className="text-[13px] font-black" style={{ color: DEEP_GREEN }}>{t("result.scores")}</p>
+              </CardHeader>
+              <CardContent className="px-5 pb-5 space-y-3">
+                {scores.map((item: any, i: number) => {
+                  const Icon = SCORE_ICONS[i] || Zap;
+                  const color = SCORE_COLORS[i] || DEEP_GREEN;
+                  const isExpanded = expandedScore === i;
+                  return (
+                    <div key={i} className="rounded-2xl transition-colors cursor-pointer"
+                      style={{ background: isExpanded ? `${color}08` : "transparent" }}
+                      onClick={() => setExpandedScore(isExpanded ? null : i)}>
+                      <div className="space-y-1.5 px-1 pt-1">
+                        <div className="flex items-center justify-between text-[13px] font-bold">
+                          <div className="flex items-center gap-2">
+                            <div className="w-6 h-6 rounded-full flex items-center justify-center bg-stone-50 shadow-sm">
+                              <Icon className="w-3.5 h-3.5" style={{ color }} />
+                            </div>
+                            <span className="text-stone-700">{t(`scores.${i}`)}</span>
+                          </div>
+                          <div className="flex items-center gap-1.5">
+                            <motion.span style={{ color }} initial={{ scale: 0 }} animate={{ scale: 1 }}
+                              transition={{ delay: 0.3 + i * 0.08, type: "spring" }}>
+                              {item.score}{t("result.scoreSuffix")}
+                            </motion.span>
+                            <motion.div animate={{ rotate: isExpanded ? 180 : 0 }} transition={{ duration: 0.2 }}>
+                              <ChevronDown className="w-3.5 h-3.5 text-stone-300" />
+                            </motion.div>
+                          </div>
+                        </div>
+                        <div className="h-1.5 rounded-full overflow-hidden bg-stone-100">
+                          <motion.div className="h-full rounded-full" style={{ background: color }}
+                            initial={{ width: "0%" }} animate={{ width: `${item.score}%` }}
+                            transition={{ delay: 0.3 + i * 0.08, duration: 0.9 }} />
+                        </div>
+                      </div>
+                      <AnimatePresence>
+                        {isExpanded && item.comment && (
+                          <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }}
+                            exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.25, ease: "easeInOut" }}
+                            className="overflow-hidden">
+                            <p className="text-[12px] text-stone-500 leading-relaxed px-1 pb-3 pt-2">{item.comment}</p>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
+                  );
+                })}
               </CardContent>
             </Card>
-          </motion.div>
-        ) : (
-          <Card className="border-2 border-dashed rounded-3xl p-6 text-center" style={{ borderColor: "#F5D5CC", background: "#FDF8F7" }}>
-            <CardHeader className="p-0 mb-4">
-              <CardTitle className="text-lg font-bold" style={{ color: DEEP_GREEN }}>{t("result.login.title")}</CardTitle>
-              <CardDescription className="text-xs">{t("result.login.desc")}</CardDescription>
-            </CardHeader>
-            <CardContent className="p-0 space-y-2">
-              <Button onClick={handleKakaoLogin}
-                className="w-full h-12 rounded-xl font-bold gap-2 border-0 shadow-sm text-[#3C1E1E]"
-                style={{ background: "#FEE500" }}>
-                <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-                  <path fillRule="evenodd" clipRule="evenodd" d="M9 1C4.582 1 1 3.79 1 7.222c0 2.154 1.386 4.045 3.484 5.14L3.62 15.5a.25.25 0 0 0 .368.274L7.9 13.39A9.63 9.63 0 0 0 9 13.444c4.418 0 8-2.791 8-6.222C17 3.79 13.418 1 9 1Z" fill="#3C1E1E"/>
-                </svg>
-                {t("result.login.kakao")}
-              </Button>
-              <Button onClick={handleGoogleLogin}
-                className="w-full h-12 rounded-xl bg-white hover:bg-stone-50 font-bold text-zinc-700 gap-2 border border-stone-200 shadow-sm">
-                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" className="w-4 h-4" />
-                {t("result.login.google")}
-              </Button>
-            </CardContent>
-          </Card>
+
+            {/* Fonday 잠금 섹션 */}
+            <Card className="border-none shadow-md rounded-3xl overflow-hidden relative bg-white">
+              <CardContent className="p-5">
+                <div className="grid grid-cols-2 gap-3 blur-sm opacity-40 pointer-events-none select-none">
+                  {[
+                    { label: t("result.locked.skinTemp"), value: "36.2°C", icon: Thermometer, color: "#E09882" },
+                    { label: t("result.locked.moisture"), value: "68%", icon: Droplets, color: "#3B82C4" },
+                    { label: t("result.locked.oil"), value: "42%", icon: Flame, color: "#F59E0B" },
+                    { label: t("result.locked.barrier"), value: "B+", icon: Shield, color: "#10B981" },
+                  ].map((item, i) => {
+                    const Icon = item.icon;
+                    return (
+                      <div key={i} className="p-3 rounded-2xl bg-stone-50 border border-stone-100">
+                        <div className="flex items-center gap-1.5 mb-1">
+                          <Icon className="w-3 h-3" style={{ color: item.color }} />
+                          <p className="text-[10px] text-stone-400">{item.label}</p>
+                        </div>
+                        <p className="text-2xl font-black" style={{ color: item.color }}>{item.value}</p>
+                      </div>
+                    );
+                  })}
+                </div>
+              </CardContent>
+              <div className="absolute inset-0 backdrop-blur-[2px] bg-white/75 flex flex-col items-center justify-center p-6 text-center">
+                <div className="w-12 h-12 rounded-2xl bg-stone-200 flex items-center justify-center mb-3 shadow-inner">
+                  <Lock className="w-6 h-6 text-stone-500" />
+                </div>
+                <p className="text-[14px] font-black text-stone-700 mb-2">{t("result.locked.title")}</p>
+                <p className="text-[12px] text-stone-500 leading-relaxed mb-3">
+                  {t("result.locked.desc")}<br />
+                  <span className="font-bold" style={{ color: SCAN_TO }}>{t("result.locked.device")}</span>{t("result.locked.deviceDesc")}
+                </p>
+                <Button onClick={() => setShowWaitlist(true)}
+                  className="h-10 px-6 rounded-xl text-white text-[12px] font-bold shadow-md"
+                  style={{ background: `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})` }}>
+                  <span className="flex items-center gap-1.5">{t("result.earlybird")} <ArrowRight className="w-4 h-4" /></span>
+                </Button>
+              </div>
+            </Card>
+
+            {/* 피부 일기 카드 / 로그인 카드 */}
+            {user === undefined ? (
+              <div className="h-16 rounded-3xl bg-stone-100 animate-pulse" />
+            ) : user ? (
+              <motion.div whileTap={{ scale: 0.98 }} onClick={() => onOpenDiary?.()} className="cursor-pointer">
+                <Card className="border-none shadow-md rounded-3xl overflow-hidden">
+                  <CardContent className="p-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-11 h-11 rounded-2xl flex items-center justify-center shrink-0"
+                        style={{ background: `linear-gradient(135deg, ${DEEP_GREEN_LIGHT}, ${DEEP_GREEN})` }}>
+                        <LineChartIcon className="w-5 h-5 text-white" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-[13px] font-black" style={{ color: DEEP_GREEN }}>{t("result.diary.title")}</p>
+                        <p className="text-[11px] text-stone-400">
+                          {history.length > 0
+                            ? t("result.diary.history", { count: history.length + 1, score: overallScore })
+                            : t("result.diary.firstRecord")}
+                        </p>
+                      </div>
+                      {user.avatar && <img src={user.avatar} className="w-7 h-7 rounded-full border border-stone-100 shrink-0" />}
+                      <ArrowRight className="w-4 h-4 text-stone-300 shrink-0" />
+                    </div>
+                    {history.length >= 1 && (
+                      <div className="h-16 mt-3 -mx-1">
+                        <ResponsiveContainer width="100%" height="100%">
+                          <LineChart data={[...history.slice().reverse().map((item: any) => ({
+                            date: new Date(item.createdAt).toLocaleDateString("ko-KR", { month: "numeric", day: "numeric" }),
+                            score: parseInt(item.overallScore),
+                          })), { date: "오늘", score: overallScore }]}>
+                            <Line type="monotone" dataKey="score" stroke={SCAN_TO} strokeWidth={2}
+                              dot={{ r: 2.5, fill: SCAN_TO, strokeWidth: 0 }} activeDot={false} />
+                            <XAxis dataKey="date" axisLine={false} tickLine={false} style={{ fontSize: "8px" }} />
+                            <YAxis hide domain={[0, 100]} />
+                          </LineChart>
+                        </ResponsiveContainer>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              </motion.div>
+            ) : (
+              <Card className="border-2 border-dashed rounded-3xl p-6 text-center" style={{ borderColor: "#F5D5CC", background: "#FDF8F7" }}>
+                <CardHeader className="p-0 mb-4">
+                  <CardTitle className="text-lg font-bold" style={{ color: DEEP_GREEN }}>{t("result.login.title")}</CardTitle>
+                  <CardDescription className="text-xs">{t("result.login.desc")}</CardDescription>
+                </CardHeader>
+                <CardContent className="p-0 space-y-2">
+                  <Button onClick={handleKakaoLogin}
+                    className="w-full h-12 rounded-xl font-bold gap-2 border-0 shadow-sm text-[#3C1E1E]"
+                    style={{ background: "#FEE500" }}>
+                    <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                      <path fillRule="evenodd" clipRule="evenodd" d="M9 1C4.582 1 1 3.79 1 7.222c0 2.154 1.386 4.045 3.484 5.14L3.62 15.5a.25.25 0 0 0 .368.274L7.9 13.39A9.63 9.63 0 0 0 9 13.444c4.418 0 8-2.791 8-6.222C17 3.79 13.418 1 9 1Z" fill="#3C1E1E"/>
+                    </svg>
+                    {t("result.login.kakao")}
+                  </Button>
+                  <Button onClick={handleGoogleLogin}
+                    className="w-full h-12 rounded-xl bg-white hover:bg-stone-50 font-bold text-zinc-700 gap-2 border border-stone-200 shadow-sm">
+                    <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" className="w-4 h-4" />
+                    {t("result.login.google")}
+                  </Button>
+                </CardContent>
+              </Card>
+            )}
+            <AdBanner slot="6349940752" />
+          </div>
         )}
 
-        {/* 광고 */}
-        <AdBanner slot="6349940752" />
+        {/* ── 솔루션 탭 ── */}
+        {activeTab === "solution" && (
+          <div className="space-y-3">
+            <div className="flex items-center gap-2 mb-1">
+              <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: `linear-gradient(135deg, ${DEEP_GREEN_LIGHT}, ${DEEP_GREEN})` }}>
+                <Leaf className="w-4 h-4 text-white" />
+              </div>
+              <div>
+                <p className="text-[13px] font-black" style={{ color: DEEP_GREEN }}>{t("modal.improvements.title")}</p>
+                <p className="text-[11px] text-stone-400">{t("modal.improvements.sub")}</p>
+              </div>
+            </div>
+            {(analysisResult?.improvements ?? []).slice(0, 3).map((item: { title: string; desc: string }, i: number) => (
+              <motion.div key={i} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.08 }} className="flex gap-3 p-4 rounded-2xl border"
+                style={{ background: i === 0 ? "#FDF1EE" : i === 1 ? "#F0F7F5" : "#F5F0FF", borderColor: i === 0 ? "#F5D5CC" : i === 1 ? "#C5DFD8" : "#DDD5F5" }}>
+                <div className="shrink-0">
+                  <div className="w-8 h-8 rounded-full flex items-center justify-center text-white text-[11px] font-black"
+                    style={{ background: i === 0 ? `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})` : i === 1 ? `linear-gradient(135deg, ${DEEP_GREEN_LIGHT}, ${DEEP_GREEN})` : "linear-gradient(135deg, #A78BFA, #7C3AED)" }}>
+                    {i + 1}
+                  </div>
+                  <p className="text-[9px] font-bold text-center mt-0.5"
+                    style={{ color: i === 0 ? SCAN_TO : i === 1 ? DEEP_GREEN : "#7C3AED" }}>STEP</p>
+                </div>
+                <div>
+                  <p className="text-[13px] font-bold text-stone-800 mb-0.5">{item.title}</p>
+                  <p className="text-[12px] text-stone-500 leading-relaxed">{item.desc}</p>
+                </div>
+              </motion.div>
+            ))}
+            {(analysisResult?.improvements ?? []).length === 0 && (
+              <p className="text-center text-sm text-stone-400 py-6">{t("modal.improvements.loading")}</p>
+            )}
+            {(analysisResult?.cosmetics ?? []).length > 0 && (
+              <>
+                <div className="flex items-center gap-2 pt-2 pb-1">
+                  <Sparkles className="w-4 h-4" style={{ color: SCAN_TO }} />
+                  <p className="text-[13px] font-black" style={{ color: DEEP_GREEN }}>{t("modal.improvements.cosmetics")}</p>
+                </div>
+                {(analysisResult.cosmetics as { type: string; key: string; reason: string }[]).map((item, i) => (
+                  <motion.div key={`c-${i}`} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.3 + i * 0.07 }}
+                    className="flex items-start gap-3 p-4 rounded-2xl bg-amber-50 border border-amber-100">
+                    <div className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0"
+                      style={{ background: "linear-gradient(135deg, #F59E0B, #D97706)" }}>
+                      <Star className="w-4 h-4 text-white" />
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-1.5 mb-0.5">
+                        <span className="text-[13px] font-black text-stone-800">{item.type}</span>
+                        <span className="text-[10px] px-1.5 py-0.5 rounded-full font-bold text-white" style={{ background: "#D97706" }}>{item.key}</span>
+                      </div>
+                      <p className="text-[12px] text-stone-500 leading-relaxed">{item.reason}</p>
+                    </div>
+                  </motion.div>
+                ))}
+              </>
+            )}
+          </div>
+        )}
 
+        {/* ── 영양 탭 ── */}
+        {activeTab === "nutrition" && (
+          <div className="space-y-3">
+            <div className="flex items-center gap-2 mb-1">
+              <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: "linear-gradient(135deg, #F59E0B, #D97706)" }}>
+                <Utensils className="w-4 h-4 text-white" />
+              </div>
+              <div>
+                <p className="text-[13px] font-black" style={{ color: "#D97706" }}>{t("nutrients.sectionTitle")}</p>
+                <p className="text-[11px] text-stone-400">{t("nutrients.sectionSub")}</p>
+              </div>
+            </div>
+            {finalType.split("").filter(l => l in NUTRIENT_COLORS).map((letter, i) => {
+              const arr = t(`nutrients.${letter}`, { returnObjects: true }) as { name: string; foods: string; why: string }[];
+              const nutrient = arr?.[0];
+              if (!nutrient) return null;
+              const color = NUTRIENT_COLORS[letter];
+              return (
+                <motion.div key={letter} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: i * 0.08 }} className="flex gap-3 p-4 rounded-2xl border"
+                  style={{ background: `${color}0D`, borderColor: `${color}33` }}>
+                  <div className="shrink-0">
+                    <div className="w-8 h-8 rounded-full flex items-center justify-center text-base" style={{ background: `${color}22` }}>
+                      {NUTRIENT_ICONS[letter]}
+                    </div>
+                    <p className="text-[9px] font-black text-center mt-0.5" style={{ color }}>{letter}</p>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[13px] font-bold mb-0.5" style={{ color }}>{nutrient.name}</p>
+                    <p className="text-[12px] text-stone-500 leading-relaxed mb-1.5">{nutrient.why}</p>
+                    <p className="text-[11px] text-stone-400">
+                      <span className="font-bold" style={{ color }}>{t("nutrients.foodLabel")} </span>{nutrient.foods}
+                    </p>
+                  </div>
+                </motion.div>
+              );
+            })}
+            <div className="pt-1">
+              <div className="flex items-center gap-2 mb-3 pt-2 border-t border-stone-100">
+                <span className="text-base">⚠️</span>
+                <p className="text-[13px] font-black" style={{ color: "#D97706" }}>{t("nutrients.avoidTitle")}</p>
+              </div>
+              <div className="rounded-2xl p-4 mb-2.5" style={{ background: "#FFF7ED", border: "1px solid #FED7AA" }}>
+                <div className="flex items-center gap-1.5 mb-2.5">
+                  <span className="text-sm">☀️</span>
+                  <span className="text-[12px] font-black text-orange-700">{t("nutrients.avoidLunch")}</span>
+                </div>
+                <div className="space-y-2">
+                  {avoidLunch.map(({ food, why }, idx) => (
+                    <div key={idx} className="flex gap-2 items-start">
+                      <span className="text-[11px] font-black text-orange-400 shrink-0 mt-0.5">✕</span>
+                      <div>
+                        <p className="text-[12px] font-bold text-stone-700">{food}</p>
+                        <p className="text-[11px] text-stone-400">{why}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div className="rounded-2xl p-4" style={{ background: "#F5F3FF", border: "1px solid #DDD6FE" }}>
+                <div className="flex items-center gap-1.5 mb-2.5">
+                  <span className="text-sm">🌙</span>
+                  <span className="text-[12px] font-black text-violet-700">{t("nutrients.avoidDinner")}</span>
+                </div>
+                <div className="space-y-2">
+                  {avoidDinner.map(({ food, why }, idx) => (
+                    <div key={idx} className="flex gap-2 items-start">
+                      <span className="text-[11px] font-black text-violet-400 shrink-0 mt-0.5">✕</span>
+                      <div>
+                        <p className="text-[12px] font-bold text-stone-700">{food}</p>
+                        <p className="text-[11px] text-stone-400">{why}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+            <div className="pt-2 space-y-2">
+              <button onClick={handlePushToggle} disabled={pushLoading}
+                className="w-full py-3 rounded-2xl font-bold text-[13px] transition-all flex items-center justify-center gap-2"
+                style={pushSubscribed
+                  ? { background: `${DEEP_GREEN}18`, color: DEEP_GREEN, border: `1px solid ${DEEP_GREEN}33` }
+                  : { background: "linear-gradient(135deg, #F59E0B, #D97706)", color: "white" }}>
+                <span>{pushSubscribed ? "🔔" : "🍽️"}</span>
+                {pushLoading ? "..." : pushSubscribed ? t("nutrients.pushBtnOn") : t("nutrients.pushBtn")}
+              </button>
+              <p className="text-[10px] text-center text-stone-400">점심 12:00 · 저녁 18:00 (KST)</p>
+            </div>
+          </div>
+        )}
+      </motion.div>
+
+      {/* ── 하단 고정 액션바 ── */}
+      <div className="fixed left-0 right-0 z-[50] flex items-center gap-2 px-4 py-3 bg-white/95 backdrop-blur-md border-t border-stone-100"
+        style={{ bottom: 60, boxShadow: "0 -4px 16px rgba(0,0,0,0.06)" }}>
         {/* 공유 */}
         <Button onClick={handleShare} disabled={shareLoading}
-          className="w-full h-14 rounded-2xl text-white font-bold shadow-lg hover:opacity-90 transition-opacity bg-gradient-to-r from-[#f09433] via-[#bc1888] to-[#8a3ab9]">
+          className="flex-1 h-12 rounded-2xl text-white font-bold bg-gradient-to-r from-[#f09433] via-[#bc1888] to-[#8a3ab9] flex items-center justify-center gap-1.5">
           {shareLoading
-            ? <><div className="w-5 h-5 mr-2 border-2 border-white/40 border-t-white rounded-full animate-spin" /> {t("result.shareLoading")}</>
-            : <><Share2 className="w-5 h-5 mr-2" /> {t("result.share")}</>
-          }
+            ? <div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+            : <><Share2 className="w-4 h-4" /><span className="text-[12px]">{t("result.share")}</span></>}
         </Button>
-
-        {/* 제휴하기 */}
+        {/* 챌린지 */}
+        {pendingChallengeToken ? (
+          <Button onClick={() => { sessionStorage.removeItem('battleChallengeToken'); window.location.href = `/battle/${pendingChallengeToken}`; }}
+            className="flex-1 h-12 rounded-2xl text-white font-bold flex items-center justify-center gap-1.5"
+            style={{ background: "linear-gradient(135deg, #7C3AED, #6D28D9)" }}>
+            <Trophy className="w-4 h-4" /><span className="text-[12px]">{t("result.challengeResult")}</span>
+          </Button>
+        ) : (
+          <Button
+            className="flex-1 h-12 rounded-2xl font-bold flex items-center justify-center gap-1"
+            style={currentShareToken
+              ? { background: "linear-gradient(135deg, #ec4899, #f43f5e)", color: "white" }
+              : { background: "#F3F4F6", color: "#9CA3AF" }}
+            disabled={!currentShareToken}
+            onClick={() => {
+              if (!currentShareToken) return;
+              markChallengeUsed();
+              const shareUrl = `${window.location.origin}/battle/${currentShareToken}`;
+              if (navigator.share) {
+                navigator.share({ title: 'Fonday AI 피부 챌린지!', text: t("result.shareText", { score: overallScore, type: finalType }), url: shareUrl }).catch(console.error);
+              } else {
+                navigator.clipboard.writeText(shareUrl).then(() => alert(t("result.challengeLinkCopied")));
+              }
+            }}>
+            <span className="text-base">👑</span><span className="text-[12px]">{t("result.challengeShort")}</span>
+          </Button>
+        )}
+        {/* 제휴 */}
         <Button onClick={() => setShowPartnership(true)}
-          className="w-full h-14 rounded-2xl font-bold shadow-lg hover:opacity-90 transition-opacity"
-          style={{ background: `linear-gradient(135deg, ${DEEP_GREEN}, ${DEEP_GREEN_LIGHT})`, color: "#fff" }}>
-          <span className="flex items-center gap-2">{t("result.partnership")} <ArrowRight className="w-5 h-5" /></span>
+          className="flex-1 h-12 rounded-2xl font-bold text-white flex items-center justify-center gap-1.5"
+          style={{ background: `linear-gradient(135deg, ${DEEP_GREEN}, ${DEEP_GREEN_LIGHT})` }}>
+          <span className="text-[12px]">{t("result.partnershipShort")}</span>
         </Button>
-      </motion.div>
+      </div>
 
       {/* 주요 분석결과 모달 */}
       <AnimatePresence>
