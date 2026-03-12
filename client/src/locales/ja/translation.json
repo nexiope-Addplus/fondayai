@@ -123,6 +123,24 @@
       "firstRecord": "今日初めての記録",
       "history": "{{count}}件の記録 · 今日 {{score}}点"
     },
+    "actionCard": {
+      "eyebrow": "Today Loop",
+      "title": "今日やること",
+      "subtitle": "結果を見るだけで終わらず、今日のルーティンまでつなげましょう。",
+      "complete": "今日のルーティンは完了です。日記にメモだけ残せばOKです。",
+      "scoreLabel": "今日の点数",
+      "routineLabel": "ルーティン",
+      "routineSub": "チェックリスト進行度",
+      "streakLabel": "連続記録",
+      "streakValue": "{{count}}日",
+      "streakSub": "最高 {{count}}日",
+      "focusLabel": "今日の重点",
+      "focusSub": "最初にやるアクション",
+      "diaryTitle": "カレンダーでチェックしてメモを残す",
+      "diaryDesc": "今日のルーティン達成とメモを肌日記にそのまま残しましょう。",
+      "diaryButton": "日記を開く",
+      "fallbackFocus": "今日のメモを残す"
+    },
     "login": {
       "title": "変化の記録を残しましょう",
       "desc": "ログインして肌日記を始めましょう。",

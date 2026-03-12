@@ -2729,6 +2729,8 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
   const [missionPops, setMissionPops] = useState<string[]>([]);
   const [showCheckinSheet, setShowCheckinSheet] = useState(false);
   const [activeTab, setActiveTab] = useState<"analysis" | "solution" | "nutrition">("analysis");
+  const [currentStreak, setCurrentStreak] = useState<StreakData>(() => getStreak());
+  const [todayTodoProgress, setTodayTodoProgress] = useState(() => getDiaryTodoProgress(todayStr()));
 
   // 챌린지 참여 후 내 결과 저장 (비로그인도 작동)
   useEffect(() => {
@@ -2758,6 +2760,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
     if (!analysisResult) return;
     const overallScore = analysisResult.scores?.[0]?.score || 0;
     const { streak, isNewMilestone, deltaScore } = updateStreak(overallScore);
+    setCurrentStreak(streak);
     setStreakDelta(deltaScore);
     if (isNewMilestone) {
       setStreakMilestone(streak.count);
@@ -2777,6 +2780,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
     if (analysisResult?.prediction?.good?.routine) {
       initDiaryTodosFromRoutine(todayStr(), analysisResult.prediction.good.routine);
     }
+    setTodayTodoProgress(getDiaryTodoProgress(todayStr()));
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -2984,6 +2988,11 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
   const isPig   = (scores[5]?.score ?? 0) > 50;    // index 5 = 잡티/색소침착
   const isWrink = (scores[4]?.score ?? 100) < 60;  // index 4 = 주름 및 탄력
   const finalType = `${isOily ? "O" : "D"}${isSens ? "S" : "R"}${isPig ? "P" : "N"}${isWrink ? "W" : "T"}`;
+  const todayRoutine = analysisResult?.prediction?.good?.routine ?? [];
+  const todayFocus = todayRoutine[0] ?? analysisResult?.improvements?.[0]?.title ?? t("result.actionCard.fallbackFocus");
+  const routineDone = todayTodoProgress.done;
+  const routineTotal = todayTodoProgress.total || todayRoutine.length;
+  const routineComplete = routineTotal > 0 && routineDone === routineTotal;
 
   const parseFoodOptions = (value?: string): string[] => {
     if (!value) return [];
@@ -3333,6 +3342,83 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
               </div>
             </div>
 
+          </CardContent>
+        </Card>
+
+        <Card className="border-none rounded-3xl overflow-hidden shadow-[0_18px_40px_rgba(201,112,98,0.16)]"
+          style={{ background: "linear-gradient(180deg, #FFF7F3 0%, #FFFFFF 100%)" }}>
+          <CardContent className="p-5">
+            <div className="flex items-start justify-between gap-3 mb-4">
+              <div>
+                <p className="text-[12px] font-black tracking-[0.18em] uppercase" style={{ color: SCAN_TO }}>
+                  {t("result.actionCard.eyebrow")}
+                </p>
+                <p className="text-[20px] font-black mt-1" style={{ color: DEEP_GREEN }}>
+                  {t("result.actionCard.title")}
+                </p>
+                <p className="text-[12px] text-stone-500 mt-1">
+                  {routineComplete ? t("result.actionCard.complete") : t("result.actionCard.subtitle")}
+                </p>
+              </div>
+              <div className="rounded-2xl px-3 py-2 text-right"
+                style={{ background: "rgba(255,255,255,0.85)", border: "1px solid #F3DDD6" }}>
+                <p className="text-[10px] font-bold text-stone-400">{t("result.actionCard.scoreLabel")}</p>
+                <p className="text-[24px] font-black leading-none" style={{ color: SCAN_TO }}>{overallScore}</p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-3 gap-2.5 mb-4">
+              <div className="rounded-2xl p-3" style={{ background: "#FFFFFF", border: "1px solid #F4E4DE" }}>
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: "#FFF1EC" }}>
+                    <CheckCircle2 className="w-4 h-4" style={{ color: SCAN_TO }} />
+                  </div>
+                  <p className="text-[10px] font-bold text-stone-400">{t("result.actionCard.routineLabel")}</p>
+                </div>
+                <p className="text-[18px] font-black leading-none" style={{ color: DEEP_GREEN }}>{routineDone}/{routineTotal || 0}</p>
+                <p className="text-[10px] text-stone-500 mt-1">{t("result.actionCard.routineSub")}</p>
+              </div>
+              <div className="rounded-2xl p-3" style={{ background: "#FFFFFF", border: "1px solid #E7EFEA" }}>
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: "#ECFDF5" }}>
+                    <Flame className="w-4 h-4 text-emerald-600" />
+                  </div>
+                  <p className="text-[10px] font-bold text-stone-400">{t("result.actionCard.streakLabel")}</p>
+                </div>
+                <p className="text-[18px] font-black leading-none" style={{ color: DEEP_GREEN }}>
+                  {t("result.actionCard.streakValue", { count: currentStreak.count || 1 })}
+                </p>
+                <p className="text-[10px] text-stone-500 mt-1">{t("result.actionCard.streakSub", { count: currentStreak.longest || currentStreak.count || 1 })}</p>
+              </div>
+              <div className="rounded-2xl p-3" style={{ background: "#FFFFFF", border: "1px solid #ECEAFB" }}>
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: "#F4F3FF" }}>
+                    <Target className="w-4 h-4 text-violet-600" />
+                  </div>
+                  <p className="text-[10px] font-bold text-stone-400">{t("result.actionCard.focusLabel")}</p>
+                </div>
+                <p className="text-[12px] font-black leading-snug" style={{ color: DEEP_GREEN }}>{todayFocus}</p>
+                <p className="text-[10px] text-stone-500 mt-1">{t("result.actionCard.focusSub")}</p>
+              </div>
+            </div>
+
+            <div className="rounded-[24px] p-4" style={{ background: "linear-gradient(135deg, rgba(224,152,130,0.12), rgba(45,95,79,0.08))" }}>
+              <div className="flex items-start gap-3">
+                <div className="w-10 h-10 rounded-2xl flex items-center justify-center shrink-0"
+                  style={{ background: `linear-gradient(135deg, ${DEEP_GREEN_LIGHT}, ${DEEP_GREEN})` }}>
+                  <CalendarDays className="w-5 h-5 text-white" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-[13px] font-black" style={{ color: DEEP_GREEN }}>{t("result.actionCard.diaryTitle")}</p>
+                  <p className="text-[11px] text-stone-500 mt-1">{t("result.actionCard.diaryDesc")}</p>
+                </div>
+                <Button onClick={() => onOpenDiary?.()} className="rounded-full px-4 text-[12px] font-black shadow-none"
+                  style={{ background: `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})` }}>
+                  <BookOpen className="w-4 h-4 mr-1.5" />
+                  {t("result.actionCard.diaryButton")}
+                </Button>
+              </div>
+            </div>
           </CardContent>
         </Card>
 

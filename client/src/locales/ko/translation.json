@@ -123,6 +123,24 @@
       "firstRecord": "오늘 첫 번째 기록",
       "history": "{{count}}번의 기록 · 오늘 {{score}}점"
     },
+    "actionCard": {
+      "eyebrow": "Today Loop",
+      "title": "오늘 바로 관리할 것",
+      "subtitle": "결과만 보고 끝내지 말고 오늘 루틴을 이어가세요.",
+      "complete": "오늘 루틴을 모두 완료했어요. 기록만 남기면 됩니다.",
+      "scoreLabel": "오늘 점수",
+      "routineLabel": "루틴 진행",
+      "routineSub": "체크리스트 완료 수",
+      "streakLabel": "연속 기록",
+      "streakValue": "{{count}}일",
+      "streakSub": "최고 {{count}}일 유지",
+      "focusLabel": "오늘 집중",
+      "focusSub": "가장 먼저 할 액션",
+      "diaryTitle": "달력에서 바로 체크하고 메모 남기기",
+      "diaryDesc": "오늘 루틴 완료 여부와 메모를 피부 일기에 바로 쌓아두세요.",
+      "diaryButton": "일기 열기",
+      "fallbackFocus": "오늘 메모 남기기"
+    },
     "login": {
       "title": "변화 과정을 기록하세요",
       "desc": "로그인으로 내 피부 일기를 시작하세요.",

@@ -123,6 +123,24 @@
       "firstRecord": "Your first entry today",
       "history": "{{count}} records · Today {{score}} pts"
     },
+    "actionCard": {
+      "eyebrow": "Today Loop",
+      "title": "What to do today",
+      "subtitle": "Do not stop at the result. Carry today's routine through.",
+      "complete": "Today's routine is complete. Just leave a note in your diary.",
+      "scoreLabel": "Today's score",
+      "routineLabel": "Routine",
+      "routineSub": "Checklist progress",
+      "streakLabel": "Streak",
+      "streakValue": "{{count}} days",
+      "streakSub": "Best {{count}} days",
+      "focusLabel": "Focus",
+      "focusSub": "Your first action",
+      "diaryTitle": "Check it off and leave a note in Diary",
+      "diaryDesc": "Log today's routine progress and memo directly in your skin diary.",
+      "diaryButton": "Open Diary",
+      "fallbackFocus": "Leave a note today"
+    },
     "login": {
       "title": "Track Your Progress",
       "desc": "Log in to start your personal skin diary.",
