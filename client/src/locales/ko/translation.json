@@ -139,7 +139,8 @@
     "diary": {
       "title": "피부 일기",
       "firstRecord": "오늘 첫 번째 기록",
-      "history": "{{count}}번의 기록 · 오늘 {{score}}점"
+      "history": "{{count}}번의 기록 · 오늘 {{score}}점",
+      "avg7d": "최근 7일 평균"
     },
     "actionCard": {
       "eyebrow": "Mission Loop",
@@ -263,7 +264,45 @@
       "noEntry": "아직 기록이 없어요",
       "noEntryDesc": "AI 스캔 후 첫 페이지가 채워져요 ✦",
       "compareTitle": "이전 스캔과 비교",
-      "calendarScore": "{{score}}점"
+      "calendarScore": "{{score}}점",
+      "autoTag": "자동 추천 태그",
+      "legendRoutine": "루틴 완료",
+      "legendIncomplete": "루틴 미완료",
+      "legendMemo": "메모",
+      "legendTag": "원인 태그",
+      "weeklyTitle": "Weekly Report",
+      "weeklyUnlocked": "7일 연속 측정 리포트가 열렸어요",
+      "weeklyLocked": "7일 연속 측정까지 {{days}}일 남았어요",
+      "weeklyUnlockedDesc": "이번 주 점수 흐름과 루틴 패턴, 메모 요약을 한 번에 확인할 수 있어요.",
+      "weeklyLockedDesc": "스트릭을 채우면 이번 주 피부 흐름과 루틴 패턴을 리포트로 열어드려요.",
+      "streakShort": "STREAK",
+      "scoreFlow": "Score Flow",
+      "weeklyAverage": "이번 주 평균 점수",
+      "best": "BEST",
+      "low": "LOW",
+      "pattern": "Pattern",
+      "bestRoutine": "가장 잘 지킨 루틴",
+      "worstRoutine": "가장 자주 놓친 루틴",
+      "collectingData": "데이터를 모으는 중이에요",
+      "memoSignals": "Memo Signals",
+      "memoCollecting": "메모가 더 쌓이면 보여드릴게요",
+      "weeklyMemoCount": "이번 주 메모 {{count}}회",
+      "causeTags": "Cause Tags",
+      "tagCollecting": "태그가 더 쌓이면 보여드릴게요",
+      "incompleteDays": "루틴 미완료일 {{count}}일",
+      "reminderTitle": "Reminder",
+      "reminderHeadline": "루틴 미완료 리마인드",
+      "reminderDesc": "앱이 열려 있고 알림 권한이 허용된 상태에서 저녁 시간에 남은 루틴을 알려드려요.",
+      "reminderNotifyTitle": "Fonday 루틴 리마인드",
+      "reminderNotifyBody": "오늘 루틴이 {{done}}/{{total}} 완료 상태예요. 남은 루틴을 체크해 보세요.",
+      "causeTagOptions": {
+        "sleep": "수면 부족",
+        "newProduct": "새 화장품",
+        "cycle": "생리 주기",
+        "diet": "식단",
+        "stress": "스트레스",
+        "outdoor": "야외 활동"
+      }
     },
     "partnership": {
       "title": "브랜드 제휴 문의",
@@ -457,7 +496,8 @@
     "distribution": "점수 분포",
     "topBaumann": "인기 바우만 타입 TOP3",
     "people": "명",
-    "loginForRank": "로그인 시 내 순위를 확인할 수 있어요"
+    "loginForRank": "로그인 시 내 순위를 확인할 수 있어요",
+    "me": "나"
   },
   "compare": {
     "prev": "이전 스캔",

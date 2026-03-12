@@ -139,7 +139,8 @@
     "diary": {
       "title": "Skin Diary",
       "firstRecord": "Your first entry today",
-      "history": "{{count}} records · Today {{score}} pts"
+      "history": "{{count}} records · Today {{score}} pts",
+      "avg7d": "7-day average"
     },
     "actionCard": {
       "eyebrow": "Mission Loop",
@@ -263,7 +264,45 @@
       "noEntry": "No entries yet",
       "noEntryDesc": "Your first page will be filled after an AI scan ✦",
       "compareTitle": "Compare with previous scan",
-      "calendarScore": "{{score}}pts"
+      "calendarScore": "{{score}}pts",
+      "autoTag": "Suggested tags",
+      "legendRoutine": "Routine done",
+      "legendIncomplete": "Routine pending",
+      "legendMemo": "Memo",
+      "legendTag": "Cause tag",
+      "weeklyTitle": "Weekly Report",
+      "weeklyUnlocked": "Your 7-day streak report is ready",
+      "weeklyLocked": "{{days}} day(s) left until your 7-day streak report opens",
+      "weeklyUnlockedDesc": "See this week's score flow, routine pattern, and memo signals at a glance.",
+      "weeklyLockedDesc": "Keep the streak going and we will unlock a weekly view of your skin flow and routine pattern.",
+      "streakShort": "STREAK",
+      "scoreFlow": "Score Flow",
+      "weeklyAverage": "Average score this week",
+      "best": "BEST",
+      "low": "LOW",
+      "pattern": "Pattern",
+      "bestRoutine": "Most consistent routine",
+      "worstRoutine": "Most missed routine",
+      "collectingData": "Collecting data",
+      "memoSignals": "Memo Signals",
+      "memoCollecting": "Add a few more memos to unlock this view",
+      "weeklyMemoCount": "{{count}} memos this week",
+      "causeTags": "Cause Tags",
+      "tagCollecting": "Add a few more tags to unlock this view",
+      "incompleteDays": "{{count}} day(s) with unfinished routines",
+      "reminderTitle": "Reminder",
+      "reminderHeadline": "Unfinished routine reminder",
+      "reminderDesc": "If the app stays open and notifications are allowed, we'll nudge you in the evening when routines are still left.",
+      "reminderNotifyTitle": "Fonday Routine Reminder",
+      "reminderNotifyBody": "Today's routine is {{done}}/{{total}} complete. Check off the steps you still have left.",
+      "causeTagOptions": {
+        "sleep": "Lack of sleep",
+        "newProduct": "New product",
+        "cycle": "Cycle",
+        "diet": "Diet",
+        "stress": "Stress",
+        "outdoor": "Outdoor time"
+      }
     },
     "partnership": {
       "title": "Brand Partnership Inquiry",
@@ -457,7 +496,8 @@
     "distribution": "Score Distribution",
     "topBaumann": "Popular Baumann Types TOP3",
     "people": " users",
-    "loginForRank": "Log in to see your rank"
+    "loginForRank": "Log in to see your rank",
+    "me": "Me"
   },
   "compare": {
     "prev": "Previous",

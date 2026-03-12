@@ -1759,15 +1759,23 @@ function saveDiaryMemo(dateStr: string, text: string) {
   if (dateStr === todayStr()) window.dispatchEvent(new CustomEvent("fonday:diary-updated"));
 }
 
-const DIARY_CAUSE_TAGS = ["수면부족", "새 화장품", "생리주기", "식단", "스트레스", "야외활동"] as const;
+const DIARY_CAUSE_TAGS = ["sleep", "newProduct", "cycle", "diet", "stress", "outdoor"] as const;
 type DiaryCauseTag = typeof DIARY_CAUSE_TAGS[number];
+const LEGACY_DIARY_CAUSE_TAG_MAP: Record<string, DiaryCauseTag> = {
+  "수면부족": "sleep",
+  "새 화장품": "newProduct",
+  "생리주기": "cycle",
+  "식단": "diet",
+  "스트레스": "stress",
+  "야외활동": "outdoor",
+};
 const CAUSE_TAG_KEYWORDS: Record<DiaryCauseTag, string[]> = {
-  "수면부족": ["피곤", "수면", "잠", "야근", "늦잠"],
-  "새 화장품": ["새", "화장품", "세럼", "크림", "토너", "제품"],
-  "생리주기": ["생리", "주기", "PMS"],
-  "식단": ["매운", "야식", "커피", "술", "밀가루", "단것", "식단"],
-  "스트레스": ["스트레스", "예민", "피로", "긴장"],
-  "야외활동": ["야외", "운동", "햇빛", "외출", "여행"],
+  sleep: ["피곤", "수면", "잠", "야근", "늦잠", "sleep", "tired", "insomnia", "寝不足", "睡眠"],
+  newProduct: ["새", "화장품", "세럼", "크림", "토너", "제품", "new product", "serum", "cream", "toner", "cosmetic", "新しい", "化粧品"],
+  cycle: ["생리", "주기", "pms", "period", "cycle", "menstrual", "生理", "周期"],
+  diet: ["매운", "야식", "커피", "술", "밀가루", "단것", "식단", "diet", "coffee", "alcohol", "spicy", "sugar", "食事", "コーヒー", "お酒"],
+  stress: ["스트레스", "예민", "피로", "긴장", "stress", "stressed", "sensitive", "ストレス", "疲れ"],
+  outdoor: ["야외", "운동", "햇빛", "외출", "여행", "outdoor", "sun", "travel", "workout", "外出", "日差し", "旅行"],
 };
 
 interface ReminderSettings {
@@ -1778,7 +1786,17 @@ interface ReminderSettings {
 }
 
 function getDiaryCauseTags(dateStr: string): DiaryCauseTag[] {
-  try { return JSON.parse(localStorage.getItem(`fonday_cause_tags_${dateStr}`) || "[]"); } catch { return []; }
+  try {
+    const raw = JSON.parse(localStorage.getItem(`fonday_cause_tags_${dateStr}`) || "[]");
+    if (!Array.isArray(raw)) return [];
+    return raw
+      .map((tag) => {
+        if (typeof tag !== "string") return null;
+        if (DIARY_CAUSE_TAGS.includes(tag as DiaryCauseTag)) return tag as DiaryCauseTag;
+        return LEGACY_DIARY_CAUSE_TAG_MAP[tag] ?? null;
+      })
+      .filter((tag): tag is DiaryCauseTag => Boolean(tag));
+  } catch { return []; }
 }
 
 function saveDiaryCauseTags(dateStr: string, tags: DiaryCauseTag[]) {
@@ -1787,6 +1805,10 @@ function saveDiaryCauseTags(dateStr: string, tags: DiaryCauseTag[]) {
     else localStorage.removeItem(`fonday_cause_tags_${dateStr}`);
   } catch {}
   if (dateStr === todayStr()) window.dispatchEvent(new CustomEvent("fonday:diary-updated"));
+}
+
+function getCauseTagLabel(t: (key: string, options?: any) => string, tag: DiaryCauseTag) {
+  return t(`modal.diary.causeTagOptions.${tag}`);
 }
 
 function suggestCauseTags(text: string): DiaryCauseTag[] {
@@ -1986,14 +2008,14 @@ function InlineMemo({ dateStr }: { dateStr: string }) {
                   ? { background: `${SCAN_FROM}20`, color: SCAN_TO, border: `1px solid ${SCAN_FROM}55` }
                   : { background: "#F6F3EE", color: "#9A8F80", border: "1px solid #ECE4DC" }}
               >
-                {tag}
+                {getCauseTagLabel(t, tag)}
               </button>
             );
           })}
         </div>
         {autoSuggestions.length > 0 && (
           <div className="mt-2 rounded-xl px-3 py-2" style={{ background: "#F6F3EE" }}>
-            <p className="text-[10px] font-bold text-stone-400 mb-1">AUTO TAG</p>
+            <p className="text-[10px] font-bold text-stone-400 mb-1">{t("modal.diary.autoTag")}</p>
             <div className="flex flex-wrap gap-1.5">
               {autoSuggestions.map((tag) => (
                 <button
@@ -2002,7 +2024,7 @@ function InlineMemo({ dateStr }: { dateStr: string }) {
                   className="px-2.5 py-1 rounded-full text-[10px] font-bold"
                   style={{ background: "#FFFFFF", color: SCAN_TO, border: `1px solid ${SCAN_FROM}40` }}
                 >
-                  + {tag}
+                  + {getCauseTagLabel(t, tag)}
                 </button>
               ))}
             </div>
@@ -2034,7 +2056,7 @@ function InlineMemo({ dateStr }: { dateStr: string }) {
               {tags.map((tag) => (
                 <span key={tag} className="px-2 py-0.5 rounded-full text-[10px] font-bold"
                   style={{ background: "#F6F3EE", color: "#9A8F80" }}>
-                  {tag}
+                  {getCauseTagLabel(t, tag)}
                 </span>
               ))}
             </div>
@@ -2078,6 +2100,11 @@ function DiaryCalendarView({ allEntries }: { allEntries: { dateStr: string; scor
     : i18n.language === "ja"
     ? `${year}年${month + 1}月`
     : new Date(year, month).toLocaleDateString("en-US", { month: "long", year: "numeric" });
+  const weekdayLabels = i18n.language === "ko"
+    ? ["일", "월", "화", "수", "목", "금", "토"]
+    : i18n.language === "ja"
+    ? ["日", "月", "火", "水", "木", "金", "土"]
+    : ["S", "M", "T", "W", "T", "F", "S"];
 
   return (
     <div className="px-5 pb-8 pt-4">
@@ -2094,7 +2121,7 @@ function DiaryCalendarView({ allEntries }: { allEntries: { dateStr: string; scor
       </div>
 
       <div className="grid grid-cols-7 mb-1">
-        {["일","월","화","수","목","금","토"].map(d => (
+        {weekdayLabels.map(d => (
           <div key={d} className="text-center text-[10px] font-bold text-stone-300 py-1.5">{d}</div>
         ))}
       </div>
@@ -2152,7 +2179,7 @@ function DiaryCalendarView({ allEntries }: { allEntries: { dateStr: string; scor
           className="mt-4 p-4 rounded-[24px] border shadow-sm" style={{ background: "linear-gradient(180deg, #FFFAF9 0%, #FFFFFF 100%)", borderColor: "#F0EDE8" }}>
           <div className="flex items-center justify-between mb-3">
             <span className="text-[11px] font-medium text-stone-400 tracking-wide">{selectedEntry.dateStr}</span>
-            <span className="text-[20px] font-black" style={{ color: SCAN_TO }}>{selectedEntry.score}점</span>
+            <span className="text-[20px] font-black" style={{ color: SCAN_TO }}>{selectedEntry.score}{t("result.scoreSuffix")}</span>
           </div>
           <InlineTodos dateStr={selectedEntry.dateStr} />
           <InlineMemo dateStr={selectedEntry.dateStr} />
@@ -2170,10 +2197,10 @@ function DiaryCalendarView({ allEntries }: { allEntries: { dateStr: string; scor
       </div>
       <div className="mt-3 flex items-center gap-3 justify-center flex-wrap">
         {[
-          { label: "루틴", color: "#10B981" },
-          { label: "미완료", color: "#D97706" },
-          { label: "메모", color: "#7C3AED" },
-          { label: "태그", color: "#2D5F4F" },
+          { label: t("modal.diary.legendRoutine"), color: "#10B981" },
+          { label: t("modal.diary.legendIncomplete"), color: "#D97706" },
+          { label: t("modal.diary.legendMemo"), color: "#7C3AED" },
+          { label: t("modal.diary.legendTag"), color: "#2D5F4F" },
         ].map(({ label, color }) => (
           <div key={label} className="flex items-center gap-1">
             <div className="w-3 h-3 rounded-full" style={{ background: color }} />
@@ -2461,7 +2488,7 @@ function DiaryFullView({ history, analysisResult, overallScore, finalType, curre
                               <span className="text-[10px] text-stone-400 w-5 text-right">{band.count}</span>
                               {isMyBand && (
                                 <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full shrink-0"
-                                  style={{ background: `${SCAN_FROM}30`, color: SCAN_TO }}>나</span>
+                                  style={{ background: `${SCAN_FROM}30`, color: SCAN_TO }}>{t("ranking.me")}</span>
                               )}
                             </div>
                           );
@@ -2578,8 +2605,8 @@ function DiaryTab({ user, analysisResult, onBack }: { user: any; analysisResult:
         && now.getMinutes() >= reminderSettings.minute
         && reminderSettings.lastNotifiedDate !== currentDate;
       if (shouldTrigger) {
-        new Notification("Fonday 루틴 리마인드", {
-          body: `오늘 루틴이 ${progress.done}/${progress.total} 완료 상태예요. 남은 루틴을 체크해 보세요.`,
+        new Notification(t("modal.diary.reminderNotifyTitle"), {
+          body: t("modal.diary.reminderNotifyBody", { done: progress.done, total: progress.total }),
           icon: "/icon-192.png",
         });
         const next = { ...reminderSettings, lastNotifiedDate: currentDate };
@@ -2625,7 +2652,7 @@ function DiaryTab({ user, analysisResult, onBack }: { user: any; analysisResult:
               <p className="text-[12px] text-stone-500 mt-2 leading-relaxed text-kr-pretty">{t("result.login.desc")}</p>
               <div className="grid grid-cols-3 gap-2.5 mt-5 text-left">
                 <div className="rounded-2xl p-3" style={{ background: "#FFF1EC" }}>
-                  <p className="text-[10px] font-bold text-stone-500">7D AVG</p>
+                  <p className="text-[10px] font-bold text-stone-500">{t("result.diary.avg7d")}</p>
                   <p className="text-[18px] font-black mt-1" style={{ color: SCAN_TO }}>--</p>
                 </div>
                 <div className="rounded-2xl p-3" style={{ background: "#F5F3FF" }}>
@@ -2678,7 +2705,7 @@ function DiaryTab({ user, analysisResult, onBack }: { user: any; analysisResult:
               <p className="text-[22px] font-black mt-1">{overallScore || "—"}</p>
             </div>
             <div className="rounded-2xl p-3 bg-white/10 border border-white/12">
-              <p className="text-[10px] font-bold text-white/70 whitespace-nowrap">AVG 7D</p>
+              <p className="text-[10px] font-bold text-white/70 whitespace-nowrap">{t("result.diary.avg7d")}</p>
               <p className="text-[22px] font-black mt-1">{avgScore || "—"}</p>
             </div>
             <div className="rounded-2xl p-3 bg-white/10 border border-white/12">
@@ -2709,20 +2736,22 @@ function DiaryTab({ user, analysisResult, onBack }: { user: any; analysisResult:
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
                   <p className="text-[10px] font-black tracking-[0.16em] uppercase" style={{ color: weeklyReport.unlocked ? SCAN_TO : "#9A8F80" }}>
-                    Weekly Report
+                    {t("modal.diary.weeklyTitle")}
                   </p>
                   <p className="text-[18px] font-black mt-1 text-kr-pretty" style={{ color: DEEP_GREEN }}>
-                    {weeklyReport.unlocked ? "7일 연속 측정 리포트가 열렸어요" : `7일 연속 측정까지 ${Math.max(7 - weeklyReport.progress, 0)}일 남았어요`}
+                    {weeklyReport.unlocked
+                      ? t("modal.diary.weeklyUnlocked")
+                      : t("modal.diary.weeklyLocked", { days: Math.max(7 - weeklyReport.progress, 0) })}
                   </p>
                   <p className="text-[11px] text-stone-500 mt-1 leading-relaxed text-kr-pretty">
                     {weeklyReport.unlocked
-                      ? "이번 주 점수 흐름과 루틴 패턴, 메모 요약을 한 번에 확인할 수 있습니다."
-                      : "스트릭을 채우면 이번 주 피부 흐름과 루틴 패턴을 리포트로 열어드립니다."}
+                      ? t("modal.diary.weeklyUnlockedDesc")
+                      : t("modal.diary.weeklyLockedDesc")}
                   </p>
                 </div>
                 <div className="rounded-2xl px-3 py-2 text-right shrink-0"
                   style={{ background: weeklyReport.unlocked ? "#FFF1EC" : "#FFFFFF", border: "1px solid #EDE3DB" }}>
-                  <p className="text-[10px] font-bold text-stone-500 whitespace-nowrap">STREAK</p>
+                  <p className="text-[10px] font-bold text-stone-500 whitespace-nowrap">{t("modal.diary.streakShort")}</p>
                   <p className="text-[20px] font-black leading-none" style={{ color: weeklyReport.unlocked ? SCAN_TO : DEEP_GREEN }}>{weeklyReport.progress}/7</p>
                 </div>
               </div>
@@ -2738,58 +2767,58 @@ function DiaryTab({ user, analysisResult, onBack }: { user: any; analysisResult:
               {weeklyReport.unlocked && (
                 <div className="grid gap-3 mt-4 md:grid-cols-2">
                   <div className="rounded-[22px] p-4" style={{ background: "#FFFFFF", border: "1px solid #F1E6DE" }}>
-                    <p className="text-[10px] font-black uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>Score Flow</p>
+                    <p className="text-[10px] font-black uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>{t("modal.diary.scoreFlow")}</p>
                     <p className="text-[22px] font-black mt-2" style={{ color: DEEP_GREEN }}>{weeklyReport.averageScore}</p>
-                    <p className="text-[11px] text-stone-500 mt-1">이번 주 평균 점수</p>
+                    <p className="text-[11px] text-stone-500 mt-1">{t("modal.diary.weeklyAverage")}</p>
                     <div className="grid grid-cols-2 gap-2 mt-3">
                       <div className="rounded-2xl p-3" style={{ background: "#FFF8F4" }}>
-                        <p className="text-[10px] text-stone-400">BEST</p>
-                        <p className="text-[14px] font-black mt-1" style={{ color: DEEP_GREEN }}>{weeklyReport.bestDay?.score ?? "--"}점</p>
+                        <p className="text-[10px] text-stone-400">{t("modal.diary.best")}</p>
+                        <p className="text-[14px] font-black mt-1" style={{ color: DEEP_GREEN }}>{weeklyReport.bestDay?.score ?? "--"}{weeklyReport.bestDay ? t("result.scoreSuffix") : ""}</p>
                       </div>
                       <div className="rounded-2xl p-3" style={{ background: "#F6F3EE" }}>
-                        <p className="text-[10px] text-stone-400">LOW</p>
-                        <p className="text-[14px] font-black mt-1" style={{ color: "#8C8070" }}>{weeklyReport.worstDay?.score ?? "--"}점</p>
+                        <p className="text-[10px] text-stone-400">{t("modal.diary.low")}</p>
+                        <p className="text-[14px] font-black mt-1" style={{ color: "#8C8070" }}>{weeklyReport.worstDay?.score ?? "--"}{weeklyReport.worstDay ? t("result.scoreSuffix") : ""}</p>
                       </div>
                     </div>
                   </div>
                   <div className="rounded-[22px] p-4" style={{ background: "#FFFFFF", border: "1px solid #F1E6DE" }}>
-                    <p className="text-[10px] font-black uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>Pattern</p>
+                    <p className="text-[10px] font-black uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>{t("modal.diary.pattern")}</p>
                     <div className="space-y-3 mt-3">
                       <div>
-                        <p className="text-[10px] text-stone-400">베스트 루틴</p>
-                        <p className="text-[13px] font-black mt-1 text-kr-pretty" style={{ color: DEEP_GREEN }}>{weeklyReport.bestRoutine?.text ?? "데이터 수집 중"}</p>
+                        <p className="text-[10px] text-stone-400">{t("modal.diary.bestRoutine")}</p>
+                        <p className="text-[13px] font-black mt-1 text-kr-pretty" style={{ color: DEEP_GREEN }}>{weeklyReport.bestRoutine?.text ?? t("modal.diary.collectingData")}</p>
                       </div>
                       <div>
-                        <p className="text-[10px] text-stone-400">가장 자주 놓친 루틴</p>
-                        <p className="text-[13px] font-black mt-1 text-kr-pretty" style={{ color: "#8C8070" }}>{weeklyReport.worstRoutine?.text ?? "데이터 수집 중"}</p>
+                        <p className="text-[10px] text-stone-400">{t("modal.diary.worstRoutine")}</p>
+                        <p className="text-[13px] font-black mt-1 text-kr-pretty" style={{ color: "#8C8070" }}>{weeklyReport.worstRoutine?.text ?? t("modal.diary.collectingData")}</p>
                       </div>
                     </div>
                   </div>
                   <div className="rounded-[22px] p-4" style={{ background: "#FFFFFF", border: "1px solid #F1E6DE" }}>
-                    <p className="text-[10px] font-black uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>Memo Signals</p>
+                    <p className="text-[10px] font-black uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>{t("modal.diary.memoSignals")}</p>
                     <div className="flex flex-wrap gap-1.5 mt-3">
-                      {(weeklyReport.keywordSummary.length > 0 ? weeklyReport.keywordSummary : ["메모 수집 중"]).map((keyword) => (
+                      {(weeklyReport.keywordSummary.length > 0 ? weeklyReport.keywordSummary : [t("modal.diary.memoCollecting")]).map((keyword) => (
                         <span key={keyword} className="px-2.5 py-1 rounded-full text-[10px] font-bold"
                           style={{ background: "#FFF1EC", color: SCAN_TO }}>
                           {keyword}
                         </span>
                       ))}
                     </div>
-                    <p className="text-[11px] text-stone-500 mt-3">이번 주 메모 {weeklyReport.memoCount}회</p>
+                    <p className="text-[11px] text-stone-500 mt-3">{t("modal.diary.weeklyMemoCount", { count: weeklyReport.memoCount })}</p>
                   </div>
                   <div className="rounded-[22px] p-4" style={{ background: "#FFFFFF", border: "1px solid #F1E6DE" }}>
-                    <p className="text-[10px] font-black uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>Cause Tags</p>
+                    <p className="text-[10px] font-black uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>{t("modal.diary.causeTags")}</p>
                     <div className="flex flex-wrap gap-1.5 mt-3">
                       {(weeklyReport.topCauseTags.length > 0
-                        ? weeklyReport.topCauseTags.map(([tag, count]) => `${tag} ${count}`)
-                        : ["태그 수집 중"]).map((item) => (
+                        ? weeklyReport.topCauseTags.map(([tag, count]) => `${getCauseTagLabel(t, tag)} ${count}`)
+                        : [t("modal.diary.tagCollecting")]).map((item) => (
                         <span key={item} className="px-2.5 py-1 rounded-full text-[10px] font-bold"
                           style={{ background: "#F5F3FF", color: "#7C3AED" }}>
                           {item}
                         </span>
                       ))}
                     </div>
-                    <p className="text-[11px] text-stone-500 mt-3">루틴 미완료일 {weeklyReport.incompleteDays}일</p>
+                    <p className="text-[11px] text-stone-500 mt-3">{t("modal.diary.incompleteDays", { count: weeklyReport.incompleteDays })}</p>
                   </div>
                 </div>
               )}
@@ -2799,10 +2828,10 @@ function DiaryTab({ user, analysisResult, onBack }: { user: any; analysisResult:
             <CardContent className="p-5">
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
-                  <p className="text-[10px] font-black tracking-[0.16em] uppercase" style={{ color: SCAN_TO }}>Reminder</p>
-                  <p className="text-[16px] font-black mt-1 text-kr-pretty" style={{ color: DEEP_GREEN }}>루틴 미완료 리마인드</p>
+                  <p className="text-[10px] font-black tracking-[0.16em] uppercase" style={{ color: SCAN_TO }}>{t("modal.diary.reminderTitle")}</p>
+                  <p className="text-[16px] font-black mt-1 text-kr-pretty" style={{ color: DEEP_GREEN }}>{t("modal.diary.reminderHeadline")}</p>
                   <p className="text-[11px] text-stone-500 mt-1 leading-relaxed text-kr-pretty">
-                    앱이 열려 있고 알림 권한이 허용된 상태에서 저녁 시간에 남은 루틴을 알려드립니다.
+                    {t("modal.diary.reminderDesc")}
                   </p>
                 </div>
                 <button
