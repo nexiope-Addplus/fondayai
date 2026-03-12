@@ -1367,10 +1367,26 @@ function ScanIdleScreen({ onScan }: { onScan: () => void }) {
         </motion.div>
       )}
 
-      {/* ── AI 스캐너 비주얼 ── */}
-      <motion.div variants={fadeChild} className="flex flex-col items-center mb-4 relative" style={{ zIndex: 1 }}>
-        {/* 세로 직사각형 프레임 (얼굴+어깨) */}
-        <div className="relative rounded-3xl overflow-hidden" style={{ width: 220, height: 280 }}>
+      {/* ── Editorial 헤더: 브랜드칩 + 제목 + 부제목 ── */}
+      <motion.div variants={fadeChild} className="mb-5 relative" style={{ zIndex: 1 }}>
+        <div className="flex justify-center mb-3">
+          <div className="flex items-center gap-1.5 px-3 py-1 rounded-full"
+            style={{ background: `${SCAN_FROM}22`, border: `1px solid ${SCAN_FROM}50` }}>
+            <Sparkles className="w-3 h-3" style={{ color: SCAN_TO }} />
+            <span className="text-[11px] font-bold tracking-widest uppercase" style={{ color: SCAN_TO }}>FONDAY AI</span>
+          </div>
+        </div>
+        <h1 className="text-[28px] font-black text-stone-800 text-center leading-tight mb-2 px-2">
+          {t("idle.title")}
+        </h1>
+        <p className="text-[13px] text-stone-500 text-center px-4">
+          {t("idle.subtitle4")}
+        </p>
+      </motion.div>
+
+      {/* ── AI 스캐너 비주얼 (풀 넓이) ── */}
+      <motion.div variants={fadeChild} className="mb-4 relative" style={{ zIndex: 1 }}>
+        <div className="relative w-full rounded-3xl overflow-hidden" style={{ height: 260 }}>
           {/* 실제 얼굴 이미지 */}
           <img
             src="/face-model.png"
@@ -1384,30 +1400,25 @@ function ScanIdleScreen({ onScan }: { onScan: () => void }) {
             animate={{ top: ["0%", "100%", "0%"] }}
             transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }} />
           {/* 하단 그라디언트 페이드 */}
-          <div className="absolute bottom-0 left-0 right-0 h-16 pointer-events-none"
-            style={{ background: "linear-gradient(to top, rgba(253,250,248,0.85), transparent)" }} />
+          <div className="absolute bottom-0 left-0 right-0 h-20 pointer-events-none"
+            style={{ background: "linear-gradient(to top, rgba(253,250,248,0.9), transparent)" }} />
           {/* 4 코너 AR 브라켓 */}
-          <div className="absolute top-2 left-2 w-7 h-7 border-t-2 border-l-2 rounded-tl-lg" style={{ borderColor: SCAN_TO }} />
-          <div className="absolute top-2 right-2 w-7 h-7 border-t-2 border-r-2 rounded-tr-lg" style={{ borderColor: SCAN_TO }} />
-          <div className="absolute bottom-2 left-2 w-7 h-7 border-b-2 border-l-2 rounded-bl-lg" style={{ borderColor: SCAN_TO }} />
-          <div className="absolute bottom-2 right-2 w-7 h-7 border-b-2 border-r-2 rounded-br-lg" style={{ borderColor: SCAN_TO }} />
-          {/* 회전 글로우 점 */}
-          <motion.div className="absolute inset-0 z-10"
-            animate={{ rotate: 360 }}
-            transition={{ duration: 6, repeat: Infinity, ease: "linear" }}>
-            <div className="absolute top-1/2 right-0 w-2 h-2 rounded-full -translate-y-1/2"
-              style={{ background: SCAN_TO, boxShadow: `0 0 8px ${SCAN_TO}` }} />
-          </motion.div>
+          <div className="absolute top-3 left-3 w-7 h-7 border-t-2 border-l-2 rounded-tl-lg" style={{ borderColor: SCAN_TO }} />
+          <div className="absolute top-3 right-3 w-7 h-7 border-t-2 border-r-2 rounded-tr-lg" style={{ borderColor: SCAN_TO }} />
+          <div className="absolute bottom-3 left-3 w-7 h-7 border-b-2 border-l-2 rounded-bl-lg" style={{ borderColor: SCAN_TO }} />
+          <div className="absolute bottom-3 right-3 w-7 h-7 border-b-2 border-r-2 rounded-br-lg" style={{ borderColor: SCAN_TO }} />
+          {/* AI ANALYZING 오버레이 (이미지 하단) */}
+          <div className="absolute bottom-3 left-0 right-0 flex justify-center z-20">
+            <motion.div
+              className="flex items-center gap-2 px-3 py-1.5 rounded-full"
+              style={{ background: "rgba(0,0,0,0.32)", backdropFilter: "blur(8px)" }}
+              animate={{ opacity: [0.7, 1, 0.7] }}
+              transition={{ duration: 1.8, repeat: Infinity }}>
+              <div className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: SCAN_FROM }} />
+              <span className="text-[10px] font-bold text-white uppercase tracking-wider">AI ANALYZING...</span>
+            </motion.div>
+          </div>
         </div>
-        {/* AI ANALYZING 텍스트 */}
-        <motion.p className="text-[10px] font-bold tracking-[0.2em] uppercase mt-3"
-          style={{ color: SCAN_TO }}
-          animate={{ opacity: [0.4, 1, 0.4] }}
-          transition={{ duration: 1.8, repeat: Infinity }}>
-          AI ANALYZING...
-        </motion.p>
-        <h1 className="text-[20px] font-bold text-stone-800 text-center mt-2 leading-snug">{t("idle.title")}</h1>
-        <p className="text-[13px] text-stone-500 text-center mt-1">{t("idle.subtitle4")}</p>
       </motion.div>
 
       {/* ── 소셜 증명 카운터 ── */}
