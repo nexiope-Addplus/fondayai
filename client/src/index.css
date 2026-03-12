@@ -199,6 +199,11 @@
  * need to be distinguished from eachother visually.
  */
 @layer utilities {
+  .text-kr-pretty {
+    word-break: keep-all;
+    overflow-wrap: anywhere;
+    text-wrap: pretty;
+  }
 
   /* Hide ugly search cancel button in Chrome until we can style it properly */
   input[type="search"]::-webkit-search-cancel-button {
