@@ -1756,6 +1756,7 @@ function saveDiaryMemo(dateStr: string, text: string) {
     if (text.trim()) localStorage.setItem(`fonday_memo_${dateStr}`, text.trim());
     else localStorage.removeItem(`fonday_memo_${dateStr}`);
   } catch {}
+  if (dateStr === todayStr()) window.dispatchEvent(new CustomEvent("fonday:diary-updated"));
 }
 
 // ─── 루틴 Todo 유틸 ──────────────────────────────────────────────
@@ -1765,6 +1766,7 @@ function getDiaryTodos(dateStr: string): TodoItem[] {
 }
 function saveDiaryTodos(dateStr: string, todos: TodoItem[]) {
   try { localStorage.setItem(`fonday_todos_${dateStr}`, JSON.stringify(todos)); } catch {}
+  if (dateStr === todayStr()) window.dispatchEvent(new CustomEvent("fonday:diary-updated"));
 }
 function getDiaryTodoProgress(dateStr: string) {
   const todos = getDiaryTodos(dateStr);
@@ -2618,79 +2620,106 @@ function SkinPredictionCard({ prediction, currentScore }: {
   const { good, bad } = prediction;
   const goodDelta = good.score - currentScore;
   const badDelta = bad.score - currentScore;
+  const rewardPts = Math.max(goodDelta, 5);
 
   return (
     <Card className="border-none shadow-md rounded-3xl overflow-hidden">
       <CardContent className="p-5">
-        {/* 헤더 */}
-        <div className="flex items-center gap-2 mb-4">
-          <div className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0 text-base"
-            style={{ background: "linear-gradient(135deg, #A78BFA, #7C3AED)" }}>
-            🔮
+        <div className="flex items-start justify-between gap-3 mb-4">
+          <div className="flex items-center gap-2 min-w-0">
+            <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 text-base"
+              style={{ background: "linear-gradient(135deg, #A78BFA, #7C3AED)" }}>
+              🔮
+            </div>
+            <div className="min-w-0">
+              <p className="text-[13px] font-black" style={{ color: DEEP_GREEN }}>{t("result.prediction.title")}</p>
+              <p className="text-[11px] text-stone-400">{t("result.prediction.currentScore", { score: currentScore })}</p>
+            </div>
           </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-[13px] font-black" style={{ color: DEEP_GREEN }}>{t("result.prediction.title")}</p>
-            <p className="text-[11px] text-stone-400">{t("result.prediction.currentScore", { score: currentScore })}</p>
+          <div className="rounded-2xl px-3 py-2 text-right shrink-0"
+            style={{ background: "#F5F3FF", border: "1px solid #E9D5FF" }}>
+            <p className="text-[10px] font-black text-violet-500">{t("result.prediction.rewardLabel")}</p>
+            <p className="text-[20px] font-black leading-none text-violet-700">+{rewardPts}</p>
+            <p className="text-[9px] text-violet-400 mt-1">{t("result.prediction.rewardSub")}</p>
           </div>
-          <span className="text-[9px] px-2 py-0.5 rounded-full bg-stone-100 text-stone-400 shrink-0">
-            {t("result.prediction.disclaimer")}
+        </div>
+
+        <div className="rounded-[24px] p-4 mb-4 text-white"
+          style={{ background: "linear-gradient(135deg, #6D28D9 0%, #C97062 100%)" }}>
+          <div className="flex items-start justify-between gap-3">
+            <div className="min-w-0">
+              <p className="text-[11px] font-black uppercase tracking-[0.14em] text-white/75">{t("result.prediction.missionEyebrow")}</p>
+              <p className="text-[18px] font-black mt-1">{t("result.prediction.missionTitle")}</p>
+              <p className="text-[12px] text-white/80 mt-1">{t("result.prediction.daysAfter", { days: good.days })}</p>
+            </div>
+            <span className="text-[9px] px-2 py-1 rounded-full bg-white/12 text-white/80 shrink-0">
+              {t("result.prediction.disclaimer")}
+            </span>
+          </div>
+          <div className="grid grid-cols-2 gap-2.5 mt-4">
+            <div className="rounded-2xl bg-white/10 p-3 border border-white/12">
+              <p className="text-[10px] font-black text-white/70">{t("result.prediction.bestRoute")}</p>
+              <p className="text-[15px] font-black mt-1 leading-tight">{good.scenario}</p>
+              <p className="text-[11px] text-emerald-100 mt-2">+{goodDelta} {t("result.scoreSuffix")}</p>
+            </div>
+            <div className="rounded-2xl bg-white/10 p-3 border border-white/12">
+              <p className="text-[10px] font-black text-white/70">{t("result.prediction.riskRoute")}</p>
+              <p className="text-[15px] font-black mt-1 leading-tight">{bad.scenario}</p>
+              <p className="text-[11px] text-orange-100 mt-2">-{Math.abs(badDelta)} {t("result.scoreSuffix")}</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="grid gap-3">
+          <div className="rounded-2xl p-4" style={{ background: "#F0FDF4", border: "1px solid #BBF7D0" }}>
+            <div className="flex items-start justify-between gap-3 mb-3">
+              <div className="min-w-0">
+                <p className="text-[12px] font-black text-emerald-700">{good.scenario}</p>
+                <p className="text-[11px] text-stone-400 mt-0.5">{t("result.prediction.goodCaption")}</p>
+              </div>
+              <div className="text-right shrink-0">
+                <p className="text-[28px] font-black leading-none text-emerald-600">{good.score}</p>
+                <p className="text-[11px] font-black text-emerald-500 mt-0.5">+{goodDelta}</p>
+              </div>
+            </div>
+            <p className="text-[10px] font-black text-emerald-700 mb-2">{t("result.prediction.routine")}</p>
+            <div className="space-y-2">
+              {good.routine?.map((r, i) => (
+                <div key={i} className="flex items-center gap-2 rounded-xl bg-white/70 px-3 py-2">
+                  <CheckCircle2 className="w-3.5 h-3.5 shrink-0 text-emerald-500" />
+                  <span className="text-[11px] font-medium text-stone-700 leading-tight">{r}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className="rounded-2xl p-4" style={{ background: "#FFF7ED", border: "1px solid #FED7AA" }}>
+            <div className="flex items-start justify-between gap-3 mb-3">
+              <div className="min-w-0">
+                <p className="text-[12px] font-black text-orange-700">{bad.scenario}</p>
+                <p className="text-[11px] text-stone-400 mt-0.5">{t("result.prediction.badCaption")}</p>
+              </div>
+              <div className="text-right shrink-0">
+                <p className="text-[28px] font-black leading-none text-orange-500">{bad.score}</p>
+                <p className="text-[11px] font-black text-orange-400 mt-0.5">-{Math.abs(badDelta)}</p>
+              </div>
+            </div>
+            <p className="text-[10px] font-black text-orange-700 mb-2">{t("result.prediction.risks")}</p>
+            <div className="flex flex-wrap gap-1.5">
+              {bad.risks?.map((r, i) => (
+                <span key={i} className="rounded-full bg-white/80 px-2.5 py-1 text-[10px] font-bold text-stone-600">
+                  {r}
+                </span>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-4 rounded-2xl px-3 py-3 flex items-center justify-between gap-3"
+          style={{ background: "#FAF5FF", border: "1px solid #E9D5FF" }}>
+          <p className="text-[11px] text-stone-500 leading-snug">{t("result.prediction.diaryHint")}</p>
+          <span className="shrink-0 rounded-full bg-violet-100 px-2.5 py-1 text-[10px] font-black text-violet-600">
+            {t("result.prediction.questHint")}
           </span>
-        </div>
-
-        {/* 긍정 시나리오 */}
-        <div className="rounded-2xl p-4 mb-3" style={{ background: "#F0FDF4", border: "1px solid #BBF7D0" }}>
-          <div className="flex items-start justify-between mb-3">
-            <div>
-              <p className="text-[12px] font-bold text-emerald-700">✅ {good.scenario}</p>
-              <p className="text-[11px] text-stone-400 mt-0.5">
-                {t("result.prediction.daysAfter", { days: good.days })}
-              </p>
-            </div>
-            <div className="text-right shrink-0 ml-3">
-              <p className="text-[30px] font-black leading-none text-emerald-600">{good.score}</p>
-              <p className="text-[11px] font-bold text-emerald-500 mt-0.5">▲ +{goodDelta}</p>
-            </div>
-          </div>
-          <p className="text-[10px] font-bold text-emerald-600 mb-1.5">📋 {t("result.prediction.routine")}</p>
-          <div className="space-y-1">
-            {good.routine?.map((r, i) => (
-              <div key={i} className="flex items-start gap-1.5">
-                <span className="text-emerald-400 mt-0.5 shrink-0 text-[10px]">•</span>
-                <span className="text-[11px] text-stone-600">{r}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* 부정 시나리오 */}
-        <div className="rounded-2xl p-4" style={{ background: "#FFF7ED", border: "1px solid #FED7AA" }}>
-          <div className="flex items-start justify-between mb-3">
-            <div>
-              <p className="text-[12px] font-bold text-orange-700">⚠️ {bad.scenario}</p>
-              <p className="text-[11px] text-stone-400 mt-0.5">
-                {t("result.prediction.daysAfter", { days: bad.days })}
-              </p>
-            </div>
-            <div className="text-right shrink-0 ml-3">
-              <p className="text-[30px] font-black leading-none text-orange-500">{bad.score}</p>
-              <p className="text-[11px] font-bold text-orange-400 mt-0.5">▼ {Math.abs(badDelta)}</p>
-            </div>
-          </div>
-          <p className="text-[10px] font-bold text-orange-600 mb-1.5">🚨 {t("result.prediction.risks")}</p>
-          <div className="space-y-1">
-            {bad.risks?.map((r, i) => (
-              <div key={i} className="flex items-start gap-1.5">
-                <span className="text-orange-400 mt-0.5 shrink-0 text-[10px]">•</span>
-                <span className="text-[11px] text-stone-600">{r}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* 일기 탭 힌트 */}
-        <div className="mt-3 pt-3 border-t border-stone-100 flex items-center gap-2">
-          <span className="text-[12px]">📖</span>
-          <p className="text-[11px] text-stone-400">{t("result.prediction.diaryHint")}</p>
         </div>
       </CardContent>
     </Card>
@@ -2798,9 +2827,11 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
       if (document.visibilityState === "visible") refreshTodayState();
     };
     window.addEventListener("focus", refreshTodayState);
+    window.addEventListener("fonday:diary-updated", refreshTodayState as EventListener);
     document.addEventListener("visibilitychange", handleVisibility);
     return () => {
       window.removeEventListener("focus", refreshTodayState);
+      window.removeEventListener("fonday:diary-updated", refreshTodayState as EventListener);
       document.removeEventListener("visibilitychange", handleVisibility);
     };
   }, []);
@@ -3024,6 +3055,8 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
   const daysToGoal = nextStreakGoal ? Math.max(nextStreakGoal - (currentStreak.count || 0), 0) : 0;
   const nextStreakReward = nextStreakGoal ? MISSION_POINTS[`streak_${nextStreakGoal}`] || 0 : 0;
   const missionReward = routineComplete ? 0 : MISSION_POINTS.daily_scan;
+  const scoreMissionDone = overallScore >= 70;
+  const premiumMissionDone = overallScore >= 80;
   const questBoard = [
     {
       id: "scan",
@@ -3049,9 +3082,26 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
       detail: t("result.actionCard.questMemoDetail"),
       accent: "#7C3AED",
     },
+    {
+      id: "score70",
+      done: scoreMissionDone,
+      label: t("result.actionCard.questScore"),
+      reward: "70+",
+      detail: t("result.actionCard.questScoreDetail"),
+      accent: "#D97706",
+    },
+    {
+      id: "score80",
+      done: premiumMissionDone,
+      label: t("result.actionCard.questPremium"),
+      reward: "80+",
+      detail: t("result.actionCard.questPremiumDetail"),
+      accent: "#0F766E",
+    },
   ];
   const questDoneCount = questBoard.filter((quest) => quest.done).length;
   const questProgressPct = Math.round((questDoneCount / questBoard.length) * 100);
+  const allClearBonus = questDoneCount === questBoard.length ? 20 : 0;
 
   const parseFoodOptions = (value?: string): string[] => {
     if (!value) return [];
@@ -3486,15 +3536,15 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
 
             <div className="rounded-[24px] p-4 mb-4" style={{ background: "#FFFDFB", border: "1px solid #F2E7E2" }}>
               <div className="flex items-center justify-between gap-3 mb-3">
-                <div>
+                <div className="min-w-0">
                   <p className="text-[11px] font-black uppercase tracking-[0.16em]" style={{ color: SCAN_TO }}>
                     {t("result.actionCard.questEyebrow")}
                   </p>
-                  <p className="text-[16px] font-black mt-1" style={{ color: DEEP_GREEN }}>
+                  <p className="text-[15px] font-black mt-1 leading-tight break-keep" style={{ color: DEEP_GREEN }}>
                     {t("result.actionCard.questTitle", { done: questDoneCount, total: questBoard.length })}
                   </p>
                 </div>
-                <div className="rounded-full px-3 py-1 text-[11px] font-black"
+                <div className="rounded-full px-3 py-1 text-[10px] font-black shrink-0"
                   style={{ background: questDoneCount === questBoard.length ? "#ECFDF5" : "#FFF1EC", color: questDoneCount === questBoard.length ? "#059669" : SCAN_TO }}>
                   {questDoneCount === questBoard.length ? t("result.actionCard.questAllClear") : t("result.actionCard.questInProgress")}
                 </div>
@@ -3507,6 +3557,11 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
                   animate={{ width: `${questProgressPct}%` }}
                   transition={{ duration: 0.6, ease: "easeOut" }}
                 />
+              </div>
+              <div className="rounded-2xl px-3 py-2 mb-3 flex items-center justify-between gap-3"
+                style={{ background: "#FFF7ED", border: "1px solid #FED7AA" }}>
+                <p className="text-[11px] font-black text-orange-700 break-keep">{t("result.actionCard.comboLabel")}</p>
+                <span className="text-[11px] font-black text-orange-500 shrink-0">+{allClearBonus}pt</span>
               </div>
               <div className="space-y-2">
                 {questBoard.map((quest, index) => (
@@ -3528,10 +3583,10 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between gap-2">
-                        <p className="text-[12px] font-black" style={{ color: DEEP_GREEN }}>{quest.label}</p>
+                        <p className="text-[12px] font-black leading-tight break-keep" style={{ color: DEEP_GREEN }}>{quest.label}</p>
                         <span className="text-[10px] font-black" style={{ color: quest.done ? "#059669" : quest.accent }}>{quest.reward}</span>
                       </div>
-                      <p className="text-[10px] text-stone-500 mt-0.5">{quest.detail}</p>
+                      <p className="text-[10px] text-stone-500 mt-0.5 leading-tight break-keep">{quest.detail}</p>
                     </div>
                   </motion.div>
                 ))}
