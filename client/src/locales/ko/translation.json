@@ -109,6 +109,14 @@
     },
     "partnershipShort": "제휴",
     "challengeShort": "챌린지",
+    "prediction": {
+      "title": "AI 피부 예측",
+      "currentScore": "현재 {{score}}점 기준",
+      "daysAfter": "{{days}}일 후 예상",
+      "routine": "추천 루틴",
+      "risks": "주요 위험 요인",
+      "disclaimer": "AI 예측 · 참고용"
+    },
     "diary": {
       "title": "피부 일기",
       "firstRecord": "오늘 첫 번째 기록",

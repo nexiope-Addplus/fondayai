@@ -64,6 +64,14 @@ interface Hotspot {
   type: string;
 }
 
+interface PredictionScenario {
+  days: number;
+  score: number;
+  scenario: string;
+  routine?: string[];
+  risks?: string[];
+}
+
 interface AnalysisResult {
   scores: { label: string; score: number; comment?: string }[];
   hotspots: Hotspot[];
@@ -72,6 +80,7 @@ interface AnalysisResult {
   skinReport?: { area: string; finding: string }[];
   improvements: { title: string; desc: string }[];
   cosmetics: { type: string; key: string; reason: string }[];
+  prediction?: { good: PredictionScenario; bad: PredictionScenario };
 }
 
 interface RankingData {
@@ -2524,6 +2533,88 @@ function MyScreen({ user, onInstall, onBack }: { user: any; onInstall: () => voi
   );
 }
 
+// ─── 피부 예측 카드 ────────────────────────────────────────────────
+function SkinPredictionCard({ prediction, currentScore }: {
+  prediction: { good: PredictionScenario; bad: PredictionScenario };
+  currentScore: number;
+}) {
+  const { t } = useTranslation();
+  const { good, bad } = prediction;
+  const goodDelta = good.score - currentScore;
+  const badDelta = bad.score - currentScore;
+
+  return (
+    <Card className="border-none shadow-md rounded-3xl overflow-hidden">
+      <CardContent className="p-5">
+        {/* 헤더 */}
+        <div className="flex items-center gap-2 mb-4">
+          <div className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0 text-base"
+            style={{ background: "linear-gradient(135deg, #A78BFA, #7C3AED)" }}>
+            🔮
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-[13px] font-black" style={{ color: DEEP_GREEN }}>{t("result.prediction.title")}</p>
+            <p className="text-[11px] text-stone-400">{t("result.prediction.currentScore", { score: currentScore })}</p>
+          </div>
+          <span className="text-[9px] px-2 py-0.5 rounded-full bg-stone-100 text-stone-400 shrink-0">
+            {t("result.prediction.disclaimer")}
+          </span>
+        </div>
+
+        {/* 긍정 시나리오 */}
+        <div className="rounded-2xl p-4 mb-3" style={{ background: "#F0FDF4", border: "1px solid #BBF7D0" }}>
+          <div className="flex items-start justify-between mb-3">
+            <div>
+              <p className="text-[12px] font-bold text-emerald-700">✅ {good.scenario}</p>
+              <p className="text-[11px] text-stone-400 mt-0.5">
+                {t("result.prediction.daysAfter", { days: good.days })}
+              </p>
+            </div>
+            <div className="text-right shrink-0 ml-3">
+              <p className="text-[30px] font-black leading-none text-emerald-600">{good.score}</p>
+              <p className="text-[11px] font-bold text-emerald-500 mt-0.5">▲ +{goodDelta}</p>
+            </div>
+          </div>
+          <p className="text-[10px] font-bold text-emerald-600 mb-1.5">📋 {t("result.prediction.routine")}</p>
+          <div className="space-y-1">
+            {good.routine?.map((r, i) => (
+              <div key={i} className="flex items-start gap-1.5">
+                <span className="text-emerald-400 mt-0.5 shrink-0 text-[10px]">•</span>
+                <span className="text-[11px] text-stone-600">{r}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* 부정 시나리오 */}
+        <div className="rounded-2xl p-4" style={{ background: "#FFF7ED", border: "1px solid #FED7AA" }}>
+          <div className="flex items-start justify-between mb-3">
+            <div>
+              <p className="text-[12px] font-bold text-orange-700">⚠️ {bad.scenario}</p>
+              <p className="text-[11px] text-stone-400 mt-0.5">
+                {t("result.prediction.daysAfter", { days: bad.days })}
+              </p>
+            </div>
+            <div className="text-right shrink-0 ml-3">
+              <p className="text-[30px] font-black leading-none text-orange-500">{bad.score}</p>
+              <p className="text-[11px] font-bold text-orange-400 mt-0.5">▼ {Math.abs(badDelta)}</p>
+            </div>
+          </div>
+          <p className="text-[10px] font-bold text-orange-600 mb-1.5">🚨 {t("result.prediction.risks")}</p>
+          <div className="space-y-1">
+            {bad.risks?.map((r, i) => (
+              <div key={i} className="flex items-start gap-1.5">
+                <span className="text-orange-400 mt-0.5 shrink-0 text-[10px]">•</span>
+                <span className="text-[11px] text-stone-600">{r}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
 function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBack, onGoMagazine, onOpenDiary, user }: any) {
   const { t } = useTranslation();
   const [history, setHistory] = useState<any[]>([]);
@@ -3158,6 +3249,14 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
 
           </CardContent>
         </Card>
+
+        {/* ── AI 피부 예측 카드 ── */}
+        {analysisResult?.prediction && (
+          <SkinPredictionCard
+            prediction={analysisResult.prediction}
+            currentScore={analysisResult.scores[0]?.score ?? 0}
+          />
+        )}
 
         {/* AI 피부 총평 */}
         {analysisResult?.aiComment && (

@@ -108,6 +108,14 @@
       "nutrition": "栄養"
     },
     "partnershipShort": "提携",
+    "prediction": {
+      "title": "AI 肌予測",
+      "currentScore": "現在{{score}}点基準",
+      "daysAfter": "{{days}}日後の予測",
+      "routine": "おすすめルーティン",
+      "risks": "主なリスク要因",
+      "disclaimer": "AI予測 · 参考用"
+    },
     "challengeShort": "チャレンジ",
     "diary": {
       "title": "肌日記",

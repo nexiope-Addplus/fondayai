@@ -108,6 +108,14 @@
       "nutrition": "Nutrition"
     },
     "partnershipShort": "Partner",
+    "prediction": {
+      "title": "AI Skin Forecast",
+      "currentScore": "Based on current score {{score}}",
+      "daysAfter": "In {{days}} days",
+      "routine": "Recommended Routine",
+      "risks": "Key Risk Factors",
+      "disclaimer": "AI forecast · reference only"
+    },
     "challengeShort": "Challenge",
     "diary": {
       "title": "Skin Diary",
