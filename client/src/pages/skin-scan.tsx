@@ -2623,12 +2623,12 @@ function SkinPredictionCard({ prediction, currentScore }: {
   const rewardPts = Math.max(goodDelta, 5);
 
   return (
-    <Card className="border-none shadow-md rounded-3xl overflow-hidden bg-white">
+    <Card className="border-none shadow-md rounded-3xl overflow-hidden">
       <CardContent className="p-5">
-        <div className="flex flex-col gap-3 mb-4 sm:flex-row sm:items-start sm:justify-between">
+        <div className="flex items-start justify-between gap-3 mb-4">
           <div className="flex items-center gap-2 min-w-0">
             <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 text-base"
-              style={{ background: `linear-gradient(135deg, ${DEEP_GREEN_LIGHT}, ${DEEP_GREEN})` }}>
+              style={{ background: "linear-gradient(135deg, #A78BFA, #7C3AED)" }}>
               🔮
             </div>
             <div className="min-w-0">
@@ -2636,37 +2636,36 @@ function SkinPredictionCard({ prediction, currentScore }: {
               <p className="text-[11px] text-stone-400">{t("result.prediction.currentScore", { score: currentScore })}</p>
             </div>
           </div>
-          <div className="rounded-2xl px-3.5 py-3 text-right shrink-0 self-start"
-            style={{ background: "#F7FAF8", border: "1px solid #DCE8E3" }}>
-            <p className="text-[10px] font-black" style={{ color: DEEP_GREEN }}>{t("result.prediction.rewardLabel")}</p>
-            <p className="text-[20px] font-black leading-none" style={{ color: DEEP_GREEN }}>+{rewardPts}</p>
-            <p className="text-[9px] text-stone-400 mt-1">{t("result.prediction.rewardSub")}</p>
+          <div className="rounded-2xl px-3 py-2 text-right shrink-0"
+            style={{ background: "#F5F3FF", border: "1px solid #E9D5FF" }}>
+            <p className="text-[10px] font-black text-violet-500">{t("result.prediction.rewardLabel")}</p>
+            <p className="text-[20px] font-black leading-none text-violet-700">+{rewardPts}</p>
+            <p className="text-[9px] text-violet-400 mt-1">{t("result.prediction.rewardSub")}</p>
           </div>
         </div>
 
-        <div className="rounded-[24px] p-4 mb-4"
-          style={{ background: "linear-gradient(135deg, rgba(45,95,79,0.08), rgba(224,152,130,0.14))", border: "1px solid #E4DDD8" }}>
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+        <div className="rounded-[24px] p-4 mb-4 text-white"
+          style={{ background: "linear-gradient(135deg, #6D28D9 0%, #C97062 100%)" }}>
+          <div className="flex items-start justify-between gap-3">
             <div className="min-w-0">
-              <p className="text-[11px] font-black uppercase tracking-[0.14em]" style={{ color: DEEP_GREEN }}>{t("result.prediction.missionEyebrow")}</p>
-              <p className="text-[18px] font-black mt-1 leading-tight text-kr-pretty" style={{ color: DEEP_GREEN }}>{t("result.prediction.missionTitle")}</p>
-              <p className="text-[12px] text-stone-600 mt-1 leading-relaxed text-kr-pretty">{t("result.prediction.daysAfter", { days: good.days })}</p>
+              <p className="text-[11px] font-black uppercase tracking-[0.14em] text-white/75">{t("result.prediction.missionEyebrow")}</p>
+              <p className="text-[18px] font-black mt-1 text-kr-pretty">{t("result.prediction.missionTitle")}</p>
+              <p className="text-[12px] text-white/80 mt-1 text-kr-pretty">{t("result.prediction.daysAfter", { days: good.days })}</p>
             </div>
-            <span className="text-[9px] px-2 py-1 rounded-full shrink-0 self-start"
-              style={{ background: "#FFFFFF", color: "#6B7280", border: "1px solid #E7DED9" }}>
+            <span className="text-[9px] px-2 py-1 rounded-full bg-white/12 text-white/80 shrink-0">
               {t("result.prediction.disclaimer")}
             </span>
           </div>
           <div className="grid grid-cols-2 gap-2.5 mt-4">
-            <div className="rounded-2xl p-3" style={{ background: "#FFFFFF", border: "1px solid #DAECE3" }}>
-              <p className="text-[10px] font-black text-emerald-700">{t("result.prediction.bestRoute")}</p>
-              <p className="text-[15px] font-black mt-1 leading-[1.35] text-kr-pretty" style={{ color: DEEP_GREEN }}>{good.scenario}</p>
-              <p className="text-[11px] text-emerald-600 mt-2">+{goodDelta} {t("result.scoreSuffix")}</p>
+            <div className="rounded-2xl bg-white/10 p-3 border border-white/12">
+              <p className="text-[10px] font-black text-white/70">{t("result.prediction.bestRoute")}</p>
+              <p className="text-[15px] font-black mt-1 leading-tight text-kr-pretty">{good.scenario}</p>
+              <p className="text-[11px] text-emerald-100 mt-2">+{goodDelta} {t("result.scoreSuffix")}</p>
             </div>
-            <div className="rounded-2xl p-3" style={{ background: "#FFFFFF", border: "1px solid #F2DFD8" }}>
-              <p className="text-[10px] font-black text-orange-700">{t("result.prediction.riskRoute")}</p>
-              <p className="text-[15px] font-black mt-1 leading-[1.35] text-kr-pretty" style={{ color: DEEP_GREEN }}>{bad.scenario}</p>
-              <p className="text-[11px] text-orange-500 mt-2">-{Math.abs(badDelta)} {t("result.scoreSuffix")}</p>
+            <div className="rounded-2xl bg-white/10 p-3 border border-white/12">
+              <p className="text-[10px] font-black text-white/70">{t("result.prediction.riskRoute")}</p>
+              <p className="text-[15px] font-black mt-1 leading-tight text-kr-pretty">{bad.scenario}</p>
+              <p className="text-[11px] text-orange-100 mt-2">-{Math.abs(badDelta)} {t("result.scoreSuffix")}</p>
             </div>
           </div>
         </div>
@@ -2675,7 +2674,7 @@ function SkinPredictionCard({ prediction, currentScore }: {
           <div className="rounded-2xl p-4" style={{ background: "#F0FDF4", border: "1px solid #BBF7D0" }}>
             <div className="flex items-start justify-between gap-3 mb-3">
               <div className="min-w-0">
-                <p className="text-[12px] font-black text-emerald-700 leading-[1.35] text-kr-pretty">{good.scenario}</p>
+                <p className="text-[12px] font-black text-emerald-700 text-kr-pretty">{good.scenario}</p>
                 <p className="text-[11px] text-stone-400 mt-0.5">{t("result.prediction.goodCaption")}</p>
               </div>
               <div className="text-right shrink-0">
@@ -2688,7 +2687,7 @@ function SkinPredictionCard({ prediction, currentScore }: {
               {good.routine?.map((r, i) => (
                 <div key={i} className="flex items-center gap-2 rounded-xl bg-white/70 px-3 py-2">
                   <CheckCircle2 className="w-3.5 h-3.5 shrink-0 text-emerald-500" />
-                  <span className="text-[11px] font-medium text-stone-700 leading-[1.45] text-kr-pretty">{r}</span>
+                  <span className="text-[11px] font-medium text-stone-700 leading-tight text-kr-pretty">{r}</span>
                 </div>
               ))}
             </div>
@@ -2696,7 +2695,7 @@ function SkinPredictionCard({ prediction, currentScore }: {
           <div className="rounded-2xl p-4" style={{ background: "#FFF7ED", border: "1px solid #FED7AA" }}>
             <div className="flex items-start justify-between gap-3 mb-3">
               <div className="min-w-0">
-                <p className="text-[12px] font-black text-orange-700 leading-[1.35] text-kr-pretty">{bad.scenario}</p>
+                <p className="text-[12px] font-black text-orange-700 text-kr-pretty">{bad.scenario}</p>
                 <p className="text-[11px] text-stone-400 mt-0.5">{t("result.prediction.badCaption")}</p>
               </div>
               <div className="text-right shrink-0">
@@ -2716,10 +2715,9 @@ function SkinPredictionCard({ prediction, currentScore }: {
         </div>
 
         <div className="mt-4 rounded-2xl px-3 py-3 flex items-center justify-between gap-3"
-          style={{ background: "#F7FAF8", border: "1px solid #DCE8E3" }}>
-          <p className="text-[11px] text-stone-500 leading-[1.45] text-kr-pretty">{t("result.prediction.diaryHint")}</p>
-          <span className="shrink-0 rounded-full px-2.5 py-1 text-[10px] font-black"
-            style={{ background: "#E7F3EE", color: DEEP_GREEN }}>
+          style={{ background: "#FAF5FF", border: "1px solid #E9D5FF" }}>
+          <p className="text-[11px] text-stone-500 leading-snug text-kr-pretty">{t("result.prediction.diaryHint")}</p>
+          <span className="shrink-0 rounded-full bg-violet-100 px-2.5 py-1 text-[10px] font-black text-violet-600">
             {t("result.prediction.questHint")}
           </span>
         </div>
@@ -3043,7 +3041,8 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
   const isWrink = (scores[4]?.score ?? 100) < 60;  // index 4 = 주름 및 탄력
   const finalType = `${isOily ? "O" : "D"}${isSens ? "S" : "R"}${isPig ? "P" : "N"}${isWrink ? "W" : "T"}`;
   const todayRoutine = analysisResult?.prediction?.good?.routine ?? [];
-  const todayFocus = todayRoutine[0] ?? analysisResult?.improvements?.[0]?.title ?? t("result.actionCard.fallbackFocus");
+  const todayMissionRoutines = todayRoutine.slice(0, 2);
+  const todayFocus = todayMissionRoutines.join(" · ") || analysisResult?.improvements?.[0]?.title || t("result.actionCard.fallbackFocus");
   const routineDone = todayTodoProgress.done;
   const routineTotal = todayTodoProgress.total || todayRoutine.length;
   const routineComplete = routineTotal > 0 && routineDone === routineTotal;
@@ -3472,22 +3471,23 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
           </Card>
         )}
 
-        <Card className="border-none rounded-3xl overflow-hidden shadow-md bg-white">
+        <Card className="border-none rounded-3xl overflow-hidden shadow-[0_18px_40px_rgba(201,112,98,0.18)]"
+          style={{ background: "linear-gradient(180deg, #FFF8F4 0%, #FFFFFF 100%)" }}>
           <CardContent className="p-5">
-            <div className="flex flex-col gap-3 mb-4 sm:flex-row sm:items-start sm:justify-between">
-              <div className="min-w-0">
+            <div className="flex items-start justify-between gap-3 mb-4">
+              <div>
                 <p className="text-[11px] font-black tracking-[0.18em] uppercase" style={{ color: SCAN_TO }}>
                   {t("result.actionCard.eyebrow")}
                 </p>
-                <p className="text-[20px] font-black mt-1 leading-tight text-kr-pretty" style={{ color: DEEP_GREEN }}>
+                <p className="text-[20px] font-black mt-1 text-kr-pretty" style={{ color: DEEP_GREEN }}>
                   {t("result.actionCard.title")}
                 </p>
-                <p className="text-[12px] text-stone-500 mt-1 leading-relaxed text-kr-pretty">
+                <p className="text-[12px] text-stone-500 mt-1 text-kr-pretty">
                   {t("result.actionCard.reason", { focus: weakestSummary || t("result.actionCard.fallbackFocus") })}
                 </p>
               </div>
-              <div className="rounded-2xl px-3.5 py-3 text-right self-start sm:min-w-[104px]"
-                style={{ background: "#FAF6F3", border: "1px solid #EEE2DA" }}>
+              <div className="rounded-2xl px-3 py-2 text-right"
+                style={{ background: "#FFF1EC", border: "1px solid #F3DDD6" }}>
                 <p className="text-[10px] font-bold" style={{ color: SCAN_TO }}>{t("result.actionCard.rewardLabel")}</p>
                 <p className="text-[22px] font-black leading-none" style={{ color: SCAN_TO }}>
                   +{missionReward}
@@ -3496,40 +3496,45 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
               </div>
             </div>
 
-            <div className="rounded-[24px] p-4 mb-4"
-              style={{ background: "linear-gradient(135deg, rgba(45,95,79,0.08), rgba(201,112,98,0.14))", border: "1px solid #E9DDD7" }}>
-              <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+            <div className="rounded-[24px] p-4 mb-4 text-white"
+              style={{ background: "linear-gradient(135deg, #2D5F4F 0%, #C97062 100%)" }}>
+              <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
-                  <p className="text-[12px] font-black uppercase tracking-[0.14em]" style={{ color: DEEP_GREEN }}>{t("result.actionCard.missionEyebrow")}</p>
-                  <p className="text-[18px] font-black mt-1 leading-tight text-kr-pretty" style={{ color: DEEP_GREEN }}>
+                  <p className="text-[12px] font-black uppercase tracking-[0.14em] text-white/80">{t("result.actionCard.missionEyebrow")}</p>
+                  <p className="text-[18px] font-black mt-1 text-kr-pretty">
                     {routineComplete ? t("result.actionCard.complete") : t("result.actionCard.missionTitle")}
                   </p>
-                  <p className="text-[12px] text-stone-600 mt-1 leading-relaxed text-kr-pretty">{todayFocus}</p>
+                  <div className="mt-1.5 space-y-1.5">
+                    {(todayMissionRoutines.length ? todayMissionRoutines : [todayFocus]).map((routine: string, index: number) => (
+                      <p key={`${routine}-${index}`} className="text-[12px] text-white/85 leading-relaxed text-kr-pretty">
+                        {todayMissionRoutines.length
+                          ? `${index === 0 ? "AM" : "PM"} ${routine}`
+                          : routine}
+                      </p>
+                    ))}
+                  </div>
                 </div>
-                <div className="rounded-2xl px-3 py-2 self-start"
-                  style={{ background: "rgba(255,255,255,0.85)", border: "1px solid #E8D7D1" }}>
-                  <p className="text-[10px] font-bold text-stone-500">{t("result.actionCard.scoreLabel")}</p>
-                  <p className="text-[24px] font-black leading-none" style={{ color: DEEP_GREEN }}>{overallScore}</p>
+                <div className="rounded-2xl px-3 py-2 bg-white/14 border border-white/20">
+                  <p className="text-[10px] font-bold text-white/70">{t("result.actionCard.scoreLabel")}</p>
+                  <p className="text-[24px] font-black leading-none">{overallScore}</p>
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-2.5 mt-4">
-                <div className="rounded-2xl p-3"
-                  style={{ background: "rgba(255,255,255,0.8)", border: "1px solid #E9DDD7" }}>
+                <div className="rounded-2xl bg-white/10 p-3 border border-white/12">
                   <div className="flex items-center gap-2 mb-1.5">
-                    <CheckCircle2 className="w-4 h-4" style={{ color: DEEP_GREEN }} />
-                    <p className="text-[10px] font-bold text-stone-500">{t("result.actionCard.routineLabel")}</p>
+                    <CheckCircle2 className="w-4 h-4 text-white" />
+                    <p className="text-[10px] font-bold text-white/70">{t("result.actionCard.routineLabel")}</p>
                   </div>
-                  <p className="text-[20px] font-black" style={{ color: DEEP_GREEN }}>{routineDone}/{routineTotal || 0}</p>
-                  <p className="text-[10px] text-stone-500 leading-relaxed text-kr-pretty">{t("result.actionCard.routineSub")}</p>
+                  <p className="text-[20px] font-black">{routineDone}/{routineTotal || 0}</p>
+                  <p className="text-[10px] text-white/75">{t("result.actionCard.routineSub")}</p>
                 </div>
-                <div className="rounded-2xl p-3"
-                  style={{ background: "rgba(255,255,255,0.8)", border: "1px solid #E9DDD7" }}>
+                <div className="rounded-2xl bg-white/10 p-3 border border-white/12">
                   <div className="flex items-center gap-2 mb-1.5">
-                    <Flame className="w-4 h-4 text-amber-500" />
-                    <p className="text-[10px] font-bold text-stone-500">{t("result.actionCard.streakLabel")}</p>
+                    <Flame className="w-4 h-4 text-amber-200" />
+                    <p className="text-[10px] font-bold text-white/70">{t("result.actionCard.streakLabel")}</p>
                   </div>
-                  <p className="text-[20px] font-black" style={{ color: DEEP_GREEN }}>{t("result.actionCard.streakValue", { count: currentStreak.count || 1 })}</p>
-                  <p className="text-[10px] text-stone-500 leading-relaxed text-kr-pretty">
+                  <p className="text-[20px] font-black">{t("result.actionCard.streakValue", { count: currentStreak.count || 1 })}</p>
+                  <p className="text-[10px] text-white/75">
                     {nextStreakGoal
                       ? t("result.actionCard.streakGoal", { days: daysToGoal, goal: nextStreakGoal, reward: nextStreakReward })
                       : t("result.actionCard.streakDone")}
@@ -3612,7 +3617,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
                   <p className="text-[10px] font-bold text-stone-400">{t("result.actionCard.pointsLabel")}</p>
                 </div>
                 <p className="text-[20px] font-black leading-none" style={{ color: DEEP_GREEN }}>{missionState.totalPoints}</p>
-                <p className="text-[10px] text-stone-500 mt-1 leading-relaxed text-kr-pretty">{t("result.actionCard.pointsSub")}</p>
+                <p className="text-[10px] text-stone-500 mt-1">{t("result.actionCard.pointsSub")}</p>
               </div>
             </div>
 
@@ -3624,9 +3629,9 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-[13px] font-black" style={{ color: DEEP_GREEN }}>{t("result.actionCard.diaryTitle")}</p>
-                  <p className="text-[11px] text-stone-500 mt-1 leading-relaxed text-kr-pretty">{t("result.actionCard.diaryDesc")}</p>
+                  <p className="text-[11px] text-stone-500 mt-1">{t("result.actionCard.diaryDesc")}</p>
                 </div>
-                <Button onClick={() => onOpenDiary?.()} className="rounded-full px-4 text-[12px] font-black shadow-none shrink-0 whitespace-nowrap"
+                <Button onClick={() => onOpenDiary?.()} className="rounded-full px-4 text-[12px] font-black shadow-none"
                   style={{ background: `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})` }}>
                   <BookOpen className="w-4 h-4 mr-1.5" />
                   {t("result.actionCard.diaryButton")}
