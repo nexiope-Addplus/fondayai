@@ -54,6 +54,8 @@ type ScanState = "idle" | "survey" | "scanning" | "result";
 interface SurveyData {
   gender: string;
   age: string;
+  genderIdx: number;
+  ageIdx: number;
   skinType: string;
   concerns: string[];
   condition: string;
@@ -1689,6 +1691,8 @@ function SurveyScreen({ onSubmit, onBack }: { onSubmit: (data: SurveyData) => vo
         <Button onClick={() => onSubmit({
           gender: genderIdx === 0 ? t("survey.female") : t("survey.male"),
           age: ageGroups[ageIdx],
+          genderIdx,
+          ageIdx,
           skinType: "복합성",
           concerns: concernIdxs.map(i => skinConcerns[i]),
           condition: "맨얼굴"
@@ -4532,6 +4536,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
   useEffect(() => {
     if (!analysisResult || user !== null || guestTokenFetched) return;
     setGuestTokenFetched(true);
+    const KO_AGE_GROUPS = ["10대","20대 초반","20대 후반","30대 초반","30대 후반","40대 초반","40대 후반","50대+"];
     fetch("/api/challenge-token", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -4542,6 +4547,8 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
         skinAge: analysisResult.skinAge,
         aiComment: analysisResult.aiComment,
         lang: i18n.language || "ko",
+        gender: (surveyData?.genderIdx ?? 0) === 0 ? "female" : "male",
+        ageGroup: KO_AGE_GROUPS[surveyData?.ageIdx ?? 2] ?? "",
       }),
     }).then(res => res.json()).then(data => {
       if (data?.shareToken) {
@@ -4576,6 +4583,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
       if (data?.id) setCurrentScanId(data.id);
       if (data?.shareToken) setCurrentShareToken(data.shareToken);
       // D1에도 저장 (관리자 통계용)
+      const KO_AGE_GROUPS2 = ["10대","20대 초반","20대 후반","30대 초반","30대 후반","40대 초반","40대 후반","50대+"];
       fetch("/api/challenge-token", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -4587,6 +4595,8 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
           aiComment: analysisResult.aiComment,
           lang: i18n.language || "ko",
           isGuest: false,
+          gender: (surveyData?.genderIdx ?? 0) === 0 ? "female" : "male",
+          ageGroup: KO_AGE_GROUPS2[surveyData?.ageIdx ?? 2] ?? "",
         }),
       }).catch(() => {});
     }).catch(() => {}); // Bug 4 fix: .catch() 추가
