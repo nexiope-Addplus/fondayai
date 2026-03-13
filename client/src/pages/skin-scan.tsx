@@ -2244,11 +2244,76 @@ function InlineMemo({ dateStr }: { dateStr: string }) {
   );
 }
 
+function DiaryRoutinePreviewCard({ routineGuide }: { routineGuide: ReturnType<typeof buildRoutineGuide> }) {
+  const { t } = useTranslation();
+
+  const sections = [
+    {
+      key: "am",
+      title: t("result.actionCard.phaseMorning"),
+      icon: Sun,
+      accent: DEEP_GREEN,
+      bg: "#F7FBFA",
+      border: "#DDECE7",
+      items: routineGuide.am,
+    },
+    {
+      key: "pm",
+      title: t("result.actionCard.phaseEvening"),
+      icon: Moon,
+      accent: SCAN_TO,
+      bg: "#FFF8F4",
+      border: "#F1DED7",
+      items: routineGuide.pm,
+    },
+  ];
+
+  return (
+    <div className="px-5 pt-4">
+      <div className="rounded-[28px] border bg-white shadow-sm" style={{ borderColor: "#F0E6E0" }}>
+        <div className="p-5">
+          <p className="text-[10px] font-black tracking-[0.16em] uppercase" style={{ color: SCAN_TO }}>{t("diary.routineTitle")}</p>
+          <p className="text-[16px] font-black mt-1 text-kr-pretty" style={{ color: DEEP_GREEN }}>{t("modal.diary.todayRoutineTitle")}</p>
+          <p className="text-[11px] text-stone-500 mt-1">{t("modal.diary.todayRoutineDesc")}</p>
+          <div className="grid gap-3 mt-4 md:grid-cols-2">
+            {sections.map(({ key, title, icon: Icon, accent, bg, border, items }) => (
+              <div key={key} className="rounded-[24px] p-4" style={{ background: bg, border: `1px solid ${border}` }}>
+                <div className="flex items-center justify-between gap-2 mb-3">
+                  <p className="text-[14px] font-black" style={{ color: DEEP_GREEN }}>{title}</p>
+                  <Icon className="w-5 h-5" style={{ color: accent }} />
+                </div>
+                {items.length > 0 ? (
+                  <div className="flex flex-wrap gap-1.5">
+                    {items.map((item) => (
+                      <span
+                        key={`${key}-${item.id}`}
+                        className="px-2.5 py-1 rounded-full text-[10px] font-bold"
+                        style={{ background: "#FFFFFF", color: accent, border: `1px solid ${accent}22` }}
+                      >
+                        {item.name}
+                      </span>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-[11px] text-stone-400">{t("modal.diary.todayRoutineEmpty")}</p>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ─── 다이어리 달력 뷰 ────────────────────────────────────────────
 function DiaryCalendarView({ allEntries }: { allEntries: { dateStr: string; score: number }[] }) {
   const { t, i18n } = useTranslation();
   const [viewDate, setViewDate] = useState(new Date());
-  const [selectedEntry, setSelectedEntry] = useState<{ dateStr: string; score: number } | null>(null);
+  const [selectedEntry, setSelectedEntry] = useState<{ dateStr: string; score: number } | null>(() => {
+    const todayEntry = allEntries.find((entry) => entry.dateStr === todayStr());
+    return todayEntry ?? null;
+  });
 
   const year = viewDate.getFullYear();
   const month = viewDate.getMonth();
@@ -2708,9 +2773,10 @@ function DiaryTab({ user, analysisResult, onBack }: { user: any; analysisResult:
   const { t } = useTranslation();
   const [history, setHistory] = useState<any[]>([]);
   const [rankingData, setRankingData] = useState<RankingData | null>(null);
-  const [tab, setTab] = useState<"timeline" | "calendar" | "ranking">("timeline");
+  const [tab, setTab] = useState<"calendar" | "timeline" | "report" | "ranking">("calendar");
   const [loading, setLoading] = useState(true);
   const [reminderSettings, setReminderSettings] = useState<ReminderSettings>(() => getReminderSettings());
+  const [myCosmetics, setMyCosmetics] = useState<CosmeticItem[]>([]);
   // Bug 7 fix: stale closure 방지용 ref
   const reminderSettingsRef = useRef(reminderSettings);
   useEffect(() => { reminderSettingsRef.current = reminderSettings; }, [reminderSettings]);
@@ -2752,6 +2818,13 @@ function DiaryTab({ user, analysisResult, onBack }: { user: any; analysisResult:
             });
           }
         } catch {}
+        try {
+          const cosmeticsRes = await fetch("/api/cosmetics");
+          if (cosmeticsRes.ok) {
+            const cosmetics = await cosmeticsRes.json();
+            setMyCosmetics(Array.isArray(cosmetics) ? cosmetics : []);
+          }
+        } catch {}
       }
       try {
         const qs = overallScore > 0 ? `?myScore=${overallScore}` : "";
@@ -2765,7 +2838,7 @@ function DiaryTab({ user, analysisResult, onBack }: { user: any; analysisResult:
 
   useEffect(() => {
     const targetTab = sessionStorage.getItem("fonday_diary_target_tab");
-    if (targetTab === "calendar" || targetTab === "timeline" || targetTab === "ranking") {
+    if (targetTab === "calendar" || targetTab === "timeline" || targetTab === "report" || targetTab === "ranking") {
       setTab(targetTab);
       sessionStorage.removeItem("fonday_diary_target_tab");
     }
@@ -2789,6 +2862,7 @@ function DiaryTab({ user, analysisResult, onBack }: { user: any; analysisResult:
   const diaryMemoReady = Boolean(getDiaryMemo(todayStr()).trim());
   const streakCount = getStreak().count;
   const weeklyReport = getWeeklyReport(allEntries, streakCount);
+  const routineGuide = buildRoutineGuide(myCosmetics, t);
 
   useEffect(() => {
     if (!reminderSettings.enabled) return;
@@ -2819,9 +2893,10 @@ function DiaryTab({ user, analysisResult, onBack }: { user: any; analysisResult:
     return () => window.clearInterval(timer);
   }, [reminderSettings.enabled]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const tabs: { id: "timeline" | "calendar" | "ranking"; label: string }[] = [
-    { id: "timeline", label: t("modal.diary.timelineTab") },
+  const tabs: { id: "calendar" | "timeline" | "report" | "ranking"; label: string }[] = [
     { id: "calendar", label: t("modal.diary.calendarTab") },
+    { id: "timeline", label: t("modal.diary.timelineTab") },
+    { id: "report", label: t("modal.diary.reportTab") },
     { id: "ranking", label: t("modal.diary.rankingTab") },
   ];
 
@@ -2930,160 +3005,86 @@ function DiaryTab({ user, analysisResult, onBack }: { user: any; analysisResult:
       </div>
 
       {/* 콘텐츠 */}
-      <div className="flex-1 overflow-y-auto overscroll-contain pb-24">
-        <div className="px-5 pt-4">
-          <Card className="border-none rounded-[28px] overflow-hidden shadow-sm"
-            style={{ background: weeklyReport.unlocked ? "linear-gradient(135deg, #FFF7F2 0%, #FFFFFF 100%)" : "linear-gradient(135deg, #F6F3EE 0%, #FFFFFF 100%)" }}>
-            <CardContent className="p-5">
-              <div className="flex items-start justify-between gap-3">
-                <div className="min-w-0">
-                  <p className="text-[10px] font-black tracking-[0.16em] uppercase" style={{ color: weeklyReport.unlocked ? SCAN_TO : "#9A8F80" }}>
-                    {t("modal.diary.weeklyTitle")}
-                  </p>
-                  <p className="text-[18px] font-black mt-1 text-kr-pretty" style={{ color: DEEP_GREEN }}>
-                    {weeklyReport.unlocked
-                      ? t("modal.diary.weeklyUnlocked")
-                      : t("modal.diary.weeklyLocked", { days: Math.max(7 - weeklyReport.progress, 0) })}
-                  </p>
-                  <p className="text-[11px] text-stone-500 mt-1 leading-relaxed text-kr-pretty">
-                    {weeklyReport.unlocked
-                      ? t("modal.diary.weeklyUnlockedDesc")
-                      : t("modal.diary.weeklyLockedDesc")}
-                  </p>
-                </div>
-                <div className="rounded-2xl px-3 py-2 text-right shrink-0"
-                  style={{ background: weeklyReport.unlocked ? "#FFF1EC" : "#FFFFFF", border: "1px solid #EDE3DB" }}>
-                  <p className="text-[10px] font-bold text-stone-500 whitespace-nowrap">{t("modal.diary.streakShort")}</p>
-                  <p className="text-[20px] font-black leading-none" style={{ color: weeklyReport.unlocked ? SCAN_TO : DEEP_GREEN }}>{weeklyReport.progress}/7</p>
-                </div>
-              </div>
-              <div className="h-2 rounded-full bg-stone-100 overflow-hidden mt-3">
-                <motion.div
-                  className="h-full rounded-full"
-                  style={{ background: `linear-gradient(90deg, ${SCAN_FROM}, ${DEEP_GREEN})` }}
-                  initial={{ width: 0 }}
-                  animate={{ width: `${Math.round((weeklyReport.progress / 7) * 100)}%` }}
-                  transition={{ duration: 0.6, ease: "easeOut" }}
-                />
-              </div>
-              {weeklyReport.unlocked && (
-                <div className="grid gap-3 mt-4 md:grid-cols-2">
-                  <div className="rounded-[22px] p-4" style={{ background: "#FFFFFF", border: "1px solid #F1E6DE" }}>
-                    <p className="text-[10px] font-black uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>{t("modal.diary.scoreFlow")}</p>
-                    <p className="text-[22px] font-black mt-2" style={{ color: DEEP_GREEN }}>{weeklyReport.averageScore}</p>
-                    <p className="text-[11px] text-stone-500 mt-1">{t("modal.diary.weeklyAverage")}</p>
-                    <div className="grid grid-cols-2 gap-2 mt-3">
-                      <div className="rounded-2xl p-3" style={{ background: "#FFF8F4" }}>
-                        <p className="text-[10px] text-stone-400">{t("modal.diary.best")}</p>
-                        <p className="text-[14px] font-black mt-1" style={{ color: DEEP_GREEN }}>{weeklyReport.bestDay?.score ?? "--"}{weeklyReport.bestDay ? t("result.scoreSuffix") : ""}</p>
-                      </div>
-                      <div className="rounded-2xl p-3" style={{ background: "#F6F3EE" }}>
-                        <p className="text-[10px] text-stone-400">{t("modal.diary.low")}</p>
-                        <p className="text-[14px] font-black mt-1" style={{ color: "#8C8070" }}>{weeklyReport.worstDay?.score ?? "--"}{weeklyReport.worstDay ? t("result.scoreSuffix") : ""}</p>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="rounded-[22px] p-4" style={{ background: "#FFFFFF", border: "1px solid #F1E6DE" }}>
-                    <p className="text-[10px] font-black uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>{t("modal.diary.pattern")}</p>
-                    <div className="space-y-3 mt-3">
-                      <div>
-                        <p className="text-[10px] text-stone-400">{t("modal.diary.bestRoutine")}</p>
-                        <p className="text-[13px] font-black mt-1 text-kr-pretty" style={{ color: DEEP_GREEN }}>{weeklyReport.bestRoutine?.text ?? t("modal.diary.collectingData")}</p>
-                      </div>
-                      <div>
-                        <p className="text-[10px] text-stone-400">{t("modal.diary.worstRoutine")}</p>
-                        <p className="text-[13px] font-black mt-1 text-kr-pretty" style={{ color: "#8C8070" }}>{weeklyReport.worstRoutine?.text ?? t("modal.diary.collectingData")}</p>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="rounded-[22px] p-4" style={{ background: "#FFFFFF", border: "1px solid #F1E6DE" }}>
-                    <p className="text-[10px] font-black uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>{t("modal.diary.memoSignals")}</p>
-                    <div className="flex flex-wrap gap-1.5 mt-3">
-                      {(weeklyReport.keywordSummary.length > 0 ? weeklyReport.keywordSummary : [t("modal.diary.memoCollecting")]).map((keyword) => (
-                        <span key={keyword} className="px-2.5 py-1 rounded-full text-[10px] font-bold"
-                          style={{ background: "#FFF1EC", color: SCAN_TO }}>
-                          {keyword}
-                        </span>
-                      ))}
-                    </div>
-                    <p className="text-[11px] text-stone-500 mt-3">{t("modal.diary.weeklyMemoCount", { count: weeklyReport.memoCount })}</p>
-                  </div>
-                  <div className="rounded-[22px] p-4" style={{ background: "#FFFFFF", border: "1px solid #F1E6DE" }}>
-                    <p className="text-[10px] font-black uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>{t("modal.diary.causeTags")}</p>
-                    <div className="flex flex-wrap gap-1.5 mt-3">
-                      {(weeklyReport.topCauseTags.length > 0
-                        ? weeklyReport.topCauseTags.map(([tag, count]) => `${getCauseTagLabel(t, tag)} ${count}`)
-                        : [t("modal.diary.tagCollecting")]).map((item) => (
-                        <span key={item} className="px-2.5 py-1 rounded-full text-[10px] font-bold"
-                          style={{ background: "#F5F3FF", color: "#7C3AED" }}>
-                          {item}
-                        </span>
-                      ))}
-                    </div>
-                    <p className="text-[11px] text-stone-500 mt-3">{t("modal.diary.incompleteDays", { count: weeklyReport.incompleteDays })}</p>
-                  </div>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-          <Card className="border-none rounded-[28px] overflow-hidden shadow-sm mt-3" style={{ background: "#FFFFFF" }}>
-            <CardContent className="p-5">
-              <div className="flex items-start justify-between gap-3">
-                <div className="min-w-0">
-                  <p className="text-[10px] font-black tracking-[0.16em] uppercase" style={{ color: SCAN_TO }}>{t("modal.diary.reminderTitle")}</p>
-                  <p className="text-[16px] font-black mt-1 text-kr-pretty" style={{ color: DEEP_GREEN }}>{t("modal.diary.reminderHeadline")}</p>
-                  <p className="text-[11px] text-stone-500 mt-1 leading-relaxed text-kr-pretty">
-                    {t("modal.diary.reminderDesc")}
-                  </p>
-                </div>
-                <button
-                  onClick={async () => {
-                    if (!reminderSettings.enabled && typeof Notification !== "undefined" && Notification.permission !== "granted") {
-                      await Notification.requestPermission();
-                    }
-                    const next = { ...reminderSettings, enabled: !reminderSettings.enabled };
-                    setReminderSettings(next);
-                    saveReminderSettings(next);
-                  }}
-                  className="shrink-0 rounded-full px-3 py-1.5 text-[11px] font-black"
-                  style={reminderSettings.enabled
-                    ? { background: "#ECFDF5", color: "#059669" }
-                    : { background: "#F6F3EE", color: "#9A8F80" }}
-                >
-                  {reminderSettings.enabled ? "ON" : "OFF"}
-                </button>
-              </div>
-              <div className="flex items-center gap-2 mt-4">
-                {[
-                  { label: "20:00", hour: 20, minute: 0 },
-                  { label: "21:00", hour: 21, minute: 0 },
-                  { label: "22:00", hour: 22, minute: 0 },
-                ].map((option) => {
-                  const selected = reminderSettings.hour === option.hour && reminderSettings.minute === option.minute;
-                  return (
-                    <button
-                      key={option.label}
-                      onClick={() => {
-                        const next = { ...reminderSettings, hour: option.hour, minute: option.minute };
-                        setReminderSettings(next);
-                        saveReminderSettings(next);
-                      }}
-                      className="px-3 py-1.5 rounded-full text-[11px] font-bold"
-                      style={selected
-                        ? { background: `${SCAN_FROM}20`, color: SCAN_TO }
-                        : { background: "#F6F3EE", color: "#9A8F80" }}
-                    >
-                      {option.label}
-                    </button>
-                  );
-                })}
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+      <div className="flex-1 overflow-hidden pb-24">
         <AnimatePresence mode="wait">
+          {tab === "calendar" && (
+            <motion.div
+              key="cal"
+              initial={{ opacity: 0, x: 28 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -28 }}
+              transition={{ duration: 0.22, ease: "easeOut" }}
+              className="h-full overflow-y-auto overscroll-contain"
+            >
+              <DiaryRoutinePreviewCard routineGuide={routineGuide} />
+              <div className="px-5 pt-3">
+                <Card className="border-none rounded-[28px] overflow-hidden shadow-sm" style={{ background: "#FFFFFF" }}>
+                  <CardContent className="p-5">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <p className="text-[10px] font-black tracking-[0.16em] uppercase" style={{ color: SCAN_TO }}>{t("modal.diary.reminderTitle")}</p>
+                        <p className="text-[16px] font-black mt-1 text-kr-pretty" style={{ color: DEEP_GREEN }}>{t("modal.diary.reminderHeadline")}</p>
+                        <p className="text-[11px] text-stone-500 mt-1 leading-relaxed text-kr-pretty">
+                          {t("modal.diary.reminderDesc")}
+                        </p>
+                      </div>
+                      <button
+                        onClick={async () => {
+                          if (!reminderSettings.enabled && typeof Notification !== "undefined" && Notification.permission !== "granted") {
+                            await Notification.requestPermission();
+                          }
+                          const next = { ...reminderSettings, enabled: !reminderSettings.enabled };
+                          setReminderSettings(next);
+                          saveReminderSettings(next);
+                        }}
+                        className="shrink-0 rounded-full px-3 py-1.5 text-[11px] font-black"
+                        style={reminderSettings.enabled
+                          ? { background: "#ECFDF5", color: "#059669" }
+                          : { background: "#F6F3EE", color: "#9A8F80" }}
+                      >
+                        {reminderSettings.enabled ? "ON" : "OFF"}
+                      </button>
+                    </div>
+                    <div className="flex items-center gap-2 mt-4">
+                      {[
+                        { label: "20:00", hour: 20, minute: 0 },
+                        { label: "21:00", hour: 21, minute: 0 },
+                        { label: "22:00", hour: 22, minute: 0 },
+                      ].map((option) => {
+                        const selected = reminderSettings.hour === option.hour && reminderSettings.minute === option.minute;
+                        return (
+                          <button
+                            key={option.label}
+                            onClick={() => {
+                              const next = { ...reminderSettings, hour: option.hour, minute: option.minute };
+                              setReminderSettings(next);
+                              saveReminderSettings(next);
+                            }}
+                            className="px-3 py-1.5 rounded-full text-[11px] font-bold"
+                            style={selected
+                              ? { background: `${SCAN_FROM}20`, color: SCAN_TO }
+                              : { background: "#F6F3EE", color: "#9A8F80" }}
+                          >
+                            {option.label}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+              <DiaryCalendarView allEntries={allEntries} />
+            </motion.div>
+          )}
           {tab === "timeline" && (
-            <motion.div key="tl" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+            <motion.div
+              key="tl"
+              initial={{ opacity: 0, x: 28 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -28 }}
+              transition={{ duration: 0.22, ease: "easeOut" }}
+              className="h-full overflow-y-auto overscroll-contain"
+            >
               {loading ? (
                 <div className="py-20 text-center"><p className="text-[12px] text-stone-400">...</p></div>
               ) : (
@@ -3092,13 +3093,122 @@ function DiaryTab({ user, analysisResult, onBack }: { user: any; analysisResult:
               )}
             </motion.div>
           )}
-          {tab === "calendar" && (
-            <motion.div key="cal" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-              <DiaryCalendarView allEntries={allEntries} />
+          {tab === "report" && (
+            <motion.div
+              key="report"
+              initial={{ opacity: 0, x: 28 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -28 }}
+              transition={{ duration: 0.22, ease: "easeOut" }}
+              className="h-full overflow-y-auto overscroll-contain"
+            >
+              <div className="px-5 pt-4 pb-8">
+                <Card className="border-none rounded-[28px] overflow-hidden shadow-sm"
+                  style={{ background: weeklyReport.unlocked ? "linear-gradient(135deg, #FFF7F2 0%, #FFFFFF 100%)" : "linear-gradient(135deg, #F6F3EE 0%, #FFFFFF 100%)" }}>
+                  <CardContent className="p-5">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <p className="text-[10px] font-black tracking-[0.16em] uppercase" style={{ color: weeklyReport.unlocked ? SCAN_TO : "#9A8F80" }}>
+                          {t("modal.diary.weeklyTitle")}
+                        </p>
+                        <p className="text-[18px] font-black mt-1 text-kr-pretty" style={{ color: DEEP_GREEN }}>
+                          {weeklyReport.unlocked
+                            ? t("modal.diary.weeklyUnlocked")
+                            : t("modal.diary.weeklyLocked", { days: Math.max(7 - weeklyReport.progress, 0) })}
+                        </p>
+                        <p className="text-[11px] text-stone-500 mt-1 leading-relaxed text-kr-pretty">
+                          {weeklyReport.unlocked
+                            ? t("modal.diary.weeklyUnlockedDesc")
+                            : t("modal.diary.weeklyLockedDesc")}
+                        </p>
+                      </div>
+                      <div className="rounded-2xl px-3 py-2 text-right shrink-0"
+                        style={{ background: weeklyReport.unlocked ? "#FFF1EC" : "#FFFFFF", border: "1px solid #EDE3DB" }}>
+                        <p className="text-[10px] font-bold text-stone-500 whitespace-nowrap">{t("modal.diary.streakShort")}</p>
+                        <p className="text-[20px] font-black leading-none" style={{ color: weeklyReport.unlocked ? SCAN_TO : DEEP_GREEN }}>{weeklyReport.progress}/7</p>
+                      </div>
+                    </div>
+                    <div className="h-2 rounded-full bg-stone-100 overflow-hidden mt-3">
+                      <motion.div
+                        className="h-full rounded-full"
+                        style={{ background: `linear-gradient(90deg, ${SCAN_FROM}, ${DEEP_GREEN})` }}
+                        initial={{ width: 0 }}
+                        animate={{ width: `${Math.round((weeklyReport.progress / 7) * 100)}%` }}
+                        transition={{ duration: 0.6, ease: "easeOut" }}
+                      />
+                    </div>
+                    {weeklyReport.unlocked && (
+                      <div className="grid gap-3 mt-4 md:grid-cols-2">
+                        <div className="rounded-[22px] p-4" style={{ background: "#FFFFFF", border: "1px solid #F1E6DE" }}>
+                          <p className="text-[10px] font-black uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>{t("modal.diary.scoreFlow")}</p>
+                          <p className="text-[22px] font-black mt-2" style={{ color: DEEP_GREEN }}>{weeklyReport.averageScore}</p>
+                          <p className="text-[11px] text-stone-500 mt-1">{t("modal.diary.weeklyAverage")}</p>
+                          <div className="grid grid-cols-2 gap-2 mt-3">
+                            <div className="rounded-2xl p-3" style={{ background: "#FFF8F4" }}>
+                              <p className="text-[10px] text-stone-400">{t("modal.diary.best")}</p>
+                              <p className="text-[14px] font-black mt-1" style={{ color: DEEP_GREEN }}>{weeklyReport.bestDay?.score ?? "--"}{weeklyReport.bestDay ? t("result.scoreSuffix") : ""}</p>
+                            </div>
+                            <div className="rounded-2xl p-3" style={{ background: "#F6F3EE" }}>
+                              <p className="text-[10px] text-stone-400">{t("modal.diary.low")}</p>
+                              <p className="text-[14px] font-black mt-1" style={{ color: "#8C8070" }}>{weeklyReport.worstDay?.score ?? "--"}{weeklyReport.worstDay ? t("result.scoreSuffix") : ""}</p>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="rounded-[22px] p-4" style={{ background: "#FFFFFF", border: "1px solid #F1E6DE" }}>
+                          <p className="text-[10px] font-black uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>{t("modal.diary.pattern")}</p>
+                          <div className="space-y-3 mt-3">
+                            <div>
+                              <p className="text-[10px] text-stone-400">{t("modal.diary.bestRoutine")}</p>
+                              <p className="text-[13px] font-black mt-1 text-kr-pretty" style={{ color: DEEP_GREEN }}>{weeklyReport.bestRoutine?.text ?? t("modal.diary.collectingData")}</p>
+                            </div>
+                            <div>
+                              <p className="text-[10px] text-stone-400">{t("modal.diary.worstRoutine")}</p>
+                              <p className="text-[13px] font-black mt-1 text-kr-pretty" style={{ color: "#8C8070" }}>{weeklyReport.worstRoutine?.text ?? t("modal.diary.collectingData")}</p>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="rounded-[22px] p-4" style={{ background: "#FFFFFF", border: "1px solid #F1E6DE" }}>
+                          <p className="text-[10px] font-black uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>{t("modal.diary.memoSignals")}</p>
+                          <div className="flex flex-wrap gap-1.5 mt-3">
+                            {(weeklyReport.keywordSummary.length > 0 ? weeklyReport.keywordSummary : [t("modal.diary.memoCollecting")]).map((keyword) => (
+                              <span key={keyword} className="px-2.5 py-1 rounded-full text-[10px] font-bold"
+                                style={{ background: "#FFF1EC", color: SCAN_TO }}>
+                                {keyword}
+                              </span>
+                            ))}
+                          </div>
+                          <p className="text-[11px] text-stone-500 mt-3">{t("modal.diary.weeklyMemoCount", { count: weeklyReport.memoCount })}</p>
+                        </div>
+                        <div className="rounded-[22px] p-4" style={{ background: "#FFFFFF", border: "1px solid #F1E6DE" }}>
+                          <p className="text-[10px] font-black uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>{t("modal.diary.causeTags")}</p>
+                          <div className="flex flex-wrap gap-1.5 mt-3">
+                            {(weeklyReport.topCauseTags.length > 0
+                              ? weeklyReport.topCauseTags.map(([tag, count]) => `${getCauseTagLabel(t, tag)} ${count}`)
+                              : [t("modal.diary.tagCollecting")]).map((item) => (
+                              <span key={item} className="px-2.5 py-1 rounded-full text-[10px] font-bold"
+                                style={{ background: "#F5F3FF", color: "#7C3AED" }}>
+                                {item}
+                              </span>
+                            ))}
+                          </div>
+                          <p className="text-[11px] text-stone-500 mt-3">{t("modal.diary.incompleteDays", { count: weeklyReport.incompleteDays })}</p>
+                        </div>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              </div>
             </motion.div>
           )}
           {tab === "ranking" && (
-            <motion.div key="rank" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+            <motion.div
+              key="rank"
+              initial={{ opacity: 0, x: 28 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -28 }}
+              transition={{ duration: 0.22, ease: "easeOut" }}
+              className="h-full overflow-y-auto overscroll-contain"
+            >
               <div className="px-5 pb-8 space-y-4 pt-4">
                 {!rankingData ? (
                   <div className="py-12 text-center"><p className="text-[12px] text-stone-400">...</p></div>
