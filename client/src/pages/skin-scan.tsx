@@ -1291,7 +1291,7 @@ function MiniScoreBarIdle({ label, score, color, delay }: { label: string; score
   }, [delay]);
   return (
     <div className="flex items-center gap-2">
-      <span className="text-[10px] flex-shrink-0 w-[52px]" style={{ color: TEXT_SECONDARY }}>{label}</span>
+      <span className="text-[10px] flex-shrink-0 w-[74px] whitespace-nowrap" style={{ color: TEXT_SECONDARY }}>{label}</span>
       <div className="flex-1 h-[5px] rounded-full overflow-hidden" style={{ background: "#E8E0D8" }}>
         <div
           className="h-full rounded-full"
@@ -4726,27 +4726,28 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
         <Card className="overflow-hidden border-none shadow-2xl rounded-3xl"
           style={{ background: "linear-gradient(180deg, #FFFCFA 0%, #FFFFFF 100%)" }}>
           <CardContent className="p-3.5">
-            <div className="grid grid-cols-[92px_1fr] gap-2.5 items-stretch sm:grid-cols-[104px_1fr] sm:gap-3">
-              <div className="relative rounded-[22px] overflow-hidden h-[132px] bg-stone-100 sm:rounded-[24px] sm:h-[144px]">
-                <img src={imageSrc} className="w-full h-full object-cover" style={{ objectPosition: "center top" }} />
-                {analysisResult?.hotspots?.slice(0, 4).map((dot: any, i: number) => (
-                  <motion.div key={i}
-                    className="absolute -translate-x-1/2 -translate-y-1/2"
-                    style={{ left: `${dot.x}%`, top: `${dot.y}%` }}
-                    initial={{ scale: 0, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    transition={{ delay: i * 0.12, type: "spring" }}
-                  >
-                    <div className="w-2 h-2 rounded-full bg-red-500 border border-white/80 shadow-md" />
-                  </motion.div>
-                ))}
-                <div className="absolute top-3 left-3 w-7 h-7 border-t-2 border-l-2 rounded-tl-lg" style={{ borderColor: SCAN_TO }} />
-                <div className="absolute top-3 right-3 w-7 h-7 border-t-2 border-r-2 rounded-tr-lg" style={{ borderColor: SCAN_TO }} />
-                <div className="absolute inset-x-0 bottom-0 h-20"
-                  style={{ background: "linear-gradient(to top, rgba(20,20,20,0.6), transparent)" }} />
-                <div className="absolute bottom-3 left-3 text-white">
-                  <p className="text-[8px] sm:text-[9px] font-bold uppercase tracking-[0.16em] text-white/75">{t("result.baumannLabel")}</p>
-                  <p className="text-[22px] sm:text-[24px] font-black leading-none">{finalType}</p>
+            <div className="grid grid-cols-[92px_1fr] gap-2.5 items-start sm:grid-cols-[104px_1fr] sm:gap-3">
+              <div>
+                <div className="relative rounded-[22px] overflow-hidden h-[120px] bg-stone-100 sm:rounded-[24px] sm:h-[132px]">
+                  <img src={imageSrc} className="w-full h-full object-cover" style={{ objectPosition: "center 18%" }} />
+                  {analysisResult?.hotspots?.slice(0, 3).map((dot: any, i: number) => (
+                    <motion.div key={i}
+                      className="absolute -translate-x-1/2 -translate-y-1/2"
+                      style={{ left: `${dot.x}%`, top: `${dot.y}%` }}
+                      initial={{ scale: 0, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      transition={{ delay: i * 0.12, type: "spring" }}
+                    >
+                      <div className="w-2 h-2 rounded-full bg-red-500 border border-white/80 shadow-md" />
+                    </motion.div>
+                  ))}
+                  <div className="absolute top-3 left-3 w-7 h-7 border-t-2 border-l-2 rounded-tl-lg" style={{ borderColor: SCAN_TO }} />
+                  <div className="absolute top-3 right-3 w-7 h-7 border-t-2 border-r-2 rounded-tr-lg" style={{ borderColor: SCAN_TO }} />
+                </div>
+                <div className="mt-2 rounded-2xl px-2.5 py-2 text-center"
+                  style={{ background: "#FFF1EC", border: "1px solid #F3DDD6" }}>
+                  <p className="text-[8px] font-black uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>{t("result.baumannLabel")}</p>
+                  <p className="text-[18px] font-black leading-none mt-1" style={{ color: SCAN_TO }}>{finalType}</p>
                 </div>
               </div>
 
@@ -4757,10 +4758,10 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
                     <p className="text-[10px] font-black uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>{t("result.scores")}</p>
                     <button
                       onClick={() => setShowAnalysis(true)}
-                      className="rounded-full px-2.5 py-1 text-[9px] font-black"
+                      className="rounded-full px-2.5 py-1 text-[9px] font-black whitespace-nowrap"
                       style={{ background: "#FFF1EC", color: SCAN_TO }}
                     >
-                      {t("modal.analysis.title")}
+                      {t("modal.analysis.title")} 보기
                     </button>
                   </div>
                   <p className="text-[11px] text-stone-500 mt-2 leading-relaxed text-kr-pretty">
@@ -4787,10 +4788,13 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
         <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
           className="flex items-center gap-3 px-4 py-3.5 rounded-2xl border"
           style={{ background: "#F0F7F5", borderColor: "#C5DFD8" }}>
-          <span className="text-[22px]">💄</span>
+          <div className="w-10 h-10 rounded-2xl flex items-center justify-center shrink-0"
+            style={{ background: `${DEEP_GREEN}14`, color: DEEP_GREEN }}>
+            <ScanLine className="w-5 h-5" />
+          </div>
           <div className="flex-1 min-w-0">
-            <p className="text-[13px] font-black" style={{ color: DEEP_GREEN }}>{t("cosmetics.ctaTitle")}</p>
-            <p className="text-[11px] text-stone-400">{t("cosmetics.ctaBannerSub")}</p>
+            <p className="text-[13px] font-black leading-tight text-kr-pretty" style={{ color: DEEP_GREEN }}>{t("cosmetics.ctaTitle")}</p>
+            <p className="text-[11px] text-stone-400 leading-tight text-kr-pretty">{t("cosmetics.ctaBannerSub")}</p>
           </div>
           {user && cosmeticCount > 0 && (
             <span className="text-[11px] font-bold px-2 py-1 rounded-full"
@@ -4804,39 +4808,6 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
             + {t("cosmetics.scanBtn")}
           </button>
         </motion.div>
-
-        {user && cosmeticsInsights.length > 0 && (
-          <Card className="border-none shadow-sm rounded-[28px] overflow-hidden"
-            style={{ background: "linear-gradient(180deg, #FFFCFA 0%, #FFFFFF 100%)" }}>
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between mb-3">
-                <div>
-                  <p className="text-[13px] font-black" style={{ color: DEEP_GREEN }}>{t("cosmetics.insightTitle")}</p>
-                  <p className="text-[11px] text-stone-400">{t("cosmetics.ctaCount", { count: cosmeticCount })}</p>
-                </div>
-                <button
-                  onClick={() => setShowCosmeticsRegister(true)}
-                  className="px-3 py-1.5 rounded-full text-[11px] font-black text-white"
-                  style={{ background: `linear-gradient(135deg, ${DEEP_GREEN}, ${DEEP_GREEN_LIGHT})` }}
-                >
-                  + {t("cosmetics.scanBtn")}
-                </button>
-              </div>
-              <div className="space-y-2.5">
-                {cosmeticsInsights.map((insight) => (
-                  <div
-                    key={insight.id}
-                    className="rounded-2xl px-3.5 py-3 border"
-                    style={{ background: `${insight.accent}10`, borderColor: `${insight.accent}28` }}
-                  >
-                    <p className="text-[12px] font-black" style={{ color: insight.accent }}>{insight.title}</p>
-                    <p className="text-[11px] text-stone-600 mt-1 leading-relaxed text-kr-pretty">{insight.desc}</p>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        )}
 
         <Card className="border-none shadow-md rounded-[32px] overflow-hidden"
           style={{ background: "linear-gradient(180deg, #FFFCFA 0%, #FFFFFF 100%)" }}>
@@ -5085,6 +5056,36 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
                       </div>
                     ))}
                   </div>
+                </div>
+              </div>
+            )}
+
+            {user && cosmeticsInsights.length > 0 && (
+              <div className="mt-3 rounded-[24px] p-4" style={{ background: "#FFFCFA", border: "1px solid #F2E7E2" }}>
+                <div className="flex items-center justify-between gap-3 mb-3">
+                  <div>
+                    <p className="text-[11px] font-black uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>{t("cosmetics.insightTitle")}</p>
+                    <p className="text-[11px] text-stone-400">{t("cosmetics.ctaCount", { count: cosmeticCount })}</p>
+                  </div>
+                  <button
+                    onClick={() => setShowCosmeticsRegister(true)}
+                    className="rounded-full px-3 py-1.5 text-[10px] font-black text-white whitespace-nowrap"
+                    style={{ background: `linear-gradient(135deg, ${DEEP_GREEN}, ${DEEP_GREEN_LIGHT})` }}
+                  >
+                    + {t("cosmetics.scanBtn")}
+                  </button>
+                </div>
+                <div className="space-y-2">
+                  {cosmeticsInsights.map((insight) => (
+                    <div
+                      key={`inline-${insight.id}`}
+                      className="rounded-2xl px-3.5 py-3 border"
+                      style={{ background: `${insight.accent}10`, borderColor: `${insight.accent}28` }}
+                    >
+                      <p className="text-[12px] font-black" style={{ color: insight.accent }}>{insight.title}</p>
+                      <p className="text-[11px] text-stone-600 mt-1 leading-relaxed text-kr-pretty">{insight.desc}</p>
+                    </div>
+                  ))}
                 </div>
               </div>
             )}
