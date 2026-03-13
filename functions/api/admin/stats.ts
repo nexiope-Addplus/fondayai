@@ -74,26 +74,38 @@ export const onRequest = async (context: any) => {
   }
 
   // KST 기준 날짜: UTC+9 offset
+  // gender/age_group 컬럼은 마이그레이션 전에 없을 수 있으므로 별도 처리
   const [
     totalResult, todayResult, weekResult, guestResult,
-    langResult, baumannResult, dailyResult, recentResult,
-    genderResult, ageGroupResult,
+    langResult, baumannResult, dailyResult,
   ] = await Promise.all([
     env.FONDAY_DB.prepare("SELECT COUNT(*) as total, AVG(overall_score) as avg_score FROM scans").first(),
-    // 오늘 = KST 기준
     env.FONDAY_DB.prepare("SELECT COUNT(*) as today FROM scans WHERE date(datetime(created_at, '+9 hours')) = date(datetime('now', '+9 hours'))").first(),
-    // 7일 = KST 기준
     env.FONDAY_DB.prepare("SELECT COUNT(*) as week FROM scans WHERE datetime(created_at, '+9 hours') >= datetime('now', '+9 hours', '-7 days')").first(),
     env.FONDAY_DB.prepare("SELECT SUM(is_guest) as guest, SUM(1-is_guest) as loggedin FROM scans").first(),
     env.FONDAY_DB.prepare("SELECT lang, COUNT(*) as cnt FROM scans GROUP BY lang ORDER BY cnt DESC").all(),
     env.FONDAY_DB.prepare("SELECT baumann_type, COUNT(*) as cnt FROM scans GROUP BY baumann_type ORDER BY cnt DESC LIMIT 8").all(),
-    // 14일 추이 — KST 기준 날짜로 그룹핑
     env.FONDAY_DB.prepare("SELECT date(datetime(created_at, '+9 hours')) as day, COUNT(*) as cnt FROM scans WHERE datetime(created_at, '+9 hours') >= datetime('now', '+9 hours', '-14 days') GROUP BY day ORDER BY day").all(),
-    env.FONDAY_DB.prepare("SELECT overall_score, baumann_type, skin_age, lang, is_guest, gender, age_group, created_at FROM scans ORDER BY created_at DESC LIMIT 20").all(),
-    // 성별 분포
-    env.FONDAY_DB.prepare("SELECT gender, COUNT(*) as cnt FROM scans WHERE gender != '' GROUP BY gender ORDER BY cnt DESC").all(),
-    // 나이대 분포
-    env.FONDAY_DB.prepare("SELECT age_group, COUNT(*) as cnt FROM scans WHERE age_group != '' GROUP BY age_group ORDER BY cnt DESC").all(),
+  ]);
+
+  // 컬럼 존재 여부 확인 후 gender/age_group/recent 쿼리
+  const tableInfo = await env.FONDAY_DB.prepare("PRAGMA table_info(scans)").all();
+  const colNames: string[] = ((tableInfo as any)?.results ?? []).map((c: any) => c.name);
+  const hasGender = colNames.includes("gender");
+  const hasAge = colNames.includes("age_group");
+
+  const recentCols = hasGender && hasAge
+    ? "overall_score, baumann_type, skin_age, lang, is_guest, gender, age_group, created_at"
+    : "overall_score, baumann_type, skin_age, lang, is_guest, created_at";
+
+  const [recentResult, genderResult, ageGroupResult] = await Promise.all([
+    env.FONDAY_DB.prepare(`SELECT ${recentCols} FROM scans ORDER BY created_at DESC LIMIT 20`).all(),
+    hasGender
+      ? env.FONDAY_DB.prepare("SELECT gender, COUNT(*) as cnt FROM scans WHERE gender != '' GROUP BY gender ORDER BY cnt DESC").all()
+      : Promise.resolve({ results: [] }),
+    hasAge
+      ? env.FONDAY_DB.prepare("SELECT age_group, COUNT(*) as cnt FROM scans WHERE age_group != '' GROUP BY age_group ORDER BY cnt DESC").all()
+      : Promise.resolve({ results: [] }),
   ]);
 
   const total = (totalResult as any)?.total ?? 0;
