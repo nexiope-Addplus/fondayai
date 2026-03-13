@@ -1315,6 +1315,20 @@ function ScanIdleScreen({ onScan }: { onScan: () => void }) {
   const daysSince = getDaysSinceLastScan();
   const [showCalendar, setShowCalendar] = useState(false);
   const [socialCount, setSocialCount] = useState(0);
+  const [pullY, setPullY] = useState(0);
+  const touchStartY = useRef(0);
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartY.current = e.touches[0].clientY;
+  };
+  const handleTouchMove = (e: React.TouchEvent) => {
+    const dy = e.touches[0].clientY - touchStartY.current;
+    if (dy > 0 && window.scrollY === 0) setPullY(Math.min(dy, 80));
+  };
+  const handleTouchEnd = () => {
+    if (pullY >= 70) window.location.reload();
+    setPullY(0);
+  };
 
   useEffect(() => {
     const today = new Date();
@@ -1358,7 +1372,17 @@ function ScanIdleScreen({ onScan }: { onScan: () => void }) {
       className="flex flex-col px-3 pb-8 relative overflow-hidden"
       style={{ minHeight: "calc(100dvh - 60px)", background: "#FDFAF8", paddingTop: 20 }}
       variants={stagger} initial="initial" animate="animate"
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
     >
+      {pullY > 10 && (
+        <div className="absolute top-0 left-0 right-0 flex items-center justify-center z-50 pointer-events-none"
+          style={{ height: pullY, opacity: pullY / 70 }}>
+          <div className={`w-7 h-7 rounded-full border-2 border-t-transparent flex items-center justify-center ${pullY >= 70 ? "border-[#C97062]" : "border-stone-300"}`}
+            style={{ animation: pullY >= 70 ? "spin 0.6s linear infinite" : "none" }} />
+        </div>
+      )}
       {/* ── Aurora 배경 blobs ── */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden" style={{ zIndex: 0 }}>
         <motion.div className="absolute rounded-full"
@@ -2593,7 +2617,7 @@ function DiaryTimeline({ history, analysisResult, overallScore, finalType, curre
       )}
 
       {/* 비교 요약 배지 */}
-      {history.length >= 1 && (
+      {history.length >= 1 && prevScores.length > 0 && (improved > 0 || declined > 0) && (
         <div className="mb-5 px-4 py-2.5 rounded-2xl flex items-center gap-2"
           style={{ background: `${DEEP_GREEN}08`, border: `1px solid ${DEEP_GREEN}15` }}>
           <Activity className="w-4 h-4 shrink-0" style={{ color: DEEP_GREEN }} />
@@ -4680,7 +4704,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
       id: "routine",
       done: routineComplete,
       label: t("result.actionCard.questRoutine"),
-      reward: `${completedRoutinePhases}/2`,
+      reward: routineComplete ? t("result.actionCard.questDone") : `${completedRoutinePhases}/2`,
       detail: t("result.actionCard.questRoutineDetail"),
       accent: "#059669",
     },
@@ -4696,7 +4720,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
       id: "score70",
       done: scoreMissionDone,
       label: t("result.actionCard.questScore"),
-      reward: "70+",
+      reward: scoreMissionDone ? `+${MISSION_POINTS.score_70}pt` : "70+",
       detail: t("result.actionCard.questScoreDetail"),
       accent: "#D97706",
     },
@@ -4704,7 +4728,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
       id: "score80",
       done: premiumMissionDone,
       label: t("result.actionCard.questPremium"),
-      reward: "80+",
+      reward: premiumMissionDone ? `+${MISSION_POINTS.score_80}pt` : "80+",
       detail: t("result.actionCard.questPremiumDetail"),
       accent: "#0F766E",
     },
@@ -6110,7 +6134,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
                 <div className="flex items-center gap-2">
                   <span className="rounded-full px-3 py-1 text-[10px] font-black"
                     style={{ background: "#FFF7ED", color: "#D97706" }}>
-                    +{allClearBonus}pt
+                    {totalPoints}pt
                   </span>
                   <button
                     onClick={() => setShowQuestSheet(false)}
