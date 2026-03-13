@@ -1837,6 +1837,28 @@ function saveReminderSettings(next: ReminderSettings) {
   try { localStorage.setItem("fonday_reminder_settings", JSON.stringify(next)); } catch {}
 }
 
+async function syncReminderToServer(next: ReminderSettings) {
+  try {
+    if (!("serviceWorker" in navigator) || !("PushManager" in window)) return;
+    const reg = await navigator.serviceWorker.ready;
+    const sub = await reg.pushManager.getSubscription();
+    if (!sub) return;
+    if (next.enabled) {
+      await fetch("/api/diary-reminder", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ endpoint: sub.endpoint, hour: next.hour, lang: localStorage.getItem("fonday_lang") || "ko" }),
+      });
+    } else {
+      await fetch("/api/diary-reminder", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ endpoint: sub.endpoint }),
+      });
+    }
+  } catch {}
+}
+
 // ─── 루틴 Todo 유틸 ──────────────────────────────────────────────
 interface TodoItem { text: string; done: boolean; }
 function getDiaryTodos(dateStr: string): TodoItem[] {
@@ -3077,6 +3099,7 @@ function DiaryTab({ user, analysisResult, onBack }: { user: any; analysisResult:
                           const next = { ...reminderSettings, enabled: !reminderSettings.enabled };
                           setReminderSettings(next);
                           saveReminderSettings(next);
+                          syncReminderToServer(next);
                         }}
                         className="shrink-0 rounded-full px-3 py-1.5 text-[11px] font-black"
                         style={reminderSettings.enabled
@@ -3100,6 +3123,7 @@ function DiaryTab({ user, analysisResult, onBack }: { user: any; analysisResult:
                               const next = { ...reminderSettings, hour: option.hour, minute: option.minute };
                               setReminderSettings(next);
                               saveReminderSettings(next);
+                              if (next.enabled) syncReminderToServer(next);
                             }}
                             className="px-3 py-1.5 rounded-full text-[11px] font-bold"
                             style={selected

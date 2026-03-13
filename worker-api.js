@@ -259,17 +259,25 @@ export default {
   // KST 09:00 (UTC 00:00) 스캔 리마인더
   // KST 12:00 (UTC 03:00) 점심 식단 알림
   // KST 18:00 (UTC 09:00) 저녁 식단 알림
+  // KST 20:00 (UTC 11:00) 루틴 리마인더
+  // KST 21:00 (UTC 12:00) 루틴 리마인더
+  // KST 22:00 (UTC 13:00) 루틴 리마인더
   async scheduled(event, env, ctx) {
-    const hour = new Date().getUTCHours();
-    const isScanReminder = (hour === 0); // UTC 00:00 = KST 09:00
-    const isLunch = (hour === 3);        // UTC 03:00 = KST 12:00
-    const isDinner = (hour === 9);       // UTC 09:00 = KST 18:00
+    const now = new Date();
+    const hour = now.getUTCHours();
+    const isScanReminder = (hour === 22);  // UTC 22:30 = KST 07:30
+    const isLunch = (hour === 3);          // UTC 03:00 = KST 12:00
+    const isDinner = (hour === 9);        // UTC 09:00 = KST 18:00
+    const isRoutine = (hour === 11 || hour === 12 || hour === 13); // KST 20/21/22시
 
     if (isScanReminder) {
       ctx.waitUntil(sendScanReminderToAll(env));
     } else if (isLunch || isDinner) {
       const meal = isLunch ? "lunch" : "dinner";
       ctx.waitUntil(sendMealPushToAll(env, meal));
+    } else if (isRoutine) {
+      const kstHour = hour + 9; // UTC → KST
+      ctx.waitUntil(sendRoutineReminderToAll(env, kstHour));
     }
   }
 };
@@ -459,6 +467,52 @@ async function sendPush(subscription, payload, env) {
   if (!resp.ok) {
     const text = await resp.text();
     throw new Error(`HTTP ${resp.status}: ${text}`);
+  }
+}
+
+// ─── 루틴 리마인더 푸시 (KST 20/21/22시, 사용자 설정 시간에만 발송) ─────
+async function sendRoutineReminderToAll(env, kstHour) {
+  const kv = env.PUSH_KV;
+  if (!kv) { console.log("[push] PUSH_KV not bound"); return; }
+
+  const allIdsRaw = await kv.get("push:all_ids");
+  if (!allIdsRaw) return;
+  const allIds = JSON.parse(allIdsRaw);
+
+  const titles = {
+    ko: "📋 루틴 체크하셨나요?",
+    en: "📋 Did you complete your routine?",
+    ja: "📋 ルーティンはお済みですか？",
+  };
+  const bodies = {
+    ko: "오늘 피부 루틴을 완료하고 피부 일기에 기록해보세요 ✨",
+    en: "Complete your skin routine and log it in your diary ✨",
+    ja: "今日のスキンルーティンを完了して肌日記に記録しましょう ✨",
+  };
+
+  for (const id of allIds) {
+    try {
+      // 이 구독자가 루틴 리마인더를 설정했는지 확인
+      const reminderRaw = await kv.get(`push:reminder:${id}`);
+      if (!reminderRaw) continue;
+
+      const reminder = JSON.parse(reminderRaw);
+      // 설정된 시간과 현재 KST 시간이 일치할 때만 발송
+      if (reminder.hour !== kstHour) continue;
+
+      const raw = await kv.get(`push:sub:${id}`);
+      if (!raw) continue;
+      const { subscription, lang } = JSON.parse(raw);
+      const l = reminder.lang || lang || "ko";
+
+      await sendPush(subscription, {
+        title: titles[l] || titles.ko,
+        body: bodies[l] || bodies.ko,
+        url: "/?tab=diary",
+      }, env);
+    } catch (e) {
+      console.error(`[push] routine reminder id=${id} error:`, e.message);
+    }
   }
 }
 
