@@ -5322,6 +5322,19 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
               </div>
               <div className="flex-1 overflow-y-auto overscroll-contain">
                 <div className="px-6 pb-8 space-y-3">
+                  {analysisResult?.aiComment && (
+                    <div className="p-4 rounded-2xl border"
+                      style={{ background: "#FFF7F2", borderColor: "#F2DDD4" }}>
+                      <div className="flex items-center gap-2 mb-2">
+                        <div className="w-7 h-7 rounded-xl flex items-center justify-center"
+                          style={{ background: `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})` }}>
+                          <Sparkles className="w-3.5 h-3.5 text-white" />
+                        </div>
+                        <p className="text-[13px] font-black" style={{ color: DEEP_GREEN }}>{t("result.aiComment")}</p>
+                      </div>
+                      <p className="text-[13px] text-stone-600 leading-relaxed text-kr-pretty">{analysisResult.aiComment}</p>
+                    </div>
+                  )}
                   {/* 10가지 항목별 분석 내용 */}
                   {scores.map((item: any, i: number) => {
                     const Icon = SCORE_ICONS[i] || Zap;
