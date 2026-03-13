@@ -2742,6 +2742,14 @@ function DiaryTab({ user, analysisResult, onBack }: { user: any; analysisResult:
     load();
   }, [user]);
 
+  useEffect(() => {
+    const targetTab = sessionStorage.getItem("fonday_diary_target_tab");
+    if (targetTab === "calendar" || targetTab === "timeline" || targetTab === "ranking") {
+      setTab(targetTab);
+      sessionStorage.removeItem("fonday_diary_target_tab");
+    }
+  }, []);
+
   const allEntries: { dateStr: string; score: number }[] = overallScore > 0
     ? [
         { dateStr: todayStr(), score: overallScore },
@@ -3997,6 +4005,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
   const [activeTab, setActiveTab] = useState<"analysis" | "solution" | "nutrition">("analysis");
   const [currentStreak, setCurrentStreak] = useState<StreakData>(() => getStreak());
   const [todayTodoProgress, setTodayTodoProgress] = useState(() => getDiaryTodoProgress(todayStr()));
+  const [todayRoutineTodos, setTodayRoutineTodos] = useState<TodoItem[]>(() => getDiaryTodos(todayStr()));
   const [missionState, setMissionState] = useState<MissionState>(() => getMissions());
   const [todayHasMemo, setTodayHasMemo] = useState(() => Boolean(getDiaryMemo(todayStr()).trim()));
   const loginPromptRef = useRef<HTMLDivElement>(null);
@@ -4006,6 +4015,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
   const [showCosmeticsGate, setShowCosmeticsGate] = useState(false);
   const [showCosmeticsRegister, setShowCosmeticsRegister] = useState(false);
   const [showRoutineUpdateSheet, setShowRoutineUpdateSheet] = useState(false);
+  const [showQuestSheet, setShowQuestSheet] = useState(false);
 
   // 챌린지 참여 후 내 결과 저장 (비로그인도 작동)
   useEffect(() => {
@@ -4059,6 +4069,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
       initDiaryTodosFromRoutine(todayStr(), analysisResult.prediction.good.routine);
     }
     setTodayTodoProgress(getDiaryTodoProgress(todayStr()));
+    setTodayRoutineTodos(getDiaryTodos(todayStr()));
     setTodayHasMemo(Boolean(getDiaryMemo(todayStr()).trim()));
     return () => timers.forEach(clearTimeout);
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -4067,6 +4078,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
   useEffect(() => {
     const refreshTodayState = () => {
       setTodayTodoProgress(getDiaryTodoProgress(todayStr()));
+      setTodayRoutineTodos(getDiaryTodos(todayStr()));
       setMissionState(getMissions());
       setTodayHasMemo(Boolean(getDiaryMemo(todayStr()).trim()));
     };
@@ -4097,6 +4109,10 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
       return;
     }
     loginPromptRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+  };
+  const handleOpenDiaryCalendar = () => {
+    sessionStorage.setItem("fonday_diary_target_tab", "calendar");
+    handleDiaryEntry();
   };
   const [isSuccess, setIsSuccess] = useState(false);
 
@@ -4325,6 +4341,22 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
     ...morningRoutineItems.map((item) => `AM · ${item}`),
     ...eveningRoutineItems.map((item) => `PM · ${item}`),
   ];
+  const getRoutineTodoState = (period: "AM" | "PM", label: string) => {
+    const prefixed = `${period} · ${label}`;
+    return todayRoutineTodos.find((todo) => todo.text === prefixed || todo.text === label);
+  };
+  const toggleRoutineChecklist = (period: "AM" | "PM", label: string) => {
+    const prefixed = `${period} · ${label}`;
+    const next = [...todayRoutineTodos];
+    const existingIndex = next.findIndex((todo) => todo.text === prefixed || todo.text === label);
+    if (existingIndex >= 0) {
+      next[existingIndex] = { ...next[existingIndex], text: prefixed, done: !next[existingIndex].done };
+    } else {
+      next.push({ text: prefixed, done: true });
+    }
+    setTodayRoutineTodos(next);
+    saveDiaryTodos(todayStr(), next);
+  };
   const todayMissionRoutines = [morningTask, eveningTask].filter(Boolean);
   const todayFocus = todayMissionRoutines.join(" · ") || analysisResult?.improvements?.[0]?.title || t("result.actionCard.fallbackFocus");
   const routineDone = todayTodoProgress.done;
@@ -4336,6 +4368,9 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
     .sort((a: { index: number; score: number }, b: { index: number; score: number }) => a.score - b.score)
     .slice(0, 2);
   const weakestSummary = weakestScores.map(({ index }: { index: number; score: number }) => t(`scores.${index}`)).join(" · ");
+  const topScoreItems = [0, 2, 3, 5]
+    .map((idx) => ({ idx, score: scores[idx]?.score ?? 0, color: SCORE_COLORS[idx] }))
+    .filter((item) => item.score > 0);
   const nextStreakGoal = [3, 7, 30].find((goal) => goal > (currentStreak.count || 0)) ?? null;
   const daysToGoal = nextStreakGoal ? Math.max(nextStreakGoal - (currentStreak.count || 0), 0) : 0;
   const nextStreakReward = nextStreakGoal ? MISSION_POINTS[`streak_${nextStreakGoal}`] || 0 : 0;
@@ -4664,33 +4699,68 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
           <h2 className="text-xl font-black tracking-tight" style={{ color: DEEP_GREEN }}>{t("result.title")}</h2>
         </div>
 
-        {/* 이미지 + 핫스팟 */}
-        <Card className="overflow-hidden border-none shadow-2xl rounded-3xl bg-zinc-900">
-          <div className="relative w-full">
-            <img src={imageSrc} className="w-full object-cover object-top" style={{ height: 280 }} />
-            {analysisResult?.hotspots?.map((dot: any, i: number) => (
-              <motion.div key={i}
-                className="absolute -translate-x-1/2 -translate-y-1/2"
-                style={{ left: `${dot.x}%`, top: `${dot.y}%` }}
-                initial={{ scale: 0, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ delay: i * 0.15, type: "spring" }}
-              >
-                {/* 중심 점 */}
-                <div className="w-2 h-2 rounded-full bg-red-500 border border-white/80 shadow-md" />
-                {/* 미세 파동 */}
-                <motion.div
-                  className="absolute inset-0 rounded-full border border-red-400"
-                  animate={{ scale: [1, 2.2, 1], opacity: [0.6, 0, 0.6] }}
-                  transition={{ repeat: Infinity, duration: 2.2, delay: i * 0.3 }}
-                />
-              </motion.div>
-            ))}
-            <div className="absolute bottom-3 left-3 bg-black/40 backdrop-blur-md px-3 py-1.5 rounded-full flex items-center gap-2">
-              <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
-              <span className="text-[10px] font-bold text-white uppercase tracking-wider">AI Detection Active</span>
+        {/* 압축형 결과 헤더 */}
+        <Card className="overflow-hidden border-none shadow-2xl rounded-3xl"
+          style={{ background: "linear-gradient(180deg, #FFFCFA 0%, #FFFFFF 100%)" }}>
+          <CardContent className="p-4">
+            <div className="grid grid-cols-[112px_1fr] gap-3 items-stretch">
+              <div className="relative rounded-[24px] overflow-hidden bg-zinc-900 min-h-[164px]">
+                <img src={imageSrc} className="w-full h-full object-cover object-top" />
+                {analysisResult?.hotspots?.slice(0, 4).map((dot: any, i: number) => (
+                  <motion.div key={i}
+                    className="absolute -translate-x-1/2 -translate-y-1/2"
+                    style={{ left: `${dot.x}%`, top: `${dot.y}%` }}
+                    initial={{ scale: 0, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ delay: i * 0.12, type: "spring" }}
+                  >
+                    <div className="w-2 h-2 rounded-full bg-red-500 border border-white/80 shadow-md" />
+                  </motion.div>
+                ))}
+                <div className="absolute inset-x-0 bottom-0 h-20"
+                  style={{ background: "linear-gradient(to top, rgba(20,20,20,0.6), transparent)" }} />
+                <div className="absolute bottom-3 left-3 text-white">
+                  <p className="text-[8px] font-black uppercase tracking-[0.18em] text-white/75">{t("result.baumannLabel")}</p>
+                  <p className="text-[24px] font-black leading-none">{finalType}</p>
+                </div>
+              </div>
+
+              <div className="min-w-0">
+                <div className="flex items-start justify-between gap-2">
+                  <div className="min-w-0">
+                    <p className="text-[10px] font-black tracking-[0.18em] uppercase" style={{ color: SCAN_TO }}>{t("result.title")}</p>
+                    <p className="text-[16px] font-black mt-1 text-kr-pretty" style={{ color: DEEP_GREEN }}>{analysisResult?.aiComment || t("result.aiComment")}</p>
+                  </div>
+                  <div className="rounded-2xl px-3 py-2 text-right shrink-0"
+                    style={{ background: "#FFF1EC", border: "1px solid #F3DDD6" }}>
+                    <p className="text-[10px] font-bold whitespace-nowrap" style={{ color: SCAN_TO }}>{t("result.overall")}</p>
+                    <p className="text-[24px] font-black leading-none" style={{ color: SCAN_TO }}>{overallScore}</p>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-2 mt-2.5">
+                  <div className="rounded-2xl px-3 py-2.5" style={{ background: "linear-gradient(135deg, #7C3AED12, #7C3AED1F)" }}>
+                    <p className="text-[10px] font-bold text-stone-500">{t("result.skinAge")}</p>
+                    <p className="text-[18px] font-black mt-1 leading-none" style={{ color: "#7C3AED" }}>
+                      {analysisResult?.skinAge && analysisResult.skinAge > 0 ? analysisResult.skinAge : "—"}
+                    </p>
+                  </div>
+                  <div className="rounded-2xl px-3 py-2.5" style={{ background: "linear-gradient(135deg, #F59E0B12, #D9770620)" }}>
+                    <p className="text-[10px] font-bold text-stone-500">{t("ranking.topLabel")}</p>
+                    <p className="text-[18px] font-black mt-1 leading-none" style={{ color: "#D97706" }}>
+                      {rankingData && rankingData.myPercentile !== undefined ? `${rankingData.myPercentile}%` : "—"}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="mt-2.5 space-y-1.5">
+                  {topScoreItems.map(({ idx, score, color }, i) => (
+                    <MiniScoreBarIdle key={idx} label={t(`scores.${idx}`)} score={score} color={color} delay={i * 80} />
+                  ))}
+                </div>
+              </div>
             </div>
-          </div>
+          </CardContent>
         </Card>
 
         {/* ── 화장품 스캔 배너 ── */}
@@ -4852,11 +4922,11 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
                 />
               </div>
               <div className="grid grid-cols-2 gap-2 mt-4">
-                <div className="rounded-2xl bg-white/10 p-3 border border-white/12">
+                <button onClick={handleOpenDiaryCalendar} className="rounded-2xl bg-white/10 p-3 border border-white/12 text-left">
                   <p className="text-[10px] font-bold text-white/70">{t("result.actionCard.routineLabel")}</p>
                   <p className="text-[20px] font-black mt-1">{routineDone}/{routineTotal || 0}</p>
                   <p className="text-[10px] text-white/75 mt-1">{t("result.actionCard.routineSub")}</p>
-                </div>
+                </button>
                 <div className="rounded-2xl bg-white/10 p-3 border border-white/12">
                   <p className="text-[10px] font-bold text-white/70">{t("result.actionCard.streakLabel")}</p>
                   <p className="text-[20px] font-black mt-1">{t("result.actionCard.streakValue", { count: currentStreak.count || 1 })}</p>
@@ -4877,13 +4947,15 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
                     {t("result.actionCard.questTitle", { done: essentialQuests.filter((quest) => quest.done).length, total: essentialQuests.length })}
                   </p>
                 </div>
-                <div className="rounded-full px-3 py-1 text-[10px] font-black shrink-0"
+                <button
+                  onClick={() => setShowQuestSheet(true)}
+                  className="rounded-full px-3 py-1 text-[10px] font-black shrink-0"
                   style={{ background: essentialQuests.every((quest) => quest.done) ? "#ECFDF5" : "#FFF1EC", color: essentialQuests.every((quest) => quest.done) ? "#059669" : SCAN_TO }}>
                   {essentialQuests.every((quest) => quest.done) ? t("result.actionCard.questAllClear") : t("result.actionCard.questInProgress")}
-                </div>
+                </button>
               </div>
               <div className="space-y-2">
-                {essentialQuests.map((quest) => (
+                {essentialQuests.slice(0, 2).map((quest) => (
                   <div
                     key={quest.id}
                     className="flex items-center gap-3 rounded-2xl px-3 py-3"
@@ -4925,13 +4997,25 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
                 </div>
                 <div className="space-y-2">
                   {morningRoutineItems.map((item, index) => (
-                    <div key={`am-${index}`} className="flex items-center gap-2 rounded-2xl px-3 py-2.5 bg-white border border-[#E6EEEA]">
+                    <button
+                      key={`am-${index}`}
+                      onClick={() => toggleRoutineChecklist("AM", item)}
+                      className="w-full flex items-center gap-2 rounded-2xl px-3 py-2.5 bg-white border border-[#E6EEEA] text-left"
+                    >
                       <span className="w-5 h-5 rounded-full flex items-center justify-center text-[9px] font-black text-white shrink-0"
                         style={{ background: DEEP_GREEN }}>{index + 1}</span>
+                      <div className={`w-4 h-4 rounded-[5px] border-2 flex items-center justify-center shrink-0 ${
+                        getRoutineTodoState("AM", item)?.done ? "border-emerald-400 bg-emerald-400" : "border-stone-200 bg-white"
+                      }`}>
+                        {getRoutineTodoState("AM", item)?.done && <CheckCircle2 className="w-3 h-3 text-white" strokeWidth={3} />}
+                      </div>
                       <p className="text-[11px] font-semibold text-stone-700 leading-tight text-kr-pretty">{item}</p>
-                    </div>
+                    </button>
                   ))}
                 </div>
+                <button onClick={handleOpenDiaryCalendar} className="text-[11px] font-bold mt-3 underline" style={{ color: DEEP_GREEN }}>
+                  {t("result.actionCard.routineSub")}
+                </button>
               </div>
 
               <div className="rounded-[24px] p-4" style={{ background: "#FFF8F4", border: "1px solid #F1DED7" }}>
@@ -4944,13 +5028,25 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
                 </div>
                 <div className="space-y-2">
                   {eveningRoutineItems.map((item, index) => (
-                    <div key={`pm-${index}`} className="flex items-center gap-2 rounded-2xl px-3 py-2.5 bg-white border border-[#F0E5E0]">
+                    <button
+                      key={`pm-${index}`}
+                      onClick={() => toggleRoutineChecklist("PM", item)}
+                      className="w-full flex items-center gap-2 rounded-2xl px-3 py-2.5 bg-white border border-[#F0E5E0] text-left"
+                    >
                       <span className="w-5 h-5 rounded-full flex items-center justify-center text-[9px] font-black text-white shrink-0"
                         style={{ background: SCAN_TO }}>{index + 1}</span>
+                      <div className={`w-4 h-4 rounded-[5px] border-2 flex items-center justify-center shrink-0 ${
+                        getRoutineTodoState("PM", item)?.done ? "border-emerald-400 bg-emerald-400" : "border-stone-200 bg-white"
+                      }`}>
+                        {getRoutineTodoState("PM", item)?.done && <CheckCircle2 className="w-3 h-3 text-white" strokeWidth={3} />}
+                      </div>
                       <p className="text-[11px] font-semibold text-stone-700 leading-tight text-kr-pretty">{item}</p>
-                    </div>
+                    </button>
                   ))}
                 </div>
+                <button onClick={handleOpenDiaryCalendar} className="text-[11px] font-bold mt-3 underline" style={{ color: SCAN_TO }}>
+                  {t("result.actionCard.diaryButton")}
+                </button>
               </div>
             </div>
 
@@ -5881,6 +5977,52 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
                 >
                   {t("cosmetics.routineUpdateApply")}
                 </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {showQuestSheet && (
+          <motion.div className="fixed inset-0 z-[120] flex items-end justify-center"
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            onClick={() => setShowQuestSheet(false)}>
+            <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
+            <motion.div
+              className="relative bg-white rounded-t-[32px] w-full max-w-md px-5 pt-5 pb-8 shadow-2xl max-h-[82vh] overflow-y-auto"
+              initial={{ y: 120 }} animate={{ y: 0 }} exit={{ y: 120 }}
+              transition={{ type: "spring", damping: 28, stiffness: 280 }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="w-10 h-1 rounded-full bg-stone-200 mx-auto mb-4" />
+              <div className="flex items-center justify-between gap-3 mb-4">
+                <div>
+                  <p className="text-[11px] font-black uppercase tracking-[0.16em]" style={{ color: SCAN_TO }}>{t("result.actionCard.questEyebrow")}</p>
+                  <p className="text-[16px] font-black mt-1" style={{ color: DEEP_GREEN }}>{t("result.actionCard.questTitle", { done: questDoneCount, total: questBoard.length })}</p>
+                </div>
+                <span className="rounded-full px-3 py-1 text-[10px] font-black"
+                  style={{ background: "#FFF7ED", color: "#D97706" }}>
+                  +{allClearBonus}pt
+                </span>
+              </div>
+              <div className="space-y-2">
+                {questBoard.map((quest) => (
+                  <div key={`sheet-${quest.id}`} className="flex items-center gap-3 rounded-2xl px-3 py-3"
+                    style={{ background: quest.done ? "#F8FFFB" : "#FFFFFF", border: `1px solid ${quest.done ? "#DDF5E8" : "#F3E7E3"}` }}>
+                    <div className="w-9 h-9 rounded-2xl flex items-center justify-center shrink-0"
+                      style={{ background: quest.done ? quest.accent : `${quest.accent}18` }}>
+                      {quest.done ? <CheckCircle2 className="w-4 h-4 text-white" /> : <Star className="w-4 h-4" style={{ color: quest.accent }} />}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between gap-2">
+                        <p className="text-[12px] font-black leading-[1.4] text-kr-pretty" style={{ color: DEEP_GREEN }}>{quest.label}</p>
+                        <span className="text-[10px] font-black" style={{ color: quest.done ? "#059669" : quest.accent }}>{quest.reward}</span>
+                      </div>
+                      <p className="text-[10px] text-stone-500 mt-0.5 leading-[1.45] text-kr-pretty">{quest.detail}</p>
+                    </div>
+                  </div>
+                ))}
               </div>
             </motion.div>
           </motion.div>
