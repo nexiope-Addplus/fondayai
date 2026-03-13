@@ -2244,8 +2244,38 @@ function InlineMemo({ dateStr }: { dateStr: string }) {
   );
 }
 
-function DiaryRoutinePreviewCard({ routineGuide }: { routineGuide: ReturnType<typeof buildRoutineGuide> }) {
+function DiaryRoutinePreviewCard({ routineGuide, dateStr }: { routineGuide: ReturnType<typeof buildRoutineGuide>; dateStr: string }) {
   const { t } = useTranslation();
+  const [todos, setTodos] = useState<TodoItem[]>(() => getDiaryTodos(dateStr));
+
+  useEffect(() => {
+    setTodos(getDiaryTodos(dateStr));
+  }, [dateStr]);
+
+  const isSectionComplete = (period: "AM" | "PM", items: string[]) => {
+    if (items.length === 0) return false;
+    return items.every((item) => {
+      const prefixed = `${period} · ${item}`;
+      return todos.some((todo) => (todo.text === prefixed || todo.text === item) && todo.done);
+    });
+  };
+
+  const setSectionComplete = (period: "AM" | "PM", items: string[]) => {
+    if (items.length === 0) return;
+    const shouldComplete = !isSectionComplete(period, items);
+    const next = [...todos];
+    items.forEach((item) => {
+      const prefixed = `${period} · ${item}`;
+      const index = next.findIndex((todo) => todo.text === prefixed || todo.text === item);
+      if (index >= 0) {
+        next[index] = { ...next[index], text: prefixed, done: shouldComplete };
+      } else {
+        next.push({ text: prefixed, done: shouldComplete });
+      }
+    });
+    setTodos(next);
+    saveDiaryTodos(dateStr, next);
+  };
 
   const sections = [
     {
@@ -2255,7 +2285,8 @@ function DiaryRoutinePreviewCard({ routineGuide }: { routineGuide: ReturnType<ty
       accent: DEEP_GREEN,
       bg: "#F7FBFA",
       border: "#DDECE7",
-      items: routineGuide.am,
+      items: routineGuide.amSteps,
+      period: "AM" as const,
     },
     {
       key: "pm",
@@ -2264,7 +2295,8 @@ function DiaryRoutinePreviewCard({ routineGuide }: { routineGuide: ReturnType<ty
       accent: SCAN_TO,
       bg: "#FFF8F4",
       border: "#F1DED7",
-      items: routineGuide.pm,
+      items: routineGuide.pmSteps,
+      period: "PM" as const,
     },
   ];
 
@@ -2276,29 +2308,37 @@ function DiaryRoutinePreviewCard({ routineGuide }: { routineGuide: ReturnType<ty
           <p className="text-[16px] font-black mt-1 text-kr-pretty" style={{ color: DEEP_GREEN }}>{t("modal.diary.todayRoutineTitle")}</p>
           <p className="text-[11px] text-stone-500 mt-1">{t("modal.diary.todayRoutineDesc")}</p>
           <div className="grid gap-3 mt-4 md:grid-cols-2">
-            {sections.map(({ key, title, icon: Icon, accent, bg, border, items }) => (
+            {sections.map(({ key, title, icon: Icon, accent, bg, border, items, period }) => {
+              const completed = isSectionComplete(period, items);
+              return (
               <div key={key} className="rounded-[24px] p-4" style={{ background: bg, border: `1px solid ${border}` }}>
                 <div className="flex items-center justify-between gap-2 mb-3">
                   <p className="text-[14px] font-black" style={{ color: DEEP_GREEN }}>{title}</p>
                   <Icon className="w-5 h-5" style={{ color: accent }} />
                 </div>
                 {items.length > 0 ? (
-                  <div className="flex flex-wrap gap-1.5">
-                    {items.map((item) => (
-                      <span
-                        key={`${key}-${item.id}`}
-                        className="px-2.5 py-1 rounded-full text-[10px] font-bold"
-                        style={{ background: "#FFFFFF", color: accent, border: `1px solid ${accent}22` }}
-                      >
-                        {item.name}
-                      </span>
-                    ))}
-                  </div>
+                  <>
+                    <p className="text-[11px] font-bold leading-relaxed text-kr-pretty" style={{ color: accent }}>
+                      {items.join(" → ")}
+                    </p>
+                    <button
+                      onClick={() => setSectionComplete(period, items)}
+                      className="mt-3 w-full rounded-2xl bg-white border px-3.5 py-3 flex items-center justify-between gap-3"
+                      style={{ borderColor: `${accent}20` }}
+                    >
+                      <p className="text-[12px] font-black" style={{ color: accent }}>{title} 완료</p>
+                      <div className={`w-5 h-5 rounded-[6px] border-2 flex items-center justify-center shrink-0 ${
+                        completed ? "border-emerald-400 bg-emerald-400" : "border-stone-200 bg-white"
+                      }`}>
+                        {completed && <CheckCircle2 className="w-3.5 h-3.5 text-white" strokeWidth={3} />}
+                      </div>
+                    </button>
+                  </>
                 ) : (
                   <p className="text-[11px] text-stone-400">{t("modal.diary.todayRoutineEmpty")}</p>
                 )}
               </div>
-            ))}
+            )})}
           </div>
         </div>
       </div>
@@ -2977,15 +3017,15 @@ function DiaryTab({ user, analysisResult, onBack }: { user: any; analysisResult:
             {finalType ? `${finalType} · ` : ""}{totalRecords > 0 ? `${t("modal.diary.countLabel", { count: totalRecords })}` : t("result.diary.firstRecord")}
           </p>
           <div className="grid grid-cols-3 gap-2.5 mt-4">
-            <div className="rounded-2xl p-3 bg-white/10 border border-white/12">
+            <div className="rounded-2xl p-3 bg-white/10 border border-white/12 text-center">
               <p className="text-[10px] font-bold text-white/70 whitespace-nowrap">{t("result.overall")}</p>
               <p className="text-[22px] font-black mt-1">{overallScore || "—"}</p>
             </div>
-            <div className="rounded-2xl p-3 bg-white/10 border border-white/12">
+            <div className="rounded-2xl p-3 bg-white/10 border border-white/12 text-center">
               <p className="text-[10px] font-bold text-white/70 whitespace-nowrap">{t("result.diary.avg7d")}</p>
               <p className="text-[22px] font-black mt-1">{avgScore || "—"}</p>
             </div>
-            <div className="rounded-2xl p-3 bg-white/10 border border-white/12">
+            <div className="rounded-2xl p-3 bg-white/10 border border-white/12 text-center">
               <p className="text-[10px] font-bold text-white/70 whitespace-nowrap">{t("diary.routineTitle")}</p>
               <p className="text-[22px] font-black mt-1">{diaryTodoProgress.total > 0 ? `${diaryTodoProgress.done}/${diaryTodoProgress.total}` : (diaryMemoReady ? "1/1" : "0/1")}</p>
             </div>
@@ -3016,7 +3056,7 @@ function DiaryTab({ user, analysisResult, onBack }: { user: any; analysisResult:
               transition={{ duration: 0.22, ease: "easeOut" }}
               className="h-full overflow-y-auto overscroll-contain"
             >
-              <DiaryRoutinePreviewCard routineGuide={routineGuide} />
+              <DiaryCalendarView allEntries={allEntries} />
               <div className="px-5 pt-3">
                 <Card className="border-none rounded-[28px] overflow-hidden shadow-sm" style={{ background: "#FFFFFF" }}>
                   <CardContent className="p-5">
@@ -3073,7 +3113,7 @@ function DiaryTab({ user, analysisResult, onBack }: { user: any; analysisResult:
                   </CardContent>
                 </Card>
               </div>
-              <DiaryCalendarView allEntries={allEntries} />
+              <DiaryRoutinePreviewCard routineGuide={routineGuide} dateStr={todayStr()} />
             </motion.div>
           )}
           {tab === "timeline" && (
