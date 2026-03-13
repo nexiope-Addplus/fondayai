@@ -66,6 +66,7 @@ export const onRequest = async (context: any) => {
     return new Response("DB not configured", { status: 500 });
   }
 
+  try {
   // 푸시 구독자 수 (PUSH_KV)
   let pushCount = 0;
   if (env.PUSH_KV) {
@@ -73,39 +74,34 @@ export const onRequest = async (context: any) => {
     pushCount = allIds ? JSON.parse(allIds).length : 0;
   }
 
-  // KST 기준 날짜: UTC+9 offset
-  // gender/age_group 컬럼은 마이그레이션 전에 없을 수 있으므로 별도 처리
+  // 기본 통계 쿼리 (KST 기준)
+  const safeQuery = async (stmt: any, method: "first" | "all") => {
+    try { return method === "first" ? await stmt.first() : await stmt.all(); } catch { return method === "first" ? null : { results: [] }; }
+  };
+
   const [
     totalResult, todayResult, weekResult, guestResult,
     langResult, baumannResult, dailyResult,
   ] = await Promise.all([
-    env.FONDAY_DB.prepare("SELECT COUNT(*) as total, AVG(overall_score) as avg_score FROM scans").first(),
-    env.FONDAY_DB.prepare("SELECT COUNT(*) as today FROM scans WHERE date(datetime(created_at, '+9 hours')) = date(datetime('now', '+9 hours'))").first(),
-    env.FONDAY_DB.prepare("SELECT COUNT(*) as week FROM scans WHERE datetime(created_at, '+9 hours') >= datetime('now', '+9 hours', '-7 days')").first(),
-    env.FONDAY_DB.prepare("SELECT SUM(is_guest) as guest, SUM(1-is_guest) as loggedin FROM scans").first(),
-    env.FONDAY_DB.prepare("SELECT lang, COUNT(*) as cnt FROM scans GROUP BY lang ORDER BY cnt DESC").all(),
-    env.FONDAY_DB.prepare("SELECT baumann_type, COUNT(*) as cnt FROM scans GROUP BY baumann_type ORDER BY cnt DESC LIMIT 8").all(),
-    env.FONDAY_DB.prepare("SELECT date(datetime(created_at, '+9 hours')) as day, COUNT(*) as cnt FROM scans WHERE datetime(created_at, '+9 hours') >= datetime('now', '+9 hours', '-14 days') GROUP BY day ORDER BY day").all(),
+    safeQuery(env.FONDAY_DB.prepare("SELECT COUNT(*) as total, AVG(overall_score) as avg_score FROM scans"), "first"),
+    safeQuery(env.FONDAY_DB.prepare("SELECT COUNT(*) as today FROM scans WHERE date(datetime(created_at, '+9 hours')) = date(datetime('now', '+9 hours'))"), "first"),
+    safeQuery(env.FONDAY_DB.prepare("SELECT COUNT(*) as week FROM scans WHERE datetime(created_at, '+9 hours') >= datetime('now', '+9 hours', '-7 days')"), "first"),
+    safeQuery(env.FONDAY_DB.prepare("SELECT SUM(is_guest) as guest, SUM(1-is_guest) as loggedin FROM scans"), "first"),
+    safeQuery(env.FONDAY_DB.prepare("SELECT lang, COUNT(*) as cnt FROM scans GROUP BY lang ORDER BY cnt DESC"), "all"),
+    safeQuery(env.FONDAY_DB.prepare("SELECT baumann_type, COUNT(*) as cnt FROM scans GROUP BY baumann_type ORDER BY cnt DESC LIMIT 8"), "all"),
+    safeQuery(env.FONDAY_DB.prepare("SELECT date(datetime(created_at, '+9 hours')) as day, COUNT(*) as cnt FROM scans WHERE datetime(created_at, '+9 hours') >= datetime('now', '+9 hours', '-14 days') GROUP BY day ORDER BY day"), "all"),
   ]);
 
-  // 컬럼 존재 여부 확인 후 gender/age_group/recent 쿼리
-  const tableInfo = await env.FONDAY_DB.prepare("PRAGMA table_info(scans)").all();
-  const colNames: string[] = ((tableInfo as any)?.results ?? []).map((c: any) => c.name);
-  const hasGender = colNames.includes("gender");
-  const hasAge = colNames.includes("age_group");
-
-  const recentCols = hasGender && hasAge
-    ? "overall_score, baumann_type, skin_age, lang, is_guest, gender, age_group, created_at"
-    : "overall_score, baumann_type, skin_age, lang, is_guest, created_at";
-
+  // gender/age_group 컬럼: 마이그레이션 전에는 쿼리 자체가 실패하므로 개별 catch
   const [recentResult, genderResult, ageGroupResult] = await Promise.all([
-    env.FONDAY_DB.prepare(`SELECT ${recentCols} FROM scans ORDER BY created_at DESC LIMIT 20`).all(),
-    hasGender
-      ? env.FONDAY_DB.prepare("SELECT gender, COUNT(*) as cnt FROM scans WHERE gender != '' GROUP BY gender ORDER BY cnt DESC").all()
-      : Promise.resolve({ results: [] }),
-    hasAge
-      ? env.FONDAY_DB.prepare("SELECT age_group, COUNT(*) as cnt FROM scans WHERE age_group != '' GROUP BY age_group ORDER BY cnt DESC").all()
-      : Promise.resolve({ results: [] }),
+    // recent: gender/age_group 포함 시도, 실패하면 기본 컬럼
+    env.FONDAY_DB.prepare("SELECT overall_score, baumann_type, skin_age, lang, is_guest, gender, age_group, created_at FROM scans ORDER BY created_at DESC LIMIT 20").all()
+      .catch(() => env.FONDAY_DB.prepare("SELECT overall_score, baumann_type, skin_age, lang, is_guest, created_at FROM scans ORDER BY created_at DESC LIMIT 20").all())
+      .catch(() => ({ results: [] })),
+    env.FONDAY_DB.prepare("SELECT gender, COUNT(*) as cnt FROM scans WHERE gender != '' GROUP BY gender ORDER BY cnt DESC").all()
+      .catch(() => ({ results: [] })),
+    env.FONDAY_DB.prepare("SELECT age_group, COUNT(*) as cnt FROM scans WHERE age_group != '' GROUP BY age_group ORDER BY cnt DESC").all()
+      .catch(() => ({ results: [] })),
   ]);
 
   const total = (totalResult as any)?.total ?? 0;
@@ -314,4 +310,10 @@ export const onRequest = async (context: any) => {
   return new Response(html, {
     headers: { "Content-Type": "text/html;charset=UTF-8" },
   });
+  } catch (e: any) {
+    return new Response(`<pre style="font-family:monospace;padding:24px">Admin error:\n${e?.message ?? e}\n\n${e?.stack ?? ""}</pre>`, {
+      status: 500,
+      headers: { "Content-Type": "text/html;charset=UTF-8" },
+    });
+  }
 };
