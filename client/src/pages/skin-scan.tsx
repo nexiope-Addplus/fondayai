@@ -2458,12 +2458,14 @@ function DiaryCalendarView({ allEntries }: { allEntries: { dateStr: string; scor
           const isSelected = selectedEntry?.dateStr === dateStr;
           return (
             <button key={dateStr}
-              onClick={() => setSelectedEntry(score !== undefined ? { dateStr, score } : null)}
+              onClick={() => setSelectedEntry({ dateStr, score: score ?? 0 })}
               className="flex min-h-[60px] flex-col items-center justify-start py-1.5 gap-1">
               <div className={`w-10 h-10 rounded-full flex items-center justify-center text-[13px] font-bold transition-all
                 ${isSelected ? "ring-2 ring-offset-1 ring-[#C97062]" : ""}`}
                 style={score !== undefined
                   ? { background: getScoreColor(score), color: getTextColor(score) }
+                  : isSelected
+                  ? { background: `${SCAN_FROM}30`, border: `1.5px solid ${SCAN_FROM}`, color: SCAN_TO }
                   : isToday
                   ? { border: `1.5px solid ${SCAN_FROM}`, color: SCAN_TO }
                   : { color: "#B0A898" }}>
@@ -2500,7 +2502,9 @@ function DiaryCalendarView({ allEntries }: { allEntries: { dateStr: string; scor
           className="mt-4 p-4 rounded-[24px] border shadow-sm" style={{ background: "linear-gradient(180deg, #FFFAF9 0%, #FFFFFF 100%)", borderColor: "#F0EDE8" }}>
           <div className="flex items-center justify-between mb-3">
             <span className="text-[11px] font-medium text-stone-400 tracking-wide">{selectedEntry.dateStr}</span>
-            <span className="text-[20px] font-black" style={{ color: SCAN_TO }}>{selectedEntry.score}{t("result.scoreSuffix")}</span>
+            {selectedEntry.score > 0 && (
+              <span className="text-[20px] font-black" style={{ color: SCAN_TO }}>{selectedEntry.score}{t("result.scoreSuffix")}</span>
+            )}
           </div>
           <InlineTodos dateStr={selectedEntry.dateStr} />
           <InlineMemo dateStr={selectedEntry.dateStr} />
@@ -2942,7 +2946,11 @@ function DiaryTab({ user, analysisResult, onBack }: { user: any; analysisResult:
         dateStr: new Date(h.createdAt).toISOString().slice(0, 10),
         score: parseInt(h.overallScore),
       }));
-  const totalRecords = allEntries.length;
+  const uniqueScanDays = new Set([
+    ...(overallScore > 0 ? [todayStr()] : []),
+    ...history.map((h: any) => new Date(h.createdAt).toISOString().slice(0, 10)),
+  ]);
+  const totalRecords = uniqueScanDays.size;
   const recentScores = allEntries.slice(0, 7).map((entry) => entry.score);
   const avgScore = recentScores.length > 0 ? Math.round(recentScores.reduce((sum, score) => sum + score, 0) / recentScores.length) : 0;
   const diaryTodoProgress = getDiaryTodoProgress(todayStr());
@@ -5039,17 +5047,17 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
             <div className="grid grid-cols-3 gap-2 mt-3">
               <div className="rounded-[18px] px-3 py-2.5 text-center" style={{ background: "#FFF4EE", border: "1px solid #F3DED6" }}>
                 <p className="text-[9px] font-black uppercase tracking-[0.12em] text-stone-400">{t("result.overall")}</p>
-                <p className="text-[20px] font-black leading-none mt-1" style={{ color: SCAN_TO }}>{overallScore}</p>
+                <p className="text-[26px] font-black leading-none mt-1" style={{ color: SCAN_TO }}>{overallScore}</p>
               </div>
               <div className="rounded-[18px] px-3 py-2.5 text-center" style={{ background: "#F7F3FF", border: "1px solid #E9DDFF" }}>
                 <p className="text-[9px] font-black uppercase tracking-[0.12em] text-stone-400">{t("result.skinAge")}</p>
-                <p className="text-[20px] font-black leading-none mt-1" style={{ color: "#7C3AED" }}>
+                <p className="text-[26px] font-black leading-none mt-1" style={{ color: "#7C3AED" }}>
                   {analysisResult?.skinAge && analysisResult.skinAge > 0 ? analysisResult.skinAge : "—"}
                 </p>
               </div>
               <div className="rounded-[18px] px-3 py-2.5 text-center" style={{ background: "#FFF8EE", border: "1px solid #F4E2C4" }}>
                 <p className="text-[9px] font-black uppercase tracking-[0.12em] text-stone-400">{t("ranking.topLabel")}</p>
-                <p className="text-[20px] font-black leading-none mt-1" style={{ color: "#D97706" }}>
+                <p className="text-[26px] font-black leading-none mt-1" style={{ color: "#D97706" }}>
                   {rankingData && rankingData.myPercentile !== undefined ? t("ranking.myPercentile", { percent: rankingData.myPercentile }) : "—"}
                 </p>
               </div>
