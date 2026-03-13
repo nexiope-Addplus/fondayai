@@ -4344,15 +4344,23 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
     const prefixed = `${period} · ${label}`;
     return todayRoutineTodos.find((todo) => todo.text === prefixed || todo.text === label);
   };
-  const toggleRoutineChecklist = (period: "AM" | "PM", label: string) => {
-    const prefixed = `${period} · ${label}`;
+  const isRoutinePeriodComplete = (period: "AM" | "PM", items: string[]) => {
+    if (items.length === 0) return false;
+    return items.every((item) => Boolean(getRoutineTodoState(period, item)?.done));
+  };
+  const setRoutinePeriodCompletion = (period: "AM" | "PM", items: string[]) => {
+    if (items.length === 0) return;
     const next = [...todayRoutineTodos];
-    const existingIndex = next.findIndex((todo) => todo.text === prefixed || todo.text === label);
-    if (existingIndex >= 0) {
-      next[existingIndex] = { ...next[existingIndex], text: prefixed, done: !next[existingIndex].done };
-    } else {
-      next.push({ text: prefixed, done: true });
-    }
+    const shouldComplete = !isRoutinePeriodComplete(period, items);
+    items.forEach((item) => {
+      const prefixed = `${period} · ${item}`;
+      const existingIndex = next.findIndex((todo) => todo.text === prefixed || todo.text === item);
+      if (existingIndex >= 0) {
+        next[existingIndex] = { ...next[existingIndex], text: prefixed, done: shouldComplete };
+      } else {
+        next.push({ text: prefixed, done: shouldComplete });
+      }
+    });
     setTodayRoutineTodos(next);
     saveDiaryTodos(todayStr(), next);
   };
@@ -4361,8 +4369,11 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
   const routineDone = todayTodoProgress.done;
   const routineTotal = todayTodoProgress.total || todayRoutine.length;
   const routineComplete = routineTotal > 0 && routineDone === routineTotal;
-  const scoreSummaryItems: { idx: number; score: number; color: string }[] = scores
-    .map((item: any, idx: number) => ({ idx, score: item?.score ?? 0, color: SCORE_COLORS[idx] || DEEP_GREEN }))
+  const morningRoutineComplete = isRoutinePeriodComplete("AM", morningRoutineItems);
+  const eveningRoutineComplete = isRoutinePeriodComplete("PM", eveningRoutineItems);
+  const completedRoutinePhases = [morningRoutineComplete, eveningRoutineComplete].filter(Boolean).length;
+  const previewScoreItems: { idx: number; score: number; color: string }[] = [1, 2, 3, 5]
+    .map((idx) => ({ idx, score: scores[idx]?.score ?? 0, color: SCORE_COLORS[idx] || DEEP_GREEN }))
     .filter((item: { idx: number; score: number; color: string }) => item.score > 0);
   const nextStreakGoal = [3, 7, 30].find((goal) => goal > (currentStreak.count || 0)) ?? null;
   const daysToGoal = nextStreakGoal ? Math.max(nextStreakGoal - (currentStreak.count || 0), 0) : 0;
@@ -4410,7 +4421,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
       id: "routine",
       done: routineComplete,
       label: t("result.actionCard.questRoutine"),
-      reward: `${routineDone}/${routineTotal || 0}`,
+      reward: `${completedRoutinePhases}/2`,
       detail: t("result.actionCard.questRoutineDetail"),
       accent: "#059669",
     },
@@ -4696,9 +4707,9 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
         <Card className="overflow-hidden border-none shadow-2xl rounded-3xl"
           style={{ background: "linear-gradient(180deg, #FFFCFA 0%, #FFFFFF 100%)" }}>
           <CardContent className="p-3.5">
-            <div className="grid grid-cols-[84px_1fr] gap-3 items-start">
-              <div className="relative rounded-[22px] overflow-hidden bg-zinc-900 h-[116px]">
-                <img src={imageSrc} className="w-full h-full object-cover object-top" />
+            <div className="grid grid-cols-[116px_1fr] gap-2.5 items-stretch sm:grid-cols-[132px_1fr] sm:gap-3">
+              <div className="relative rounded-[22px] overflow-hidden min-h-[168px] bg-stone-100 sm:rounded-[24px] sm:min-h-[176px]">
+                <img src={imageSrc} className="w-full h-full object-cover" style={{ objectPosition: "center top" }} />
                 {analysisResult?.hotspots?.slice(0, 4).map((dot: any, i: number) => (
                   <motion.div key={i}
                     className="absolute -translate-x-1/2 -translate-y-1/2"
@@ -4710,28 +4721,36 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
                     <div className="w-2 h-2 rounded-full bg-red-500 border border-white/80 shadow-md" />
                   </motion.div>
                 ))}
+                <div className="absolute top-3 left-3 w-7 h-7 border-t-2 border-l-2 rounded-tl-lg" style={{ borderColor: SCAN_TO }} />
+                <div className="absolute top-3 right-3 w-7 h-7 border-t-2 border-r-2 rounded-tr-lg" style={{ borderColor: SCAN_TO }} />
                 <div className="absolute inset-x-0 bottom-0 h-20"
                   style={{ background: "linear-gradient(to top, rgba(20,20,20,0.6), transparent)" }} />
                 <div className="absolute bottom-3 left-3 text-white">
-                  <p className="text-[16px] font-black leading-none">{overallScore}</p>
-                  <p className="text-[8px] font-black uppercase tracking-[0.18em] text-white/75">{t("result.overall")}</p>
+                  <p className="text-[8px] sm:text-[9px] font-bold uppercase tracking-[0.16em] text-white/75">{t("result.baumannLabel")}</p>
+                  <p className="text-[22px] sm:text-[24px] font-black leading-none">{finalType}</p>
                 </div>
               </div>
 
-              <div className="min-w-0">
-                <div className="flex items-center justify-between gap-2 mb-2">
-                  <div className="min-w-0">
-                    <p className="text-[10px] font-black tracking-[0.18em] uppercase" style={{ color: SCAN_TO }}>{t("result.scores")}</p>
-                    <p className="text-[13px] font-black mt-1 text-kr-pretty" style={{ color: DEEP_GREEN }}>{t("result.aiComment")}</p>
+              <div className="flex flex-col">
+                <div className="rounded-[20px] px-2.5 py-2.5 mb-2.5 sm:rounded-[22px] sm:px-3"
+                  style={{ background: `${SCAN_FROM}10`, border: `1px solid ${SCAN_FROM}24` }}>
+                  <div className="flex items-center justify-between gap-2">
+                    <p className="text-[10px] font-black uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>{t("result.scores")}</p>
+                    <button
+                      onClick={() => setShowAnalysis(true)}
+                      className="rounded-full px-2.5 py-1 text-[9px] font-black"
+                      style={{ background: "#FFF1EC", color: SCAN_TO }}
+                    >
+                      {t("modal.analysis.title")}
+                    </button>
                   </div>
-                  <span className="rounded-full px-2.5 py-1 text-[10px] font-black shrink-0"
-                    style={{ background: "#FFF1EC", color: SCAN_TO }}>
-                    10
-                  </span>
+                  <p className="text-[11px] text-stone-500 mt-2 leading-relaxed text-kr-pretty">
+                    {analysisResult?.aiComment || t("result.aiComment")}
+                  </p>
                 </div>
-                <div className="space-y-1.5">
-                  {scoreSummaryItems.map(({ idx, score, color }: { idx: number; score: number; color: string }, i: number) => (
-                    <MiniScoreBarIdle key={idx} label={t(`scores.${idx}`)} score={score} color={color} delay={i * 60} />
+                <div className="flex flex-col gap-1.5">
+                  {previewScoreItems.map(({ idx, score, color }: { idx: number; score: number; color: string }, i: number) => (
+                    <MiniScoreBarIdle key={idx} label={t(`scores.${idx}`)} score={score} color={color} delay={i * 80} />
                   ))}
                 </div>
               </div>
@@ -4900,8 +4919,8 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
               <div className="grid grid-cols-2 gap-2 mt-4">
                 <button onClick={handleOpenDiaryCalendar} className="rounded-2xl bg-white/10 p-3 border border-white/12 text-left">
                   <p className="text-[10px] font-bold text-white/70">{t("result.actionCard.routineLabel")}</p>
-                  <p className="text-[20px] font-black mt-1">{routineDone}/{routineTotal || 0}</p>
-                  <p className="text-[10px] text-white/75 mt-1">{t("result.actionCard.routineSub")}</p>
+                  <p className="text-[14px] font-black mt-1 text-kr-pretty">{todayFocus}</p>
+                  <p className="text-[10px] text-white/75 mt-1">{t("result.actionCard.diaryButton")}</p>
                 </button>
                 <div className="rounded-2xl bg-white/10 p-3 border border-white/12">
                   <p className="text-[10px] font-bold text-white/70">{t("result.actionCard.streakLabel")}</p>
@@ -4971,26 +4990,22 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
                   </div>
                   <Sun className="w-5 h-5" style={{ color: SCAN_TO }} />
                 </div>
-                <div className="space-y-2">
-                  {morningRoutineItems.map((item, index) => (
-                    <button
-                      key={`am-${index}`}
-                      onClick={() => toggleRoutineChecklist("AM", item)}
-                      className="w-full flex items-center gap-2 rounded-2xl px-3 py-2.5 bg-white border border-[#E6EEEA] text-left"
-                    >
-                      <span className="w-5 h-5 rounded-full flex items-center justify-center text-[9px] font-black text-white shrink-0"
-                        style={{ background: DEEP_GREEN }}>{index + 1}</span>
-                      <div className={`w-4 h-4 rounded-[5px] border-2 flex items-center justify-center shrink-0 ${
-                        getRoutineTodoState("AM", item)?.done ? "border-emerald-400 bg-emerald-400" : "border-stone-200 bg-white"
-                      }`}>
-                        {getRoutineTodoState("AM", item)?.done && <CheckCircle2 className="w-3 h-3 text-white" strokeWidth={3} />}
-                      </div>
-                      <p className="text-[11px] font-semibold text-stone-700 leading-tight text-kr-pretty">{item}</p>
-                    </button>
-                  ))}
-                </div>
-                <button onClick={handleOpenDiaryCalendar} className="text-[11px] font-bold mt-3 underline" style={{ color: DEEP_GREEN }}>
-                  {t("result.actionCard.routineSub")}
+                <p className="text-[11px] text-stone-500 leading-relaxed text-kr-pretty">
+                  {morningRoutineItems.join(" → ")}
+                </p>
+                <button
+                  onClick={() => setRoutinePeriodCompletion("AM", morningRoutineItems)}
+                  className="w-full mt-3 flex items-center justify-between gap-3 rounded-2xl px-3.5 py-3 bg-white border border-[#E6EEEA] text-left"
+                >
+                  <div>
+                    <p className="text-[12px] font-black" style={{ color: DEEP_GREEN }}>{t("cosmetics.amBtn")} 완료</p>
+                    <p className="text-[10px] text-stone-500 mt-1">{t("result.actionCard.routineSub")}</p>
+                  </div>
+                  <div className={`w-5 h-5 rounded-[6px] border-2 flex items-center justify-center shrink-0 ${
+                    morningRoutineComplete ? "border-emerald-400 bg-emerald-400" : "border-stone-200 bg-white"
+                  }`}>
+                    {morningRoutineComplete && <CheckCircle2 className="w-3.5 h-3.5 text-white" strokeWidth={3} />}
+                  </div>
                 </button>
               </div>
 
@@ -5002,26 +5017,22 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
                   </div>
                   <Moon className="w-5 h-5" style={{ color: SCAN_TO }} />
                 </div>
-                <div className="space-y-2">
-                  {eveningRoutineItems.map((item, index) => (
-                    <button
-                      key={`pm-${index}`}
-                      onClick={() => toggleRoutineChecklist("PM", item)}
-                      className="w-full flex items-center gap-2 rounded-2xl px-3 py-2.5 bg-white border border-[#F0E5E0] text-left"
-                    >
-                      <span className="w-5 h-5 rounded-full flex items-center justify-center text-[9px] font-black text-white shrink-0"
-                        style={{ background: SCAN_TO }}>{index + 1}</span>
-                      <div className={`w-4 h-4 rounded-[5px] border-2 flex items-center justify-center shrink-0 ${
-                        getRoutineTodoState("PM", item)?.done ? "border-emerald-400 bg-emerald-400" : "border-stone-200 bg-white"
-                      }`}>
-                        {getRoutineTodoState("PM", item)?.done && <CheckCircle2 className="w-3 h-3 text-white" strokeWidth={3} />}
-                      </div>
-                      <p className="text-[11px] font-semibold text-stone-700 leading-tight text-kr-pretty">{item}</p>
-                    </button>
-                  ))}
-                </div>
-                <button onClick={handleOpenDiaryCalendar} className="text-[11px] font-bold mt-3 underline" style={{ color: SCAN_TO }}>
-                  {t("result.actionCard.diaryButton")}
+                <p className="text-[11px] text-stone-500 leading-relaxed text-kr-pretty">
+                  {eveningRoutineItems.join(" → ")}
+                </p>
+                <button
+                  onClick={() => setRoutinePeriodCompletion("PM", eveningRoutineItems)}
+                  className="w-full mt-3 flex items-center justify-between gap-3 rounded-2xl px-3.5 py-3 bg-white border border-[#F0E5E0] text-left"
+                >
+                  <div>
+                    <p className="text-[12px] font-black" style={{ color: SCAN_TO }}>{t("cosmetics.pmBtn")} 완료</p>
+                    <p className="text-[10px] text-stone-500 mt-1">{t("result.actionCard.diaryButton")}</p>
+                  </div>
+                  <div className={`w-5 h-5 rounded-[6px] border-2 flex items-center justify-center shrink-0 ${
+                    eveningRoutineComplete ? "border-emerald-400 bg-emerald-400" : "border-stone-200 bg-white"
+                  }`}>
+                    {eveningRoutineComplete && <CheckCircle2 className="w-3.5 h-3.5 text-white" strokeWidth={3} />}
+                  </div>
                 </button>
               </div>
             </div>
