@@ -6,6 +6,35 @@ import { randomUUID } from "crypto";
 import { isConfigured, d1Query } from "./d1";
 import type { Scan } from "@shared/schema";
 
+function parseGeminiJson(text: string) {
+  const jsonStart = text.indexOf("{");
+  const jsonEnd = text.lastIndexOf("}");
+  if (jsonStart === -1 || jsonEnd === -1 || jsonEnd <= jsonStart) {
+    throw new Error("AI가 JSON을 반환하지 않았습니다.");
+  }
+
+  const candidate = text.slice(jsonStart, jsonEnd + 1);
+  const attempts = [
+    candidate,
+    candidate
+      .replace(/```json|```/gi, "")
+      .replace(/[“”]/g, '"')
+      .replace(/[‘’]/g, "'")
+      .replace(/,\s*([}\]])/g, "$1")
+      .replace(/([{,]\s*)([A-Za-z0-9_]+)\s*:/g, '$1"$2":'),
+  ];
+
+  for (const attempt of attempts) {
+    try {
+      return JSON.parse(attempt);
+    } catch {
+      continue;
+    }
+  }
+
+  throw new Error("AI 응답 JSON 파싱에 실패했습니다.");
+}
+
 /** D1 row → Scan 타입 변환 */
 function mapD1Scan(row: any): Scan {
   return {
@@ -202,13 +231,7 @@ export async function registerRoutes(
       console.log("[Gemini] 응답 길이:", text.length, "/ 앞100자:", text.slice(0, 100));
 
       // 마크다운 코드블록 + thinking 텍스트 방어
-      const jsonStart = text.indexOf("{");
-      const jsonEnd = text.lastIndexOf("}");
-      if (jsonStart === -1 || jsonEnd === -1) {
-        console.error("[Gemini] JSON 없음. 전체 응답:", text.slice(0, 500));
-        throw new Error("AI가 JSON을 반환하지 않았습니다.");
-      }
-      const analysisData = JSON.parse(text.slice(jsonStart, jsonEnd + 1));
+      const analysisData = parseGeminiJson(text);
 
       // scores: 반드시 10개 항목 강제 보정 (comment 포함)
       const REQUIRED_LABELS = [
@@ -416,9 +439,7 @@ JSON으로만 응답하세요 (다른 텍스트 절대 금지):
         prompt
       ]);
       const text = result.response.text();
-      const jsonStart = text.indexOf("{");
-      const jsonEnd = text.lastIndexOf("}");
-      const parsed = JSON.parse(text.slice(jsonStart, jsonEnd + 1));
+      const parsed = parseGeminiJson(text);
       res.json(parsed);
     } catch {
       res.json({ name: "", brand: "", category: "기타스킨케어", isSkincareRelevant: true, productType: "" });

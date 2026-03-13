@@ -1,5 +1,34 @@
 import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from "@google/generative-ai";
 
+function parseGeminiJson(text: string) {
+  const jsonStart = text.indexOf("{");
+  const jsonEnd = text.lastIndexOf("}");
+  if (jsonStart === -1 || jsonEnd === -1 || jsonEnd <= jsonStart) {
+    throw new Error("AI가 JSON을 반환하지 않았습니다.");
+  }
+
+  const candidate = text.slice(jsonStart, jsonEnd + 1);
+  const attempts = [
+    candidate,
+    candidate
+      .replace(/```json|```/gi, "")
+      .replace(/[“”]/g, '"')
+      .replace(/[‘’]/g, "'")
+      .replace(/,\s*([}\]])/g, "$1")
+      .replace(/([{,]\s*)([A-Za-z0-9_]+)\s*:/g, '$1"$2":'),
+  ];
+
+  for (const attempt of attempts) {
+    try {
+      return JSON.parse(attempt);
+    } catch {
+      continue;
+    }
+  }
+
+  throw new Error("AI 응답 JSON 파싱에 실패했습니다.");
+}
+
 function buildPrompt(surveyData: any, lang: string): string {
   const surveyJson = JSON.stringify(surveyData);
 
@@ -144,12 +173,7 @@ export const onRequest = async (context: any) => {
       ]);
 
       const text = result.response.text();
-      const jsonStart = text.indexOf("{");
-      const jsonEnd = text.lastIndexOf("}");
-      if (jsonStart === -1 || jsonEnd === -1) {
-        throw new Error("AI가 JSON을 반환하지 않았습니다.");
-      }
-      const analysisData = JSON.parse(text.slice(jsonStart, jsonEnd + 1));
+      const analysisData = parseGeminiJson(text);
 
       // scores: 반드시 10개 항목 강제 보정
       const REQUIRED_LABELS = [

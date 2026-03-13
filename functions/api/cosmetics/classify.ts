@@ -5,6 +5,35 @@ const CORS = {
   "Access-Control-Allow-Headers": "Content-Type",
 };
 
+function parseGeminiJson(text: string) {
+  const jsonStart = text.indexOf("{");
+  const jsonEnd = text.lastIndexOf("}");
+  if (jsonStart === -1 || jsonEnd === -1 || jsonEnd <= jsonStart) {
+    throw new Error("AI가 JSON을 반환하지 않았습니다.");
+  }
+
+  const candidate = text.slice(jsonStart, jsonEnd + 1);
+  const attempts = [
+    candidate,
+    candidate
+      .replace(/```json|```/gi, "")
+      .replace(/[“”]/g, '"')
+      .replace(/[‘’]/g, "'")
+      .replace(/,\s*([}\]])/g, "$1")
+      .replace(/([{,]\s*)([A-Za-z0-9_]+)\s*:/g, '$1"$2":'),
+  ];
+
+  for (const attempt of attempts) {
+    try {
+      return JSON.parse(attempt);
+    } catch {
+      continue;
+    }
+  }
+
+  throw new Error("AI 응답 JSON 파싱에 실패했습니다.");
+}
+
 export const onRequest = async (context: any) => {
   const { request, env } = context;
 
@@ -59,9 +88,7 @@ JSON으로만 응답하세요 (다른 텍스트 절대 금지):
 
     const geminiData: any = await geminiRes.json();
     const text = geminiData?.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
-    const jsonStart = text.indexOf("{");
-    const jsonEnd = text.lastIndexOf("}");
-    const parsed = JSON.parse(text.slice(jsonStart, jsonEnd + 1));
+    const parsed = parseGeminiJson(text);
 
     return new Response(JSON.stringify(parsed), { headers: CORS });
   } catch {
