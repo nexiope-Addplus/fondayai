@@ -5250,12 +5250,12 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
             <div className="grid gap-3 mt-4 md:grid-cols-2">
               <button
                 onClick={() => setRoutinePeriodCompletion("AM", morningRoutineItems)}
-                className="flex items-center justify-between gap-3 rounded-2xl px-3.5 py-3 bg-white border border-[#E6EEEA] text-left"
+                className="w-full flex items-center justify-between gap-3 rounded-2xl px-3.5 py-3 text-left"
                 style={{ background: "#F7FBFA", border: "1px solid #DDECE7" }}
               >
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 min-w-0">
                   <Sun className="w-4 h-4 shrink-0" style={{ color: DEEP_GREEN }} />
-                  <p className="text-[12px] font-black" style={{ color: DEEP_GREEN }}>{t("result.actionCard.phaseMorning")} 완료</p>
+                  <p className="text-[11px] font-bold truncate" style={{ color: DEEP_GREEN }}>{morningRoutineItems.join(" → ")}</p>
                 </div>
                 <div className={`w-5 h-5 rounded-[6px] border-2 flex items-center justify-center shrink-0 ${
                   morningRoutineComplete ? "border-emerald-400 bg-emerald-400" : "border-stone-200 bg-white"
@@ -5266,12 +5266,12 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
 
               <button
                 onClick={() => setRoutinePeriodCompletion("PM", eveningRoutineItems)}
-                className="flex items-center justify-between gap-3 rounded-2xl px-3.5 py-3 text-left"
+                className="w-full flex items-center justify-between gap-3 rounded-2xl px-3.5 py-3 text-left"
                 style={{ background: "#FFF8F4", border: "1px solid #F1DED7" }}
               >
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 min-w-0">
                   <Moon className="w-4 h-4 shrink-0" style={{ color: SCAN_TO }} />
-                  <p className="text-[12px] font-black" style={{ color: SCAN_TO }}>{t("result.actionCard.phaseEvening")} 완료</p>
+                  <p className="text-[11px] font-bold truncate" style={{ color: SCAN_TO }}>{eveningRoutineItems.join(" → ")}</p>
                 </div>
                 <div className={`w-5 h-5 rounded-[6px] border-2 flex items-center justify-center shrink-0 ${
                   eveningRoutineComplete ? "border-emerald-400 bg-emerald-400" : "border-stone-200 bg-white"
