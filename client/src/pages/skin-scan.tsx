@@ -3536,12 +3536,16 @@ function CosmeticsRegisterModal({ onClose, onSuccess }: { onClose: () => void; o
     setRegistering(true);
     try {
       const thumbnail = capturedImage ? await compressThumbnail(capturedImage, 300) : "";
-      await fetch("/api/cosmetics", {
+      const res = await fetch("/api/cosmetics", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name: name.trim(), brand: brand.trim(), category, timeOfDay, openedAt, isSkincareRelevant: true, imageThumbnail: thumbnail }),
       });
-      onSuccess();
+      if (res.ok) {
+        onSuccess();
+      } else {
+        setRegistering(false);
+      }
     } catch {
       setRegistering(false);
     }
