@@ -4664,6 +4664,8 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
                   <img src={imageSrc} className="w-full h-full object-cover" style={{ objectPosition: "center 18%" }} />
                   <div className="absolute top-3 left-3 w-7 h-7 border-t-2 border-l-2 rounded-tl-lg" style={{ borderColor: SCAN_TO }} />
                   <div className="absolute top-3 right-3 w-7 h-7 border-t-2 border-r-2 rounded-tr-lg" style={{ borderColor: SCAN_TO }} />
+                  <div className="absolute bottom-3 left-3 w-7 h-7 border-b-2 border-l-2 rounded-bl-lg" style={{ borderColor: SCAN_TO }} />
+                  <div className="absolute bottom-3 right-3 w-7 h-7 border-b-2 border-r-2 rounded-br-lg" style={{ borderColor: SCAN_TO }} />
                 </div>
                 <div className="mt-2 rounded-2xl px-2.5 py-2 text-center"
                   style={{ background: "#FFF1EC", border: "1px solid #F3DDD6" }}>
@@ -4725,9 +4727,8 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
                 <div className="flex items-center justify-between gap-3">
                   <div className="min-w-0">
                     <p className="text-[10px] font-black uppercase tracking-[0.16em]" style={{ color: SCAN_TO }}>{t("result.baumannLabel")}</p>
-                    <p className="text-[12px] font-black mt-1 text-kr-pretty" style={{ color: DEEP_GREEN }}>
-                      {surveyData?.age} {surveyData?.gender} · {t("result.mbtiSub")}
-                    </p>
+                    <p className="text-[18px] font-black mt-1 leading-none" style={{ color: DEEP_GREEN }}>{finalType}</p>
+                    <p className="text-[11px] font-medium mt-1 text-stone-500 text-kr-pretty">{t("result.mbtiSub")}</p>
                   </div>
                   <div className="rounded-full px-3 py-1 text-[10px] font-black shrink-0"
                     style={{ background: `${DEEP_GREEN}10`, color: DEEP_GREEN }}>
@@ -4747,9 +4748,17 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
                 })}
               </div>
               {analysisResult?.aiComment && (
-                <p className="text-[11px] text-stone-600 mt-3 leading-relaxed text-kr-pretty line-clamp-2">
-                  {analysisResult.aiComment}
-                </p>
+                <button
+                  onClick={() => setShowAnalysis(true)}
+                  className="mt-3 block w-full rounded-2xl px-3 py-2.5 text-left"
+                  style={{ background: "#FFFFFF", border: "1px solid #F0E2DA" }}
+                >
+                  <p className="text-[10px] font-black uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>{t("result.aiComment")}</p>
+                  <p className="text-[11px] text-stone-600 mt-1 leading-relaxed text-kr-pretty line-clamp-2">
+                    {analysisResult.aiComment}
+                  </p>
+                  <p className="text-[10px] font-black mt-2" style={{ color: SCAN_TO }}>{t("modal.analysis.title")} 보기</p>
+                </button>
               )}
             </div>
           </CardContent>
@@ -4855,7 +4864,6 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
                 >
                   <div>
                     <p className="text-[12px] font-black" style={{ color: DEEP_GREEN }}>{t("cosmetics.amBtn")} 완료</p>
-                    <p className="text-[10px] text-stone-500 mt-1">{morningRoutineComplete ? t("result.actionCard.questDone") : t("result.actionCard.questPending")}</p>
                   </div>
                   <div className={`w-5 h-5 rounded-[6px] border-2 flex items-center justify-center shrink-0 ${
                     morningRoutineComplete ? "border-emerald-400 bg-emerald-400" : "border-stone-200 bg-white"
@@ -4882,7 +4890,6 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
                 >
                   <div>
                     <p className="text-[12px] font-black" style={{ color: SCAN_TO }}>{t("cosmetics.pmBtn")} 완료</p>
-                    <p className="text-[10px] text-stone-500 mt-1">{eveningRoutineComplete ? t("result.actionCard.questDone") : t("result.actionCard.questPending")}</p>
                   </div>
                   <div className={`w-5 h-5 rounded-[6px] border-2 flex items-center justify-center shrink-0 ${
                     eveningRoutineComplete ? "border-emerald-400 bg-emerald-400" : "border-stone-200 bg-white"
