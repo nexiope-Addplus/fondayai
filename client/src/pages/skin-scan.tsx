@@ -2023,6 +2023,64 @@ function buildCosmeticsInsights(
   return insights.slice(0, 3);
 }
 
+const CATEGORY_ORDER = ["클렌저", "토너", "세럼", "진정케어", "각질케어", "아이크림", "장벽케어", "크림", "선크림"];
+
+function sortCosmeticsForRoutine(items: CosmeticItem[]) {
+  return [...items].sort((a, b) => {
+    const aIndex = CATEGORY_ORDER.indexOf(a.category);
+    const bIndex = CATEGORY_ORDER.indexOf(b.category);
+    const normalizedA = aIndex === -1 ? CATEGORY_ORDER.length : aIndex;
+    const normalizedB = bIndex === -1 ? CATEGORY_ORDER.length : bIndex;
+    return normalizedA - normalizedB;
+  });
+}
+
+function buildRoutineGuide(cosmetics: CosmeticItem[], t: (key: string, options?: any) => string) {
+  const am = sortCosmeticsForRoutine(
+    cosmetics.filter((item) => item.time_of_day === "am" || item.time_of_day === "both"),
+  );
+  const pm = sortCosmeticsForRoutine(
+    cosmetics.filter((item) => item.time_of_day === "pm" || item.time_of_day === "both"),
+  );
+  const categories = cosmetics.map((item) => item.category);
+  const categoryCount = new Map<string, number>();
+  categories.forEach((category) => categoryCount.set(category, (categoryCount.get(category) || 0) + 1));
+
+  const goodMixes: string[] = [];
+  const cautions: string[] = [];
+
+  if (categories.includes("진정케어") && categories.includes("장벽케어")) {
+    goodMixes.push(t("cosmetics.goodComboBarrier"));
+  }
+  if (categories.includes("세럼") && categories.includes("크림")) {
+    goodMixes.push(t("cosmetics.goodComboLayering"));
+  }
+  if (categories.includes("선크림")) {
+    goodMixes.push(t("cosmetics.goodComboSunscreen"));
+  }
+
+  const exfoliatorCount = categoryCount.get("각질케어") || 0;
+  if (exfoliatorCount >= 2) {
+    cautions.push(t("cosmetics.cautionOverExfoliate"));
+  }
+  if (cosmetics.some((item) => item.category === "각질케어" && (item.time_of_day === "am" || item.time_of_day === "both"))) {
+    cautions.push(t("cosmetics.cautionMorningExfoliate"));
+  }
+  if ((categoryCount.get("세럼") || 0) >= 3) {
+    cautions.push(t("cosmetics.cautionTooManySerums"));
+  }
+  if (!categories.includes("장벽케어") && !categories.includes("진정케어")) {
+    cautions.push(t("cosmetics.cautionRecoveryGap"));
+  }
+
+  return {
+    am,
+    pm,
+    goodMixes: goodMixes.slice(0, 3),
+    cautions: cautions.slice(0, 3),
+  };
+}
+
 // ─── 인라인 루틴 Todo ────────────────────────────────────────────
 function InlineTodos({ dateStr }: { dateStr: string }) {
   const { t } = useTranslation();
@@ -3086,9 +3144,10 @@ function DiaryTab({ user, analysisResult, onBack }: { user: any; analysisResult:
 // ─── 마이 페이지 ─────────────────────────────────────────────────
 function MyCosmeticsModal({ onClose, onAddNew }: { onClose: () => void; onAddNew: () => void }) {
   const { t } = useTranslation();
-  const [list, setList] = useState<any[]>([]);
+  const [list, setList] = useState<CosmeticItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const routineGuide = buildRoutineGuide(list, t);
 
   useEffect(() => {
     fetch("/api/cosmetics").then(r => r.json()).then(data => {
@@ -3133,28 +3192,109 @@ function MyCosmeticsModal({ onClose, onAddNew }: { onClose: () => void; onAddNew
               <p className="text-[12px] text-stone-400">제품 전면을 촬영하면 자동으로 등록돼요</p>
             </div>
           ) : (
-            list.map(item => (
-              <div key={item.id} className="flex items-center gap-3 p-3 rounded-2xl bg-stone-50">
-                {item.image_thumbnail
-                  ? <img src={item.image_thumbnail} className="w-12 h-12 rounded-xl object-cover bg-stone-200 shrink-0" />
-                  : <div className="w-12 h-12 rounded-xl bg-stone-200 flex items-center justify-center shrink-0">
-                      <span className="text-xl">💄</span>
-                    </div>
-                }
-                <div className="flex-1 min-w-0">
-                  <p className="text-[13px] font-bold text-stone-800 truncate">{item.name}</p>
-                  <p className="text-[11px] text-stone-400">{item.brand ? `${item.brand} · ` : ""}{t(`cosmetics.categories.${item.category}`)}</p>
+            <>
+              <div className="rounded-[28px] p-4 border border-[#E8DFD8]" style={{ background: "linear-gradient(180deg, #FFFCFA 0%, #FFFFFF 100%)" }}>
+                <div className="flex items-start justify-between gap-3 mb-3">
+                  <div>
+                    <p className="text-[13px] font-black" style={{ color: DEEP_GREEN }}>{t("cosmetics.routineCoachTitle")}</p>
+                    <p className="text-[11px] text-stone-400">{t("cosmetics.routineCoachDesc")}</p>
+                  </div>
+                  <span className="px-2.5 py-1 rounded-full text-[10px] font-black"
+                    style={{ background: `${SCAN_FROM}16`, color: SCAN_TO }}>
+                    {t("cosmetics.ctaCount", { count: list.length })}
+                  </span>
                 </div>
-                <span className="text-[10px] font-bold px-2 py-1 rounded-full shrink-0"
-                  style={{ background: `${DEEP_GREEN}15`, color: DEEP_GREEN }}>
-                  {item.time_of_day === "am" ? t("cosmetics.amBtn") : item.time_of_day === "pm" ? t("cosmetics.pmBtn") : t("cosmetics.bothBtn")}
-                </span>
-                <button onClick={() => handleDelete(item.id)} disabled={deletingId === item.id}
-                  className="w-7 h-7 rounded-full bg-stone-100 flex items-center justify-center text-stone-400 text-[11px] shrink-0 active:opacity-70 disabled:opacity-40">
-                  {deletingId === item.id ? <div className="w-3 h-3 border border-stone-400 border-t-transparent rounded-full animate-spin" /> : "✕"}
-                </button>
+
+                <div className="grid grid-cols-2 gap-2.5">
+                  <div className="rounded-2xl p-3" style={{ background: "#F6FBF9", border: "1px solid #D7ECE4" }}>
+                    <p className="text-[10px] font-black uppercase tracking-[0.14em]" style={{ color: DEEP_GREEN }}>{t("cosmetics.amBtn")}</p>
+                    <div className="mt-2 space-y-1.5">
+                      {routineGuide.am.length > 0 ? routineGuide.am.map((item, index) => (
+                        <div key={`${item.id}-am`} className="flex items-center gap-2">
+                          <span className="w-5 h-5 rounded-full flex items-center justify-center text-[9px] font-black text-white shrink-0"
+                            style={{ background: DEEP_GREEN }}>{index + 1}</span>
+                          <div className="min-w-0">
+                            <p className="text-[11px] font-bold text-stone-700 truncate">{item.name}</p>
+                            <p className="text-[9px] text-stone-400">{t(`cosmetics.categories.${item.category}`)}</p>
+                          </div>
+                        </div>
+                      )) : (
+                        <p className="text-[11px] text-stone-400 leading-relaxed">{t("cosmetics.routineEmptyAm")}</p>
+                      )}
+                    </div>
+                  </div>
+                  <div className="rounded-2xl p-3" style={{ background: "#FFF7F2", border: "1px solid #F4DDD3" }}>
+                    <p className="text-[10px] font-black uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>{t("cosmetics.pmBtn")}</p>
+                    <div className="mt-2 space-y-1.5">
+                      {routineGuide.pm.length > 0 ? routineGuide.pm.map((item, index) => (
+                        <div key={`${item.id}-pm`} className="flex items-center gap-2">
+                          <span className="w-5 h-5 rounded-full flex items-center justify-center text-[9px] font-black text-white shrink-0"
+                            style={{ background: SCAN_TO }}>{index + 1}</span>
+                          <div className="min-w-0">
+                            <p className="text-[11px] font-bold text-stone-700 truncate">{item.name}</p>
+                            <p className="text-[9px] text-stone-400">{t(`cosmetics.categories.${item.category}`)}</p>
+                          </div>
+                        </div>
+                      )) : (
+                        <p className="text-[11px] text-stone-400 leading-relaxed">{t("cosmetics.routineEmptyPm")}</p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mt-3 grid gap-2">
+                  <div className="rounded-2xl p-3 border" style={{ background: "#F8FFFB", borderColor: "#D8EFE4" }}>
+                    <p className="text-[11px] font-black" style={{ color: DEEP_GREEN }}>{t("cosmetics.goodComboTitle")}</p>
+                    <div className="mt-2 flex flex-wrap gap-1.5">
+                      {routineGuide.goodMixes.length > 0 ? routineGuide.goodMixes.map((item, index) => (
+                        <span key={`good-${index}`} className="px-2.5 py-1 rounded-full text-[10px] font-bold"
+                          style={{ background: "#ECFDF5", color: "#059669" }}>
+                          {item}
+                        </span>
+                      )) : (
+                        <p className="text-[11px] text-stone-400">{t("cosmetics.goodComboEmpty")}</p>
+                      )}
+                    </div>
+                  </div>
+                  <div className="rounded-2xl p-3 border" style={{ background: "#FFF8F2", borderColor: "#F5DDCF" }}>
+                    <p className="text-[11px] font-black" style={{ color: "#C2410C" }}>{t("cosmetics.cautionTitle")}</p>
+                    <div className="mt-2 space-y-1.5">
+                      {routineGuide.cautions.length > 0 ? routineGuide.cautions.map((item, index) => (
+                        <div key={`caution-${index}`} className="flex items-start gap-2">
+                          <span className="text-[11px] font-black mt-0.5" style={{ color: "#EA580C" }}>!</span>
+                          <p className="text-[11px] text-stone-600 leading-relaxed">{item}</p>
+                        </div>
+                      )) : (
+                        <p className="text-[11px] text-stone-400">{t("cosmetics.cautionEmpty")}</p>
+                      )}
+                    </div>
+                  </div>
+                </div>
               </div>
-            ))
+
+              {list.map(item => (
+                <div key={item.id} className="flex items-center gap-3 p-3 rounded-2xl bg-stone-50">
+                  {item.image_thumbnail
+                    ? <img src={item.image_thumbnail} className="w-12 h-12 rounded-xl object-cover bg-stone-200 shrink-0" />
+                    : <div className="w-12 h-12 rounded-xl bg-stone-200 flex items-center justify-center shrink-0">
+                        <span className="text-xl">💄</span>
+                      </div>
+                  }
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[13px] font-bold text-stone-800 truncate">{item.name}</p>
+                    <p className="text-[11px] text-stone-400">{item.brand ? `${item.brand} · ` : ""}{t(`cosmetics.categories.${item.category}`)}</p>
+                  </div>
+                  <span className="text-[10px] font-bold px-2 py-1 rounded-full shrink-0"
+                    style={{ background: `${DEEP_GREEN}15`, color: DEEP_GREEN }}>
+                    {item.time_of_day === "am" ? t("cosmetics.amBtn") : item.time_of_day === "pm" ? t("cosmetics.pmBtn") : t("cosmetics.bothBtn")}
+                  </span>
+                  <button onClick={() => handleDelete(item.id)} disabled={deletingId === item.id}
+                    className="w-7 h-7 rounded-full bg-stone-100 flex items-center justify-center text-stone-400 text-[11px] shrink-0 active:opacity-70 disabled:opacity-40">
+                    {deletingId === item.id ? <div className="w-3 h-3 border border-stone-400 border-t-transparent rounded-full animate-spin" /> : "✕"}
+                  </button>
+                </div>
+              ))}
+            </>
           )}
 
           <button onClick={onAddNew}
