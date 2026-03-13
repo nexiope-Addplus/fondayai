@@ -3239,14 +3239,11 @@ function MyCosmeticsModal({ onClose, onAddNew }: { onClose: () => void; onAddNew
                   <div className="rounded-2xl p-3" style={{ background: "#F6FBF9", border: "1px solid #D7ECE4" }}>
                     <p className="text-[10px] font-black uppercase tracking-[0.14em]" style={{ color: DEEP_GREEN }}>{t("cosmetics.amBtn")}</p>
                     <div className="mt-2 space-y-1.5">
-                      {routineGuide.am.length > 0 ? routineGuide.am.map((item, index) => (
-                        <div key={`${item.id}-am`} className="flex items-center gap-2">
+                      {routineGuide.amSteps.length > 0 ? routineGuide.amSteps.map((item, index) => (
+                        <div key={`${item}-am`} className="flex items-center gap-2">
                           <span className="w-5 h-5 rounded-full flex items-center justify-center text-[9px] font-black text-white shrink-0"
                             style={{ background: DEEP_GREEN }}>{index + 1}</span>
-                          <div className="min-w-0">
-                            <p className="text-[11px] font-bold text-stone-700 truncate">{item.name}</p>
-                            <p className="text-[9px] text-stone-400">{t(`cosmetics.categories.${item.category}`)}</p>
-                          </div>
+                          <p className="text-[11px] font-bold text-stone-700 truncate">{item}</p>
                         </div>
                       )) : (
                         <p className="text-[11px] text-stone-400 leading-relaxed">{t("cosmetics.routineEmptyAm")}</p>
@@ -3256,14 +3253,11 @@ function MyCosmeticsModal({ onClose, onAddNew }: { onClose: () => void; onAddNew
                   <div className="rounded-2xl p-3" style={{ background: "#FFF7F2", border: "1px solid #F4DDD3" }}>
                     <p className="text-[10px] font-black uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>{t("cosmetics.pmBtn")}</p>
                     <div className="mt-2 space-y-1.5">
-                      {routineGuide.pm.length > 0 ? routineGuide.pm.map((item, index) => (
-                        <div key={`${item.id}-pm`} className="flex items-center gap-2">
+                      {routineGuide.pmSteps.length > 0 ? routineGuide.pmSteps.map((item, index) => (
+                        <div key={`${item}-pm`} className="flex items-center gap-2">
                           <span className="w-5 h-5 rounded-full flex items-center justify-center text-[9px] font-black text-white shrink-0"
                             style={{ background: SCAN_TO }}>{index + 1}</span>
-                          <div className="min-w-0">
-                            <p className="text-[11px] font-bold text-stone-700 truncate">{item.name}</p>
-                            <p className="text-[9px] text-stone-400">{t(`cosmetics.categories.${item.category}`)}</p>
-                          </div>
+                          <p className="text-[11px] font-bold text-stone-700 truncate">{item}</p>
                         </div>
                       )) : (
                         <p className="text-[11px] text-stone-400 leading-relaxed">{t("cosmetics.routineEmptyPm")}</p>
@@ -3316,7 +3310,13 @@ function MyCosmeticsModal({ onClose, onAddNew }: { onClose: () => void; onAddNew
                   </div>
                   <span className="text-[10px] font-bold px-2 py-1 rounded-full shrink-0"
                     style={{ background: `${DEEP_GREEN}15`, color: DEEP_GREEN }}>
-                    {item.time_of_day === "am" ? t("cosmetics.amBtn") : item.time_of_day === "pm" ? t("cosmetics.pmBtn") : t("cosmetics.bothBtn")}
+                    {item.time_of_day === "am"
+                      ? t("cosmetics.amBtn")
+                      : item.time_of_day === "pm"
+                      ? t("cosmetics.pmBtn")
+                      : inferCosmeticTimeOfDay(item.category) === "am"
+                      ? t("cosmetics.amBtn")
+                      : t("cosmetics.pmBtn")}
                   </span>
                   <button onClick={() => handleDelete(item.id)} disabled={deletingId === item.id}
                     className="w-7 h-7 rounded-full bg-stone-100 flex items-center justify-center text-stone-400 text-[11px] shrink-0 active:opacity-70 disabled:opacity-40">
@@ -3526,11 +3526,9 @@ function MyScreen({ user, onInstall, onBack }: { user: any; onInstall: () => voi
 }
 
 // ─── 피부 예측 카드 ────────────────────────────────────────────────
-function SkinPredictionCard({ prediction, currentScore, missionPhases, missionProgressPct, onOpenDiary }: {
+function SkinPredictionCard({ prediction, currentScore, onOpenDiary }: {
   prediction: { good: PredictionScenario; bad: PredictionScenario };
   currentScore: number;
-  missionPhases: { id: string; label: string; detail: string; done: boolean }[];
-  missionProgressPct: number;
   onOpenDiary?: () => void;
 }) {
   const { t } = useTranslation();
@@ -3538,14 +3536,6 @@ function SkinPredictionCard({ prediction, currentScore, missionPhases, missionPr
   const goodDelta = good.score - currentScore;
   const badDelta = bad.score - currentScore;
   const rewardPts = Math.max(goodDelta, 5);
-  const routeReadyCount = missionPhases.filter((phase) => phase.done).length;
-  const remainingRoutePhases = missionPhases.filter((phase) => !phase.done);
-  const routeStatusLabel = remainingRoutePhases.length === 0
-    ? t("result.prediction.routeReady")
-    : t("result.prediction.routePending", { count: remainingRoutePhases.length });
-  const routeStatusDesc = remainingRoutePhases.length === 0
-    ? t("result.prediction.routeReadyDesc")
-    : t("result.prediction.routePendingDesc", { tasks: remainingRoutePhases.map((phase) => phase.label).join(" · ") });
 
   return (
     <Card className="border-none shadow-md rounded-3xl overflow-hidden">
@@ -3592,54 +3582,6 @@ function SkinPredictionCard({ prediction, currentScore, missionPhases, missionPr
               <p className="text-[15px] font-black mt-1 leading-tight text-kr-pretty">{bad.scenario}</p>
               <p className="text-[11px] text-orange-100 mt-2">-{Math.abs(badDelta)} {t("result.scoreSuffix")}</p>
             </div>
-          </div>
-        </div>
-
-        <div className="rounded-[24px] p-4 mb-4" style={{ background: "#FFFBF8", border: "1px solid #F2E1D8" }}>
-          <div className="flex items-start justify-between gap-3">
-            <div className="min-w-0">
-              <p className="text-[11px] font-black uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>
-                {t("result.prediction.routeStatusEyebrow")}
-              </p>
-              <p className="text-[18px] font-black mt-1 text-kr-pretty" style={{ color: DEEP_GREEN }}>
-                {routeStatusLabel}
-              </p>
-              <p className="text-[11px] text-stone-500 mt-1 leading-relaxed text-kr-pretty">{routeStatusDesc}</p>
-            </div>
-            <div className="rounded-2xl px-3 py-2 text-right shrink-0"
-              style={{ background: "#FFF1EC", border: "1px solid #F3DDD6" }}>
-              <p className="text-[10px] font-bold text-stone-500">{t("result.prediction.routeStatusProgress")}</p>
-              <p className="text-[20px] font-black leading-none" style={{ color: SCAN_TO }}>
-                {routeReadyCount}/{missionPhases.length}
-              </p>
-            </div>
-          </div>
-          <div className="h-2 rounded-full bg-stone-100 overflow-hidden mt-3">
-            <motion.div
-              className="h-full rounded-full"
-              style={{ background: `linear-gradient(90deg, ${SCAN_FROM}, ${DEEP_GREEN})` }}
-              initial={{ width: 0 }}
-              animate={{ width: `${missionProgressPct}%` }}
-              transition={{ duration: 0.6, ease: "easeOut" }}
-            />
-          </div>
-          <div className="grid gap-2 mt-3">
-            {missionPhases.map((phase) => (
-              <div
-                key={phase.id}
-                className="flex items-center justify-between gap-3 rounded-2xl px-3 py-2.5"
-                style={{ background: phase.done ? "#F8FFFB" : "#FFFFFF", border: `1px solid ${phase.done ? "#DDF5E8" : "#F3E7E3"}` }}
-              >
-                <div className="min-w-0">
-                  <p className="text-[11px] font-black text-kr-pretty" style={{ color: DEEP_GREEN }}>{phase.label}</p>
-                  <p className="text-[10px] text-stone-500 mt-0.5 leading-relaxed text-kr-pretty">{phase.detail}</p>
-                </div>
-                <span className="shrink-0 rounded-full px-2.5 py-1 text-[10px] font-black"
-                  style={{ background: phase.done ? "#ECFDF5" : "#FFF7ED", color: phase.done ? "#059669" : "#D97706" }}>
-                  {phase.done ? t("result.prediction.routeDone") : t("result.prediction.routeNext")}
-                </span>
-              </div>
-            ))}
           </div>
         </div>
 
@@ -4879,29 +4821,19 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
 
         <Card className="border-none rounded-3xl overflow-hidden shadow-[0_18px_40px_rgba(201,112,98,0.18)]"
           style={{ background: "linear-gradient(180deg, #FFF8F4 0%, #FFFFFF 100%)" }}>
-          <CardContent className="p-5">
+          <CardContent className="p-4">
             <div className="rounded-[26px] p-4 text-white"
               style={{ background: "linear-gradient(135deg, #2D5F4F 0%, #C97062 100%)" }}>
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
                   <p className="text-[11px] font-black tracking-[0.18em] uppercase text-white/80">{t("result.actionCard.missionEyebrow")}</p>
                   <p className="text-[20px] font-black mt-1 text-kr-pretty">{t("result.actionCard.title")}</p>
-                  <p className="text-[12px] text-white/75 mt-2 leading-relaxed text-kr-pretty">{missionStatusDetail}</p>
+                  <p className="text-[12px] text-white/75 mt-2 leading-relaxed text-kr-pretty">{missionStatusText}</p>
                 </div>
                 <div className="rounded-2xl px-3 py-2 bg-white/14 border border-white/20 text-right shrink-0">
                   <p className="text-[10px] font-bold text-white/70">{t("result.actionCard.rewardLabel")}</p>
                   <p className="text-[24px] font-black leading-none">+{missionReward + allClearBonus}</p>
                   <p className="text-[9px] text-white/70 mt-1">{t("result.actionCard.rewardSub")}</p>
-                </div>
-              </div>
-              <div className="flex items-center justify-between gap-3 mt-4">
-                <div className="min-w-0">
-                  <p className="text-[11px] font-black text-white/80">{t("result.actionCard.progressLabel")}</p>
-                  <p className="text-[14px] font-black mt-1">{missionStatusText}</p>
-                </div>
-                <div className="text-right shrink-0">
-                  <p className="text-[10px] font-bold text-white/70">{t("result.actionCard.progressCount")}</p>
-                  <p className="text-[16px] font-black">{essentialQuests.filter((quest) => quest.done).length}/{essentialQuests.length}</p>
                 </div>
               </div>
               <div className="h-2 rounded-full bg-white/15 overflow-hidden mt-3">
@@ -4912,21 +4844,15 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
                   transition={{ duration: 0.6, ease: "easeOut" }}
                 />
               </div>
-              <div className="grid grid-cols-2 gap-2 mt-4">
-                <button onClick={() => setShowAnalysis(true)} className="rounded-2xl bg-white/10 p-3 border border-white/12 text-left">
-                  <p className="text-[10px] font-bold text-white/70">{t("result.scores")}</p>
-                  <p className="text-[14px] font-black mt-1 text-kr-pretty">{weakestSummary || t("result.aiComment")}</p>
-                  <p className="text-[10px] text-white/75 mt-1">{t("modal.analysis.title")}</p>
+              <div className="flex items-center justify-between gap-3 mt-3">
+                <button onClick={() => setShowQuestSheet(true)} className="rounded-full px-3 py-1.5 text-[10px] font-black shrink-0 bg-white/14 border border-white/15">
+                  {essentialQuests.filter((quest) => quest.done).length}/{essentialQuests.length} {t("result.actionCard.progressCount")}
                 </button>
-                <div className="rounded-2xl bg-white/10 p-3 border border-white/12">
-                  <p className="text-[10px] font-bold text-white/70">{t("result.actionCard.streakLabel")}</p>
-                  <p className="text-[20px] font-black mt-1">{t("result.actionCard.streakValue", { count: currentStreak.count || 1 })}</p>
-                  <p className="text-[10px] text-white/75 mt-1">
-                    {nextStreakGoal
-                      ? t("result.actionCard.streakGoal", { days: daysToGoal, goal: nextStreakGoal, reward: nextStreakReward })
-                      : t("result.actionCard.streakDone")}
-                  </p>
-                </div>
+                <p className="text-[10px] text-white/75 text-right">
+                  {nextStreakGoal
+                    ? t("result.actionCard.streakGoal", { days: daysToGoal, goal: nextStreakGoal, reward: nextStreakReward })
+                    : t("result.actionCard.streakDone")}
+                </p>
               </div>
             </div>
 
@@ -4946,7 +4872,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
                 </button>
               </div>
               <div className="space-y-2">
-                {essentialQuests.slice(0, 2).map((quest) => (
+                {essentialQuests.slice(0, 1).map((quest) => (
                   <div
                     key={quest.id}
                     className="flex items-center gap-3 rounded-2xl px-3 py-3"
@@ -5115,8 +5041,6 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
           <SkinPredictionCard
             prediction={analysisResult.prediction}
             currentScore={analysisResult.scores[0]?.score ?? 0}
-            missionPhases={missionPhases.map(({ id, label, detail, done }) => ({ id, label, detail, done }))}
-            missionProgressPct={missionPhaseProgressPct}
             onOpenDiary={handleDiaryEntry}
           />
         )}
