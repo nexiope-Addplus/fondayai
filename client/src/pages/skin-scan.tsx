@@ -4672,17 +4672,6 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
               <div>
                 <div className="relative rounded-[22px] overflow-hidden h-[120px] bg-stone-100 sm:rounded-[24px] sm:h-[132px]">
                   <img src={imageSrc} className="w-full h-full object-cover" style={{ objectPosition: "center 18%" }} />
-                  {analysisResult?.hotspots?.slice(0, 3).map((dot: any, i: number) => (
-                    <motion.div key={i}
-                      className="absolute -translate-x-1/2 -translate-y-1/2"
-                      style={{ left: `${dot.x}%`, top: `${dot.y}%` }}
-                      initial={{ scale: 0, opacity: 0 }}
-                      animate={{ scale: 1, opacity: 1 }}
-                      transition={{ delay: i * 0.12, type: "spring" }}
-                    >
-                      <div className="w-2 h-2 rounded-full bg-red-500 border border-white/80 shadow-md" />
-                    </motion.div>
-                  ))}
                   <div className="absolute top-3 left-3 w-7 h-7 border-t-2 border-l-2 rounded-tl-lg" style={{ borderColor: SCAN_TO }} />
                   <div className="absolute top-3 right-3 w-7 h-7 border-t-2 border-r-2 rounded-tr-lg" style={{ borderColor: SCAN_TO }} />
                 </div>
@@ -4821,18 +4810,18 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
 
         <Card className="border-none rounded-3xl overflow-hidden shadow-[0_18px_40px_rgba(201,112,98,0.18)]"
           style={{ background: "linear-gradient(180deg, #FFF8F4 0%, #FFFFFF 100%)" }}>
-          <CardContent className="p-4">
-            <div className="rounded-[26px] p-4 text-white"
+          <CardContent className="p-3.5">
+            <div className="rounded-[26px] p-3.5 text-white"
               style={{ background: "linear-gradient(135deg, #2D5F4F 0%, #C97062 100%)" }}>
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
                   <p className="text-[11px] font-black tracking-[0.18em] uppercase text-white/80">{t("result.actionCard.missionEyebrow")}</p>
-                  <p className="text-[20px] font-black mt-1 text-kr-pretty">{t("result.actionCard.title")}</p>
-                  <p className="text-[12px] text-white/75 mt-2 leading-relaxed text-kr-pretty">{missionStatusText}</p>
+                  <p className="text-[18px] font-black mt-1 text-kr-pretty">{t("result.actionCard.title")}</p>
+                  <p className="text-[11px] text-white/75 mt-1.5 leading-relaxed text-kr-pretty line-clamp-1">{missionStatusText}</p>
                 </div>
                 <div className="rounded-2xl px-3 py-2 bg-white/14 border border-white/20 text-right shrink-0">
                   <p className="text-[10px] font-bold text-white/70">{t("result.actionCard.rewardLabel")}</p>
-                  <p className="text-[24px] font-black leading-none">+{missionReward + allClearBonus}</p>
+                  <p className="text-[20px] font-black leading-none">+{missionReward + allClearBonus}</p>
                   <p className="text-[9px] text-white/70 mt-1">{t("result.actionCard.rewardSub")}</p>
                 </div>
               </div>
@@ -4846,60 +4835,13 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
               </div>
               <div className="flex items-center justify-between gap-3 mt-3">
                 <button onClick={() => setShowQuestSheet(true)} className="rounded-full px-3 py-1.5 text-[10px] font-black shrink-0 bg-white/14 border border-white/15">
-                  {essentialQuests.filter((quest) => quest.done).length}/{essentialQuests.length} {t("result.actionCard.progressCount")}
+                  {t("result.actionCard.questTitle", { done: essentialQuests.filter((quest) => quest.done).length, total: essentialQuests.length })}
                 </button>
-                <p className="text-[10px] text-white/75 text-right">
+                <p className="text-[10px] text-white/75 text-right line-clamp-1">
                   {nextStreakGoal
                     ? t("result.actionCard.streakGoal", { days: daysToGoal, goal: nextStreakGoal, reward: nextStreakReward })
                     : t("result.actionCard.streakDone")}
                 </p>
-              </div>
-            </div>
-
-            <div className="mt-4 rounded-[24px] p-4" style={{ background: "#FFFDFB", border: "1px solid #F2E7E2" }}>
-              <div className="flex items-center justify-between gap-3 mb-3">
-                <div className="min-w-0">
-                  <p className="text-[11px] font-black uppercase tracking-[0.16em]" style={{ color: SCAN_TO }}>{t("result.actionCard.questEyebrow")}</p>
-                  <p className="text-[15px] font-black mt-1 leading-[1.35] text-kr-pretty" style={{ color: DEEP_GREEN }}>
-                    {t("result.actionCard.questTitle", { done: essentialQuests.filter((quest) => quest.done).length, total: essentialQuests.length })}
-                  </p>
-                </div>
-                <button
-                  onClick={() => setShowQuestSheet(true)}
-                  className="rounded-full px-3 py-1 text-[10px] font-black shrink-0"
-                  style={{ background: essentialQuests.every((quest) => quest.done) ? "#ECFDF5" : "#FFF1EC", color: essentialQuests.every((quest) => quest.done) ? "#059669" : SCAN_TO }}>
-                  {essentialQuests.every((quest) => quest.done) ? t("result.actionCard.questAllClear") : t("result.actionCard.questInProgress")}
-                </button>
-              </div>
-              <div className="space-y-2">
-                {essentialQuests.slice(0, 1).map((quest) => (
-                  <div
-                    key={quest.id}
-                    className="flex items-center gap-3 rounded-2xl px-3 py-3"
-                    style={{ background: quest.done ? "#F8FFFB" : "#FFFFFF", border: `1px solid ${quest.done ? "#DDF5E8" : "#F3E7E3"}` }}
-                  >
-                    <div className="w-9 h-9 rounded-2xl flex items-center justify-center shrink-0"
-                      style={{ background: quest.done ? quest.accent : `${quest.accent}18` }}>
-                      {quest.done ? (
-                        <CheckCircle2 className="w-4 h-4 text-white" />
-                      ) : (
-                        <Star className="w-4 h-4" style={{ color: quest.accent }} />
-                      )}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between gap-2">
-                        <p className="text-[12px] font-black leading-[1.4] text-kr-pretty" style={{ color: DEEP_GREEN }}>{quest.label}</p>
-                        <span className="text-[10px] font-black" style={{ color: quest.done ? "#059669" : quest.accent }}>{quest.reward}</span>
-                      </div>
-                      <p className="text-[10px] text-stone-500 mt-0.5 leading-[1.45] text-kr-pretty">{quest.detail}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-              <div className="mt-3 rounded-2xl px-3 py-2 flex items-center justify-between gap-3"
-                style={{ background: "#FFF7ED", border: "1px solid #FED7AA" }}>
-                <p className="text-[11px] font-black text-orange-700 text-kr-pretty">{t("result.actionCard.comboLabel")}</p>
-                <span className="text-[11px] font-black text-orange-500 shrink-0">+{allClearBonus}pt</span>
               </div>
             </div>
 
