@@ -4461,7 +4461,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
         {/* 이미지 + 핫스팟 */}
         <Card className="overflow-hidden border-none shadow-2xl rounded-3xl bg-zinc-900">
           <div className="relative w-full">
-            <img src={imageSrc} className="w-full object-cover" style={{ height: 280 }} />
+            <img src={imageSrc} className="w-full object-cover object-top" style={{ height: 280 }} />
             {analysisResult?.hotspots?.map((dot: any, i: number) => (
               <motion.div key={i}
                 className="absolute -translate-x-1/2 -translate-y-1/2"
