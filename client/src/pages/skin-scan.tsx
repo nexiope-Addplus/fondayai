@@ -3993,7 +3993,6 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
   const nutrientsDrag = useDragControls();
   const diaryDrag = useDragControls();
   const [showNutrients, setShowNutrients] = useState(false);
-  const [expandedScore, setExpandedScore] = useState<number | null>(null);
   const [showDiary, setShowDiary] = useState(false);
   const [rankingData, setRankingData] = useState<RankingData | null>(null);
   const [diaryTab, setDiaryTab] = useState<"history" | "compare" | "ranking">("history");
@@ -4002,7 +4001,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
   const [streakDelta, setStreakDelta] = useState<number>(0);
   const [missionPops, setMissionPops] = useState<string[]>([]);
   const [showCheckinSheet, setShowCheckinSheet] = useState(false);
-  const [activeTab, setActiveTab] = useState<"analysis" | "solution" | "nutrition">("analysis");
+  const [activeTab, setActiveTab] = useState<"solution" | "nutrition">("solution");
   const [currentStreak, setCurrentStreak] = useState<StreakData>(() => getStreak());
   const [todayTodoProgress, setTodayTodoProgress] = useState(() => getDiaryTodoProgress(todayStr()));
   const [todayRoutineTodos, setTodayRoutineTodos] = useState<TodoItem[]>(() => getDiaryTodos(todayStr()));
@@ -4362,15 +4361,9 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
   const routineDone = todayTodoProgress.done;
   const routineTotal = todayTodoProgress.total || todayRoutine.length;
   const routineComplete = routineTotal > 0 && routineDone === routineTotal;
-  const weakestScores: { index: number; score: number }[] = scores
-    .slice(1)
-    .map((item: any, index: number) => ({ index: index + 1, score: item.score }))
-    .sort((a: { index: number; score: number }, b: { index: number; score: number }) => a.score - b.score)
-    .slice(0, 2);
-  const weakestSummary = weakestScores.map(({ index }: { index: number; score: number }) => t(`scores.${index}`)).join(" · ");
-  const topScoreItems = [0, 2, 3, 5]
-    .map((idx) => ({ idx, score: scores[idx]?.score ?? 0, color: SCORE_COLORS[idx] }))
-    .filter((item) => item.score > 0);
+  const scoreSummaryItems: { idx: number; score: number; color: string }[] = scores
+    .map((item: any, idx: number) => ({ idx, score: item?.score ?? 0, color: SCORE_COLORS[idx] || DEEP_GREEN }))
+    .filter((item: { idx: number; score: number; color: string }) => item.score > 0);
   const nextStreakGoal = [3, 7, 30].find((goal) => goal > (currentStreak.count || 0)) ?? null;
   const daysToGoal = nextStreakGoal ? Math.max(nextStreakGoal - (currentStreak.count || 0), 0) : 0;
   const nextStreakReward = nextStreakGoal ? MISSION_POINTS[`streak_${nextStreakGoal}`] || 0 : 0;
@@ -4702,9 +4695,9 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
         {/* 압축형 결과 헤더 */}
         <Card className="overflow-hidden border-none shadow-2xl rounded-3xl"
           style={{ background: "linear-gradient(180deg, #FFFCFA 0%, #FFFFFF 100%)" }}>
-          <CardContent className="p-4">
-            <div className="grid grid-cols-[112px_1fr] gap-3 items-stretch">
-              <div className="relative rounded-[24px] overflow-hidden bg-zinc-900 min-h-[164px]">
+          <CardContent className="p-3.5">
+            <div className="grid grid-cols-[84px_1fr] gap-3 items-start">
+              <div className="relative rounded-[22px] overflow-hidden bg-zinc-900 h-[116px]">
                 <img src={imageSrc} className="w-full h-full object-cover object-top" />
                 {analysisResult?.hotspots?.slice(0, 4).map((dot: any, i: number) => (
                   <motion.div key={i}
@@ -4720,42 +4713,25 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
                 <div className="absolute inset-x-0 bottom-0 h-20"
                   style={{ background: "linear-gradient(to top, rgba(20,20,20,0.6), transparent)" }} />
                 <div className="absolute bottom-3 left-3 text-white">
-                  <p className="text-[8px] font-black uppercase tracking-[0.18em] text-white/75">{t("result.baumannLabel")}</p>
-                  <p className="text-[24px] font-black leading-none">{finalType}</p>
+                  <p className="text-[16px] font-black leading-none">{overallScore}</p>
+                  <p className="text-[8px] font-black uppercase tracking-[0.18em] text-white/75">{t("result.overall")}</p>
                 </div>
               </div>
 
               <div className="min-w-0">
-                <div className="flex items-start justify-between gap-2">
+                <div className="flex items-center justify-between gap-2 mb-2">
                   <div className="min-w-0">
-                    <p className="text-[10px] font-black tracking-[0.18em] uppercase" style={{ color: SCAN_TO }}>{t("result.title")}</p>
-                    <p className="text-[16px] font-black mt-1 text-kr-pretty" style={{ color: DEEP_GREEN }}>{analysisResult?.aiComment || t("result.aiComment")}</p>
+                    <p className="text-[10px] font-black tracking-[0.18em] uppercase" style={{ color: SCAN_TO }}>{t("result.scores")}</p>
+                    <p className="text-[13px] font-black mt-1 text-kr-pretty" style={{ color: DEEP_GREEN }}>{t("result.aiComment")}</p>
                   </div>
-                  <div className="rounded-2xl px-3 py-2 text-right shrink-0"
-                    style={{ background: "#FFF1EC", border: "1px solid #F3DDD6" }}>
-                    <p className="text-[10px] font-bold whitespace-nowrap" style={{ color: SCAN_TO }}>{t("result.overall")}</p>
-                    <p className="text-[24px] font-black leading-none" style={{ color: SCAN_TO }}>{overallScore}</p>
-                  </div>
+                  <span className="rounded-full px-2.5 py-1 text-[10px] font-black shrink-0"
+                    style={{ background: "#FFF1EC", color: SCAN_TO }}>
+                    10
+                  </span>
                 </div>
-
-                <div className="grid grid-cols-2 gap-2 mt-2.5">
-                  <div className="rounded-2xl px-3 py-2.5" style={{ background: "linear-gradient(135deg, #7C3AED12, #7C3AED1F)" }}>
-                    <p className="text-[10px] font-bold text-stone-500">{t("result.skinAge")}</p>
-                    <p className="text-[18px] font-black mt-1 leading-none" style={{ color: "#7C3AED" }}>
-                      {analysisResult?.skinAge && analysisResult.skinAge > 0 ? analysisResult.skinAge : "—"}
-                    </p>
-                  </div>
-                  <div className="rounded-2xl px-3 py-2.5" style={{ background: "linear-gradient(135deg, #F59E0B12, #D9770620)" }}>
-                    <p className="text-[10px] font-bold text-stone-500">{t("ranking.topLabel")}</p>
-                    <p className="text-[18px] font-black mt-1 leading-none" style={{ color: "#D97706" }}>
-                      {rankingData && rankingData.myPercentile !== undefined ? `${rankingData.myPercentile}%` : "—"}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="mt-2.5 space-y-1.5">
-                  {topScoreItems.map(({ idx, score, color }, i) => (
-                    <MiniScoreBarIdle key={idx} label={t(`scores.${idx}`)} score={score} color={color} delay={i * 80} />
+                <div className="space-y-1.5">
+                  {scoreSummaryItems.map(({ idx, score, color }: { idx: number; score: number; color: string }, i: number) => (
+                    <MiniScoreBarIdle key={idx} label={t(`scores.${idx}`)} score={score} color={color} delay={i * 60} />
                   ))}
                 </div>
               </div>
@@ -5108,14 +5084,13 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
           />
         )}
 
-        {/* ── 3탭 네비게이션 ── */}
+        {/* ── 2탭 네비게이션 ── */}
         <div className="rounded-[28px] p-2.5 border border-[#F0E6E0] sticky top-0 z-20 backdrop-blur-md"
           style={{ background: "linear-gradient(180deg, rgba(255,249,246,0.96) 0%, rgba(255,255,255,0.96) 100%)" }}>
           <div className="flex gap-2">
-          {(["analysis", "solution", "nutrition"] as const).map((tab) => {
-            const labels = { analysis: t("result.tab.analysis"), solution: t("result.tab.solution"), nutrition: t("result.tab.nutrition") };
+          {(["solution", "nutrition"] as const).map((tab) => {
+            const labels = { solution: t("result.tab.solution"), nutrition: t("result.tab.nutrition") };
             const icons = {
-              analysis: <LayoutGrid className="w-4 h-4" />,
               solution: <Leaf className="w-4 h-4" />,
               nutrition: <Utensils className="w-4 h-4" />,
             };
@@ -5134,65 +5109,9 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
           </div>
         </div>
 
-        {/* ── 분석 탭 ── */}
-        {activeTab === "analysis" && (
-          <div className="space-y-6">
-            {/* 10가지 점수 아코디언 */}
-            <Card className="border-none shadow-md rounded-3xl bg-white">
-              <CardHeader className="pb-1 pt-5 px-5">
-                <p className="text-[13px] font-black" style={{ color: DEEP_GREEN }}>{t("result.scores")}</p>
-              </CardHeader>
-              <CardContent className="px-5 pb-5 space-y-3">
-                {scores.map((item: any, i: number) => {
-                  const Icon = SCORE_ICONS[i] || Zap;
-                  const color = SCORE_COLORS[i] || DEEP_GREEN;
-                  const isExpanded = expandedScore === i;
-                  return (
-                    <div key={i} className="rounded-2xl transition-colors cursor-pointer"
-                      style={{ background: isExpanded ? `${color}08` : "transparent" }}
-                      onClick={() => setExpandedScore(isExpanded ? null : i)}>
-                      <div className="space-y-1.5 px-1 pt-1">
-                        <div className="flex items-center justify-between text-[13px] font-bold">
-                          <div className="flex items-center gap-2">
-                            <div className="w-6 h-6 rounded-full flex items-center justify-center bg-stone-50 shadow-sm">
-                              <Icon className="w-3.5 h-3.5" style={{ color }} />
-                            </div>
-                            <span className="text-stone-700">{t(`scores.${i}`)}</span>
-                          </div>
-                          <div className="flex items-center gap-1.5">
-                            <motion.span style={{ color }} initial={{ scale: 0 }} animate={{ scale: 1 }}
-                              transition={{ delay: 0.3 + i * 0.08, type: "spring" }}>
-                              {item.score}{t("result.scoreSuffix")}
-                            </motion.span>
-                            <motion.div animate={{ rotate: isExpanded ? 180 : 0 }} transition={{ duration: 0.2 }}>
-                              <ChevronDown className="w-3.5 h-3.5 text-stone-300" />
-                            </motion.div>
-                          </div>
-                        </div>
-                        <div className="h-1.5 rounded-full overflow-hidden bg-stone-100">
-                          <motion.div className="h-full rounded-full" style={{ background: color }}
-                            initial={{ width: "0%" }} animate={{ width: `${item.score}%` }}
-                            transition={{ delay: 0.3 + i * 0.08, duration: 0.9 }} />
-                        </div>
-                      </div>
-                      <AnimatePresence>
-                        {isExpanded && item.comment && (
-                          <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }}
-                            exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.25, ease: "easeInOut" }}
-                            className="overflow-hidden">
-                            <p className="text-[12px] text-stone-500 leading-relaxed px-1 pb-3 pt-2">{item.comment}</p>
-                          </motion.div>
-                        )}
-                      </AnimatePresence>
-                    </div>
-                  );
-                })}
-              </CardContent>
-            </Card>
-
-            {/* Fonday 잠금 섹션 */}
-            <Card className="border-none shadow-md rounded-3xl overflow-hidden relative bg-white">
-              <CardContent className="p-5">
+        {/* Fonday 잠금 섹션 */}
+        <Card className="border-none shadow-md rounded-3xl overflow-hidden relative bg-white">
+          <CardContent className="p-5">
                 <div className="grid grid-cols-2 gap-3 blur-sm opacity-40 pointer-events-none select-none">
                   {[
                     { label: t("result.locked.skinTemp"), value: "36.2°C", icon: Thermometer, color: "#E09882" },
@@ -5295,10 +5214,8 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
                     <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" className="w-4 h-4" />
                     {t("result.login.google")}
                   </Button>
-                </CardContent>
-              </Card>
-              </div>
-            )}
+          </CardContent>
+        </Card>
             <AdBanner slot="6349940752" />
           </div>
         )}
@@ -6001,10 +5918,19 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
                   <p className="text-[11px] font-black uppercase tracking-[0.16em]" style={{ color: SCAN_TO }}>{t("result.actionCard.questEyebrow")}</p>
                   <p className="text-[16px] font-black mt-1" style={{ color: DEEP_GREEN }}>{t("result.actionCard.questTitle", { done: questDoneCount, total: questBoard.length })}</p>
                 </div>
-                <span className="rounded-full px-3 py-1 text-[10px] font-black"
-                  style={{ background: "#FFF7ED", color: "#D97706" }}>
-                  +{allClearBonus}pt
-                </span>
+                <div className="flex items-center gap-2">
+                  <span className="rounded-full px-3 py-1 text-[10px] font-black"
+                    style={{ background: "#FFF7ED", color: "#D97706" }}>
+                    +{allClearBonus}pt
+                  </span>
+                  <button
+                    onClick={() => setShowQuestSheet(false)}
+                    className="w-8 h-8 rounded-full bg-stone-100 flex items-center justify-center text-stone-400"
+                    aria-label="Close quest board"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
               </div>
               <div className="space-y-2">
                 {questBoard.map((quest) => (
