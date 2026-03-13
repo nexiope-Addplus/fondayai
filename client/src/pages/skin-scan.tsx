@@ -2997,10 +2997,105 @@ function DiaryTab({ user, analysisResult, onBack }: { user: any; analysisResult:
 }
 
 // ─── 마이 페이지 ─────────────────────────────────────────────────
+function MyCosmeticsModal({ onClose, onAddNew }: { onClose: () => void; onAddNew: () => void }) {
+  const { t } = useTranslation();
+  const [list, setList] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetch("/api/cosmetics").then(r => r.json()).then(data => {
+      setList(Array.isArray(data) ? data : []);
+      setLoading(false);
+    }).catch(() => setLoading(false));
+  }, []);
+
+  const handleDelete = async (id: string) => {
+    setDeletingId(id);
+    await fetch(`/api/cosmetics/${id}`, { method: "DELETE" }).catch(() => {});
+    setList(prev => prev.filter(i => i.id !== id));
+    setDeletingId(null);
+  };
+
+  return (
+    <motion.div className="fixed inset-0 z-[120] flex items-end justify-center"
+      initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+      onClick={onClose}>
+      <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
+      <motion.div className="relative bg-white rounded-t-[32px] w-full max-w-md pb-10 shadow-2xl overflow-y-auto max-h-[85vh]"
+        initial={{ y: 150, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 150, opacity: 0 }}
+        transition={{ type: "spring", damping: 28, stiffness: 280 }}
+        onClick={e => e.stopPropagation()}>
+        <div className="sticky top-0 bg-white/95 backdrop-blur-md px-6 pt-5 pb-4 border-b border-stone-100 z-10">
+          <div className="w-10 h-1 rounded-full bg-stone-200 mx-auto mb-4" />
+          <div className="flex items-center justify-between">
+            <p className="text-[16px] font-black" style={{ color: DEEP_GREEN }}>{t("cosmetics.myTitle")}</p>
+            <button onClick={onClose} className="w-8 h-8 rounded-full bg-stone-100 flex items-center justify-center text-stone-400 text-sm">✕</button>
+          </div>
+        </div>
+
+        <div className="px-5 pt-4 space-y-2">
+          {loading ? (
+            <div className="flex justify-center py-10">
+              <div className="w-6 h-6 border-2 border-stone-200 border-t-stone-400 rounded-full animate-spin" />
+            </div>
+          ) : list.length === 0 ? (
+            <div className="text-center py-12">
+              <span className="text-4xl block mb-3">💄</span>
+              <p className="text-[14px] font-bold text-stone-600 mb-1">{t("cosmetics.myEmpty")}</p>
+              <p className="text-[12px] text-stone-400">제품 전면을 촬영하면 자동으로 등록돼요</p>
+            </div>
+          ) : (
+            list.map(item => (
+              <div key={item.id} className="flex items-center gap-3 p-3 rounded-2xl bg-stone-50">
+                {item.image_thumbnail
+                  ? <img src={item.image_thumbnail} className="w-12 h-12 rounded-xl object-cover bg-stone-200 shrink-0" />
+                  : <div className="w-12 h-12 rounded-xl bg-stone-200 flex items-center justify-center shrink-0">
+                      <span className="text-xl">💄</span>
+                    </div>
+                }
+                <div className="flex-1 min-w-0">
+                  <p className="text-[13px] font-bold text-stone-800 truncate">{item.name}</p>
+                  <p className="text-[11px] text-stone-400">{item.brand ? `${item.brand} · ` : ""}{t(`cosmetics.categories.${item.category}`)}</p>
+                </div>
+                <span className="text-[10px] font-bold px-2 py-1 rounded-full shrink-0"
+                  style={{ background: `${DEEP_GREEN}15`, color: DEEP_GREEN }}>
+                  {item.time_of_day === "am" ? t("cosmetics.amBtn") : item.time_of_day === "pm" ? t("cosmetics.pmBtn") : t("cosmetics.bothBtn")}
+                </span>
+                <button onClick={() => handleDelete(item.id)} disabled={deletingId === item.id}
+                  className="w-7 h-7 rounded-full bg-stone-100 flex items-center justify-center text-stone-400 text-[11px] shrink-0 active:opacity-70 disabled:opacity-40">
+                  {deletingId === item.id ? <div className="w-3 h-3 border border-stone-400 border-t-transparent rounded-full animate-spin" /> : "✕"}
+                </button>
+              </div>
+            ))
+          )}
+
+          <button onClick={onAddNew}
+            className="w-full py-4 rounded-2xl font-black text-[14px] text-white flex items-center justify-center gap-2 mt-2"
+            style={{ background: `linear-gradient(135deg, ${DEEP_GREEN}, ${DEEP_GREEN_LIGHT})` }}>
+            <span>+</span> {t("cosmetics.ctaBtn")}
+          </button>
+        </div>
+      </motion.div>
+    </motion.div>
+  );
+}
+
 function MyScreen({ user, onInstall, onBack }: { user: any; onInstall: () => void; onBack: () => void }) {
   const { t, i18n } = useTranslation();
   const [showCalendar, setShowCalendar] = useState(false);
+  const [showMyCosmetics, setShowMyCosmetics] = useState(false);
+  const [showCosmeticsRegister, setShowCosmeticsRegister] = useState(false);
+  const [myCosmetics, setMyCosmetics] = useState<any[]>([]);
   const attendance = getAttendance();
+
+  useEffect(() => {
+    if (user) {
+      fetch("/api/cosmetics").then(r => r.json()).then(data => {
+        setMyCosmetics(Array.isArray(data) ? data : []);
+      }).catch(() => {});
+    }
+  }, [user]);
 
   const handleLogout = () => {
     fetch('/api/logout', { method: 'POST' }).then(() => window.location.reload());
@@ -3095,6 +3190,26 @@ function MyScreen({ user, onInstall, onBack }: { user: any; onInstall: () => voi
           </div>
         </div>
 
+        {/* 화장품 루틴 목록 (로그인 시만) */}
+        {user && (
+          <button onClick={() => setShowMyCosmetics(true)}
+            className="w-full flex items-center gap-3 p-4 rounded-2xl bg-white border border-stone-100 active:opacity-70">
+            <div className="w-9 h-9 rounded-xl flex items-center justify-center"
+              style={{ background: `${DEEP_GREEN}15` }}>
+              <span className="text-[16px]">💄</span>
+            </div>
+            <div className="flex-1 text-left">
+              <p className="text-[14px] font-bold text-stone-800">{t("cosmetics.myTitle")}</p>
+              <p className="text-[11px] text-stone-400">
+                {myCosmetics.length > 0
+                  ? t("cosmetics.ctaCount", { count: myCosmetics.length })
+                  : t("cosmetics.myEmpty")}
+              </p>
+            </div>
+            <ChevronRight className="w-4 h-4 text-stone-300" />
+          </button>
+        )}
+
         {/* 앱 설치 */}
         <button onClick={onInstall}
           className="w-full flex items-center justify-between p-4 rounded-2xl bg-white border border-stone-100 active:opacity-70">
@@ -3123,6 +3238,31 @@ function MyScreen({ user, onInstall, onBack }: { user: any; onInstall: () => voi
       {/* 출석 달력 모달 */}
       <AnimatePresence>
         {showCalendar && <AttendanceCalendarModal onClose={() => setShowCalendar(false)} />}
+      </AnimatePresence>
+
+      {/* 내 화장품 목록 모달 */}
+      <AnimatePresence>
+        {showMyCosmetics && (
+          <MyCosmeticsModal
+            onClose={() => setShowMyCosmetics(false)}
+            onAddNew={() => { setShowMyCosmetics(false); setShowCosmeticsRegister(true); }}
+          />
+        )}
+      </AnimatePresence>
+
+      {/* 화장품 등록 모달 (MyScreen에서 열기) */}
+      <AnimatePresence>
+        {showCosmeticsRegister && (
+          <CosmeticsRegisterModal
+            onClose={() => setShowCosmeticsRegister(false)}
+            onSuccess={() => {
+              setShowCosmeticsRegister(false);
+              fetch("/api/cosmetics").then(r => r.json()).then(data => {
+                setMyCosmetics(Array.isArray(data) ? data : []);
+              }).catch(() => {});
+            }}
+          />
+        )}
       </AnimatePresence>
     </div>
   );
@@ -3316,34 +3456,71 @@ function SkinPredictionCard({ prediction, currentScore, missionPhases, missionPr
 // ─── 화장품 등록 모달 ─────────────────────────────────────────────
 const COSMETIC_CATEGORIES = ["클렌저","토너","세럼","크림","선크림","각질케어","진정케어","장벽케어","아이크림","기타스킨케어"] as const;
 
+/** 이미지 base64 → 300×300 JPEG 70% 압축 */
+function compressThumbnail(base64: string, maxSize = 300): Promise<string> {
+  return new Promise(resolve => {
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement("canvas");
+      const ratio = Math.min(maxSize / img.width, maxSize / img.height, 1);
+      canvas.width = Math.round(img.width * ratio);
+      canvas.height = Math.round(img.height * ratio);
+      canvas.getContext("2d")!.drawImage(img, 0, 0, canvas.width, canvas.height);
+      resolve(canvas.toDataURL("image/jpeg", 0.7));
+    };
+    img.onerror = () => resolve(base64);
+    img.src = base64;
+  });
+}
+
 function CosmeticsRegisterModal({ onClose, onSuccess }: { onClose: () => void; onSuccess: () => void }) {
   const { t } = useTranslation();
+  // step 1 = 촬영, step 2 = 확인+등록
   const [step, setStep] = useState<1 | 2>(1);
+  const [capturedImage, setCapturedImage] = useState<string | null>(null);
+  const [analyzing, setAnalyzing] = useState(false);
   const [name, setName] = useState("");
   const [brand, setBrand] = useState("");
   const [category, setCategory] = useState<string>("");
   const [timeOfDay, setTimeOfDay] = useState<"am" | "pm" | "both">("both");
   const [openedAt, setOpenedAt] = useState(new Date().toISOString().slice(0, 10));
-  const [classifying, setClassifying] = useState(false);
   const [registering, setRegistering] = useState(false);
   const [showNonSkincareAlert, setShowNonSkincareAlert] = useState(false);
   const [nonSkincareType, setNonSkincareType] = useState("");
+  const cameraInputRef = useRef<HTMLInputElement>(null);
+  const galleryInputRef = useRef<HTMLInputElement>(null);
 
-  const handleNext = async () => {
-    if (!name.trim()) return;
-    setClassifying(true);
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const base64 = ev.target?.result as string;
+      setCapturedImage(base64);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleAnalyze = async () => {
+    if (!capturedImage) return;
+    setAnalyzing(true);
     try {
+      const compressed = await compressThumbnail(capturedImage, 600);
       const res = await fetch("/api/cosmetics/classify", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: name.trim(), brand: brand.trim() }),
+        body: JSON.stringify({ imageBase64: compressed }),
       });
       const data = await res.json();
       if (!data.isSkincareRelevant) {
-        setNonSkincareType(data.productType || name);
+        setNonSkincareType(data.productType || data.name || "");
         setShowNonSkincareAlert(true);
+        setName(data.name || "");
+        setBrand(data.brand || "");
         setCategory("기타스킨케어");
       } else {
+        setName(data.name || "");
+        setBrand(data.brand || "");
         setCategory(data.category || "기타스킨케어");
         setStep(2);
       }
@@ -3351,17 +3528,18 @@ function CosmeticsRegisterModal({ onClose, onSuccess }: { onClose: () => void; o
       setCategory("기타스킨케어");
       setStep(2);
     }
-    setClassifying(false);
+    setAnalyzing(false);
   };
 
   const handleRegister = async () => {
     if (!category) return;
     setRegistering(true);
     try {
+      const thumbnail = capturedImage ? await compressThumbnail(capturedImage, 300) : "";
       await fetch("/api/cosmetics", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: name.trim(), brand: brand.trim(), category, timeOfDay, openedAt, isSkincareRelevant: true }),
+        body: JSON.stringify({ name: name.trim(), brand: brand.trim(), category, timeOfDay, openedAt, isSkincareRelevant: true, imageThumbnail: thumbnail }),
       });
       onSuccess();
     } catch {
@@ -3382,11 +3560,10 @@ function CosmeticsRegisterModal({ onClose, onSuccess }: { onClose: () => void; o
           <div className="w-10 h-1 rounded-full bg-stone-200 mx-auto mb-4" />
           <div className="flex items-center justify-between">
             <p className="text-[16px] font-black" style={{ color: DEEP_GREEN }}>
-              {step === 1 ? t("cosmetics.registerTitle") : t("cosmetics.categoryLabel")}
+              {step === 1 ? t("cosmetics.scanPhoto") : t("cosmetics.confirm")}
             </p>
             <button onClick={onClose} className="w-8 h-8 rounded-full bg-stone-100 flex items-center justify-center text-stone-400 text-sm">✕</button>
           </div>
-          {/* 진행 바 */}
           <div className="flex gap-1.5 mt-3">
             {[1, 2].map(s => (
               <div key={s} className="flex-1 h-1 rounded-full transition-all"
@@ -3395,34 +3572,75 @@ function CosmeticsRegisterModal({ onClose, onSuccess }: { onClose: () => void; o
           </div>
         </div>
 
+        {/* 숨겨진 파일 input */}
+        <input ref={cameraInputRef} type="file" accept="image/*" capture="environment"
+          className="hidden" onChange={handleFileChange} />
+        <input ref={galleryInputRef} type="file" accept="image/*"
+          className="hidden" onChange={handleFileChange} />
+
         <div className="px-6 pt-5 space-y-4">
           {step === 1 && (
             <>
-              <div>
-                <label className="text-[11px] font-bold text-stone-400 uppercase tracking-wider mb-1.5 block">제품명 *</label>
-                <input value={name} onChange={e => setName(e.target.value)}
-                  placeholder={t("cosmetics.namePlaceholder")}
-                  className="w-full px-4 py-3.5 rounded-2xl border border-stone-200 text-[14px] font-medium text-stone-800 outline-none focus:border-[#2D5F4F] bg-stone-50 transition-colors"
-                  autoFocus />
+              {/* 촬영 영역 */}
+              {capturedImage ? (
+                <div className="relative rounded-3xl overflow-hidden bg-stone-100" style={{ height: 260 }}>
+                  <img src={capturedImage} className="w-full h-full object-cover" />
+                  <button onClick={() => { setCapturedImage(null); if (cameraInputRef.current) cameraInputRef.current.value = ""; if (galleryInputRef.current) galleryInputRef.current.value = ""; }}
+                    className="absolute top-3 right-3 w-8 h-8 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center text-white text-sm">
+                    ✕
+                  </button>
+                </div>
+              ) : (
+                <div className="rounded-3xl bg-stone-50 border-2 border-dashed border-stone-200 flex flex-col items-center justify-center gap-3"
+                  style={{ height: 220 }}>
+                  <span className="text-5xl">💄</span>
+                  <p className="text-[13px] font-bold text-stone-400">{t("cosmetics.scanPhoto")}</p>
+                  <p className="text-[11px] text-stone-300">제품 전면이 잘 보이게 찍어주세요</p>
+                </div>
+              )}
+
+              <div className="flex gap-2">
+                <button onClick={() => cameraInputRef.current?.click()}
+                  className="flex-1 py-3.5 rounded-2xl text-[13px] font-bold border border-stone-200 bg-stone-50 text-stone-700 flex items-center justify-center gap-1.5 active:opacity-70">
+                  📷 {t("cosmetics.scanPhoto")}
+                </button>
+                <button onClick={() => galleryInputRef.current?.click()}
+                  className="flex-1 py-3.5 rounded-2xl text-[13px] font-bold border border-stone-200 bg-stone-50 text-stone-700 flex items-center justify-center gap-1.5 active:opacity-70">
+                  🖼 {t("cosmetics.orGallery")}
+                </button>
               </div>
-              <div>
-                <label className="text-[11px] font-bold text-stone-400 uppercase tracking-wider mb-1.5 block">브랜드</label>
-                <input value={brand} onChange={e => setBrand(e.target.value)}
-                  placeholder={t("cosmetics.brandPlaceholder")}
-                  className="w-full px-4 py-3.5 rounded-2xl border border-stone-200 text-[14px] font-medium text-stone-800 outline-none focus:border-[#2D5F4F] bg-stone-50 transition-colors" />
-              </div>
-              <button onClick={handleNext} disabled={!name.trim() || classifying}
-                className="w-full py-4 rounded-2xl font-black text-[14px] text-white flex items-center justify-center gap-2 disabled:opacity-50 mt-2"
-                style={{ background: classifying ? "#9CA3AF" : `linear-gradient(135deg, ${DEEP_GREEN}, ${DEEP_GREEN_LIGHT})` }}>
-                {classifying
-                  ? <><div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" /> {t("cosmetics.classifying")}</>
-                  : t("cosmetics.nextBtn")}
+
+              <button onClick={handleAnalyze} disabled={!capturedImage || analyzing}
+                className="w-full py-4 rounded-2xl font-black text-[14px] text-white flex items-center justify-center gap-2 disabled:opacity-50"
+                style={{ background: (!capturedImage || analyzing) ? "#9CA3AF" : `linear-gradient(135deg, ${DEEP_GREEN}, ${DEEP_GREEN_LIGHT})` }}>
+                {analyzing
+                  ? <><div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" /> {t("cosmetics.analyzing")}</>
+                  : <>{t("cosmetics.nextBtn")}</>}
               </button>
             </>
           )}
 
           {step === 2 && (
             <>
+              {/* 사진 미리보기 + 인식 결과 */}
+              <div className="flex gap-3 items-start">
+                {capturedImage && (
+                  <img src={capturedImage} className="w-20 h-20 rounded-2xl object-cover bg-stone-100 shrink-0" />
+                )}
+                <div className="flex-1 min-w-0 space-y-2">
+                  <div>
+                    <label className="text-[10px] font-bold text-stone-400 uppercase tracking-wider mb-1 block">제품명</label>
+                    <input value={name} onChange={e => setName(e.target.value)}
+                      className="w-full px-3 py-2.5 rounded-xl border border-stone-200 text-[13px] font-medium text-stone-800 outline-none focus:border-[#2D5F4F] bg-stone-50" />
+                  </div>
+                  <div>
+                    <label className="text-[10px] font-bold text-stone-400 uppercase tracking-wider mb-1 block">브랜드</label>
+                    <input value={brand} onChange={e => setBrand(e.target.value)}
+                      className="w-full px-3 py-2.5 rounded-xl border border-stone-200 text-[13px] font-medium text-stone-800 outline-none focus:border-[#2D5F4F] bg-stone-50" />
+                  </div>
+                </div>
+              </div>
+
               {/* 카테고리 */}
               <div>
                 <label className="text-[11px] font-bold text-stone-400 uppercase tracking-wider mb-2 block">{t("cosmetics.categoryLabel")}</label>
@@ -3462,13 +3680,19 @@ function CosmeticsRegisterModal({ onClose, onSuccess }: { onClose: () => void; o
                   className="w-full px-4 py-3.5 rounded-2xl border border-stone-200 text-[14px] font-medium text-stone-800 outline-none focus:border-[#2D5F4F] bg-stone-50" />
               </div>
 
-              <button onClick={handleRegister} disabled={!category || registering}
-                className="w-full py-4 rounded-2xl font-black text-[14px] text-white flex items-center justify-center gap-2 disabled:opacity-50 mt-2"
-                style={{ background: registering ? "#9CA3AF" : `linear-gradient(135deg, ${DEEP_GREEN}, ${DEEP_GREEN_LIGHT})` }}>
-                {registering
-                  ? <><div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" /> {t("cosmetics.registering")}</>
-                  : <><span>💄</span> {t("cosmetics.registerBtn")}</>}
-              </button>
+              <div className="flex gap-2">
+                <button onClick={() => setStep(1)}
+                  className="flex-1 py-4 rounded-2xl font-bold text-[13px] border border-stone-200 text-stone-600 bg-stone-50">
+                  {t("cosmetics.retake")}
+                </button>
+                <button onClick={handleRegister} disabled={!category || registering}
+                  className="flex-[2] py-4 rounded-2xl font-black text-[14px] text-white flex items-center justify-center gap-2 disabled:opacity-50"
+                  style={{ background: (!category || registering) ? "#9CA3AF" : `linear-gradient(135deg, ${DEEP_GREEN}, ${DEEP_GREEN_LIGHT})` }}>
+                  {registering
+                    ? <><div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" /> {t("cosmetics.registering")}</>
+                    : <><span>💄</span> {t("cosmetics.registerBtn")}</>}
+                </button>
+              </div>
             </>
           )}
         </div>
@@ -4259,6 +4483,28 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
           </div>
         </Card>
 
+        {/* ── 화장품 스캔 배너 ── */}
+        <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
+          className="flex items-center gap-3 px-4 py-3.5 rounded-2xl border"
+          style={{ background: "#F0F7F5", borderColor: "#C5DFD8" }}>
+          <span className="text-[22px]">💄</span>
+          <div className="flex-1 min-w-0">
+            <p className="text-[13px] font-black" style={{ color: DEEP_GREEN }}>{t("cosmetics.ctaTitle")}</p>
+            <p className="text-[11px] text-stone-400">{t("cosmetics.ctaBannerSub")}</p>
+          </div>
+          {user && cosmeticCount > 0 && (
+            <span className="text-[11px] font-bold px-2 py-1 rounded-full"
+              style={{ background: `${DEEP_GREEN}15`, color: DEEP_GREEN }}>
+              {t("cosmetics.ctaCount", { count: cosmeticCount })}
+            </span>
+          )}
+          <button onClick={() => user ? setShowCosmeticsRegister(true) : setShowCosmeticsGate(true)}
+            className="shrink-0 px-4 py-2 rounded-xl text-white text-[12px] font-black"
+            style={{ background: `linear-gradient(135deg, ${DEEP_GREEN}, ${DEEP_GREEN_LIGHT})` }}>
+            + {t("cosmetics.scanBtn")}
+          </button>
+        </motion.div>
+
         <Card className="border-none shadow-md rounded-[32px] overflow-hidden"
           style={{ background: "linear-gradient(180deg, #FFFCFA 0%, #FFFFFF 100%)" }}>
           <CardContent className="p-5">
@@ -4795,49 +5041,6 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
         {/* ── 솔루션 탭 ── */}
         {activeTab === "solution" && (
           <div className="space-y-3">
-
-            {/* ── 화장품 루틴 분석 히어로 CTA ── */}
-            <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
-              className="rounded-[24px] p-5 overflow-hidden relative"
-              style={{ background: "linear-gradient(135deg, #1A3B2E 0%, #2D5F4F 60%, #3D7A66 100%)" }}>
-              {/* 배경 장식 */}
-              <div className="absolute top-0 right-0 w-32 h-32 rounded-full opacity-10"
-                style={{ background: "radial-gradient(circle, #fff 0%, transparent 70%)", transform: "translate(30%, -30%)" }} />
-              <div className="absolute bottom-0 left-0 w-20 h-20 rounded-full opacity-5"
-                style={{ background: "radial-gradient(circle, #fff 0%, transparent 70%)", transform: "translate(-30%, 30%)" }} />
-
-              <div className="relative z-10">
-                <div className="flex items-center gap-2 mb-2">
-                  <span className="text-xl">💄</span>
-                  <p className="text-[16px] font-black text-white">{t("cosmetics.ctaTitle")}</p>
-                  {user && cosmeticCount > 0 && (
-                    <span className="ml-auto text-[11px] font-bold px-2.5 py-1 rounded-full bg-white/20 text-white">
-                      {t("cosmetics.ctaCount", { count: cosmeticCount })}
-                    </span>
-                  )}
-                </div>
-                <p className="text-[12px] text-white/75 mb-3 leading-relaxed">{t("cosmetics.ctaDesc")}</p>
-                <div className="flex flex-col gap-1 mb-4">
-                  {[t("cosmetics.ctaBullet1"), t("cosmetics.ctaBullet2"), t("cosmetics.ctaBullet3")].map((b, i) => (
-                    <div key={i} className="flex items-center gap-1.5">
-                      <div className="w-1.5 h-1.5 rounded-full bg-white/60 shrink-0" />
-                      <span className="text-[11px] text-white/70">{b}</span>
-                    </div>
-                  ))}
-                </div>
-                <button
-                  onClick={() => {
-                    if (!user) { setShowCosmeticsGate(true); return; }
-                    setShowCosmeticsRegister(true);
-                  }}
-                  className="w-full py-3 rounded-2xl font-black text-[13px] flex items-center justify-center gap-2 active:opacity-80 transition-opacity"
-                  style={{ background: "white", color: DEEP_GREEN }}>
-                  <span>💄</span>
-                  {t("cosmetics.ctaBtn")}
-                  <span className="ml-auto text-stone-400">→</span>
-                </button>
-              </div>
-            </motion.div>
 
             <div className="flex items-center gap-2 mb-1">
               <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: `linear-gradient(135deg, ${DEEP_GREEN_LIGHT}, ${DEEP_GREEN})` }}>

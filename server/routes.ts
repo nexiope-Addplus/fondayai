@@ -131,10 +131,13 @@ export async function registerRoutes(
         opened_at TEXT,
         status TEXT DEFAULT 'active',
         is_skincare_relevant INTEGER DEFAULT 1,
+        image_thumbnail TEXT DEFAULT '',
         created_at TEXT NOT NULL
       )`,
       []
     ).catch(() => {});
+    // 기존 테이블에 컬럼 추가 (없으면 추가, 있으면 무시)
+    d1Query("ALTER TABLE cosmetics ADD COLUMN image_thumbnail TEXT DEFAULT ''", []).catch(() => {});
   }
 
   // diary_entries 테이블 초기화 (멱등)
@@ -392,26 +395,33 @@ export async function registerRoutes(
 
   // ── 화장품 API ──────────────────────────────────────────────────
 
-  // 제품명+브랜드 → Gemini로 카테고리 자동 분류 (인증 불필요)
+  // 화장품 사진 → Gemini Vision으로 제품 자동 분류 (인증 불필요)
   app.post("/api/cosmetics/classify", async (req, res) => {
-    const { name, brand = "" } = req.body;
-    if (!name) return res.status(400).json({ error: "name 필요" });
+    const { imageBase64 } = req.body;
+    if (!imageBase64) return res.status(400).json({ error: "imageBase64 필요" });
     const apiKey = process.env.GOOGLE_API_KEY;
     if (!apiKey) return res.status(500).json({ error: "API key 없음" });
     try {
       const genAI = new GoogleGenerativeAI(apiKey);
       const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
-      const prompt = `제품명: "${name}", 브랜드: "${brand}"
-이 제품을 다음 카테고리 중 하나로만 분류하세요:
-클렌저|토너|세럼|크림|선크림|각질케어|진정케어|장벽케어|아이크림|기타스킨케어|스킨케어아님
-스킨케어아님이면 정확한 제품 유형도 포함하세요.
-JSON으로만 응답하세요: {"category":"...","isSkincareRelevant":true/false,"productType":"파운데이션 등 (스킨케어아님일 때만)"}`;
-      const result = await model.generateContent(prompt);
-      const text = result.response.text().replace(/```json\n?|\n?```/g, "").trim();
-      const parsed = JSON.parse(text);
+      const imageData = imageBase64.replace(/^data:image\/\w+;base64,/, "");
+      const mimeType = imageBase64.startsWith("data:image/png") ? "image/png" : "image/jpeg";
+      const prompt = `이 화장품 제품 사진을 분석하세요.
+JSON으로만 응답하세요 (다른 텍스트 절대 금지):
+{"name":"제품명","brand":"브랜드명","category":"카테고리","isSkincareRelevant":true,"productType":""}
+카테고리는 반드시 다음 중 하나: 클렌저|토너|세럼|크림|선크림|각질케어|진정케어|장벽케어|아이크림|기타스킨케어|스킨케어아님
+스킨케어아님이면 isSkincareRelevant=false, productType에 제품 종류 기입 (예: 파운데이션)`;
+      const result = await model.generateContent([
+        { inlineData: { mimeType, data: imageData } },
+        prompt
+      ]);
+      const text = result.response.text();
+      const jsonStart = text.indexOf("{");
+      const jsonEnd = text.lastIndexOf("}");
+      const parsed = JSON.parse(text.slice(jsonStart, jsonEnd + 1));
       res.json(parsed);
     } catch {
-      res.json({ category: "기타스킨케어", isSkincareRelevant: true, productType: "" });
+      res.json({ name: "", brand: "", category: "기타스킨케어", isSkincareRelevant: true, productType: "" });
     }
   });
 
@@ -419,16 +429,16 @@ JSON으로만 응답하세요: {"category":"...","isSkincareRelevant":true/false
   app.post("/api/cosmetics", async (req, res) => {
     if (!req.isAuthenticated()) return res.status(401).json({ error: "로그인 필요" });
     const userId = (req.user as any).id;
-    const { name, brand, category, timeOfDay, openedAt, isSkincareRelevant } = req.body;
+    const { name, brand, category, timeOfDay, openedAt, isSkincareRelevant, imageThumbnail } = req.body;
     if (!name || !category) return res.status(400).json({ error: "name, category 필요" });
     if (!isConfigured()) return res.json({ success: true, offline: true });
     try {
       const id = randomUUID();
       const createdAt = new Date().toISOString();
       await d1Query(
-        `INSERT INTO cosmetics (id, user_id, name, brand, category, time_of_day, opened_at, status, is_skincare_relevant, created_at)
-         VALUES (?, ?, ?, ?, ?, ?, ?, 'active', ?, ?)`,
-        [id, userId, name, brand || "", category, timeOfDay || "both", openedAt || null, isSkincareRelevant !== false ? 1 : 0, createdAt]
+        `INSERT INTO cosmetics (id, user_id, name, brand, category, time_of_day, opened_at, status, is_skincare_relevant, image_thumbnail, created_at)
+         VALUES (?, ?, ?, ?, ?, ?, ?, 'active', ?, ?, ?)`,
+        [id, userId, name, brand || "", category, timeOfDay || "both", openedAt || null, isSkincareRelevant !== false ? 1 : 0, imageThumbnail || "", createdAt]
       );
       res.json({ id, success: true });
     } catch (error: any) {
