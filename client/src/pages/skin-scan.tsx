@@ -5098,19 +5098,19 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
               </div>
             </div>
             <div className="grid grid-cols-3 gap-2 mt-3">
-              <div className="rounded-[18px] px-3 py-2.5 text-center" style={{ background: "#FFF4EE", border: "1px solid #F3DED6" }}>
+              <div className="rounded-[18px] px-2 py-4 flex flex-col items-center justify-center text-center" style={{ background: "#FFF4EE", border: "1px solid #F3DED6" }}>
                 <p className="text-[9px] font-black uppercase tracking-[0.12em] text-stone-400">{t("result.overall")}</p>
-                <p className="text-[26px] font-black leading-none mt-1" style={{ color: SCAN_TO }}>{overallScore}</p>
+                <p className="text-[40px] font-black leading-none mt-1.5" style={{ color: SCAN_TO }}>{overallScore}</p>
               </div>
-              <div className="rounded-[18px] px-3 py-2.5 text-center" style={{ background: "#F7F3FF", border: "1px solid #E9DDFF" }}>
+              <div className="rounded-[18px] px-2 py-4 flex flex-col items-center justify-center text-center" style={{ background: "#F7F3FF", border: "1px solid #E9DDFF" }}>
                 <p className="text-[9px] font-black uppercase tracking-[0.12em] text-stone-400">{t("result.skinAge")}</p>
-                <p className="text-[26px] font-black leading-none mt-1" style={{ color: "#7C3AED" }}>
+                <p className="text-[40px] font-black leading-none mt-1.5" style={{ color: "#7C3AED" }}>
                   {analysisResult?.skinAge && analysisResult.skinAge > 0 ? analysisResult.skinAge : "—"}
                 </p>
               </div>
-              <div className="rounded-[18px] px-3 py-2.5 text-center" style={{ background: "#FFF8EE", border: "1px solid #F4E2C4" }}>
+              <div className="rounded-[18px] px-2 py-4 flex flex-col items-center justify-center text-center" style={{ background: "#FFF8EE", border: "1px solid #F4E2C4" }}>
                 <p className="text-[9px] font-black uppercase tracking-[0.12em] text-stone-400">{t("ranking.topLabel")}</p>
-                <p className="text-[26px] font-black leading-none mt-1" style={{ color: "#D97706" }}>
+                <p className="text-[34px] font-black leading-none mt-1.5" style={{ color: "#D97706" }}>
                   {rankingData && rankingData.myPercentile !== undefined ? t("ranking.myPercentile", { percent: rankingData.myPercentile }) : "—"}
                 </p>
               </div>
@@ -5228,8 +5228,15 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
                 <p className="text-[11px] font-black uppercase tracking-[0.16em]" style={{ color: DEEP_GREEN }}>{t("diary.routineTitle")}</p>
-                <p className="text-[15px] font-black mt-1" style={{ color: DEEP_GREEN }}>{t("result.actionCard.reason", { focus: todayFocus })}</p>
-                <p className="text-[11px] text-stone-500 mt-1 line-clamp-1">{t("cosmetics.routineCoachDesc")}</p>
+                <div className="mt-1 space-y-0.5">
+                  <p className="text-[13px] font-bold leading-snug" style={{ color: DEEP_GREEN }}>
+                    🌅 {t("cosmetics.amBtn")}: {morningRoutineItems.join(" + ")}
+                  </p>
+                  <p className="text-[13px] font-bold leading-snug" style={{ color: SCAN_TO }}>
+                    🌙 {t("cosmetics.pmBtn")}: {eveningRoutineItems.join(" + ")}
+                  </p>
+                </div>
+                <p className="text-[11px] text-stone-500 mt-1">{t("cosmetics.routineCoachDesc")}</p>
               </div>
               <Button
                 onClick={handleDiaryEntry}
@@ -5246,15 +5253,9 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
                   <p className="text-[14px] font-black" style={{ color: DEEP_GREEN }}>{t("result.actionCard.phaseMorning")}</p>
                   <Sun className="w-5 h-5 shrink-0" style={{ color: SCAN_TO }} />
                 </div>
-                <div className="space-y-1.5">
-                  {morningRoutineItems.map((item, i) => (
-                    <div key={`am-${i}`} className="flex items-center gap-2">
-                      <span className="w-5 h-5 rounded-full flex items-center justify-center text-[9px] font-black text-white shrink-0"
-                        style={{ background: DEEP_GREEN }}>{i + 1}</span>
-                      <p className="text-[11px] text-stone-600 font-medium">{item}</p>
-                    </div>
-                  ))}
-                </div>
+                <p className="text-[11px] font-bold leading-relaxed" style={{ color: DEEP_GREEN }}>
+                  {morningRoutineItems.join(" → ")}
+                </p>
                 <button
                   onClick={() => setRoutinePeriodCompletion("AM", morningRoutineItems)}
                   className="w-full mt-3 flex items-center justify-between gap-3 rounded-2xl px-3.5 py-3 bg-white border border-[#E6EEEA] text-left"
@@ -5275,15 +5276,9 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
                   <p className="text-[14px] font-black" style={{ color: DEEP_GREEN }}>{t("result.actionCard.phaseEvening")}</p>
                   <Moon className="w-5 h-5 shrink-0" style={{ color: SCAN_TO }} />
                 </div>
-                <div className="space-y-1.5">
-                  {eveningRoutineItems.map((item, i) => (
-                    <div key={`pm-${i}`} className="flex items-center gap-2">
-                      <span className="w-5 h-5 rounded-full flex items-center justify-center text-[9px] font-black text-white shrink-0"
-                        style={{ background: SCAN_TO }}>{i + 1}</span>
-                      <p className="text-[11px] text-stone-600 font-medium">{item}</p>
-                    </div>
-                  ))}
-                </div>
+                <p className="text-[11px] font-bold leading-relaxed" style={{ color: SCAN_TO }}>
+                  {eveningRoutineItems.join(" → ")}
+                </p>
                 <button
                   onClick={() => setRoutinePeriodCompletion("PM", eveningRoutineItems)}
                   className="w-full mt-3 flex items-center justify-between gap-3 rounded-2xl px-3.5 py-3 bg-white border border-[#F0E5E0] text-left"
