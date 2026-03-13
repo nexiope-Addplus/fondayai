@@ -117,7 +117,24 @@ export async function registerRoutes(
   httpServer: Server,
   app: Express
 ): Promise<Server> {
-  
+
+  // diary_entries 테이블 초기화 (멱등)
+  if (isConfigured()) {
+    d1Query(
+      `CREATE TABLE IF NOT EXISTS diary_entries (
+        id TEXT PRIMARY KEY,
+        user_id TEXT NOT NULL,
+        date_str TEXT NOT NULL,
+        memo TEXT DEFAULT '',
+        todos TEXT DEFAULT '[]',
+        cause_tags TEXT DEFAULT '[]',
+        updated_at TEXT NOT NULL,
+        UNIQUE(user_id, date_str)
+      )`,
+      []
+    ).catch(() => {});
+  }
+
   app.post("/api/analyze-skin", async (req, res) => {
     try {
       const { image, surveyData, lang = "ko" } = req.body;
@@ -351,6 +368,48 @@ export async function registerRoutes(
       res.json(scans);
     } catch (error: any) {
       res.status(500).json({ message: "기록 조회 실패", error: error.message });
+    }
+  });
+
+  // 피부 일기 — 전체 항목 조회 (로그인 필수)
+  app.get("/api/diary", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).json([]);
+    const userId = (req.user as any).id;
+    if (!isConfigured()) return res.json([]);
+    try {
+      const result = await d1Query(
+        "SELECT date_str, memo, todos, cause_tags, updated_at FROM diary_entries WHERE user_id = ? ORDER BY date_str DESC",
+        [userId]
+      );
+      res.json(result?.results || []);
+    } catch {
+      res.json([]);
+    }
+  });
+
+  // 피부 일기 — 날짜별 upsert (로그인 필수)
+  app.post("/api/diary", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).json({ error: "로그인 필요" });
+    const userId = (req.user as any).id;
+    const { dateStr, memo, todos, causeTags } = req.body;
+    if (!dateStr) return res.status(400).json({ error: "dateStr 필요" });
+    if (!isConfigured()) return res.json({ success: true, offline: true });
+    try {
+      const id = `${userId}_${dateStr}`;
+      const updatedAt = new Date().toISOString();
+      await d1Query(
+        `INSERT INTO diary_entries (id, user_id, date_str, memo, todos, cause_tags, updated_at)
+         VALUES (?, ?, ?, ?, ?, ?, ?)
+         ON CONFLICT(user_id, date_str) DO UPDATE SET
+           memo = excluded.memo,
+           todos = excluded.todos,
+           cause_tags = excluded.cause_tags,
+           updated_at = excluded.updated_at`,
+        [id, userId, dateStr, memo || "", JSON.stringify(todos || []), JSON.stringify(causeTags || []), updatedAt]
+      );
+      res.json({ success: true });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
     }
   });
 

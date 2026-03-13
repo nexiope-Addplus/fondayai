@@ -1672,18 +1672,19 @@ function SurveyScreen({ onSubmit, onBack }: { onSubmit: (data: SurveyData) => vo
 
 // ─── 분석 중 화면 ─────────────────────────────────────────────────
 function ScanningScreen({ imageSrc }: { imageSrc: string | null }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [textIdx, setTextIdx] = useState(0);
   const [progress, setProgress] = useState(0);
   const texts = t("scanning.texts", { returnObjects: true }) as string[];
 
-  // 텍스트 사이클 (진행바와 독립)
+  // 텍스트 사이클 — 언어 변경 시 재시작 (Bug 6 fix)
   useEffect(() => {
+    setTextIdx(0);
     const interval = setInterval(() => {
       setTextIdx(prev => (prev + 1) % texts.length);
     }, 1800);
     return () => clearInterval(interval);
-  }, []);
+  }, [i18n.language]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // 진행바: 0 → 95% 단방향 스무스 증가 (절대 감소 없음)
   useEffect(() => {
@@ -1756,7 +1757,8 @@ function saveDiaryMemo(dateStr: string, text: string) {
     if (text.trim()) localStorage.setItem(`fonday_memo_${dateStr}`, text.trim());
     else localStorage.removeItem(`fonday_memo_${dateStr}`);
   } catch {}
-  if (dateStr === todayStr()) window.dispatchEvent(new CustomEvent("fonday:diary-updated"));
+  // 모든 날짜 dispatch + dateStr 포함 (서버 동기화용)
+  window.dispatchEvent(new CustomEvent("fonday:diary-updated", { detail: { dateStr } }));
 }
 
 const DIARY_CAUSE_TAGS = ["sleep", "newProduct", "cycle", "diet", "stress", "outdoor"] as const;
@@ -1804,7 +1806,7 @@ function saveDiaryCauseTags(dateStr: string, tags: DiaryCauseTag[]) {
     if (tags.length > 0) localStorage.setItem(`fonday_cause_tags_${dateStr}`, JSON.stringify(tags));
     else localStorage.removeItem(`fonday_cause_tags_${dateStr}`);
   } catch {}
-  if (dateStr === todayStr()) window.dispatchEvent(new CustomEvent("fonday:diary-updated"));
+  window.dispatchEvent(new CustomEvent("fonday:diary-updated", { detail: { dateStr } }));
 }
 
 function getCauseTagLabel(t: (key: string, options?: any) => string, tag: DiaryCauseTag) {
@@ -1835,7 +1837,7 @@ function getDiaryTodos(dateStr: string): TodoItem[] {
 }
 function saveDiaryTodos(dateStr: string, todos: TodoItem[]) {
   try { localStorage.setItem(`fonday_todos_${dateStr}`, JSON.stringify(todos)); } catch {}
-  if (dateStr === todayStr()) window.dispatchEvent(new CustomEvent("fonday:diary-updated"));
+  window.dispatchEvent(new CustomEvent("fonday:diary-updated", { detail: { dateStr } }));
 }
 function getDiaryTodoProgress(dateStr: string) {
   const todos = getDiaryTodos(dateStr);
@@ -2542,6 +2544,9 @@ function DiaryTab({ user, analysisResult, onBack }: { user: any; analysisResult:
   const [tab, setTab] = useState<"timeline" | "calendar" | "ranking">("timeline");
   const [loading, setLoading] = useState(true);
   const [reminderSettings, setReminderSettings] = useState<ReminderSettings>(() => getReminderSettings());
+  // Bug 7 fix: stale closure 방지용 ref
+  const reminderSettingsRef = useRef(reminderSettings);
+  useEffect(() => { reminderSettingsRef.current = reminderSettings; }, [reminderSettings]);
 
   const scores = analysisResult?.scores || [];
   const overallScore = scores[0]?.score || 0;
@@ -2560,6 +2565,25 @@ function DiaryTab({ user, analysisResult, onBack }: { user: any; analysisResult:
         try {
           const r = await fetch("/api/scans");
           if (r.ok) { const d = await r.json(); if (Array.isArray(d)) setHistory(d); }
+        } catch {}
+        // 서버 → localStorage 동기화 (기기 변경/캐시 삭제 복원)
+        try {
+          const r = await fetch("/api/diary");
+          if (r.ok) {
+            const entries: any[] = await r.json();
+            entries.forEach((entry: any) => {
+              const { date_str, memo, todos, cause_tags } = entry;
+              if (memo) localStorage.setItem(`fonday_memo_${date_str}`, memo);
+              try {
+                const t = JSON.parse(todos || "[]");
+                if (t.length > 0) localStorage.setItem(`fonday_todos_${date_str}`, todos);
+              } catch {}
+              try {
+                const c = JSON.parse(cause_tags || "[]");
+                if (c.length > 0) localStorage.setItem(`fonday_cause_tags_${date_str}`, cause_tags);
+              } catch {}
+            });
+          }
         } catch {}
       }
       try {
@@ -2595,27 +2619,30 @@ function DiaryTab({ user, analysisResult, onBack }: { user: any; analysisResult:
     if (!reminderSettings.enabled) return;
     if (typeof Notification === "undefined") return;
     if (Notification.permission !== "granted") return;
+    // Bug 7 fix: ref로 최신 settings 참조 → 중복 알림 방지
     const timer = window.setInterval(() => {
+      const settings = reminderSettingsRef.current;
+      if (!settings.enabled) return;
       const now = new Date();
       const currentDate = todayStr();
       const progress = getDiaryTodoProgress(currentDate);
       const incomplete = progress.total > 0 && progress.done < progress.total;
       const shouldTrigger = incomplete
-        && now.getHours() === reminderSettings.hour
-        && now.getMinutes() >= reminderSettings.minute
-        && reminderSettings.lastNotifiedDate !== currentDate;
+        && now.getHours() === settings.hour
+        && now.getMinutes() >= settings.minute
+        && settings.lastNotifiedDate !== currentDate;
       if (shouldTrigger) {
         new Notification(t("modal.diary.reminderNotifyTitle"), {
           body: t("modal.diary.reminderNotifyBody", { done: progress.done, total: progress.total }),
           icon: "/icon-192.png",
         });
-        const next = { ...reminderSettings, lastNotifiedDate: currentDate };
+        const next = { ...settings, lastNotifiedDate: currentDate };
         setReminderSettings(next);
         saveReminderSettings(next);
       }
     }, 60000);
     return () => window.clearInterval(timer);
-  }, [reminderSettings]);
+  }, [reminderSettings.enabled]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const tabs: { id: "timeline" | "calendar" | "ranking"; label: string }[] = [
     { id: "timeline", label: t("modal.diary.timelineTab") },
@@ -3354,20 +3381,22 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
     const { streak, isNewMilestone, deltaScore } = updateStreak(overallScore);
     setCurrentStreak(streak);
     setStreakDelta(deltaScore);
+    // Bug 3 fix: timeout ID 수집 후 cleanup 반환
+    const timers: ReturnType<typeof setTimeout>[] = [];
     if (isNewMilestone) {
       setStreakMilestone(streak.count);
-      setTimeout(() => setStreakMilestone(null), 3000);
+      timers.push(setTimeout(() => setStreakMilestone(null), 3000));
     }
     const newMissions = checkAndCompleteMissions(streak.count, overallScore);
     setMissionState(getMissions());
     if (newMissions.length > 0) {
       setMissionPops(newMissions);
-      setTimeout(() => setMissionPops([]), 3500);
+      timers.push(setTimeout(() => setMissionPops([]), 3500));
     }
     // 출석 체크인 (오늘 첫 스캔이면 팝업)
     const isNew = checkinToday();
     if (isNew) {
-      setTimeout(() => setShowCheckinSheet(true), 1200);
+      timers.push(setTimeout(() => setShowCheckinSheet(true), 1200));
     }
     // 예측 루틴 → 오늘 Todo로 자동 저장 (오늘 처음이면)
     if (analysisResult?.prediction?.good?.routine) {
@@ -3375,6 +3404,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
     }
     setTodayTodoProgress(getDiaryTodoProgress(todayStr()));
     setTodayHasMemo(Boolean(getDiaryMemo(todayStr()).trim()));
+    return () => timers.forEach(clearTimeout);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -3484,19 +3514,20 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
   // 히스토리 로드 (로그인 시)
   useEffect(() => {
     if (!user) return;
-    fetch("/api/scans").then(res => res.json()).then(data => {
-      if (Array.isArray(data)) setHistory(data);
-    });
+    fetch("/api/scans")
+      .then(res => res.json())
+      .then(data => { if (Array.isArray(data)) setHistory(data); })
+      .catch(() => {});
   }, [user]);
 
-  // 랭킹 데이터 로드
+  // 랭킹 데이터 로드 (Bug 2 fix: analysisResult 의존성 추가)
   useEffect(() => {
     const score = analysisResult?.scores?.[0]?.score || 0;
     fetch(`/api/ranking?myScore=${score}`)
       .then(res => res.json())
       .then(data => setRankingData(data))
       .catch(() => {});
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [analysisResult]);
 
   // 비로그인 챌린지 토큰 생성 (로그인 여부 확정 후 즉시)
   const [guestTokenFetched, setGuestTokenFetched] = useState(false);
@@ -3523,7 +3554,8 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
   // 스캔 저장 (로그인 + 분석결과 둘 다 준비됐을 때)
   useEffect(() => {
     if (!user || !analysisResult || isSaved) return;
-    const overallScore = analysisResult.scores.find((s: any) => s.label === "종합 컨디션")?.score || 0;
+    // Bug 1 fix: 한국어 label 하드코딩 제거 → index 0 (항상 종합점수)
+    const overallScore = analysisResult.scores[0]?.score || 0;
     fetch("/api/scans", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -3555,7 +3587,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
           isGuest: false,
         }),
       }).catch(() => {});
-    });
+    }).catch(() => {}); // Bug 4 fix: .catch() 추가
   }, [user, analysisResult]);
 
   // 모달 열릴 때 배경 스크롤 잠금
@@ -5688,6 +5720,24 @@ export default function SkinScanPage() {
       .then(data => setUser(data ?? null))
       .catch(() => setUser(null));
   }, []);
+
+  // 피부 일기 서버 동기화 — 저장 이벤트 발생 시 서버에 write-through
+  useEffect(() => {
+    if (!user) return;
+    const handler = (e: Event) => {
+      const dateStr = (e as CustomEvent).detail?.dateStr || todayStr();
+      const memo = getDiaryMemo(dateStr);
+      const todos = getDiaryTodos(dateStr);
+      const causeTags = getDiaryCauseTags(dateStr);
+      fetch("/api/diary", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ dateStr, memo, todos, causeTags }),
+      }).catch(() => {});
+    };
+    window.addEventListener("fonday:diary-updated", handler);
+    return () => window.removeEventListener("fonday:diary-updated", handler);
+  }, [user]);
 
   // OAuth 로그인 후 결과 화면 복원
   useEffect(() => {
