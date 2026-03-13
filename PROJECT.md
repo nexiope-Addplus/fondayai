@@ -249,7 +249,7 @@ if (!user) return new Response(JSON.stringify([]), { status: 401 });
 
 ### 핵심 플로우
 1. **Idle 화면** → 카메라 촬영 → 설문 (30초) → AI 분석 → 결과 화면
-2. 결과 화면: 3탭 (분석 | 솔루션 | 영양) + 하단 고정 액션바
+2. 결과 화면: 상단 요약 + 오늘 목표 + 루틴 카드 + 2탭 (솔루션 | 영양) + 하단 고정 액션바
 
 ### 피부 분석
 - Gemini 2.5 Flash Vision → 10개 점수 항목 (0~100)
@@ -261,6 +261,7 @@ if (!user) return new Response(JSON.stringify([]), { status: 401 });
 ### 화장품 카메라 스캔
 - 제품 전면 촬영 → Gemini Vision → 이름/브랜드/카테고리 자동 추출
 - 썸네일(300px JPEG) D1 저장
+- 등록 시 `am/pm/both`를 직접 받지 않고 카테고리 기준 기본 시간대로 자동 추천
 - 결과 화면 사진 바로 아래 배너로 접근
 - MyScreen에서 등록 목록 확인 및 삭제
 
@@ -273,6 +274,19 @@ if (!user) return new Response(JSON.stringify([]), { status: 401 });
 - localStorage 기반 (`fonday_streak`, `fonday_missions`, `fonday_attendance`)
 - 연속 스캔 스트릭, 9개 미션, 출석 포인트 (하루 3pt)
 - 결과 진입 시 자동 체크인
+
+### 결과 화면 UX (2026-03-13 최신)
+- 상단 요약은 `작은 얼굴 프레임 + 핵심 점수 4개 + 상세 분석 모달 버튼` 구조
+- 종합 점수 / 피부 MBTI / 피부나이 / 백분위는 아래 카드형 요약 블록에서 유지
+- `오늘 목표`는 진행판 역할만 맡고, 루틴 상세 내용은 반복 노출하지 않도록 축소
+- 아침/저녁 루틴은 제품명 나열 대신 카테고리 순서(`토너 → 세럼 → 선크림`) 중심으로 표기
+- 루틴 체크는 제품별 여러 개가 아니라 `아침 완료`, `저녁 완료` 1회 체크로 diary todo에 일괄 반영
+- 하단 탭은 현재 `솔루션 / 영양` 2개만 사용하고, 전체 10개 점수는 `주요 분석결과` 모달에서 확인
+
+### AI 응답 파싱 안정화
+- `functions/api/analyze-skin.ts` 와 `server/routes.ts` 에 Gemini JSON 복구 파서 추가
+- 코드블록, 스마트 따옴표, trailing comma, quote 없는 key 일부를 방어
+- `functions/api/cosmetics/classify.ts` 에도 동일한 복구 파서 반영
 
 ### 랭킹/피부 챌린지
 - D1 전체 스캔 데이터 기반 백분위 계산
@@ -318,6 +332,7 @@ const SCAN_TO = "#C97062";
 - `server/routes.ts` — **로컬 개발 전용** (Express 서버)
 - `functions/api/*.ts` — **프로덕션 실제 동작** (Cloudflare Pages Functions)
 - 새 API 엔드포인트를 만들 때 **반드시 두 곳 모두** 구현해야 합니다
+- 특히 Gemini JSON 파싱 보강처럼 분석/분류 로직을 수정할 때 `functions/api/*.ts` 와 `server/routes.ts` 를 같이 맞춰야 합니다
 
 ### Cloudflare Functions 패턴
 ```typescript
@@ -344,6 +359,7 @@ export const onRequest = async (context: any) => {
 - **6000줄 이상**의 단일 파일 — 전체 앱 UI가 여기 있음
 - 컴포넌트 순서: 유틸함수 → 작은 컴포넌트 → 큰 컴포넌트(MyScreen, ResultScreen, SkinScanPage 순)
 - 수정 전 반드시 해당 섹션 주변 코드를 먼저 읽을 것
+- 최근 변경이 결과 화면(ResultScreen)에 많이 몰려 있으므로, 상단 요약/미션 허브/루틴 카드/모달 구조를 같이 읽고 수정하는 편이 안전합니다
 
 ### D1 테이블 마이그레이션
 - 코드로 자동 마이그레이션 없음 — Cloudflare D1 콘솔에서 수동 실행 필요
@@ -354,9 +370,12 @@ export const onRequest = async (context: any) => {
 ## 11. TODO / 다음 작업
 
 ### 즉시 필요
-- [ ] 화장품 등록 후 MyScreen 목록 즉시 갱신 (현재 재진입 시 갱신)
+- [ ] 기존에 `both` 로 저장된 화장품 데이터를 카테고리 기반 기본 시간대로 정리할지 결정
+- [ ] 결과 화면 상단 카드에서 얼굴 crop을 실기기 기준으로 한 번 더 미세조정
+- [ ] `오늘 목표`와 아침/저녁 루틴 카드의 정보 밀도를 더 줄일지 검토
 - [ ] D1 Console 테스트 크론 (`*/30 * * * *`) 삭제
 - [ ] 공유 이미지 실기기 테스트 (WASM CDN 로드 확인)
+- [ ] `server/auth.ts` 타입 선언 누락 정리 (`passport-google-oauth20`, `passport-kakao`, implicit any)
 
 ### Phase 2.5 — 아침 리포트 이메일 (다음 우선순위)
 - Resend API 연동
@@ -392,9 +411,15 @@ git push origin main
 
 | 커밋 | 내용 |
 |------|------|
+| b49879b | feat(result): 결과 화면 중복 축소 + 화장품 자동 시간대 추천 |
+| fed963f | feat(result): 루틴 완료 체크를 아침/저녁 단위로 단순화 |
+| 2767a8d | fix(result): 결과 사진 축소 + 중복 점수 패널 제거 |
+| 9257c93 | fix(ai): Gemini JSON 파싱 복구 로직 추가 |
+| a35a1bf | feat(result): compact summary and sync routine actions |
+| 5577807 | feat(result): 오늘 목표 허브 + 루틴 코치 통합 |
+| 8070560 | feat(cosmetics): routine coach / good combo / caution 추가 |
+| cfe287c | feat(flow): diary API 프로덕션 동기화 + cosmetics insight 추가 |
+| 44d3b0c | feat(idle): hero copy / mobile layout 정리 |
+| ee03355 | docs: add PROJECT.md for cross-session AI context |
 | 94ee36f | fix(ux): 사진 object-top, 용어 한국어화 |
 | d520a73 | feat(functions): 화장품 Cloudflare Functions 3개 추가 |
-| e7558be | fix(cosmetics): register 응답 ok 체크 |
-| 8f0c5c2 | feat(cosmetics): 카메라 스캔 + Gemini Vision + 썸네일 |
-| c585f9b | feat(i18n): 피부 일기/주간 리포트 현지화 |
-| bc8eb71 | feat: D1 영구 저장 마이그레이션 |
