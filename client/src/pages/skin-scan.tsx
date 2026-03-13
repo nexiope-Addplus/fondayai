@@ -92,6 +92,17 @@ interface RankingData {
   myPercentile?: number;
 }
 
+interface CosmeticItem {
+  id: string;
+  name: string;
+  brand?: string;
+  category: string;
+  time_of_day?: "am" | "pm" | "both";
+  opened_at?: string | null;
+  image_thumbnail?: string;
+  status?: string;
+}
+
 const BAUMANN_COLORS: Record<string, string> = {
   O: "#F59E0B",
   D: "#3B82F6",
@@ -1463,16 +1474,16 @@ function ScanIdleScreen({ onScan }: { onScan: () => void }) {
 
       {/* 단계 표시 */}
       <motion.div variants={fadeChild} className="mb-4 relative" style={{ zIndex: 1 }}>
-        <div className="bg-white/90 rounded-2xl px-4 py-3.5 border border-stone-100"
+        <div className="bg-white/90 rounded-2xl px-3.5 py-3 border border-stone-100 sm:px-4 sm:py-3.5"
           style={{ boxShadow: "0 2px 12px rgba(180,130,110,0.08)", backdropFilter: "blur(8px)" }}>
-          <p className="text-[10px] font-semibold text-stone-400 text-center mb-3 tracking-widest uppercase">
+          <p className="text-[10px] font-semibold text-stone-400 text-center mb-2.5 tracking-widest uppercase">
             {t("idle.stepsTitle")}
           </p>
           <div className="flex items-start justify-between">
             {STEPS.map((step, i) => (
               <div key={i} className="flex items-start" style={{ flex: 1 }}>
-                <div className="flex flex-col items-center gap-1.5 flex-1">
-                  <div className="w-10 h-10 rounded-full flex items-center justify-center text-lg"
+                <div className="flex flex-col items-center gap-1 flex-1">
+                  <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-base sm:text-lg"
                     style={step.active
                       ? { background: `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})`, boxShadow: `0 4px 14px ${SCAN_FROM}44` }
                       : { background: "#EDE6DE" }}>
@@ -1480,10 +1491,10 @@ function ScanIdleScreen({ onScan }: { onScan: () => void }) {
                   </div>
                   <div className="text-center">
                     <div className="text-[11px] font-bold text-stone-700">{step.title}</div>
-                    <div className="text-[9.5px] text-stone-400 mt-0.5">{step.sub}</div>
+                    <div className="text-[9px] sm:text-[9.5px] text-stone-400 mt-0.5 leading-tight">{step.sub}</div>
                   </div>
                 </div>
-                {i < 2 && <div className="text-stone-200 text-sm pt-3 flex-shrink-0">›</div>}
+                {i < 2 && <div className="text-stone-200 text-sm pt-2.5 flex-shrink-0">›</div>}
               </div>
             ))}
           </div>
@@ -1512,7 +1523,7 @@ function ScanIdleScreen({ onScan }: { onScan: () => void }) {
         )}
         <motion.button
           onClick={onScan}
-          className="w-full py-[18px] rounded-[18px] text-white text-[16px] font-bold tracking-tight"
+          className="w-full py-4 sm:py-[18px] rounded-[18px] text-white text-[15px] sm:text-[16px] font-bold tracking-tight"
           style={{ background: `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})` }}
           whileHover={{ scale: 1.01 }}
           whileTap={{ scale: 0.97 }}
@@ -1928,6 +1939,88 @@ function getWeeklyReport(entries: { dateStr: string; score: number }[], streakCo
     incompleteDays,
     memoCount: memos.length,
   };
+}
+
+function daysSinceDate(dateStr?: string | null): number | null {
+  if (!dateStr) return null;
+  const time = new Date(dateStr).getTime();
+  if (Number.isNaN(time)) return null;
+  return Math.max(0, Math.floor((Date.now() - time) / 86400000));
+}
+
+function buildCosmeticsInsights(
+  cosmetics: CosmeticItem[],
+  overallScore: number,
+  previousScore: number | null,
+  t: (key: string, options?: any) => string,
+) {
+  if (cosmetics.length === 0) return [];
+
+  const insights: { id: string; title: string; desc: string; accent: string }[] = [];
+  const categories = new Set(cosmetics.map((item) => item.category));
+  const amCount = cosmetics.filter((item) => item.time_of_day === "am" || item.time_of_day === "both").length;
+  const pmCount = cosmetics.filter((item) => item.time_of_day === "pm" || item.time_of_day === "both").length;
+  const recent = cosmetics
+    .map((item) => ({ item, days: daysSinceDate(item.opened_at) }))
+    .filter((entry): entry is { item: CosmeticItem; days: number } => entry.days !== null)
+    .sort((a, b) => a.days - b.days)[0];
+
+  if (recent && recent.days <= 14) {
+    insights.push({
+      id: "recent",
+      title: t("cosmetics.insightRecentTitle"),
+      desc: t("cosmetics.insightRecentDesc", { name: recent.item.name, days: recent.days + 1 }),
+      accent: "#C97062",
+    });
+  }
+
+  if (!categories.has("선크림")) {
+    insights.push({
+      id: "sunscreen",
+      title: t("cosmetics.insightSunscreenTitle"),
+      desc: t("cosmetics.insightSunscreenDesc"),
+      accent: "#D97706",
+    });
+  }
+
+  if (pmCount === 0 || pmCount < Math.max(1, Math.ceil(amCount / 2))) {
+    insights.push({
+      id: "pm-balance",
+      title: t("cosmetics.insightBalanceTitle"),
+      desc: t("cosmetics.insightBalanceDesc", { am: amCount, pm: pmCount }),
+      accent: DEEP_GREEN,
+    });
+  }
+
+  if (previousScore !== null && previousScore > 0) {
+    const delta = overallScore - previousScore;
+    if (delta >= 5) {
+      insights.push({
+        id: "score-up",
+        title: t("cosmetics.insightScoreUpTitle"),
+        desc: t("cosmetics.insightScoreUpDesc", { delta }),
+        accent: "#059669",
+      });
+    } else if (delta <= -5) {
+      insights.push({
+        id: "score-down",
+        title: t("cosmetics.insightScoreDownTitle"),
+        desc: t("cosmetics.insightScoreDownDesc", { delta: Math.abs(delta) }),
+        accent: "#DC2626",
+      });
+    }
+  }
+
+  if (insights.length === 0) {
+    insights.push({
+      id: "coverage",
+      title: t("cosmetics.insightCoverageTitle"),
+      desc: t("cosmetics.insightCoverageDesc", { count: cosmetics.length }),
+      accent: SCAN_TO,
+    });
+  }
+
+  return insights.slice(0, 3);
 }
 
 // ─── 인라인 루틴 Todo ────────────────────────────────────────────
@@ -3768,6 +3861,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
   const loginPromptRef = useRef<HTMLDivElement>(null);
   // 화장품 기능
   const [cosmeticCount, setCosmeticCount] = useState(0);
+  const [myCosmetics, setMyCosmetics] = useState<CosmeticItem[]>([]);
   const [showCosmeticsGate, setShowCosmeticsGate] = useState(false);
   const [showCosmeticsRegister, setShowCosmeticsRegister] = useState(false);
 
@@ -3945,7 +4039,11 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
     if (!user) return;
     fetch("/api/cosmetics")
       .then(r => r.ok ? r.json() : [])
-      .then((data: any[]) => setCosmeticCount(Array.isArray(data) ? data.length : 0))
+      .then((data: CosmeticItem[]) => {
+        const next = Array.isArray(data) ? data : [];
+        setMyCosmetics(next);
+        setCosmeticCount(next.length);
+      })
       .catch(() => {});
   }, [user]);
 
@@ -4069,6 +4167,8 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
   const isPig   = (scores[5]?.score ?? 0) > 50;    // index 5 = 잡티/색소침착
   const isWrink = (scores[4]?.score ?? 100) < 60;  // index 4 = 주름 및 탄력
   const finalType = `${isOily ? "O" : "D"}${isSens ? "S" : "R"}${isPig ? "P" : "N"}${isWrink ? "W" : "T"}`;
+  const previousScore = history.length > 0 ? parseInt(history[0]?.overallScore || "0", 10) || null : null;
+  const cosmeticsInsights = buildCosmeticsInsights(myCosmetics, overallScore, previousScore, t);
   const todayRoutine = analysisResult?.prediction?.good?.routine ?? [];
   const morningTask = todayRoutine[0] ?? analysisResult?.improvements?.[0]?.title ?? t("result.actionCard.fallbackFocus");
   const eveningTask = todayRoutine[1] ?? analysisResult?.improvements?.[1]?.title ?? analysisResult?.improvements?.[0]?.title ?? t("result.actionCard.eveningFallback");
@@ -4502,6 +4602,39 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
             + {t("cosmetics.scanBtn")}
           </button>
         </motion.div>
+
+        {user && cosmeticsInsights.length > 0 && (
+          <Card className="border-none shadow-sm rounded-[28px] overflow-hidden"
+            style={{ background: "linear-gradient(180deg, #FFFCFA 0%, #FFFFFF 100%)" }}>
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between mb-3">
+                <div>
+                  <p className="text-[13px] font-black" style={{ color: DEEP_GREEN }}>{t("cosmetics.insightTitle")}</p>
+                  <p className="text-[11px] text-stone-400">{t("cosmetics.ctaCount", { count: cosmeticCount })}</p>
+                </div>
+                <button
+                  onClick={() => setShowCosmeticsRegister(true)}
+                  className="px-3 py-1.5 rounded-full text-[11px] font-black text-white"
+                  style={{ background: `linear-gradient(135deg, ${DEEP_GREEN}, ${DEEP_GREEN_LIGHT})` }}
+                >
+                  + {t("cosmetics.scanBtn")}
+                </button>
+              </div>
+              <div className="space-y-2.5">
+                {cosmeticsInsights.map((insight) => (
+                  <div
+                    key={insight.id}
+                    className="rounded-2xl px-3.5 py-3 border"
+                    style={{ background: `${insight.accent}10`, borderColor: `${insight.accent}28` }}
+                  >
+                    <p className="text-[12px] font-black" style={{ color: insight.accent }}>{insight.title}</p>
+                    <p className="text-[11px] text-stone-600 mt-1 leading-relaxed text-kr-pretty">{insight.desc}</p>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         <Card className="border-none shadow-md rounded-[32px] overflow-hidden"
           style={{ background: "linear-gradient(180deg, #FFFCFA 0%, #FFFFFF 100%)" }}>
@@ -5635,8 +5768,15 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
           <CosmeticsRegisterModal
             onClose={() => setShowCosmeticsRegister(false)}
             onSuccess={() => {
-              setCosmeticCount(prev => prev + 1);
               setShowCosmeticsRegister(false);
+              fetch("/api/cosmetics")
+                .then(r => r.ok ? r.json() : [])
+                .then((data: CosmeticItem[]) => {
+                  const next = Array.isArray(data) ? data : [];
+                  setMyCosmetics(next);
+                  setCosmeticCount(next.length);
+                })
+                .catch(() => {});
             }}
           />
         )}
