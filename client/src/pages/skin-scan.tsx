@@ -1343,7 +1343,7 @@ function ScanIdleScreen({ onScan }: { onScan: () => void }) {
 
     <motion.div
       className="flex flex-col px-3 pb-8 relative overflow-hidden"
-      style={{ minHeight: "calc(100dvh - 60px)", background: "#FDFAF8", paddingTop: 28 }}
+      style={{ minHeight: "calc(100dvh - 60px)", background: "#FDFAF8", paddingTop: 20 }}
       variants={stagger} initial="initial" animate="animate"
     >
       {/* ── Aurora 배경 blobs ── */}
@@ -1353,7 +1353,7 @@ function ScanIdleScreen({ onScan }: { onScan: () => void }) {
           animate={{ x: [0, 30, -10, 0], y: [0, 20, 40, 0] }}
           transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }} />
         <motion.div className="absolute rounded-full"
-          style={{ width: 200, height: 200, background: "#C084FC18", filter: "blur(40px)", top: 80, right: -40 }}
+          style={{ width: 200, height: 200, background: "#F3D4C818", filter: "blur(40px)", top: 80, right: -40 }}
           animate={{ x: [0, -20, 10, 0], y: [0, 30, -10, 0] }}
           transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }} />
         <motion.div className="absolute rounded-full"
@@ -1376,102 +1376,90 @@ function ScanIdleScreen({ onScan }: { onScan: () => void }) {
         </motion.div>
       )}
 
-      {/* ── Editorial 헤더: 브랜드칩 + 제목 + 부제목 ── */}
-      <motion.div variants={fadeChild} className="mb-5 relative" style={{ zIndex: 1 }}>
-        <div className="flex justify-center mb-3">
+      {/* ── 헤더 + 히어로 미리보기 ── */}
+      <motion.div variants={fadeChild} className="mb-4 relative" style={{ zIndex: 1 }}>
+        <div className="flex items-center justify-between gap-2 mb-3">
           <div className="flex items-center gap-1.5 px-3 py-1 rounded-full"
             style={{ background: `${SCAN_FROM}22`, border: `1px solid ${SCAN_FROM}50` }}>
             <Sparkles className="w-3 h-3" style={{ color: SCAN_TO }} />
             <span className="text-[11px] font-bold tracking-widest uppercase" style={{ color: SCAN_TO }}>FONDAY AI</span>
           </div>
+          <div className="px-3 py-1 rounded-full bg-white/80 border border-white/70 shadow-[0_8px_24px_rgba(189,133,111,0.12)]">
+            <span className="text-[10px] font-bold" style={{ color: DEEP_GREEN }}>{t("idle.heroBadge")}</span>
+          </div>
         </div>
-        <h1 className="text-[28px] font-black text-stone-800 text-center leading-tight mb-2 px-2">
-          {t("idle.title")}
+        <h1 className="text-[28px] sm:text-[30px] font-black text-stone-800 leading-[1.08] mb-2 px-1">
+          {t("idle.subtitle1")}<br />{t("idle.subtitle3")}
         </h1>
-        <p className="text-[13px] text-stone-500 text-center px-4">
+        <p className="text-[13px] text-stone-500 px-1 mb-3.5">
           {t("idle.subtitle4")}
         </p>
-      </motion.div>
 
-      {/* ── AI 스캐너 비주얼 (풀 넓이) ── */}
-      <motion.div variants={fadeChild} className="mb-4 relative" style={{ zIndex: 1 }}>
-        <div className="relative w-full rounded-3xl overflow-hidden" style={{ height: 260 }}>
-          {/* 실제 얼굴 이미지 */}
-          <img
-            src="/face-model.png"
-            alt="face"
-            className="w-full h-full object-cover"
-            style={{ objectPosition: "center top" }}
-          />
-          {/* 스캔 라인 */}
-          <motion.div className="absolute left-0 right-0 h-[2px] z-10"
-            style={{ background: `linear-gradient(90deg, transparent 0%, ${SCAN_TO}CC 40%, ${SCAN_FROM} 50%, ${SCAN_TO}CC 60%, transparent 100%)` }}
-            animate={{ top: ["0%", "100%", "0%"] }}
-            transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }} />
-          {/* 하단 그라디언트 페이드 */}
-          <div className="absolute bottom-0 left-0 right-0 h-20 pointer-events-none"
-            style={{ background: "linear-gradient(to top, rgba(253,250,248,0.9), transparent)" }} />
-          {/* 4 코너 AR 브라켓 */}
-          <div className="absolute top-3 left-3 w-7 h-7 border-t-2 border-l-2 rounded-tl-lg" style={{ borderColor: SCAN_TO }} />
-          <div className="absolute top-3 right-3 w-7 h-7 border-t-2 border-r-2 rounded-tr-lg" style={{ borderColor: SCAN_TO }} />
-          <div className="absolute bottom-3 left-3 w-7 h-7 border-b-2 border-l-2 rounded-bl-lg" style={{ borderColor: SCAN_TO }} />
-          <div className="absolute bottom-3 right-3 w-7 h-7 border-b-2 border-r-2 rounded-br-lg" style={{ borderColor: SCAN_TO }} />
-          {/* AI ANALYZING 오버레이 (이미지 하단) */}
-          <div className="absolute bottom-3 left-0 right-0 flex justify-center z-20">
-            <motion.div
-              className="flex items-center gap-2 px-3 py-1.5 rounded-full"
-              style={{ background: "rgba(0,0,0,0.32)", backdropFilter: "blur(8px)" }}
-              animate={{ opacity: [0.7, 1, 0.7] }}
-              transition={{ duration: 1.8, repeat: Infinity }}>
-              <div className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: SCAN_FROM }} />
-              <span className="text-[10px] font-bold text-white uppercase tracking-wider">AI ANALYZING...</span>
-            </motion.div>
-          </div>
-        </div>
-      </motion.div>
-
-      {/* ── 소셜 증명 카운터 ── */}
-      <motion.div variants={fadeChild} className="flex justify-center mb-4 relative" style={{ zIndex: 1 }}>
-        <div className="flex items-center gap-2 px-4 py-2 rounded-2xl"
-          style={{ background: "rgba(255,255,255,0.85)", backdropFilter: "blur(8px)", border: `1px solid ${SCAN_FROM}40`, boxShadow: `0 2px 12px ${SCAN_FROM}20` }}>
-          <span className="text-[16px]">🔥</span>
-          <span className="text-[12px] font-semibold text-stone-600">
-            {t("idle.socialCount", { n: socialCount.toLocaleString() })}
-          </span>
-        </div>
-      </motion.div>
-
-      {/* 결과 미리보기 카드 */}
-      <motion.div variants={fadeChild} className="mb-4 relative" style={{ zIndex: 1 }}>
-        <div className="bg-white/90 rounded-2xl p-4 border border-stone-100"
-          style={{ boxShadow: "0 4px 24px rgba(180,130,110,0.12), 0 1px 4px rgba(0,0,0,0.05)", backdropFilter: "blur(8px)" }}>
+        <div className="rounded-[28px] p-3 border border-white/70 sm:rounded-[30px] sm:p-3.5"
+          style={{ background: "rgba(255,255,255,0.84)", boxShadow: "0 18px 44px rgba(160,120,100,0.15)", backdropFilter: "blur(14px)" }}>
           <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center gap-2">
-              <div className="w-7 h-7 rounded-full flex items-center justify-center text-sm flex-shrink-0"
-                style={{ background: `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})` }}>✨</div>
-              <div>
-                <div className="text-[11px] font-bold text-stone-700">{t("idle.previewTitle")}</div>
-                <div className="text-[9px] text-stone-400">{t("idle.previewSub")}</div>
+            <div>
+              <div className="text-[11px] font-bold text-stone-700">{t("idle.previewTitle")}</div>
+              <div className="text-[9px] text-stone-400">{t("idle.previewSub")}</div>
+            </div>
+            <div className="flex items-center gap-1.5 px-2 py-1 rounded-full max-w-[52%] sm:max-w-none"
+              style={{ background: `${SCAN_FROM}16`, color: SCAN_TO }}>
+              <Heart className="w-3 h-3 shrink-0" />
+              <span className="text-[9.5px] leading-tight font-bold text-right break-keep">{t("idle.socialCount", { n: socialCount.toLocaleString() })}</span>
+            </div>
+          </div>
+          <div className="grid grid-cols-[116px_1fr] gap-2.5 items-stretch sm:grid-cols-[132px_1fr] sm:gap-3">
+            <div className="relative rounded-[22px] overflow-hidden min-h-[168px] bg-stone-100 sm:rounded-[24px] sm:min-h-[176px]">
+              <img
+                src="/face-model.png"
+                alt="preview"
+                className="w-full h-full object-cover"
+                style={{ objectPosition: "center top" }}
+              />
+              <motion.div className="absolute left-0 right-0 h-[2px] z-10"
+                style={{ background: `linear-gradient(90deg, transparent 0%, ${SCAN_TO}CC 40%, ${SCAN_FROM} 50%, ${SCAN_TO}CC 60%, transparent 100%)` }}
+                animate={{ top: ["5%", "88%", "5%"] }}
+                transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }} />
+              <div className="absolute inset-x-0 bottom-0 h-24"
+                style={{ background: "linear-gradient(to top, rgba(20,20,20,0.55), transparent)" }} />
+              <div className="absolute top-3 left-3 w-7 h-7 border-t-2 border-l-2 rounded-tl-lg" style={{ borderColor: SCAN_TO }} />
+              <div className="absolute top-3 right-3 w-7 h-7 border-t-2 border-r-2 rounded-tr-lg" style={{ borderColor: SCAN_TO }} />
+              <div className="absolute bottom-3 left-3 text-white">
+                <p className="text-[8px] sm:text-[9px] font-bold uppercase tracking-[0.16em] text-white/75">{t("idle.heroMbtiLabel")}</p>
+                <p className="text-[22px] sm:text-[24px] font-black leading-none">OSNT</p>
               </div>
             </div>
-            <div className="px-2.5 py-0.5 rounded-full text-[12px] font-black text-white flex-shrink-0"
-              style={{ background: `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})` }}>
-              82{t("result.scoreSuffix")}
+            <div className="flex flex-col">
+              <div className="rounded-[20px] px-2.5 py-2.5 mb-2.5 sm:rounded-[22px] sm:px-3"
+                style={{ background: `${SCAN_FROM}10`, border: `1px solid ${SCAN_FROM}24` }}>
+                <div className="flex items-center justify-between gap-2">
+                  <p className="text-[10px] font-black uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>{t("idle.heroBenefitsTitle")}</p>
+                  <span className="text-[9px] font-black uppercase tracking-[0.14em]" style={{ color: TEXT_SECONDARY }}>{t("idle.heroTag")}</span>
+                </div>
+                <div className="grid grid-cols-1 gap-2 mt-2">
+                  <div className="flex items-center gap-2 text-[11px] font-semibold text-stone-700">
+                    <Badge className="h-5 rounded-full px-2 text-[9px]" style={{ background: "#F3E8E2", color: SCAN_TO }}>{t("result.baumannLabel")}</Badge>
+                    <span>{t("idle.heroBenefit1")}</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-[11px] font-semibold text-stone-700">
+                    <Badge className="h-5 rounded-full px-2 text-[9px]" style={{ background: "#E7F7F0", color: DEEP_GREEN }}>{t("result.scores")}</Badge>
+                    <span>{t("idle.heroBenefit2")}</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-[11px] font-semibold text-stone-700">
+                    <Badge className="h-5 rounded-full px-2 text-[9px]" style={{ background: "#FFF2E8", color: "#C2410C" }}>{t("result.skinAge")}</Badge>
+                    <span>{t("idle.heroBenefit3")}</span>
+                  </div>
+                </div>
+              </div>
+              <div className="flex flex-col gap-1.5">
+                {PREVIEW_SCORES.map(({ idx, score, color }, i) => (
+                  <MiniScoreBarIdle key={idx} label={t(`scores.${idx}`)} score={score} color={color} delay={500 + i * 100} />
+                ))}
+              </div>
             </div>
-          </div>
-          <div className="flex flex-col gap-1.5">
-            {PREVIEW_SCORES.map(({ idx, score, color }, i) => (
-              <MiniScoreBarIdle key={idx} label={t(`scores.${idx}`)} score={score} color={color} delay={500 + i * 100} />
-            ))}
           </div>
         </div>
       </motion.div>
-
-      {/* 날씨 데일리 팁 카드 */}
-      <div className="relative" style={{ zIndex: 1 }}><WeatherTipCard /></div>
-
-      {/* 미션 카드 */}
-      <div className="relative" style={{ zIndex: 1 }}><MissionCard /></div>
 
       {/* 단계 표시 */}
       <motion.div variants={fadeChild} className="mb-4 relative" style={{ zIndex: 1 }}>
@@ -1503,8 +1491,8 @@ function ScanIdleScreen({ onScan }: { onScan: () => void }) {
       </motion.div>
 
       {/* 개인정보 보호 배지 */}
-      <motion.div variants={fadeChild} className="mb-5 relative" style={{ zIndex: 1 }}>
-        <div className="flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl border"
+      <motion.div variants={fadeChild} className="mb-4 relative" style={{ zIndex: 1 }}>
+        <div className="flex items-center justify-center gap-1.5 px-3.5 py-2.5 rounded-2xl border"
           style={{ background: "#F0FAF6", borderColor: "#C5E5DA" }}>
           <Lock className="w-3.5 h-3.5 flex-shrink-0" style={{ color: DEEP_GREEN }} />
           <span className="text-[11px] font-semibold" style={{ color: DEEP_GREEN }}>{t("idle.privacy")}</span>
@@ -1544,6 +1532,12 @@ function ScanIdleScreen({ onScan }: { onScan: () => void }) {
           {t("idle.ctaHint")}
         </p>
       </motion.div>
+
+      {/* 재방문용 부가 카드 */}
+      <div className="mt-5 relative space-y-3" style={{ zIndex: 1 }}>
+        <WeatherTipCard />
+        <MissionCard />
+      </div>
 
       {/* ── 교육용 콘텐츠 섹션 (AdSense 정책: 퍼블리셔 콘텐츠 제공) ── */}
       <motion.div variants={fadeChild} className="mt-8 border-t border-stone-100 pt-6 space-y-5 relative" style={{ zIndex: 1 }}>
