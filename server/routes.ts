@@ -545,5 +545,49 @@ ingredients: 사진에 전성분 텍스트가 보이면 그대로 추출. 안 �
     }
   });
 
+  // 게스트 스캔 연결 (로그인 후 shareToken으로 user_id 연결)
+  app.post("/api/link-guest-scan", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).json({ error: "로그인 필요" });
+    const { shareToken } = req.body;
+    if (!shareToken) return res.status(400).json({ error: "shareToken 필요" });
+    const user = req.user as any;
+    try {
+      if (isConfigured()) {
+        await d1Query(
+          `UPDATE scans SET user_id = ?, is_guest = 0 WHERE share_token = ? AND (user_id IS NULL OR user_id = '')`,
+          [user.id, shareToken]
+        );
+      }
+      res.json({ ok: true });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // 스트릭/출석 서버 동기화 (로컬 개발용)
+  const userStatsMap = new Map<string, any>();
+  app.get("/api/user-stats", (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).json({ error: "로그인 필요" });
+    const user = req.user as any;
+    const data = userStatsMap.get(user.id) ?? null;
+    res.json(data);
+  });
+  app.post("/api/user-stats", (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).json({ error: "로그인 필요" });
+    const user = req.user as any;
+    const { streak, attendance, missionState } = req.body;
+    const existing = userStatsMap.get(user.id);
+    let merged = { streak, attendance, missionState };
+    if (existing) {
+      if ((existing.streak?.count ?? 0) > (streak?.count ?? 0)) merged.streak = existing.streak;
+      if (existing.attendance?.dates && attendance?.dates) {
+        const unionDates = [...new Set([...existing.attendance.dates, ...attendance.dates])];
+        merged.attendance = { dates: unionDates, totalPoints: unionDates.length * 3 };
+      }
+    }
+    userStatsMap.set(user.id, merged);
+    res.json({ ok: true });
+  });
+
   return httpServer;
 }

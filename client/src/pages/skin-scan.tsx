@@ -2867,6 +2867,7 @@ function DiaryTab({ user, analysisResult, onBack }: { user: any; analysisResult:
   const [tab, setTab] = useState<"calendar" | "timeline" | "report" | "ranking">("calendar");
   const [loading, setLoading] = useState(true);
   const [reminderSettings, setReminderSettings] = useState<ReminderSettings>(() => getReminderSettings());
+  const [reminderPushWarn, setReminderPushWarn] = useState(false);
   const [myCosmetics, setMyCosmetics] = useState<CosmeticItem[]>([]);
   // Bug 7 fix: stale closure 방지용 ref
   const reminderSettingsRef = useRef(reminderSettings);
@@ -3125,8 +3126,22 @@ function DiaryTab({ user, analysisResult, onBack }: { user: any; analysisResult:
                       </div>
                       <button
                         onClick={async () => {
-                          if (!reminderSettings.enabled && typeof Notification !== "undefined" && Notification.permission !== "granted") {
-                            await Notification.requestPermission();
+                          if (!reminderSettings.enabled) {
+                            // 켜기 전에 push 구독 확인
+                            if (!("serviceWorker" in navigator) || !("PushManager" in window)) {
+                              setReminderPushWarn(true);
+                              setTimeout(() => setReminderPushWarn(false), 3000);
+                              return;
+                            }
+                            try {
+                              const reg = await navigator.serviceWorker.ready;
+                              const sub = await reg.pushManager.getSubscription();
+                              if (!sub) {
+                                setReminderPushWarn(true);
+                                setTimeout(() => setReminderPushWarn(false), 3000);
+                                return;
+                              }
+                            } catch { /* ignore */ }
                           }
                           const next = { ...reminderSettings, enabled: !reminderSettings.enabled };
                           setReminderSettings(next);
@@ -3141,6 +3156,11 @@ function DiaryTab({ user, analysisResult, onBack }: { user: any; analysisResult:
                         {reminderSettings.enabled ? "ON" : "OFF"}
                       </button>
                     </div>
+                    {reminderPushWarn && (
+                      <p className="text-[11px] text-amber-600 mt-1.5">
+                        먼저 알림을 구독해야 합니다. 분석결과 → 영양 탭에서 구독해 주세요.
+                      </p>
+                    )}
                     <div className="flex items-center gap-2 mt-4">
                       {[
                         { label: "20:00", hour: 20, minute: 0 },
@@ -4352,6 +4372,18 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
     setTodayTodoProgress(getDiaryTodoProgress(todayStr()));
     setTodayRoutineTodos(getDiaryTodos(todayStr()));
     setTodayHasMemo(Boolean(getDiaryMemo(todayStr()).trim()));
+    // 로그인 사용자 → 스트릭/출석 서버 동기화
+    if (user) {
+      fetch("/api/user-stats", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          streak,
+          attendance: getAttendance(),
+          missionState: getMissions(),
+        }),
+      }).catch(() => {});
+    }
     return () => timers.forEach(clearTimeout);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -4512,7 +4544,11 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
         lang: i18n.language || "ko",
       }),
     }).then(res => res.json()).then(data => {
-      if (data?.shareToken) setCurrentShareToken(data.shareToken);
+      if (data?.shareToken) {
+        setCurrentShareToken(data.shareToken);
+        // 로그인 후 연결을 위해 localStorage에도 보관
+        try { localStorage.setItem("fonday_guest_token", data.shareToken); } catch {}
+      }
     }).catch(() => {});
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, analysisResult]);
@@ -4872,11 +4908,14 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
         i18nTexts,
       };
 
+      const shareController = new AbortController();
+      const shareTimeout = setTimeout(() => shareController.abort(), 20000);
       const res = await fetch("/api/generate-share", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
-      });
+        signal: shareController.signal,
+      }).finally(() => clearTimeout(shareTimeout));
       if (!res.ok) {
         const errBody = await res.json().catch(() => ({})) as any;
         throw new Error(`generate-share failed: ${res.status} | ${errBody?.error ?? ""}: ${errBody?.detail ?? ""}`);
@@ -4906,9 +4945,13 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
         }
       }
     } catch (e) {
-      if (e instanceof Error && e.name !== "AbortError") {
-        console.error("[share]", e);
-        alert(`공유 실패: ${e.message}`);
+      console.error("[share]", e);
+      if (e instanceof Error) {
+        if (e.name === "AbortError") {
+          alert("이미지 생성 시간이 초과되었습니다. 잠시 후 다시 시도해 주세요.");
+        } else {
+          alert(`공유 실패: ${e.message}`);
+        }
       }
     } finally {
       setShareLoading(false);
@@ -6792,6 +6835,45 @@ export default function SkinScanPage() {
       .then(data => setUser(data ?? null))
       .catch(() => setUser(null));
   }, []);
+
+  // 로그인 후 게스트 스캔 연결
+  useEffect(() => {
+    if (!user) return;
+    const guestToken = (() => { try { return localStorage.getItem("fonday_guest_token"); } catch { return null; } })();
+    if (!guestToken) return;
+    fetch("/api/link-guest-scan", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ shareToken: guestToken }),
+    }).then(() => {
+      try { localStorage.removeItem("fonday_guest_token"); } catch {}
+    }).catch(() => {});
+  }, [user]);
+
+  // 로그인 후 스트릭/출석 서버 데이터 복원
+  useEffect(() => {
+    if (!user) return;
+    fetch("/api/user-stats")
+      .then(r => r.ok ? r.json() : null)
+      .then(data => {
+        if (!data) return;
+        // streak: count 더 큰 쪽 우선
+        try {
+          const local = getStreak();
+          if ((data.streak?.count ?? 0) > (local.count ?? 0)) {
+            localStorage.setItem("fonday_streak", JSON.stringify(data.streak));
+          }
+          // attendance: dates 합집합
+          const localAtt = getAttendance();
+          if (data.attendance?.dates) {
+            const unionDates = [...new Set([...localAtt.dates, ...data.attendance.dates])];
+            const merged = { dates: unionDates, totalPoints: unionDates.length * 3 };
+            localStorage.setItem("fonday_attendance", JSON.stringify(merged));
+          }
+        } catch { /* ignore */ }
+      })
+      .catch(() => {});
+  }, [user]);
 
   // 피부 일기 서버 동기화 — 저장 이벤트 발생 시 서버에 write-through
   useEffect(() => {
