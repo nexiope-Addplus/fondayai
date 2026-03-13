@@ -5190,14 +5190,18 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
             <div className="grid gap-3 mt-4 md:grid-cols-2">
               <div className="rounded-[24px] p-4" style={{ background: "#F7FBFA", border: "1px solid #DDECE7" }}>
                 <div className="flex items-center justify-between gap-2 mb-3">
-                  <div>
-                    <p className="text-[14px] font-black" style={{ color: DEEP_GREEN }}>{t("result.actionCard.phaseMorning")}</p>
-                  </div>
-                  <Sun className="w-5 h-5" style={{ color: SCAN_TO }} />
+                  <p className="text-[14px] font-black" style={{ color: DEEP_GREEN }}>{t("result.actionCard.phaseMorning")}</p>
+                  <Sun className="w-5 h-5 shrink-0" style={{ color: SCAN_TO }} />
                 </div>
-                <p className="text-[11px] text-stone-500 leading-relaxed text-kr-pretty">
-                  {morningRoutineItems.join(" → ")}
-                </p>
+                <div className="space-y-1.5">
+                  {morningRoutineItems.map((item, i) => (
+                    <div key={`am-${i}`} className="flex items-center gap-2">
+                      <span className="w-5 h-5 rounded-full flex items-center justify-center text-[9px] font-black text-white shrink-0"
+                        style={{ background: DEEP_GREEN }}>{i + 1}</span>
+                      <p className="text-[11px] text-stone-600 font-medium">{item}</p>
+                    </div>
+                  ))}
+                </div>
                 <button
                   onClick={() => setRoutinePeriodCompletion("AM", morningRoutineItems)}
                   className="w-full mt-3 flex items-center justify-between gap-3 rounded-2xl px-3.5 py-3 bg-white border border-[#E6EEEA] text-left"
@@ -5215,14 +5219,18 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
 
               <div className="rounded-[24px] p-4" style={{ background: "#FFF8F4", border: "1px solid #F1DED7" }}>
                 <div className="flex items-center justify-between gap-2 mb-3">
-                  <div>
-                    <p className="text-[14px] font-black" style={{ color: DEEP_GREEN }}>{t("result.actionCard.phaseEvening")}</p>
-                  </div>
-                  <Moon className="w-5 h-5" style={{ color: SCAN_TO }} />
+                  <p className="text-[14px] font-black" style={{ color: DEEP_GREEN }}>{t("result.actionCard.phaseEvening")}</p>
+                  <Moon className="w-5 h-5 shrink-0" style={{ color: SCAN_TO }} />
                 </div>
-                <p className="text-[11px] text-stone-500 leading-relaxed text-kr-pretty">
-                  {eveningRoutineItems.join(" → ")}
-                </p>
+                <div className="space-y-1.5">
+                  {eveningRoutineItems.map((item, i) => (
+                    <div key={`pm-${i}`} className="flex items-center gap-2">
+                      <span className="w-5 h-5 rounded-full flex items-center justify-center text-[9px] font-black text-white shrink-0"
+                        style={{ background: SCAN_TO }}>{i + 1}</span>
+                      <p className="text-[11px] text-stone-600 font-medium">{item}</p>
+                    </div>
+                  ))}
+                </div>
                 <button
                   onClick={() => setRoutinePeriodCompletion("PM", eveningRoutineItems)}
                   className="w-full mt-3 flex items-center justify-between gap-3 rounded-2xl px-3.5 py-3 bg-white border border-[#F0E5E0] text-left"
