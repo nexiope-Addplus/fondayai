@@ -2025,6 +2025,17 @@ function buildCosmeticsInsights(
 }
 
 const CATEGORY_ORDER = ["클렌저", "토너", "세럼", "진정케어", "각질케어", "아이크림", "장벽케어", "크림", "선크림"];
+const CATEGORY_DEFAULT_TIME: Record<string, ("am" | "pm")[]> = {
+  "클렌저": ["am", "pm"],
+  "토너": ["am", "pm"],
+  "세럼": ["am", "pm"],
+  "진정케어": ["pm"],
+  "각질케어": ["pm"],
+  "아이크림": ["pm"],
+  "장벽케어": ["pm"],
+  "크림": ["pm"],
+  "선크림": ["am"],
+};
 
 function sortCosmeticsForRoutine(items: CosmeticItem[]) {
   return [...items].sort((a, b) => {
@@ -2036,16 +2047,24 @@ function sortCosmeticsForRoutine(items: CosmeticItem[]) {
   });
 }
 
+function inferCosmeticTimeOfDay(category: string): "am" | "pm" {
+  const defaultTimes = CATEGORY_DEFAULT_TIME[category] || ["pm"];
+  return defaultTimes[0] || "pm";
+}
+
 function buildRoutineGuide(cosmetics: CosmeticItem[], t: (key: string, options?: any) => string) {
-  const am = sortCosmeticsForRoutine(
-    cosmetics.filter((item) => item.time_of_day === "am" || item.time_of_day === "both"),
-  );
-  const pm = sortCosmeticsForRoutine(
-    cosmetics.filter((item) => item.time_of_day === "pm" || item.time_of_day === "both"),
-  );
+  const shouldIncludeInTime = (item: CosmeticItem, period: "am" | "pm") => {
+    if (item.time_of_day === "am" || item.time_of_day === "pm") return item.time_of_day === period;
+    const defaults = CATEGORY_DEFAULT_TIME[item.category] || ["pm"];
+    return defaults.includes(period);
+  };
+  const am = sortCosmeticsForRoutine(cosmetics.filter((item) => shouldIncludeInTime(item, "am")));
+  const pm = sortCosmeticsForRoutine(cosmetics.filter((item) => shouldIncludeInTime(item, "pm")));
   const categories = cosmetics.map((item) => item.category);
   const categoryCount = new Map<string, number>();
   categories.forEach((category) => categoryCount.set(category, (categoryCount.get(category) || 0) + 1));
+  const uniqueAmSteps = Array.from(new Set(am.map((item) => item.category))).map((category) => t(`cosmetics.categories.${category}`));
+  const uniquePmSteps = Array.from(new Set(pm.map((item) => item.category))).map((category) => t(`cosmetics.categories.${category}`));
 
   const goodMixes: string[] = [];
   const cautions: string[] = [];
@@ -2077,6 +2096,8 @@ function buildRoutineGuide(cosmetics: CosmeticItem[], t: (key: string, options?:
   return {
     am,
     pm,
+    amSteps: uniqueAmSteps,
+    pmSteps: uniquePmSteps,
     goodMixes: goodMixes.slice(0, 3),
     cautions: cautions.slice(0, 3),
   };
@@ -3718,7 +3739,6 @@ function CosmeticsRegisterModal({ onClose, onSuccess }: { onClose: () => void; o
   const [name, setName] = useState("");
   const [brand, setBrand] = useState("");
   const [category, setCategory] = useState<string>("");
-  const [timeOfDay, setTimeOfDay] = useState<"am" | "pm" | "both">("both");
   const [openedAt, setOpenedAt] = useState(new Date().toISOString().slice(0, 10));
   const [registering, setRegistering] = useState(false);
   const [showNonSkincareAlert, setShowNonSkincareAlert] = useState(false);
@@ -3775,7 +3795,15 @@ function CosmeticsRegisterModal({ onClose, onSuccess }: { onClose: () => void; o
       const res = await fetch("/api/cosmetics", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: name.trim(), brand: brand.trim(), category, timeOfDay, openedAt, isSkincareRelevant: true, imageThumbnail: thumbnail }),
+        body: JSON.stringify({
+          name: name.trim(),
+          brand: brand.trim(),
+          category,
+          timeOfDay: inferCosmeticTimeOfDay(category),
+          openedAt,
+          isSkincareRelevant: true,
+          imageThumbnail: thumbnail,
+        }),
       });
       if (res.ok) {
         onSuccess();
@@ -3892,22 +3920,6 @@ function CosmeticsRegisterModal({ onClose, onSuccess }: { onClose: () => void; o
                         ? { background: DEEP_GREEN, color: "white", borderColor: DEEP_GREEN }
                         : { background: "#F9F7F5", color: "#6B6560", borderColor: "#E7E5E4" }}>
                       {t(`cosmetics.categories.${cat}`)}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* 사용 시간 */}
-              <div>
-                <label className="text-[11px] font-bold text-stone-400 uppercase tracking-wider mb-2 block">{t("cosmetics.timeLabel")}</label>
-                <div className="flex gap-2">
-                  {(["am", "pm", "both"] as const).map(time => (
-                    <button key={time} onClick={() => setTimeOfDay(time)}
-                      className="flex-1 py-3 rounded-2xl text-[13px] font-bold border transition-all"
-                      style={timeOfDay === time
-                        ? { background: DEEP_GREEN, color: "white", borderColor: DEEP_GREEN }
-                        : { background: "#F9F7F5", color: "#6B6560", borderColor: "#E7E5E4" }}>
-                      {t(`cosmetics.${time}Btn`)}
                     </button>
                   ))}
                 </div>
@@ -4330,11 +4342,11 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
   const todayRoutine = analysisResult?.prediction?.good?.routine ?? [];
   const morningTask = todayRoutine[0] ?? analysisResult?.improvements?.[0]?.title ?? t("result.actionCard.fallbackFocus");
   const eveningTask = todayRoutine[1] ?? analysisResult?.improvements?.[1]?.title ?? analysisResult?.improvements?.[0]?.title ?? t("result.actionCard.eveningFallback");
-  const morningRoutineItems = routineGuide.am.length > 0
-    ? routineGuide.am.map((item) => item.name)
+  const morningRoutineItems = routineGuide.amSteps.length > 0
+    ? routineGuide.amSteps
     : [morningTask];
-  const eveningRoutineItems = routineGuide.pm.length > 0
-    ? routineGuide.pm.map((item) => item.name)
+  const eveningRoutineItems = routineGuide.pmSteps.length > 0
+    ? routineGuide.pmSteps
     : [eveningTask];
   const routineUpdateItems = [
     ...morningRoutineItems.map((item) => `AM · ${item}`),
@@ -4372,6 +4384,13 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
   const morningRoutineComplete = isRoutinePeriodComplete("AM", morningRoutineItems);
   const eveningRoutineComplete = isRoutinePeriodComplete("PM", eveningRoutineItems);
   const completedRoutinePhases = [morningRoutineComplete, eveningRoutineComplete].filter(Boolean).length;
+  const weakestScores: { index: number; score: number }[] = scores
+    .slice(1)
+    .map((item: any, index: number) => ({ index: index + 1, score: item.score }))
+    .sort((a: { index: number; score: number }, b: { index: number; score: number }) => a.score - b.score)
+    .slice(0, 2);
+  const weakestSummary = weakestScores.map(({ index }: { index: number; score: number }) => t(`scores.${index}`)).join(" · ");
+  const scoreDelta = previousScore !== null ? overallScore - previousScore : null;
   const previewScoreItems: { idx: number; score: number; color: string }[] = [1, 2, 3, 5]
     .map((idx) => ({ idx, score: scores[idx]?.score ?? 0, color: SCORE_COLORS[idx] || DEEP_GREEN }))
     .filter((item: { idx: number; score: number; color: string }) => item.score > 0);
@@ -4707,8 +4726,8 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
         <Card className="overflow-hidden border-none shadow-2xl rounded-3xl"
           style={{ background: "linear-gradient(180deg, #FFFCFA 0%, #FFFFFF 100%)" }}>
           <CardContent className="p-3.5">
-            <div className="grid grid-cols-[116px_1fr] gap-2.5 items-stretch sm:grid-cols-[132px_1fr] sm:gap-3">
-              <div className="relative rounded-[22px] overflow-hidden min-h-[168px] bg-stone-100 sm:rounded-[24px] sm:min-h-[176px]">
+            <div className="grid grid-cols-[92px_1fr] gap-2.5 items-stretch sm:grid-cols-[104px_1fr] sm:gap-3">
+              <div className="relative rounded-[22px] overflow-hidden h-[132px] bg-stone-100 sm:rounded-[24px] sm:h-[144px]">
                 <img src={imageSrc} className="w-full h-full object-cover" style={{ objectPosition: "center top" }} />
                 {analysisResult?.hotspots?.slice(0, 4).map((dot: any, i: number) => (
                   <motion.div key={i}
@@ -4745,7 +4764,13 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
                     </button>
                   </div>
                   <p className="text-[11px] text-stone-500 mt-2 leading-relaxed text-kr-pretty">
-                    {analysisResult?.aiComment || t("result.aiComment")}
+                    {scoreDelta !== null
+                      ? scoreDelta > 0
+                        ? `${t("result.overall")} +${scoreDelta}`
+                        : scoreDelta < 0
+                        ? `${t("result.overall")} -${Math.abs(scoreDelta)}`
+                        : `${t("result.overall")} ${overallScore}`
+                      : `${t("result.actionCard.phaseRecord")} · ${weakestSummary || t("result.scores")}`}
                   </p>
                 </div>
                 <div className="flex flex-col gap-1.5">
@@ -4917,10 +4942,10 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
                 />
               </div>
               <div className="grid grid-cols-2 gap-2 mt-4">
-                <button onClick={handleOpenDiaryCalendar} className="rounded-2xl bg-white/10 p-3 border border-white/12 text-left">
-                  <p className="text-[10px] font-bold text-white/70">{t("result.actionCard.routineLabel")}</p>
-                  <p className="text-[14px] font-black mt-1 text-kr-pretty">{todayFocus}</p>
-                  <p className="text-[10px] text-white/75 mt-1">{t("result.actionCard.diaryButton")}</p>
+                <button onClick={() => setShowAnalysis(true)} className="rounded-2xl bg-white/10 p-3 border border-white/12 text-left">
+                  <p className="text-[10px] font-bold text-white/70">{t("result.scores")}</p>
+                  <p className="text-[14px] font-black mt-1 text-kr-pretty">{weakestSummary || t("result.aiComment")}</p>
+                  <p className="text-[10px] text-white/75 mt-1">{t("modal.analysis.title")}</p>
                 </button>
                 <div className="rounded-2xl bg-white/10 p-3 border border-white/12">
                   <p className="text-[10px] font-bold text-white/70">{t("result.actionCard.streakLabel")}</p>
@@ -4986,7 +5011,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
                 <div className="flex items-center justify-between gap-2 mb-3">
                   <div>
                     <p className="text-[11px] font-black uppercase tracking-[0.16em]" style={{ color: DEEP_GREEN }}>{t("cosmetics.amBtn")}</p>
-                    <p className="text-[14px] font-black mt-1" style={{ color: DEEP_GREEN }}>{morningTask}</p>
+                    <p className="text-[14px] font-black mt-1" style={{ color: DEEP_GREEN }}>{t("result.actionCard.phaseMorning")}</p>
                   </div>
                   <Sun className="w-5 h-5" style={{ color: SCAN_TO }} />
                 </div>
@@ -5013,7 +5038,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
                 <div className="flex items-center justify-between gap-2 mb-3">
                   <div>
                     <p className="text-[11px] font-black uppercase tracking-[0.16em]" style={{ color: SCAN_TO }}>{t("cosmetics.pmBtn")}</p>
-                    <p className="text-[14px] font-black mt-1" style={{ color: DEEP_GREEN }}>{eveningTask}</p>
+                    <p className="text-[14px] font-black mt-1" style={{ color: DEEP_GREEN }}>{t("result.actionCard.phaseEvening")}</p>
                   </div>
                   <Moon className="w-5 h-5" style={{ color: SCAN_TO }} />
                 </div>
