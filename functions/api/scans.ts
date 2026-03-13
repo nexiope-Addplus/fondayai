@@ -38,12 +38,12 @@ export const onRequest = async (context: any) => {
   if (request.method === "POST") {
     const body: any = await request.json();
 
-    // Use crypto.randomUUID() for generation in Cloudflare Workers
     const shareToken = crypto.randomUUID();
+    const createdAt = new Date().toISOString();
 
     const newScan = {
       id: Date.now().toString(),
-      createdAt: new Date().toISOString(),
+      createdAt,
       overallScore: String(body.overallScore),
       skinAge: body.skinAge ?? null,
       baumannType: body.baumannType ?? null,
@@ -52,18 +52,38 @@ export const onRequest = async (context: any) => {
       hotspots: body.hotspots ?? [],
       improvements: body.improvements ?? [],
       cosmetics: body.cosmetics ?? [],
-      shareToken: shareToken,
+      shareToken,
     };
 
     if (env.SCANS_KV) {
-      // 1. Save to user's history
       const raw = await env.SCANS_KV.get(kvKey);
       const scans: any[] = raw ? JSON.parse(raw) : [];
       scans.unshift(newScan);
       await env.SCANS_KV.put(kvKey, JSON.stringify(scans.slice(0, 30)));
-
-      // 2. Save public copy by shareToken for Battle Mode
       await env.SCANS_KV.put(`share:${shareToken}`, JSON.stringify(newScan));
+    }
+
+    // D1에도 저장 (관리자 통계용) — gender/age_group 포함
+    if (env.FONDAY_DB) {
+      env.FONDAY_DB.prepare(
+        `INSERT OR IGNORE INTO scans
+           (id, user_id, overall_score, baumann_type, skin_age, ai_comment, scores,
+            share_token, lang, is_guest, gender, age_group, created_at)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?, ?)`
+      ).bind(
+        crypto.randomUUID(),
+        user.id,
+        body.overallScore ?? 0,
+        body.baumannType ?? "",
+        body.skinAge ?? null,
+        body.aiComment ?? "",
+        JSON.stringify(body.scores ?? []),
+        shareToken,
+        body.lang ?? "ko",
+        body.gender ?? "",
+        body.ageGroup ?? "",
+        createdAt
+      ).run().catch(() => {});
     }
 
     return new Response(JSON.stringify(newScan), { headers: CORS });

@@ -4577,6 +4577,9 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
         aiComment: analysisResult.aiComment,
         improvements: analysisResult.improvements ?? [],
         cosmetics: analysisResult.cosmetics ?? [],
+        lang: i18n.language || "ko",
+        gender: (surveyData?.genderIdx ?? 0) === 0 ? "female" : "male",
+        ageGroup: ["10대","20대 초반","20대 후반","30대 초반","30대 후반","40대 초반","40대 후반","50대+"][surveyData?.ageIdx ?? 2] ?? "",
       })
     }).then(res => res.json()).then(data => {
       setIsSaved(true);
