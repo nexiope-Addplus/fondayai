@@ -9,6 +9,7 @@ import {
   AlertCircle,
   Shield,
   Sun,
+  Moon,
   Share2,
   LineChart as LineChartIcon,
   ChevronLeft,
@@ -4004,6 +4005,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
   const [myCosmetics, setMyCosmetics] = useState<CosmeticItem[]>([]);
   const [showCosmeticsGate, setShowCosmeticsGate] = useState(false);
   const [showCosmeticsRegister, setShowCosmeticsRegister] = useState(false);
+  const [showRoutineUpdateSheet, setShowRoutineUpdateSheet] = useState(false);
 
   // 챌린지 참여 후 내 결과 저장 (비로그인도 작동)
   useEffect(() => {
@@ -4309,9 +4311,20 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
   const finalType = `${isOily ? "O" : "D"}${isSens ? "S" : "R"}${isPig ? "P" : "N"}${isWrink ? "W" : "T"}`;
   const previousScore = history.length > 0 ? parseInt(history[0]?.overallScore || "0", 10) || null : null;
   const cosmeticsInsights = buildCosmeticsInsights(myCosmetics, overallScore, previousScore, t);
+  const routineGuide = buildRoutineGuide(myCosmetics, t);
   const todayRoutine = analysisResult?.prediction?.good?.routine ?? [];
   const morningTask = todayRoutine[0] ?? analysisResult?.improvements?.[0]?.title ?? t("result.actionCard.fallbackFocus");
   const eveningTask = todayRoutine[1] ?? analysisResult?.improvements?.[1]?.title ?? analysisResult?.improvements?.[0]?.title ?? t("result.actionCard.eveningFallback");
+  const morningRoutineItems = routineGuide.am.length > 0
+    ? routineGuide.am.map((item) => item.name)
+    : [morningTask];
+  const eveningRoutineItems = routineGuide.pm.length > 0
+    ? routineGuide.pm.map((item) => item.name)
+    : [eveningTask];
+  const routineUpdateItems = [
+    ...morningRoutineItems.map((item) => `AM · ${item}`),
+    ...eveningRoutineItems.map((item) => `PM · ${item}`),
+  ];
   const todayMissionRoutines = [morningTask, eveningTask].filter(Boolean);
   const todayFocus = todayMissionRoutines.join(" · ") || analysisResult?.improvements?.[0]?.title || t("result.actionCard.fallbackFocus");
   const routineDone = todayTodoProgress.done;
@@ -4400,7 +4413,6 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
   ];
   const essentialQuestIds = new Set(["scan", "routine", "memo"]);
   const essentialQuests = questBoard.filter((quest) => essentialQuestIds.has(quest.id));
-  const bonusQuests = questBoard.filter((quest) => !essentialQuestIds.has(quest.id));
   const questDoneCount = questBoard.filter((quest) => quest.done).length;
   const questProgressPct = Math.round((questDoneCount / questBoard.length) * 100);
   const allClearBonus = questDoneCount === questBoard.length ? 20 : 0;
@@ -4413,46 +4425,6 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
   const missionStatusDetail = remainingPhases.length === 0
     ? t("result.actionCard.statusDone")
     : t("result.actionCard.statusNext", { tasks: remainingPhases.map((phase) => phase.label).join(" · ") });
-  const missionRewards = [
-    {
-      id: "scan",
-      label: t("result.actionCard.rewardScan"),
-      value: `+${MISSION_POINTS.daily_scan}pt`,
-      done: missionState.dailyCompleted,
-      desc: t("result.actionCard.questScanDetail"),
-      tone: "#C97062",
-      background: "#FFF1EC",
-    },
-    {
-      id: "streak",
-      label: t("result.actionCard.rewardStreak"),
-      value: nextStreakGoal ? `+${nextStreakReward}pt` : t("result.actionCard.rewardClaimed"),
-      done: !nextStreakGoal,
-      desc: nextStreakGoal
-        ? t("result.actionCard.streakGoal", { days: daysToGoal, goal: nextStreakGoal, reward: nextStreakReward })
-        : t("result.actionCard.streakDone"),
-      tone: "#D97706",
-      background: "#FFF7ED",
-    },
-    {
-      id: "score70",
-      label: t("result.actionCard.rewardScore"),
-      value: `+${MISSION_POINTS.score_70}pt`,
-      done: scoreMissionDone,
-      desc: t("result.actionCard.questScoreDetail"),
-      tone: "#0F766E",
-      background: "#ECFDF5",
-    },
-    {
-      id: "score80",
-      label: t("result.actionCard.rewardPremium"),
-      value: `+${MISSION_POINTS.score_80}pt`,
-      done: premiumMissionDone,
-      desc: t("result.actionCard.questPremiumDetail"),
-      tone: "#7C3AED",
-      background: "#F5F3FF",
-    },
-  ];
 
   const parseFoodOptions = (value?: string): string[] => {
     if (!value) return [];
@@ -4847,46 +4819,18 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
         <Card className="border-none rounded-3xl overflow-hidden shadow-[0_18px_40px_rgba(201,112,98,0.18)]"
           style={{ background: "linear-gradient(180deg, #FFF8F4 0%, #FFFFFF 100%)" }}>
           <CardContent className="p-5">
-            <div className="flex items-start justify-between gap-3 mb-4">
-              <div className="min-w-0">
-                <p className="text-[11px] font-black tracking-[0.18em] uppercase" style={{ color: SCAN_TO }}>
-                  {t("result.actionCard.eyebrow")}
-                </p>
-                <p className="text-[20px] font-black mt-1 text-kr-pretty" style={{ color: DEEP_GREEN }}>
-                  {t("result.actionCard.title")}
-                </p>
-                <p className="text-[12px] text-stone-500 mt-1 text-kr-pretty leading-relaxed">
-                  {t("result.actionCard.subtitle")}
-                </p>
-                <p className="text-[12px] text-stone-500 mt-2 text-kr-pretty">
-                  {t("result.actionCard.reason", { focus: weakestSummary || t("result.actionCard.fallbackFocus") })}
-                </p>
-              </div>
-              <div className="rounded-2xl px-3 py-2 text-right"
-                style={{ background: "#FFF1EC", border: "1px solid #F3DDD6" }}>
-                <p className="text-[10px] font-bold whitespace-nowrap" style={{ color: SCAN_TO }}>{t("result.actionCard.rewardLabel")}</p>
-                <p className="text-[22px] font-black leading-none" style={{ color: SCAN_TO }}>
-                  +{missionReward}
-                </p>
-                <p className="text-[9px] text-stone-400 mt-1 whitespace-nowrap">{t("result.actionCard.rewardSub")}</p>
-              </div>
-            </div>
-
-            <div className="rounded-[24px] p-4 mb-4 text-white"
+            <div className="rounded-[26px] p-4 text-white"
               style={{ background: "linear-gradient(135deg, #2D5F4F 0%, #C97062 100%)" }}>
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
-                  <p className="text-[12px] font-black uppercase tracking-[0.14em] text-white/80">{t("result.actionCard.missionEyebrow")}</p>
-                  <p className="text-[18px] font-black mt-1 text-kr-pretty">
-                    {routineComplete ? t("result.actionCard.complete") : t("result.actionCard.missionTitle")}
-                  </p>
-                  <p className="text-[12px] text-white/75 mt-2 leading-relaxed text-kr-pretty">
-                    {missionStatusDetail}
-                  </p>
+                  <p className="text-[11px] font-black tracking-[0.18em] uppercase text-white/80">{t("result.actionCard.missionEyebrow")}</p>
+                  <p className="text-[20px] font-black mt-1 text-kr-pretty">{t("result.actionCard.title")}</p>
+                  <p className="text-[12px] text-white/75 mt-2 leading-relaxed text-kr-pretty">{missionStatusDetail}</p>
                 </div>
-                <div className="rounded-2xl px-3 py-2 bg-white/14 border border-white/20">
-                  <p className="text-[10px] font-bold text-white/70 whitespace-nowrap">{t("result.actionCard.scoreLabel")}</p>
-                  <p className="text-[24px] font-black leading-none">{overallScore}</p>
+                <div className="rounded-2xl px-3 py-2 bg-white/14 border border-white/20 text-right shrink-0">
+                  <p className="text-[10px] font-bold text-white/70">{t("result.actionCard.rewardLabel")}</p>
+                  <p className="text-[24px] font-black leading-none">+{missionReward + allClearBonus}</p>
+                  <p className="text-[9px] text-white/70 mt-1">{t("result.actionCard.rewardSub")}</p>
                 </div>
               </div>
               <div className="flex items-center justify-between gap-3 mt-4">
@@ -4896,33 +4840,27 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
                 </div>
                 <div className="text-right shrink-0">
                   <p className="text-[10px] font-bold text-white/70">{t("result.actionCard.progressCount")}</p>
-                  <p className="text-[16px] font-black">{missionPhaseDoneCount}/{missionPhases.length}</p>
+                  <p className="text-[16px] font-black">{essentialQuests.filter((quest) => quest.done).length}/{essentialQuests.length}</p>
                 </div>
               </div>
               <div className="h-2 rounded-full bg-white/15 overflow-hidden mt-3">
                 <motion.div
                   className="h-full rounded-full bg-white"
                   initial={{ width: 0 }}
-                  animate={{ width: `${missionPhaseProgressPct}%` }}
+                  animate={{ width: `${questProgressPct}%` }}
                   transition={{ duration: 0.6, ease: "easeOut" }}
                 />
               </div>
-              <div className="grid grid-cols-2 gap-2.5 mt-4">
+              <div className="grid grid-cols-2 gap-2 mt-4">
                 <div className="rounded-2xl bg-white/10 p-3 border border-white/12">
-                  <div className="flex items-center gap-2 mb-1.5">
-                    <CheckCircle2 className="w-4 h-4 text-white" />
-                    <p className="text-[10px] font-bold text-white/70">{t("result.actionCard.routineLabel")}</p>
-                  </div>
-                  <p className="text-[20px] font-black">{routineDone}/{routineTotal || 0}</p>
-                  <p className="text-[10px] text-white/75">{t("result.actionCard.routineSub")}</p>
+                  <p className="text-[10px] font-bold text-white/70">{t("result.actionCard.routineLabel")}</p>
+                  <p className="text-[20px] font-black mt-1">{routineDone}/{routineTotal || 0}</p>
+                  <p className="text-[10px] text-white/75 mt-1">{t("result.actionCard.routineSub")}</p>
                 </div>
                 <div className="rounded-2xl bg-white/10 p-3 border border-white/12">
-                  <div className="flex items-center gap-2 mb-1.5">
-                    <Flame className="w-4 h-4 text-amber-200" />
-                    <p className="text-[10px] font-bold text-white/70">{t("result.actionCard.streakLabel")}</p>
-                  </div>
-                  <p className="text-[20px] font-black">{t("result.actionCard.streakValue", { count: currentStreak.count || 1 })}</p>
-                  <p className="text-[10px] text-white/75">
+                  <p className="text-[10px] font-bold text-white/70">{t("result.actionCard.streakLabel")}</p>
+                  <p className="text-[20px] font-black mt-1">{t("result.actionCard.streakValue", { count: currentStreak.count || 1 })}</p>
+                  <p className="text-[10px] text-white/75 mt-1">
                     {nextStreakGoal
                       ? t("result.actionCard.streakGoal", { days: daysToGoal, goal: nextStreakGoal, reward: nextStreakReward })
                       : t("result.actionCard.streakDone")}
@@ -4931,159 +4869,119 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
               </div>
             </div>
 
-            <div className="grid gap-3 mb-4 md:grid-cols-3">
-              {missionPhases.map((phase) => {
-                const Icon = phase.icon;
-                return (
+            <div className="mt-4 rounded-[24px] p-4" style={{ background: "#FFFDFB", border: "1px solid #F2E7E2" }}>
+              <div className="flex items-center justify-between gap-3 mb-3">
+                <div className="min-w-0">
+                  <p className="text-[11px] font-black uppercase tracking-[0.16em]" style={{ color: SCAN_TO }}>{t("result.actionCard.questEyebrow")}</p>
+                  <p className="text-[15px] font-black mt-1 leading-[1.35] text-kr-pretty" style={{ color: DEEP_GREEN }}>
+                    {t("result.actionCard.questTitle", { done: essentialQuests.filter((quest) => quest.done).length, total: essentialQuests.length })}
+                  </p>
+                </div>
+                <div className="rounded-full px-3 py-1 text-[10px] font-black shrink-0"
+                  style={{ background: essentialQuests.every((quest) => quest.done) ? "#ECFDF5" : "#FFF1EC", color: essentialQuests.every((quest) => quest.done) ? "#059669" : SCAN_TO }}>
+                  {essentialQuests.every((quest) => quest.done) ? t("result.actionCard.questAllClear") : t("result.actionCard.questInProgress")}
+                </div>
+              </div>
+              <div className="space-y-2">
+                {essentialQuests.map((quest) => (
                   <div
-                    key={phase.id}
-                    className="rounded-[22px] p-4"
-                    style={{ background: phase.done ? "#F7FFFB" : "#FFFFFF", border: `1px solid ${phase.done ? "#DDF5E8" : "#F3E7E3"}` }}
+                    key={quest.id}
+                    className="flex items-center gap-3 rounded-2xl px-3 py-3"
+                    style={{ background: quest.done ? "#F8FFFB" : "#FFFFFF", border: `1px solid ${quest.done ? "#DDF5E8" : "#F3E7E3"}` }}
                   >
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="w-10 h-10 rounded-2xl flex items-center justify-center shrink-0"
-                        style={{ background: phase.done ? phase.accent : `${phase.accent}18` }}>
-                        <Icon className="w-4 h-4" style={{ color: phase.done ? "#FFFFFF" : phase.accent }} />
+                    <div className="w-9 h-9 rounded-2xl flex items-center justify-center shrink-0"
+                      style={{ background: quest.done ? quest.accent : `${quest.accent}18` }}>
+                      {quest.done ? (
+                        <CheckCircle2 className="w-4 h-4 text-white" />
+                      ) : (
+                        <Star className="w-4 h-4" style={{ color: quest.accent }} />
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between gap-2">
+                        <p className="text-[12px] font-black leading-[1.4] text-kr-pretty" style={{ color: DEEP_GREEN }}>{quest.label}</p>
+                        <span className="text-[10px] font-black" style={{ color: quest.done ? "#059669" : quest.accent }}>{quest.reward}</span>
                       </div>
-                      <span className="rounded-full px-2.5 py-1 text-[10px] font-black shrink-0"
-                        style={{ background: phase.done ? "#ECFDF5" : "#FFF7ED", color: phase.done ? "#059669" : "#D97706" }}>
-                        {phase.done ? t("result.actionCard.phaseDone") : t("result.actionCard.phasePending")}
+                      <p className="text-[10px] text-stone-500 mt-0.5 leading-[1.45] text-kr-pretty">{quest.detail}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <div className="mt-3 rounded-2xl px-3 py-2 flex items-center justify-between gap-3"
+                style={{ background: "#FFF7ED", border: "1px solid #FED7AA" }}>
+                <p className="text-[11px] font-black text-orange-700 text-kr-pretty">{t("result.actionCard.comboLabel")}</p>
+                <span className="text-[11px] font-black text-orange-500 shrink-0">+{allClearBonus}pt</span>
+              </div>
+            </div>
+
+            <div className="grid gap-3 mt-4 md:grid-cols-2">
+              <div className="rounded-[24px] p-4" style={{ background: "#F7FBFA", border: "1px solid #DDECE7" }}>
+                <div className="flex items-center justify-between gap-2 mb-3">
+                  <div>
+                    <p className="text-[11px] font-black uppercase tracking-[0.16em]" style={{ color: DEEP_GREEN }}>{t("cosmetics.amBtn")}</p>
+                    <p className="text-[14px] font-black mt-1" style={{ color: DEEP_GREEN }}>{morningTask}</p>
+                  </div>
+                  <Sun className="w-5 h-5" style={{ color: SCAN_TO }} />
+                </div>
+                <div className="space-y-2">
+                  {morningRoutineItems.map((item, index) => (
+                    <div key={`am-${index}`} className="flex items-center gap-2 rounded-2xl px-3 py-2.5 bg-white border border-[#E6EEEA]">
+                      <span className="w-5 h-5 rounded-full flex items-center justify-center text-[9px] font-black text-white shrink-0"
+                        style={{ background: DEEP_GREEN }}>{index + 1}</span>
+                      <p className="text-[11px] font-semibold text-stone-700 leading-tight text-kr-pretty">{item}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="rounded-[24px] p-4" style={{ background: "#FFF8F4", border: "1px solid #F1DED7" }}>
+                <div className="flex items-center justify-between gap-2 mb-3">
+                  <div>
+                    <p className="text-[11px] font-black uppercase tracking-[0.16em]" style={{ color: SCAN_TO }}>{t("cosmetics.pmBtn")}</p>
+                    <p className="text-[14px] font-black mt-1" style={{ color: DEEP_GREEN }}>{eveningTask}</p>
+                  </div>
+                  <Moon className="w-5 h-5" style={{ color: SCAN_TO }} />
+                </div>
+                <div className="space-y-2">
+                  {eveningRoutineItems.map((item, index) => (
+                    <div key={`pm-${index}`} className="flex items-center gap-2 rounded-2xl px-3 py-2.5 bg-white border border-[#F0E5E0]">
+                      <span className="w-5 h-5 rounded-full flex items-center justify-center text-[9px] font-black text-white shrink-0"
+                        style={{ background: SCAN_TO }}>{index + 1}</span>
+                      <p className="text-[11px] font-semibold text-stone-700 leading-tight text-kr-pretty">{item}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {(routineGuide.goodMixes.length > 0 || routineGuide.cautions.length > 0 || cosmeticsInsights.length > 0) && (
+              <div className="grid gap-3 mt-4 md:grid-cols-2">
+                <div className="rounded-[24px] p-4" style={{ background: "#F8FFFB", border: "1px solid #D8EFE4" }}>
+                  <p className="text-[11px] font-black" style={{ color: DEEP_GREEN }}>{t("cosmetics.goodComboTitle")}</p>
+                  <div className="mt-2 flex flex-wrap gap-1.5">
+                    {(routineGuide.goodMixes.length > 0 ? routineGuide.goodMixes : cosmeticsInsights.slice(0, 2).map((item) => item.title)).map((item, index) => (
+                      <span key={`good-mix-${index}`} className="px-2.5 py-1 rounded-full text-[10px] font-bold"
+                        style={{ background: "#ECFDF5", color: "#059669" }}>
+                        {item}
                       </span>
-                    </div>
-                    <p className="text-[12px] font-black mt-3 text-kr-pretty" style={{ color: DEEP_GREEN }}>{phase.label}</p>
-                    <p className="text-[11px] text-stone-500 mt-1 leading-relaxed text-kr-pretty">{phase.detail}</p>
-                  </div>
-                );
-              })}
-            </div>
-
-            <div className="grid gap-3 mb-4 md:grid-cols-2">
-              <div className="rounded-[24px] p-4" style={{ background: "#FFFDFB", border: "1px solid #F2E7E2" }}>
-                <div className="flex items-center justify-between gap-3 mb-3">
-                  <div className="min-w-0">
-                    <p className="text-[11px] font-black uppercase tracking-[0.16em]" style={{ color: SCAN_TO }}>
-                      {t("result.actionCard.questEyebrow")}
-                    </p>
-                    <p className="text-[15px] font-black mt-1 leading-[1.35] text-kr-pretty" style={{ color: DEEP_GREEN }}>
-                      {t("result.actionCard.questTitle", { done: essentialQuests.filter((quest) => quest.done).length, total: essentialQuests.length })}
-                    </p>
-                  </div>
-                  <div className="rounded-full px-3 py-1 text-[10px] font-black shrink-0"
-                    style={{ background: essentialQuests.every((quest) => quest.done) ? "#ECFDF5" : "#FFF1EC", color: essentialQuests.every((quest) => quest.done) ? "#059669" : SCAN_TO }}>
-                    {essentialQuests.every((quest) => quest.done) ? t("result.actionCard.questAllClear") : t("result.actionCard.questInProgress")}
+                    ))}
                   </div>
                 </div>
-                <div className="space-y-2">
-                  {essentialQuests.map((quest, index) => (
-                    <motion.div
-                      key={quest.id}
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.1 + index * 0.06 }}
-                      className="flex items-center gap-3 rounded-2xl px-3 py-3"
-                      style={{ background: quest.done ? "#F8FFFB" : "#FFFFFF", border: `1px solid ${quest.done ? "#DDF5E8" : "#F3E7E3"}` }}
-                    >
-                      <div className="w-9 h-9 rounded-2xl flex items-center justify-center shrink-0"
-                        style={{ background: quest.done ? quest.accent : `${quest.accent}18` }}>
-                        {quest.done ? (
-                          <CheckCircle2 className="w-4 h-4 text-white" />
-                        ) : (
-                          <Star className="w-4 h-4" style={{ color: quest.accent }} />
-                        )}
+                <div className="rounded-[24px] p-4" style={{ background: "#FFF8F2", border: "1px solid #F5DDCF" }}>
+                  <p className="text-[11px] font-black" style={{ color: "#C2410C" }}>{t("cosmetics.cautionTitle")}</p>
+                  <div className="mt-2 space-y-1.5">
+                    {(routineGuide.cautions.length > 0 ? routineGuide.cautions : cosmeticsInsights.slice(0, 2).map((item) => item.desc)).slice(0, 2).map((item, index) => (
+                      <div key={`caution-note-${index}`} className="flex items-start gap-2">
+                        <span className="text-[11px] font-black mt-0.5" style={{ color: "#EA580C" }}>!</span>
+                        <p className="text-[11px] text-stone-600 leading-relaxed text-kr-pretty">{item}</p>
                       </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center justify-between gap-2">
-                          <p className="text-[12px] font-black leading-[1.4] text-kr-pretty" style={{ color: DEEP_GREEN }}>{quest.label}</p>
-                          <span className="text-[10px] font-black" style={{ color: quest.done ? "#059669" : quest.accent }}>{quest.reward}</span>
-                        </div>
-                        <p className="text-[10px] text-stone-500 mt-0.5 leading-[1.45] text-kr-pretty">{quest.detail}</p>
-                      </div>
-                    </motion.div>
-                  ))}
+                    ))}
+                  </div>
                 </div>
               </div>
+            )}
 
-              <div className="rounded-[24px] p-4" style={{ background: "#FFFDFB", border: "1px solid #F2E7E2" }}>
-                <div className="flex items-center justify-between gap-3 mb-3">
-                  <div className="min-w-0">
-                    <p className="text-[11px] font-black uppercase tracking-[0.16em]" style={{ color: SCAN_TO }}>
-                      {t("result.actionCard.bonusEyebrow")}
-                    </p>
-                    <p className="text-[15px] font-black mt-1 leading-[1.35] text-kr-pretty" style={{ color: DEEP_GREEN }}>
-                      {t("result.actionCard.bonusTitle", { done: bonusQuests.filter((quest) => quest.done).length, total: bonusQuests.length })}
-                    </p>
-                  </div>
-                  <div className="rounded-full px-3 py-1 text-[10px] font-black shrink-0"
-                    style={{ background: bonusQuests.every((quest) => quest.done) ? "#ECFDF5" : "#FFF7ED", color: bonusQuests.every((quest) => quest.done) ? "#059669" : "#D97706" }}>
-                    {bonusQuests.every((quest) => quest.done) ? t("result.actionCard.bonusReady") : t("result.actionCard.bonusLocked")}
-                  </div>
-                </div>
-                <div className="h-2 rounded-full bg-stone-100 overflow-hidden mb-3">
-                  <motion.div
-                    className="h-full rounded-full"
-                    style={{ background: `linear-gradient(90deg, ${SCAN_FROM}, ${DEEP_GREEN})` }}
-                    initial={{ width: 0 }}
-                    animate={{ width: `${questProgressPct}%` }}
-                    transition={{ duration: 0.6, ease: "easeOut" }}
-                  />
-                </div>
-                <div className="rounded-2xl px-3 py-2 mb-3 flex items-center justify-between gap-3"
-                  style={{ background: "#FFF7ED", border: "1px solid #FED7AA" }}>
-                  <p className="text-[11px] font-black text-orange-700 text-kr-pretty">{t("result.actionCard.comboLabel")}</p>
-                  <span className="text-[11px] font-black text-orange-500 shrink-0">+{allClearBonus}pt</span>
-                </div>
-                <div className="space-y-2">
-                  {bonusQuests.map((quest, index) => (
-                    <motion.div
-                      key={quest.id}
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.12 + index * 0.06 }}
-                      className="flex items-center gap-3 rounded-2xl px-3 py-3"
-                      style={{ background: quest.done ? "#F8FFFB" : "#FFFFFF", border: `1px solid ${quest.done ? "#DDF5E8" : "#F3E7E3"}` }}
-                    >
-                      <div className="w-9 h-9 rounded-2xl flex items-center justify-center shrink-0"
-                        style={{ background: quest.done ? quest.accent : `${quest.accent}18` }}>
-                        {quest.done ? (
-                          <CheckCircle2 className="w-4 h-4 text-white" />
-                        ) : (
-                          <Star className="w-4 h-4" style={{ color: quest.accent }} />
-                        )}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center justify-between gap-2">
-                          <p className="text-[12px] font-black leading-[1.4] text-kr-pretty" style={{ color: DEEP_GREEN }}>{quest.label}</p>
-                          <span className="text-[10px] font-black" style={{ color: quest.done ? "#059669" : quest.accent }}>{quest.reward}</span>
-                        </div>
-                        <p className="text-[10px] text-stone-500 mt-0.5 leading-[1.45] text-kr-pretty">{quest.detail}</p>
-                      </div>
-                    </motion.div>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            <div className="grid gap-3 mb-4 md:grid-cols-2">
-              {missionRewards.map((reward) => (
-                <div key={reward.id} className="rounded-[22px] p-4" style={{ background: reward.background, border: "1px solid rgba(0,0,0,0.04)" }}>
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="min-w-0">
-                      <p className="text-[11px] font-black uppercase tracking-[0.14em]" style={{ color: reward.tone }}>
-                        {reward.label}
-                      </p>
-                      <p className="text-[18px] font-black mt-1" style={{ color: DEEP_GREEN }}>{reward.value}</p>
-                    </div>
-                    <span className="rounded-full px-2.5 py-1 text-[10px] font-black shrink-0"
-                      style={{ background: reward.done ? "#ECFDF5" : "#FFFFFF", color: reward.done ? "#059669" : reward.tone }}>
-                      {reward.done ? t("result.actionCard.rewardReady") : t("result.actionCard.rewardLocked")}
-                    </span>
-                  </div>
-                  <p className="text-[10px] text-stone-500 mt-2 leading-relaxed text-kr-pretty">{reward.desc}</p>
-                </div>
-              ))}
-            </div>
-
-            <div className="rounded-[24px] p-4" style={{ background: "linear-gradient(135deg, rgba(224,152,130,0.12), rgba(45,95,79,0.08))" }}>
+            <div className="rounded-[24px] p-4 mt-4" style={{ background: "linear-gradient(135deg, rgba(224,152,130,0.12), rgba(45,95,79,0.08))" }}>
               <div className="flex items-start gap-3">
                 <div className="w-10 h-10 rounded-2xl flex items-center justify-center shrink-0"
                   style={{ background: `linear-gradient(135deg, ${DEEP_GREEN_LIGHT}, ${DEEP_GREEN})` }}>
@@ -5915,10 +5813,77 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
                   const next = Array.isArray(data) ? data : [];
                   setMyCosmetics(next);
                   setCosmeticCount(next.length);
+                  if (next.length > 0) setShowRoutineUpdateSheet(true);
                 })
                 .catch(() => {});
             }}
           />
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {showRoutineUpdateSheet && (
+          <motion.div className="fixed inset-0 z-[120] flex items-end justify-center"
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            onClick={() => setShowRoutineUpdateSheet(false)}>
+            <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
+            <motion.div
+              className="relative bg-white rounded-t-[32px] w-full max-w-md p-6 pb-8 shadow-2xl"
+              initial={{ y: 120 }} animate={{ y: 0 }} exit={{ y: 120 }}
+              transition={{ type: "spring", damping: 28, stiffness: 280 }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="w-10 h-1 rounded-full bg-stone-200 mx-auto mb-5" />
+              <p className="text-[16px] font-black text-center" style={{ color: DEEP_GREEN }}>{t("cosmetics.routineUpdateTitle")}</p>
+              <p className="text-[12px] text-stone-500 text-center mt-2 leading-relaxed text-kr-pretty">{t("cosmetics.routineUpdateDesc")}</p>
+              <div className="mt-5 rounded-3xl p-4" style={{ background: "#F8FAF9", border: "1px solid #E5EEEA" }}>
+                <div className="grid grid-cols-2 gap-2.5">
+                  <div className="rounded-2xl p-3" style={{ background: "#FFFFFF", border: "1px solid #DCE9E4" }}>
+                    <p className="text-[10px] font-black uppercase tracking-[0.14em]" style={{ color: DEEP_GREEN }}>{t("cosmetics.amBtn")}</p>
+                    <div className="mt-2 space-y-1.5">
+                      {morningRoutineItems.map((item, index) => (
+                        <div key={`suggest-am-${index}`} className="flex items-center gap-2">
+                          <span className="w-5 h-5 rounded-full flex items-center justify-center text-[9px] font-black text-white shrink-0"
+                            style={{ background: DEEP_GREEN }}>{index + 1}</span>
+                          <p className="text-[11px] font-semibold text-stone-700 leading-tight text-kr-pretty">{item}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="rounded-2xl p-3" style={{ background: "#FFFFFF", border: "1px solid #F2DED6" }}>
+                    <p className="text-[10px] font-black uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>{t("cosmetics.pmBtn")}</p>
+                    <div className="mt-2 space-y-1.5">
+                      {eveningRoutineItems.map((item, index) => (
+                        <div key={`suggest-pm-${index}`} className="flex items-center gap-2">
+                          <span className="w-5 h-5 rounded-full flex items-center justify-center text-[9px] font-black text-white shrink-0"
+                            style={{ background: SCAN_TO }}>{index + 1}</span>
+                          <p className="text-[11px] font-semibold text-stone-700 leading-tight text-kr-pretty">{item}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="flex gap-2 mt-5">
+                <button
+                  onClick={() => setShowRoutineUpdateSheet(false)}
+                  className="flex-1 py-3.5 rounded-2xl text-[13px] font-bold border border-stone-200 text-stone-600 bg-stone-50"
+                >
+                  {t("cosmetics.routineUpdateKeep")}
+                </button>
+                <button
+                  onClick={() => {
+                    saveDiaryTodos(todayStr(), routineUpdateItems.map((text) => ({ text, done: false })));
+                    setShowRoutineUpdateSheet(false);
+                  }}
+                  className="flex-1 py-3.5 rounded-2xl text-[13px] font-black text-white"
+                  style={{ background: `linear-gradient(135deg, ${DEEP_GREEN}, ${DEEP_GREEN_LIGHT})` }}
+                >
+                  {t("cosmetics.routineUpdateApply")}
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
         )}
       </AnimatePresence>
 
