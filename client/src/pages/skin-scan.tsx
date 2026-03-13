@@ -5248,51 +5248,37 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
             </div>
 
             <div className="grid gap-3 mt-4 md:grid-cols-2">
-              <div className="rounded-[24px] p-4" style={{ background: "#F7FBFA", border: "1px solid #DDECE7" }}>
-                <div className="flex items-center justify-between gap-2 mb-3">
-                  <p className="text-[14px] font-black" style={{ color: DEEP_GREEN }}>{t("result.actionCard.phaseMorning")}</p>
-                  <Sun className="w-5 h-5 shrink-0" style={{ color: SCAN_TO }} />
+              <button
+                onClick={() => setRoutinePeriodCompletion("AM", morningRoutineItems)}
+                className="flex items-center justify-between gap-3 rounded-2xl px-3.5 py-3 bg-white border border-[#E6EEEA] text-left"
+                style={{ background: "#F7FBFA", border: "1px solid #DDECE7" }}
+              >
+                <div className="flex items-center gap-2">
+                  <Sun className="w-4 h-4 shrink-0" style={{ color: DEEP_GREEN }} />
+                  <p className="text-[12px] font-black" style={{ color: DEEP_GREEN }}>{t("result.actionCard.phaseMorning")} 완료</p>
                 </div>
-                <p className="text-[11px] font-bold leading-relaxed" style={{ color: DEEP_GREEN }}>
-                  {morningRoutineItems.join(" → ")}
-                </p>
-                <button
-                  onClick={() => setRoutinePeriodCompletion("AM", morningRoutineItems)}
-                  className="w-full mt-3 flex items-center justify-between gap-3 rounded-2xl px-3.5 py-3 bg-white border border-[#E6EEEA] text-left"
-                >
-                  <div>
-                    <p className="text-[12px] font-black" style={{ color: DEEP_GREEN }}>{t("result.actionCard.phaseMorning")} 완료</p>
-                  </div>
-                  <div className={`w-5 h-5 rounded-[6px] border-2 flex items-center justify-center shrink-0 ${
-                    morningRoutineComplete ? "border-emerald-400 bg-emerald-400" : "border-stone-200 bg-white"
-                  }`}>
-                    {morningRoutineComplete && <CheckCircle2 className="w-3.5 h-3.5 text-white" strokeWidth={3} />}
-                  </div>
-                </button>
-              </div>
+                <div className={`w-5 h-5 rounded-[6px] border-2 flex items-center justify-center shrink-0 ${
+                  morningRoutineComplete ? "border-emerald-400 bg-emerald-400" : "border-stone-200 bg-white"
+                }`}>
+                  {morningRoutineComplete && <CheckCircle2 className="w-3.5 h-3.5 text-white" strokeWidth={3} />}
+                </div>
+              </button>
 
-              <div className="rounded-[24px] p-4" style={{ background: "#FFF8F4", border: "1px solid #F1DED7" }}>
-                <div className="flex items-center justify-between gap-2 mb-3">
-                  <p className="text-[14px] font-black" style={{ color: DEEP_GREEN }}>{t("result.actionCard.phaseEvening")}</p>
-                  <Moon className="w-5 h-5 shrink-0" style={{ color: SCAN_TO }} />
+              <button
+                onClick={() => setRoutinePeriodCompletion("PM", eveningRoutineItems)}
+                className="flex items-center justify-between gap-3 rounded-2xl px-3.5 py-3 text-left"
+                style={{ background: "#FFF8F4", border: "1px solid #F1DED7" }}
+              >
+                <div className="flex items-center gap-2">
+                  <Moon className="w-4 h-4 shrink-0" style={{ color: SCAN_TO }} />
+                  <p className="text-[12px] font-black" style={{ color: SCAN_TO }}>{t("result.actionCard.phaseEvening")} 완료</p>
                 </div>
-                <p className="text-[11px] font-bold leading-relaxed" style={{ color: SCAN_TO }}>
-                  {eveningRoutineItems.join(" → ")}
-                </p>
-                <button
-                  onClick={() => setRoutinePeriodCompletion("PM", eveningRoutineItems)}
-                  className="w-full mt-3 flex items-center justify-between gap-3 rounded-2xl px-3.5 py-3 bg-white border border-[#F0E5E0] text-left"
-                >
-                  <div>
-                    <p className="text-[12px] font-black" style={{ color: SCAN_TO }}>{t("result.actionCard.phaseEvening")} 완료</p>
-                  </div>
-                  <div className={`w-5 h-5 rounded-[6px] border-2 flex items-center justify-center shrink-0 ${
-                    eveningRoutineComplete ? "border-emerald-400 bg-emerald-400" : "border-stone-200 bg-white"
-                  }`}>
-                    {eveningRoutineComplete && <CheckCircle2 className="w-3.5 h-3.5 text-white" strokeWidth={3} />}
-                  </div>
-                </button>
-              </div>
+                <div className={`w-5 h-5 rounded-[6px] border-2 flex items-center justify-center shrink-0 ${
+                  eveningRoutineComplete ? "border-emerald-400 bg-emerald-400" : "border-stone-200 bg-white"
+                }`}>
+                  {eveningRoutineComplete && <CheckCircle2 className="w-3.5 h-3.5 text-white" strokeWidth={3} />}
+                </div>
+              </button>
             </div>
 
             {(routineGuide.goodMixes.length > 0 || routineGuide.cautions.length > 0 || cosmeticsInsights.length > 0) && (
