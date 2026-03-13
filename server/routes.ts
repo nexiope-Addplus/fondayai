@@ -158,6 +158,7 @@ export async function registerRoutes(
         category TEXT NOT NULL,
         time_of_day TEXT DEFAULT 'both',
         opened_at TEXT,
+        ingredients TEXT DEFAULT '',
         status TEXT DEFAULT 'active',
         is_skincare_relevant INTEGER DEFAULT 1,
         image_thumbnail TEXT DEFAULT '',
@@ -167,6 +168,7 @@ export async function registerRoutes(
     ).catch(() => {});
     // 기존 테이블에 컬럼 추가 (없으면 추가, 있으면 무시)
     d1Query("ALTER TABLE cosmetics ADD COLUMN image_thumbnail TEXT DEFAULT ''", []).catch(() => {});
+    d1Query("ALTER TABLE cosmetics ADD COLUMN ingredients TEXT DEFAULT ''", []).catch(() => {});
   }
 
   // diary_entries 테이블 초기화 (멱등)
@@ -450,16 +452,16 @@ JSON으로만 응답하세요 (다른 텍스트 절대 금지):
   app.post("/api/cosmetics", async (req, res) => {
     if (!req.isAuthenticated()) return res.status(401).json({ error: "로그인 필요" });
     const userId = (req.user as any).id;
-    const { name, brand, category, timeOfDay, openedAt, isSkincareRelevant, imageThumbnail } = req.body;
+    const { name, brand, category, timeOfDay, openedAt, ingredients, isSkincareRelevant, imageThumbnail } = req.body;
     if (!name || !category) return res.status(400).json({ error: "name, category 필요" });
     if (!isConfigured()) return res.json({ success: true, offline: true });
     try {
       const id = randomUUID();
       const createdAt = new Date().toISOString();
       await d1Query(
-        `INSERT INTO cosmetics (id, user_id, name, brand, category, time_of_day, opened_at, status, is_skincare_relevant, image_thumbnail, created_at)
-         VALUES (?, ?, ?, ?, ?, ?, ?, 'active', ?, ?, ?)`,
-        [id, userId, name, brand || "", category, timeOfDay || "both", openedAt || null, isSkincareRelevant !== false ? 1 : 0, imageThumbnail || "", createdAt]
+        `INSERT INTO cosmetics (id, user_id, name, brand, category, time_of_day, opened_at, ingredients, status, is_skincare_relevant, image_thumbnail, created_at)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'active', ?, ?, ?)`,
+        [id, userId, name, brand || "", category, timeOfDay || "both", openedAt || null, ingredients || "", isSkincareRelevant !== false ? 1 : 0, imageThumbnail || "", createdAt]
       );
       res.json({ id, success: true });
     } catch (error: any) {

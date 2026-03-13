@@ -24,6 +24,27 @@ export const onRequest = async (context: any) => {
     return new Response(JSON.stringify([]), { headers: CORS });
   }
 
+  try {
+    await db.prepare(
+      `CREATE TABLE IF NOT EXISTS cosmetics (
+        id TEXT PRIMARY KEY,
+        user_id TEXT NOT NULL,
+        name TEXT NOT NULL,
+        brand TEXT DEFAULT '',
+        category TEXT NOT NULL,
+        time_of_day TEXT DEFAULT 'both',
+        opened_at TEXT,
+        ingredients TEXT DEFAULT '',
+        status TEXT DEFAULT 'active',
+        is_skincare_relevant INTEGER DEFAULT 1,
+        image_thumbnail TEXT DEFAULT '',
+        created_at TEXT NOT NULL
+      )`
+    ).run();
+    await db.prepare("ALTER TABLE cosmetics ADD COLUMN ingredients TEXT DEFAULT ''").run().catch(() => {});
+    await db.prepare("ALTER TABLE cosmetics ADD COLUMN image_thumbnail TEXT DEFAULT ''").run().catch(() => {});
+  } catch {}
+
   // GET: 화장품 목록
   if (request.method === "GET") {
     try {
@@ -40,7 +61,7 @@ export const onRequest = async (context: any) => {
   // POST: 화장품 등록
   if (request.method === "POST") {
     const body: any = await request.json();
-    const { name, brand, category, timeOfDay, openedAt, isSkincareRelevant, imageThumbnail } = body;
+    const { name, brand, category, timeOfDay, openedAt, ingredients, isSkincareRelevant, imageThumbnail } = body;
 
     if (!name || !category) {
       return new Response(JSON.stringify({ error: "name, category 필요" }), { status: 400, headers: CORS });
@@ -51,8 +72,8 @@ export const onRequest = async (context: any) => {
       const createdAt = new Date().toISOString();
       await db
         .prepare(
-          `INSERT INTO cosmetics (id, user_id, name, brand, category, time_of_day, opened_at, status, is_skincare_relevant, image_thumbnail, created_at)
-           VALUES (?, ?, ?, ?, ?, ?, ?, 'active', ?, ?, ?)`
+          `INSERT INTO cosmetics (id, user_id, name, brand, category, time_of_day, opened_at, ingredients, status, is_skincare_relevant, image_thumbnail, created_at)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'active', ?, ?, ?)`
         )
         .bind(
           id,
@@ -62,6 +83,7 @@ export const onRequest = async (context: any) => {
           category,
           timeOfDay || "both",
           openedAt || null,
+          ingredients || "",
           isSkincareRelevant !== false ? 1 : 0,
           imageThumbnail || "",
           createdAt

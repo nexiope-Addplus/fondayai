@@ -261,9 +261,11 @@ if (!user) return new Response(JSON.stringify([]), { status: 401 });
 ### 화장품 카메라 스캔
 - 제품 전면 촬영 → Gemini Vision → 이름/브랜드/카테고리 자동 추출
 - 썸네일(300px JPEG) D1 저장
+- 전성분 텍스트를 수동 입력해서 제품 상세 시트에서 확인 가능
 - 등록 시 `am/pm/both`를 직접 받지 않고 카테고리 기준 기본 시간대로 자동 추천
 - 결과 화면 사진 바로 아래 배너로 접근
-- MyScreen에서 등록 목록 확인 및 삭제
+- MyScreen에서 `내 루틴 요약 + 아침/저녁 루틴 보드 + 제품 컬렉션` 형태로 확인
+- 제품 카드를 누르면 상세 시트에서 카테고리/사용 시간/개봉일/성분 확인 및 삭제 가능
 
 ### 피부 일기 (DiaryTab)
 - 로컬스토리지 + D1 서버 동기화 (write-through + server-wins)
@@ -282,6 +284,7 @@ if (!user) return new Response(JSON.stringify([]), { status: 401 });
 - 아침/저녁 루틴은 제품명 나열 대신 카테고리 순서(`토너 → 세럼 → 선크림`) 중심으로 표기
 - 루틴 체크는 제품별 여러 개가 아니라 `아침 완료`, `저녁 완료` 1회 체크로 diary todo에 일괄 반영
 - 하단 탭은 현재 `솔루션 / 영양` 2개만 사용하고, 전체 10개 점수는 `주요 분석결과` 모달에서 확인
+- 핫스팟(red dot) 오버레이는 설명 부족 문제로 제거됨
 
 ### AI 응답 파싱 안정화
 - `functions/api/analyze-skin.ts` 와 `server/routes.ts` 에 Gemini JSON 복구 파서 추가
@@ -373,6 +376,7 @@ export const onRequest = async (context: any) => {
 - [ ] 기존에 `both` 로 저장된 화장품 데이터를 카테고리 기반 기본 시간대로 정리할지 결정
 - [ ] 결과 화면 상단 카드에서 얼굴 crop을 실기기 기준으로 한 번 더 미세조정
 - [ ] `오늘 목표`와 아침/저녁 루틴 카드의 정보 밀도를 더 줄일지 검토
+- [ ] MyScreen 화장품 상세 시트에 성분 OCR/자동 추출까지 붙일지 결정 (현재는 수동 입력)
 - [ ] D1 Console 테스트 크론 (`*/30 * * * *`) 삭제
 - [ ] 공유 이미지 실기기 테스트 (WASM CDN 로드 확인)
 - [ ] `server/auth.ts` 타입 선언 누락 정리 (`passport-google-oauth20`, `passport-kakao`, implicit any)
@@ -411,6 +415,12 @@ git push origin main
 
 | 커밋 | 내용 |
 |------|------|
+| b26991f | feat(diary): 피부일기 탭을 달력 중심 독립 페이지형으로 정리 |
+| afa0913 | fix(diary): 달력 우선 배치 + 오늘 루틴 완료형 UI 정리 |
+| 249a0e7 | fix(result): 결과 요약 카드 정렬 및 총포인트 통합 |
+| dec3a48 | fix(result): 주요 분석결과 시트 상단에 피부 총평 먼저 노출 |
+| 2296c26 | fix(result): MBTI 요약/루틴 액션 문구 정리 |
+| 576701d | feat(result): 결과 화면 시각 위계 재정리 |
 | b49879b | feat(result): 결과 화면 중복 축소 + 화장품 자동 시간대 추천 |
 | fed963f | feat(result): 루틴 완료 체크를 아침/저녁 단위로 단순화 |
 | 2767a8d | fix(result): 결과 사진 축소 + 중복 점수 패널 제거 |

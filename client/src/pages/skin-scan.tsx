@@ -101,6 +101,7 @@ interface CosmeticItem {
   time_of_day?: "am" | "pm" | "both";
   opened_at?: string | null;
   image_thumbnail?: string;
+  ingredients?: string;
   status?: string;
 }
 
@@ -3327,6 +3328,7 @@ function MyCosmeticsModal({ onClose, onAddNew }: { onClose: () => void; onAddNew
   const [list, setList] = useState<CosmeticItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [selectedItem, setSelectedItem] = useState<CosmeticItem | null>(null);
   const routineGuide = buildRoutineGuide(list, t);
 
   useEffect(() => {
@@ -3340,8 +3342,35 @@ function MyCosmeticsModal({ onClose, onAddNew }: { onClose: () => void; onAddNew
     setDeletingId(id);
     await fetch(`/api/cosmetics/${id}`, { method: "DELETE" }).catch(() => {});
     setList(prev => prev.filter(i => i.id !== id));
+    setSelectedItem(prev => (prev?.id === id ? null : prev));
     setDeletingId(null);
   };
+
+  const quickInsights = [
+    list[0] ? t("cosmetics.boardRecent", { name: list[0].name }) : null,
+    !list.some((item) => item.category === "선크림") ? t("cosmetics.insightSunscreenTitle") : null,
+    routineGuide.pm.length === 0 ? t("cosmetics.boardNeedPm") : null,
+    routineGuide.cautions[0] ?? null,
+  ].filter(Boolean) as string[];
+
+  const sections = [
+    {
+      key: "am",
+      title: t("result.actionCard.phaseMorning"),
+      accent: DEEP_GREEN,
+      bg: "#F6FBF9",
+      border: "#D7ECE4",
+      items: routineGuide.am,
+    },
+    {
+      key: "pm",
+      title: t("result.actionCard.phaseEvening"),
+      accent: SCAN_TO,
+      bg: "#FFF7F2",
+      border: "#F4DDD3",
+      items: routineGuide.pm,
+    },
+  ];
 
   return (
     <motion.div className="fixed inset-0 z-[120] flex items-end justify-center"
@@ -3366,21 +3395,22 @@ function MyCosmeticsModal({ onClose, onAddNew }: { onClose: () => void; onAddNew
               <div className="w-6 h-6 border-2 border-stone-200 border-t-stone-400 rounded-full animate-spin" />
             </div>
           ) : list.length === 0 ? (
-            <div className="text-center py-12">
-              <div className="w-14 h-14 rounded-3xl mx-auto mb-3 flex items-center justify-center"
-                style={{ background: `${DEEP_GREEN}12`, color: DEEP_GREEN }}>
+              <div className="text-center py-12">
+                <div className="w-14 h-14 rounded-3xl mx-auto mb-3 flex items-center justify-center"
+                  style={{ background: `${DEEP_GREEN}12`, color: DEEP_GREEN }}>
                 <Droplets className="w-7 h-7" />
               </div>
               <p className="text-[14px] font-bold text-stone-600 mb-1">{t("cosmetics.myEmpty")}</p>
-              <p className="text-[12px] text-stone-400">제품 전면을 촬영하면 자동으로 등록돼요</p>
+              <p className="text-[12px] text-stone-400">{t("cosmetics.myEmptyDesc")}</p>
             </div>
           ) : (
             <>
-              <div className="rounded-[28px] p-4 border border-[#E8DFD8]" style={{ background: "linear-gradient(180deg, #FFFCFA 0%, #FFFFFF 100%)" }}>
-                <div className="flex items-start justify-between gap-3 mb-3">
+              <div className="rounded-[30px] p-5 border border-[#E8DFD8]" style={{ background: "linear-gradient(180deg, #FFFCFA 0%, #FFFFFF 100%)" }}>
+                <div className="flex items-start justify-between gap-3">
                   <div>
-                    <p className="text-[13px] font-black" style={{ color: DEEP_GREEN }}>{t("cosmetics.routineCoachTitle")}</p>
-                    <p className="text-[11px] text-stone-400">{t("cosmetics.routineCoachDesc")}</p>
+                    <p className="text-[10px] font-black tracking-[0.16em] uppercase" style={{ color: SCAN_TO }}>{t("cosmetics.myTitle")}</p>
+                    <p className="text-[18px] font-black mt-1" style={{ color: DEEP_GREEN }}>{t("cosmetics.boardHeadline")}</p>
+                    <p className="text-[11px] text-stone-400 mt-1">{t("cosmetics.boardSub")}</p>
                   </div>
                   <span className="px-2.5 py-1 rounded-full text-[10px] font-black"
                     style={{ background: `${SCAN_FROM}16`, color: SCAN_TO }}>
@@ -3388,105 +3418,189 @@ function MyCosmeticsModal({ onClose, onAddNew }: { onClose: () => void; onAddNew
                   </span>
                 </div>
 
-                <div className="grid grid-cols-2 gap-2.5">
-                  <div className="rounded-2xl p-3" style={{ background: "#F6FBF9", border: "1px solid #D7ECE4" }}>
-                    <p className="text-[10px] font-black uppercase tracking-[0.14em]" style={{ color: DEEP_GREEN }}>{t("cosmetics.amBtn")}</p>
-                    <div className="mt-2 space-y-1.5">
-                      {routineGuide.amSteps.length > 0 ? routineGuide.amSteps.map((item, index) => (
-                        <div key={`${item}-am`} className="flex items-center gap-2">
-                          <span className="w-5 h-5 rounded-full flex items-center justify-center text-[9px] font-black text-white shrink-0"
-                            style={{ background: DEEP_GREEN }}>{index + 1}</span>
-                          <p className="text-[11px] font-bold text-stone-700 truncate">{item}</p>
-                        </div>
-                      )) : (
-                        <p className="text-[11px] text-stone-400 leading-relaxed">{t("cosmetics.routineEmptyAm")}</p>
-                      )}
-                    </div>
-                  </div>
-                  <div className="rounded-2xl p-3" style={{ background: "#FFF7F2", border: "1px solid #F4DDD3" }}>
-                    <p className="text-[10px] font-black uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>{t("cosmetics.pmBtn")}</p>
-                    <div className="mt-2 space-y-1.5">
-                      {routineGuide.pmSteps.length > 0 ? routineGuide.pmSteps.map((item, index) => (
-                        <div key={`${item}-pm`} className="flex items-center gap-2">
-                          <span className="w-5 h-5 rounded-full flex items-center justify-center text-[9px] font-black text-white shrink-0"
-                            style={{ background: SCAN_TO }}>{index + 1}</span>
-                          <p className="text-[11px] font-bold text-stone-700 truncate">{item}</p>
-                        </div>
-                      )) : (
-                        <p className="text-[11px] text-stone-400 leading-relaxed">{t("cosmetics.routineEmptyPm")}</p>
-                      )}
-                    </div>
-                  </div>
+                <div className="flex flex-wrap gap-1.5 mt-4">
+                  {quickInsights.slice(0, 3).map((item) => (
+                    <span key={item} className="px-2.5 py-1 rounded-full text-[10px] font-bold"
+                      style={{ background: "#FFF4EE", color: SCAN_TO, border: "1px solid #F3DED6" }}>
+                      {item}
+                    </span>
+                  ))}
                 </div>
+              </div>
 
-                <div className="mt-3 grid gap-2">
-                  <div className="rounded-2xl p-3 border" style={{ background: "#F8FFFB", borderColor: "#D8EFE4" }}>
-                    <p className="text-[11px] font-black" style={{ color: DEEP_GREEN }}>{t("cosmetics.goodComboTitle")}</p>
-                    <div className="mt-2 flex flex-wrap gap-1.5">
-                      {routineGuide.goodMixes.length > 0 ? routineGuide.goodMixes.map((item, index) => (
-                        <span key={`good-${index}`} className="px-2.5 py-1 rounded-full text-[10px] font-bold"
-                          style={{ background: "#ECFDF5", color: "#059669" }}>
-                          {item}
-                        </span>
-                      )) : (
-                        <p className="text-[11px] text-stone-400">{t("cosmetics.goodComboEmpty")}</p>
-                      )}
+              <div className="grid gap-3">
+                {sections.map(({ key, title, accent, bg, border, items }) => (
+                  <div key={key} className="rounded-[28px] p-4 border" style={{ background: bg, borderColor: border }}>
+                    <div className="flex items-center justify-between gap-3 mb-3">
+                      <div>
+                        <p className="text-[15px] font-black" style={{ color: DEEP_GREEN }}>{title}</p>
+                        <p className="text-[11px] text-stone-400">
+                          {items.length > 0 ? t("cosmetics.boardStepCount", { count: items.length }) : t(key === "am" ? "cosmetics.routineEmptyAm" : "cosmetics.routineEmptyPm")}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      {items.map((item, index) => (
+                        <button
+                          key={`${key}-${item.id}`}
+                          onClick={() => setSelectedItem(item)}
+                          className="w-full rounded-2xl bg-white border px-3.5 py-3 flex items-center gap-3 text-left"
+                          style={{ borderColor: `${accent}20` }}
+                        >
+                          <span className="w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-black text-white shrink-0"
+                            style={{ background: accent }}>
+                            {index + 1}
+                          </span>
+                          <div className="min-w-0 flex-1">
+                            <p className="text-[12px] font-black truncate" style={{ color: DEEP_GREEN }}>{t(`cosmetics.categories.${item.category}`)}</p>
+                            <p className="text-[11px] text-stone-400 truncate">{item.name}</p>
+                          </div>
+                          <ChevronRight className="w-4 h-4 text-stone-300 shrink-0" />
+                        </button>
+                      ))}
                     </div>
                   </div>
-                  <div className="rounded-2xl p-3 border" style={{ background: "#FFF8F2", borderColor: "#F5DDCF" }}>
-                    <p className="text-[11px] font-black" style={{ color: "#C2410C" }}>{t("cosmetics.cautionTitle")}</p>
-                    <div className="mt-2 space-y-1.5">
-                      {routineGuide.cautions.length > 0 ? routineGuide.cautions.map((item, index) => (
-                        <div key={`caution-${index}`} className="flex items-start gap-2">
-                          <span className="text-[11px] font-black mt-0.5" style={{ color: "#EA580C" }}>!</span>
-                          <p className="text-[11px] text-stone-600 leading-relaxed">{item}</p>
+                ))}
+              </div>
+
+              <div className="rounded-[30px] p-4 border border-[#ECE4DC] bg-white">
+                <div className="flex items-center justify-between gap-3 mb-3">
+                  <div>
+                    <p className="text-[15px] font-black" style={{ color: DEEP_GREEN }}>{t("cosmetics.collectionTitle")}</p>
+                    <p className="text-[11px] text-stone-400">{t("cosmetics.collectionSub")}</p>
+                  </div>
+                  <button onClick={onAddNew}
+                    className="px-3 py-1.5 rounded-full text-[10px] font-black text-white"
+                    style={{ background: `linear-gradient(135deg, ${DEEP_GREEN}, ${DEEP_GREEN_LIGHT})` }}>
+                    + {t("cosmetics.ctaBtn")}
+                  </button>
+                </div>
+                <div className="grid grid-cols-2 gap-2.5">
+                  {list.map(item => (
+                    <button
+                      key={item.id}
+                      onClick={() => setSelectedItem(item)}
+                      className="rounded-[24px] p-3 bg-stone-50 border border-stone-100 text-left shadow-[0_4px_14px_rgba(0,0,0,0.03)]"
+                    >
+                      {item.image_thumbnail
+                        ? <img src={item.image_thumbnail} className="w-full h-28 rounded-2xl object-cover bg-stone-200" />
+                        : <div className="w-full h-28 rounded-2xl bg-stone-100 flex items-center justify-center">
+                            <Droplets className="w-7 h-7 text-stone-400" />
+                          </div>
+                      }
+                      <div className="mt-3">
+                        <p className="text-[12px] font-black text-stone-800 truncate">{item.name}</p>
+                        <p className="text-[11px] text-stone-400 truncate">{item.brand || t("cosmetics.noBrand")}</p>
+                        <div className="flex flex-wrap gap-1.5 mt-2">
+                          <span className="px-2 py-1 rounded-full text-[9px] font-bold"
+                            style={{ background: `${DEEP_GREEN}12`, color: DEEP_GREEN }}>
+                            {t(`cosmetics.categories.${item.category}`)}
+                          </span>
+                          <span className="px-2 py-1 rounded-full text-[9px] font-bold"
+                            style={{ background: `${SCAN_FROM}14`, color: SCAN_TO }}>
+                            {item.time_of_day === "am"
+                              ? t("cosmetics.amBtn")
+                              : item.time_of_day === "pm"
+                              ? t("cosmetics.pmBtn")
+                              : inferCosmeticTimeOfDay(item.category) === "am"
+                              ? t("cosmetics.amBtn")
+                              : t("cosmetics.pmBtn")}
+                          </span>
                         </div>
-                      )) : (
-                        <p className="text-[11px] text-stone-400">{t("cosmetics.cautionEmpty")}</p>
-                      )}
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </>
+          )}
+
+          {!loading && list.length === 0 && (
+            <button onClick={onAddNew}
+              className="w-full py-4 rounded-2xl font-black text-[14px] text-white flex items-center justify-center gap-2 mt-2"
+              style={{ background: `linear-gradient(135deg, ${DEEP_GREEN}, ${DEEP_GREEN_LIGHT})` }}>
+              <span>+</span> {t("cosmetics.ctaBtn")}
+            </button>
+          )}
+        </div>
+      </motion.div>
+
+      <AnimatePresence>
+        {selectedItem && (
+          <motion.div className="absolute inset-0 z-[130] flex items-end justify-center"
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+            <div className="absolute inset-0 bg-black/30" onClick={() => setSelectedItem(null)} />
+            <motion.div className="relative bg-white rounded-t-[32px] w-full max-w-md p-6 pb-8"
+              initial={{ y: 120 }} animate={{ y: 0 }} exit={{ y: 120 }}
+              transition={{ type: "spring", damping: 28, stiffness: 280 }}>
+              <div className="w-10 h-1 rounded-full bg-stone-200 mx-auto mb-5" />
+              <div className="flex items-start gap-3">
+                {selectedItem.image_thumbnail
+                  ? <img src={selectedItem.image_thumbnail} className="w-20 h-20 rounded-[22px] object-cover bg-stone-100 shrink-0" />
+                  : <div className="w-20 h-20 rounded-[22px] bg-stone-100 flex items-center justify-center shrink-0">
+                      <Droplets className="w-8 h-8 text-stone-400" />
                     </div>
+                }
+                <div className="min-w-0 flex-1">
+                  <p className="text-[18px] font-black text-stone-800 text-kr-pretty">{selectedItem.name}</p>
+                  <p className="text-[12px] text-stone-400 mt-1">{selectedItem.brand || t("cosmetics.noBrand")}</p>
+                  <div className="flex flex-wrap gap-1.5 mt-2">
+                    <span className="px-2.5 py-1 rounded-full text-[10px] font-bold"
+                      style={{ background: `${DEEP_GREEN}12`, color: DEEP_GREEN }}>
+                      {t(`cosmetics.categories.${selectedItem.category}`)}
+                    </span>
+                    <span className="px-2.5 py-1 rounded-full text-[10px] font-bold"
+                      style={{ background: `${SCAN_FROM}14`, color: SCAN_TO }}>
+                      {selectedItem.time_of_day === "am"
+                        ? t("cosmetics.amBtn")
+                        : selectedItem.time_of_day === "pm"
+                        ? t("cosmetics.pmBtn")
+                        : inferCosmeticTimeOfDay(selectedItem.category) === "am"
+                        ? t("cosmetics.amBtn")
+                        : t("cosmetics.pmBtn")}
+                    </span>
                   </div>
                 </div>
               </div>
 
-              {list.map(item => (
-                <div key={item.id} className="flex items-center gap-3 p-3 rounded-2xl bg-stone-50">
-                  {item.image_thumbnail
-                    ? <img src={item.image_thumbnail} className="w-12 h-12 rounded-xl object-cover bg-stone-200 shrink-0" />
-                    : <div className="w-12 h-12 rounded-xl bg-stone-200 flex items-center justify-center shrink-0">
-                        <Droplets className="w-5 h-5 text-stone-500" />
-                      </div>
-                  }
-                  <div className="flex-1 min-w-0">
-                    <p className="text-[13px] font-bold text-stone-800 truncate">{item.name}</p>
-                    <p className="text-[11px] text-stone-400">{item.brand ? `${item.brand} · ` : ""}{t(`cosmetics.categories.${item.category}`)}</p>
-                  </div>
-                  <span className="text-[10px] font-bold px-2 py-1 rounded-full shrink-0"
-                    style={{ background: `${DEEP_GREEN}15`, color: DEEP_GREEN }}>
-                    {item.time_of_day === "am"
-                      ? t("cosmetics.amBtn")
-                      : item.time_of_day === "pm"
-                      ? t("cosmetics.pmBtn")
-                      : inferCosmeticTimeOfDay(item.category) === "am"
-                      ? t("cosmetics.amBtn")
-                      : t("cosmetics.pmBtn")}
-                  </span>
-                  <button onClick={() => handleDelete(item.id)} disabled={deletingId === item.id}
-                    className="w-7 h-7 rounded-full bg-stone-100 flex items-center justify-center text-stone-400 text-[11px] shrink-0 active:opacity-70 disabled:opacity-40">
-                    {deletingId === item.id ? <div className="w-3 h-3 border border-stone-400 border-t-transparent rounded-full animate-spin" /> : "✕"}
-                  </button>
+              <div className="grid grid-cols-2 gap-2.5 mt-5">
+                <div className="rounded-2xl p-3" style={{ background: "#F8FAF9", border: "1px solid #E4ECE8" }}>
+                  <p className="text-[10px] font-black uppercase tracking-[0.14em] text-stone-400">{t("cosmetics.openedLabel")}</p>
+                  <p className="text-[12px] font-black mt-1" style={{ color: DEEP_GREEN }}>{selectedItem.opened_at || t("cosmetics.detailUnknown")}</p>
                 </div>
-              ))}
-            </>
-          )}
+                <div className="rounded-2xl p-3" style={{ background: "#FFF8F4", border: "1px solid #F1DED7" }}>
+                  <p className="text-[10px] font-black uppercase tracking-[0.14em] text-stone-400">{t("cosmetics.detailStatusLabel")}</p>
+                  <p className="text-[12px] font-black mt-1" style={{ color: SCAN_TO }}>{t("cosmetics.detailStatusActive")}</p>
+                </div>
+              </div>
 
-          <button onClick={onAddNew}
-            className="w-full py-4 rounded-2xl font-black text-[14px] text-white flex items-center justify-center gap-2 mt-2"
-            style={{ background: `linear-gradient(135deg, ${DEEP_GREEN}, ${DEEP_GREEN_LIGHT})` }}>
-            <span>+</span> {t("cosmetics.ctaBtn")}
-          </button>
-        </div>
-      </motion.div>
+              <div className="mt-4 rounded-[24px] p-4" style={{ background: "#FFFCFA", border: "1px solid #F2E7E2" }}>
+                <p className="text-[11px] font-black uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>{t("cosmetics.ingredientsLabel")}</p>
+                <p className="text-[12px] text-stone-600 mt-2 leading-relaxed whitespace-pre-wrap text-kr-pretty">
+                  {selectedItem.ingredients?.trim() || t("cosmetics.ingredientsEmpty")}
+                </p>
+              </div>
+
+              <div className="flex gap-2 mt-5">
+                <button
+                  onClick={() => handleDelete(selectedItem.id)}
+                  disabled={deletingId === selectedItem.id}
+                  className="flex-1 py-3.5 rounded-2xl font-bold text-[13px] border border-stone-200 text-stone-600 bg-stone-50 disabled:opacity-40"
+                >
+                  {deletingId === selectedItem.id ? "..." : t("cosmetics.deleteConfirm")}
+                </button>
+                <button
+                  onClick={() => setSelectedItem(null)}
+                  className="flex-1 py-3.5 rounded-2xl font-black text-[13px] text-white"
+                  style={{ background: `linear-gradient(135deg, ${DEEP_GREEN}, ${DEEP_GREEN_LIGHT})` }}
+                >
+                  {t("cosmetics.confirm")}
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 }
@@ -3825,6 +3939,7 @@ function CosmeticsRegisterModal({ onClose, onSuccess }: { onClose: () => void; o
   const [brand, setBrand] = useState("");
   const [category, setCategory] = useState<string>("");
   const [openedAt, setOpenedAt] = useState(new Date().toISOString().slice(0, 10));
+  const [ingredients, setIngredients] = useState("");
   const [registering, setRegistering] = useState(false);
   const [showNonSkincareAlert, setShowNonSkincareAlert] = useState(false);
   const [nonSkincareType, setNonSkincareType] = useState("");
@@ -3886,6 +4001,7 @@ function CosmeticsRegisterModal({ onClose, onSuccess }: { onClose: () => void; o
           category,
           timeOfDay: inferCosmeticTimeOfDay(category),
           openedAt,
+          ingredients: ingredients.trim(),
           isSkincareRelevant: true,
           imageThumbnail: thumbnail,
         }),
@@ -4015,6 +4131,17 @@ function CosmeticsRegisterModal({ onClose, onSuccess }: { onClose: () => void; o
                 <label className="text-[11px] font-bold text-stone-400 uppercase tracking-wider mb-2 block">{t("cosmetics.openedLabel")}</label>
                 <input type="date" value={openedAt} onChange={e => setOpenedAt(e.target.value)}
                   className="w-full px-4 py-3.5 rounded-2xl border border-stone-200 text-[14px] font-medium text-stone-800 outline-none focus:border-[#2D5F4F] bg-stone-50" />
+              </div>
+
+              <div>
+                <label className="text-[11px] font-bold text-stone-400 uppercase tracking-wider mb-2 block">{t("cosmetics.ingredientsLabel")}</label>
+                <textarea
+                  value={ingredients}
+                  onChange={e => setIngredients(e.target.value)}
+                  rows={3}
+                  placeholder={t("cosmetics.ingredientsPlaceholder")}
+                  className="w-full px-4 py-3 rounded-2xl border border-stone-200 text-[13px] font-medium text-stone-800 outline-none focus:border-[#2D5F4F] bg-stone-50 resize-none"
+                />
               </div>
 
               <div className="flex gap-2">
