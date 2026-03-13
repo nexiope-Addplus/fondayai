@@ -3313,6 +3313,200 @@ function SkinPredictionCard({ prediction, currentScore, missionPhases, missionPr
   );
 }
 
+// ─── 화장품 등록 모달 ─────────────────────────────────────────────
+const COSMETIC_CATEGORIES = ["클렌저","토너","세럼","크림","선크림","각질케어","진정케어","장벽케어","아이크림","기타스킨케어"] as const;
+
+function CosmeticsRegisterModal({ onClose, onSuccess }: { onClose: () => void; onSuccess: () => void }) {
+  const { t } = useTranslation();
+  const [step, setStep] = useState<1 | 2>(1);
+  const [name, setName] = useState("");
+  const [brand, setBrand] = useState("");
+  const [category, setCategory] = useState<string>("");
+  const [timeOfDay, setTimeOfDay] = useState<"am" | "pm" | "both">("both");
+  const [openedAt, setOpenedAt] = useState(new Date().toISOString().slice(0, 10));
+  const [classifying, setClassifying] = useState(false);
+  const [registering, setRegistering] = useState(false);
+  const [showNonSkincareAlert, setShowNonSkincareAlert] = useState(false);
+  const [nonSkincareType, setNonSkincareType] = useState("");
+
+  const handleNext = async () => {
+    if (!name.trim()) return;
+    setClassifying(true);
+    try {
+      const res = await fetch("/api/cosmetics/classify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: name.trim(), brand: brand.trim() }),
+      });
+      const data = await res.json();
+      if (!data.isSkincareRelevant) {
+        setNonSkincareType(data.productType || name);
+        setShowNonSkincareAlert(true);
+        setCategory("기타스킨케어");
+      } else {
+        setCategory(data.category || "기타스킨케어");
+        setStep(2);
+      }
+    } catch {
+      setCategory("기타스킨케어");
+      setStep(2);
+    }
+    setClassifying(false);
+  };
+
+  const handleRegister = async () => {
+    if (!category) return;
+    setRegistering(true);
+    try {
+      await fetch("/api/cosmetics", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: name.trim(), brand: brand.trim(), category, timeOfDay, openedAt, isSkincareRelevant: true }),
+      });
+      onSuccess();
+    } catch {
+      setRegistering(false);
+    }
+  };
+
+  return (
+    <motion.div className="fixed inset-0 z-[120] flex items-end justify-center"
+      initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+      onClick={onClose}>
+      <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
+      <motion.div className="relative bg-white rounded-t-[32px] w-full max-w-md pb-10 shadow-2xl overflow-y-auto max-h-[90vh]"
+        initial={{ y: 150, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 150, opacity: 0 }}
+        transition={{ type: "spring", damping: 28, stiffness: 280 }}
+        onClick={e => e.stopPropagation()}>
+        <div className="sticky top-0 bg-white/95 backdrop-blur-md px-6 pt-5 pb-4 border-b border-stone-100 z-10">
+          <div className="w-10 h-1 rounded-full bg-stone-200 mx-auto mb-4" />
+          <div className="flex items-center justify-between">
+            <p className="text-[16px] font-black" style={{ color: DEEP_GREEN }}>
+              {step === 1 ? t("cosmetics.registerTitle") : t("cosmetics.categoryLabel")}
+            </p>
+            <button onClick={onClose} className="w-8 h-8 rounded-full bg-stone-100 flex items-center justify-center text-stone-400 text-sm">✕</button>
+          </div>
+          {/* 진행 바 */}
+          <div className="flex gap-1.5 mt-3">
+            {[1, 2].map(s => (
+              <div key={s} className="flex-1 h-1 rounded-full transition-all"
+                style={{ background: s <= step ? DEEP_GREEN : "#E7E5E4" }} />
+            ))}
+          </div>
+        </div>
+
+        <div className="px-6 pt-5 space-y-4">
+          {step === 1 && (
+            <>
+              <div>
+                <label className="text-[11px] font-bold text-stone-400 uppercase tracking-wider mb-1.5 block">제품명 *</label>
+                <input value={name} onChange={e => setName(e.target.value)}
+                  placeholder={t("cosmetics.namePlaceholder")}
+                  className="w-full px-4 py-3.5 rounded-2xl border border-stone-200 text-[14px] font-medium text-stone-800 outline-none focus:border-[#2D5F4F] bg-stone-50 transition-colors"
+                  autoFocus />
+              </div>
+              <div>
+                <label className="text-[11px] font-bold text-stone-400 uppercase tracking-wider mb-1.5 block">브랜드</label>
+                <input value={brand} onChange={e => setBrand(e.target.value)}
+                  placeholder={t("cosmetics.brandPlaceholder")}
+                  className="w-full px-4 py-3.5 rounded-2xl border border-stone-200 text-[14px] font-medium text-stone-800 outline-none focus:border-[#2D5F4F] bg-stone-50 transition-colors" />
+              </div>
+              <button onClick={handleNext} disabled={!name.trim() || classifying}
+                className="w-full py-4 rounded-2xl font-black text-[14px] text-white flex items-center justify-center gap-2 disabled:opacity-50 mt-2"
+                style={{ background: classifying ? "#9CA3AF" : `linear-gradient(135deg, ${DEEP_GREEN}, ${DEEP_GREEN_LIGHT})` }}>
+                {classifying
+                  ? <><div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" /> {t("cosmetics.classifying")}</>
+                  : t("cosmetics.nextBtn")}
+              </button>
+            </>
+          )}
+
+          {step === 2 && (
+            <>
+              {/* 카테고리 */}
+              <div>
+                <label className="text-[11px] font-bold text-stone-400 uppercase tracking-wider mb-2 block">{t("cosmetics.categoryLabel")}</label>
+                <div className="grid grid-cols-3 gap-2">
+                  {COSMETIC_CATEGORIES.map(cat => (
+                    <button key={cat} onClick={() => setCategory(cat)}
+                      className="py-2.5 px-2 rounded-2xl text-[12px] font-bold border transition-all text-center"
+                      style={category === cat
+                        ? { background: DEEP_GREEN, color: "white", borderColor: DEEP_GREEN }
+                        : { background: "#F9F7F5", color: "#6B6560", borderColor: "#E7E5E4" }}>
+                      {t(`cosmetics.categories.${cat}`)}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* 사용 시간 */}
+              <div>
+                <label className="text-[11px] font-bold text-stone-400 uppercase tracking-wider mb-2 block">{t("cosmetics.timeLabel")}</label>
+                <div className="flex gap-2">
+                  {(["am", "pm", "both"] as const).map(time => (
+                    <button key={time} onClick={() => setTimeOfDay(time)}
+                      className="flex-1 py-3 rounded-2xl text-[13px] font-bold border transition-all"
+                      style={timeOfDay === time
+                        ? { background: DEEP_GREEN, color: "white", borderColor: DEEP_GREEN }
+                        : { background: "#F9F7F5", color: "#6B6560", borderColor: "#E7E5E4" }}>
+                      {t(`cosmetics.${time}Btn`)}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* 개봉일 */}
+              <div>
+                <label className="text-[11px] font-bold text-stone-400 uppercase tracking-wider mb-2 block">{t("cosmetics.openedLabel")}</label>
+                <input type="date" value={openedAt} onChange={e => setOpenedAt(e.target.value)}
+                  className="w-full px-4 py-3.5 rounded-2xl border border-stone-200 text-[14px] font-medium text-stone-800 outline-none focus:border-[#2D5F4F] bg-stone-50" />
+              </div>
+
+              <button onClick={handleRegister} disabled={!category || registering}
+                className="w-full py-4 rounded-2xl font-black text-[14px] text-white flex items-center justify-center gap-2 disabled:opacity-50 mt-2"
+                style={{ background: registering ? "#9CA3AF" : `linear-gradient(135deg, ${DEEP_GREEN}, ${DEEP_GREEN_LIGHT})` }}>
+                {registering
+                  ? <><div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" /> {t("cosmetics.registering")}</>
+                  : <><span>💄</span> {t("cosmetics.registerBtn")}</>}
+              </button>
+            </>
+          )}
+        </div>
+      </motion.div>
+
+      {/* 스킨케어 아님 경고 시트 */}
+      <AnimatePresence>
+        {showNonSkincareAlert && (
+          <motion.div className="absolute inset-0 z-10 flex items-end justify-center"
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+            <div className="absolute inset-0 bg-black/30" onClick={() => setShowNonSkincareAlert(false)} />
+            <motion.div className="relative bg-white rounded-t-[28px] w-full max-w-md p-6 pb-8"
+              initial={{ y: 80 }} animate={{ y: 0 }} exit={{ y: 80 }}>
+              <div className="w-10 h-1 rounded-full bg-stone-200 mx-auto mb-5" />
+              <div className="text-4xl text-center mb-3">🙅‍♀️</div>
+              <p className="text-[16px] font-black text-stone-800 text-center mb-2">{t("cosmetics.notSkincareTitle")}</p>
+              <p className="text-[13px] text-stone-500 text-center leading-relaxed whitespace-pre-line mb-5">
+                {t("cosmetics.notSkincareDesc", { type: nonSkincareType })}
+              </p>
+              <div className="space-y-2.5">
+                <button onClick={() => { setShowNonSkincareAlert(false); setStep(2); }}
+                  className="w-full py-3.5 rounded-2xl text-[13px] font-bold border border-stone-200 text-stone-600 bg-stone-50">
+                  {t("cosmetics.notSkincareKeep")}
+                </button>
+                <button onClick={() => { setShowNonSkincareAlert(false); onClose(); }}
+                  className="w-full py-3.5 rounded-2xl text-[13px] font-black text-white"
+                  style={{ background: `linear-gradient(135deg, ${DEEP_GREEN}, ${DEEP_GREEN_LIGHT})` }}>
+                  {t("cosmetics.notSkincareSkip")}
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.div>
+  );
+}
+
 function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBack, onGoMagazine, onOpenDiary, user }: any) {
   const { t } = useTranslation();
   const [history, setHistory] = useState<any[]>([]);
@@ -3350,6 +3544,10 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
   const [missionState, setMissionState] = useState<MissionState>(() => getMissions());
   const [todayHasMemo, setTodayHasMemo] = useState(() => Boolean(getDiaryMemo(todayStr()).trim()));
   const loginPromptRef = useRef<HTMLDivElement>(null);
+  // 화장품 기능
+  const [cosmeticCount, setCosmeticCount] = useState(0);
+  const [showCosmeticsGate, setShowCosmeticsGate] = useState(false);
+  const [showCosmeticsRegister, setShowCosmeticsRegister] = useState(false);
 
   // 챌린지 참여 후 내 결과 저장 (비로그인도 작동)
   useEffect(() => {
@@ -3517,6 +3715,15 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
     fetch("/api/scans")
       .then(res => res.json())
       .then(data => { if (Array.isArray(data)) setHistory(data); })
+      .catch(() => {});
+  }, [user]);
+
+  // 등록된 화장품 수 로드 (로그인 시)
+  useEffect(() => {
+    if (!user) return;
+    fetch("/api/cosmetics")
+      .then(r => r.ok ? r.json() : [])
+      .then((data: any[]) => setCosmeticCount(Array.isArray(data) ? data.length : 0))
       .catch(() => {});
   }, [user]);
 
@@ -4588,6 +4795,50 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
         {/* ── 솔루션 탭 ── */}
         {activeTab === "solution" && (
           <div className="space-y-3">
+
+            {/* ── 화장품 루틴 분석 히어로 CTA ── */}
+            <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
+              className="rounded-[24px] p-5 overflow-hidden relative"
+              style={{ background: "linear-gradient(135deg, #1A3B2E 0%, #2D5F4F 60%, #3D7A66 100%)" }}>
+              {/* 배경 장식 */}
+              <div className="absolute top-0 right-0 w-32 h-32 rounded-full opacity-10"
+                style={{ background: "radial-gradient(circle, #fff 0%, transparent 70%)", transform: "translate(30%, -30%)" }} />
+              <div className="absolute bottom-0 left-0 w-20 h-20 rounded-full opacity-5"
+                style={{ background: "radial-gradient(circle, #fff 0%, transparent 70%)", transform: "translate(-30%, 30%)" }} />
+
+              <div className="relative z-10">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-xl">💄</span>
+                  <p className="text-[16px] font-black text-white">{t("cosmetics.ctaTitle")}</p>
+                  {user && cosmeticCount > 0 && (
+                    <span className="ml-auto text-[11px] font-bold px-2.5 py-1 rounded-full bg-white/20 text-white">
+                      {t("cosmetics.ctaCount", { count: cosmeticCount })}
+                    </span>
+                  )}
+                </div>
+                <p className="text-[12px] text-white/75 mb-3 leading-relaxed">{t("cosmetics.ctaDesc")}</p>
+                <div className="flex flex-col gap-1 mb-4">
+                  {[t("cosmetics.ctaBullet1"), t("cosmetics.ctaBullet2"), t("cosmetics.ctaBullet3")].map((b, i) => (
+                    <div key={i} className="flex items-center gap-1.5">
+                      <div className="w-1.5 h-1.5 rounded-full bg-white/60 shrink-0" />
+                      <span className="text-[11px] text-white/70">{b}</span>
+                    </div>
+                  ))}
+                </div>
+                <button
+                  onClick={() => {
+                    if (!user) { setShowCosmeticsGate(true); return; }
+                    setShowCosmeticsRegister(true);
+                  }}
+                  className="w-full py-3 rounded-2xl font-black text-[13px] flex items-center justify-center gap-2 active:opacity-80 transition-opacity"
+                  style={{ background: "white", color: DEEP_GREEN }}>
+                  <span>💄</span>
+                  {t("cosmetics.ctaBtn")}
+                  <span className="ml-auto text-stone-400">→</span>
+                </button>
+              </div>
+            </motion.div>
+
             <div className="flex items-center gap-2 mb-1">
               <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: `linear-gradient(135deg, ${DEEP_GREEN_LIGHT}, ${DEEP_GREEN})` }}>
                 <Leaf className="w-4 h-4 text-white" />
@@ -5109,6 +5360,84 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
               </div>
             </motion.div>
           </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* 화장품 로그인 게이트 바텀시트 */}
+      <AnimatePresence>
+        {showCosmeticsGate && (
+          <motion.div className="fixed inset-0 z-[110] flex items-end justify-center"
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            onClick={() => setShowCosmeticsGate(false)}>
+            <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
+            <motion.div className="relative bg-white rounded-t-[32px] w-full max-w-md p-6 pb-10 shadow-2xl"
+              initial={{ y: 120, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 120, opacity: 0 }}
+              transition={{ type: "spring", damping: 28, stiffness: 280 }}
+              onClick={e => e.stopPropagation()}>
+              <div className="w-10 h-1 rounded-full bg-stone-200 mx-auto mb-5" />
+              {/* 헤더 */}
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl shrink-0"
+                  style={{ background: "linear-gradient(135deg, #1A3B2E, #2D5F4F)" }}>
+                  💄
+                </div>
+                <div>
+                  <p className="text-[16px] font-black" style={{ color: DEEP_GREEN }}>{t("cosmetics.loginGateTitle")}</p>
+                  <p className="text-[12px] text-stone-400 font-semibold">{t("cosmetics.loginGateSubtitle")}</p>
+                </div>
+              </div>
+              {/* 설명 */}
+              <p className="text-[13px] text-stone-600 mb-3 leading-relaxed">{t("cosmetics.loginGateDesc")}</p>
+              {/* 기능 목록 */}
+              <div className="rounded-2xl p-4 mb-5 space-y-2.5" style={{ background: "#F0F7F5" }}>
+                {[
+                  t("cosmetics.loginGateBullet1"),
+                  t("cosmetics.loginGateBullet2"),
+                  t("cosmetics.loginGateBullet3"),
+                  t("cosmetics.loginGateBullet4"),
+                  t("cosmetics.loginGateBullet5"),
+                ].map((b, i) => (
+                  <div key={i} className="flex items-center gap-2">
+                    <div className="w-5 h-5 rounded-full flex items-center justify-center shrink-0"
+                      style={{ background: DEEP_GREEN }}>
+                      <span className="text-white text-[10px] font-black">✓</span>
+                    </div>
+                    <span className="text-[12px] text-stone-700 font-medium">{b}</span>
+                  </div>
+                ))}
+              </div>
+              {/* 로그인 버튼 */}
+              <div className="space-y-2.5">
+                <button onClick={() => { setShowCosmeticsGate(false); window.location.href = "/auth/kakao"; }}
+                  className="w-full py-3.5 rounded-2xl text-[14px] font-black flex items-center justify-center gap-2"
+                  style={{ background: "#FEE500", color: "#3C1E1E" }}>
+                  <span>💬</span> {t("cosmetics.loginGateKakao")}
+                </button>
+                <button onClick={() => { setShowCosmeticsGate(false); window.location.href = "/auth/google"; }}
+                  className="w-full py-3.5 rounded-2xl text-[14px] font-black flex items-center justify-center gap-2 bg-white border border-stone-200 text-stone-700">
+                  <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" className="w-4 h-4" />
+                  {t("cosmetics.loginGateGoogle")}
+                </button>
+                <button onClick={() => setShowCosmeticsGate(false)}
+                  className="w-full py-2.5 text-[13px] font-semibold text-stone-400">
+                  {t("cosmetics.loginGateLater")}
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* 화장품 등록 모달 */}
+      <AnimatePresence>
+        {showCosmeticsRegister && (
+          <CosmeticsRegisterModal
+            onClose={() => setShowCosmeticsRegister(false)}
+            onSuccess={() => {
+              setCosmeticCount(prev => prev + 1);
+              setShowCosmeticsRegister(false);
+            }}
+          />
         )}
       </AnimatePresence>
 

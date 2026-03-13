@@ -118,6 +118,25 @@ export async function registerRoutes(
   app: Express
 ): Promise<Server> {
 
+  // cosmetics 테이블 초기화 (멱등)
+  if (isConfigured()) {
+    d1Query(
+      `CREATE TABLE IF NOT EXISTS cosmetics (
+        id TEXT PRIMARY KEY,
+        user_id TEXT NOT NULL,
+        name TEXT NOT NULL,
+        brand TEXT DEFAULT '',
+        category TEXT NOT NULL,
+        time_of_day TEXT DEFAULT 'both',
+        opened_at TEXT,
+        status TEXT DEFAULT 'active',
+        is_skincare_relevant INTEGER DEFAULT 1,
+        created_at TEXT NOT NULL
+      )`,
+      []
+    ).catch(() => {});
+  }
+
   // diary_entries 테이블 초기화 (멱등)
   if (isConfigured()) {
     d1Query(
@@ -368,6 +387,85 @@ export async function registerRoutes(
       res.json(scans);
     } catch (error: any) {
       res.status(500).json({ message: "기록 조회 실패", error: error.message });
+    }
+  });
+
+  // ── 화장품 API ──────────────────────────────────────────────────
+
+  // 제품명+브랜드 → Gemini로 카테고리 자동 분류 (인증 불필요)
+  app.post("/api/cosmetics/classify", async (req, res) => {
+    const { name, brand = "" } = req.body;
+    if (!name) return res.status(400).json({ error: "name 필요" });
+    const apiKey = process.env.GOOGLE_API_KEY;
+    if (!apiKey) return res.status(500).json({ error: "API key 없음" });
+    try {
+      const genAI = new GoogleGenerativeAI(apiKey);
+      const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+      const prompt = `제품명: "${name}", 브랜드: "${brand}"
+이 제품을 다음 카테고리 중 하나로만 분류하세요:
+클렌저|토너|세럼|크림|선크림|각질케어|진정케어|장벽케어|아이크림|기타스킨케어|스킨케어아님
+스킨케어아님이면 정확한 제품 유형도 포함하세요.
+JSON으로만 응답하세요: {"category":"...","isSkincareRelevant":true/false,"productType":"파운데이션 등 (스킨케어아님일 때만)"}`;
+      const result = await model.generateContent(prompt);
+      const text = result.response.text().replace(/```json\n?|\n?```/g, "").trim();
+      const parsed = JSON.parse(text);
+      res.json(parsed);
+    } catch {
+      res.json({ category: "기타스킨케어", isSkincareRelevant: true, productType: "" });
+    }
+  });
+
+  // 화장품 등록 (로그인 필수)
+  app.post("/api/cosmetics", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).json({ error: "로그인 필요" });
+    const userId = (req.user as any).id;
+    const { name, brand, category, timeOfDay, openedAt, isSkincareRelevant } = req.body;
+    if (!name || !category) return res.status(400).json({ error: "name, category 필요" });
+    if (!isConfigured()) return res.json({ success: true, offline: true });
+    try {
+      const id = randomUUID();
+      const createdAt = new Date().toISOString();
+      await d1Query(
+        `INSERT INTO cosmetics (id, user_id, name, brand, category, time_of_day, opened_at, status, is_skincare_relevant, created_at)
+         VALUES (?, ?, ?, ?, ?, ?, ?, 'active', ?, ?)`,
+        [id, userId, name, brand || "", category, timeOfDay || "both", openedAt || null, isSkincareRelevant !== false ? 1 : 0, createdAt]
+      );
+      res.json({ id, success: true });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // 화장품 목록 조회 (로그인 필수)
+  app.get("/api/cosmetics", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).json([]);
+    const userId = (req.user as any).id;
+    if (!isConfigured()) return res.json([]);
+    try {
+      const result = await d1Query(
+        "SELECT * FROM cosmetics WHERE user_id = ? AND status = 'active' ORDER BY created_at DESC",
+        [userId]
+      );
+      res.json(result?.results || []);
+    } catch {
+      res.json([]);
+    }
+  });
+
+  // 화장품 삭제 (로그인 필수)
+  app.delete("/api/cosmetics/:id", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).json({ error: "로그인 필요" });
+    const userId = (req.user as any).id;
+    const { id } = req.params;
+    if (!isConfigured()) return res.json({ success: true });
+    try {
+      await d1Query(
+        "UPDATE cosmetics SET status = 'deleted' WHERE id = ? AND user_id = ?",
+        [id, userId]
+      );
+      res.json({ success: true });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
     }
   });
 
