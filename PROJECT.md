@@ -254,7 +254,7 @@ if (!user) return new Response(JSON.stringify([]), { status: 401 });
 ### 피부 분석
 - Gemini 2.5 Flash Vision → 10개 점수 항목 (0~100)
 - **바우만 타입** 4축 계산: O/D(수분), S/R(민감도), P/N(색소), W/T(탄력)
-- 핫스팟 시각화 (% 좌표 기반 overlay)
+- 핫스팟(red dot) overlay는 한때 실험했지만, 설명 부족으로 현재 제거됨
 - 피부 나이 추정
 - 14일 후 피부 예측 (good/bad 시나리오)
 
@@ -415,6 +415,7 @@ git push origin main
 
 | 커밋 | 내용 |
 |------|------|
+| 0c07009 | feat(cosmetics): 내 화장품 루틴 보드형 개편 + 성분 상세 시트/저장 추가 |
 | b26991f | feat(diary): 피부일기 탭을 달력 중심 독립 페이지형으로 정리 |
 | afa0913 | fix(diary): 달력 우선 배치 + 오늘 루틴 완료형 UI 정리 |
 | 249a0e7 | fix(result): 결과 요약 카드 정렬 및 총포인트 통합 |
