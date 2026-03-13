@@ -63,9 +63,10 @@ export const onRequest = async (context: any) => {
 
     const prompt = `이 화장품 제품 사진을 분석하세요.
 JSON으로만 응답하세요 (다른 텍스트 절대 금지):
-{"name":"제품명","brand":"브랜드명","category":"카테고리","isSkincareRelevant":true,"productType":""}
+{"name":"제품명","brand":"브랜드명","category":"카테고리","isSkincareRelevant":true,"productType":"","ingredients":"전성분"}
 카테고리는 반드시 다음 중 하나: 클렌저|토너|세럼|크림|선크림|각질케어|진정케어|장벽케어|아이크림|기타스킨케어|스킨케어아님
-스킨케어아님이면 isSkincareRelevant=false, productType에 제품 종류 기입 (예: 파운데이션)`;
+스킨케어아님이면 isSkincareRelevant=false, productType에 제품 종류 기입 (예: 파운데이션)
+ingredients: 사진에 전성분 텍스트가 보이면 그대로 추출. 안 보이면 제품명+브랜드 기반으로 알려진 주요 성분을 쉼표로 나열. 알 수 없으면 빈 문자열.`;
 
     const geminiRes = await fetch(
       `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,

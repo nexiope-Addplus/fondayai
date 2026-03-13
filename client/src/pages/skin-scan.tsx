@@ -3998,10 +3998,12 @@ function CosmeticsRegisterModal({ onClose, onSuccess }: { onClose: () => void; o
         setName(data.name || "");
         setBrand(data.brand || "");
         setCategory("기타스킨케어");
+        setIngredients(data.ingredients || "");
       } else {
         setName(data.name || "");
         setBrand(data.brand || "");
         setCategory(data.category || "기타스킨케어");
+        setIngredients(data.ingredients || "");
         setStep(2);
       }
     } catch {
