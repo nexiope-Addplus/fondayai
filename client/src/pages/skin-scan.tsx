@@ -41,7 +41,7 @@ import {
   CalendarDays,
   CheckCircle2,
 } from "lucide-react";
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Legend } from 'recharts';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -1682,9 +1682,9 @@ function SurveyScreen({ onSubmit, onBack }: { onSubmit: (data: SurveyData) => vo
                 </Button>
               ))}
             </div>
-          </div>
+                </div>
 
-          <div className="space-y-3">
+                <div className="space-y-3">
             <label className="text-[12px] font-bold ml-1 uppercase tracking-wider" style={{ color: DEEP_GREEN_LIGHT }}>{t("survey.age")}</label>
             <div className="grid grid-cols-2 gap-2">
               {ageGroups.map((item, idx) => (
@@ -2287,6 +2287,52 @@ const REPORT_CONCERNS: Array<{
   },
 ];
 
+function parseIngredientTokens(raw?: string) {
+  if (!raw) return [];
+  return raw
+    .split(/[\n,\/]/)
+    .map((item) => item.trim())
+    .filter((item) => item.length >= 2)
+    .slice(0, 8);
+}
+
+function getSeasonLabel(lang: ReportLang) {
+  const month = new Date().getMonth() + 1;
+  const season = month >= 3 && month <= 5 ? "spring" : month >= 6 && month <= 8 ? "summer" : month >= 9 && month <= 11 ? "autumn" : "winter";
+  const labels = {
+    ko: { spring: "봄", summer: "여름", autumn: "가을", winter: "겨울" },
+    en: { spring: "Spring", summer: "Summer", autumn: "Autumn", winter: "Winter" },
+    ja: { spring: "春", summer: "夏", autumn: "秋", winter: "冬" },
+  };
+  return labels[lang][season];
+}
+
+function getRecoveryGuide(lang: ReportLang, procedureNames: string[]) {
+  const hasLaser = procedureNames.some((name) => /laser|레이저|レーザー|toning|토닝/i.test(name));
+  const hasPeel = procedureNames.some((name) => /peel|필|필링|ピー/i.test(name));
+  const hasTightening = procedureNames.some((name) => /rf|tight|고주파|弾力|たるみ/i.test(name));
+
+  if (lang === "en") {
+    return [
+      hasLaser ? "Avoid retinoids, exfoliating acids, and scrubs for 3-5 days after laser-based sessions." : "Pause strong actives for 2-3 days after any intensive treatment.",
+      hasPeel ? "Use bland barrier care and strict SPF after peeling-focused sessions." : "Keep the routine simple with cleanser, moisturizer, and SPF.",
+      hasTightening ? "Watch for transient dryness and layer hydration before adding new actives." : "Reintroduce stronger actives only after visible irritation settles.",
+    ];
+  }
+  if (lang === "ja") {
+    return [
+      hasLaser ? "レーザー系施術後3〜5日はレチノール・角質ケア・スクラブを避けてください。" : "刺激の強い施術後は2〜3日ほど強いアクティブを休んでください。",
+      hasPeel ? "ピーリング後はバリア保湿とUV防御を最優先にしてください。" : "クレンザー・保湿・UV中心のシンプルケアが安全です。",
+      hasTightening ? "高周波後は一時的な乾燥を見やすいので保湿を厚めにしてください。" : "赤みや刺激が落ち着いてから強い成分を戻してください。",
+    ];
+  }
+  return [
+    hasLaser ? "레이저 계열 시술 후 3~5일은 레티놀, 각질 케어, 스크럽을 쉬는 편이 안전합니다." : "강한 시술 직후 2~3일은 고함량 액티브를 쉬어 주세요.",
+    hasPeel ? "필링 계열 후에는 장벽 보습과 자외선 차단을 최우선으로 두세요." : "클렌저-보습제-SPF 중심의 단순 루틴이 회복에 유리합니다.",
+    hasTightening ? "고주파/탄력 관리 후에는 일시적 건조가 올 수 있어 수분 레이어링이 필요합니다." : "열감이나 따가움이 가라앉은 뒤에만 강한 성분을 재투입하세요.",
+  ];
+}
+
 function buildDiaryReportModel({
   history,
   analysisResult,
@@ -2359,14 +2405,134 @@ function buildDiaryReportModel({
     })))
     .filter((item, index, arr) => arr.findIndex((candidate) => candidate.name === item.name) === index)
     .slice(0, 3);
-
-  const topCauseTags = weeklyReport.topCauseTags.slice(0, 3).map(([tag, count]) => `${getCauseTagLabel(t, tag)} ${count}`);
-  const periodEnd = snapshots.length > 0 ? new Date(snapshots[0].createdAt).toISOString().slice(5, 10) : today.slice(5, 10);
-  const periodStart = snapshots.length > 0 ? new Date(snapshots[snapshots.length - 1].createdAt).toISOString().slice(5, 10) : today.slice(5, 10);
   const recentOverall = snapshots.slice(0, 3).map((scan) => Number(scan.overallScore) || 0);
   const previousOverall = snapshots.slice(3, 6).map((scan) => Number(scan.overallScore) || 0);
   const recentMean = recentOverall.length > 0 ? recentOverall.reduce((sum, value) => sum + value, 0) / recentOverall.length : overallScore;
   const previousMean = previousOverall.length > 0 ? previousOverall.reduce((sum, value) => sum + value, 0) / previousOverall.length : recentMean;
+  const scoreByDate = new Map(
+    snapshots.map((scan) => [new Date(scan.createdAt).toISOString().slice(0, 10), Number(scan.overallScore) || 0]),
+  );
+  const triggerSignals = DIARY_CAUSE_TAGS.map((tag) => {
+    const taggedDates = Array.from(scoreByDate.keys()).filter((dateStr) => getDiaryCauseTags(dateStr).includes(tag));
+    const taggedScores = taggedDates.map((dateStr) => scoreByDate.get(dateStr) || 0).filter((score) => score > 0);
+    const baselineScores = Array.from(scoreByDate.entries())
+      .filter(([dateStr]) => !taggedDates.includes(dateStr))
+      .map(([, score]) => score)
+      .filter((score) => score > 0);
+    const taggedAvg = taggedScores.length > 0 ? taggedScores.reduce((sum, score) => sum + score, 0) / taggedScores.length : 0;
+    const baselineAvg = baselineScores.length > 0 ? baselineScores.reduce((sum, score) => sum + score, 0) / baselineScores.length : recentMean;
+    return {
+      tag,
+      label: getCauseTagLabel(t, tag),
+      diff: taggedScores.length > 0 ? Math.round(taggedAvg - baselineAvg) : 0,
+      count: taggedScores.length,
+    };
+  })
+    .filter((item) => item.count > 0)
+    .sort((a, b) => a.diff - b.diff)
+    .slice(0, 3);
+
+  const ingredientSignals = (() => {
+    const signalMap = new Map<string, { deltaSum: number; count: number }>();
+    myCosmetics.forEach((item) => {
+      const openedAt = item.opened_at ? new Date(item.opened_at) : null;
+      if (!openedAt || Number.isNaN(openedAt.getTime())) return;
+      const before = snapshots
+        .filter((scan) => new Date(scan.createdAt).getTime() < openedAt.getTime())
+        .slice(0, 3)
+        .map((scan) => Number(scan.overallScore) || 0)
+        .filter((score) => score > 0);
+      const after = snapshots
+        .filter((scan) => new Date(scan.createdAt).getTime() >= openedAt.getTime())
+        .slice(0, 3)
+        .map((scan) => Number(scan.overallScore) || 0)
+        .filter((score) => score > 0);
+      if (before.length === 0 || after.length === 0) return;
+      const delta = after.reduce((sum, score) => sum + score, 0) / after.length
+        - before.reduce((sum, score) => sum + score, 0) / before.length;
+      parseIngredientTokens(item.ingredients).forEach((ingredient) => {
+        const stat = signalMap.get(ingredient) || { deltaSum: 0, count: 0 };
+        stat.deltaSum += delta;
+        stat.count += 1;
+        signalMap.set(ingredient, stat);
+      });
+    });
+    return Array.from(signalMap.entries())
+      .map(([ingredient, stat]) => ({ ingredient, delta: Math.round(stat.deltaSum / stat.count), count: stat.count }))
+      .filter((item) => item.count > 0)
+      .sort((a, b) => b.delta - a.delta);
+  })();
+
+  const radarData = REPORT_CONCERNS.slice(0, 6).map((concern) => {
+    const currentScore = (() => {
+      const current = snapshots[0];
+      const matched = (current?.scores || []).find((item: any) => item?.label === concern.label);
+      if (!matched || !Number.isFinite(Number(matched.score))) return 50;
+      return 100 - concern.risk(Number(matched.score));
+    })();
+    const averageScore = (() => {
+      const values = snapshots.flatMap((scan) => {
+        const matched = (scan?.scores || []).find((item: any) => item?.label === concern.label);
+        if (!matched || !Number.isFinite(Number(matched.score))) return [];
+        return [100 - concern.risk(Number(matched.score))];
+      });
+      return values.length > 0 ? Math.round(values.reduce((sum, value) => sum + value, 0) / values.length) : currentScore;
+    })();
+    return {
+      subject: concern.titles[lang],
+      current: currentScore,
+      average: averageScore,
+    };
+  });
+
+  const seasonGuide = (() => {
+    const season = getSeasonLabel(lang);
+    const keyConcern = focusConcerns[0]?.key;
+    if (lang === "en") {
+      if (keyConcern === "hydration") return `${season} dryness likely amplifies barrier fatigue. Keep a heavier PM moisturizer than usual.`;
+      if (keyConcern === "pigmentation") return `${season} UV exposure can prolong pigment retention. Keep daily antioxidant + SPF habits tight.`;
+      return `${season} environment shifts can widen score volatility. Keep the routine stable when symptoms flare.`;
+    }
+    if (lang === "ja") {
+      if (keyConcern === "hydration") return `${season}の乾燥でバリア疲労が強まりやすいです。夜は保湿量を少し厚めにしてください。`;
+      if (keyConcern === "pigmentation") return `${season}の紫外線で色素残存が長引きやすいです。抗酸化ケアとSPFを厳守してください。`;
+      return `${season}の環境変化でスコア変動が広がりやすいです。症状が揺れる時ほどルーティンを固定してください。`;
+    }
+    if (keyConcern === "hydration") return `${season} 건조 환경이 장벽 피로를 키우는 시기입니다. 야간 보습량을 평소보다 두텁게 가져가세요.`;
+    if (keyConcern === "pigmentation") return `${season} 자외선 노출이 색소 흔적을 오래 끌 수 있습니다. 항산화 케어와 SPF 루틴을 더 엄격하게 유지하세요.`;
+    return `${season} 환경 변수로 점수 변동폭이 커질 수 있는 시기입니다. 흔들릴수록 루틴을 단순하게 고정하는 편이 좋습니다.`;
+  })();
+
+  const forecast = (() => {
+    const base = Math.round(recentMean || overallScore || 60);
+    const routineBoost = weeklyReport.incompleteDays <= 1 ? 4 : 1;
+    const concernPenalty = Math.round((focusConcerns[0]?.avgRisk || 40) / 18);
+    const week1 = Math.max(45, Math.min(95, base + routineBoost - concernPenalty));
+    const week2 = Math.max(45, Math.min(95, week1 + 3));
+    if (lang === "en") {
+      return {
+        week1,
+        week2,
+        note: `If the current routine is kept stable, the next two weeks could recover toward ${week2} with the biggest lift coming from ${focusConcerns[0]?.titles.en || "barrier care"}.`,
+      };
+    }
+    if (lang === "ja") {
+      return {
+        week1,
+        week2,
+        note: `現在のルーティンを安定して維持できれば、今後2週間で${week2}前後まで回復する余地があります。最優先は${focusConcerns[0]?.titles.ja || "バリアケア"}です。`,
+      };
+    }
+    return {
+      week1,
+      week2,
+      note: `지금 루틴을 안정적으로 유지하면 향후 2주 안에 ${week2}점 전후까지 회복할 여지가 있습니다. 가장 큰 개선 축은 ${focusConcerns[0]?.titles.ko || "장벽 케어"}입니다.`,
+    };
+  })();
+
+  const topCauseTags = weeklyReport.topCauseTags.slice(0, 3).map(([tag, count]) => `${getCauseTagLabel(t, tag)} ${count}`);
+  const periodEnd = snapshots.length > 0 ? new Date(snapshots[0].createdAt).toISOString().slice(5, 10) : today.slice(5, 10);
+  const periodStart = snapshots.length > 0 ? new Date(snapshots[snapshots.length - 1].createdAt).toISOString().slice(5, 10) : today.slice(5, 10);
   const trendDelta = Math.round(recentMean - previousMean);
   const trendKey = trendDelta >= 3 ? "trendUp" : trendDelta <= -3 ? "trendDown" : "trendFlat";
   const executiveSummary = lang === "ko"
@@ -2389,11 +2555,17 @@ function buildDiaryReportModel({
     ingredientPlan,
     procedurePlan,
     topCauseTags,
+    triggerSignals,
     keywordSummary: weeklyReport.keywordSummary,
     routineHighlights: {
       strong: weeklyReport.bestRoutine?.text || copy.notEnough,
       watch: weeklyReport.worstRoutine?.text || copy.notEnough,
     },
+    ingredientSignals,
+    recoveryGuide: getRecoveryGuide(lang, procedurePlan.map((item) => item.name)),
+    radarData,
+    seasonGuide,
+    forecast,
     cosmeticsSignal: myCosmetics.length > 0
       ? copy.cosmeticsReady.replace("{{count}}", String(myCosmetics.length))
       : copy.cosmeticsMissing,
@@ -3381,6 +3553,44 @@ function DiaryTab({ user, analysisResult, onBack }: { user: any; analysisResult:
     t,
     lang: reportLang,
   });
+  const reportDetailText = reportLang === "ko"
+    ? {
+        radarTitle: "피부 균형 스파이더 그래프",
+        radarSub: "현재 상태와 누적 평균을 한 번에 비교합니다.",
+        ingredientTrack: "성분 반응 추적",
+        ingredientTrackSub: "화장품 개봉 이후 점수 흐름을 기준으로 성분 신호를 추렸습니다.",
+        recoveryGuide: "시술 후 회복 가이드",
+        seasonImpact: "계절/환경 영향 해석",
+        triggerCorrelation: "트리거 상관관계",
+        forecastTitle: "다음 2주 회복 예측",
+        positiveFlow: "긍정 신호",
+        cautionFlow: "주의 신호",
+      }
+    : reportLang === "ja"
+      ? {
+          radarTitle: "肌バランススパイダー",
+          radarSub: "現在状態と累積平均を一目で比較します。",
+          ingredientTrack: "成分反応トラッキング",
+          ingredientTrackSub: "開封後のスコア変化から成分シグナルを抽出しました。",
+          recoveryGuide: "施術後の回復ガイド",
+          seasonImpact: "季節・環境影響の解釈",
+          triggerCorrelation: "トリガー相関",
+          forecastTitle: "今後2週間の回復予測",
+          positiveFlow: "プラスシグナル",
+          cautionFlow: "注意シグナル",
+        }
+      : {
+          radarTitle: "Skin Balance Spider",
+          radarSub: "Compare the current profile against your accumulated average.",
+          ingredientTrack: "Ingredient response tracking",
+          ingredientTrackSub: "Signals are estimated from score shifts after product opening dates.",
+          recoveryGuide: "Post-procedure recovery guide",
+          seasonImpact: "Season & environment interpretation",
+          triggerCorrelation: "Trigger correlation",
+          forecastTitle: "Next 2-week recovery forecast",
+          positiveFlow: "Positive signals",
+          cautionFlow: "Signals to watch",
+        };
 
   useEffect(() => {
     if (!reminderSettings.enabled) return;
@@ -3702,6 +3912,27 @@ function DiaryTab({ user, analysisResult, onBack }: { user: any; analysisResult:
                   </CardContent>
                 </Card>
 
+                <Card className="border-none rounded-[24px] shadow-sm overflow-hidden" style={{ background: "#FFFFFF" }}>
+                  <CardContent className="p-4">
+                    <p className="text-[11px] font-black uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>
+                      {reportDetailText.radarTitle}
+                    </p>
+                    <p className="text-[11px] text-stone-500 mt-1">{reportDetailText.radarSub}</p>
+                    <div className="w-full h-72 pt-2">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <RadarChart cx="50%" cy="50%" outerRadius="68%" data={diaryReport.radarData}>
+                          <PolarGrid stroke="#E7E1DA" />
+                          <PolarAngleAxis dataKey="subject" tick={{ fill: "#7C6F63", fontSize: 10, fontWeight: 700 }} />
+                          <PolarRadiusAxis angle={90} domain={[0, 100]} tick={false} axisLine={false} />
+                          <Radar name={reportLang === "ko" ? "현재" : reportLang === "ja" ? "現在" : "Current"} dataKey="current" stroke={SCAN_TO} fill={SCAN_TO} fillOpacity={0.22} strokeWidth={2} />
+                          <Radar name={reportLang === "ko" ? "누적 평균" : reportLang === "ja" ? "累積平均" : "Average"} dataKey="average" stroke={DEEP_GREEN} fill={DEEP_GREEN} fillOpacity={0.38} strokeWidth={2} />
+                          <Legend iconType="circle" wrapperStyle={{ fontSize: "12px", fontWeight: 700, color: "#444", paddingTop: "8px" }} />
+                        </RadarChart>
+                      </ResponsiveContainer>
+                    </div>
+                  </CardContent>
+                </Card>
+
                 <div className="space-y-3">
                   <p className="text-[11px] font-black uppercase tracking-[0.14em] px-1" style={{ color: SCAN_TO }}>
                     {diaryReport.copy.priority}
@@ -3771,6 +4002,66 @@ function DiaryTab({ user, analysisResult, onBack }: { user: any; analysisResult:
                   </Card>
                 </div>
 
+                <div className="grid gap-3 md:grid-cols-2">
+                  <Card className="border-none rounded-[24px] shadow-sm overflow-hidden" style={{ background: "#FFFFFF" }}>
+                    <CardContent className="p-4">
+                      <p className="text-[11px] font-black uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>
+                        {reportDetailText.ingredientTrack}
+                      </p>
+                      <p className="text-[11px] text-stone-500 mt-1">{reportDetailText.ingredientTrackSub}</p>
+                      <div className="space-y-3 mt-3">
+                        {diaryReport.ingredientSignals.length > 0 ? (
+                          <>
+                            <div>
+                              <p className="text-[10px] font-black uppercase tracking-[0.12em] text-emerald-600">{reportDetailText.positiveFlow}</p>
+                              <div className="space-y-2 mt-2">
+                                {diaryReport.ingredientSignals.filter((item) => item.delta >= 0).slice(0, 3).map((item) => (
+                                  <div key={`good-${item.ingredient}`} className="rounded-[16px] p-3" style={{ background: "#ECFDF5" }}>
+                                    <div className="flex items-center justify-between gap-2">
+                                      <p className="text-[13px] font-black text-emerald-700">{item.ingredient}</p>
+                                      <span className="text-[10px] font-bold text-emerald-600">+{item.delta}</span>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                            <div>
+                              <p className="text-[10px] font-black uppercase tracking-[0.12em]" style={{ color: SCAN_TO }}>{reportDetailText.cautionFlow}</p>
+                              <div className="space-y-2 mt-2">
+                                {diaryReport.ingredientSignals.filter((item) => item.delta < 0).slice(0, 3).map((item) => (
+                                  <div key={`bad-${item.ingredient}`} className="rounded-[16px] p-3" style={{ background: "#FFF1EC" }}>
+                                    <div className="flex items-center justify-between gap-2">
+                                      <p className="text-[13px] font-black" style={{ color: SCAN_TO }}>{item.ingredient}</p>
+                                      <span className="text-[10px] font-bold" style={{ color: SCAN_TO }}>{item.delta}</span>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          </>
+                        ) : (
+                          <p className="text-[12px] text-stone-400 py-8 text-center">{diaryReport.copy.notEnough}</p>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="border-none rounded-[24px] shadow-sm overflow-hidden" style={{ background: "#FFFFFF" }}>
+                    <CardContent className="p-4">
+                      <p className="text-[11px] font-black uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>
+                        {reportDetailText.recoveryGuide}
+                      </p>
+                      <div className="space-y-2 mt-3">
+                        {diaryReport.recoveryGuide.map((item: string) => (
+                          <div key={item} className="rounded-[18px] p-3" style={{ background: "#F7FAF8", border: "1px solid #E5F0EB" }}>
+                            <p className="text-[12px] text-stone-600 leading-relaxed">{item}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+
                 <Card className="border-none rounded-[24px] shadow-sm overflow-hidden" style={{ background: "#FFFFFF" }}>
                   <CardContent className="p-4">
                     <p className="text-[11px] font-black uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>
@@ -3820,6 +4111,66 @@ function DiaryTab({ user, analysisResult, onBack }: { user: any; analysisResult:
                           ))}
                         </div>
                       )}
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <div className="grid gap-3 md:grid-cols-2">
+                  <Card className="border-none rounded-[24px] shadow-sm overflow-hidden" style={{ background: "#FFFFFF" }}>
+                    <CardContent className="p-4">
+                      <p className="text-[11px] font-black uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>
+                        {reportDetailText.seasonImpact}
+                      </p>
+                      <p className="text-[13px] text-stone-600 mt-3 leading-relaxed text-kr-pretty">{diaryReport.seasonGuide}</p>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="border-none rounded-[24px] shadow-sm overflow-hidden" style={{ background: "#FFFFFF" }}>
+                    <CardContent className="p-4">
+                      <p className="text-[11px] font-black uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>
+                        {reportDetailText.triggerCorrelation}
+                      </p>
+                      <div className="space-y-2 mt-3">
+                        {diaryReport.triggerSignals.length > 0 ? diaryReport.triggerSignals.map((item) => (
+                          <div key={item.tag} className="rounded-[18px] p-3" style={{ background: item.diff <= 0 ? "#FFF1EC" : "#ECFDF5" }}>
+                            <div className="flex items-center justify-between gap-2">
+                              <p className="text-[13px] font-black" style={{ color: item.diff <= 0 ? SCAN_TO : "#059669" }}>{item.label}</p>
+                              <span className="text-[10px] font-bold" style={{ color: item.diff <= 0 ? SCAN_TO : "#059669" }}>
+                                {item.diff > 0 ? `+${item.diff}` : item.diff}
+                              </span>
+                            </div>
+                          </div>
+                        )) : (
+                          <p className="text-[12px] text-stone-400 py-8 text-center">{diaryReport.copy.notEnough}</p>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+
+                <Card className="border-none rounded-[24px] shadow-sm overflow-hidden" style={{ background: "linear-gradient(135deg, #F0F9F4 0%, #FFFFFF 100%)" }}>
+                  <CardContent className="p-4">
+                    <div className="flex items-start justify-between gap-3">
+                      <div>
+                        <p className="text-[11px] font-black uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>
+                          {reportDetailText.forecastTitle}
+                        </p>
+                        <p className="text-[13px] text-stone-600 mt-2 leading-relaxed text-kr-pretty">{diaryReport.forecast.note}</p>
+                      </div>
+                      <div className="rounded-[22px] px-3 py-2 shrink-0 text-right" style={{ background: "#FFFFFF", border: "1px solid #DCEFE5" }}>
+                        <p className="text-[10px] font-bold text-stone-400">WEEK 2</p>
+                        <p className="text-[20px] font-black mt-1" style={{ color: DEEP_GREEN }}>{diaryReport.forecast.week2}</p>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-3 mt-4">
+                      <div className="rounded-[18px] p-3" style={{ background: "#FFFFFF", border: "1px solid #E5F0EB" }}>
+                        <p className="text-[10px] font-bold text-stone-400">WEEK 1</p>
+                        <p className="text-[22px] font-black mt-1" style={{ color: SCAN_TO }}>{diaryReport.forecast.week1}</p>
+                      </div>
+                      <div className="rounded-[18px] p-3" style={{ background: "#FFFFFF", border: "1px solid #E5F0EB" }}>
+                        <p className="text-[10px] font-bold text-stone-400">WEEK 2</p>
+                        <p className="text-[22px] font-black mt-1" style={{ color: DEEP_GREEN }}>{diaryReport.forecast.week2}</p>
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
