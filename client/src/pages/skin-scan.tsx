@@ -2016,6 +2016,390 @@ function getWeeklyReport(entries: { dateStr: string; score: number }[], streakCo
   };
 }
 
+type ReportLang = "ko" | "en" | "ja";
+type ReportConcernKey =
+  | "hydration"
+  | "redness"
+  | "pores"
+  | "pigmentation"
+  | "elasticity"
+  | "breakout"
+  | "darkCircle"
+  | "glow"
+  | "texture";
+
+function getReportLang(lang: string): ReportLang {
+  if (lang.startsWith("ja")) return "ja";
+  if (lang.startsWith("en")) return "en";
+  return "ko";
+}
+
+const REPORT_COPY: Record<ReportLang, Record<string, string>> = {
+  ko: {
+    deck: "Skin Analysis Desk",
+    title: "누적 피부 리포트",
+    subtitle: "최근 스캔, 일기, 루틴 데이터를 합쳐 피부 전문가 노트처럼 정리했어요.",
+    period: "분석 기간",
+    scans: "누적 스캔",
+    diary: "일기 메모",
+    adherence: "루틴 이행",
+    executive: "전문가 코멘트",
+    priority: "우선 케어 과제",
+    ingredients: "추천 성분 처방",
+    procedures: "권장 시술 방향",
+    routine: "루틴/생활 시그널",
+    trendUp: "회복 흐름",
+    trendFlat: "정체 구간",
+    trendDown: "변동성 주의",
+    trendUpDesc: "최근 평균 점수가 앞선 구간보다 개선됐습니다.",
+    trendFlatDesc: "최근 점수가 비슷한 범위에서 유지되고 있습니다.",
+    trendDownDesc: "최근 점수가 앞선 구간보다 내려가 원인 추적이 필요합니다.",
+    routineStrong: "루틴 유지력이 안정적입니다.",
+    routineWeak: "루틴 누락일이 보여 야간 회복 관리가 필요합니다.",
+    notEnough: "데이터가 더 쌓이면 리포트 정확도가 올라갑니다.",
+    scoreRisk: "리스크 {{value}}",
+    avgRisk: "최근 평균",
+    recommended: "권장",
+    caution: "주의",
+    procedureNote: "시술은 피부과/의료진 상담 후 피부 민감도와 생활 패턴에 맞춰 결정하세요.",
+    routineGood: "잘 유지되는 루틴",
+    routineWatch: "흔들리는 루틴",
+    memoSignals: "메모 시그널",
+    causeSignals: "원인 태그",
+    cosmeticsSignal: "화장품 루틴 시그널",
+    cosmeticsMissing: "등록 화장품이 적어 성분 루틴 인사이트는 초기 단계예요.",
+    cosmeticsReady: "등록된 화장품 {{count}}개를 기준으로 루틴 밀도를 같이 봤어요.",
+  },
+  en: {
+    deck: "Skin Analysis Desk",
+    title: "Accumulated Skin Report",
+    subtitle: "We combined scans, diary notes, and routine data into a clinician-style summary.",
+    period: "Period",
+    scans: "Total scans",
+    diary: "Diary notes",
+    adherence: "Routine adherence",
+    executive: "Clinical summary",
+    priority: "Priority concerns",
+    ingredients: "Ingredient prescription",
+    procedures: "Procedure direction",
+    routine: "Routine & lifestyle signals",
+    trendUp: "Recovery trend",
+    trendFlat: "Stable range",
+    trendDown: "Watch volatility",
+    trendUpDesc: "Recent average scores improved versus the previous block.",
+    trendFlatDesc: "Recent scores are holding in a similar range.",
+    trendDownDesc: "Recent scores slipped versus the previous block and need review.",
+    routineStrong: "Routine adherence looks stable.",
+    routineWeak: "Skipped days suggest the evening recovery flow needs work.",
+    notEnough: "This report sharpens as more data accumulates.",
+    scoreRisk: "Risk {{value}}",
+    avgRisk: "Recent mean",
+    recommended: "Recommended",
+    caution: "Caution",
+    procedureNote: "Choose procedures only after consulting a licensed clinician and reviewing sensitivity.",
+    routineGood: "Reliable routine",
+    routineWatch: "Watch closely",
+    memoSignals: "Memo signals",
+    causeSignals: "Trigger tags",
+    cosmeticsSignal: "Cosmetic routine signal",
+    cosmeticsMissing: "There are not enough registered products yet for deep ingredient routine analysis.",
+    cosmeticsReady: "Routine density was reviewed across {{count}} registered products.",
+  },
+  ja: {
+    deck: "Skin Analysis Desk",
+    title: "蓄積肌レポート",
+    subtitle: "スキャン、日記、ルーティンデータをまとめて専門家ノートのように整理しました。",
+    period: "分析期間",
+    scans: "累積スキャン",
+    diary: "日記メモ",
+    adherence: "ルーティン実行",
+    executive: "専門家コメント",
+    priority: "優先ケア課題",
+    ingredients: "推奨成分処方",
+    procedures: "推奨施術の方向",
+    routine: "ルーティン・生活シグナル",
+    trendUp: "回復トレンド",
+    trendFlat: "安定区間",
+    trendDown: "変動に注意",
+    trendUpDesc: "直近平均スコアは前の区間より改善しています。",
+    trendFlatDesc: "最近のスコアは近い範囲で維持されています。",
+    trendDownDesc: "直近スコアが前の区間より下がっており原因確認が必要です。",
+    routineStrong: "ルーティン継続力は安定しています。",
+    routineWeak: "未完了日があり夜の回復管理が必要です。",
+    notEnough: "データが増えるほどレポート精度が上がります。",
+    scoreRisk: "リスク {{value}}",
+    avgRisk: "直近平均",
+    recommended: "推奨",
+    caution: "注意",
+    procedureNote: "施術は皮膚科・医療者と相談し、敏感度と生活パターンを考慮して決めてください。",
+    routineGood: "維持できているルーティン",
+    routineWatch: "乱れやすいルーティン",
+    memoSignals: "メモシグナル",
+    causeSignals: "原因タグ",
+    cosmeticsSignal: "コスメルーティンシグナル",
+    cosmeticsMissing: "登録コスメが少なく、成分ルーティン分析はまだ初期段階です。",
+    cosmeticsReady: "登録済みコスメ{{count}}件をもとにルーティン密度も確認しました。",
+  },
+};
+
+const REPORT_CONCERNS: Array<{
+  key: ReportConcernKey;
+  label: string;
+  risk: (score: number) => number;
+  accent: string;
+  titles: Record<ReportLang, string>;
+  summaries: Record<ReportLang, string>;
+  ingredients: Array<{ name: Record<ReportLang, string>; reason: Record<ReportLang, string> }>;
+  procedures: Array<{ name: Record<ReportLang, string>; reason: Record<ReportLang, string> }>;
+}> = [
+  {
+    key: "hydration",
+    label: "수분 밸런스",
+    risk: (score) => 100 - score,
+    accent: "#3B82F6",
+    titles: { ko: "수분-장벽 저하", en: "Hydration barrier dip", ja: "水分・バリア低下" },
+    summaries: {
+      ko: "수분이 떨어지는 날에 전체 점수 하락이 같이 나타나는 패턴입니다.",
+      en: "Lower hydration is moving with wider score drops.",
+      ja: "水分低下の日に全体スコア低下が重なる傾向です。",
+    },
+    ingredients: [
+      { name: { ko: "히알루론산", en: "Hyaluronic acid", ja: "ヒアルロン酸" }, reason: { ko: "수분 저장력을 높여 각질 들뜸을 완화합니다.", en: "Supports water retention and reduces surface dryness.", ja: "水分保持を高めて乾燥感を和らげます。" } },
+      { name: { ko: "세라마이드", en: "Ceramide", ja: "セラミド" }, reason: { ko: "피부 장벽 복구에 직접적인 축을 담당합니다.", en: "Directly supports barrier repair.", ja: "肌バリア修復を支えます。" } },
+    ],
+    procedures: [
+      { name: { ko: "저자극 스킨부스터", en: "Low-irritation skin booster", ja: "低刺激スキンブースター" }, reason: { ko: "만성 건조와 장벽 저하 구간에서 수분 보강에 유리합니다.", en: "Useful when chronic dryness and barrier loss dominate.", ja: "慢性的な乾燥とバリア低下が続く時に向いています。" } },
+    ],
+  },
+  {
+    key: "redness",
+    label: "붉은기 수준",
+    risk: (score) => score,
+    accent: "#EF4444",
+    titles: { ko: "민감도 상승", en: "Redness reactivity", ja: "赤み反応性" },
+    summaries: {
+      ko: "자극 노출 후 붉은기 점수가 쉽게 오르는 민감 패턴입니다.",
+      en: "Redness flares easily after likely irritation triggers.",
+      ja: "刺激要因の後に赤みが上がりやすい敏感パターンです。",
+    },
+    ingredients: [
+      { name: { ko: "판테놀", en: "Panthenol", ja: "パンテノール" }, reason: { ko: "열감과 민감 반응이 반복될 때 진정 축으로 좋습니다.", en: "Good anchor ingredient for repeated reactivity.", ja: "反応が続く時の鎮静軸として有効です。" } },
+      { name: { ko: "센텔라", en: "Centella asiatica", ja: "ツボクサ" }, reason: { ko: "붉은기 완화와 장벽 회복을 동시에 보조합니다.", en: "Helps calm redness while supporting repair.", ja: "赤み緩和とバリア回復を助けます。" } },
+    ],
+    procedures: [
+      { name: { ko: "LED 진정 케어", en: "LED calming care", ja: "LED鎮静ケア" }, reason: { ko: "민감기에는 강한 시술보다 열 자극이 적은 관리가 적합합니다.", en: "Lower-heat calming care is often safer than aggressive procedures.", ja: "敏感期は強い施術より低刺激ケアが向いています。" } },
+    ],
+  },
+  {
+    key: "pores",
+    label: "모공 상태",
+    risk: (score) => 100 - score,
+    accent: "#F59E0B",
+    titles: { ko: "유분-모공 부담", en: "Sebum-pore load", ja: "皮脂・毛穴負担" },
+    summaries: {
+      ko: "유분 관리가 흔들릴 때 모공 점수가 빠르게 떨어지는 흐름입니다.",
+      en: "Pore condition softens quickly when oil control slips.",
+      ja: "皮脂管理が乱れると毛穴状態が下がりやすい流れです。",
+    },
+    ingredients: [
+      { name: { ko: "나이아신아마이드", en: "Niacinamide", ja: "ナイアシンアミド" }, reason: { ko: "피지와 결을 함께 관리하기 좋은 다목적 성분입니다.", en: "A multipurpose ingredient for oil balance and texture.", ja: "皮脂とキメを同時に見やすい多機能成分です。" } },
+      { name: { ko: "BHA", en: "BHA", ja: "BHA" }, reason: { ko: "모공 내부 각질과 피지 축적 관리에 적합합니다.", en: "Useful for pore congestion and oil build-up.", ja: "毛穴内の角質・皮脂ケアに向いています。" } },
+    ],
+    procedures: [
+      { name: { ko: "아쿠아필 계열", en: "Hydro / aqua peel", ja: "アクアピーリング系" }, reason: { ko: "막힌 모공과 표면 피지 정리에 직관적인 선택지입니다.", en: "A direct option for congestion and surface oil control.", ja: "詰まり毛穴と表面皮脂の整理に向いています。" } },
+    ],
+  },
+  {
+    key: "pigmentation",
+    label: "잡티/색소침착",
+    risk: (score) => score,
+    accent: "#8B5CF6",
+    titles: { ko: "색소 흔적 누적", en: "Pigment retention", ja: "色素残存" },
+    summaries: {
+      ko: "자외선·염증 후 색소가 오래 남는 경향이 보입니다.",
+      en: "Pigment marks appear to linger after UV or inflammation exposure.",
+      ja: "紫外線や炎症後の色素が残りやすい傾向です。",
+    },
+    ingredients: [
+      { name: { ko: "비타민C", en: "Vitamin C", ja: "ビタミンC" }, reason: { ko: "톤 보정과 항산화 관리의 기본축입니다.", en: "Core ingredient for tone support and antioxidant care.", ja: "トーン補正と抗酸化ケアの軸になります。" } },
+      { name: { ko: "트라넥사믹 애씨드", en: "Tranexamic acid", ja: "トラネキサム酸" }, reason: { ko: "반복되는 색소 흔적 관리에 유용합니다.", en: "Useful when pigment marks recur.", ja: "色素痕が繰り返す時に有用です。" } },
+    ],
+    procedures: [
+      { name: { ko: "토닝 레이저 상담", en: "Laser toning consult", ja: "トーニングレーザー相談" }, reason: { ko: "색소가 누적될 때 시술 적합도 검토 가치가 있습니다.", en: "Worth evaluating when pigmentation continues to accumulate.", ja: "色素蓄積が続く時は適応確認の価値があります。" } },
+    ],
+  },
+  {
+    key: "elasticity",
+    label: "주름 및 탄력",
+    risk: (score) => 100 - score,
+    accent: "#14B8A6",
+    titles: { ko: "탄력 저하 신호", en: "Elasticity decline", ja: "弾力低下サイン" },
+    summaries: {
+      ko: "건조와 피로 누적 구간에서 탄력 점수가 눌리는 흐름입니다.",
+      en: "Elasticity softens when dryness and fatigue stack together.",
+      ja: "乾燥や疲労が重なる時に弾力スコアが落ちやすいです。",
+    },
+    ingredients: [
+      { name: { ko: "레티놀", en: "Retinol", ja: "レチノール" }, reason: { ko: "탄력 저하 관리의 대표 성분입니다.", en: "A classic ingredient for firmness management.", ja: "弾力ケアの代表成分です。" } },
+      { name: { ko: "펩타이드", en: "Peptides", ja: "ペプチド" }, reason: { ko: "자극을 낮추면서 탄력 루틴을 보강하기 좋습니다.", en: "Useful for adding firmness support with lower irritation.", ja: "比較的やさしく弾力ケアを補強できます。" } },
+    ],
+    procedures: [
+      { name: { ko: "고주파 탄력 관리", en: "RF tightening consult", ja: "高周波たるみ相談" }, reason: { ko: "탄력 축이 지속적으로 낮다면 검토 가능한 방향입니다.", en: "A reasonable direction when elasticity continues to trend down.", ja: "弾力低下が続くなら検討しやすい方向です。" } },
+    ],
+  },
+  {
+    key: "breakout",
+    label: "트러블 위험",
+    risk: (score) => 100 - score,
+    accent: "#EC4899",
+    titles: { ko: "트러블 재발성", en: "Breakout recurrence", ja: "トラブル再発性" },
+    summaries: {
+      ko: "생활 패턴 변화에 따라 트러블 위험도가 흔들리는 흐름입니다.",
+      en: "Breakout risk appears sensitive to routine and lifestyle disruption.",
+      ja: "生活リズムの乱れでトラブルリスクが動きやすい流れです。",
+    },
+    ingredients: [
+      { name: { ko: "아젤라익 애씨드", en: "Azelaic acid", ja: "アゼライン酸" }, reason: { ko: "트러블과 붉은 흔적을 함께 보기에 좋습니다.", en: "Useful for both breakouts and post-redness marks.", ja: "トラブルと赤み跡を一緒に見やすい成分です。" } },
+      { name: { ko: "징크 PCA", en: "Zinc PCA", ja: "ジンクPCA" }, reason: { ko: "피지 균형과 번들거림 완화에 유리합니다.", en: "Supports oil balance and shine control.", ja: "皮脂バランスとテカリ管理に向いています。" } },
+    ],
+    procedures: [
+      { name: { ko: "블루/레드 LED 관리", en: "Blue / red LED care", ja: "ブルー/レッドLEDケア" }, reason: { ko: "반복성 트러블 구간에서 저자극 보조 옵션이 됩니다.", en: "A gentle support option for recurrent breakouts.", ja: "再発しやすいトラブルの補助選択肢になります。" } },
+    ],
+  },
+  {
+    key: "darkCircle",
+    label: "다크서클",
+    risk: (score) => score,
+    accent: "#6366F1",
+    titles: { ko: "눈가 피로 누적", en: "Under-eye fatigue", ja: "目元疲労" },
+    summaries: {
+      ko: "수면/피로 변수에 따라 눈가 컨디션이 흔들리는 모습입니다.",
+      en: "Under-eye condition appears responsive to fatigue and sleep load.",
+      ja: "睡眠や疲労により目元状態が揺れやすいようです。",
+    },
+    ingredients: [
+      { name: { ko: "카페인", en: "Caffeine", ja: "カフェイン" }, reason: { ko: "부기와 눈가 컨디션 관리에 보조적입니다.", en: "Helpful as a support ingredient for puffiness and under-eye tone.", ja: "むくみと目元コンディション管理の補助になります。" } },
+      { name: { ko: "비타민K", en: "Vitamin K", ja: "ビタミンK" }, reason: { ko: "눈가 톤 관리 루틴에 자주 쓰이는 축입니다.", en: "Often used in targeted under-eye tone routines.", ja: "目元トーンケアで使われやすい軸です。" } },
+    ],
+    procedures: [
+      { name: { ko: "눈가 순환 관리", en: "Under-eye circulation care", ja: "目元循環ケア" }, reason: { ko: "피로형 다크서클이면 생활 패턴 교정과 함께 검토할 수 있습니다.", en: "Can be considered alongside sleep and fatigue correction.", ja: "疲労型なら生活改善と一緒に検討できます。" } },
+    ],
+  },
+];
+
+function buildDiaryReportModel({
+  history,
+  analysisResult,
+  overallScore,
+  finalType,
+  weeklyReport,
+  myCosmetics,
+  t,
+  lang,
+}: {
+  history: any[];
+  analysisResult: AnalysisResult | null;
+  overallScore: number;
+  finalType: string;
+  weeklyReport: ReturnType<typeof getWeeklyReport>;
+  myCosmetics: CosmeticItem[];
+  t: (key: string, options?: any) => string;
+  lang: ReportLang;
+}) {
+  const copy = REPORT_COPY[lang];
+  const today = todayStr();
+  const snapshots = [
+    ...(analysisResult ? [{
+      createdAt: new Date().toISOString(),
+      overallScore,
+      skinAge: analysisResult.skinAge ?? null,
+      baumannType: finalType,
+      scores: analysisResult.scores ?? [],
+    }] : []),
+    ...history,
+  ].filter((scan, index, arr) => {
+    const date = new Date(scan.createdAt).toISOString().slice(0, 10);
+    return arr.findIndex((candidate) => new Date(candidate.createdAt).toISOString().slice(0, 10) === date) === index;
+  });
+
+  const concernRows = REPORT_CONCERNS.map((concern) => {
+    const risks = snapshots.flatMap((scan) => {
+      const matched = (scan.scores || []).find((item: any) => item?.label === concern.label);
+      if (!matched || !Number.isFinite(Number(matched.score))) return [];
+      return [concern.risk(Number(matched.score))];
+    });
+    const recentBlock = risks.slice(0, 3);
+    const prevBlock = risks.slice(3, 6);
+    const avgRisk = risks.length > 0 ? Math.round(risks.reduce((sum, value) => sum + value, 0) / risks.length) : 0;
+    const recentAvg = recentBlock.length > 0 ? recentBlock.reduce((sum, value) => sum + value, 0) / recentBlock.length : avgRisk;
+    const prevAvg = prevBlock.length > 0 ? prevBlock.reduce((sum, value) => sum + value, 0) / prevBlock.length : recentAvg;
+    return {
+      ...concern,
+      avgRisk,
+      delta: Math.round(recentAvg - prevAvg),
+    };
+  }).sort((a, b) => b.avgRisk - a.avgRisk);
+
+  const focusConcerns = concernRows.slice(0, 3);
+  const ingredientPlan = focusConcerns
+    .flatMap((concern) => concern.ingredients.map((item) => ({
+      concern: concern.titles[lang],
+      name: item.name[lang],
+      reason: item.reason[lang],
+      accent: concern.accent,
+    })))
+    .filter((item, index, arr) => arr.findIndex((candidate) => candidate.name === item.name) === index)
+    .slice(0, 4);
+  const procedurePlan = focusConcerns
+    .flatMap((concern) => concern.procedures.map((item) => ({
+      concern: concern.titles[lang],
+      name: item.name[lang],
+      reason: item.reason[lang],
+      accent: concern.accent,
+    })))
+    .filter((item, index, arr) => arr.findIndex((candidate) => candidate.name === item.name) === index)
+    .slice(0, 3);
+
+  const topCauseTags = weeklyReport.topCauseTags.slice(0, 3).map(([tag, count]) => `${getCauseTagLabel(t, tag)} ${count}`);
+  const periodEnd = snapshots.length > 0 ? new Date(snapshots[0].createdAt).toISOString().slice(5, 10) : today.slice(5, 10);
+  const periodStart = snapshots.length > 0 ? new Date(snapshots[snapshots.length - 1].createdAt).toISOString().slice(5, 10) : today.slice(5, 10);
+  const recentOverall = snapshots.slice(0, 3).map((scan) => Number(scan.overallScore) || 0);
+  const previousOverall = snapshots.slice(3, 6).map((scan) => Number(scan.overallScore) || 0);
+  const recentMean = recentOverall.length > 0 ? recentOverall.reduce((sum, value) => sum + value, 0) / recentOverall.length : overallScore;
+  const previousMean = previousOverall.length > 0 ? previousOverall.reduce((sum, value) => sum + value, 0) / previousOverall.length : recentMean;
+  const trendDelta = Math.round(recentMean - previousMean);
+  const trendKey = trendDelta >= 3 ? "trendUp" : trendDelta <= -3 ? "trendDown" : "trendFlat";
+  const executiveSummary = lang === "ko"
+    ? `최근 ${snapshots.length}회 스캔과 최근 7일 일기 데이터를 종합하면 ${focusConcerns[0]?.titles.ko || "기초 컨디션"} 축의 부담이 가장 큽니다. ${focusConcerns[1]?.titles.ko || "생활 패턴"}와 ${focusConcerns[2]?.titles.ko || "루틴 안정성"}도 보조 이슈로 보여, 단기 진정만보다 장벽/색소/유분 관리의 우선순위를 분리해 접근하는 편이 좋습니다.`
+    : lang === "ja"
+      ? `直近${snapshots.length}回のスキャンと7日分の日記を総合すると、最優先課題は${focusConcerns[0]?.titles.ja || "基礎コンディション"}です。${focusConcerns[1]?.titles.ja || "生活パターン"}と${focusConcerns[2]?.titles.ja || "ルーティン安定性"}も補助課題として見えるため、単発ケアより優先順位を分けた管理が有効です。`
+      : `Across ${snapshots.length} recent scans and the last 7 days of diary data, the highest burden is on ${focusConcerns[0]?.titles.en || "baseline condition"}. ${focusConcerns[1]?.titles.en || "lifestyle pattern"} and ${focusConcerns[2]?.titles.en || "routine stability"} are secondary drivers, so a prioritized plan will work better than one-off fixes.`;
+
+  return {
+    copy,
+    periodLabel: `${periodStart} - ${periodEnd}`,
+    scanCount: snapshots.length,
+    memoCount: weeklyReport.memoCount,
+    adherence: weeklyReport.incompleteDays === 0 ? "92%" : `${Math.max(48, 100 - weeklyReport.incompleteDays * 12)}%`,
+    trendKey,
+    trendDesc: copy[`${trendKey}Desc`],
+    routineDesc: weeklyReport.incompleteDays <= 1 ? copy.routineStrong : copy.routineWeak,
+    executiveSummary,
+    focusConcerns,
+    ingredientPlan,
+    procedurePlan,
+    topCauseTags,
+    keywordSummary: weeklyReport.keywordSummary,
+    routineHighlights: {
+      strong: weeklyReport.bestRoutine?.text || copy.notEnough,
+      watch: weeklyReport.worstRoutine?.text || copy.notEnough,
+    },
+    cosmeticsSignal: myCosmetics.length > 0
+      ? copy.cosmeticsReady.replace("{{count}}", String(myCosmetics.length))
+      : copy.cosmeticsMissing,
+  };
+}
+
 function daysSinceDate(dateStr?: string | null): number | null {
   if (!dateStr) return null;
   const time = new Date(dateStr).getTime();
@@ -2986,6 +3370,17 @@ function DiaryTab({ user, analysisResult, onBack }: { user: any; analysisResult:
   const streakCount = getStreak().count;
   const weeklyReport = getWeeklyReport(allEntries, streakCount);
   const routineGuide = buildRoutineGuide(myCosmetics, t);
+  const reportLang = getReportLang(i18n.language || "ko");
+  const diaryReport = buildDiaryReportModel({
+    history,
+    analysisResult,
+    overallScore,
+    finalType,
+    weeklyReport,
+    myCosmetics,
+    t,
+    lang: reportLang,
+  });
 
   useEffect(() => {
     if (!reminderSettings.enabled) return;
@@ -3246,99 +3641,186 @@ function DiaryTab({ user, analysisResult, onBack }: { user: any; analysisResult:
               transition={{ duration: 0.22, ease: "easeOut" }}
               className="h-full overflow-y-auto overscroll-contain"
             >
-              <div className="px-5 pt-4 pb-8">
+              <div className="px-5 pt-4 pb-8 space-y-4">
                 <Card className="border-none rounded-[28px] overflow-hidden shadow-sm"
-                  style={{ background: weeklyReport.unlocked ? "linear-gradient(135deg, #FFF7F2 0%, #FFFFFF 100%)" : "linear-gradient(135deg, #F6F3EE 0%, #FFFFFF 100%)" }}>
+                  style={{ background: "linear-gradient(135deg, #FEF3EC 0%, #FFFDFB 60%, #F2F7F4 100%)" }}>
                   <CardContent className="p-5">
                     <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0">
-                        <p className="text-[10px] font-black tracking-[0.16em] uppercase" style={{ color: weeklyReport.unlocked ? SCAN_TO : "#9A8F80" }}>
-                          {t("modal.diary.weeklyTitle")}
+                        <p className="text-[10px] font-black tracking-[0.16em] uppercase" style={{ color: SCAN_TO }}>
+                          {diaryReport.copy.deck}
                         </p>
-                        <p className="text-[18px] font-black mt-1 text-kr-pretty" style={{ color: DEEP_GREEN }}>
-                          {weeklyReport.unlocked
-                            ? t("modal.diary.weeklyUnlocked")
-                            : t("modal.diary.weeklyLocked", { days: Math.max(7 - weeklyReport.progress, 0) })}
+                        <p className="text-[20px] font-black mt-1 text-kr-pretty" style={{ color: DEEP_GREEN }}>
+                          {diaryReport.copy.title}
                         </p>
                         <p className="text-[11px] text-stone-500 mt-1 leading-relaxed text-kr-pretty">
-                          {weeklyReport.unlocked
-                            ? t("modal.diary.weeklyUnlockedDesc")
-                            : t("modal.diary.weeklyLockedDesc")}
+                          {diaryReport.copy.subtitle}
                         </p>
                       </div>
-                      <div className="rounded-2xl px-3 py-2 text-right shrink-0"
-                        style={{ background: weeklyReport.unlocked ? "#FFF1EC" : "#FFFFFF", border: "1px solid #EDE3DB" }}>
-                        <p className="text-[10px] font-bold text-stone-500 whitespace-nowrap">{t("modal.diary.streakShort")}</p>
-                        <p className="text-[20px] font-black leading-none" style={{ color: weeklyReport.unlocked ? SCAN_TO : DEEP_GREEN }}>{weeklyReport.progress}/7</p>
+                      <div className="rounded-[22px] px-3 py-2 text-right shrink-0"
+                        style={{ background: "#FFFFFFAA", border: "1px solid #F1E6DE" }}>
+                        <p className="text-[10px] font-bold text-stone-500 whitespace-nowrap">{diaryReport.copy.period}</p>
+                        <p className="text-[14px] font-black mt-1" style={{ color: DEEP_GREEN }}>{diaryReport.periodLabel}</p>
                       </div>
                     </div>
-                    <div className="h-2 rounded-full bg-stone-100 overflow-hidden mt-3">
-                      <motion.div
-                        className="h-full rounded-full"
-                        style={{ background: `linear-gradient(90deg, ${SCAN_FROM}, ${DEEP_GREEN})` }}
-                        initial={{ width: 0 }}
-                        animate={{ width: `${Math.round((weeklyReport.progress / 7) * 100)}%` }}
-                        transition={{ duration: 0.6, ease: "easeOut" }}
-                      />
+
+                    <div className="grid grid-cols-3 gap-2 mt-4">
+                      <div className="rounded-2xl p-3" style={{ background: "#FFFFFF", border: "1px solid #F2E7DF" }}>
+                        <p className="text-[10px] font-bold text-stone-400">{diaryReport.copy.scans}</p>
+                        <p className="text-[20px] font-black mt-1" style={{ color: DEEP_GREEN }}>{diaryReport.scanCount}</p>
+                      </div>
+                      <div className="rounded-2xl p-3" style={{ background: "#FFFFFF", border: "1px solid #F2E7DF" }}>
+                        <p className="text-[10px] font-bold text-stone-400">{diaryReport.copy.diary}</p>
+                        <p className="text-[20px] font-black mt-1" style={{ color: SCAN_TO }}>{diaryReport.memoCount}</p>
+                      </div>
+                      <div className="rounded-2xl p-3" style={{ background: "#FFFFFF", border: "1px solid #F2E7DF" }}>
+                        <p className="text-[10px] font-bold text-stone-400">{diaryReport.copy.adherence}</p>
+                        <p className="text-[20px] font-black mt-1" style={{ color: "#0F766E" }}>{diaryReport.adherence}</p>
+                      </div>
                     </div>
-                    {weeklyReport.unlocked && (
-                      <div className="grid gap-3 mt-4 md:grid-cols-2">
-                        <div className="rounded-[22px] p-4" style={{ background: "#FFFFFF", border: "1px solid #F1E6DE" }}>
-                          <p className="text-[10px] font-black uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>{t("modal.diary.scoreFlow")}</p>
-                          <p className="text-[22px] font-black mt-2" style={{ color: DEEP_GREEN }}>{weeklyReport.averageScore}</p>
-                          <p className="text-[11px] text-stone-500 mt-1">{t("modal.diary.weeklyAverage")}</p>
-                          <div className="grid grid-cols-2 gap-2 mt-3">
-                            <div className="rounded-2xl p-3" style={{ background: "#FFF8F4" }}>
-                              <p className="text-[10px] text-stone-400">{t("modal.diary.best")}</p>
-                              <p className="text-[14px] font-black mt-1" style={{ color: DEEP_GREEN }}>{weeklyReport.bestDay?.score ?? "--"}{weeklyReport.bestDay ? t("result.scoreSuffix") : ""}</p>
-                            </div>
-                            <div className="rounded-2xl p-3" style={{ background: "#F6F3EE" }}>
-                              <p className="text-[10px] text-stone-400">{t("modal.diary.low")}</p>
-                              <p className="text-[14px] font-black mt-1" style={{ color: "#8C8070" }}>{weeklyReport.worstDay?.score ?? "--"}{weeklyReport.worstDay ? t("result.scoreSuffix") : ""}</p>
-                            </div>
-                          </div>
+
+                    <div className="rounded-[22px] p-4 mt-4" style={{ background: "#FFFFFF", border: "1px solid #F2E7DF" }}>
+                      <div className="flex items-center justify-between gap-3">
+                        <div>
+                          <p className="text-[10px] font-black uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>
+                            {diaryReport.copy.executive}
+                          </p>
+                          <p className="text-[18px] font-black mt-1" style={{ color: DEEP_GREEN }}>
+                            {diaryReport.copy[diaryReport.trendKey]}
+                          </p>
                         </div>
-                        <div className="rounded-[22px] p-4" style={{ background: "#FFFFFF", border: "1px solid #F1E6DE" }}>
-                          <p className="text-[10px] font-black uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>{t("modal.diary.pattern")}</p>
-                          <div className="space-y-3 mt-3">
-                            <div>
-                              <p className="text-[10px] text-stone-400">{t("modal.diary.bestRoutine")}</p>
-                              <p className="text-[13px] font-black mt-1 text-kr-pretty" style={{ color: DEEP_GREEN }}>{weeklyReport.bestRoutine?.text ?? t("modal.diary.collectingData")}</p>
-                            </div>
-                            <div>
-                              <p className="text-[10px] text-stone-400">{t("modal.diary.worstRoutine")}</p>
-                              <p className="text-[13px] font-black mt-1 text-kr-pretty" style={{ color: "#8C8070" }}>{weeklyReport.worstRoutine?.text ?? t("modal.diary.collectingData")}</p>
-                            </div>
-                          </div>
-                        </div>
-                        <div className="rounded-[22px] p-4" style={{ background: "#FFFFFF", border: "1px solid #F1E6DE" }}>
-                          <p className="text-[10px] font-black uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>{t("modal.diary.memoSignals")}</p>
-                          <div className="flex flex-wrap gap-1.5 mt-3">
-                            {(weeklyReport.keywordSummary.length > 0 ? weeklyReport.keywordSummary : [t("modal.diary.memoCollecting")]).map((keyword) => (
-                              <span key={keyword} className="px-2.5 py-1 rounded-full text-[10px] font-bold"
-                                style={{ background: "#FFF1EC", color: SCAN_TO }}>
-                                {keyword}
-                              </span>
-                            ))}
-                          </div>
-                          <p className="text-[11px] text-stone-500 mt-3">{t("modal.diary.weeklyMemoCount", { count: weeklyReport.memoCount })}</p>
-                        </div>
-                        <div className="rounded-[22px] p-4" style={{ background: "#FFFFFF", border: "1px solid #F1E6DE" }}>
-                          <p className="text-[10px] font-black uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>{t("modal.diary.causeTags")}</p>
-                          <div className="flex flex-wrap gap-1.5 mt-3">
-                            {(weeklyReport.topCauseTags.length > 0
-                              ? weeklyReport.topCauseTags.map(([tag, count]) => `${getCauseTagLabel(t, tag)} ${count}`)
-                              : [t("modal.diary.tagCollecting")]).map((item) => (
-                              <span key={item} className="px-2.5 py-1 rounded-full text-[10px] font-bold"
-                                style={{ background: "#F5F3FF", color: "#7C3AED" }}>
-                                {item}
-                              </span>
-                            ))}
-                          </div>
-                          <p className="text-[11px] text-stone-500 mt-3">{t("modal.diary.incompleteDays", { count: weeklyReport.incompleteDays })}</p>
+                        <div className="px-3 py-1.5 rounded-full text-[10px] font-black"
+                          style={{ background: `${SCAN_FROM}18`, color: SCAN_TO }}>
+                          {diaryReport.trendDesc}
                         </div>
                       </div>
-                    )}
+                      <p className="text-[13px] text-stone-600 mt-3 leading-relaxed text-kr-pretty">
+                        {diaryReport.executiveSummary}
+                      </p>
+                      <p className="text-[11px] text-stone-500 mt-3">{diaryReport.routineDesc}</p>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <div className="space-y-3">
+                  <p className="text-[11px] font-black uppercase tracking-[0.14em] px-1" style={{ color: SCAN_TO }}>
+                    {diaryReport.copy.priority}
+                  </p>
+                  {diaryReport.focusConcerns.map((concern) => (
+                    <Card key={concern.key} className="border-none rounded-[24px] shadow-sm overflow-hidden" style={{ background: "#FFFFFF" }}>
+                      <CardContent className="p-4">
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="min-w-0">
+                            <p className="text-[15px] font-black text-kr-pretty" style={{ color: concern.accent }}>{concern.titles[reportLang]}</p>
+                            <p className="text-[12px] text-stone-500 mt-1 leading-relaxed">{concern.summaries[reportLang]}</p>
+                          </div>
+                          <div className="rounded-2xl px-3 py-2 shrink-0 text-right"
+                            style={{ background: `${concern.accent}12`, border: `1px solid ${concern.accent}20` }}>
+                            <p className="text-[10px] font-bold" style={{ color: concern.accent }}>{diaryReport.copy.avgRisk}</p>
+                            <p className="text-[20px] font-black leading-none mt-1" style={{ color: concern.accent }}>{concern.avgRisk}</p>
+                          </div>
+                        </div>
+                        <div className="mt-3 h-2 rounded-full bg-stone-100 overflow-hidden">
+                          <div className="h-full rounded-full" style={{ width: `${Math.min(100, concern.avgRisk)}%`, background: concern.accent }} />
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+
+                <div className="grid gap-3 md:grid-cols-2">
+                  <Card className="border-none rounded-[24px] shadow-sm overflow-hidden" style={{ background: "#FFFFFF" }}>
+                    <CardContent className="p-4">
+                      <p className="text-[11px] font-black uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>
+                        {diaryReport.copy.ingredients}
+                      </p>
+                      <div className="space-y-3 mt-3">
+                        {diaryReport.ingredientPlan.map((item) => (
+                          <div key={item.name} className="rounded-[18px] p-3" style={{ background: `${item.accent}10` }}>
+                            <div className="flex items-center justify-between gap-2">
+                              <p className="text-[13px] font-black" style={{ color: item.accent }}>{item.name}</p>
+                              <span className="text-[10px] font-bold px-2 py-1 rounded-full bg-white/80 text-stone-500">{item.concern}</span>
+                            </div>
+                            <p className="text-[11px] text-stone-600 mt-2 leading-relaxed">{item.reason}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="border-none rounded-[24px] shadow-sm overflow-hidden" style={{ background: "#FFFFFF" }}>
+                    <CardContent className="p-4">
+                      <p className="text-[11px] font-black uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>
+                        {diaryReport.copy.procedures}
+                      </p>
+                      <div className="space-y-3 mt-3">
+                        {diaryReport.procedurePlan.map((item) => (
+                          <div key={item.name} className="rounded-[18px] p-3 border" style={{ borderColor: `${item.accent}20`, background: "#FFFCFA" }}>
+                            <div className="flex items-center justify-between gap-2">
+                              <p className="text-[13px] font-black" style={{ color: DEEP_GREEN }}>{item.name}</p>
+                              <span className="text-[10px] font-bold px-2 py-1 rounded-full" style={{ background: `${item.accent}12`, color: item.accent }}>
+                                {diaryReport.copy.recommended}
+                              </span>
+                            </div>
+                            <p className="text-[11px] text-stone-600 mt-2 leading-relaxed">{item.reason}</p>
+                          </div>
+                        ))}
+                      </div>
+                      <p className="text-[11px] text-stone-500 mt-3 leading-relaxed">{diaryReport.copy.procedureNote}</p>
+                    </CardContent>
+                  </Card>
+                </div>
+
+                <Card className="border-none rounded-[24px] shadow-sm overflow-hidden" style={{ background: "#FFFFFF" }}>
+                  <CardContent className="p-4">
+                    <p className="text-[11px] font-black uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>
+                      {diaryReport.copy.routine}
+                    </p>
+                    <div className="grid gap-3 mt-3 md:grid-cols-2">
+                      <div className="rounded-[20px] p-4" style={{ background: "#FFF8F4" }}>
+                        <p className="text-[10px] font-black uppercase tracking-[0.12em] text-stone-400">{diaryReport.copy.routineGood}</p>
+                        <p className="text-[13px] font-black mt-2 text-kr-pretty" style={{ color: DEEP_GREEN }}>{diaryReport.routineHighlights.strong}</p>
+                      </div>
+                      <div className="rounded-[20px] p-4" style={{ background: "#F6F3EE" }}>
+                        <p className="text-[10px] font-black uppercase tracking-[0.12em] text-stone-400">{diaryReport.copy.routineWatch}</p>
+                        <p className="text-[13px] font-black mt-2 text-kr-pretty" style={{ color: "#8C8070" }}>{diaryReport.routineHighlights.watch}</p>
+                      </div>
+                      <div className="rounded-[20px] p-4" style={{ background: "#FFF1EC" }}>
+                        <p className="text-[10px] font-black uppercase tracking-[0.12em]" style={{ color: SCAN_TO }}>{diaryReport.copy.memoSignals}</p>
+                        <div className="flex flex-wrap gap-1.5 mt-3">
+                          {(diaryReport.keywordSummary.length > 0 ? diaryReport.keywordSummary : [diaryReport.copy.notEnough]).map((item) => (
+                            <span key={item} className="px-2.5 py-1 rounded-full text-[10px] font-bold" style={{ background: "#FFFFFF", color: SCAN_TO }}>
+                              {item}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                      <div className="rounded-[20px] p-4" style={{ background: "#F5F3FF" }}>
+                        <p className="text-[10px] font-black uppercase tracking-[0.12em] text-[#7C3AED]">{diaryReport.copy.causeSignals}</p>
+                        <div className="flex flex-wrap gap-1.5 mt-3">
+                          {(diaryReport.topCauseTags.length > 0 ? diaryReport.topCauseTags : [diaryReport.copy.notEnough]).map((item) => (
+                            <span key={item} className="px-2.5 py-1 rounded-full text-[10px] font-bold" style={{ background: "#FFFFFF", color: "#7C3AED" }}>
+                              {item}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="rounded-[20px] p-4 mt-3" style={{ background: "#F7FAF8", border: "1px solid #E5F0EB" }}>
+                      <p className="text-[10px] font-black uppercase tracking-[0.12em]" style={{ color: DEEP_GREEN }}>
+                        {diaryReport.copy.cosmeticsSignal}
+                      </p>
+                      <p className="text-[12px] text-stone-600 mt-2 leading-relaxed">{diaryReport.cosmeticsSignal}</p>
+                      {routineGuide.cautions.length > 0 && (
+                        <div className="flex flex-wrap gap-1.5 mt-3">
+                          {routineGuide.cautions.slice(0, 2).map((item) => (
+                            <span key={item} className="px-2.5 py-1 rounded-full text-[10px] font-bold" style={{ background: "#FFF1EC", color: SCAN_TO }}>
+                              {item}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                    </div>
                   </CardContent>
                 </Card>
               </div>
