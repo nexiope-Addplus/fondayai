@@ -4509,6 +4509,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
             scoreSummary: buildPushScoreSummary(analysisResult),
           }),
         });
+        await syncReminderToServer(getReminderSettings());
       })
       .catch((error) => console.error("[push-sync]", error));
 
@@ -4530,6 +4531,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
       const existing = await reg.pushManager.getSubscription();
       if (existing && pushSubscribed) {
         // 구독 해제
+        await syncReminderToServer({ ...getReminderSettings(), enabled: false });
         await fetch("/api/push-subscribe", { method: "DELETE", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ endpoint: existing.endpoint }) });
         await existing.unsubscribe();
         setPushSubscribed(false);
@@ -4552,6 +4554,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
             scoreSummary: buildPushScoreSummary(analysisResult),
           }),
         });
+        await syncReminderToServer(getReminderSettings());
         setPushSubscribed(true);
       }
     } catch (e) { console.error("[push]", e); }
