@@ -20,7 +20,7 @@ export const onRequest = async (context: any) => {
   // ── POST: 구독 저장 ───────────────────────────────────────────
   if (request.method === "POST") {
     const body: any = await request.json();
-    const { subscription, baumannType, lang } = body;
+    const { subscription, baumannType, lang, scoreSummary } = body;
 
     if (!subscription?.endpoint) {
       return new Response(JSON.stringify({ error: "subscription required" }), { status: 400, headers: CORS });
@@ -28,9 +28,29 @@ export const onRequest = async (context: any) => {
 
     // endpoint를 기반으로 고유 ID 생성 (URL 안전 해시)
     const id = btoa(subscription.endpoint).replace(/[^a-zA-Z0-9]/g, "").slice(-32);
-    const record = { id, subscription, baumannType: baumannType || "OSNT", lang: lang || "ko", createdAt: new Date().toISOString() };
+    const nextScoreSummary = Array.isArray(scoreSummary)
+      ? scoreSummary
+          .map((item: any) => ({
+            label: typeof item?.label === "string" ? item.label : "",
+            score: Number(item?.score),
+          }))
+          .filter((item: any) => item.label && Number.isFinite(item.score))
+          .slice(0, 3)
+      : [];
 
     if (kv) {
+      const prevRaw = await kv.get(`push:sub:${id}`);
+      const prev = prevRaw ? JSON.parse(prevRaw) : null;
+      const record = {
+        ...prev,
+        id,
+        subscription,
+        baumannType: baumannType || prev?.baumannType || "OSNT",
+        lang: lang || prev?.lang || "ko",
+        scoreSummary: nextScoreSummary.length ? nextScoreSummary : (prev?.scoreSummary || []),
+        createdAt: prev?.createdAt || new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      };
       await kv.put(`push:sub:${id}`, JSON.stringify(record));
       // 전체 ID 목록 업데이트
       const allRaw = await kv.get("push:all_ids");

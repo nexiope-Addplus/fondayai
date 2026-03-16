@@ -118,6 +118,29 @@ const BAUMANN_COLORS: Record<string, string> = {
   T: "#14B8A6",
 };
 
+function buildPushScoreSummary(result: AnalysisResult | null) {
+  if (!result?.scores?.length) return [];
+
+  return [...result.scores]
+    .filter((item) => Number.isFinite(Number(item?.score)) && typeof item?.label === "string")
+    .sort((a, b) => Number(a.score) - Number(b.score))
+    .slice(0, 3)
+    .map((item) => ({
+      label: item.label,
+      score: Number(item.score),
+    }));
+}
+
+function buildBaumannTypeFromResult(result: AnalysisResult | null) {
+  const scores = result?.scores || [];
+  const isOily = (scores[3]?.score ?? 100) < 50;
+  const isSens = (scores[2]?.score ?? 0) > 50;
+  const isPig = (scores[5]?.score ?? 0) > 50;
+  const isWrink = (scores[4]?.score ?? 100) < 60;
+
+  return `${isOily ? "O" : "D"}${isSens ? "S" : "R"}${isPig ? "P" : "N"}${isWrink ? "W" : "T"}`;
+}
+
 const DEEP_GREEN = "#2D5F4F";
 const DEEP_GREEN_LIGHT = "#3D7A66";
 const TEXT_SECONDARY = "#8C8070";
@@ -4437,6 +4460,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
   const [pushSubscribed, setPushSubscribed] = useState(false);
   const [pushLoading, setPushLoading] = useState(false);
   const [showPushPrompt, setShowPushPrompt] = useState(false);
+  const pushBaumannType = buildBaumannTypeFromResult(analysisResult);
 
   useEffect(() => {
     // 이미 구독 중인지 확인
@@ -4463,6 +4487,35 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
   useEffect(() => {
     if (pushSubscribed) setShowPushPrompt(false);
   }, [pushSubscribed]);
+
+  useEffect(() => {
+    if (!analysisResult || !pushSubscribed) return;
+    if (!("serviceWorker" in navigator) || !("PushManager" in window)) return;
+
+    let cancelled = false;
+
+    navigator.serviceWorker.ready
+      .then(async (reg) => {
+        const existing = await reg.pushManager.getSubscription();
+        if (!existing || cancelled) return;
+
+        await fetch("/api/push-subscribe", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            subscription: existing.toJSON(),
+            baumannType: pushBaumannType,
+            lang: i18n.language || "ko",
+            scoreSummary: buildPushScoreSummary(analysisResult),
+          }),
+        });
+      })
+      .catch((error) => console.error("[push-sync]", error));
+
+    return () => {
+      cancelled = true;
+    };
+  }, [analysisResult, pushBaumannType, pushSubscribed]);
 
   const handlePushToggle = async () => {
     if (!("serviceWorker" in navigator) || !("PushManager" in window)) {
@@ -4492,7 +4545,12 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
         await fetch("/api/push-subscribe", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ subscription: sub.toJSON(), baumannType: finalType, lang: i18n.language || "ko" }),
+          body: JSON.stringify({
+            subscription: sub.toJSON(),
+            baumannType: pushBaumannType,
+            lang: i18n.language || "ko",
+            scoreSummary: buildPushScoreSummary(analysisResult),
+          }),
         });
         setPushSubscribed(true);
       }

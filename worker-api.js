@@ -340,23 +340,269 @@ const MEAL_TIPS = {
   },
 };
 
-function getMealTip(baumannType, lang, meal) {
+const SCORE_FOCUS_MAP = {
+  "수분 밸런스": "hydration",
+  "붉은기 수준": "calming",
+  "모공 상태": "trouble",
+  "주름 및 탄력": "firmness",
+  "잡티/색소침착": "brightening",
+  "트러블 위험": "trouble",
+  "다크서클": "recovery",
+  "피부 광채": "brightening",
+  "피부결 균일도": "firmness",
+};
+
+const MEAL_VARIETY = {
+  ko: {
+    lunch: {
+      hydration: [
+        { key: "hydration-a", menu: "오이냉국", tip: "수분이 낮은 날에는 수분 많은 채소 반찬을 함께 드세요." },
+        { key: "hydration-b", menu: "두유 한 컵", tip: "점심에 수분과 단백질을 같이 보충하면 건조감 완화에 도움이 됩니다." },
+      ],
+      calming: [
+        { key: "calming-a", menu: "양배추찜", tip: "자극이 적은 채소를 곁들이면 붉은기 완화에 유리합니다." },
+        { key: "calming-b", menu: "무가당 보리차", tip: "매운 양념 대신 담백한 구성으로 민감도를 낮춰주세요." },
+      ],
+      trouble: [
+        { key: "trouble-a", menu: "병아리콩 샐러드", tip: "섬유질과 식물성 단백질을 더해 피지 급등을 완화하세요." },
+        { key: "trouble-b", menu: "구운 버섯", tip: "튀김 대신 구운 토핑을 더하면 모공과 트러블 부담이 덜합니다." },
+      ],
+      brightening: [
+        { key: "brightening-a", menu: "파프리카 샐러드", tip: "비타민C가 풍부한 채소를 더해 칙칙함 관리에 힘을 주세요." },
+        { key: "brightening-b", menu: "키위 1개", tip: "항산화 과일을 곁들이면 색소 고민 완화에 도움이 됩니다." },
+      ],
+      firmness: [
+        { key: "firmness-a", menu: "검은콩 반찬", tip: "단백질과 폴리페놀을 보강해 탄력 관리에 도움을 주세요." },
+        { key: "firmness-b", menu: "참깨나물", tip: "미네랄이 풍부한 곁들임을 더해 피부결 회복을 보조하세요." },
+      ],
+      recovery: [
+        { key: "recovery-a", menu: "단호박 샐러드", tip: "눈가 피로가 있는 날엔 베타카로틴 식품을 함께 드세요." },
+        { key: "recovery-b", menu: "삶은 달걀 추가", tip: "점심 단백질을 보강하면 오후 처짐과 칙칙함 완화에 유리합니다." },
+      ],
+      default: [
+        { key: "default-a", menu: "제철 과일 한 조각", tip: "한 가지 색이 아닌 여러 색 재료를 먹는 편이 피부에 유리합니다." },
+        { key: "default-b", menu: "나물 한 접시", tip: "가공식품보다 채소 반찬 비중을 조금 더 올려보세요." },
+      ],
+    },
+    dinner: {
+      hydration: [
+        { key: "hydration-a", menu: "들깨 버섯국", tip: "저녁에는 수분과 지방을 함께 보충해 장벽 회복을 도와주세요." },
+        { key: "hydration-b", menu: "아보카도 슬라이스", tip: "건조한 날 저녁엔 좋은 지방을 조금 더하는 편이 좋습니다." },
+      ],
+      calming: [
+        { key: "calming-a", menu: "찐애호박", tip: "자극적인 야식 대신 부드러운 채소를 더해 붉은기를 가라앉히세요." },
+        { key: "calming-b", menu: "두부구이 추가", tip: "맵고 짠 반찬보다 담백한 단백질을 선택하는 편이 안전합니다." },
+      ],
+      trouble: [
+        { key: "trouble-a", menu: "렌틸콩 곁들임", tip: "야식성 탄수화물 대신 포만감 있는 콩류를 더해 트러블 부담을 줄이세요." },
+        { key: "trouble-b", menu: "구운 가지", tip: "기름진 저녁 대신 채소 비중을 늘리면 밤사이 피지 부담이 덜합니다." },
+      ],
+      brightening: [
+        { key: "brightening-a", menu: "토마토 샐러드", tip: "저녁 항산화 식품은 칙칙함과 색소 고민 관리에 도움이 됩니다." },
+        { key: "brightening-b", menu: "오렌지 반 개", tip: "비타민C 공급원을 조금 더하면 다음 날 피부 톤 관리에 유리합니다." },
+      ],
+      firmness: [
+        { key: "firmness-a", menu: "검은깨 두부", tip: "탄력 저하가 느껴질 때는 단백질과 미네랄 보강이 중요합니다." },
+        { key: "firmness-b", menu: "해조류 무침", tip: "미네랄이 풍부한 해조류를 곁들여 피부결 회복을 보조하세요." },
+      ],
+      recovery: [
+        { key: "recovery-a", menu: "브로콜리 찜", tip: "피로 누적이 보이면 항산화 채소를 저녁에 더해 회복을 도와주세요." },
+        { key: "recovery-b", menu: "따뜻한 우엉차", tip: "늦은 저녁 카페인 대신 부담 적은 음료로 마무리하는 편이 좋습니다." },
+      ],
+      default: [
+        { key: "default-a", menu: "나물 2가지", tip: "저녁엔 탄수화물보다 채소와 단백질 비중을 높여보세요." },
+        { key: "default-b", menu: "맑은 국 한 그릇", tip: "과식보다 가벼운 구성이 다음 날 피부 컨디션에 유리합니다." },
+      ],
+    },
+  },
+  en: {
+    lunch: {
+      hydration: [
+        { key: "hydration-a", menu: "cucumber soup", tip: "Add a water-rich side when hydration is trending low." },
+        { key: "hydration-b", menu: "a cup of soy milk", tip: "Extra fluids plus protein at lunch can help dryness." },
+      ],
+      calming: [
+        { key: "calming-a", menu: "steamed cabbage", tip: "Mild vegetable sides are better than spicy add-ons on red days." },
+        { key: "calming-b", menu: "unsweetened barley tea", tip: "Keep the lunch profile gentle to calm reactive skin." },
+      ],
+      trouble: [
+        { key: "trouble-a", menu: "chickpea salad", tip: "More fiber and lean protein can reduce oil spikes." },
+        { key: "trouble-b", menu: "roasted mushrooms", tip: "Roasted toppings are easier on pores than fried sides." },
+      ],
+      brightening: [
+        { key: "brightening-a", menu: "bell pepper salad", tip: "Vitamin C rich vegetables support tone recovery." },
+        { key: "brightening-b", menu: "one kiwi", tip: "An antioxidant fruit side helps with dullness care." },
+      ],
+      firmness: [
+        { key: "firmness-a", menu: "black bean side", tip: "Protein and polyphenols support firmness care." },
+        { key: "firmness-b", menu: "sesame greens", tip: "Mineral-rich greens help texture recovery." },
+      ],
+      recovery: [
+        { key: "recovery-a", menu: "pumpkin salad", tip: "Beta-carotene rich sides can help on tired-eye days." },
+        { key: "recovery-b", menu: "an extra boiled egg", tip: "A little more lunch protein helps afternoon recovery." },
+      ],
+      default: [
+        { key: "default-a", menu: "seasonal fruit", tip: "A more colorful plate usually supports better skin nutrition." },
+        { key: "default-b", menu: "mixed greens", tip: "Shift part of the meal from processed foods to vegetables." },
+      ],
+    },
+    dinner: {
+      hydration: [
+        { key: "hydration-a", menu: "perilla mushroom soup", tip: "Pair fluid intake with healthy fats at dinner for barrier support." },
+        { key: "hydration-b", menu: "sliced avocado", tip: "A little extra healthy fat helps on dry-skin evenings." },
+      ],
+      calming: [
+        { key: "calming-a", menu: "steamed zucchini", tip: "Choose soft, mild sides over spicy late-night foods." },
+        { key: "calming-b", menu: "extra grilled tofu", tip: "A bland protein side is safer for redness-prone skin." },
+      ],
+      trouble: [
+        { key: "trouble-a", menu: "lentil side", tip: "Swap greasy late carbs for legumes to lower breakout load." },
+        { key: "trouble-b", menu: "roasted eggplant", tip: "More vegetables at dinner reduce overnight oil burden." },
+      ],
+      brightening: [
+        { key: "brightening-a", menu: "tomato salad", tip: "Antioxidant foods at dinner help with tone and spot care." },
+        { key: "brightening-b", menu: "half an orange", tip: "A small vitamin C side can support next-day brightness." },
+      ],
+      firmness: [
+        { key: "firmness-a", menu: "black sesame tofu", tip: "Protein and minerals support elasticity and texture." },
+        { key: "firmness-b", menu: "seaweed side", tip: "Mineral-rich sea vegetables help recovery overnight." },
+      ],
+      recovery: [
+        { key: "recovery-a", menu: "steamed broccoli", tip: "Antioxidant vegetables can help when fatigue shows up under the eyes." },
+        { key: "recovery-b", menu: "warm burdock tea", tip: "Finish dinner with a low-stimulus drink instead of caffeine." },
+      ],
+      default: [
+        { key: "default-a", menu: "two vegetable sides", tip: "Keep dinner lighter with more vegetables than refined carbs." },
+        { key: "default-b", menu: "clear soup", tip: "A lighter dinner often leads to better skin the next morning." },
+      ],
+    },
+  },
+  ja: {
+    lunch: {
+      hydration: [
+        { key: "hydration-a", menu: "きゅうりのスープ", tip: "水分が低い日は水分の多い副菜を追加してください。" },
+        { key: "hydration-b", menu: "豆乳1杯", tip: "昼に水分とたんぱく質を足すと乾燥対策に役立ちます。" },
+      ],
+      calming: [
+        { key: "calming-a", menu: "蒸しキャベツ", tip: "赤みがある日は辛い副菜よりやさしい野菜が向いています。" },
+        { key: "calming-b", menu: "無糖の麦茶", tip: "刺激の少ない構成が敏感肌の安定に有利です。" },
+      ],
+      trouble: [
+        { key: "trouble-a", menu: "ひよこ豆サラダ", tip: "食物繊維とたんぱく質を足すと皮脂の急上昇を抑えやすいです。" },
+        { key: "trouble-b", menu: "ローストきのこ", tip: "揚げ物より焼きトッピングの方が毛穴負担が軽くなります。" },
+      ],
+      brightening: [
+        { key: "brightening-a", menu: "パプリカサラダ", tip: "ビタミンC豊富な副菜がくすみケアを支えます。" },
+        { key: "brightening-b", menu: "キウイ1個", tip: "抗酸化フルーツを足すと肌トーン管理に役立ちます。" },
+      ],
+      firmness: [
+        { key: "firmness-a", menu: "黒豆の副菜", tip: "たんぱく質とポリフェノールがハリケアを助けます。" },
+        { key: "firmness-b", menu: "ごま和え", tip: "ミネラル豊富な副菜がキメの回復を支えます。" },
+      ],
+      recovery: [
+        { key: "recovery-a", menu: "かぼちゃサラダ", tip: "目元疲れがある日はβカロテン食品を足してください。" },
+        { key: "recovery-b", menu: "ゆで卵追加", tip: "昼のたんぱく質補強が午後の回復に役立ちます。" },
+      ],
+      default: [
+        { key: "default-a", menu: "旬の果物", tip: "色の多い食事の方が肌には有利です。" },
+        { key: "default-b", menu: "青菜の副菜", tip: "加工食品より野菜の割合を少し増やしてみてください。" },
+      ],
+    },
+    dinner: {
+      hydration: [
+        { key: "hydration-a", menu: "えごまきのこスープ", tip: "夜は水分と良質な脂質を一緒に補うのが有利です。" },
+        { key: "hydration-b", menu: "アボカドスライス", tip: "乾燥する夜は良質な脂質を少し足してください。" },
+      ],
+      calming: [
+        { key: "calming-a", menu: "蒸しズッキーニ", tip: "刺激の強い夜食よりやさしい野菜を選んでください。" },
+        { key: "calming-b", menu: "豆腐焼き追加", tip: "赤みがある日は淡白なたんぱく質が無難です。" },
+      ],
+      trouble: [
+        { key: "trouble-a", menu: "レンズ豆の副菜", tip: "脂っこい夜食より豆類で満足感を作る方が安全です。" },
+        { key: "trouble-b", menu: "焼きナス", tip: "野菜の比率を増やすと夜間の皮脂負担を抑えやすいです。" },
+      ],
+      brightening: [
+        { key: "brightening-a", menu: "トマトサラダ", tip: "夜の抗酸化食材がくすみや色素悩みの管理を助けます。" },
+        { key: "brightening-b", menu: "オレンジ半分", tip: "少量のビタミンCが翌朝の明るさ維持に役立ちます。" },
+      ],
+      firmness: [
+        { key: "firmness-a", menu: "黒ごま豆腐", tip: "たんぱく質とミネラルが弾力とキメを支えます。" },
+        { key: "firmness-b", menu: "海藻の副菜", tip: "ミネラル豊富な海藻が夜の回復を助けます。" },
+      ],
+      recovery: [
+        { key: "recovery-a", menu: "蒸しブロッコリー", tip: "疲れが出る日は抗酸化野菜を夜に追加してください。" },
+        { key: "recovery-b", menu: "温かいごぼう茶", tip: "カフェインより穏やかな飲み物で締める方が良いです。" },
+      ],
+      default: [
+        { key: "default-a", menu: "野菜の副菜2つ", tip: "夕食は炭水化物より野菜とたんぱく質を少し増やしてください。" },
+        { key: "default-b", menu: "澄まし汁", tip: "軽めの夕食の方が翌朝の肌コンディションに有利です。" },
+      ],
+    },
+  },
+};
+
+function hashString(value = "") {
+  let hash = 0;
+  for (let i = 0; i < value.length; i += 1) {
+    hash = ((hash << 5) - hash + value.charCodeAt(i)) | 0;
+  }
+  return Math.abs(hash);
+}
+
+function getPrimaryFocus(scoreSummary) {
+  if (!Array.isArray(scoreSummary) || scoreSummary.length === 0) return "default";
+
+  const sorted = [...scoreSummary]
+    .map(item => ({ label: item?.label, score: Number(item?.score) }))
+    .filter(item => item.label && Number.isFinite(item.score))
+    .sort((a, b) => a.score - b.score);
+
+  for (const item of sorted) {
+    const focus = SCORE_FOCUS_MAP[item.label];
+    if (focus) return focus;
+  }
+  return "default";
+}
+
+function pickVariant(items, seed, previousKey) {
+  if (!Array.isArray(items) || items.length === 0) return null;
+  let index = hashString(seed) % items.length;
+  if (items.length > 1 && previousKey && items[index]?.key === previousKey) {
+    index = (index + 1) % items.length;
+  }
+  return items[index];
+}
+
+function getMealTip({ baumannType, lang, meal, scoreSummary, subscriberId, mealHistory }) {
   const langData = MEAL_TIPS[lang] || MEAL_TIPS.ko;
   const mealData = langData[meal];
+  const history = mealHistory?.[meal] || null;
+  const focus = getPrimaryFocus(scoreSummary);
+  const addonData = ((MEAL_VARIETY[lang] || MEAL_VARIETY.ko)[meal] || {});
 
   // 바우만 4글자 전체 매칭 (우선순위: O/D → S/R → P/N → W/T)
   const priority = ["O", "D", "S", "R", "P", "N", "W", "T"];
   const matched = priority.filter(l => baumannType?.includes(l) && mealData[l]);
+  const baseOptions = matched.length > 0
+    ? matched.map(key => ({ key, ...mealData[key] }))
+    : [{ key: "default", ...mealData.default }];
+  const dateSeed = new Date().toISOString().slice(0, 10);
+  const base = pickVariant(baseOptions, `${subscriberId}:${meal}:base:${focus}:${dateSeed}`, history?.baseKey) || baseOptions[0];
+  const addonOptions = addonData[focus] || addonData.default || [];
+  const addon = pickVariant(addonOptions, `${subscriberId}:${meal}:addon:${focus}:${dateSeed}`, history?.addonKey);
+  const secondaryTips = matched
+    .filter(key => key !== base.key)
+    .slice(0, 1)
+    .map(key => mealData[key].tip);
+  const tipParts = [base.tip, addon?.tip, ...secondaryTips].filter(Boolean);
 
-  if (matched.length === 0) return mealData.default;
-
-  // 메뉴는 최우선 글자 기준
-  const menu = mealData[matched[0]].menu;
-
-  // 팁은 상위 2개 글자 조합 (4글자 모두 반영)
-  const tips = matched.slice(0, 2).map(l => mealData[l].tip).join(" ");
-
-  return { menu, tip: tips };
+  return {
+    menu: addon ? `${base.menu} + ${addon.menu}` : base.menu,
+    tip: tipParts.join(" "),
+    baseKey: base.key,
+    addonKey: addon?.key || null,
+    focus,
+  };
 }
 
 // ─── VAPID 서명 (JWK 방식, Web Crypto API) ───────────────────────
@@ -557,12 +803,9 @@ async function sendMealPushToAll(env, meal) {
     try {
       const raw = await kv.get(`push:sub:${id}`);
       if (!raw) continue;
-      const { subscription, baumannType, lang } = JSON.parse(raw);
-      const tip = getMealTip(baumannType, lang, meal);
-      const langData = MEAL_TIPS[lang] || MEAL_TIPS.ko;
-      const title = meal === "lunch"
-        ? (langData.lunch.default ? "🥗 Fonday 점심 추천" : "🥗 Fonday Lunch")
-        : (langData.dinner.default ? "🍽️ Fonday 저녁 추천" : "🍽️ Fonday Dinner");
+      const record = JSON.parse(raw);
+      const { subscription, baumannType, lang, scoreSummary, mealHistory } = record;
+      const tip = getMealTip({ baumannType, lang, meal, scoreSummary, subscriberId: id, mealHistory });
       // 언어별 타이틀
       const titles = { ko: meal === "lunch" ? "🥗 Fonday 점심 추천" : "🍽️ Fonday 저녁 추천",
                        en: meal === "lunch" ? "🥗 Fonday Lunch Pick" : "🍽️ Fonday Dinner Pick",
@@ -573,6 +816,18 @@ async function sendMealPushToAll(env, meal) {
         body: `${typeLabel}${tip.menu}\n${tip.tip}`,
         url: "/",
       }, env);
+      await kv.put(`push:sub:${id}`, JSON.stringify({
+        ...record,
+        mealHistory: {
+          ...(mealHistory || {}),
+          [meal]: {
+            sentAt: new Date().toISOString(),
+            baseKey: tip.baseKey,
+            addonKey: tip.addonKey,
+            focus: tip.focus,
+          },
+        },
+      }));
     } catch (e) {
       console.error(`[push] id=${id} error:`, e.message);
     }
