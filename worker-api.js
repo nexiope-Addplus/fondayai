@@ -256,8 +256,9 @@ export default {
   },
 
   // ── Cron 스케줄러 ──────────────────────────────────────────────
-  // KST 09:00 (UTC 00:00) 스캔 리마인더
+  // KST 07:30 (UTC 22:30) 스캔 리마인더
   // KST 12:00 (UTC 03:00) 점심 식단 알림
+  // KST 15:00 (UTC 06:00) 수분 리마인더
   // KST 18:00 (UTC 09:00) 저녁 식단 알림
   // KST 20:00 (UTC 11:00) 루틴 리마인더
   // KST 21:00 (UTC 12:00) 루틴 리마인더
@@ -267,11 +268,14 @@ export default {
     const hour = now.getUTCHours();
     const isScanReminder = (hour === 22);  // UTC 22:30 = KST 07:30
     const isLunch = (hour === 3);          // UTC 03:00 = KST 12:00
+    const isHydration = (hour === 6);      // UTC 06:00 = KST 15:00
     const isDinner = (hour === 9);        // UTC 09:00 = KST 18:00
     const isRoutine = (hour === 11 || hour === 12 || hour === 13); // KST 20/21/22시
 
     if (isScanReminder) {
       ctx.waitUntil(sendScanReminderToAll(env));
+    } else if (isHydration) {
+      ctx.waitUntil(sendHydrationPushToAll(env));
     } else if (isLunch || isDinner) {
       const meal = isLunch ? "lunch" : "dinner";
       ctx.waitUntil(sendMealPushToAll(env, meal));
@@ -541,6 +545,17 @@ const MEAL_VARIETY = {
   },
 };
 
+function getCareSettings(record = {}) {
+  const source = record?.careSettings || {};
+  return {
+    enabled: Boolean(source.enabled),
+    scan: source.scan !== false,
+    meal: source.meal !== false,
+    hydration: source.hydration !== false,
+    routine: source.routine !== false,
+  };
+}
+
 function hashString(value = "") {
   let hash = 0;
   for (let i = 0; i < value.length; i += 1) {
@@ -748,7 +763,10 @@ async function sendRoutineReminderToAll(env, kstHour) {
 
       const raw = await kv.get(`push:sub:${id}`);
       if (!raw) continue;
-      const { subscription, lang } = JSON.parse(raw);
+      const record = JSON.parse(raw);
+      const { subscription, lang } = record;
+      const care = getCareSettings(record);
+      if (!care.enabled || !care.routine) continue;
       const l = reminder.lang || lang || "ko";
 
       await sendPush(subscription, {
@@ -778,7 +796,10 @@ async function sendScanReminderToAll(env) {
     try {
       const raw = await kv.get(`push:sub:${id}`);
       if (!raw) continue;
-      const { subscription, lang } = JSON.parse(raw);
+      const record = JSON.parse(raw);
+      const { subscription, lang } = record;
+      const care = getCareSettings(record);
+      if (!care.enabled || !care.scan) continue;
       await sendPush(subscription, {
         title: titles[lang] || titles.ko,
         body: bodies[lang] || bodies.ko,
@@ -786,6 +807,44 @@ async function sendScanReminderToAll(env) {
       }, env);
     } catch (e) {
       console.error(`[push] scan reminder id=${id} error:`, e.message);
+    }
+  }
+}
+
+async function sendHydrationPushToAll(env) {
+  const kv = env.PUSH_KV;
+  if (!kv) { console.log("[push] PUSH_KV not bound"); return; }
+
+  const allIdsRaw = await kv.get("push:all_ids");
+  if (!allIdsRaw) return;
+  const allIds = JSON.parse(allIdsRaw);
+
+  const titles = {
+    ko: "💧 AI 밀착케어 수분 체크",
+    en: "💧 AI Care Hydration Check",
+    ja: "💧 AI密着ケア 水分チェック",
+  };
+  const bodies = {
+    ko: "오후 피부 처짐을 막으려면 지금 물 한 컵과 가벼운 보습 리터치가 좋아요.",
+    en: "A glass of water and a light moisture refresh can help your skin through the afternoon.",
+    ja: "午後の乾燥だれを防ぐために、今は水1杯と軽い保湿リタッチがおすすめです。",
+  };
+
+  for (const id of allIds) {
+    try {
+      const raw = await kv.get(`push:sub:${id}`);
+      if (!raw) continue;
+      const record = JSON.parse(raw);
+      const { subscription, lang } = record;
+      const care = getCareSettings(record);
+      if (!care.enabled || !care.hydration) continue;
+      await sendPush(subscription, {
+        title: titles[lang] || titles.ko,
+        body: bodies[lang] || bodies.ko,
+        url: "/",
+      }, env);
+    } catch (e) {
+      console.error(`[push] hydration id=${id} error:`, e.message);
     }
   }
 }
@@ -805,6 +864,8 @@ async function sendMealPushToAll(env, meal) {
       if (!raw) continue;
       const record = JSON.parse(raw);
       const { subscription, baumannType, lang, scoreSummary, mealHistory } = record;
+      const care = getCareSettings(record);
+      if (!care.enabled || !care.meal) continue;
       const tip = getMealTip({ baumannType, lang, meal, scoreSummary, subscriberId: id, mealHistory });
       // 언어별 타이틀
       const titles = { ko: meal === "lunch" ? "🥗 Fonday 점심 추천" : "🍽️ Fonday 저녁 추천",

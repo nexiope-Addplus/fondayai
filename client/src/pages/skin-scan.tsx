@@ -1845,6 +1845,47 @@ interface ReminderSettings {
   lastNotifiedDate: string;
 }
 
+interface AICareSettings {
+  enabled: boolean;
+  scan: boolean;
+  meal: boolean;
+  hydration: boolean;
+  routine: boolean;
+  routineHour: number;
+  routineMinute: number;
+}
+
+function getAICareSettings(): AICareSettings {
+  try {
+    const raw = localStorage.getItem("fonday_ai_care_settings");
+    if (raw) {
+      const parsed = JSON.parse(raw) as Partial<AICareSettings>;
+      return {
+        enabled: Boolean(parsed.enabled),
+        scan: parsed.scan ?? true,
+        meal: parsed.meal ?? true,
+        hydration: parsed.hydration ?? true,
+        routine: parsed.routine ?? true,
+        routineHour: parsed.routineHour ?? 21,
+        routineMinute: parsed.routineMinute ?? 0,
+      };
+    }
+  } catch {}
+  return {
+    enabled: false,
+    scan: true,
+    meal: true,
+    hydration: true,
+    routine: true,
+    routineHour: 21,
+    routineMinute: 0,
+  };
+}
+
+function saveAICareSettings(next: AICareSettings) {
+  try { localStorage.setItem("fonday_ai_care_settings", JSON.stringify(next)); } catch {}
+}
+
 function getDiaryCauseTags(dateStr: string): DiaryCauseTag[] {
   try {
     const raw = JSON.parse(localStorage.getItem(`fonday_cause_tags_${dateStr}`) || "[]");
@@ -1881,11 +1922,24 @@ function getReminderSettings(): ReminderSettings {
     const raw = localStorage.getItem("fonday_reminder_settings");
     if (raw) return JSON.parse(raw) as ReminderSettings;
   } catch {}
-  return { enabled: false, hour: 21, minute: 0, lastNotifiedDate: "" };
+  const aiCare = getAICareSettings();
+  return {
+    enabled: aiCare.enabled && aiCare.routine,
+    hour: aiCare.routineHour,
+    minute: aiCare.routineMinute,
+    lastNotifiedDate: "",
+  };
 }
 
 function saveReminderSettings(next: ReminderSettings) {
   try { localStorage.setItem("fonday_reminder_settings", JSON.stringify(next)); } catch {}
+  const aiCare = getAICareSettings();
+  saveAICareSettings({
+    ...aiCare,
+    routine: next.enabled,
+    routineHour: next.hour,
+    routineMinute: next.minute,
+  });
 }
 
 async function syncReminderToServer(next: ReminderSettings) {
@@ -1894,7 +1948,8 @@ async function syncReminderToServer(next: ReminderSettings) {
     const reg = await navigator.serviceWorker.ready;
     const sub = await reg.pushManager.getSubscription();
     if (!sub) return;
-    if (next.enabled) {
+    const aiCare = getAICareSettings();
+    if (next.enabled && aiCare.enabled && aiCare.routine) {
       await fetch("/api/diary-reminder", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -3450,11 +3505,13 @@ function DiaryTab({ user, analysisResult, onBack }: { user: any; analysisResult:
   const [tab, setTab] = useState<"calendar" | "timeline" | "report" | "ranking">("calendar");
   const [loading, setLoading] = useState(true);
   const [reminderSettings, setReminderSettings] = useState<ReminderSettings>(() => getReminderSettings());
+  const [aiCareSettings, setAICareSettings] = useState<AICareSettings>(() => getAICareSettings());
   const [reminderPushWarn, setReminderPushWarn] = useState(false);
   const [myCosmetics, setMyCosmetics] = useState<CosmeticItem[]>([]);
   // Bug 7 fix: stale closure 방지용 ref
   const reminderSettingsRef = useRef(reminderSettings);
   useEffect(() => { reminderSettingsRef.current = reminderSettings; }, [reminderSettings]);
+  useEffect(() => { setAICareSettings(getAICareSettings()); }, [reminderSettings]);
 
   const scores = analysisResult?.scores || [];
   const overallScore = scores[0]?.score || 0;
@@ -3753,11 +3810,16 @@ function DiaryTab({ user, analysisResult, onBack }: { user: any; analysisResult:
                         <p className="text-[10px] font-black tracking-[0.16em] uppercase" style={{ color: SCAN_TO }}>{t("modal.diary.reminderTitle")}</p>
                         <p className="text-[16px] font-black mt-1 text-kr-pretty" style={{ color: DEEP_GREEN }}>{t("modal.diary.reminderHeadline")}</p>
                         <p className="text-[11px] text-stone-500 mt-1 leading-relaxed text-kr-pretty">
-                          {t("modal.diary.reminderDesc")}
+                          {t("modal.diary.reminderDesc")} {aiCareSettings.enabled ? "" : "AI 밀착케어를 먼저 켜야 작동해요."}
                         </p>
                       </div>
                       <button
                         onClick={async () => {
+                          if (!aiCareSettings.enabled) {
+                            setReminderPushWarn(true);
+                            setTimeout(() => setReminderPushWarn(false), 3000);
+                            return;
+                          }
                           if (!reminderSettings.enabled) {
                             // 켜기 전에 push 구독 확인
                             if (!("serviceWorker" in navigator) || !("PushManager" in window)) {
@@ -3778,6 +3840,9 @@ function DiaryTab({ user, analysisResult, onBack }: { user: any; analysisResult:
                           const next = { ...reminderSettings, enabled: !reminderSettings.enabled };
                           setReminderSettings(next);
                           saveReminderSettings(next);
+                          const nextCare = { ...aiCareSettings, routine: next.enabled, routineHour: next.hour, routineMinute: next.minute };
+                          setAICareSettings(nextCare);
+                          saveAICareSettings(nextCare);
                           syncReminderToServer(next);
                         }}
                         className="shrink-0 rounded-full px-3 py-1.5 text-[11px] font-black"
@@ -3790,7 +3855,7 @@ function DiaryTab({ user, analysisResult, onBack }: { user: any; analysisResult:
                     </div>
                     {reminderPushWarn && (
                       <p className="text-[11px] text-amber-600 mt-1.5">
-                        먼저 알림을 구독해야 합니다. 분석결과 → 영양 탭에서 구독해 주세요.
+                        먼저 AI 밀착케어를 켜고 알림을 허용해 주세요. 분석결과 → 영양 탭에서 설정할 수 있어요.
                       </p>
                     )}
                     <div className="flex items-center gap-2 mt-4">
@@ -3807,6 +3872,9 @@ function DiaryTab({ user, analysisResult, onBack }: { user: any; analysisResult:
                               const next = { ...reminderSettings, hour: option.hour, minute: option.minute };
                               setReminderSettings(next);
                               saveReminderSettings(next);
+                              const nextCare = { ...aiCareSettings, routineHour: option.hour, routineMinute: option.minute };
+                              setAICareSettings(nextCare);
+                              saveAICareSettings(nextCare);
                               if (next.enabled) syncReminderToServer(next);
                             }}
                             className="px-3 py-1.5 rounded-full text-[11px] font-bold"
@@ -5293,7 +5361,57 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
   const [pushSubscribed, setPushSubscribed] = useState(false);
   const [pushLoading, setPushLoading] = useState(false);
   const [showPushPrompt, setShowPushPrompt] = useState(false);
+  const [aiCareSettings, setAICareSettings] = useState<AICareSettings>(() => getAICareSettings());
   const pushBaumannType = buildBaumannTypeFromResult(analysisResult);
+  const aiCareLabels = i18n.language?.startsWith("en")
+    ? {
+        title: "AI Care",
+        desc: "One switch for scan, meal, hydration, and routine coaching based on your skin result.",
+        on: "AI Care On",
+        off: "Turn On AI Care",
+        scan: "Scan",
+        meal: "Meals",
+        hydration: "Hydration",
+        routine: "Routine",
+        schedule: "Scan 07:30 · Lunch 12:00 · Water 15:00 · Dinner 18:00 · Routine 20-22:00",
+      }
+    : i18n.language?.startsWith("ja")
+      ? {
+          title: "AI密着ケア",
+          desc: "肌結果に合わせてスキャン・食事・水分・ルーティン通知をまとめて管理します。",
+          on: "AI密着ケア ON",
+          off: "AI密着ケアを有効化",
+          scan: "スキャン",
+          meal: "食事",
+          hydration: "水分",
+          routine: "ルーティン",
+          schedule: "スキャン 07:30 · 昼食 12:00 · 水分 15:00 · 夕食 18:00 · ルーティン 20-22時",
+        }
+      : {
+          title: "AI 밀착케어",
+          desc: "한 번 켜두면 피부 결과에 맞춰 스캔, 식단, 수분, 루틴 알림을 함께 관리해드려요.",
+          on: "AI 밀착케어 ON",
+          off: "AI 밀착케어 켜기",
+          scan: "스캔",
+          meal: "식단",
+          hydration: "수분",
+          routine: "루틴",
+          schedule: "스캔 07:30 · 점심 12:00 · 수분 15:00 · 저녁 18:00 · 루틴 20~22시",
+        };
+
+  const syncPushSubscription = async (subscription: PushSubscriptionJSON, nextCareSettings: AICareSettings) => {
+    await fetch("/api/push-subscribe", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        subscription,
+        baumannType: pushBaumannType,
+        lang: i18n.language || "ko",
+        scoreSummary: buildPushScoreSummary(analysisResult),
+        careSettings: nextCareSettings,
+      }),
+    });
+  };
 
   useEffect(() => {
     // 이미 구독 중인지 확인
@@ -5340,6 +5458,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
             baumannType: pushBaumannType,
             lang: i18n.language || "ko",
             scoreSummary: buildPushScoreSummary(analysisResult),
+            careSettings: aiCareSettings,
           }),
         });
         await syncReminderToServer(getReminderSettings());
@@ -5349,9 +5468,9 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
     return () => {
       cancelled = true;
     };
-  }, [analysisResult, pushBaumannType, pushSubscribed]);
+  }, [aiCareSettings, analysisResult, pushBaumannType, pushSubscribed]);
 
-  const handlePushToggle = async () => {
+  const handlePushToggle = async (forceEnabled?: boolean) => {
     if (!("serviceWorker" in navigator) || !("PushManager" in window)) {
       alert(t("nutrients.pushUnsupported")); return;
     }
@@ -5362,8 +5481,12 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
     try {
       const reg = await navigator.serviceWorker.register("/sw.js");
       const existing = await reg.pushManager.getSubscription();
-      if (existing && pushSubscribed) {
+      const shouldEnable = forceEnabled ?? !pushSubscribed;
+      if (existing && !shouldEnable) {
         // 구독 해제
+        const nextCare = { ...aiCareSettings, enabled: false };
+        setAICareSettings(nextCare);
+        saveAICareSettings(nextCare);
         await syncReminderToServer({ ...getReminderSettings(), enabled: false });
         await fetch("/api/push-subscribe", { method: "DELETE", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ endpoint: existing.endpoint }) });
         await existing.unsubscribe();
@@ -5373,25 +5496,53 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
         const perm = await Notification.requestPermission();
         if (perm !== "granted") { setPushLoading(false); return; }
         const VAPID_PUBLIC = import.meta.env.VITE_VAPID_PUBLIC_KEY || "";
-        const sub = await reg.pushManager.subscribe({
+        const sub = existing || await reg.pushManager.subscribe({
           userVisibleOnly: true,
           applicationServerKey: VAPID_PUBLIC,
         });
-        await fetch("/api/push-subscribe", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            subscription: sub.toJSON(),
-            baumannType: pushBaumannType,
-            lang: i18n.language || "ko",
-            scoreSummary: buildPushScoreSummary(analysisResult),
-          }),
+        const nextCare = { ...aiCareSettings, enabled: true };
+        setAICareSettings(nextCare);
+        saveAICareSettings(nextCare);
+        await syncPushSubscription(sub.toJSON(), nextCare);
+        await syncReminderToServer({
+          ...getReminderSettings(),
+          enabled: nextCare.routine,
+          hour: nextCare.routineHour,
+          minute: nextCare.routineMinute,
         });
-        await syncReminderToServer(getReminderSettings());
         setPushSubscribed(true);
       }
     } catch (e) { console.error("[push]", e); }
     setPushLoading(false);
+  };
+
+  const updateAICareOption = async (key: "scan" | "meal" | "hydration" | "routine", value: boolean) => {
+    const next = { ...aiCareSettings, [key]: value };
+    setAICareSettings(next);
+    saveAICareSettings(next);
+    if (key === "routine") {
+      saveReminderSettings({
+        ...getReminderSettings(),
+        enabled: value,
+        hour: next.routineHour,
+        minute: next.routineMinute,
+      });
+      await syncReminderToServer({
+        ...getReminderSettings(),
+        enabled: value,
+        hour: next.routineHour,
+        minute: next.routineMinute,
+      });
+    }
+    if (!pushSubscribed) return;
+    try {
+      const reg = await navigator.serviceWorker.ready;
+      const sub = await reg.pushManager.getSubscription();
+      if (!sub) return;
+      await syncPushSubscription(sub.toJSON(), next);
+    } catch (error) {
+      console.error("[ai-care-option]", error);
+    }
   };
 
   // 히스토리 로드 (로그인 시)
@@ -6507,15 +6658,41 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
               </div>
             </div>
             <div className="pt-2 space-y-2">
-              <button onClick={handlePushToggle} disabled={pushLoading}
-                className="w-full py-3 rounded-2xl font-bold text-[13px] transition-all flex items-center justify-center gap-2"
-                style={pushSubscribed
-                  ? { background: `${DEEP_GREEN}18`, color: DEEP_GREEN, border: `1px solid ${DEEP_GREEN}33` }
-                  : { background: "linear-gradient(135deg, #F59E0B, #D97706)", color: "white" }}>
-                <span>{pushSubscribed ? "🔔" : "🍽️"}</span>
-                {pushLoading ? "..." : pushSubscribed ? t("nutrients.pushBtnOn") : t("nutrients.pushBtn")}
-              </button>
-              <p className="text-[10px] text-center text-stone-400">점심 12:00 · 저녁 18:00 (KST)</p>
+              <div className="rounded-[24px] p-4" style={{ background: "#FFFBF7", border: "1px solid #F3E4D8" }}>
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <p className="text-[11px] font-black uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>{aiCareLabels.title}</p>
+                    <p className="text-[12px] text-stone-500 mt-1 leading-relaxed text-kr-pretty">{aiCareLabels.desc}</p>
+                  </div>
+                  <button onClick={() => handlePushToggle()} disabled={pushLoading}
+                    className="shrink-0 rounded-full px-3 py-1.5 text-[11px] font-black"
+                    style={pushSubscribed
+                      ? { background: `${DEEP_GREEN}18`, color: DEEP_GREEN, border: `1px solid ${DEEP_GREEN}33` }
+                      : { background: "linear-gradient(135deg, #F59E0B, #D97706)", color: "white" }}>
+                    {pushLoading ? "..." : pushSubscribed ? aiCareLabels.on : aiCareLabels.off}
+                  </button>
+                </div>
+                <div className="grid grid-cols-2 gap-2 mt-3">
+                  {([
+                    ["scan", aiCareLabels.scan],
+                    ["meal", aiCareLabels.meal],
+                    ["hydration", aiCareLabels.hydration],
+                    ["routine", aiCareLabels.routine],
+                  ] as const).map(([key, label]) => (
+                    <button
+                      key={key}
+                      onClick={() => updateAICareOption(key, !aiCareSettings[key])}
+                      disabled={!pushSubscribed}
+                      className="rounded-2xl px-3 py-2 text-[11px] font-black disabled:opacity-50"
+                      style={aiCareSettings[key]
+                        ? { background: `${SCAN_FROM}20`, color: SCAN_TO, border: `1px solid ${SCAN_TO}22` }
+                        : { background: "#F6F3EE", color: "#9A8F80", border: "1px solid #ECE6DE" }}>
+                      {label}
+                    </button>
+                  ))}
+                </div>
+                <p className="text-[10px] text-center text-stone-400 mt-3">{aiCareLabels.schedule}</p>
+              </div>
             </div>
           </div>
         )}
@@ -6887,19 +7064,45 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
 
                   {/* 푸시 알림 구독 */}
                   <div className="pt-2 space-y-2">
-                    <button
-                      onClick={handlePushToggle}
-                      disabled={pushLoading}
-                      className="w-full py-3 rounded-2xl font-bold text-[13px] transition-all flex items-center justify-center gap-2"
-                      style={pushSubscribed
-                        ? { background: `${DEEP_GREEN}18`, color: DEEP_GREEN, border: `1px solid ${DEEP_GREEN}33` }
-                        : { background: "linear-gradient(135deg, #F59E0B, #D97706)", color: "white" }
-                      }
-                    >
-                      <span>{pushSubscribed ? "🔔" : "🍽️"}</span>
-                      {pushLoading ? "..." : pushSubscribed ? t("nutrients.pushBtnOn") : t("nutrients.pushBtn")}
-                    </button>
-                    <p className="text-[10px] text-center text-stone-400">점심 12:00 · 저녁 18:00 (KST)</p>
+                    <div className="rounded-[24px] p-4" style={{ background: "#FFFBF7", border: "1px solid #F3E4D8" }}>
+                      <div className="flex items-start justify-between gap-3">
+                        <div>
+                          <p className="text-[11px] font-black uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>{aiCareLabels.title}</p>
+                          <p className="text-[12px] text-stone-500 mt-1 leading-relaxed text-kr-pretty">{aiCareLabels.desc}</p>
+                        </div>
+                        <button
+                          onClick={() => handlePushToggle()}
+                          disabled={pushLoading}
+                          className="shrink-0 rounded-full px-3 py-1.5 text-[11px] font-black"
+                          style={pushSubscribed
+                            ? { background: `${DEEP_GREEN}18`, color: DEEP_GREEN, border: `1px solid ${DEEP_GREEN}33` }
+                            : { background: "linear-gradient(135deg, #F59E0B, #D97706)", color: "white" }
+                          }
+                        >
+                          {pushLoading ? "..." : pushSubscribed ? aiCareLabels.on : aiCareLabels.off}
+                        </button>
+                      </div>
+                      <div className="grid grid-cols-2 gap-2 mt-3">
+                        {([
+                          ["scan", aiCareLabels.scan],
+                          ["meal", aiCareLabels.meal],
+                          ["hydration", aiCareLabels.hydration],
+                          ["routine", aiCareLabels.routine],
+                        ] as const).map(([key, label]) => (
+                          <button
+                            key={key}
+                            onClick={() => updateAICareOption(key, !aiCareSettings[key])}
+                            disabled={!pushSubscribed}
+                            className="rounded-2xl px-3 py-2 text-[11px] font-black disabled:opacity-50"
+                            style={aiCareSettings[key]
+                              ? { background: `${SCAN_FROM}20`, color: SCAN_TO, border: `1px solid ${SCAN_TO}22` }
+                              : { background: "#F6F3EE", color: "#9A8F80", border: "1px solid #ECE6DE" }}>
+                            {label}
+                          </button>
+                        ))}
+                      </div>
+                      <p className="text-[10px] text-center text-stone-400 mt-3">{aiCareLabels.schedule}</p>
+                    </div>
                   </div>
                 </div>
               </div>

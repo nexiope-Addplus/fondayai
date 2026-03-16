@@ -20,7 +20,7 @@ export const onRequest = async (context: any) => {
   // ── POST: 구독 저장 ───────────────────────────────────────────
   if (request.method === "POST") {
     const body: any = await request.json();
-    const { subscription, baumannType, lang, scoreSummary } = body;
+    const { subscription, baumannType, lang, scoreSummary, careSettings } = body;
 
     if (!subscription?.endpoint) {
       return new Response(JSON.stringify({ error: "subscription required" }), { status: 400, headers: CORS });
@@ -37,6 +37,15 @@ export const onRequest = async (context: any) => {
           .filter((item: any) => item.label && Number.isFinite(item.score))
           .slice(0, 3)
       : [];
+    const nextCareSettings = {
+      enabled: Boolean(careSettings?.enabled),
+      scan: careSettings?.scan !== false,
+      meal: careSettings?.meal !== false,
+      hydration: careSettings?.hydration !== false,
+      routine: careSettings?.routine !== false,
+      routineHour: Number.isFinite(Number(careSettings?.routineHour)) ? Number(careSettings.routineHour) : 21,
+      routineMinute: Number.isFinite(Number(careSettings?.routineMinute)) ? Number(careSettings.routineMinute) : 0,
+    };
 
     if (kv) {
       const prevRaw = await kv.get(`push:sub:${id}`);
@@ -48,6 +57,7 @@ export const onRequest = async (context: any) => {
         baumannType: baumannType || prev?.baumannType || "OSNT",
         lang: lang || prev?.lang || "ko",
         scoreSummary: nextScoreSummary.length ? nextScoreSummary : (prev?.scoreSummary || []),
+        careSettings: { ...(prev?.careSettings || {}), ...nextCareSettings },
         createdAt: prev?.createdAt || new Date().toISOString(),
         updatedAt: new Date().toISOString(),
       };
