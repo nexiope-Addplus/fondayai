@@ -222,10 +222,87 @@ CREATE TABLE IF NOT EXISTS cosmetics (
 ### Worker (worker-api.js)
 - **이름**: fonday-push-worker (wrangler.toml 참조)
 - **바인딩**: PUSH_KV
+- **배포 방식**: GitHub 자동배포 아님. `git push`로는 반영되지 않음. `npx wrangler deploy` 또는 Cloudflare 대시보드 수동 배포 필요
+- **주의**: 현재 Codex 실행 환경에서는 `CLOUDFLARE_API_TOKEN` 미설정으로 `wrangler deploy` 실패함. 실제 배포 시 토큰 환경변수 필요
 - **크론**:
-  - `0 0 * * *` — KST 09:00 스캔 리마인더
-  - `0 3 * * *` — KST 12:00 점심 피부 팁
-  - `0 9 * * *` — KST 18:00 저녁 루틴 알림
+  - `30 22 * * *` — KST 07:30 스캔 리마인더
+  - `0 3 * * *` — KST 12:00 점심 식단 알림
+  - `0 6 * * *` — KST 15:00 수분 리마인더
+  - `0 9 * * *` — KST 18:00 저녁 식단 알림
+  - `0 11-13 * * *` — KST 20:00/21:00/22:00 루틴 리마인더
+
+---
+
+## 5-1. 최근 주요 업데이트 (2026-03-16)
+
+### A. 식단 추천 알림 다양화
+- `worker-api.js`
+  - 기존 바우만 타입 고정 메뉴 1개 구조를 변경
+  - 최근 측정 결과의 낮은 점수(`scoreSummary`)를 기반으로 식단 보완 메뉴/팁을 조합
+  - 같은 사용자에게 같은 메뉴 조합이 연속으로 가지 않도록 `mealHistory` 저장
+- `functions/api/push-subscribe.ts`
+  - 구독 데이터에 `scoreSummary` 병합 저장
+- `client/src/pages/skin-scan.tsx`
+  - 푸시 구독 시 최근 취약 점수 3개를 서버에 전송
+  - 이미 구독 중이어도 새 스캔 결과가 나오면 서버 구독 메타데이터 재동기화
+
+### B. 루틴 리마인더 동기화 보강
+- 푸시 구독이 갱신될 때 `/api/diary-reminder` 도 다시 동기화하도록 수정
+- 구독 재발급 후 루틴 리마인더가 서버 KV에서 끊기는 문제를 줄임
+
+### C. 일기 리포트 탭 고도화
+- `client/src/pages/skin-scan.tsx`
+  - 리포트 탭을 단순 주간 잠금 카드에서 누적 분석형 화면으로 확장
+  - 추가된 내용:
+    - 전문가 코멘트형 누적 리포트
+    - 우선 케어 과제 3개
+    - 성분 중심 추천
+    - 시술 방향 제안
+    - 루틴/메모/원인 태그 시그널
+    - 스파이더 그래프(현재 vs 누적 평균)
+    - 성분 반응 추적
+    - 시술 후 회복 가이드
+    - 계절/환경 영향 해석
+    - 트리거 상관관계
+    - 향후 2주 회복 예측
+- 아직 전용 `/report` 페이지로 분리하지는 않았고, 현재는 `DiaryTab` 내부 리포트 탭에서 확장된 상태
+
+### D. AI 밀착케어 알림 체계 통합
+- 목표: 흩어져 있던 스캔/식단/수분/루틴 알림을 `AI 밀착케어` 1개 설정으로 통합
+- `client/src/pages/skin-scan.tsx`
+  - 결과 페이지 기존 식단 푸시 버튼을 `AI 밀착케어` 카드로 교체
+  - 설정 모델 `AICareSettings` 추가
+  - 하위 옵션:
+    - `scan`
+    - `meal`
+    - `hydration`
+    - `routine`
+  - 루틴 시간은 기존 다이어리 리마인더 UI에서 계속 조정하되, 내부적으로 AI 밀착케어 설정과 연동
+- `functions/api/push-subscribe.ts`
+  - 구독 데이터에 `careSettings` 저장
+- `worker-api.js`
+  - 스캔/식단/루틴 알림 전송 전에 `careSettings.enabled` 및 각 하위 옵션 확인
+  - 새 `sendHydrationPushToAll()` 추가
+- `wrangler.toml`
+  - 수분 리마인더용 `0 6 * * *` (KST 15:00) 크론 추가
+
+### E. 배포/운영 관련 현재 상태
+- GitHub `main`에는 반영 완료
+- 그러나 Cloudflare Worker `fonday-push-worker` 는 **자동 Git 배포가 아님**
+- Cloudflare 대시보드에서 확인한 결과:
+  - `Build > Git repository` 비어 있음
+  - 즉 Worker는 수동 배포 필요
+- `npx wrangler deploy` 시도했으나 현재 환경에서 실패
+  - 이유: 비대화형 환경이라 `CLOUDFLARE_API_TOKEN` 필요
+- 따라서 다음 AI/작업자는 아래 중 하나를 해야 함:
+  - `export CLOUDFLARE_API_TOKEN=... && npx wrangler deploy`
+  - 또는 Cloudflare 대시보드에서 수동 배포
+- 배포 후 Cloudflare Worker의 `Trigger Events`에서 반드시 아래 크론 반영 여부 확인 필요:
+  - `30 22 * * *`
+  - `0 3 * * *`
+  - `0 6 * * *`
+  - `0 9 * * *`
+  - `0 11-13 * * *`
 
 ---
 
