@@ -6240,17 +6240,17 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
           style={{ background: "linear-gradient(180deg, rgba(255,249,246,0.97) 0%, rgba(255,255,255,0.97) 100%)" }}>
           <div className="flex gap-2">
             {([
-              { id: "routine" as const, label: t("result.tab.routine"), icon: <CheckCircle2 className="w-4 h-4" /> },
-              { id: "solution" as const, label: t("result.tab.solution"), icon: <Leaf className="w-4 h-4" /> },
-              { id: "nutrition" as const, label: t("result.tab.nutrition"), icon: <Utensils className="w-4 h-4" /> },
-            ]).map(({ id, label, icon }) => {
+              { id: "routine" as const,   label: t("result.tab.routine"),   icon: <CheckCircle2 className="w-4 h-4" />, from: "#34D399", to: "#059669",  inactiveBg: "#F0FDF4", inactiveText: "#86EFAC" },
+              { id: "solution" as const,  label: t("result.tab.solution"),  icon: <Leaf className="w-4 h-4" />,         from: SCAN_FROM, to: SCAN_TO,   inactiveBg: "#FFF6F1", inactiveText: "#A8A29E" },
+              { id: "nutrition" as const, label: t("result.tab.nutrition"), icon: <Utensils className="w-4 h-4" />,     from: "#FCD34D", to: "#D97706", inactiveBg: "#FFFBEB", inactiveText: "#FDE68A" },
+            ]).map(({ id, label, icon, from, to, inactiveBg, inactiveText }) => {
               const isActive = activeTab === id;
               return (
-                <button key={id} onClick={() => setActiveTab(id)}
+                <button key={id} onClick={() => { setActiveTab(id); resultScrollRef.current?.scrollTo({ top: 0, behavior: "smooth" }); }}
                   className="flex-1 flex flex-col items-center gap-1 py-3 rounded-[20px] text-[12px] font-black transition-all"
                   style={isActive
-                    ? { background: `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})`, color: "white", boxShadow: `0 4px 14px ${SCAN_TO}55` }
-                    : { background: "#FFF6F1", color: "#A8A29E" }}>
+                    ? { background: `linear-gradient(135deg, ${from}, ${to})`, color: "white", boxShadow: `0 4px 14px ${to}55` }
+                    : { background: inactiveBg, color: inactiveText }}>
                   {icon}
                   <span>{label}</span>
                 </button>
@@ -6490,6 +6490,14 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
           </CardContent>
         </Card>
             <AdBanner slot="6349940752" />
+            {/* 다음 탭 유도 */}
+            <button
+              onClick={() => { setActiveTab("solution"); resultScrollRef.current?.scrollTo({ top: 0, behavior: "smooth" }); }}
+              className="w-full flex items-center justify-center gap-2 py-3.5 rounded-2xl text-[13px] font-black text-white transition-all active:scale-95"
+              style={{ background: `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})` }}>
+              <Leaf className="w-4 h-4" />
+              <span>{t("result.tab.solution")} →</span>
+            </button>
           </div>
         )}
 
@@ -6675,6 +6683,14 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
                 </Button>
               </div>
             </div>
+            {/* 다음 탭 유도 */}
+            <button
+              onClick={() => { setActiveTab("nutrition"); resultScrollRef.current?.scrollTo({ top: 0, behavior: "smooth" }); }}
+              className="w-full flex items-center justify-center gap-2 py-3.5 rounded-2xl text-[13px] font-black text-white transition-all active:scale-95"
+              style={{ background: "linear-gradient(135deg, #FCD34D, #D97706)" }}>
+              <Utensils className="w-4 h-4" />
+              <span>{t("result.tab.nutrition")} →</span>
+            </button>
           </div>
         )}
 
