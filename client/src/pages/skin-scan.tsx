@@ -5006,6 +5006,45 @@ function SkinPredictionCard({ prediction, currentScore, onOpenDiary }: {
 const COSMETIC_CATEGORIES = ["클렌저","토너","세럼","크림","선크림","각질케어","진정케어","장벽케어","아이크림","기타스킨케어"] as const;
 
 /** 이미지 base64 → 300×300 JPEG 70% 압축 */
+async function cropFaceFromImage(src: string): Promise<string> {
+  try {
+    const mp = await import('@mediapipe/face_mesh');
+    const { FaceMesh } = mp;
+    const img = new Image();
+    img.src = src;
+    await new Promise<void>((r) => { img.onload = () => r(); img.onerror = () => r(); });
+    const faceMesh = new FaceMesh({
+      locateFile: (f: string) => `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh@0.4/${f}`,
+    });
+    faceMesh.setOptions({ maxNumFaces: 1, refineLandmarks: false, minDetectionConfidence: 0.3, minTrackingConfidence: 0.3 });
+    let lms: any[] = [];
+    await new Promise<void>((r) => {
+      faceMesh.onResults((res: any) => { if (res.multiFaceLandmarks?.[0]) lms = res.multiFaceLandmarks[0]; r(); });
+      faceMesh.send({ image: img });
+    });
+    faceMesh.close();
+    if (!lms.length) return src;
+    const xs = lms.map((l: any) => l.x);
+    const ys = lms.map((l: any) => l.y);
+    let minX = Math.min(...xs), maxX = Math.max(...xs);
+    let minY = Math.min(...ys), maxY = Math.max(...ys);
+    const fW = maxX - minX, fH = maxY - minY;
+    minX = Math.max(0, minX - fW * 0.22);
+    maxX = Math.min(1, maxX + fW * 0.22);
+    minY = Math.max(0, minY - fH * 0.48);
+    maxY = Math.min(1, maxY + fH * 0.12);
+    const iW = img.naturalWidth, iH = img.naturalHeight;
+    const sx = minX * iW, sy = minY * iH, sw = (maxX - minX) * iW, sh = (maxY - minY) * iH;
+    const canvas = document.createElement('canvas');
+    canvas.width = Math.round(sw);
+    canvas.height = Math.round(sh);
+    canvas.getContext('2d')!.drawImage(img, sx, sy, sw, sh, 0, 0, canvas.width, canvas.height);
+    return canvas.toDataURL('image/jpeg', 0.9);
+  } catch {
+    return src;
+  }
+}
+
 function compressThumbnail(base64: string, maxSize = 300): Promise<string> {
   return new Promise(resolve => {
     const img = new Image();
@@ -5290,7 +5329,7 @@ function CosmeticsRegisterModal({ onClose, onSuccess }: { onClose: () => void; o
   );
 }
 
-function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBack, onGoMagazine, onOpenDiary, user }: any) {
+function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, imageBase64, onBack, onGoMagazine, onOpenDiary, user }: any) {
   const { t } = useTranslation();
   const [history, setHistory] = useState<any[]>([]);
   const [isSaved, setIsSaved] = useState(false);
@@ -6192,7 +6231,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
             <div className="grid grid-cols-[92px_1fr] gap-2.5 items-start sm:grid-cols-[104px_1fr] sm:gap-3">
               <div>
                 <div className="relative rounded-[22px] overflow-hidden h-[120px] bg-stone-100 sm:rounded-[24px] sm:h-[132px]">
-                  <img src={imageSrc} className="w-full h-full object-cover" style={{ objectPosition: "center 18%" }} />
+                  <img src={faceCroppedSrc || imageSrc} className="w-full h-full object-cover" style={{ objectPosition: "center 50%" }} />
                   <div className="absolute top-3 left-3 w-7 h-7 border-t-2 border-l-2 rounded-tl-lg" style={{ borderColor: SCAN_TO }} />
                   <div className="absolute top-3 right-3 w-7 h-7 border-t-2 border-r-2 rounded-tr-lg" style={{ borderColor: SCAN_TO }} />
                   <div className="absolute bottom-3 left-3 w-7 h-7 border-b-2 border-l-2 rounded-bl-lg" style={{ borderColor: SCAN_TO }} />
@@ -8098,6 +8137,7 @@ export default function SkinScanPage() {
   const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imageSrc, setImageSrc] = useState<string | null>(null);
+  const [faceCroppedSrc, setFaceCroppedSrc] = useState<string | null>(null);
   const [imageBase64, setImageBase64] = useState<string | null>(null);
   const [user, setUser] = useState<any>(undefined);
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
@@ -8205,7 +8245,10 @@ export default function SkinScanPage() {
 
   const handleCapture = useCallback((file: File) => {
     setImageFile(file);
-    setImageSrc(URL.createObjectURL(file));
+    const objUrl = URL.createObjectURL(file);
+    setImageSrc(objUrl);
+    setFaceCroppedSrc(null);
+    cropFaceFromImage(objUrl).then(setFaceCroppedSrc).catch(() => {});
     setShowCamera(false);
     setScanState("survey");
     // 설문 중에 미리 base64 변환 시작
@@ -8280,6 +8323,7 @@ export default function SkinScanPage() {
                   surveyData={surveyData}
                   analysisResult={analysisResult}
                   imageSrc={imageSrc}
+                  faceCroppedSrc={faceCroppedSrc}
                   imageBase64={imageBase64}
                   onBack={() => setScanState("idle")}
                   onGoMagazine={() => setActiveTab("magazine")}
