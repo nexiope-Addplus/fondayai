@@ -266,30 +266,30 @@ export default {
   async scheduled(event, env, ctx) {
     const now = new Date();
     const hour = now.getUTCHours();
-    const isWeatherCare = (hour === 23);   // UTC 23:00 = KST 08:00
-    const isScanReminder = (hour === 22);  // UTC 22:30 = KST 07:30
-    const isUVCare = (hour === 1);         // UTC 01:00 = KST 10:00
-    const isLunch = (hour === 3);          // UTC 03:00 = KST 12:00
-    const isHydration = (hour === 6);      // UTC 06:00 = KST 15:00
-    const isDinner = (hour === 9);         // UTC 09:00 = KST 18:00
-    const isRoutine = (hour === 11 || hour === 12 || hour === 13); // KST 20/21/22시
-    const isBedtime = (hour === 14);       // UTC 14:00 = KST 23:00
 
-    if (isWeatherCare) {
-      ctx.waitUntil(sendWeatherCarePushToAll(env));
-    } else if (isScanReminder) {
-      ctx.waitUntil(sendScanReminderToAll(env));
-    } else if (isUVCare) {
+    if (hour === 22) {
+      // KST 07:00 — 스캔 리마인더 + 날씨 케어 동시 발송
+      ctx.waitUntil(Promise.all([
+        sendScanReminderToAll(env),
+        sendWeatherCarePushToAll(env),
+      ]));
+    } else if (hour === 1) {
+      // KST 10:00 — UV 케어
       ctx.waitUntil(sendUVCarePushToAll(env));
-    } else if (isHydration) {
+    } else if (hour === 3) {
+      // KST 12:00 — 점심
+      ctx.waitUntil(sendMealPushToAll(env, "lunch"));
+    } else if (hour === 6) {
+      // KST 15:00 — 수분 리마인더
       ctx.waitUntil(sendHydrationPushToAll(env));
-    } else if (isLunch || isDinner) {
-      const meal = isLunch ? "lunch" : "dinner";
-      ctx.waitUntil(sendMealPushToAll(env, meal));
-    } else if (isRoutine) {
-      const kstHour = hour + 9; // UTC → KST
-      ctx.waitUntil(sendRoutineReminderToAll(env, kstHour));
-    } else if (isBedtime) {
+    } else if (hour === 9) {
+      // KST 18:00 — 저녁
+      ctx.waitUntil(sendMealPushToAll(env, "dinner"));
+    } else if (hour === 11 || hour === 12 || hour === 13) {
+      // KST 20/21/22시 — 루틴 리마인더
+      ctx.waitUntil(sendRoutineReminderToAll(env, hour + 9));
+    } else if (hour === 14) {
+      // KST 23:00 — 취침 케어
       ctx.waitUntil(sendBedtimeCarePushToAll(env));
     }
   }
