@@ -6365,7 +6365,17 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
           </div>
         </div>
 
-        <div className="overflow-hidden">
+        <div className="overflow-hidden"
+          onTouchStart={(e) => { (e.currentTarget as any)._touchX = e.touches[0].clientX; }}
+          onTouchEnd={(e) => {
+            const startX = (e.currentTarget as any)._touchX;
+            if (startX == null) return;
+            const diff = e.changedTouches[0].clientX - startX;
+            if (Math.abs(diff) < 40) return;
+            const cur = TAB_ORDER.indexOf(activeTab);
+            if (diff < 0 && cur < TAB_ORDER.length - 1) goTo(TAB_ORDER[cur + 1]);
+            else if (diff > 0 && cur > 0) goTo(TAB_ORDER[cur - 1]);
+          }}>
         <AnimatePresence mode="wait" initial={false} custom={tabDirectionRef.current}>
         {/* ── 루틴 탭 ── */}
         {activeTab === "routine" && (
@@ -6552,23 +6562,29 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
                       </div>
                       {user.avatar && <img src={user.avatar} className="w-7 h-7 rounded-full border border-stone-100 shrink-0" />}
                     </div>
-                    {/* 점수 변화 강조 */}
-                    <div className="mt-3 rounded-2xl p-3"
-                      style={{ background: streakDelta > 0 ? "#F0FDF4" : streakDelta < 0 ? "#FFF5F5" : "#F8F7F5" }}>
-                      {streakDelta !== 0 ? (
-                        <div className="flex items-center gap-3">
-                          <span className="text-[28px] font-black leading-none"
-                            style={{ color: streakDelta > 0 ? "#059669" : "#DC2626" }}>
-                            {streakDelta > 0 ? "▲" : "▼"} {Math.abs(streakDelta)}점
-                          </span>
-                          <p className="text-[11px] text-stone-500 leading-snug">
-                            지난번보다<br />{streakDelta > 0 ? "좋아졌어요! 🎉" : "떨어졌어요"}
-                          </p>
+                    {/* 점수 변화 강조 — 서버 history 기반 delta */}
+                    {(() => {
+                      const delta = previousScore !== null ? overallScore - previousScore : 0;
+                      return (
+                        <div className="mt-3 rounded-2xl p-3"
+                          style={{ background: delta > 0 ? "#F0FDF4" : delta < 0 ? "#FFF5F5" : "#F8F7F5" }}>
+                          {previousScore !== null ? (
+                            <div className="flex items-center gap-3">
+                              <span className="text-[28px] font-black leading-none"
+                                style={{ color: delta > 0 ? "#059669" : delta < 0 ? "#DC2626" : "#A8A29E" }}>
+                                {delta > 0 ? "▲" : delta < 0 ? "▼" : "―"} {Math.abs(delta)}점
+                              </span>
+                              <p className="text-[11px] text-stone-500 leading-snug">
+                                지난번보다<br />
+                                {delta > 0 ? "좋아졌어요! 🎉" : delta < 0 ? "떨어졌어요" : "변화 없어요"}
+                              </p>
+                            </div>
+                          ) : (
+                            <p className="text-[12px] font-bold text-stone-500">✨ 오늘 첫 피부 기록이에요!</p>
+                          )}
                         </div>
-                      ) : (
-                        <p className="text-[12px] font-bold text-stone-500">✨ 오늘 첫 피부 기록이에요!</p>
-                      )}
-                    </div>
+                      );
+                    })()}
                     {/* 하단 stat pills */}
                     <div className="flex gap-2 mt-2">
                       <div className="flex-1 rounded-2xl py-2 px-2 text-center" style={{ background: "#FFF5F0" }}>
