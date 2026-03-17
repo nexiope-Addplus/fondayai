@@ -266,14 +266,21 @@ export default {
   async scheduled(event, env, ctx) {
     const now = new Date();
     const hour = now.getUTCHours();
+    const isWeatherCare = (hour === 23);   // UTC 23:00 = KST 08:00
     const isScanReminder = (hour === 22);  // UTC 22:30 = KST 07:30
+    const isUVCare = (hour === 1);         // UTC 01:00 = KST 10:00
     const isLunch = (hour === 3);          // UTC 03:00 = KST 12:00
     const isHydration = (hour === 6);      // UTC 06:00 = KST 15:00
-    const isDinner = (hour === 9);        // UTC 09:00 = KST 18:00
+    const isDinner = (hour === 9);         // UTC 09:00 = KST 18:00
     const isRoutine = (hour === 11 || hour === 12 || hour === 13); // KST 20/21/22시
+    const isBedtime = (hour === 14);       // UTC 14:00 = KST 23:00
 
-    if (isScanReminder) {
+    if (isWeatherCare) {
+      ctx.waitUntil(sendWeatherCarePushToAll(env));
+    } else if (isScanReminder) {
       ctx.waitUntil(sendScanReminderToAll(env));
+    } else if (isUVCare) {
+      ctx.waitUntil(sendUVCarePushToAll(env));
     } else if (isHydration) {
       ctx.waitUntil(sendHydrationPushToAll(env));
     } else if (isLunch || isDinner) {
@@ -282,6 +289,8 @@ export default {
     } else if (isRoutine) {
       const kstHour = hour + 9; // UTC → KST
       ctx.waitUntil(sendRoutineReminderToAll(env, kstHour));
+    } else if (isBedtime) {
+      ctx.waitUntil(sendBedtimeCarePushToAll(env));
     }
   }
 };
@@ -555,6 +564,9 @@ function getCareSettings(record = {}) {
     meal: source.meal !== false,
     hydration: source.hydration !== false,
     routine: source.routine !== false,
+    uvCare: source.uvCare !== false,
+    bedtime: source.bedtime !== false,
+    weatherCare: source.weatherCare !== false,
   };
 }
 
@@ -893,6 +905,233 @@ async function sendMealPushToAll(env, meal) {
       }));
     } catch (e) {
       console.error(`[push] id=${id} error:`, e.message);
+    }
+  }
+}
+
+// ─── 날씨 케어 푸시 (KST 08:00 — Open-Meteo Seoul 기반) ──────────
+async function sendWeatherCarePushToAll(env) {
+  const kv = env.PUSH_KV;
+  if (!kv) return;
+  const allIdsRaw = await kv.get("push:all_ids");
+  if (!allIdsRaw) return;
+  const allIds = JSON.parse(allIdsRaw);
+
+  // Open-Meteo Seoul 오늘 날씨 fetch (API키 불필요)
+  let weatherCode = 0, tempMax = 20, tempMin = 10, precip = 0;
+  try {
+    const res = await fetch(
+      "https://api.open-meteo.com/v1/forecast?latitude=37.5665&longitude=126.9780" +
+      "&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum" +
+      "&timezone=Asia/Seoul&forecast_days=1"
+    );
+    const data = await res.json();
+    weatherCode = data.daily?.weather_code?.[0] ?? 0;
+    tempMax = data.daily?.temperature_2m_max?.[0] ?? 20;
+    tempMin = data.daily?.temperature_2m_min?.[0] ?? 10;
+    precip = data.daily?.precipitation_sum?.[0] ?? 0;
+  } catch (e) {
+    console.error("[weather-care] fetch failed:", e.message);
+  }
+
+  // 날씨 코드별 피부 케어 팁
+  function getWeatherTip(code, max, min, rain, lang) {
+    const isCold = max < 10;
+    const isHot = max > 28;
+    const isRainy = code >= 51 && code <= 82 || rain > 1;
+    const isClear = code <= 3;
+    const isFoggy = code === 45 || code === 48;
+
+    const tips = {
+      ko: isCold
+        ? { icon: "🥶", title: "한파 피부 케어", body: `오늘 최저 ${Math.round(min)}°C · 찬 바람에 장벽이 무너지기 쉬워요. 크림을 겹쳐 바르고 외출 전 선크림도 잊지 마세요.` }
+        : isRainy
+        ? { icon: "🌧", title: "비 오는 날 피부 케어", body: `오늘 강수 ${Math.round(rain)}mm · 습도가 높아 모공이 넓어지기 쉬워요. 가벼운 수분 세럼으로 정돈해 주세요.` }
+        : isFoggy
+        ? { icon: "🌫", title: "미세먼지·안개 주의", body: `오늘 안개/먼지 많음 · 외출 후 이중세안을 꼭 해주세요. 항산화 세럼으로 피부를 보호하세요.` }
+        : isHot
+        ? { icon: "🌡", title: "고온 피부 케어", body: `오늘 최고 ${Math.round(max)}°C · 피지 분비가 늘어요. 오일 프리 보습과 SPF50+ 선크림을 챙겨주세요.` }
+        : isClear
+        ? { icon: "☀️", title: "맑은 날 피부 루틴", body: `오늘 맑고 ${Math.round(min)}~${Math.round(max)}°C · 자외선이 강해요. 외출 2시간마다 선크림을 덧발라 주세요.` }
+        : { icon: "🌤", title: "오늘 날씨 피부 케어", body: `오늘 ${Math.round(min)}~${Math.round(max)}°C · 수분 밸런스를 유지하고 보습 한 단계 더 챙겨보세요.` },
+      en: isCold
+        ? { icon: "🥶", title: "Cold Weather Skin Care", body: `Low ${Math.round(min)}°C today · Cold wind breaks down your barrier. Layer up your cream and don't skip sunscreen.` }
+        : isRainy
+        ? { icon: "🌧", title: "Rainy Day Skin Care", body: `${Math.round(rain)}mm today · High humidity can enlarge pores. Use a light hydrating serum to keep skin balanced.` }
+        : isFoggy
+        ? { icon: "🌫", title: "Fog & Dust Alert", body: `Foggy/dusty today · Double cleanse after going out and use an antioxidant serum for protection.` }
+        : isHot
+        ? { icon: "🌡", title: "Hot Weather Skin Care", body: `High ${Math.round(max)}°C today · Sebum production rises. Go for oil-free moisturizer and SPF50+ sunscreen.` }
+        : isClear
+        ? { icon: "☀️", title: "Sunny Day Skin Routine", body: `Clear skies, ${Math.round(min)}~${Math.round(max)}°C · UV is strong. Reapply sunscreen every 2 hours outdoors.` }
+        : { icon: "🌤", title: "Today's Skin Care", body: `${Math.round(min)}~${Math.round(max)}°C today · Keep moisture balanced and add one extra hydration step.` },
+      ja: isCold
+        ? { icon: "🥶", title: "寒波時のスキンケア", body: `最低気温${Math.round(min)}°C · 冷たい風でバリアが崩れやすいです。クリームを重ねて日焼け止めもお忘れなく。` }
+        : isRainy
+        ? { icon: "🌧", title: "雨の日のスキンケア", body: `降水量${Math.round(rain)}mm · 湿度が高く毛穴が開きやすいです。軽い保湿セラムで整えてください。` }
+        : isFoggy
+        ? { icon: "🌫", title: "霧・ほこり注意", body: `霧・ほこりが多い日 · 外出後はダブルクレンジングを。抗酸化セラムで肌を守ってください。` }
+        : isHot
+        ? { icon: "🌡", title: "高温時のスキンケア", body: `最高${Math.round(max)}°C · 皮脂分泌が増えます。オイルフリー保湿とSPF50+日焼け止めを。` }
+        : isClear
+        ? { icon: "☀️", title: "晴れの日のルーティン", body: `晴れ、${Math.round(min)}~${Math.round(max)}°C · 紫外線が強め。外出中は2時間ごとに日焼け止めを塗り直してください。` }
+        : { icon: "🌤", title: "今日のスキンケア", body: `${Math.round(min)}~${Math.round(max)}°C · 水分バランスを保ち、保湿をもう一手間加えてみてください。` },
+    };
+    return tips[lang] || tips.ko;
+  }
+
+  for (const id of allIds) {
+    try {
+      const raw = await kv.get(`push:sub:${id}`);
+      if (!raw) continue;
+      const record = JSON.parse(raw);
+      const { subscription, lang } = record;
+      const care = getCareSettings(record);
+      if (!care.enabled || !care.weatherCare) continue;
+      const tip = getWeatherTip(weatherCode, tempMax, tempMin, precip, lang || "ko");
+      await sendPush(subscription, {
+        title: `${tip.icon} ${tip.title}`,
+        body: tip.body,
+        url: "/",
+      }, env);
+    } catch (e) {
+      console.error(`[weather-care] id=${id} error:`, e.message);
+    }
+  }
+}
+
+// ─── UV 케어 푸시 (KST 10:00 — Open-Meteo UV index) ─────────────
+async function sendUVCarePushToAll(env) {
+  const kv = env.PUSH_KV;
+  if (!kv) return;
+  const allIdsRaw = await kv.get("push:all_ids");
+  if (!allIdsRaw) return;
+  const allIds = JSON.parse(allIdsRaw);
+
+  // Open-Meteo Seoul 시간별 UV 지수
+  let uvAt10 = 3;
+  try {
+    const res = await fetch(
+      "https://api.open-meteo.com/v1/forecast?latitude=37.5665&longitude=126.9780" +
+      "&hourly=uv_index&timezone=Asia/Seoul&forecast_days=1"
+    );
+    const data = await res.json();
+    uvAt10 = data.hourly?.uv_index?.[10] ?? 3; // 10시 인덱스
+  } catch (e) {
+    console.error("[uv-care] fetch failed:", e.message);
+  }
+
+  // UV 2 이하면 발송 생략 (낮음)
+  if (uvAt10 < 2) return;
+
+  function getUVTip(uv, lang) {
+    const level = uv >= 11 ? "extreme" : uv >= 8 ? "veryHigh" : uv >= 6 ? "high" : uv >= 3 ? "moderate" : "low";
+    const tips = {
+      ko: {
+        moderate: { title: `☀️ UV ${Math.round(uv)} 보통`, body: "SPF30 이상 선크림을 바르고 자외선이 강한 11시~15시에는 그늘을 이용하세요." },
+        high:     { title: `🌞 UV ${Math.round(uv)} 높음`, body: "SPF50+ 선크림 필수! 2시간마다 덧바르고 챙 넓은 모자를 챙기세요." },
+        veryHigh: { title: `🔆 UV ${Math.round(uv)} 매우 높음`, body: "자외선이 매우 강해요. 장시간 외출을 자제하고 SPF50+ + PA+++ 이상을 사용하세요." },
+        extreme:  { title: `⚠️ UV ${Math.round(uv)} 위험`, body: "자외선 위험 수준! 외출 시 물리적 차단제와 보호 의류를 반드시 착용하세요." },
+      },
+      en: {
+        moderate: { title: `☀️ UV ${Math.round(uv)} Moderate`, body: "Apply SPF30+ sunscreen and seek shade between 11am–3pm." },
+        high:     { title: `🌞 UV ${Math.round(uv)} High`, body: "SPF50+ is essential! Reapply every 2 hours and wear a wide-brim hat." },
+        veryHigh: { title: `🔆 UV ${Math.round(uv)} Very High`, body: "UV is very strong. Limit time outdoors and use SPF50+ PA+++ or higher." },
+        extreme:  { title: `⚠️ UV ${Math.round(uv)} Extreme`, body: "Dangerous UV level! Wear physical sunscreen and protective clothing outdoors." },
+      },
+      ja: {
+        moderate: { title: `☀️ UV ${Math.round(uv)} 普通`, body: "SPF30以上の日焼け止めを塗り、11時~15時は日陰を活用しましょう。" },
+        high:     { title: `🌞 UV ${Math.round(uv)} 高い`, body: "SPF50+必須！2時間おとに塗り直し、つばの広い帽子を忘れずに。" },
+        veryHigh: { title: `🔆 UV ${Math.round(uv)} 非常に高い`, body: "UV非常に強いです。外出を控え、SPF50+ PA+++ 以上を使用してください。" },
+        extreme:  { title: `⚠️ UV ${Math.round(uv)} 危険`, body: "危険なUVレベルです！外出時は物理的日焼け止めと保護衣類を必ず着用。" },
+      },
+    };
+    return (tips[lang] || tips.ko)[level] || (tips[lang] || tips.ko).moderate;
+  }
+
+  for (const id of allIds) {
+    try {
+      const raw = await kv.get(`push:sub:${id}`);
+      if (!raw) continue;
+      const record = JSON.parse(raw);
+      const { subscription, lang } = record;
+      const care = getCareSettings(record);
+      if (!care.enabled || !care.uvCare) continue;
+      const tip = getUVTip(uvAt10, lang || "ko");
+      await sendPush(subscription, {
+        title: tip.title,
+        body: tip.body,
+        url: "/",
+      }, env);
+    } catch (e) {
+      console.error(`[uv-care] id=${id} error:`, e.message);
+    }
+  }
+}
+
+// ─── 취침 케어 푸시 (KST 23:00) ──────────────────────────────────
+async function sendBedtimeCarePushToAll(env) {
+  const kv = env.PUSH_KV;
+  if (!kv) return;
+  const allIdsRaw = await kv.get("push:all_ids");
+  if (!allIdsRaw) return;
+  const allIds = JSON.parse(allIdsRaw);
+
+  const titles = {
+    ko: "🌙 취침 전 피부 케어",
+    en: "🌙 Bedtime Skin Care",
+    ja: "🌙 就寝前スキンケア",
+  };
+
+  // 바우만 타입별 취침 케어 팁
+  const bedtimeTips = {
+    ko: {
+      O: "모공 속 노폐물을 클렌징으로 깨끗이 씻어내고 가벼운 나이트 크림으로 마무리하세요.",
+      D: "수분 크림을 듬뿍 바르고 슬리핑 팩으로 밀봉해 아침까지 촉촉하게 유지하세요.",
+      S: "자극 없는 진정 앰플을 먼저 바른 후 세라마이드 크림으로 장벽을 강화하세요.",
+      P: "비타민C 세럼이나 나이아신아마이드로 취침 중 색소 케어를 해보세요.",
+      W: "레티놀 또는 펩타이드 크림으로 밤사이 콜라겐 합성을 도와보세요.",
+      default: "클렌징 → 토너 → 에센스 → 크림 순서로 나이트 루틴을 완성하세요. 숙면도 최고의 피부 케어예요.",
+    },
+    en: {
+      O: "Deep cleanse to clear pores, then finish with a light night cream.",
+      D: "Apply rich moisturizer and seal with a sleeping pack for all-night hydration.",
+      S: "Start with a soothing ampoule, then layer ceramide cream to rebuild your barrier.",
+      P: "Use a vitamin C serum or niacinamide overnight to target pigmentation while you sleep.",
+      W: "Apply retinol or peptide cream to support collagen synthesis overnight.",
+      default: "Complete your night routine: cleanse → toner → essence → cream. Good sleep is the best skin care.",
+    },
+    ja: {
+      O: "クレンジングで毛穴の汚れをしっかり落とし、軽いナイトクリームで仕上げてください。",
+      D: "たっぷりの保湿クリームを塗り、スリーピングパックで朝まで水分を閉じ込めてください。",
+      S: "低刺激の鎮静アンプルを先に塗り、セラミドクリームでバリアを強化してください。",
+      P: "ビタミンCセラムやナイアシンアミドで就寝中に色素ケアをしてみてください。",
+      W: "レチノールまたはペプチドクリームで夜間のコラーゲン合成をサポートしましょう。",
+      default: "クレンジング→トナー→エッセンス→クリームの順にナイトルーティンを完成させてください。良質な睡眠も最高のスキンケアです。",
+    },
+  };
+
+  for (const id of allIds) {
+    try {
+      const raw = await kv.get(`push:sub:${id}`);
+      if (!raw) continue;
+      const record = JSON.parse(raw);
+      const { subscription, baumannType, lang } = record;
+      const care = getCareSettings(record);
+      if (!care.enabled || !care.bedtime) continue;
+      const l = lang || "ko";
+      const tips = bedtimeTips[l] || bedtimeTips.ko;
+      // 바우만 4글자 중 첫 번째 매칭
+      const priority = ["S", "D", "P", "W", "O"];
+      const matched = priority.find(k => baumannType?.includes(k) && tips[k]);
+      const body = matched ? tips[matched] : tips.default;
+      await sendPush(subscription, {
+        title: titles[l] || titles.ko,
+        body,
+        url: "/",
+      }, env);
+    } catch (e) {
+      console.error(`[bedtime-care] id=${id} error:`, e.message);
     }
   }
 }

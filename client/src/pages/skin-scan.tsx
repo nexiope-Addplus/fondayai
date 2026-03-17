@@ -1853,6 +1853,9 @@ interface AICareSettings {
   routine: boolean;
   routineHour: number;
   routineMinute: number;
+  uvCare: boolean;
+  bedtime: boolean;
+  weatherCare: boolean;
 }
 
 function getAICareSettings(): AICareSettings {
@@ -1868,6 +1871,9 @@ function getAICareSettings(): AICareSettings {
         routine: parsed.routine ?? true,
         routineHour: parsed.routineHour ?? 21,
         routineMinute: parsed.routineMinute ?? 0,
+        uvCare: parsed.uvCare ?? true,
+        bedtime: parsed.bedtime ?? true,
+        weatherCare: parsed.weatherCare ?? true,
       };
     }
   } catch {}
@@ -1879,6 +1885,9 @@ function getAICareSettings(): AICareSettings {
     routine: true,
     routineHour: 21,
     routineMinute: 0,
+    uvCare: true,
+    bedtime: true,
+    weatherCare: true,
   };
 }
 
@@ -5366,37 +5375,46 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
   const aiCareLabels = i18n.language?.startsWith("en")
     ? {
         title: "AI Care",
-        desc: "One switch for scan, meal, hydration, and routine coaching based on your skin result.",
+        desc: "All-day skin coaching: scan, meals, hydration, UV, weather & bedtime routine.",
         on: "AI Care On",
         off: "Turn On AI Care",
         scan: "Scan",
         meal: "Meals",
         hydration: "Hydration",
         routine: "Routine",
-        schedule: "Scan 07:30 · Lunch 12:00 · Water 15:00 · Dinner 18:00 · Routine 20-22:00",
+        uvCare: "☀️ UV",
+        bedtime: "🌙 Bedtime",
+        weatherCare: "🌤 Weather",
+        schedule: "08:00 Weather · 07:30 Scan · 10:00 UV · 12:00 Lunch · 15:00 Water · 18:00 Dinner · Routine · 23:00 Bedtime",
       }
     : i18n.language?.startsWith("ja")
       ? {
           title: "AI密着ケア",
-          desc: "肌結果に合わせてスキャン・食事・水分・ルーティン通知をまとめて管理します。",
+          desc: "スキャン・食事・水分・UV・天気・就寝ケアまで丸ごと管理します。",
           on: "AI密着ケア ON",
           off: "AI密着ケアを有効化",
           scan: "スキャン",
           meal: "食事",
           hydration: "水分",
           routine: "ルーティン",
-          schedule: "スキャン 07:30 · 昼食 12:00 · 水分 15:00 · 夕食 18:00 · ルーティン 20-22時",
+          uvCare: "☀️ UV",
+          bedtime: "🌙 就寝",
+          weatherCare: "🌤 天気",
+          schedule: "08:00 天気 · 07:30 スキャン · 10:00 UV · 12:00 昼食 · 15:00 水分 · 18:00 夕食 · ルーティン · 23:00 就寝",
         }
       : {
           title: "AI 밀착케어",
-          desc: "한 번 켜두면 피부 결과에 맞춰 스캔, 식단, 수분, 루틴 알림을 함께 관리해드려요.",
+          desc: "하루 종일 피부 코칭: 스캔, 식단, 수분, UV, 날씨, 취침 루틴까지.",
           on: "AI 밀착케어 ON",
           off: "AI 밀착케어 켜기",
           scan: "스캔",
           meal: "식단",
           hydration: "수분",
           routine: "루틴",
-          schedule: "스캔 07:30 · 점심 12:00 · 수분 15:00 · 저녁 18:00 · 루틴 20~22시",
+          uvCare: "☀️ UV",
+          bedtime: "🌙 취침",
+          weatherCare: "🌤 날씨",
+          schedule: "08:00 날씨 · 07:30 스캔 · 10:00 UV · 12:00 점심 · 15:00 수분 · 18:00 저녁 · 루틴 · 23:00 취침",
         };
 
   const syncPushSubscription = async (subscription: PushSubscriptionJSON, nextCareSettings: AICareSettings) => {
@@ -5516,7 +5534,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
     setPushLoading(false);
   };
 
-  const updateAICareOption = async (key: "scan" | "meal" | "hydration" | "routine", value: boolean) => {
+  const updateAICareOption = async (key: "scan" | "meal" | "hydration" | "routine" | "uvCare" | "bedtime" | "weatherCare", value: boolean) => {
     const next = { ...aiCareSettings, [key]: value };
     setAICareSettings(next);
     saveAICareSettings(next);
@@ -6416,6 +6434,9 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
                 ["meal", aiCareLabels.meal],
                 ["hydration", aiCareLabels.hydration],
                 ["routine", aiCareLabels.routine],
+                ["uvCare", aiCareLabels.uvCare],
+                ["bedtime", aiCareLabels.bedtime],
+                ["weatherCare", aiCareLabels.weatherCare],
               ] as const).map(([key, label]) => (
                 <button key={key}
                   onClick={() => updateAICareOption(key, !aiCareSettings[key])}
