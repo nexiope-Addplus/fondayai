@@ -6365,6 +6365,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
           </div>
         </div>
 
+        <div className="overflow-hidden">
         <AnimatePresence mode="wait" initial={false} custom={tabDirectionRef.current}>
         {/* ── 루틴 탭 ── */}
         {activeTab === "routine" && (
@@ -6903,6 +6904,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
         )}
 
         </AnimatePresence>
+        </div>
 
         {/* ── 제휴 텍스트 링크 ── */}
         <div className="pt-2 pb-1 text-center">
