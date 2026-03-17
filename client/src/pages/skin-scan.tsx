@@ -4018,30 +4018,28 @@ function DiaryTab({ user, analysisResult, onBack }: { user: any; analysisResult:
                     </div>
 
                     <div className="grid grid-cols-3 gap-2 mt-4">
-                      <div className="rounded-2xl p-3" style={{ background: "#FFFFFF", border: "1px solid #F2E7DF" }}>
+                      <div className="rounded-2xl p-3 text-center" style={{ background: "#FFFFFF", border: "1px solid #F2E7DF" }}>
                         <p className="text-[10px] font-bold text-stone-400">{diaryReport.copy.scans}</p>
                         <p className="text-[20px] font-black mt-1" style={{ color: DEEP_GREEN }}>{diaryReport.scanCount}</p>
                       </div>
-                      <div className="rounded-2xl p-3" style={{ background: "#FFFFFF", border: "1px solid #F2E7DF" }}>
+                      <div className="rounded-2xl p-3 text-center" style={{ background: "#FFFFFF", border: "1px solid #F2E7DF" }}>
                         <p className="text-[10px] font-bold text-stone-400">{diaryReport.copy.diary}</p>
                         <p className="text-[20px] font-black mt-1" style={{ color: SCAN_TO }}>{diaryReport.memoCount}</p>
                       </div>
-                      <div className="rounded-2xl p-3" style={{ background: "#FFFFFF", border: "1px solid #F2E7DF" }}>
+                      <div className="rounded-2xl p-3 text-center" style={{ background: "#FFFFFF", border: "1px solid #F2E7DF" }}>
                         <p className="text-[10px] font-bold text-stone-400">{diaryReport.copy.adherence}</p>
                         <p className="text-[20px] font-black mt-1" style={{ color: "#0F766E" }}>{diaryReport.adherence}</p>
                       </div>
                     </div>
 
-                    <div className="rounded-[22px] p-4 mt-4" style={{ background: "#FFFFFF", border: "1px solid #F2E7DF" }}>
-                      <div className="flex items-center justify-between gap-3">
-                        <div>
-                          <p className="text-[10px] font-black uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>
-                            {diaryReport.copy.executive}
-                          </p>
-                          <p className="text-[18px] font-black mt-1" style={{ color: DEEP_GREEN }}>
-                            {diaryReport.copy[diaryReport.trendKey]}
-                          </p>
-                        </div>
+                    <div className="rounded-[22px] p-4 mt-4 text-center" style={{ background: "#FFFFFF", border: "1px solid #F2E7DF" }}>
+                      <p className="text-[10px] font-black uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>
+                        {diaryReport.copy.executive}
+                      </p>
+                      <div className="flex items-center justify-center gap-2 mt-1">
+                        <p className="text-[18px] font-black" style={{ color: DEEP_GREEN }}>
+                          {diaryReport.copy[diaryReport.trendKey]}
+                        </p>
                         <div className="px-3 py-1.5 rounded-full text-[10px] font-black"
                           style={{ background: `${SCAN_FROM}18`, color: SCAN_TO }}>
                           {diaryReport.trendDesc}
@@ -5464,10 +5462,10 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
         desc: "All-day skin coaching: scan, meals, hydration, UV, weather & bedtime routine.",
         on: "AI Care On",
         off: "Turn On AI Care",
-        scan: "Scan",
-        meal: "Meals",
-        hydration: "Hydration",
-        routine: "Routine",
+        scan: "📷 Scan",
+        meal: "🥗 Meals",
+        hydration: "💧 Hydration",
+        routine: "✨ Routine",
         uvCare: "☀️ UV",
         bedtime: "🌙 Bedtime",
         weatherCare: "🌤 Weather",
@@ -5479,10 +5477,10 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
           desc: "スキャン・食事・水分・UV・天気・就寝ケアまで丸ごと管理します。",
           on: "AI密着ケア ON",
           off: "AI密着ケアを有効化",
-          scan: "スキャン",
-          meal: "食事",
-          hydration: "水分",
-          routine: "ルーティン",
+          scan: "📷 スキャン",
+          meal: "🥗 食事",
+          hydration: "💧 水分",
+          routine: "✨ ルーティン",
           uvCare: "☀️ UV",
           bedtime: "🌙 就寝",
           weatherCare: "🌤 天気",
@@ -5493,10 +5491,10 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
           desc: "하루 종일 피부 코칭: 스캔, 식단, 수분, UV, 날씨, 취침 루틴까지.",
           on: "AI 밀착케어 ON",
           off: "AI 밀착케어 켜기",
-          scan: "스캔",
-          meal: "식단",
-          hydration: "수분",
-          routine: "루틴",
+          scan: "📷 스캔",
+          meal: "🥗 식단",
+          hydration: "💧 수분",
+          routine: "✨ 루틴",
           uvCare: "☀️ UV",
           bedtime: "🌙 취침",
           weatherCare: "🌤 날씨",
@@ -6547,7 +6545,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
               <div className="h-16 rounded-3xl bg-stone-100 animate-pulse" />
             ) : user ? (
               <motion.div whileTap={{ scale: 0.98 }} onClick={() => onOpenDiary?.()} className="cursor-pointer">
-                <Card className="border-none shadow-md rounded-3xl overflow-hidden">
+                <Card className="rounded-3xl overflow-hidden" style={{ background: "#FDFCFB", border: "1.5px solid #DDD4CB", boxShadow: "0 2px 12px rgba(150,110,90,0.10)" }}>
                   <CardContent className="p-4">
                     <div className="flex items-center gap-3">
                       <div className="w-11 h-11 rounded-2xl flex items-center justify-center shrink-0"
@@ -6588,7 +6586,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
                     {/* 하단 stat pills */}
                     <div className="flex gap-2 mt-2">
                       <div className="flex-1 rounded-2xl py-2 px-2 text-center" style={{ background: "#FFF5F0" }}>
-                        <p className="text-[9px] font-bold text-stone-400 mb-0.5">스트릭</p>
+                        <p className="text-[9px] font-bold text-stone-400 mb-0.5">연속 기록</p>
                         <p className="text-[14px] font-black" style={{ color: SCAN_TO }}>{currentStreak.count || 1}🔥</p>
                       </div>
                       <div className="flex-1 rounded-2xl py-2 px-2 text-center" style={{ background: "#F0FDF4" }}>
@@ -6602,6 +6600,26 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
                         <p className="text-[9px] font-black">일기 보기</p>
                       </button>
                     </div>
+                    {/* 이전 측정 기록 미니 히스토리 */}
+                    {history.length > 0 && (
+                      <div className="mt-2.5 pt-2.5 border-t border-stone-100">
+                        <p className="text-[9px] font-bold text-stone-400 mb-1.5">이전 측정 기록</p>
+                        <div className="flex gap-1.5 overflow-x-auto pb-0.5">
+                          {[...history].slice(0, 5).map((h: any, i: number) => {
+                            const sc = parseInt(h.overallScore || "0", 10);
+                            const d = new Date(h.createdAt);
+                            const label = `${d.getMonth() + 1}/${d.getDate()}`;
+                            return (
+                              <div key={i} className="flex flex-col items-center shrink-0 px-2.5 py-1.5 rounded-xl"
+                                style={{ background: "#F5F2EE", minWidth: 36 }}>
+                                <p className="text-[11px] font-black" style={{ color: SCAN_TO }}>{sc}</p>
+                                <p className="text-[8px] text-stone-400 mt-0.5">{label}</p>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
                   </CardContent>
                 </Card>
               </motion.div>
