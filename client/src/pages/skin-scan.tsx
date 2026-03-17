@@ -6692,8 +6692,8 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
             </div>
 
             {!analysisResult?.nutritionTips ? (
-              <div className="flex items-center justify-center gap-2 py-8 text-stone-400">
-                <div className="w-4 h-4 border-2 border-stone-300 border-t-amber-400 rounded-full animate-spin" />
+              <div className="flex flex-col items-center justify-center gap-2 py-10 text-stone-400">
+                <span className="text-3xl">🥗</span>
                 <p className="text-[12px]">{t("nutrients.loadingTips")}</p>
               </div>
             ) : (
