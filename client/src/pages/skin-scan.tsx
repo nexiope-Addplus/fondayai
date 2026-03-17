@@ -5244,6 +5244,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
   const [email, setEmail] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const resultScrollRef = useRef<HTMLDivElement>(null);
+  const tabNavRef = useRef<HTMLDivElement>(null);
   const [shareLoading, setShareLoading] = useState(false);
   const analysisDrag = useDragControls();
   const improvementsDrag = useDragControls();
@@ -6236,17 +6237,22 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
         })()}
 
         {/* ── 3탭 네비게이션 ── */}
-        <div className="rounded-[28px] p-2.5 border border-[#F0E6E0] sticky top-0 z-20 backdrop-blur-md"
+        <div ref={tabNavRef} className="rounded-[28px] p-2.5 border border-[#F0E6E0] sticky top-0 z-20 backdrop-blur-md"
           style={{ background: "linear-gradient(180deg, rgba(255,249,246,0.97) 0%, rgba(255,255,255,0.97) 100%)" }}>
           <div className="flex gap-2">
             {([
-              { id: "routine" as const,   label: t("result.tab.routine"),   icon: <CheckCircle2 className="w-4 h-4" />, from: "#34D399", to: "#059669",  inactiveBg: "#F0FDF4", inactiveText: "#86EFAC" },
-              { id: "solution" as const,  label: t("result.tab.solution"),  icon: <Leaf className="w-4 h-4" />,         from: SCAN_FROM, to: SCAN_TO,   inactiveBg: "#FFF6F1", inactiveText: "#A8A29E" },
-              { id: "nutrition" as const, label: t("result.tab.nutrition"), icon: <Utensils className="w-4 h-4" />,     from: "#FCD34D", to: "#D97706", inactiveBg: "#FFFBEB", inactiveText: "#FDE68A" },
+              { id: "routine" as const,   label: t("result.tab.routine"),   icon: <CheckCircle2 className="w-4 h-4" />, from: "#10B981", to: "#047857",  inactiveBg: "#ECFDF5", inactiveText: "#059669" },
+              { id: "solution" as const,  label: t("result.tab.solution"),  icon: <Leaf className="w-4 h-4" />,         from: SCAN_FROM, to: SCAN_TO,   inactiveBg: "#FFF6F1", inactiveText: "#C97062" },
+              { id: "nutrition" as const, label: t("result.tab.nutrition"), icon: <Utensils className="w-4 h-4" />,     from: "#F97316", to: "#C2410C", inactiveBg: "#FFF7ED", inactiveText: "#C2410C" },
             ]).map(({ id, label, icon, from, to, inactiveBg, inactiveText }) => {
               const isActive = activeTab === id;
               return (
-                <button key={id} onClick={() => { setActiveTab(id); resultScrollRef.current?.scrollTo({ top: 0, behavior: "smooth" }); }}
+                <button key={id} onClick={() => {
+                  setActiveTab(id);
+                  const nav = tabNavRef.current;
+                  const container = resultScrollRef.current;
+                  if (nav && container) container.scrollTo({ top: nav.offsetTop, behavior: "smooth" });
+                }}
                   className="flex-1 flex flex-col items-center gap-1 py-3 rounded-[20px] text-[12px] font-black transition-all"
                   style={isActive
                     ? { background: `linear-gradient(135deg, ${from}, ${to})`, color: "white", boxShadow: `0 4px 14px ${to}55` }
@@ -6492,7 +6498,12 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
             <AdBanner slot="6349940752" />
             {/* 다음 탭 유도 */}
             <button
-              onClick={() => { setActiveTab("solution"); resultScrollRef.current?.scrollTo({ top: 0, behavior: "smooth" }); }}
+              onClick={() => {
+                setActiveTab("solution");
+                const nav = tabNavRef.current;
+                const container = resultScrollRef.current;
+                if (nav && container) container.scrollTo({ top: nav.offsetTop, behavior: "smooth" });
+              }}
               className="w-full flex items-center justify-center gap-2 py-3.5 rounded-2xl text-[13px] font-black text-white transition-all active:scale-95"
               style={{ background: `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})` }}>
               <Leaf className="w-4 h-4" />
@@ -6685,9 +6696,14 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
             </div>
             {/* 다음 탭 유도 */}
             <button
-              onClick={() => { setActiveTab("nutrition"); resultScrollRef.current?.scrollTo({ top: 0, behavior: "smooth" }); }}
+              onClick={() => {
+                setActiveTab("nutrition");
+                const nav = tabNavRef.current;
+                const container = resultScrollRef.current;
+                if (nav && container) container.scrollTo({ top: nav.offsetTop, behavior: "smooth" });
+              }}
               className="w-full flex items-center justify-center gap-2 py-3.5 rounded-2xl text-[13px] font-black text-white transition-all active:scale-95"
-              style={{ background: "linear-gradient(135deg, #FCD34D, #D97706)" }}>
+              style={{ background: "linear-gradient(135deg, #F97316, #C2410C)" }}>
               <Utensils className="w-4 h-4" />
               <span>{t("result.tab.nutrition")} →</span>
             </button>
