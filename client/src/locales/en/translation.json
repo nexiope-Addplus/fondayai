@@ -119,6 +119,11 @@
       "solution": "Solution",
       "nutrition": "Nutrition"
     },
+    "onboarding": {
+      "title": "First Scan Complete!",
+      "sub": "Explore the 3 tabs — Routine is today's tasks, Solution is your improvement path, Nutrition is what to eat today.",
+      "dismiss": "Let's go →"
+    },
     "todayAction": "Today's Key Care",
     "deviceTeaser": {
       "title": "Fonday Device",
@@ -408,6 +413,10 @@
     "pushBtnOn": "Reminders On ✓",
     "pushUnsupported": "Push notifications are not supported in this browser.",
     "pushDenied": "Notification permission is blocked. Please allow it in browser settings.",
+    "eatTitle": "Good Foods Today",
+    "hydrationLabel": "Hydration Goal",
+    "targetScoreLabel": "Related Score",
+    "loadingTips": "Analyzing your diet...",
     "lunchTitle": "🥗 Fonday Lunch Pick",
     "dinnerTitle": "🍽️ Fonday Dinner Pick",
     "avoidTitle": "Foods to Avoid Today",

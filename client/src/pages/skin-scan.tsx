@@ -84,6 +84,11 @@ interface AnalysisResult {
   improvements: { title: string; desc: string }[];
   cosmetics: { type: string; key: string; reason: string }[];
   prediction?: { good: PredictionScenario; bad: PredictionScenario };
+  nutritionTips?: {
+    eatFoods: { emoji: string; food: string; reason: string; targetScore: string }[];
+    avoidFoods: { emoji: string; food: string; reason: string }[];
+    hydrationGoal: string;
+  } | null;
 }
 
 interface RankingData {
@@ -5266,6 +5271,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
   const [showCosmeticsGate, setShowCosmeticsGate] = useState(false);
   const [showCosmeticsRegister, setShowCosmeticsRegister] = useState(false);
   const [showRoutineUpdateSheet, setShowRoutineUpdateSheet] = useState(false);
+  const [showOnboarding, setShowOnboarding] = useState(() => !localStorage.getItem("fonday_onboarding_done"));
   const [showQuestSheet, setShowQuestSheet] = useState(false);
 
   // 챌린지 참여 후 내 결과 저장 (비로그인도 작동)
@@ -6257,6 +6263,28 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
         {activeTab === "routine" && (
           <div className="space-y-4">
 
+        {/* 첫 방문자 온보딩 카드 */}
+        {showOnboarding && history.length === 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }}
+            className="rounded-3xl p-4 flex items-start gap-3"
+            style={{ background: "#FFF5F0", border: "1px solid #F3DDD6" }}
+          >
+            <span className="text-xl shrink-0 mt-0.5">✨</span>
+            <div className="flex-1 min-w-0">
+              <p className="text-[13px] font-black text-stone-800 mb-0.5">{t("result.onboarding.title")}</p>
+              <p className="text-[11px] text-stone-500 leading-relaxed text-kr-pretty">{t("result.onboarding.sub")}</p>
+              <button
+                onClick={() => { localStorage.setItem("fonday_onboarding_done", "1"); setShowOnboarding(false); }}
+                className="mt-2 text-[11px] font-black rounded-full px-3 py-1 text-white"
+                style={{ background: "linear-gradient(135deg, #f87171, #C97062)" }}
+              >
+                {t("result.onboarding.dismiss")}
+              </button>
+            </div>
+          </motion.div>
+        )}
+
         {/* 퀘스트 / 미션 카드 */}
         <Card className="border border-[#EADFD8] rounded-3xl overflow-hidden shadow-[0_12px_30px_rgba(201,112,98,0.12)] bg-white">
           <CardContent className="p-3.5">
@@ -6658,75 +6686,73 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
                 <Utensils className="w-4 h-4 text-white" />
               </div>
               <div>
-                <p className="text-[13px] font-black" style={{ color: "#D97706" }}>{t("nutrients.sectionTitle")}</p>
+                <p className="text-[13px] font-black" style={{ color: "#D97706" }}>{t("nutrients.eatTitle")}</p>
                 <p className="text-[11px] text-stone-400">{t("nutrients.sectionSub")}</p>
               </div>
             </div>
-            {finalType.split("").filter(l => l in NUTRIENT_COLORS).map((letter, i) => {
-              const arr = t(`nutrients.${letter}`, { returnObjects: true }) as { name: string; foods: string; why: string }[];
-              const nutrient = arr?.[0];
-              if (!nutrient) return null;
-              const color = NUTRIENT_COLORS[letter];
-              return (
-                <motion.div key={letter} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: i * 0.08 }} className="flex gap-3 p-4 rounded-2xl border"
-                  style={{ background: `${color}0D`, borderColor: `${color}33` }}>
-                  <div className="shrink-0">
-                    <div className="w-8 h-8 rounded-full flex items-center justify-center text-base" style={{ background: `${color}22` }}>
-                      {NUTRIENT_ICONS[letter]}
-                    </div>
-                    <p className="text-[9px] font-black text-center mt-0.5" style={{ color }}>{letter}</p>
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-[13px] font-bold mb-0.5" style={{ color }}>{nutrient.name}</p>
-                    <p className="text-[12px] text-stone-500 leading-relaxed mb-1.5">{nutrient.why}</p>
-                    <p className="text-[11px] text-stone-400">
-                      <span className="font-bold" style={{ color }}>{t("nutrients.foodLabel")} </span>{nutrient.foods}
-                    </p>
-                  </div>
-                </motion.div>
-              );
-            })}
-            <div className="pt-1">
-              <div className="flex items-center gap-2 mb-3 pt-2 border-t border-stone-100">
-                <span className="text-base">⚠️</span>
-                <p className="text-[13px] font-black" style={{ color: "#D97706" }}>{t("nutrients.avoidTitle")}</p>
+
+            {!analysisResult?.nutritionTips ? (
+              <div className="flex items-center justify-center gap-2 py-8 text-stone-400">
+                <div className="w-4 h-4 border-2 border-stone-300 border-t-amber-400 rounded-full animate-spin" />
+                <p className="text-[12px]">{t("nutrients.loadingTips")}</p>
               </div>
-              <div className="rounded-2xl p-4 mb-2.5" style={{ background: "#FFF7ED", border: "1px solid #FED7AA" }}>
-                <div className="flex items-center gap-1.5 mb-2.5">
-                  <span className="text-sm">☀️</span>
-                  <span className="text-[12px] font-black text-orange-700">{t("nutrients.avoidLunch")}</span>
-                </div>
+            ) : (
+              <>
+                {/* 오늘 먹으면 좋은 것 */}
                 <div className="space-y-2">
-                  {avoidLunch.map(({ food, why }, idx) => (
-                    <div key={idx} className="flex gap-2 items-start">
-                      <span className="text-[11px] font-black text-orange-400 shrink-0 mt-0.5">✕</span>
-                      <div>
-                        <p className="text-[12px] font-bold text-stone-700">{food}</p>
-                        <p className="text-[11px] text-stone-400">{why}</p>
+                  {analysisResult.nutritionTips.eatFoods.map((item: { emoji: string; food: string; reason: string; targetScore: string }, i: number) => (
+                    <motion.div key={i} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: i * 0.07 }}
+                      className="flex items-start gap-3 p-3.5 rounded-2xl"
+                      style={{ background: "linear-gradient(135deg, #FFF1F0, #FFF7F5)", border: "1px solid #FECACA" }}>
+                      <span className="text-2xl shrink-0 mt-0.5">{item.emoji}</span>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-0.5">
+                          <p className="text-[13px] font-black text-stone-800">{item.food}</p>
+                          <span className="text-[9px] font-black rounded-full px-2 py-0.5 text-white shrink-0"
+                            style={{ background: "linear-gradient(135deg, #f87171, #C97062)" }}>
+                            {t("nutrients.targetScoreLabel")}: {item.targetScore}
+                          </span>
+                        </div>
+                        <p className="text-[11px] text-stone-500 leading-relaxed">{item.reason}</p>
                       </div>
-                    </div>
+                    </motion.div>
                   ))}
                 </div>
-              </div>
-              <div className="rounded-2xl p-4" style={{ background: "#F5F3FF", border: "1px solid #DDD6FE" }}>
-                <div className="flex items-center gap-1.5 mb-2.5">
-                  <span className="text-sm">🌙</span>
-                  <span className="text-[12px] font-black text-violet-700">{t("nutrients.avoidDinner")}</span>
-                </div>
-                <div className="space-y-2">
-                  {avoidDinner.map(({ food, why }, idx) => (
-                    <div key={idx} className="flex gap-2 items-start">
-                      <span className="text-[11px] font-black text-violet-400 shrink-0 mt-0.5">✕</span>
-                      <div>
-                        <p className="text-[12px] font-bold text-stone-700">{food}</p>
-                        <p className="text-[11px] text-stone-400">{why}</p>
-                      </div>
+
+                {/* 수분 목표 */}
+                {analysisResult.nutritionTips.hydrationGoal && (
+                  <div className="flex items-center gap-3 rounded-2xl px-4 py-3"
+                    style={{ background: "#EFF6FF", border: "1px solid #BFDBFE" }}>
+                    <span className="text-xl shrink-0">💧</span>
+                    <div>
+                      <p className="text-[10px] font-black text-blue-600 mb-0.5">{t("nutrients.hydrationLabel")}</p>
+                      <p className="text-[12px] text-stone-600 leading-relaxed">{analysisResult.nutritionTips.hydrationGoal}</p>
                     </div>
-                  ))}
+                  </div>
+                )}
+
+                {/* 피해야 할 것 */}
+                <div className="pt-1">
+                  <div className="flex items-center gap-2 mb-3 pt-2 border-t border-stone-100">
+                    <span className="text-base">⚠️</span>
+                    <p className="text-[13px] font-black" style={{ color: "#D97706" }}>{t("nutrients.avoidTitle")}</p>
+                  </div>
+                  <div className="space-y-2">
+                    {analysisResult.nutritionTips.avoidFoods.map((item: { emoji: string; food: string; reason: string }, idx: number) => (
+                      <div key={idx} className="flex items-start gap-3 p-3 rounded-2xl"
+                        style={{ background: "#FFF7ED", border: "1px solid #FED7AA" }}>
+                        <span className="text-xl shrink-0">{item.emoji}</span>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-[12px] font-bold text-stone-700 mb-0.5">{item.food}</p>
+                          <p className="text-[11px] text-stone-400">{item.reason}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            </div>
+              </>
+            )}
           </div>
         )}
 

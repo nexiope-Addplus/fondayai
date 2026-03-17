@@ -119,6 +119,11 @@
       "solution": "ソリューション",
       "nutrition": "栄養"
     },
+    "onboarding": {
+      "title": "初スキャン完了！",
+      "sub": "3つのタブを見てみましょう — ルーティンは今日のタスク、ソリューションは改善方向、栄養は今日食べるものです。",
+      "dismiss": "始める →"
+    },
     "todayAction": "今日のケア",
     "deviceTeaser": {
       "title": "Fondayデバイス",
@@ -408,6 +413,10 @@
     "pushBtnOn": "リマインダーON ✓",
     "pushUnsupported": "このブラウザはプッシュ通知に対応していません。",
     "pushDenied": "通知の許可がブロックされています。ブラウザの設定で許可してください。",
+    "eatTitle": "今日の肌に良い食べ物",
+    "hydrationLabel": "水分目標",
+    "targetScoreLabel": "関連スコア",
+    "loadingTips": "食事分析中...",
     "lunchTitle": "🥗 Fondayランチおすすめ",
     "dinnerTitle": "🍽️ Fondayディナーおすすめ",
     "avoidTitle": "今日避けるべき食べ物",

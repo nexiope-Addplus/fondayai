@@ -119,6 +119,11 @@
       "solution": "솔루션",
       "nutrition": "영양"
     },
+    "onboarding": {
+      "title": "첫 스캔 완료!",
+      "sub": "3개 탭을 살펴보세요 — 루틴은 오늘 할 일, 솔루션은 개선 방향, 영양은 오늘 먹을 것이에요.",
+      "dismiss": "시작하기 →"
+    },
     "todayAction": "오늘의 핵심 케어",
     "deviceTeaser": {
       "title": "Fonday 디바이스",
@@ -408,6 +413,10 @@
     "pushBtnOn": "알림 켜짐 ✓",
     "pushUnsupported": "이 브라우저는 푸시 알림을 지원하지 않아요.",
     "pushDenied": "알림 권한이 차단되어 있어요. 브라우저 설정에서 허용해 주세요.",
+    "eatTitle": "오늘 피부에 좋은 음식",
+    "hydrationLabel": "오늘 수분 목표",
+    "targetScoreLabel": "점수 연관",
+    "loadingTips": "맞춤 식단 분석 중...",
     "lunchTitle": "🥗 Fonday 점심 추천",
     "dinnerTitle": "🍽️ Fonday 저녁 추천",
     "avoidTitle": "오늘 피해야 할 음식",
