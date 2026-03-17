@@ -224,12 +224,15 @@ interface MissionState {
   completed: string[];
   dailyDate: string;
   dailyCompleted: boolean;
+  dailyImproved: boolean;
+  dailyChallenged: boolean;
   totalPoints: number;
 }
 
 const MISSION_POINTS: Record<string, number> = {
   first_scan: 50, daily_scan: 10, streak_3: 100, streak_7: 200,
   streak_30: 500, score_70: 150, score_80: 300, challenge: 100, share: 50,
+  daily_improve: 20, daily_challenge: 50,
 };
 
 function todayStr(): string {
@@ -278,10 +281,10 @@ function getMissions(): MissionState {
     const raw = localStorage.getItem("fonday_missions");
     if (raw) return JSON.parse(raw) as MissionState;
   } catch {}
-  return { completed: [], dailyDate: "", dailyCompleted: false, totalPoints: 0 };
+  return { completed: [], dailyDate: "", dailyCompleted: false, dailyImproved: false, dailyChallenged: false, totalPoints: 0 };
 }
 
-function checkAndCompleteMissions(streakCount: number, overallScore: number): string[] {
+function checkAndCompleteMissions(streakCount: number, overallScore: number, scoreDelta?: number | null): string[] {
   const state = getMissions();
   const today = todayStr();
   const newlyCompleted: string[] = [];
@@ -289,12 +292,20 @@ function checkAndCompleteMissions(streakCount: number, overallScore: number): st
   if (state.dailyDate !== today) {
     state.dailyDate = today;
     state.dailyCompleted = false;
+    state.dailyImproved = false;
+    state.dailyChallenged = false;
   }
 
   if (!state.dailyCompleted) {
     state.dailyCompleted = true;
     state.totalPoints += MISSION_POINTS.daily_scan;
     newlyCompleted.push("daily_scan");
+  }
+
+  if (scoreDelta != null && scoreDelta > 0 && !state.dailyImproved) {
+    state.dailyImproved = true;
+    state.totalPoints += MISSION_POINTS.daily_improve;
+    newlyCompleted.push("daily_improve");
   }
 
   const checks = [
@@ -596,11 +607,16 @@ function PushPromptSheet({ onAllow, onDismiss, isLoading }: { onAllow: () => voi
 
 function markChallengeUsed() {
   const state = getMissions();
+  const today = todayStr();
   if (!state.completed.includes("challenge")) {
     state.completed.push("challenge");
     state.totalPoints += MISSION_POINTS.challenge;
-    try { localStorage.setItem("fonday_missions", JSON.stringify(state)); } catch {}
   }
+  if (state.dailyDate === today && !state.dailyChallenged) {
+    state.dailyChallenged = true;
+    state.totalPoints += MISSION_POINTS.daily_challenge;
+  }
+  try { localStorage.setItem("fonday_missions", JSON.stringify(state)); } catch {}
 }
 
 function markShareUsed() {
@@ -1186,11 +1202,16 @@ function MissionCard() {
   const today = todayStr();
   const isDailyCompleted = missions.dailyDate === today && missions.dailyCompleted;
 
-  const ALL_MISSION_IDS = ["daily_scan", "first_scan", "streak_3", "streak_7", "streak_30", "score_70", "score_80", "challenge", "share"];
+  const ALL_MISSION_IDS = ["daily_scan", "daily_improve", "daily_challenge", "first_scan", "streak_3", "streak_7", "streak_30", "score_70", "score_80", "challenge", "share"];
+  const isDailyImproved = missions.dailyDate === today && missions.dailyImproved;
+  const isDailyChallenged = missions.dailyDate === today && missions.dailyChallenged;
 
   const missionItems = ALL_MISSION_IDS.map(id => {
-    const isDaily = id === "daily_scan";
-    const done = isDaily ? isDailyCompleted : missions.completed.includes(id);
+    let done: boolean;
+    if (id === "daily_scan") done = isDailyCompleted;
+    else if (id === "daily_improve") done = isDailyImproved;
+    else if (id === "daily_challenge") done = isDailyChallenged;
+    else done = missions.completed.includes(id);
     return { id, done, points: MISSION_POINTS[id] || 0 };
   });
 
@@ -5291,7 +5312,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
       setStreakMilestone(streak.count);
       timers.push(setTimeout(() => setStreakMilestone(null), 3000));
     }
-    const newMissions = checkAndCompleteMissions(streak.count, overallScore);
+    const newMissions = checkAndCompleteMissions(streak.count, overallScore, deltaScore);
     setMissionState(getMissions());
     if (newMissions.length > 0) {
       setMissionPops(newMissions);
@@ -5781,36 +5802,8 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
   const nextStreakReward = nextStreakGoal ? MISSION_POINTS[`streak_${nextStreakGoal}`] || 0 : 0;
   const attendance = getAttendance();
   const totalPoints = missionState.totalPoints + attendance.totalPoints;
-  const missionReward = routineComplete ? 0 : MISSION_POINTS.daily_scan;
-  const scoreMissionDone = overallScore >= 70;
-  const premiumMissionDone = overallScore >= 80;
-  const phaseDoneThreshold = Math.min(2, Math.max(routineTotal, todayRoutine.length, 1));
-  const missionPhases = [
-    {
-      id: "am",
-      label: t("result.actionCard.phaseMorning"),
-      detail: morningTask,
-      done: routineDone >= 1,
-      accent: "#F59E0B",
-      icon: Sun,
-    },
-    {
-      id: "pm",
-      label: t("result.actionCard.phaseEvening"),
-      detail: eveningTask,
-      done: routineDone >= phaseDoneThreshold,
-      accent: "#6366F1",
-      icon: Clock,
-    },
-    {
-      id: "record",
-      label: t("result.actionCard.phaseRecord"),
-      detail: todayHasMemo ? t("result.actionCard.phaseRecordDone") : t("result.actionCard.phaseRecordDesc"),
-      done: todayHasMemo,
-      accent: "#C97062",
-      icon: FileText,
-    },
-  ];
+  const dailyImproved = missionState.dailyDate === todayStr() && missionState.dailyImproved;
+  const dailyChallenged = missionState.dailyDate === todayStr() && missionState.dailyChallenged;
   const questBoard = [
     {
       id: "scan",
@@ -5837,20 +5830,20 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
       accent: "#7C3AED",
     },
     {
-      id: "score70",
-      done: scoreMissionDone,
-      label: t("result.actionCard.questScore"),
-      reward: scoreMissionDone ? `+${MISSION_POINTS.score_70}pt` : "70+",
-      detail: t("result.actionCard.questScoreDetail"),
-      accent: "#D97706",
+      id: "improve",
+      done: dailyImproved,
+      label: t("result.actionCard.questImprove"),
+      reward: dailyImproved ? `+${MISSION_POINTS.daily_improve}pt` : `+${MISSION_POINTS.daily_improve}pt`,
+      detail: t("result.actionCard.questImproveDetail"),
+      accent: "#0284C7",
     },
     {
-      id: "score80",
-      done: premiumMissionDone,
-      label: t("result.actionCard.questPremium"),
-      reward: premiumMissionDone ? `+${MISSION_POINTS.score_80}pt` : "80+",
-      detail: t("result.actionCard.questPremiumDetail"),
-      accent: "#0F766E",
+      id: "challenge_share",
+      done: dailyChallenged,
+      label: t("result.actionCard.questChallenge"),
+      reward: `+${MISSION_POINTS.daily_challenge}pt`,
+      detail: t("result.actionCard.questChallengeDetail"),
+      accent: "#7C3AED",
     },
   ];
   const essentialQuestIds = new Set(["scan", "routine", "memo"]);
@@ -5858,15 +5851,12 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
   const questDoneCount = questBoard.filter((quest) => quest.done).length;
   const questProgressPct = Math.round((questDoneCount / questBoard.length) * 100);
   const allClearBonus = questDoneCount === questBoard.length ? 20 : 0;
-  const missionPhaseDoneCount = missionPhases.filter((phase) => phase.done).length;
-  const missionPhaseProgressPct = Math.round((missionPhaseDoneCount / missionPhases.length) * 100);
-  const remainingPhases = missionPhases.filter((phase) => !phase.done);
-  const missionStatusText = remainingPhases.length === 0
-    ? t("result.actionCard.remainingDone")
-    : t("result.actionCard.remainingCount", { count: remainingPhases.length });
-  const missionStatusDetail = remainingPhases.length === 0
+  const firstIncompleteQuest = questBoard.find((q) => !q.done);
+  const questStatusDetail = questDoneCount === questBoard.length
     ? t("result.actionCard.statusDone")
-    : t("result.actionCard.statusNext", { tasks: remainingPhases.map((phase) => phase.label).join(" → ") });
+    : firstIncompleteQuest
+      ? t("result.actionCard.statusNext", { tasks: firstIncompleteQuest.label })
+      : "";
 
   const parseFoodOptions = (value?: string): string[] => {
     if (!value) return [];
@@ -6260,7 +6250,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
               <div className="min-w-0">
                 <p className="text-[11px] font-black tracking-[0.16em] uppercase" style={{ color: SCAN_TO }}>{t("result.actionCard.missionEyebrow")}</p>
                 <p className="text-[16px] font-black mt-1 text-kr-pretty" style={{ color: DEEP_GREEN }}>{t("result.actionCard.title")}</p>
-                <p className="text-[11px] text-stone-500 mt-1.5 leading-relaxed text-kr-pretty">{missionStatusDetail}</p>
+                <p className="text-[11px] text-stone-500 mt-1.5 leading-relaxed text-kr-pretty">{questStatusDetail}</p>
               </div>
               <div className="rounded-2xl px-3 py-2 text-right shrink-0"
                 style={{ background: "#FFF5F0", border: "1px solid #F1DED7" }}>
