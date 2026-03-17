@@ -5876,6 +5876,12 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
     });
   };
 
+  // 날짜 기반 시드 — 매일 다른 음식 추천 (YYYYMMDD 정수)
+  const dailySeed = (() => {
+    const d = new Date();
+    return d.getFullYear() * 10000 + (d.getMonth() + 1) * 100 + d.getDate();
+  })();
+
   // 점수 기반 피해야 할 음식 키 (바우만 외 추가 항목)
   const scoreAvoidKeys: string[] = [];
   if ((scores[1]?.score ?? 100) < 50) scoreAvoidKeys.push("hydration");
@@ -5887,13 +5893,13 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
   const avoidLunch: { food: string; why: string }[] = dedupeFoods([
     ...finalType.split("").filter(l => l in NUTRIENT_COLORS).map((l, idx) => {
       const d = t(`nutrients.avoidFoods.${l}`, { returnObjects: true }) as any;
-      const food = pickFoodOption(d?.lunch, overallScore + idx + l.charCodeAt(0));
+      const food = pickFoodOption(d?.lunch, overallScore + idx + l.charCodeAt(0) + dailySeed);
       return food ? { food, why: d.lunchWhy } : null;
     }).filter(Boolean) as { food: string; why: string }[],
     ...scoreAvoidKeys.map((key, idx) => {
       const d = t(`nutrients.scoreAvoid.${key}`, { returnObjects: true }) as any;
       const relatedScore = scores[idx + 1]?.score ?? overallScore;
-      const food = pickFoodOption(d?.foods, relatedScore + idx + key.length);
+      const food = pickFoodOption(d?.foods, relatedScore + idx + key.length + dailySeed);
       return food ? { food, why: d.why } : null;
     }).filter(Boolean) as { food: string; why: string }[],
   ]).slice(0, 4);
@@ -5902,13 +5908,13 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
   const avoidDinner: { food: string; why: string }[] = dedupeFoods([
     ...finalType.split("").filter(l => l in NUTRIENT_COLORS).map((l, idx) => {
       const d = t(`nutrients.avoidFoods.${l}`, { returnObjects: true }) as any;
-      const food = pickFoodOption(d?.dinner, overallScore + idx + l.charCodeAt(0) + 5, 1);
+      const food = pickFoodOption(d?.dinner, overallScore + idx + l.charCodeAt(0) + 5 + dailySeed);
       return food ? { food, why: d.dinnerWhy } : null;
     }).filter(Boolean) as { food: string; why: string }[],
     ...scoreAvoidKeys.map((key, idx) => {
       const d = t(`nutrients.scoreAvoid.${key}`, { returnObjects: true }) as any;
       const relatedScore = scores[idx + 5]?.score ?? overallScore;
-      const food = pickFoodOption(d?.foods, relatedScore + idx + key.length + 7, 1);
+      const food = pickFoodOption(d?.foods, relatedScore + idx + key.length + 7 + dailySeed);
       return food ? { food, why: d.why } : null;
     }).filter(Boolean) as { food: string; why: string }[],
   ]).slice(0, 4);
@@ -6382,6 +6388,48 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
           />
         )}
 
+        {/* ── AI 밀착케어 ── */}
+        <div className="rounded-[20px] p-4" style={{ background: "#FFFBF7", border: "1px solid #F3E4D8" }}>
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex items-center gap-2.5">
+              <div className="w-9 h-9 rounded-xl flex items-center justify-center text-lg shrink-0"
+                style={{ background: "linear-gradient(135deg, #FEF3C7, #FDE68A)" }}>
+                🤖
+              </div>
+              <div>
+                <p className="text-[13px] font-black" style={{ color: SCAN_TO }}>{aiCareLabels.title}</p>
+                <p className="text-[10px] text-stone-400 mt-0.5">{aiCareLabels.schedule}</p>
+              </div>
+            </div>
+            <button onClick={() => handlePushToggle()} disabled={pushLoading}
+              className="shrink-0 rounded-full px-3 py-1.5 text-[11px] font-black"
+              style={pushSubscribed
+                ? { background: `${DEEP_GREEN}18`, color: DEEP_GREEN, border: `1px solid ${DEEP_GREEN}33` }
+                : { background: "linear-gradient(135deg, #F59E0B, #D97706)", color: "white" }}>
+              {pushLoading ? "..." : pushSubscribed ? aiCareLabels.on : aiCareLabels.off}
+            </button>
+          </div>
+          {pushSubscribed && (
+            <div className="flex gap-2 mt-3 flex-wrap">
+              {([
+                ["scan", aiCareLabels.scan],
+                ["meal", aiCareLabels.meal],
+                ["hydration", aiCareLabels.hydration],
+                ["routine", aiCareLabels.routine],
+              ] as const).map(([key, label]) => (
+                <button key={key}
+                  onClick={() => updateAICareOption(key, !aiCareSettings[key])}
+                  className="rounded-full px-3 py-1 text-[11px] font-black"
+                  style={aiCareSettings[key]
+                    ? { background: `${SCAN_FROM}20`, color: SCAN_TO, border: `1px solid ${SCAN_TO}33` }
+                    : { background: "#F6F3EE", color: "#9A8F80", border: "1px solid #ECE6DE" }}>
+                  {label}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+
         {/* ── 2탭 네비게이션 ── */}
         <div className="rounded-[28px] p-2.5 border border-[#F0E6E0] sticky top-0 z-20 backdrop-blur-md"
           style={{ background: "linear-gradient(180deg, rgba(255,249,246,0.96) 0%, rgba(255,255,255,0.96) 100%)" }}>
@@ -6655,43 +6703,6 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
                     </div>
                   ))}
                 </div>
-              </div>
-            </div>
-            <div className="pt-2 space-y-2">
-              <div className="rounded-[24px] p-4" style={{ background: "#FFFBF7", border: "1px solid #F3E4D8" }}>
-                <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <p className="text-[11px] font-black uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>{aiCareLabels.title}</p>
-                    <p className="text-[12px] text-stone-500 mt-1 leading-relaxed text-kr-pretty">{aiCareLabels.desc}</p>
-                  </div>
-                  <button onClick={() => handlePushToggle()} disabled={pushLoading}
-                    className="shrink-0 rounded-full px-3 py-1.5 text-[11px] font-black"
-                    style={pushSubscribed
-                      ? { background: `${DEEP_GREEN}18`, color: DEEP_GREEN, border: `1px solid ${DEEP_GREEN}33` }
-                      : { background: "linear-gradient(135deg, #F59E0B, #D97706)", color: "white" }}>
-                    {pushLoading ? "..." : pushSubscribed ? aiCareLabels.on : aiCareLabels.off}
-                  </button>
-                </div>
-                <div className="grid grid-cols-2 gap-2 mt-3">
-                  {([
-                    ["scan", aiCareLabels.scan],
-                    ["meal", aiCareLabels.meal],
-                    ["hydration", aiCareLabels.hydration],
-                    ["routine", aiCareLabels.routine],
-                  ] as const).map(([key, label]) => (
-                    <button
-                      key={key}
-                      onClick={() => updateAICareOption(key, !aiCareSettings[key])}
-                      disabled={!pushSubscribed}
-                      className="rounded-2xl px-3 py-2 text-[11px] font-black disabled:opacity-50"
-                      style={aiCareSettings[key]
-                        ? { background: `${SCAN_FROM}20`, color: SCAN_TO, border: `1px solid ${SCAN_TO}22` }
-                        : { background: "#F6F3EE", color: "#9A8F80", border: "1px solid #ECE6DE" }}>
-                      {label}
-                    </button>
-                  ))}
-                </div>
-                <p className="text-[10px] text-center text-stone-400 mt-3">{aiCareLabels.schedule}</p>
               </div>
             </div>
           </div>
@@ -7062,48 +7073,6 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
                     </div>
                   </div>
 
-                  {/* 푸시 알림 구독 */}
-                  <div className="pt-2 space-y-2">
-                    <div className="rounded-[24px] p-4" style={{ background: "#FFFBF7", border: "1px solid #F3E4D8" }}>
-                      <div className="flex items-start justify-between gap-3">
-                        <div>
-                          <p className="text-[11px] font-black uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>{aiCareLabels.title}</p>
-                          <p className="text-[12px] text-stone-500 mt-1 leading-relaxed text-kr-pretty">{aiCareLabels.desc}</p>
-                        </div>
-                        <button
-                          onClick={() => handlePushToggle()}
-                          disabled={pushLoading}
-                          className="shrink-0 rounded-full px-3 py-1.5 text-[11px] font-black"
-                          style={pushSubscribed
-                            ? { background: `${DEEP_GREEN}18`, color: DEEP_GREEN, border: `1px solid ${DEEP_GREEN}33` }
-                            : { background: "linear-gradient(135deg, #F59E0B, #D97706)", color: "white" }
-                          }
-                        >
-                          {pushLoading ? "..." : pushSubscribed ? aiCareLabels.on : aiCareLabels.off}
-                        </button>
-                      </div>
-                      <div className="grid grid-cols-2 gap-2 mt-3">
-                        {([
-                          ["scan", aiCareLabels.scan],
-                          ["meal", aiCareLabels.meal],
-                          ["hydration", aiCareLabels.hydration],
-                          ["routine", aiCareLabels.routine],
-                        ] as const).map(([key, label]) => (
-                          <button
-                            key={key}
-                            onClick={() => updateAICareOption(key, !aiCareSettings[key])}
-                            disabled={!pushSubscribed}
-                            className="rounded-2xl px-3 py-2 text-[11px] font-black disabled:opacity-50"
-                            style={aiCareSettings[key]
-                              ? { background: `${SCAN_FROM}20`, color: SCAN_TO, border: `1px solid ${SCAN_TO}22` }
-                              : { background: "#F6F3EE", color: "#9A8F80", border: "1px solid #ECE6DE" }}>
-                            {label}
-                          </button>
-                        ))}
-                      </div>
-                      <p className="text-[10px] text-center text-stone-400 mt-3">{aiCareLabels.schedule}</p>
-                    </div>
-                  </div>
                 </div>
               </div>
             </motion.div>

@@ -547,8 +547,10 @@ const MEAL_VARIETY = {
 
 function getCareSettings(record = {}) {
   const source = record?.careSettings || {};
+  // careSettings 자체가 없는 레거시 구독은 enabled=true로 취급 (기존 구독자 알림 유지)
+  const hasExplicitSettings = record?.careSettings != null;
   return {
-    enabled: Boolean(source.enabled),
+    enabled: hasExplicitSettings ? Boolean(source.enabled) : true,
     scan: source.scan !== false,
     meal: source.meal !== false,
     hydration: source.hydration !== false,
