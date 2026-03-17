@@ -1029,21 +1029,9 @@ function BottomNav({ active, onChange, scanState }: {
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-2xl border-t border-stone-100">
       <div className="max-w-md mx-auto px-2">
-        <div className="grid grid-cols-5 h-[64px]">
+        <div className="grid grid-cols-4 h-[64px]">
           {btn("scan", <Camera className="w-5 h-5" />, t("nav.scan"))}
           {btn("diary", <BookOpen className="w-5 h-5" />, t("nav.diary"))}
-          {/* 중앙 Fonday 강조 버튼 */}
-          <a
-            href="https://fonday.replit.app/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex flex-col items-center justify-center gap-0.5 active:opacity-70 -mt-3">
-            <div className="w-12 h-12 rounded-full flex items-center justify-center shadow-lg"
-              style={{ background: "linear-gradient(135deg, #E09882, #C97062)" }}>
-              <Zap className="w-5 h-5 text-white" />
-            </div>
-            <span className="text-[11px] font-black" style={{ color: "#C97062" }}>Fonday</span>
-          </a>
           {btn("magazine", <FileText className="w-5 h-5" />, t("nav.magazine"))}
           {btn("my", <User className="w-5 h-5" />, t("nav.my"))}
         </div>
@@ -4791,6 +4779,22 @@ function MyScreen({ user, onInstall, onBack }: { user: any; onInstall: () => voi
           </div>
           <ChevronRight className="w-4 h-4 text-stone-300" />
         </a>
+        {/* Fonday 디바이스 링크 */}
+        <a href="https://fonday.replit.app/" target="_blank" rel="noopener noreferrer"
+          className="flex items-center justify-between px-4 py-3.5 rounded-2xl active:opacity-70 transition-opacity"
+          style={{ background: "linear-gradient(135deg, #FFF1EC, #FFEDE6)", border: "1px solid #F3DDD6" }}>
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-xl flex items-center justify-center"
+              style={{ background: "linear-gradient(135deg, #E09882, #C97062)" }}>
+              <Zap className="w-5 h-5 text-white" />
+            </div>
+            <div>
+              <p className="text-[14px] font-bold" style={{ color: "#C97062" }}>Fonday 디바이스</p>
+              <p className="text-[11px] text-stone-400">피부 전용 측정 디바이스 알아보기</p>
+            </div>
+          </div>
+          <ChevronRight className="w-4 h-4" style={{ color: "#C97062" }} />
+        </a>
       </div>
 
       {/* 출석 달력 모달 */}
@@ -6718,10 +6722,19 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
             </div>
           </div>
         )}
+
+        {/* ── 제휴 텍스트 링크 ── */}
+        <div className="pt-2 pb-1 text-center">
+          <button onClick={() => setShowPartnership(true)}
+            className="text-[11px] text-stone-400 underline underline-offset-2 hover:text-stone-600 transition-colors">
+            {t("result.partnershipLink")}
+          </button>
+        </div>
+
       </motion.div>
 
       {/* ── 하단 고정 액션바 ── */}
-      <div className="fixed left-0 right-0 z-[50] flex items-center gap-2 px-4 py-3 bg-white/95 backdrop-blur-md border-t border-stone-100"
+      <div className="fixed left-0 right-0 z-[50] flex items-center gap-2.5 px-4 py-3 bg-white/95 backdrop-blur-md border-t border-stone-100"
         style={{ bottom: 60, boxShadow: "0 -4px 16px rgba(0,0,0,0.06)" }}>
         {/* 공유 */}
         <Button onClick={handleShare} disabled={shareLoading}
@@ -6757,12 +6770,6 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
             <span className="text-base">👑</span><span className="text-[12px]">{t("result.challengeShort")}</span>
           </Button>
         )}
-        {/* 제휴 */}
-        <Button onClick={() => setShowPartnership(true)}
-          className="flex-1 h-12 rounded-2xl font-bold text-white flex items-center justify-center gap-1.5"
-          style={{ background: `linear-gradient(135deg, ${DEEP_GREEN}, ${DEEP_GREEN_LIGHT})` }}>
-          <span className="text-[12px]">{t("result.partnershipShort")}</span>
-        </Button>
       </div>
 
       {/* 주요 분석결과 모달 */}

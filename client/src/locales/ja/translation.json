@@ -115,6 +115,7 @@
       "nutrition": "栄養"
     },
     "partnershipShort": "提携",
+    "partnershipLink": "クリニック・ブランドの提携お問い合わせ",
     "prediction": {
       "title": "AI 肌予測",
       "currentScore": "現在{{score}}点基準",

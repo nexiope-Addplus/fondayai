@@ -115,6 +115,7 @@
       "nutrition": "Nutrition"
     },
     "partnershipShort": "Partner",
+    "partnershipLink": "Partnership inquiry for clinics & brands",
     "prediction": {
       "title": "AI Skin Forecast",
       "currentScore": "Based on current score {{score}}",
