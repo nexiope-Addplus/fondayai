@@ -1434,7 +1434,15 @@ function ScanIdleScreen({ onScan }: { onScan: () => void }) {
     >
       {/* 상단 헤더 row */}
       <div className="flex justify-between items-center mb-3 relative" style={{ zIndex: 1 }}>
-        <AttendanceBadge onClick={() => setShowCalendar(true)} />
+        <div className="flex items-center gap-2">
+          <AttendanceBadge onClick={() => setShowCalendar(true)} />
+          {streak.count >= 2 && (
+            <span className="text-[11px] font-bold px-2.5 py-1 rounded-full"
+              style={{ background: "#FFF7ED", color: "#C2410C", border: "1px solid #FED7AA" }}>
+              {t("streak.badge", { count: streak.count })}
+            </span>
+          )}
+        </div>
         <LangSwitcher />
       </div>
 
@@ -1629,27 +1637,27 @@ function ScanIdleScreen({ onScan }: { onScan: () => void }) {
 
       {/* 단계 표시 */}
       <motion.div variants={fadeChild} className="mb-4 relative" style={{ zIndex: 1 }}>
-        <div className="bg-white/90 rounded-2xl px-3.5 py-3 border border-stone-100 sm:px-4 sm:py-3.5"
+        <div className="bg-white/90 rounded-2xl px-3 py-2 border border-stone-100"
           style={{ boxShadow: "0 2px 12px rgba(180,130,110,0.08)", backdropFilter: "blur(8px)" }}>
-          <p className="text-[10px] font-semibold text-stone-400 text-center mb-2.5 tracking-widest uppercase">
+          <p className="text-[9px] font-semibold text-stone-400 text-center mb-2 tracking-widest uppercase">
             {t("idle.stepsTitle")}
           </p>
           <div className="flex items-start justify-between">
             {STEPS.map((step, i) => (
               <div key={i} className="flex items-start" style={{ flex: 1 }}>
                 <div className="flex flex-col items-center gap-1 flex-1">
-                  <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-base sm:text-lg"
+                  <div className="w-8 h-8 rounded-full flex items-center justify-center text-sm"
                     style={step.active
                       ? { background: `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})`, boxShadow: `0 4px 14px ${SCAN_FROM}44` }
                       : { background: "#EDE6DE" }}>
                     {step.icon}
                   </div>
                   <div className="text-center">
-                    <div className="text-[11px] font-bold text-stone-700">{step.title}</div>
-                    <div className="text-[9px] sm:text-[9.5px] text-stone-400 mt-0.5 leading-tight">{step.sub}</div>
+                    <div className="text-[10px] font-bold text-stone-700">{step.title}</div>
+                    <div className="text-[9px] text-stone-400 mt-0.5 leading-tight">{step.sub}</div>
                   </div>
                 </div>
-                {i < 2 && <div className="text-stone-200 text-sm pt-2.5 flex-shrink-0">›</div>}
+                {i < 2 && <div className="text-stone-200 text-sm pt-2 flex-shrink-0">›</div>}
               </div>
             ))}
           </div>
@@ -1667,15 +1675,6 @@ function ScanIdleScreen({ onScan }: { onScan: () => void }) {
 
       {/* CTA 버튼 */}
       <motion.div variants={fadeChild} className="mt-auto relative" style={{ zIndex: 1 }}>
-        {/* 스트릭 배지 */}
-        {streak.count >= 2 && (
-          <div className="flex justify-center mb-3">
-            <span className="text-[13px] font-bold px-4 py-1.5 rounded-full"
-              style={{ background: "#FFF7ED", color: "#C2410C", border: "1px solid #FED7AA" }}>
-              {t("streak.badge", { count: streak.count })}
-            </span>
-          </div>
-        )}
         <motion.button
           onClick={onScan}
           className="w-full py-4 sm:py-[18px] rounded-[18px] text-white text-[15px] sm:text-[16px] font-bold tracking-tight"
