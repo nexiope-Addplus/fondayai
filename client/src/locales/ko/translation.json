@@ -53,7 +53,11 @@
       "바우만 타입에 맞춘 성분·루틴·제품 유형 맞춤 추천"
     ],
     "privacyLink": "개인정보처리방침",
-    "termsLink": "이용약관"
+    "termsLink": "이용약관",
+    "greetingMorning": "좋은 아침이에요! 오늘 AM 루틴 준비됐나요?",
+    "greetingNoon": "한낮 자외선 주의! 자차 발랐나요?",
+    "greetingAfternoon": "오후엔 수분이 중요해요. 미스트 한 번 뿌려볼까요?",
+    "greetingNight": "오늘 하루도 수고했어요. 야간 루틴 마무리해볼까요?"
   },
   "camera": {
     "noCamera": "카메라를 사용할 수 없습니다. 사진으로 선택해 주세요.",
@@ -110,9 +114,15 @@
     "solutions": "맞춤솔루션",
     "solutionsSub": "AI가 분석 결과를 바탕으로 제안합니다",
     "tab": {
+      "routine": "루틴",
       "analysis": "분석",
       "solution": "솔루션",
       "nutrition": "영양"
+    },
+    "todayAction": "오늘의 핵심 케어",
+    "deviceTeaser": {
+      "title": "Fonday 디바이스",
+      "sub": "피부를 실시간으로 측정하는 전용 디바이스"
     },
     "partnershipShort": "제휴",
     "partnershipLink": "피부과 · 화장품 브랜드 제휴 문의",

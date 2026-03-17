@@ -53,7 +53,11 @@
       "Delivers personalized ingredient, routine & product recommendations for your Baumann type"
     ],
     "privacyLink": "Privacy Policy",
-    "termsLink": "Terms of Use"
+    "termsLink": "Terms of Use",
+    "greetingMorning": "Good morning! Ready for your AM routine?",
+    "greetingNoon": "High UV alert! Did you apply sunscreen?",
+    "greetingAfternoon": "Afternoon hydration check — time for a mist?",
+    "greetingNight": "Great day! Let's wrap up your night routine."
   },
   "camera": {
     "noCamera": "Camera unavailable. Please select a photo instead.",
@@ -110,9 +114,15 @@
     "solutions": "Custom Solutions",
     "solutionsSub": "AI-powered recommendations based on your results",
     "tab": {
+      "routine": "Routine",
       "analysis": "Analysis",
       "solution": "Solution",
       "nutrition": "Nutrition"
+    },
+    "todayAction": "Today's Key Care",
+    "deviceTeaser": {
+      "title": "Fonday Device",
+      "sub": "A dedicated device for real-time skin measurement"
     },
     "partnershipShort": "Partner",
     "partnershipLink": "Partnership inquiry for clinics & brands",

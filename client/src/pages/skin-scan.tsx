@@ -1433,6 +1433,28 @@ function ScanIdleScreen({ onScan }: { onScan: () => void }) {
           transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }} />
       </div>
 
+      {/* 시간대별 그리팅 */}
+      {(() => {
+        const hour = new Date().getHours();
+        const greetings = [
+          { range: [6, 10],  emoji: "☀️", key: "idle.greetingMorning" },
+          { range: [10, 14], emoji: "🌤", key: "idle.greetingNoon" },
+          { range: [14, 20], emoji: "💧", key: "idle.greetingAfternoon" },
+          { range: [20, 25], emoji: "🌙", key: "idle.greetingNight" },
+        ];
+        const g = greetings.find(({ range }) => hour >= range[0] && hour < range[1]);
+        if (!g) return null;
+        return (
+          <motion.div variants={fadeChild} className="mb-3 relative" style={{ zIndex: 1 }}>
+            <div className="flex items-center gap-2 px-3.5 py-2.5 rounded-2xl"
+              style={{ background: "rgba(255,255,255,0.85)", border: "1px solid rgba(201,112,98,0.12)", backdropFilter: "blur(8px)" }}>
+              <span className="text-base">{g.emoji}</span>
+              <p className="text-[12px] font-semibold text-stone-600">{t(g.key)}</p>
+            </div>
+          </motion.div>
+        );
+      })()}
+
       {/* 컴백 배너 (3일+ 경과 시) */}
       {daysSince !== null && daysSince >= 3 && (
         <motion.div variants={fadeChild} className="mb-3 relative" style={{ zIndex: 1 }}>
@@ -5265,7 +5287,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
   const [streakDelta, setStreakDelta] = useState<number>(0);
   const [missionPops, setMissionPops] = useState<string[]>([]);
   const [showCheckinSheet, setShowCheckinSheet] = useState(false);
-  const [activeTab, setActiveTab] = useState<"solution" | "nutrition">("solution");
+  const [activeTab, setActiveTab] = useState<"routine" | "solution" | "nutrition">("routine");
   const [currentStreak, setCurrentStreak] = useState<StreakData>(() => getStreak());
   const [todayTodoProgress, setTodayTodoProgress] = useState(() => getDiaryTodoProgress(todayStr()));
   const [todayRoutineTodos, setTodayRoutineTodos] = useState<TodoItem[]>(() => getDiaryTodos(todayStr()));
@@ -6223,31 +6245,54 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
           </CardContent>
         </Card>
 
-        {/* ── 화장품 스캔 배너 ── */}
-        <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
-          className="flex items-center gap-3 px-4 py-3.5 rounded-2xl border"
-          style={{ background: "#F0F7F5", borderColor: "#C5DFD8" }}>
-          <div className="w-10 h-10 rounded-2xl flex items-center justify-center shrink-0"
-            style={{ background: `${DEEP_GREEN}14`, color: DEEP_GREEN }}>
-            <ScanLine className="w-5 h-5" />
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-[13px] font-black leading-tight text-kr-pretty" style={{ color: DEEP_GREEN }}>{t("cosmetics.ctaTitle")}</p>
-            <p className="text-[11px] text-stone-400 leading-tight text-kr-pretty">{t("cosmetics.ctaBannerSub")}</p>
-          </div>
-          {user && cosmeticCount > 0 && (
-            <span className="text-[11px] font-bold px-2 py-1 rounded-full"
-              style={{ background: `${DEEP_GREEN}15`, color: DEEP_GREEN }}>
-              {t("cosmetics.ctaCount", { count: cosmeticCount })}
-            </span>
-          )}
-          <button onClick={() => user ? setShowCosmeticsRegister(true) : setShowCosmeticsGate(true)}
-            className="shrink-0 px-4 py-2 rounded-xl text-white text-[12px] font-black"
-            style={{ background: `linear-gradient(135deg, ${DEEP_GREEN}, ${DEEP_GREEN_LIGHT})` }}>
-            + {t("cosmetics.scanBtn")}
-          </button>
-        </motion.div>
+        {/* ── 오늘의 핵심 액션 카드 ── */}
+        {(analysisResult?.improvements ?? []).length > 0 && (() => {
+          const top = (analysisResult.improvements as { title: string; desc: string }[])[0];
+          return (
+            <motion.div variants={fadeChild} className="rounded-[20px] p-4"
+              style={{ background: "linear-gradient(135deg, #FFF5F0, #FFF9F7)", border: "1px solid #F3DDD6" }}>
+              <div className="flex items-center gap-2 mb-2">
+                <div className="w-7 h-7 rounded-xl flex items-center justify-center text-sm shrink-0"
+                  style={{ background: `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})` }}>🎯</div>
+                <p className="text-[10px] font-black uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>
+                  {t("result.todayAction")}
+                </p>
+              </div>
+              <p className="text-[14px] font-black text-stone-800 leading-tight mb-1">{top.title}</p>
+              <p className="text-[11px] text-stone-500 leading-relaxed">{top.desc}</p>
+            </motion.div>
+          );
+        })()}
 
+        {/* ── 3탭 네비게이션 ── */}
+        <div className="rounded-[28px] p-2.5 border border-[#F0E6E0] sticky top-0 z-20 backdrop-blur-md"
+          style={{ background: "linear-gradient(180deg, rgba(255,249,246,0.97) 0%, rgba(255,255,255,0.97) 100%)" }}>
+          <div className="flex gap-2">
+            {([
+              { id: "routine" as const, label: t("result.tab.routine"), icon: <CheckCircle2 className="w-4 h-4" /> },
+              { id: "solution" as const, label: t("result.tab.solution"), icon: <Leaf className="w-4 h-4" /> },
+              { id: "nutrition" as const, label: t("result.tab.nutrition"), icon: <Utensils className="w-4 h-4" /> },
+            ]).map(({ id, label, icon }) => {
+              const isActive = activeTab === id;
+              return (
+                <button key={id} onClick={() => setActiveTab(id)}
+                  className="flex-1 flex flex-col items-center gap-1 py-3 rounded-[20px] text-[12px] font-black transition-all"
+                  style={isActive
+                    ? { background: `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})`, color: "white", boxShadow: `0 4px 14px ${SCAN_TO}55` }
+                    : { background: "#FFF6F1", color: "#A8A29E" }}>
+                  {icon}
+                  <span>{label}</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* ── 루틴 탭 ── */}
+        {activeTab === "routine" && (
+          <div className="space-y-4">
+
+        {/* 퀘스트 / 미션 카드 */}
         <Card className="border border-[#EADFD8] rounded-3xl overflow-hidden shadow-[0_12px_30px_rgba(201,112,98,0.12)] bg-white">
           <CardContent className="p-3.5">
             <div className="flex items-start justify-between gap-3">
@@ -6289,6 +6334,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
           </CardContent>
         </Card>
 
+        {/* 루틴 체크 카드 */}
         <Card className="border border-[#E6ECE8] shadow-md rounded-3xl overflow-hidden bg-white">
           <CardContent className="p-4">
             <div className="flex items-start justify-between gap-3">
@@ -6445,71 +6491,6 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
           )}
         </div>
 
-        {/* ── 2탭 네비게이션 ── */}
-        <div className="rounded-[28px] p-2.5 border border-[#F0E6E0] sticky top-0 z-20 backdrop-blur-md"
-          style={{ background: "linear-gradient(180deg, rgba(255,249,246,0.96) 0%, rgba(255,255,255,0.96) 100%)" }}>
-          <div className="flex gap-2">
-          {(["solution", "nutrition"] as const).map((tab) => {
-            const labels = { solution: t("result.tab.solution"), nutrition: t("result.tab.nutrition") };
-            const icons = {
-              solution: <Leaf className="w-4 h-4" />,
-              nutrition: <Utensils className="w-4 h-4" />,
-            };
-            const isActive = activeTab === tab;
-            return (
-              <button key={tab} onClick={() => setActiveTab(tab)}
-                className="flex-1 flex flex-col items-center gap-1 py-3 rounded-[20px] text-[13px] font-black transition-all"
-                style={isActive
-                  ? { background: `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})`, color: "white", boxShadow: `0 4px 14px ${SCAN_TO}55` }
-                  : { background: "#FFF6F1", color: "#A8A29E" }}>
-                {icons[tab]}
-                <span>{labels[tab]}</span>
-              </button>
-            );
-          })}
-          </div>
-        </div>
-
-        {/* Fonday 잠금 섹션 */}
-        <Card className="border-none shadow-md rounded-3xl overflow-hidden relative bg-white">
-          <CardContent className="p-5">
-                <div className="grid grid-cols-2 gap-3 blur-sm opacity-40 pointer-events-none select-none">
-                  {[
-                    { label: t("result.locked.skinTemp"), value: "36.2°C", icon: Thermometer, color: "#E09882" },
-                    { label: t("result.locked.moisture"), value: "68%", icon: Droplets, color: "#3B82C4" },
-                    { label: t("result.locked.oil"), value: "42%", icon: Flame, color: "#F59E0B" },
-                    { label: t("result.locked.barrier"), value: "B+", icon: Shield, color: "#10B981" },
-                  ].map((item, i) => {
-                    const Icon = item.icon;
-                    return (
-                      <div key={i} className="p-3 rounded-2xl bg-stone-50 border border-stone-100">
-                        <div className="flex items-center gap-1.5 mb-1">
-                          <Icon className="w-3 h-3" style={{ color: item.color }} />
-                          <p className="text-[10px] text-stone-400">{item.label}</p>
-                        </div>
-                        <p className="text-2xl font-black" style={{ color: item.color }}>{item.value}</p>
-                      </div>
-                    );
-                  })}
-                </div>
-              </CardContent>
-              <div className="absolute inset-0 backdrop-blur-[2px] bg-white/75 flex flex-col items-center justify-center p-6 text-center">
-                <div className="w-12 h-12 rounded-2xl bg-stone-200 flex items-center justify-center mb-3 shadow-inner">
-                  <Lock className="w-6 h-6 text-stone-500" />
-                </div>
-                <p className="text-[14px] font-black text-stone-700 mb-2">{t("result.locked.title")}</p>
-                <p className="text-[12px] text-stone-500 leading-relaxed mb-3">
-                  {t("result.locked.desc")}<br />
-                  <span className="font-bold" style={{ color: SCAN_TO }}>{t("result.locked.device")}</span>{t("result.locked.deviceDesc")}
-                </p>
-                <Button onClick={() => setShowWaitlist(true)}
-                  className="h-10 px-6 rounded-xl text-white text-[12px] font-bold shadow-md"
-                  style={{ background: `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})` }}>
-                  <span className="flex items-center gap-1.5">{t("result.earlybird")} <ArrowRight className="w-4 h-4" /></span>
-                </Button>
-              </div>
-            </Card>
-
             {/* 피부 일기 카드 / 로그인 카드 */}
             {user === undefined ? (
               <div className="h-16 rounded-3xl bg-stone-100 animate-pulse" />
@@ -6581,9 +6562,38 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
           </div>
         )}
 
+          </div>
+        )}
+
         {/* ── 솔루션 탭 ── */}
         {activeTab === "solution" && (
-          <div className="space-y-3">
+          <div className="space-y-4">
+
+            {/* 화장품 스캔 배너 */}
+            <div className="flex items-center gap-3 px-4 py-3.5 rounded-2xl border"
+              style={{ background: "#F0F7F5", borderColor: "#C5DFD8" }}>
+              <div className="w-10 h-10 rounded-2xl flex items-center justify-center shrink-0"
+                style={{ background: `${DEEP_GREEN}14`, color: DEEP_GREEN }}>
+                <ScanLine className="w-5 h-5" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-[13px] font-black leading-tight text-kr-pretty" style={{ color: DEEP_GREEN }}>{t("cosmetics.ctaTitle")}</p>
+                <p className="text-[11px] text-stone-400 leading-tight text-kr-pretty">{t("cosmetics.ctaBannerSub")}</p>
+              </div>
+              {user && cosmeticCount > 0 && (
+                <span className="text-[11px] font-bold px-2 py-1 rounded-full"
+                  style={{ background: `${DEEP_GREEN}15`, color: DEEP_GREEN }}>
+                  {t("cosmetics.ctaCount", { count: cosmeticCount })}
+                </span>
+              )}
+              <button onClick={() => user ? setShowCosmeticsRegister(true) : setShowCosmeticsGate(true)}
+                className="shrink-0 px-4 py-2 rounded-xl text-white text-[12px] font-black"
+                style={{ background: `linear-gradient(135deg, ${DEEP_GREEN}, ${DEEP_GREEN_LIGHT})` }}>
+                + {t("cosmetics.scanBtn")}
+              </button>
+            </div>
+
+            <div className="space-y-3">
 
             <div className="flex items-center gap-2 mb-1">
               <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: `linear-gradient(135deg, ${DEEP_GREEN_LIGHT}, ${DEEP_GREEN})` }}>
@@ -6640,6 +6650,46 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
                 ))}
               </>
             )}
+            </div>
+
+            {/* ── Fonday 디바이스 티저 (잠금 → 기대감 카드) ── */}
+            <div className="rounded-[24px] overflow-hidden border"
+              style={{ background: "linear-gradient(135deg, #FFF8F5 0%, #FFF1EC 100%)", borderColor: "#F3DDD6" }}>
+              <div className="p-5">
+                <div className="flex items-start justify-between gap-3 mb-4">
+                  <div>
+                    <p className="text-[10px] font-black uppercase tracking-[0.18em]" style={{ color: SCAN_TO }}>COMING SOON</p>
+                    <p className="text-[17px] font-black mt-1" style={{ color: DEEP_GREEN }}>{t("result.deviceTeaser.title")}</p>
+                    <p className="text-[11px] text-stone-400 mt-1">{t("result.deviceTeaser.sub")}</p>
+                  </div>
+                  <div className="w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 text-2xl"
+                    style={{ background: "linear-gradient(135deg, #FFEDE6, #FFD9CD)" }}>
+                    🔬
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-2 mb-4">
+                  {[
+                    { icon: Thermometer, label: t("result.locked.skinTemp"), color: "#E09882" },
+                    { icon: Droplets, label: t("result.locked.moisture"), color: "#3B82C4" },
+                    { icon: Flame, label: t("result.locked.oil"), color: "#F59E0B" },
+                    { icon: Shield, label: t("result.locked.barrier"), color: "#10B981" },
+                  ].map((item, i) => {
+                    const Icon = item.icon;
+                    return (
+                      <div key={i} className="flex items-center gap-2 p-2.5 rounded-xl bg-white/70">
+                        <Icon className="w-4 h-4 shrink-0" style={{ color: item.color }} />
+                        <p className="text-[11px] font-semibold text-stone-600">{item.label}</p>
+                      </div>
+                    );
+                  })}
+                </div>
+                <Button onClick={() => setShowWaitlist(true)}
+                  className="w-full h-11 rounded-xl text-white text-[12px] font-bold"
+                  style={{ background: `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})` }}>
+                  <span className="flex items-center gap-1.5">{t("result.earlybird")} <ArrowRight className="w-4 h-4" /></span>
+                </Button>
+              </div>
+            </div>
           </div>
         )}
 

@@ -53,7 +53,11 @@
       "バウマンタイプに合わせた成分・ルーティン・製品をカスタム推薦"
     ],
     "privacyLink": "プライバシーポリシー",
-    "termsLink": "利用規約"
+    "termsLink": "利用規約",
+    "greetingMorning": "おはようございます！AMルーティンの準備はできましたか？",
+    "greetingNoon": "紫外線が強い時間帯です。日焼け止めは塗りましたか？",
+    "greetingAfternoon": "午後は保湿が大切です。ミストを一吹きしてみましょう！",
+    "greetingNight": "お疲れ様でした。夜のルーティンで締めくくりましょう。"
   },
   "camera": {
     "noCamera": "カメラが使えません。写真を選んでください。",
@@ -110,9 +114,15 @@
     "solutions": "カスタムソリューション",
     "solutionsSub": "AIが分析結果をもとに提案します",
     "tab": {
+      "routine": "ルーティン",
       "analysis": "分析",
       "solution": "ソリューション",
       "nutrition": "栄養"
+    },
+    "todayAction": "今日のケア",
+    "deviceTeaser": {
+      "title": "Fondayデバイス",
+      "sub": "肌をリアルタイムで計測する専用デバイス"
     },
     "partnershipShort": "提携",
     "partnershipLink": "クリニック・ブランドの提携お問い合わせ",
