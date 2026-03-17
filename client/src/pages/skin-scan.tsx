@@ -85,7 +85,7 @@ interface AnalysisResult {
   cosmetics: { type: string; key: string; reason: string }[];
   prediction?: { good: PredictionScenario; bad: PredictionScenario };
   nutritionTips?: {
-    eatFoods: { emoji: string; food: string; reason: string; targetScore: string }[];
+    supplements: { emoji: string; name: string; dose: string; reason: string; targetScore: string }[];
     avoidFoods: { emoji: string; food: string; reason: string }[];
     hydrationGoal: string;
   } | null;
@@ -1248,7 +1248,7 @@ function MissionCard() {
   );
 }
 
-function WeatherTipCard() {
+function WeatherTipCard({ compact }: { compact?: boolean } = {}) {
   const { t } = useTranslation();
   const [weather, setWeather] = useState<WeatherData | null>(null);
   const [denied, setDenied] = useState(false);
@@ -1276,6 +1276,26 @@ function WeatherTipCard() {
   const dayIdx = Math.floor(Date.now() / 86400000) % tipArr.length;
   const tip = tipArr[dayIdx] as { emoji: string; title: string; body: string };
   const aqiLabel = weather.aqi ? t(`weather.aqi${weather.aqi}`) : null;
+
+  if (compact) {
+    return (
+      <div className="px-3.5 py-2.5 border-t border-stone-100/80"
+        style={{ background: "linear-gradient(135deg, #EAF4F0 0%, #F0FAF6 100%)" }}>
+        <div className="flex items-start gap-2.5">
+          <span className="text-xl leading-none flex-shrink-0 mt-0.5">{tip.emoji}</span>
+          <div className="flex-1 min-w-0">
+            <p className="text-[12px] font-black text-stone-700 leading-tight">{tip.title}</p>
+            <p className="text-[10.5px] text-stone-500 leading-relaxed mt-0.5">{tip.body}</p>
+          </div>
+          <div className="flex flex-col items-end gap-1 shrink-0">
+            <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full text-white"
+              style={{ background: DEEP_GREEN }}>{weather.temp}°C</span>
+            {aqiLabel && <span className="text-[9px] font-semibold px-1.5 py-0.5 rounded-full bg-white/70 text-stone-500 border border-stone-200">{aqiLabel}</span>}
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <motion.div variants={fadeChild} className="mb-4">
@@ -1352,6 +1372,7 @@ function ScanIdleScreen({ onScan }: { onScan: () => void }) {
   const streak = getStreak();
   const daysSince = getDaysSinceLastScan();
   const [showCalendar, setShowCalendar] = useState(false);
+  const [showBaumannExp, setShowBaumannExp] = useState(false);
   const [socialCount, setSocialCount] = useState(0);
   const [pullY, setPullY] = useState(0);
   const touchStartY = useRef(0);
@@ -1440,7 +1461,7 @@ function ScanIdleScreen({ onScan }: { onScan: () => void }) {
           transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }} />
       </div>
 
-      {/* 시간대별 그리팅 */}
+      {/* 시간대별 그리팅 + 날씨 팁 통합 카드 */}
       {(() => {
         const hour = new Date().getHours();
         const greetings = [
@@ -1453,10 +1474,13 @@ function ScanIdleScreen({ onScan }: { onScan: () => void }) {
         if (!g) return null;
         return (
           <motion.div variants={fadeChild} className="mb-3 relative" style={{ zIndex: 1 }}>
-            <div className="flex items-center gap-2 px-3.5 py-2.5 rounded-2xl"
-              style={{ background: "rgba(255,255,255,0.85)", border: "1px solid rgba(201,112,98,0.12)", backdropFilter: "blur(8px)" }}>
-              <span className="text-base">{g.emoji}</span>
-              <p className="text-[12px] font-semibold text-stone-600">{t(g.key)}</p>
+            <div className="rounded-2xl overflow-hidden border"
+              style={{ background: "rgba(255,255,255,0.85)", borderColor: "rgba(201,112,98,0.12)", backdropFilter: "blur(8px)" }}>
+              <div className="flex items-center gap-2 px-3.5 py-2.5">
+                <span className="text-base">{g.emoji}</span>
+                <p className="text-[12px] font-semibold text-stone-600">{t(g.key)}</p>
+              </div>
+              <WeatherTipCard compact />
             </div>
           </motion.div>
         );
@@ -1561,6 +1585,48 @@ function ScanIdleScreen({ onScan }: { onScan: () => void }) {
         </div>
       </motion.div>
 
+      {/* 바우만 설명 더보기 accordion */}
+      <motion.div variants={fadeChild} className="mb-4 relative" style={{ zIndex: 1 }}>
+        <div className="rounded-2xl border border-stone-100 bg-white/90" style={{ backdropFilter: "blur(8px)" }}>
+          <button onClick={() => setShowBaumannExp(v => !v)}
+            className="w-full flex items-center justify-between px-4 py-3">
+            <div className="flex items-center gap-2">
+              <span className="text-base">🧬</span>
+              <p className="text-[13px] font-black text-stone-800">{t("idle.baumannSectionTitle")}</p>
+            </div>
+            <div className="flex items-center gap-1.5">
+              {!showBaumannExp && <span className="text-[10px] font-bold text-stone-400">O/D · S/R · P/N · W/T</span>}
+              <ChevronDown className={`w-4 h-4 text-stone-400 transition-transform duration-200 ${showBaumannExp ? "rotate-180" : ""}`} />
+            </div>
+          </button>
+          <AnimatePresence>
+            {showBaumannExp && (
+              <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.22 }}
+                className="overflow-hidden px-4 pb-4">
+                <p className="text-[11px] text-stone-500 mb-3 leading-relaxed">{t("idle.baumannSectionDesc")}</p>
+                <div className="space-y-1.5 mb-3">
+                  {(t("idle.baumannAxes", { returnObjects: true }) as any[]).map((ax: any, i: number) => (
+                    <div key={i} className="flex items-center gap-3 p-2.5 rounded-xl bg-stone-50">
+                      <p className="text-[11px] font-black text-stone-600 w-16 shrink-0">{ax.label}</p>
+                      <p className="text-[11px] text-stone-400">{ax.desc}</p>
+                    </div>
+                  ))}
+                </div>
+                <div className="flex flex-wrap gap-1.5">
+                  {(Object.entries(BAUMANN_COLORS) as [string, string][]).map(([letter, color]) => (
+                    <span key={letter} className="text-[10px] font-bold px-2.5 py-1 rounded-full border"
+                      style={{ color, background: `${color}12`, borderColor: `${color}25` }}>
+                      {letter} {t(`baumann.${letter}.name`)}
+                    </span>
+                  ))}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+      </motion.div>
+
       {/* 단계 표시 */}
       <motion.div variants={fadeChild} className="mb-4 relative" style={{ zIndex: 1 }}>
         <div className="bg-white/90 rounded-2xl px-3.5 py-3 border border-stone-100 sm:px-4 sm:py-3.5"
@@ -1633,10 +1699,6 @@ function ScanIdleScreen({ onScan }: { onScan: () => void }) {
         </p>
       </motion.div>
 
-      {/* 재방문용 부가 카드 */}
-      <div className="mt-5 relative space-y-3" style={{ zIndex: 1 }}>
-        <WeatherTipCard />
-      </div>
 
       <div className="text-center pt-4 pb-4 relative" style={{ zIndex: 1 }}>
         <a href="/privacy.html" className="text-[10px] underline" style={{ color: TEXT_SECONDARY }}>
@@ -5699,6 +5761,11 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
     el.style.overflow = (showAnalysis || showImprovements) ? 'hidden' : 'auto';
   }, [showAnalysis, showImprovements]);
 
+  const tabSlideVariants = {
+    enter: (dir: number) => ({ x: dir * 30, opacity: 0 }),
+    center: { x: 0, opacity: 1 },
+    exit: (dir: number) => ({ x: dir * -30, opacity: 0 }),
+  };
   const TAB_ORDER = { routine: 0, solution: 1, nutrition: 2 } as const;
   const goTo = (next: "routine" | "solution" | "nutrition") => {
     tabDirectionRef.current = TAB_ORDER[next] >= TAB_ORDER[activeTab] ? 1 : -1;
@@ -6289,7 +6356,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
                   className="flex-1 flex flex-col items-center gap-1 py-3 rounded-[20px] text-[12px] font-black transition-all"
                   style={isActive
                     ? { background: `linear-gradient(135deg, ${from}, ${to})`, color: "white", boxShadow: `0 4px 14px ${to}55` }
-                    : { background: inactiveBg, color: inactiveText }}>
+                    : { background: inactiveBg, color: inactiveText, border: `1.5px solid ${to}40` }}>
                   {icon}
                   <span>{label}</span>
                 </button>
@@ -6298,15 +6365,11 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
           </div>
         </div>
 
-        <AnimatePresence mode="wait" initial={false}>
-          <motion.div key={activeTab}
-            initial={{ x: tabDirectionRef.current * 20, opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            exit={{ x: tabDirectionRef.current * -20, opacity: 0 }}
-            transition={{ duration: 0.18, ease: "easeOut" }}>
-
+        <AnimatePresence mode="wait" initial={false} custom={tabDirectionRef.current}>
         {/* ── 루틴 탭 ── */}
         {activeTab === "routine" && (
+          <motion.div key="routine" custom={tabDirectionRef.current} variants={tabSlideVariants}
+            initial="enter" animate="center" exit="exit" transition={{ duration: 0.2, ease: "easeInOut" }}>
           <div className="space-y-4">
 
         {/* 첫 방문자 온보딩 카드 */}
@@ -6483,27 +6546,40 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
                       <div className="flex-1 min-w-0">
                         <p className="text-[13px] font-black" style={{ color: DEEP_GREEN }}>{t("result.diary.title")}</p>
                         <p className="text-[11px] text-stone-400">
-                          {history.length > 0
-                            ? t("result.diary.history", {
-                                count: history.filter((h: any) => new Date(h.createdAt).toISOString().slice(0, 10) !== todayStr()).length + 1,
-                                score: overallScore
-                              })
-                            : t("result.diary.firstRecord")}
+                          {history.filter((h: any) => new Date(h.createdAt).toISOString().slice(0, 10) !== todayStr()).length + 1}회 기록
                         </p>
                       </div>
                       {user.avatar && <img src={user.avatar} className="w-7 h-7 rounded-full border border-stone-100 shrink-0" />}
-                      <ArrowRight className="w-4 h-4 text-stone-300 shrink-0" />
                     </div>
-                    <div className="flex gap-2 mt-3">
-                      <div className="flex-1 rounded-2xl py-2.5 px-2 text-center" style={{ background: "#FFF5F0" }}>
+                    {/* 점수 변화 강조 */}
+                    <div className="mt-3 rounded-2xl p-3"
+                      style={{ background: streakDelta > 0 ? "#F0FDF4" : streakDelta < 0 ? "#FFF5F5" : "#F8F7F5" }}>
+                      {streakDelta !== 0 ? (
+                        <div className="flex items-center gap-3">
+                          <span className="text-[28px] font-black leading-none"
+                            style={{ color: streakDelta > 0 ? "#059669" : "#DC2626" }}>
+                            {streakDelta > 0 ? "▲" : "▼"} {Math.abs(streakDelta)}점
+                          </span>
+                          <p className="text-[11px] text-stone-500 leading-snug">
+                            지난번보다<br />{streakDelta > 0 ? "좋아졌어요! 🎉" : "떨어졌어요"}
+                          </p>
+                        </div>
+                      ) : (
+                        <p className="text-[12px] font-bold text-stone-500">✨ 오늘 첫 피부 기록이에요!</p>
+                      )}
+                    </div>
+                    {/* 하단 stat pills */}
+                    <div className="flex gap-2 mt-2">
+                      <div className="flex-1 rounded-2xl py-2 px-2 text-center" style={{ background: "#FFF5F0" }}>
                         <p className="text-[9px] font-bold text-stone-400 mb-0.5">스트릭</p>
-                        <p className="text-[16px] font-black" style={{ color: SCAN_TO }}>{currentStreak.count || 1}🔥</p>
+                        <p className="text-[14px] font-black" style={{ color: SCAN_TO }}>{currentStreak.count || 1}🔥</p>
                       </div>
-                      <div className="flex-1 rounded-2xl py-2.5 px-2 text-center" style={{ background: "#F0FDF4" }}>
+                      <div className="flex-1 rounded-2xl py-2 px-2 text-center" style={{ background: "#F0FDF4" }}>
                         <p className="text-[9px] font-bold text-stone-400 mb-0.5">총 스캔</p>
-                        <p className="text-[16px] font-black" style={{ color: "#059669" }}>{history.length + 1}</p>
+                        <p className="text-[14px] font-black" style={{ color: "#059669" }}>{history.length + 1}</p>
                       </div>
-                      <button onClick={() => onOpenDiary?.()} className="flex-1 rounded-2xl py-2.5 px-2 flex flex-col items-center justify-center gap-0.5 text-white active:scale-95 transition-all"
+                      <button onClick={(e) => { e.stopPropagation(); onOpenDiary?.(); }}
+                        className="flex-1 rounded-2xl py-2 px-2 flex flex-col items-center justify-center gap-0.5 text-white active:scale-95 transition-all"
                         style={{ background: `linear-gradient(135deg, ${DEEP_GREEN}, #2D5F4F)` }}>
                         <BookOpen className="w-3.5 h-3.5" />
                         <p className="text-[9px] font-black">일기 보기</p>
@@ -6548,10 +6624,13 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
         )}
 
           </div>
+          </motion.div>
         )}
 
         {/* ── 솔루션 탭 ── */}
         {activeTab === "solution" && (
+          <motion.div key="solution" custom={tabDirectionRef.current} variants={tabSlideVariants}
+            initial="enter" animate="center" exit="exit" transition={{ duration: 0.2, ease: "easeInOut" }}>
           <div className="space-y-4">
 
             {/* 화장품 스캔 배너 */}
@@ -6738,44 +6817,48 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
               <span>{t("result.tab.nutrition")} →</span>
             </button>
           </div>
+          </motion.div>
         )}
 
         {/* ── 영양 탭 ── */}
         {activeTab === "nutrition" && (
+          <motion.div key="nutrition" custom={tabDirectionRef.current} variants={tabSlideVariants}
+            initial="enter" animate="center" exit="exit" transition={{ duration: 0.2, ease: "easeInOut" }}>
           <div className="space-y-3">
             <div className="flex items-center gap-2 mb-1">
-              <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: "linear-gradient(135deg, #F59E0B, #D97706)" }}>
-                <Utensils className="w-4 h-4 text-white" />
+              <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: "linear-gradient(135deg, #8B5CF6, #7C3AED)" }}>
+                <Sparkles className="w-4 h-4 text-white" />
               </div>
               <div>
-                <p className="text-[13px] font-black" style={{ color: "#D97706" }}>{t("nutrients.eatTitle")}</p>
-                <p className="text-[11px] text-stone-400">{t("nutrients.sectionSub")}</p>
+                <p className="text-[13px] font-black" style={{ color: "#7C3AED" }}>{t("nutrients.supplementsTitle")}</p>
+                <p className="text-[11px] text-stone-400">{t("nutrients.supplementsSub")}</p>
               </div>
             </div>
 
             {!analysisResult?.nutritionTips ? (
               <div className="flex flex-col items-center justify-center gap-2 py-10 text-stone-400">
-                <span className="text-3xl">🥗</span>
+                <span className="text-3xl">💊</span>
                 <p className="text-[12px]">{t("nutrients.loadingTips")}</p>
               </div>
             ) : (
               <>
-                {/* 오늘 먹으면 좋은 것 */}
+                {/* 영양제 추천 */}
                 <div className="space-y-2">
-                  {analysisResult.nutritionTips.eatFoods.map((item: { emoji: string; food: string; reason: string; targetScore: string }, i: number) => (
+                  {analysisResult.nutritionTips.supplements.map((item: { emoji: string; name: string; dose: string; reason: string; targetScore: string }, i: number) => (
                     <motion.div key={i} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: i * 0.07 }}
                       className="flex items-start gap-3 p-3.5 rounded-2xl"
-                      style={{ background: "linear-gradient(135deg, #FFF1F0, #FFF7F5)", border: "1px solid #FECACA" }}>
+                      style={{ background: "linear-gradient(135deg, #F5F3FF, #FAF8FF)", border: "1px solid #DDD6FE" }}>
                       <span className="text-2xl shrink-0 mt-0.5">{item.emoji}</span>
                       <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-0.5">
-                          <p className="text-[13px] font-black text-stone-800">{item.food}</p>
+                        <div className="flex items-center gap-2 mb-0.5 flex-wrap">
+                          <p className="text-[13px] font-black text-stone-800">{item.name}</p>
                           <span className="text-[9px] font-black rounded-full px-2 py-0.5 text-white shrink-0"
-                            style={{ background: "linear-gradient(135deg, #f87171, #C97062)" }}>
-                            {t("nutrients.targetScoreLabel")}: {item.targetScore}
+                            style={{ background: "linear-gradient(135deg, #8B5CF6, #7C3AED)" }}>
+                            {item.targetScore}
                           </span>
                         </div>
+                        <p className="text-[10px] font-bold mb-0.5" style={{ color: "#7C3AED" }}>💊 {item.dose}</p>
                         <p className="text-[11px] text-stone-500 leading-relaxed">{item.reason}</p>
                       </div>
                     </motion.div>
@@ -6816,9 +6899,9 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
               </>
             )}
           </div>
+          </motion.div>
         )}
 
-          </motion.div>
         </AnimatePresence>
 
         {/* ── 제휴 텍스트 링크 ── */}

@@ -413,6 +413,8 @@
     "pushBtnOn": "알림 켜짐 ✓",
     "pushUnsupported": "이 브라우저는 푸시 알림을 지원하지 않아요.",
     "pushDenied": "알림 권한이 차단되어 있어요. 브라우저 설정에서 허용해 주세요.",
+    "supplementsTitle": "바우만 타입 맞춤 영양제",
+    "supplementsSub": "내 피부 타입에 필요한 핵심 영양소",
     "eatTitle": "오늘 피부에 좋은 음식",
     "hydrationLabel": "오늘 수분 목표",
     "targetScoreLabel": "점수 연관",
