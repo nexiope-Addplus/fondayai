@@ -502,7 +502,7 @@ function AttendanceBadge({ onClick }: { onClick: () => void }) {
   const checkedToday = data.dates.includes(today);
   return (
     <button onClick={onClick}
-      className="fixed top-4 left-4 z-[60] flex items-center gap-1 bg-white/80 backdrop-blur-sm rounded-full px-2.5 py-1.5 shadow-sm border border-stone-100 transition-all active:scale-95">
+      className="flex items-center gap-1 bg-white/80 backdrop-blur-sm rounded-full px-2.5 py-1.5 shadow-sm border border-stone-100 transition-all active:scale-95">
       <CalendarDays className="w-3.5 h-3.5" style={{ color: checkedToday ? SCAN_TO : "#B0A898" }} />
       <span className="text-[11px] font-bold" style={{ color: checkedToday ? SCAN_TO : "#B0A898" }}>
         {checkedToday ? t("attendance.alreadyChecked") : t("attendance.checkIn")}
@@ -999,7 +999,7 @@ function LangSwitcher() {
   const langs = ["EN", "KO", "JA"];
   const current = (i18nHook.language || "en").toUpperCase();
   return (
-    <div className="fixed top-4 right-4 z-[60] flex items-center gap-0.5 bg-white/80 backdrop-blur-sm rounded-full px-2 py-1 shadow-sm border border-stone-100">
+    <div className="flex items-center gap-0.5 bg-white/80 backdrop-blur-sm rounded-full px-2 py-1 shadow-sm border border-stone-100">
       {langs.map((lang, idx) => (
         <button
           key={lang}
@@ -1398,9 +1398,6 @@ function ScanIdleScreen({ onScan }: { onScan: () => void }) {
 
   return (
     <>
-      {/* 출석 달력 배지 */}
-      <AttendanceBadge onClick={() => setShowCalendar(true)} />
-
       {/* 출석 달력 모달 */}
       <AnimatePresence>
         {showCalendar && <AttendanceCalendarModal onClose={() => setShowCalendar(false)} />}
@@ -1414,6 +1411,12 @@ function ScanIdleScreen({ onScan }: { onScan: () => void }) {
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
     >
+      {/* 상단 헤더 row */}
+      <div className="flex justify-between items-center mb-3 relative" style={{ zIndex: 1 }}>
+        <AttendanceBadge onClick={() => setShowCalendar(true)} />
+        <LangSwitcher />
+      </div>
+
       {pullY > 10 && (
         <div className="absolute top-0 left-0 right-0 flex items-center justify-center z-50 pointer-events-none"
           style={{ height: pullY, opacity: pullY / 70 }}>
@@ -1633,7 +1636,6 @@ function ScanIdleScreen({ onScan }: { onScan: () => void }) {
       {/* 재방문용 부가 카드 */}
       <div className="mt-5 relative space-y-3" style={{ zIndex: 1 }}>
         <WeatherTipCard />
-        <MissionCard />
       </div>
 
       <div className="text-center pt-4 pb-4 relative" style={{ zIndex: 1 }}>
@@ -5237,6 +5239,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
   const [showWaitlist, setShowWaitlist] = useState(false);
   const [showImprovements, setShowImprovements] = useState(false);
   const [showAnalysis, setShowAnalysis] = useState(false);
+  const [showBaumannInfo, setShowBaumannInfo] = useState(false);
   const [showPartnership, setShowPartnership] = useState(false);
   const [partnerForm, setPartnerForm] = useState({ name: "", company: "", email: "", message: "" });
   const [isPartnerSubmitting, setIsPartnerSubmitting] = useState(false);
@@ -5260,6 +5263,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
   const [missionPops, setMissionPops] = useState<string[]>([]);
   const [showCheckinSheet, setShowCheckinSheet] = useState(false);
   const [activeTab, setActiveTab] = useState<"routine" | "solution" | "nutrition">("routine");
+  const tabDirectionRef = useRef<1 | -1>(1);
   const [currentStreak, setCurrentStreak] = useState<StreakData>(() => getStreak());
   const [todayTodoProgress, setTodayTodoProgress] = useState(() => getDiaryTodoProgress(todayStr()));
   const [todayRoutineTodos, setTodayRoutineTodos] = useState<TodoItem[]>(() => getDiaryTodos(todayStr()));
@@ -5694,6 +5698,15 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
     if (!el) return;
     el.style.overflow = (showAnalysis || showImprovements) ? 'hidden' : 'auto';
   }, [showAnalysis, showImprovements]);
+
+  const TAB_ORDER = { routine: 0, solution: 1, nutrition: 2 } as const;
+  const goTo = (next: "routine" | "solution" | "nutrition") => {
+    tabDirectionRef.current = TAB_ORDER[next] >= TAB_ORDER[activeTab] ? 1 : -1;
+    setActiveTab(next);
+    const nav = tabNavRef.current;
+    const container = resultScrollRef.current;
+    if (nav && container) container.scrollTo({ top: nav.offsetTop, behavior: "smooth" });
+  };
 
   const handlePartnershipSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -6180,7 +6193,14 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
                 <div className="flex items-center justify-between gap-3">
                   <div className="min-w-0">
                     <p className="text-[10px] font-black uppercase tracking-[0.16em]" style={{ color: SCAN_TO }}>{t("result.baumannLabel")}</p>
-                    <p className="text-[18px] font-black mt-1 leading-none" style={{ color: DEEP_GREEN }}>{finalType}</p>
+                    <div className="flex items-center gap-2 mt-1">
+                      <p className="text-[18px] font-black leading-none" style={{ color: DEEP_GREEN }}>{finalType}</p>
+                      <button onClick={() => setShowBaumannInfo(v => !v)}
+                        className="text-[10px] font-bold px-2.5 py-1 rounded-full transition-all"
+                        style={{ background: `${SCAN_TO}18`, color: SCAN_TO }}>
+                        {showBaumannInfo ? "접기" : "설명"}
+                      </button>
+                    </div>
                     <p className="text-[11px] font-medium mt-1 text-stone-500 text-kr-pretty">{t("result.mbtiSub")}</p>
                   </div>
                   <div className="rounded-full px-3 py-1 text-[10px] font-black shrink-0"
@@ -6200,6 +6220,24 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
                   );
                 })}
               </div>
+              <AnimatePresence>
+                {showBaumannInfo && (
+                  <motion.div initial={{ opacity: 0, y: -6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }}
+                    className="mt-2 grid grid-cols-2 gap-1.5">
+                    {finalType.split("").map((letter) => {
+                      const color = BAUMANN_COLORS[letter];
+                      if (!color) return null;
+                      return (
+                        <div key={letter} className="rounded-2xl p-2.5"
+                          style={{ background: `${color}10`, border: `1px solid ${color}20` }}>
+                          <p className="text-[12px] font-black" style={{ color }}>{letter} — {t(`baumann.${letter}.name`)}</p>
+                          <p className="text-[10px] text-stone-500 mt-0.5 leading-relaxed">{t(`baumann.${letter}.desc`)}</p>
+                        </div>
+                      );
+                    })}
+                  </motion.div>
+                )}
+              </AnimatePresence>
               {analysisResult?.aiComment && (
                 <button
                   onClick={() => setShowAnalysis(true)}
@@ -6247,12 +6285,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
             ]).map(({ id, label, icon, from, to, inactiveBg, inactiveText }) => {
               const isActive = activeTab === id;
               return (
-                <button key={id} onClick={() => {
-                  setActiveTab(id);
-                  const nav = tabNavRef.current;
-                  const container = resultScrollRef.current;
-                  if (nav && container) container.scrollTo({ top: nav.offsetTop, behavior: "smooth" });
-                }}
+                <button key={id} onClick={() => goTo(id)}
                   className="flex-1 flex flex-col items-center gap-1 py-3 rounded-[20px] text-[12px] font-black transition-all"
                   style={isActive
                     ? { background: `linear-gradient(135deg, ${from}, ${to})`, color: "white", boxShadow: `0 4px 14px ${to}55` }
@@ -6264,6 +6297,13 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
             })}
           </div>
         </div>
+
+        <AnimatePresence mode="wait" initial={false}>
+          <motion.div key={activeTab}
+            initial={{ x: tabDirectionRef.current * 20, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            exit={{ x: tabDirectionRef.current * -20, opacity: 0 }}
+            transition={{ duration: 0.18, ease: "easeOut" }}>
 
         {/* ── 루틴 탭 ── */}
         {activeTab === "routine" && (
@@ -6454,21 +6494,21 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
                       {user.avatar && <img src={user.avatar} className="w-7 h-7 rounded-full border border-stone-100 shrink-0" />}
                       <ArrowRight className="w-4 h-4 text-stone-300 shrink-0" />
                     </div>
-                    {history.length >= 1 && (
-                      <div className="h-16 mt-3 -mx-1">
-                        <ResponsiveContainer width="100%" height="100%">
-                          <LineChart data={[...history.slice().reverse().map((item: any) => ({
-                            date: new Date(item.createdAt).toLocaleDateString("ko-KR", { month: "numeric", day: "numeric" }),
-                            score: parseInt(item.overallScore),
-                          })), { date: "오늘", score: overallScore }]}>
-                            <Line type="monotone" dataKey="score" stroke={SCAN_TO} strokeWidth={2}
-                              dot={{ r: 2.5, fill: SCAN_TO, strokeWidth: 0 }} activeDot={false} />
-                            <XAxis dataKey="date" axisLine={false} tickLine={false} style={{ fontSize: "8px" }} />
-                            <YAxis hide domain={[0, 100]} />
-                          </LineChart>
-                        </ResponsiveContainer>
+                    <div className="flex gap-2 mt-3">
+                      <div className="flex-1 rounded-2xl py-2.5 px-2 text-center" style={{ background: "#FFF5F0" }}>
+                        <p className="text-[9px] font-bold text-stone-400 mb-0.5">스트릭</p>
+                        <p className="text-[16px] font-black" style={{ color: SCAN_TO }}>{currentStreak.count || 1}🔥</p>
                       </div>
-                    )}
+                      <div className="flex-1 rounded-2xl py-2.5 px-2 text-center" style={{ background: "#F0FDF4" }}>
+                        <p className="text-[9px] font-bold text-stone-400 mb-0.5">총 스캔</p>
+                        <p className="text-[16px] font-black" style={{ color: "#059669" }}>{history.length + 1}</p>
+                      </div>
+                      <button onClick={() => onOpenDiary?.()} className="flex-1 rounded-2xl py-2.5 px-2 flex flex-col items-center justify-center gap-0.5 text-white active:scale-95 transition-all"
+                        style={{ background: `linear-gradient(135deg, ${DEEP_GREEN}, #2D5F4F)` }}>
+                        <BookOpen className="w-3.5 h-3.5" />
+                        <p className="text-[9px] font-black">일기 보기</p>
+                      </button>
+                    </div>
                   </CardContent>
                 </Card>
               </motion.div>
@@ -6498,12 +6538,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
             <AdBanner slot="6349940752" />
             {/* 다음 탭 유도 */}
             <button
-              onClick={() => {
-                setActiveTab("solution");
-                const nav = tabNavRef.current;
-                const container = resultScrollRef.current;
-                if (nav && container) container.scrollTo({ top: nav.offsetTop, behavior: "smooth" });
-              }}
+              onClick={() => goTo("solution")}
               className="w-full flex items-center justify-center gap-2 py-3.5 rounded-2xl text-[13px] font-black text-white transition-all active:scale-95"
               style={{ background: `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})` }}>
               <Leaf className="w-4 h-4" />
@@ -6696,12 +6731,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
             </div>
             {/* 다음 탭 유도 */}
             <button
-              onClick={() => {
-                setActiveTab("nutrition");
-                const nav = tabNavRef.current;
-                const container = resultScrollRef.current;
-                if (nav && container) container.scrollTo({ top: nav.offsetTop, behavior: "smooth" });
-              }}
+              onClick={() => goTo("nutrition")}
               className="w-full flex items-center justify-center gap-2 py-3.5 rounded-2xl text-[13px] font-black text-white transition-all active:scale-95"
               style={{ background: "linear-gradient(135deg, #F97316, #C2410C)" }}>
               <Utensils className="w-4 h-4" />
@@ -6787,6 +6817,9 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
             )}
           </div>
         )}
+
+          </motion.div>
+        </AnimatePresence>
 
         {/* ── 제휴 텍스트 링크 ── */}
         <div className="pt-2 pb-1 text-center">
@@ -8107,7 +8140,6 @@ export default function SkinScanPage() {
 
   return (
     <div className="min-h-[100dvh] bg-[#FAF9F6] text-stone-900">
-      {scanState === "idle" && <LangSwitcher />}
       <div className="max-w-md mx-auto relative min-h-[100dvh]">
 
         {/* 얼굴 가이드 카메라 */}
