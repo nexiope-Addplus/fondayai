@@ -360,6 +360,7 @@
     "calendarTitle": "출석 달력",
     "thisMonth": "이번 달 {{n}}일 출석",
     "calendarBadge": "🗓 {{n}}pt",
+    "checkIn": "출석 체크",
     "alreadyChecked": "오늘 출석 완료 ✓",
     "close": "닫기"
   },

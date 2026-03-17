@@ -360,6 +360,7 @@
     "calendarTitle": "Attendance Calendar",
     "thisMonth": "{{n}} days this month",
     "calendarBadge": "🗓 {{n}}pts",
+    "checkIn": "Check In",
     "alreadyChecked": "Checked in today ✓",
     "close": "Close"
   },

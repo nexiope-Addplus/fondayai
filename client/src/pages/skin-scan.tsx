@@ -452,7 +452,6 @@ function CheckinSuccessSheet({ onKakao, onGoogle, onDismiss, user }: {
             <CheckCircle2 className="w-7 h-7 text-white" />
           </div>
           <h2 className="text-[18px] font-black text-stone-800 mb-1">{t("attendance.title")}</h2>
-          <p className="text-[12px] font-bold text-amber-500">{t("attendance.totalPoints", { n: data.totalPoints })}</p>
         </div>
 
         {!user && (
@@ -501,7 +500,7 @@ function AttendanceBadge({ onClick }: { onClick: () => void }) {
       className="fixed top-4 left-4 z-[60] flex items-center gap-1 bg-white/80 backdrop-blur-sm rounded-full px-2.5 py-1.5 shadow-sm border border-stone-100 transition-all active:scale-95">
       <CalendarDays className="w-3.5 h-3.5" style={{ color: checkedToday ? SCAN_TO : "#B0A898" }} />
       <span className="text-[11px] font-bold" style={{ color: checkedToday ? SCAN_TO : "#B0A898" }}>
-        {checkedToday ? t("attendance.alreadyChecked") : t("attendance.calendarBadge", { n: data.totalPoints })}
+        {checkedToday ? t("attendance.alreadyChecked") : t("attendance.checkIn")}
       </span>
     </button>
   );
@@ -1632,48 +1631,15 @@ function ScanIdleScreen({ onScan }: { onScan: () => void }) {
         <MissionCard />
       </div>
 
-      {/* ── 교육용 콘텐츠 섹션 (AdSense 정책: 퍼블리셔 콘텐츠 제공) ── */}
-      <motion.div variants={fadeChild} className="mt-8 border-t border-stone-100 pt-6 space-y-5 relative" style={{ zIndex: 1 }}>
-        <h2 className="text-[14px] font-black tracking-tight" style={{ color: DEEP_GREEN }}>{t("idle.baumannSectionTitle")}</h2>
-        <p className="text-[12.5px] leading-relaxed text-stone-500">
-          {t("idle.baumannSectionDesc")}
-        </p>
-
-        <div className="grid grid-cols-2 gap-2.5">
-          {(t("idle.baumannAxes", { returnObjects: true }) as { label: string; desc: string }[]).map((item, i) => {
-            const icons = ["💧", "🌡️", "🌅", "⏳"];
-            return (
-              <div key={i} className="bg-white rounded-xl p-3 border border-stone-100">
-                <span className="text-lg">{icons[i]}</span>
-                <p className="text-[11px] font-bold text-stone-700 mt-1">{item.label}</p>
-                <p className="text-[10px] text-stone-400">{item.desc}</p>
-              </div>
-            );
-          })}
-        </div>
-
-        <div className="bg-white rounded-2xl p-4 border border-stone-100">
-          <h3 className="text-[13px] font-black mb-2" style={{ color: DEEP_GREEN }}>{t("idle.howTitle")}</h3>
-          <ul className="space-y-1.5">
-            {(t("idle.howSteps", { returnObjects: true }) as string[]).map((item, i) => (
-              <li key={i} className="flex items-start gap-2 text-[11.5px] text-stone-500">
-                <span className="text-[10px] font-black mt-0.5 shrink-0" style={{ color: SCAN_TO }}>{i + 1}</span>
-                {item}
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        <div className="text-center pt-1 pb-4">
-          <a href="/privacy.html" className="text-[10px] underline" style={{ color: TEXT_SECONDARY }}>
-            {t("idle.privacyLink")}
-          </a>
-          <span className="text-[10px] text-stone-200 mx-2">·</span>
-          <a href="/terms.html" className="text-[10px] underline" style={{ color: TEXT_SECONDARY }}>
-            {t("idle.termsLink")}
-          </a>
-        </div>
-      </motion.div>
+      <div className="text-center pt-4 pb-4 relative" style={{ zIndex: 1 }}>
+        <a href="/privacy.html" className="text-[10px] underline" style={{ color: TEXT_SECONDARY }}>
+          {t("idle.privacyLink")}
+        </a>
+        <span className="text-[10px] text-stone-200 mx-2">·</span>
+        <a href="/terms.html" className="text-[10px] underline" style={{ color: TEXT_SECONDARY }}>
+          {t("idle.termsLink")}
+        </a>
+      </div>
     </motion.div>
     </>
   );
@@ -6088,7 +6054,6 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
           <span className="text-2xl">🎯</span>
           <p className="font-black text-stone-800 text-[14px]">{t("mission.newAchieve")}</p>
           <p className="text-[12px] text-stone-500">{t(`mission.${missionPops[0]}`)}</p>
-          <p className="text-[13px] font-bold text-amber-500">+{MISSION_POINTS[missionPops[0]] || 0}pt</p>
         </motion.div>
       )}
     </AnimatePresence>
@@ -6295,18 +6260,10 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
         {/* 퀘스트 / 미션 카드 */}
         <Card className="border border-[#EADFD8] rounded-3xl overflow-hidden shadow-[0_12px_30px_rgba(201,112,98,0.12)] bg-white">
           <CardContent className="p-3.5">
-            <div className="flex items-start justify-between gap-3">
-              <div className="min-w-0">
-                <p className="text-[11px] font-black tracking-[0.16em] uppercase" style={{ color: SCAN_TO }}>{t("result.actionCard.missionEyebrow")}</p>
-                <p className="text-[16px] font-black mt-1 text-kr-pretty" style={{ color: DEEP_GREEN }}>{t("result.actionCard.title")}</p>
-                <p className="text-[11px] text-stone-500 mt-1.5 leading-relaxed text-kr-pretty">{questStatusDetail}</p>
-              </div>
-              <div className="rounded-2xl px-3 py-2 text-right shrink-0"
-                style={{ background: "#FFF5F0", border: "1px solid #F1DED7" }}>
-                <p className="text-[10px] font-bold text-stone-400">{t("result.actionCard.totalPointsLabel")}</p>
-                <p className="text-[19px] font-black leading-none" style={{ color: SCAN_TO }}>{totalPoints}pt</p>
-                <p className="text-[9px] text-stone-400 mt-1">{t("result.actionCard.totalPointsSub")}</p>
-              </div>
+            <div className="min-w-0">
+              <p className="text-[11px] font-black tracking-[0.16em] uppercase" style={{ color: SCAN_TO }}>{t("result.actionCard.missionEyebrow")}</p>
+              <p className="text-[16px] font-black mt-1 text-kr-pretty" style={{ color: DEEP_GREEN }}>{t("result.actionCard.title")}</p>
+              <p className="text-[11px] text-stone-500 mt-1.5 leading-relaxed text-kr-pretty">{questStatusDetail}</p>
             </div>
             <div className="h-2 rounded-full bg-stone-100 overflow-hidden mt-3">
               <motion.div
@@ -6436,60 +6393,6 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
             )}
           </CardContent>
         </Card>
-
-        {/* ── AI 피부 예측 카드 ── */}
-        {analysisResult?.prediction && (
-          <SkinPredictionCard
-            prediction={analysisResult.prediction}
-            currentScore={analysisResult.scores[0]?.score ?? 0}
-            onOpenDiary={handleDiaryEntry}
-          />
-        )}
-
-        {/* ── AI 밀착케어 ── */}
-        <div className="rounded-[20px] p-4" style={{ background: "#FFFBF7", border: "1px solid #F3E4D8" }}>
-          <div className="flex items-center justify-between gap-3">
-            <div className="flex items-center gap-2.5">
-              <div className="w-9 h-9 rounded-xl flex items-center justify-center text-lg shrink-0"
-                style={{ background: "linear-gradient(135deg, #FEF3C7, #FDE68A)" }}>
-                🤖
-              </div>
-              <div>
-                <p className="text-[13px] font-black" style={{ color: SCAN_TO }}>{aiCareLabels.title}</p>
-                <p className="text-[10px] text-stone-400 mt-0.5">{aiCareLabels.schedule}</p>
-              </div>
-            </div>
-            <button onClick={() => handlePushToggle()} disabled={pushLoading}
-              className="shrink-0 rounded-full px-3 py-1.5 text-[11px] font-black"
-              style={pushSubscribed
-                ? { background: `${DEEP_GREEN}18`, color: DEEP_GREEN, border: `1px solid ${DEEP_GREEN}33` }
-                : { background: "linear-gradient(135deg, #F59E0B, #D97706)", color: "white" }}>
-              {pushLoading ? "..." : pushSubscribed ? aiCareLabels.on : aiCareLabels.off}
-            </button>
-          </div>
-          {pushSubscribed && (
-            <div className="flex gap-2 mt-3 flex-wrap">
-              {([
-                ["scan", aiCareLabels.scan],
-                ["meal", aiCareLabels.meal],
-                ["hydration", aiCareLabels.hydration],
-                ["routine", aiCareLabels.routine],
-                ["uvCare", aiCareLabels.uvCare],
-                ["bedtime", aiCareLabels.bedtime],
-                ["weatherCare", aiCareLabels.weatherCare],
-              ] as const).map(([key, label]) => (
-                <button key={key}
-                  onClick={() => updateAICareOption(key, !aiCareSettings[key])}
-                  className="rounded-full px-3 py-1 text-[11px] font-black"
-                  style={aiCareSettings[key]
-                    ? { background: `${SCAN_FROM}20`, color: SCAN_TO, border: `1px solid ${SCAN_TO}33` }
-                    : { background: "#F6F3EE", color: "#9A8F80", border: "1px solid #ECE6DE" }}>
-                  {label}
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
 
             {/* 피부 일기 카드 / 로그인 카드 */}
             {user === undefined ? (
@@ -6650,6 +6553,60 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, imageBase64, onBac
                 ))}
               </>
             )}
+            </div>
+
+            {/* ── AI 피부 예측 카드 ── */}
+            {analysisResult?.prediction && (
+              <SkinPredictionCard
+                prediction={analysisResult.prediction}
+                currentScore={analysisResult.scores[0]?.score ?? 0}
+                onOpenDiary={handleDiaryEntry}
+              />
+            )}
+
+            {/* ── AI 밀착케어 ── */}
+            <div className="rounded-[20px] p-4" style={{ background: "#FFFBF7", border: "1px solid #F3E4D8" }}>
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-9 h-9 rounded-xl flex items-center justify-center text-lg shrink-0"
+                    style={{ background: "linear-gradient(135deg, #FEF3C7, #FDE68A)" }}>
+                    🤖
+                  </div>
+                  <div>
+                    <p className="text-[13px] font-black" style={{ color: SCAN_TO }}>{aiCareLabels.title}</p>
+                    <p className="text-[10px] text-stone-400 mt-0.5">{aiCareLabels.schedule}</p>
+                  </div>
+                </div>
+                <button onClick={() => handlePushToggle()} disabled={pushLoading}
+                  className="shrink-0 rounded-full px-3 py-1.5 text-[11px] font-black"
+                  style={pushSubscribed
+                    ? { background: `${DEEP_GREEN}18`, color: DEEP_GREEN, border: `1px solid ${DEEP_GREEN}33` }
+                    : { background: "linear-gradient(135deg, #F59E0B, #D97706)", color: "white" }}>
+                  {pushLoading ? "..." : pushSubscribed ? aiCareLabels.on : aiCareLabels.off}
+                </button>
+              </div>
+              {pushSubscribed && (
+                <div className="flex gap-2 mt-3 flex-wrap">
+                  {([
+                    ["scan", aiCareLabels.scan],
+                    ["meal", aiCareLabels.meal],
+                    ["hydration", aiCareLabels.hydration],
+                    ["routine", aiCareLabels.routine],
+                    ["uvCare", aiCareLabels.uvCare],
+                    ["bedtime", aiCareLabels.bedtime],
+                    ["weatherCare", aiCareLabels.weatherCare],
+                  ] as const).map(([key, label]) => (
+                    <button key={key}
+                      onClick={() => updateAICareOption(key, !aiCareSettings[key])}
+                      className="rounded-full px-3 py-1 text-[11px] font-black"
+                      style={aiCareSettings[key]
+                        ? { background: `${SCAN_FROM}20`, color: SCAN_TO, border: `1px solid ${SCAN_TO}33` }
+                        : { background: "#F6F3EE", color: "#9A8F80", border: "1px solid #ECE6DE" }}>
+                      {label}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
 
             {/* ── Fonday 디바이스 티저 (잠금 → 기대감 카드) ── */}

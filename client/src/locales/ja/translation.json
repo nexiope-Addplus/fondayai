@@ -360,6 +360,7 @@
     "calendarTitle": "出席カレンダー",
     "thisMonth": "今月 {{n}}日出席",
     "calendarBadge": "🗓 {{n}}pt",
+    "checkIn": "チェックイン",
     "alreadyChecked": "今日の出席完了 ✓",
     "close": "閉じる"
   },
