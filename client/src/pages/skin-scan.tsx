@@ -5573,10 +5573,8 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
     if (returnTab) localStorage.setItem("fonday_return_tab", returnTab);
     if (analysisResult) localStorage.setItem("pendingResult", JSON.stringify({ analysisResult, surveyData, imageBase64 }));
     if (provider === "line") {
-      // LINE은 iOS에서 LINE 앱 딥링크 → 콜백이 새 Safari 탭으로 열림
-      // window.open으로 PWA 창을 유지하고, 앱으로 돌아올 때 visibilitychange로 로그인 감지
-      localStorage.setItem("fonday_login_pending", "1");
-      window.open(`/auth/${provider}`, "_blank");
+      // LIFF SDK: iOS PWA에서도 동일 탭에서 LINE 로그인 처리
+      window.location.href = "https://liff.line.me/2009518965-G9uSn0zN";
     } else {
       window.location.href = `/auth/${provider}`;
     }
@@ -8350,8 +8348,8 @@ export default function SkinScanPage() {
   const openLoginPopup = useCallback((provider: "kakao" | "line" | "google", returnTab?: string) => {
     if (returnTab) localStorage.setItem("fonday_return_tab", returnTab);
     if (provider === "line") {
-      localStorage.setItem("fonday_login_pending", "1");
-      window.open(`/auth/${provider}`, "_blank");
+      // LIFF SDK: iOS PWA에서도 동일 탭에서 LINE 로그인 처리
+      window.location.href = "https://liff.line.me/2009518965-G9uSn0zN";
     } else {
       window.location.href = `/auth/${provider}`;
     }
