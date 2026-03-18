@@ -8,6 +8,7 @@ export const onRequest = (context: any) => {
     redirect_uri: `${origin}/auth/line/callback`,
     state: crypto.randomUUID(),
     scope: "profile openid",
+    disable_auto_login: "true",  // iOS에서 LINE 앱 자동 실행 방지 → 웹 폼 로그인
   });
 
   return Response.redirect(

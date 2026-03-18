@@ -5572,12 +5572,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
   const openLoginPopup = useCallback((provider: "kakao" | "line" | "google", returnTab?: string) => {
     if (returnTab) localStorage.setItem("fonday_return_tab", returnTab);
     if (analysisResult) localStorage.setItem("pendingResult", JSON.stringify({ analysisResult, surveyData, imageBase64 }));
-    if (provider === "line") {
-      // LIFF SDK: iOS PWA에서도 동일 탭에서 LINE 로그인 처리
-      window.location.href = "https://liff.line.me/2009518965-G9uSn0zN";
-    } else {
-      window.location.href = `/auth/${provider}`;
-    }
+    window.location.href = `/auth/${provider}`;
   }, [analysisResult, surveyData, imageBase64]);
 
   const handleGoogleLogin = () => openLoginPopup("google");
@@ -8347,12 +8342,7 @@ export default function SkinScanPage() {
   // 팝업 로그인 (DiaryTab·MyScreen 등에서 사용)
   const openLoginPopup = useCallback((provider: "kakao" | "line" | "google", returnTab?: string) => {
     if (returnTab) localStorage.setItem("fonday_return_tab", returnTab);
-    if (provider === "line") {
-      // LIFF SDK: iOS PWA에서도 동일 탭에서 LINE 로그인 처리
-      window.location.href = "https://liff.line.me/2009518965-G9uSn0zN";
-    } else {
-      window.location.href = `/auth/${provider}`;
-    }
+    window.location.href = `/auth/${provider}`;
   }, []);
 
   // 로그인 후 게스트 스캔 연결
