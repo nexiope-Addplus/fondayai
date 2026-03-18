@@ -3632,7 +3632,7 @@ function DiaryFullView({ history, analysisResult, overallScore, finalType, curre
 
 // ─── 결과 화면 ────────────────────────────────────────────────────
 // ─── 피부 일기 탭 (독립 데이터 페칭) ─────────────────────────────
-function DiaryTab({ user, analysisResult, onBack }: { user: any; analysisResult: AnalysisResult | null; onBack?: () => void }) {
+function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: any; analysisResult: AnalysisResult | null; onBack?: () => void; onLogin?: (p: "kakao"|"line"|"google", tab: string) => void }) {
   const { t } = useTranslation();
   const [history, setHistory] = useState<any[]>([]);
   const [rankingData, setRankingData] = useState<RankingData | null>(null);
@@ -3862,21 +3862,21 @@ function DiaryTab({ user, analysisResult, onBack }: { user: any; analysisResult:
               </div>
               <div className="space-y-2 mt-6">
                 {i18n.language === "ko" ? (
-                  <Button onClick={() => { sessionStorage.setItem("fonday_return_tab", "diary"); window.location.href = "/auth/kakao"; }}
+                  <Button onClick={() => onLogin ? onLogin("kakao", "diary") : (sessionStorage.setItem("fonday_return_tab", "diary"), window.location.href = "/auth/kakao")}
                     className="w-full h-12 rounded-xl font-bold gap-2 border-0 shadow-sm text-[#3C1E1E]"
                     style={{ background: "#FEE500" }}>
                     <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path fillRule="evenodd" clipRule="evenodd" d="M9 1C4.582 1 1 3.79 1 7.222c0 2.154 1.386 4.045 3.484 5.14L3.62 15.5a.25.25 0 0 0 .368.274L7.9 13.39A9.63 9.63 0 0 0 9 13.444c4.418 0 8-2.791 8-6.222C17 3.79 13.418 1 9 1Z" fill="#3C1E1E"/></svg>
                     {t("result.login.kakao")}
                   </Button>
                 ) : (
-                  <Button onClick={() => { sessionStorage.setItem("fonday_return_tab", "diary"); window.location.href = "/auth/line"; }}
+                  <Button onClick={() => onLogin ? onLogin("line", "diary") : (sessionStorage.setItem("fonday_return_tab", "diary"), window.location.href = "/auth/line")}
                     className="w-full h-12 rounded-xl font-bold gap-2 border-0 shadow-sm text-white"
                     style={{ background: "#06C755" }}>
                     <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 1C4.582 1 1 3.79 1 7.222c0 2.03 1.09 3.84 2.8 5.04-.12.44-.77 2.96-.8 3.15a.2.2 0 0 0 .3.22l3.72-2.46c.6.09 1.3.14 1.98.14 4.418 0 8-2.791 8-6.222C17 3.79 13.418 1 9 1Z" fill="white"/></svg>
                     {t("result.login.line")}
                   </Button>
                 )}
-                <Button onClick={() => { sessionStorage.setItem("fonday_return_tab", "diary"); window.location.href = "/auth/google"; }}
+                <Button onClick={() => onLogin ? onLogin("google", "diary") : (sessionStorage.setItem("fonday_return_tab", "diary"), window.location.href = "/auth/google")}
                   className="w-full h-12 rounded-xl bg-white hover:bg-stone-50 font-bold text-zinc-700 gap-2 border border-stone-200 shadow-sm">
                   <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" className="w-4 h-4" />
                   {t("result.login.google")}
@@ -4752,7 +4752,7 @@ function MyCosmeticsModal({ onClose, onAddNew }: { onClose: () => void; onAddNew
   );
 }
 
-function MyScreen({ user, onInstall, onBack }: { user: any; onInstall: () => void; onBack: () => void }) {
+function MyScreen({ user, onInstall, onBack, onLogin }: { user: any; onInstall: () => void; onBack: () => void; onLogin?: (p: "kakao"|"line"|"google", tab: string) => void }) {
   const { t, i18n } = useTranslation();
   const [showCalendar, setShowCalendar] = useState(false);
   const [showMyCosmetics, setShowMyCosmetics] = useState(false);
@@ -4833,21 +4833,21 @@ function MyScreen({ user, onInstall, onBack }: { user: any; onInstall: () => voi
               <p className="text-[12px] text-stone-400">{t("attendance.loginDesc")}</p>
             </div>
             {i18n.language === "ko" ? (
-              <button onClick={() => { sessionStorage.setItem("fonday_return_tab", "my"); window.location.href = "/auth/kakao"; }}
+              <button onClick={() => onLogin ? onLogin("kakao", "my") : (sessionStorage.setItem("fonday_return_tab", "my"), window.location.href = "/auth/kakao")}
                 className="w-full h-11 rounded-xl font-bold text-[13px] gap-2 flex items-center justify-center border-0 text-[#3C1E1E]"
                 style={{ background: "#FEE500" }}>
                 <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path fillRule="evenodd" clipRule="evenodd" d="M9 1C4.582 1 1 3.79 1 7.222c0 2.154 1.386 4.045 3.484 5.14L3.62 15.5a.25.25 0 0 0 .368.274L7.9 13.39A9.63 9.63 0 0 0 9 13.444c4.418 0 8-2.791 8-6.222C17 3.79 13.418 1 9 1Z" fill="#3C1E1E"/></svg>
                 {t("attendance.kakao")}
               </button>
             ) : (
-              <button onClick={() => { sessionStorage.setItem("fonday_return_tab", "my"); window.location.href = "/auth/line"; }}
+              <button onClick={() => onLogin ? onLogin("line", "my") : (sessionStorage.setItem("fonday_return_tab", "my"), window.location.href = "/auth/line")}
                 className="w-full h-11 rounded-xl font-bold text-[13px] gap-2 flex items-center justify-center border-0 text-white"
                 style={{ background: "#06C755" }}>
                 <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 1C4.582 1 1 3.79 1 7.222c0 2.03 1.09 3.84 2.8 5.04-.12.44-.77 2.96-.8 3.15a.2.2 0 0 0 .3.22l3.72-2.46c.6.09 1.3.14 1.98.14 4.418 0 8-2.791 8-6.222C17 3.79 13.418 1 9 1Z" fill="white"/></svg>
                 {t("attendance.line")}
               </button>
             )}
-            <button onClick={() => { sessionStorage.setItem("fonday_return_tab", "my"); window.location.href = "/auth/google"; }}
+            <button onClick={() => onLogin ? onLogin("google", "my") : (sessionStorage.setItem("fonday_return_tab", "my"), window.location.href = "/auth/google")}
               className="w-full h-11 rounded-xl font-bold text-[13px] gap-2 border border-stone-200 bg-white text-stone-700 flex items-center justify-center">
               <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" className="w-4 h-4" />
               {t("attendance.google")}
@@ -4945,7 +4945,7 @@ function MyScreen({ user, onInstall, onBack }: { user: any; onInstall: () => voi
               <Zap className="w-5 h-5 text-white" />
             </div>
             <div>
-              <p className="text-[14px] font-bold" style={{ color: "#C97062" }}>Fonday 디바이스</p>
+              <p className="text-[14px] font-bold" style={{ color: "#C97062" }}>{t("result.deviceTeaser.title")}</p>
               <p className="text-[11px] text-stone-400">{t("result.deviceTeaser.sub")}</p>
             </div>
           </div>
@@ -5569,18 +5569,26 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
     };
   }, []);
 
-  const handleGoogleLogin = () => {
+  const openLoginPopup = useCallback((provider: "kakao" | "line" | "google", returnTab?: string) => {
+    if (returnTab) sessionStorage.setItem("fonday_return_tab", returnTab);
     if (analysisResult) sessionStorage.setItem("pendingResult", JSON.stringify({ analysisResult, surveyData, imageBase64 }));
-    window.location.href = "/auth/google";
-  };
-  const handleKakaoLogin = () => {
-    if (analysisResult) sessionStorage.setItem("pendingResult", JSON.stringify({ analysisResult, surveyData, imageBase64 }));
-    window.location.href = "/auth/kakao";
-  };
-  const handleLineLogin = () => {
-    if (analysisResult) sessionStorage.setItem("pendingResult", JSON.stringify({ analysisResult, surveyData, imageBase64 }));
-    window.location.href = "/auth/line";
-  };
+    const url = `/auth/${provider}`;
+    const w = 480, h = 620;
+    const left = Math.round((screen.width - w) / 2);
+    const top = Math.round((screen.height - h) / 2);
+    const popup = window.open(url, "fonday-login", `popup,width=${w},height=${h},left=${left},top=${top}`);
+    if (!popup || popup.closed) { window.location.href = url; return; }
+    const onMsg = (e: MessageEvent) => {
+      if (e.origin !== window.location.origin || e.data !== "fonday:login:success") return;
+      window.removeEventListener("message", onMsg);
+      fetch("/api/user").then(r => r.ok ? r.json() : null).then(u => setUser(u ?? null));
+    };
+    window.addEventListener("message", onMsg);
+  }, [analysisResult, surveyData, imageBase64]);
+
+  const handleGoogleLogin = () => openLoginPopup("google");
+  const handleKakaoLogin = () => openLoginPopup("kakao");
+  const handleLineLogin = () => openLoginPopup("line");
   const isKo = i18n.language === "ko";
   const socialLoginButton = isKo ? (
     <Button onClick={handleKakaoLogin}
@@ -6432,7 +6440,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
                       <button onClick={() => setShowBaumannInfo(v => !v)}
                         className="text-[10px] font-bold px-2.5 py-1 rounded-full transition-all"
                         style={{ background: `${SCAN_TO}18`, color: SCAN_TO }}>
-                        {showBaumannInfo ? "접기" : "설명"}
+                        {showBaumannInfo ? t("result.baumannFold") : t("result.baumannExpand")}
                       </button>
                     </div>
                     <p className="text-[11px] font-medium mt-1 text-stone-500 text-kr-pretty">{t("result.mbtiSub")}</p>
@@ -6730,7 +6738,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
                       <div className="flex-1 min-w-0">
                         <p className="text-[13px] font-black" style={{ color: DEEP_GREEN }}>{t("result.diary.title")}</p>
                         <p className="text-[11px] text-stone-400">
-                          {history.filter((h: any) => new Date(h.createdAt).toISOString().slice(0, 10) !== todayStr()).length + 1}회 기록
+                          {t("result.diary.scanCount", { n: history.filter((h: any) => new Date(h.createdAt).toISOString().slice(0, 10) !== todayStr()).length + 1 })}
                         </p>
                       </div>
                       {user.avatar && <img src={user.avatar} className="w-7 h-7 rounded-full border border-stone-100 shrink-0" />}
@@ -6745,15 +6753,14 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
                             <div className="flex items-center gap-3">
                               <span className="text-[28px] font-black leading-none"
                                 style={{ color: delta > 0 ? "#059669" : delta < 0 ? "#DC2626" : "#A8A29E" }}>
-                                {delta > 0 ? "▲" : delta < 0 ? "▼" : "―"} {Math.abs(delta)}점
+                                {delta > 0 ? "▲" : delta < 0 ? "▼" : "―"} {t("result.diary.deltaPoint", { n: Math.abs(delta) })}
                               </span>
-                              <p className="text-[11px] text-stone-500 leading-snug">
-                                지난번보다<br />
-                                {delta > 0 ? "좋아졌어요! 🎉" : delta < 0 ? "떨어졌어요" : "변화 없어요"}
+                              <p className="text-[11px] text-stone-500 leading-snug whitespace-pre-line">
+                                {delta > 0 ? t("result.diary.improved") : delta < 0 ? t("result.diary.worse") : t("result.diary.noChange")}
                               </p>
                             </div>
                           ) : (
-                            <p className="text-[12px] font-bold text-stone-500">✨ 오늘 첫 피부 기록이에요!</p>
+                            <p className="text-[12px] font-bold text-stone-500">{t("result.diary.firstScan")}</p>
                           )}
                         </div>
                       );
@@ -6761,7 +6768,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
                     {/* 하단 stat pills */}
                     <div className="flex gap-2 mt-2">
                       <div className="flex-1 rounded-2xl py-2 px-2 text-center" style={{ background: "#FFF5F0" }}>
-                        <p className="text-[9px] font-bold text-stone-400 mb-0.5">연속 기록</p>
+                        <p className="text-[9px] font-bold text-stone-400 mb-0.5">{t("result.diary.streak")}</p>
                         <p className="text-[14px] font-black" style={{ color: SCAN_TO }}>{currentStreak.count || 1}🔥</p>
                       </div>
                       <div className="flex-1 rounded-2xl py-2 px-2 text-center" style={{ background: "#F0FDF4" }}>
@@ -7528,21 +7535,21 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
               {/* 로그인 버튼 */}
               <div className="space-y-2.5">
                 {i18n.language === "ko" ? (
-                  <button onClick={() => { setShowCosmeticsGate(false); sessionStorage.setItem("fonday_return_tab", "scan"); window.location.href = "/auth/kakao"; }}
+                  <button onClick={() => { setShowCosmeticsGate(false); openLoginPopup("kakao", "scan"); }}
                     className="w-full py-3.5 rounded-2xl text-[14px] font-black flex items-center justify-center gap-2"
                     style={{ background: "#FEE500", color: "#3C1E1E" }}>
                     <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path fillRule="evenodd" clipRule="evenodd" d="M9 1C4.582 1 1 3.79 1 7.222c0 2.154 1.386 4.045 3.484 5.14L3.62 15.5a.25.25 0 0 0 .368.274L7.9 13.39A9.63 9.63 0 0 0 9 13.444c4.418 0 8-2.791 8-6.222C17 3.79 13.418 1 9 1Z" fill="#3C1E1E"/></svg>
                     {t("cosmetics.loginGateKakao")}
                   </button>
                 ) : (
-                  <button onClick={() => { setShowCosmeticsGate(false); sessionStorage.setItem("fonday_return_tab", "scan"); window.location.href = "/auth/line"; }}
+                  <button onClick={() => { setShowCosmeticsGate(false); openLoginPopup("line", "scan"); }}
                     className="w-full py-3.5 rounded-2xl text-[14px] font-black flex items-center justify-center gap-2 text-white"
                     style={{ background: "#06C755" }}>
                     <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 1C4.582 1 1 3.79 1 7.222c0 2.03 1.09 3.84 2.8 5.04-.12.44-.77 2.96-.8 3.15a.2.2 0 0 0 .3.22l3.72-2.46c.6.09 1.3.14 1.98.14 4.418 0 8-2.791 8-6.222C17 3.79 13.418 1 9 1Z" fill="white"/></svg>
                     {t("cosmetics.loginGateLine")}
                   </button>
                 )}
-                <button onClick={() => { setShowCosmeticsGate(false); sessionStorage.setItem("fonday_return_tab", "scan"); window.location.href = "/auth/google"; }}
+                <button onClick={() => { setShowCosmeticsGate(false); openLoginPopup("google", "scan"); }}
                   className="w-full py-3.5 rounded-2xl text-[14px] font-black flex items-center justify-center gap-2 bg-white border border-stone-200 text-stone-700">
                   <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" className="w-4 h-4" />
                   {t("cosmetics.loginGateGoogle")}
@@ -8302,9 +8309,22 @@ export default function SkinScanPage() {
   };
 
   useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const justLoggedIn = params.get("login") === "success";
+    if (justLoggedIn) window.history.replaceState({}, "", "/");
+
     fetch("/api/user")
       .then(res => res.ok ? res.json() : null)
-      .then(data => setUser(data ?? null))
+      .then(data => {
+        setUser(data ?? null);
+        // 팝업 모드: 로그인 성공 시 부모에 알리고 팝업 닫기
+        if (data && justLoggedIn && window.opener && !window.opener.closed) {
+          try {
+            window.opener.postMessage("fonday:login:success", window.location.origin);
+            window.close();
+          } catch {}
+        }
+      })
       .catch(() => setUser(null));
   }, []);
 
@@ -8480,7 +8500,7 @@ export default function SkinScanPage() {
           )}
           {activeTab === "diary" && (
             <motion.div key="diary" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-              <DiaryTab user={user} analysisResult={analysisResult} onBack={() => setActiveTab("scan")} />
+              <DiaryTab user={user} analysisResult={analysisResult} onBack={() => setActiveTab("scan")} onLogin={openLoginPopup} />
             </motion.div>
           )}
           {activeTab === "magazine" && (
@@ -8490,7 +8510,7 @@ export default function SkinScanPage() {
           )}
           {activeTab === "my" && (
             <motion.div key="my" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-              <MyScreen user={user} onInstall={handleInstall} onBack={() => setActiveTab("scan")} />
+              <MyScreen user={user} onInstall={handleInstall} onBack={() => setActiveTab("scan")} onLogin={openLoginPopup} />
             </motion.div>
           )}
         </AnimatePresence>

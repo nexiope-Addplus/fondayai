@@ -201,8 +201,17 @@
       "title": "肌日記",
       "firstRecord": "今日初めての記録",
       "history": "{{count}}件の記録 · 今日 {{score}}点",
-      "avg7d": "直近7日平均"
+      "avg7d": "直近7日平均",
+      "scanCount": "{{n}}回記録",
+      "streak": "連続記録",
+      "deltaPoint": "{{n}}点",
+      "improved": "前回より改善！🎉",
+      "worse": "前回より低下",
+      "noChange": "変化なし",
+      "firstScan": "✨ 今日初めての肌記録です！"
     },
+    "baumannExpand": "詳細",
+    "baumannFold": "閉じる",
     "actionCard": {
       "eyebrow": "今日のケアプラン",
       "title": "この結果から今日のミッション",

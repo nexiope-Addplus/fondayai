@@ -201,8 +201,17 @@
       "title": "Skin Diary",
       "firstRecord": "Your first entry today",
       "history": "{{count}} records · Today {{score}} pts",
-      "avg7d": "7-day average"
+      "avg7d": "7-day average",
+      "scanCount": "{{n}} records",
+      "streak": "Streak",
+      "deltaPoint": "{{n}}pts",
+      "improved": "Better than last! 🎉",
+      "worse": "Worse than last",
+      "noChange": "No change",
+      "firstScan": "✨ Your first skin record today!"
     },
+    "baumannExpand": "Detail",
+    "baumannFold": "Close",
     "actionCard": {
       "eyebrow": "Today's Care Plan",
       "title": "Today's mission from your result",

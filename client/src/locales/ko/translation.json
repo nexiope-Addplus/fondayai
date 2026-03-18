@@ -201,8 +201,17 @@
       "title": "피부 일기",
       "firstRecord": "오늘 첫 번째 기록",
       "history": "{{count}}번의 기록 · 오늘 {{score}}점",
-      "avg7d": "최근 7일 평균"
+      "avg7d": "최근 7일 평균",
+      "scanCount": "{{n}}회 기록",
+      "streak": "연속 기록",
+      "deltaPoint": "{{n}}점",
+      "improved": "지난번보다\n좋아졌어요! 🎉",
+      "worse": "지난번보다\n떨어졌어요",
+      "noChange": "변화 없어요",
+      "firstScan": "✨ 오늘 첫 피부 기록이에요!"
     },
+    "baumannExpand": "설명",
+    "baumannFold": "접기",
     "actionCard": {
       "eyebrow": "오늘의 케어 플랜",
       "title": "이 결과 기준 오늘의 미션",

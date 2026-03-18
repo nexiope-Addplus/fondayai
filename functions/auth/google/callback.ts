@@ -56,7 +56,7 @@ export const onRequest = async (context: any) => {
     return new Response(null, {
       status: 302,
       headers: {
-        Location: "/",
+        Location: "/?login=success",
         "Set-Cookie": `fonday_session=${jwt}; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=${maxAge}`,
       },
     });
