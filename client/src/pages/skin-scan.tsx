@@ -6594,34 +6594,36 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
                     + {t("cosmetics.scanBtn")}
                   </button>
                 </div>
-                <div className="grid gap-3 md:grid-cols-2">
-                  <div className="rounded-[20px] p-3" style={{ background: "#F8FFFB", border: "1px solid #D8EFE4" }}>
-                    <p className="text-[11px] font-black" style={{ color: DEEP_GREEN }}>{t("cosmetics.goodComboTitle")}</p>
-                    <div className="mt-2 flex flex-wrap gap-1.5">
-                      {routineGuide.goodMixes.length > 0 ? routineGuide.goodMixes.slice(0, 3).map((item, index) => (
-                        <span key={`good-mix-${index}`} className="px-2.5 py-1 rounded-full text-[10px] font-bold"
-                          style={{ background: "#ECFDF5", color: "#059669" }}>
-                          {item}
-                        </span>
-                      )) : (
-                        <p className="text-[10px] text-stone-400 mt-1">{t("cosmetics.goodComboEmpty")}</p>
-                      )}
+                {myCosmetics.length > 0 && (
+                  <div className="grid gap-3 md:grid-cols-2">
+                    <div className="rounded-[20px] p-3" style={{ background: "#F8FFFB", border: "1px solid #D8EFE4" }}>
+                      <p className="text-[11px] font-black" style={{ color: DEEP_GREEN }}>{t("cosmetics.goodComboTitle")}</p>
+                      <div className="mt-2 flex flex-wrap gap-1.5">
+                        {routineGuide.goodMixes.length > 0 ? routineGuide.goodMixes.slice(0, 3).map((item, index) => (
+                          <span key={`good-mix-${index}`} className="px-2.5 py-1 rounded-full text-[10px] font-bold"
+                            style={{ background: "#ECFDF5", color: "#059669" }}>
+                            {item}
+                          </span>
+                        )) : (
+                          <p className="text-[10px] text-stone-400 mt-1">{t("cosmetics.goodComboEmpty")}</p>
+                        )}
+                      </div>
+                    </div>
+                    <div className="rounded-[20px] p-3" style={{ background: "#FFF8F2", border: "1px solid #F5DDCF" }}>
+                      <p className="text-[11px] font-black" style={{ color: "#C2410C" }}>{t("cosmetics.cautionTitle")}</p>
+                      <div className="mt-2 space-y-1.5">
+                        {routineGuide.cautions.length > 0 ? routineGuide.cautions.slice(0, 2).map((item, index) => (
+                          <div key={`caution-note-${index}`} className="flex items-start gap-2">
+                            <span className="text-[11px] font-black mt-0.5" style={{ color: "#EA580C" }}>!</span>
+                            <p className="text-[11px] text-stone-600 leading-relaxed text-kr-pretty">{item}</p>
+                          </div>
+                        )) : (
+                          <p className="text-[10px] text-stone-400 mt-1">{t("cosmetics.cautionEmpty")}</p>
+                        )}
+                      </div>
                     </div>
                   </div>
-                  <div className="rounded-[20px] p-3" style={{ background: "#FFF8F2", border: "1px solid #F5DDCF" }}>
-                    <p className="text-[11px] font-black" style={{ color: "#C2410C" }}>{t("cosmetics.cautionTitle")}</p>
-                    <div className="mt-2 space-y-1.5">
-                      {routineGuide.cautions.length > 0 ? routineGuide.cautions.slice(0, 2).map((item, index) => (
-                        <div key={`caution-note-${index}`} className="flex items-start gap-2">
-                          <span className="text-[11px] font-black mt-0.5" style={{ color: "#EA580C" }}>!</span>
-                          <p className="text-[11px] text-stone-600 leading-relaxed text-kr-pretty">{item}</p>
-                        </div>
-                      )) : (
-                        <p className="text-[10px] text-stone-400 mt-1">{t("cosmetics.cautionEmpty")}</p>
-                      )}
-                    </div>
-                  </div>
-                </div>
+                )}
               </div>
             )}
           </CardContent>
