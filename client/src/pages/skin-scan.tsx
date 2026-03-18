@@ -8328,6 +8328,21 @@ export default function SkinScanPage() {
       .catch(() => setUser(null));
   }, []);
 
+  // 팝업 로그인 (DiaryTab·MyScreen 등에서 사용)
+  const openLoginPopup = useCallback((provider: "kakao" | "line" | "google", returnTab?: string) => {
+    if (returnTab) sessionStorage.setItem("fonday_return_tab", returnTab);
+    const url = `/auth/${provider}`;
+    const w = 480, h = 620;
+    const popup = window.open(url, "fonday-login", `popup,width=${w},height=${h},left=${Math.round((screen.width - w) / 2)},top=${Math.round((screen.height - h) / 2)}`);
+    if (!popup || popup.closed) { window.location.href = url; return; }
+    const onMsg = (e: MessageEvent) => {
+      if (e.origin !== window.location.origin || e.data !== "fonday:login:success") return;
+      window.removeEventListener("message", onMsg);
+      fetch("/api/user").then(r => r.ok ? r.json() : null).then(u => setUser(u ?? null));
+    };
+    window.addEventListener("message", onMsg);
+  }, []);
+
   // 로그인 후 게스트 스캔 연결
   useEffect(() => {
     if (!user) return;
