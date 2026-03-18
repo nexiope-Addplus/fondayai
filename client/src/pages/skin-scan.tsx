@@ -1248,26 +1248,28 @@ function MissionCard() {
   );
 }
 
-function WeatherTipCard({ compact }: { compact?: boolean } = {}) {
+function WeatherTipCard({ compact, weather: weatherProp }: { compact?: boolean; weather?: WeatherData | null } = {}) {
   const { t } = useTranslation();
-  const [weather, setWeather] = useState<WeatherData | null>(null);
+  const [internalWeather, setInternalWeather] = useState<WeatherData | null>(null);
   const [denied, setDenied] = useState(false);
 
   useEffect(() => {
+    if (weatherProp !== undefined) return; // 외부에서 prop으로 전달된 경우 내부 fetch 스킵
     if (!navigator.geolocation) return;
     navigator.geolocation.getCurrentPosition(
       (pos) => {
         const { latitude: lat, longitude: lon } = pos.coords;
         fetch(`/api/weather?lat=${lat}&lon=${lon}`)
           .then((r) => r.ok ? r.json() : null)
-          .then((data) => { if (data && !data.error) setWeather(data as WeatherData); })
+          .then((data) => { if (data && !data.error) setInternalWeather(data as WeatherData); })
           .catch(() => {});
       },
       () => setDenied(true),
       { timeout: 8000 }
     );
-  }, []);
+  }, [weatherProp]);
 
+  const weather = weatherProp ?? internalWeather;
   if (denied || !weather) return null;
 
   const tipKey = getWeatherTipKey(weather);
@@ -1375,7 +1377,23 @@ function ScanIdleScreen({ onScan }: { onScan: () => void }) {
   const [showBaumannExp, setShowBaumannExp] = useState(false);
   const [socialCount, setSocialCount] = useState(0);
   const [pullY, setPullY] = useState(0);
+  const [idleWeather, setIdleWeather] = useState<WeatherData | null>(null);
   const touchStartY = useRef(0);
+
+  useEffect(() => {
+    if (!navigator.geolocation) return;
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const { latitude: lat, longitude: lon } = pos.coords;
+        fetch(`/api/weather?lat=${lat}&lon=${lon}`)
+          .then((r) => r.ok ? r.json() : null)
+          .then((data) => { if (data && !data.error) setIdleWeather(data as WeatherData); })
+          .catch(() => {});
+      },
+      () => {},
+      { timeout: 8000 }
+    );
+  }, []);
 
   const handleTouchStart = (e: React.TouchEvent) => {
     touchStartY.current = e.touches[0].clientY;
@@ -1469,26 +1487,49 @@ function ScanIdleScreen({ onScan }: { onScan: () => void }) {
           transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }} />
       </div>
 
-      {/* 시간대별 그리팅 + 날씨 팁 통합 카드 */}
+      {/* 날씨 기반 그리팅 + 날씨 팁 통합 카드 */}
       {(() => {
         const hour = new Date().getHours();
-        const greetings = [
+        const weatherEmojiMap: Record<WeatherTipKey, string> = {
+          polluted: "😷", snowy: "❄️", rainy: "🌧️", foggy: "🌫️",
+          cold: "🧣", sunny_hot: "🌞", sunny: "☀️", dry: "🌵", humid: "💦", cloudy: "☁️",
+        };
+        const weatherKeyMap: Record<WeatherTipKey, string> = {
+          polluted: "idle.greetingWeatherPolluted",
+          snowy:    "idle.greetingWeatherSnowy",
+          rainy:    "idle.greetingWeatherRainy",
+          foggy:    "idle.greetingWeatherFoggy",
+          cold:     "idle.greetingWeatherCold",
+          sunny_hot:"idle.greetingWeatherSunnyHot",
+          sunny:    "idle.greetingWeatherSunny",
+          dry:      "idle.greetingWeatherDry",
+          humid:    "idle.greetingWeatherHumid",
+          cloudy:   "idle.greetingWeatherCloudy",
+        };
+        const timeBased = [
           { range: [6, 10],  emoji: "☀️", key: "idle.greetingMorning" },
-          { range: [10, 14], emoji: "🌤", key: "idle.greetingNoon" },
+          { range: [10, 14], emoji: "🌤️", key: "idle.greetingNoon" },
           { range: [14, 20], emoji: "💧", key: "idle.greetingAfternoon" },
           { range: [20, 25], emoji: "🌙", key: "idle.greetingNight" },
         ];
-        const g = greetings.find(({ range }) => hour >= range[0] && hour < range[1]);
-        if (!g) return null;
+        const fallback = timeBased.find(({ range }) => hour >= range[0] && hour < range[1]);
+        if (!fallback) return null;
+
+        // 낮 시간대(6~20)에 날씨 데이터가 있으면 날씨 기반 그리팅 사용
+        const useWeatherGreeting = idleWeather && hour >= 6 && hour < 20;
+        const wKey = useWeatherGreeting ? getWeatherTipKey(idleWeather!) : null;
+        const emoji = wKey ? weatherEmojiMap[wKey] : fallback.emoji;
+        const greetingKey = wKey ? weatherKeyMap[wKey] : fallback.key;
+
         return (
           <motion.div variants={fadeChild} className="mb-3 relative" style={{ zIndex: 1 }}>
             <div className="rounded-2xl overflow-hidden border"
               style={{ background: "rgba(255,255,255,0.85)", borderColor: "rgba(201,112,98,0.12)", backdropFilter: "blur(8px)" }}>
               <div className="flex items-center gap-2 px-3.5 py-2.5">
-                <span className="text-base">{g.emoji}</span>
-                <p className="text-[12px] font-semibold text-stone-600">{t(g.key)}</p>
+                <span className="text-base">{emoji}</span>
+                <p className="text-[12px] font-semibold text-stone-600">{t(greetingKey)}</p>
               </div>
-              <WeatherTipCard compact />
+              <WeatherTipCard compact weather={idleWeather} />
             </div>
           </motion.div>
         );

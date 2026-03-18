@@ -57,7 +57,17 @@
     "greetingMorning": "おはようございます！今日の天気に合わせて朝のスキンケアを始めましょう。",
     "greetingNoon": "日中はUVが強いです！日焼け止めは塗りましたか？",
     "greetingAfternoon": "午後は保湿が必要です。今日の天気の肌ヒントも確認しましょう！",
-    "greetingNight": "今日もお疲れ様！夜のスキンケアで肌を整えましょう。"
+    "greetingNight": "今日もお疲れ様！夜のスキンケアで肌を整えましょう。",
+    "greetingWeatherPolluted": "今日は大気汚染が酷いです。帰宅後のクレンジングをしっかりと！",
+    "greetingWeatherSnowy": "雪の日です！保湿クリームで肌バリアを守りましょう。",
+    "greetingWeatherRainy": "雨の日です！軽めの保湿で肌をうるおいキープしましょう。",
+    "greetingWeatherFoggy": "霧の日です！帰宅後はていねいにクレンジングしましょう。",
+    "greetingWeatherCold": "寒い日です！セラミドクリームで肌バリアを守りましょう。",
+    "greetingWeatherSunnyHot": "UVが非常に強いです！日焼け止めを2時間ごとに塗り直しましょう。",
+    "greetingWeatherSunny": "晴れの日！外出前に日焼け止めをお忘れなく。",
+    "greetingWeatherDry": "乾燥注意！水分補給と保湿ケアをしっかり行いましょう。",
+    "greetingWeatherHumid": "湿度が高い日！軽めのスキンケアで快適に過ごしましょう。",
+    "greetingWeatherCloudy": "曇りでもUVはあります！日焼け止めは必須ですよ。"
   },
   "camera": {
     "noCamera": "カメラが使えません。写真を選んでください。",

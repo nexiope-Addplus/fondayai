@@ -57,7 +57,17 @@
     "greetingMorning": "Good morning! Start your skincare based on today's weather.",
     "greetingNoon": "UV is strong at midday! Did you apply sunscreen?",
     "greetingAfternoon": "Time to rehydrate! Check today's weather skin tip below.",
-    "greetingNight": "Great work today! Let's wrap up with your evening skincare."
+    "greetingNight": "Great work today! Let's wrap up with your evening skincare.",
+    "greetingWeatherPolluted": "Air quality is poor today. Don't skip cleansing when you get home!",
+    "greetingWeatherSnowy": "It's snowing! Keep your skin barrier strong with a rich moisturizer.",
+    "greetingWeatherRainy": "It's raining today! Keep skin comfortable with a light moisturizer.",
+    "greetingWeatherFoggy": "Foggy out there! Do a thorough cleanse when you get home.",
+    "greetingWeatherCold": "It's cold today! Protect your skin barrier with a ceramide moisturizer.",
+    "greetingWeatherSunnyHot": "UV is very strong! Reapply sunscreen every 2 hours.",
+    "greetingWeatherSunny": "Clear skies today! Don't forget your sunscreen before heading out.",
+    "greetingWeatherDry": "Air is dry today! Stay on top of your hydration routine.",
+    "greetingWeatherHumid": "High humidity today! Go for lightweight skincare products.",
+    "greetingWeatherCloudy": "Overcast, but UV is still there! Sunscreen is a must."
   },
   "camera": {
     "noCamera": "Camera unavailable. Please select a photo instead.",
