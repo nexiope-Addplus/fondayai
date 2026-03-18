@@ -5940,7 +5940,12 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
     }
     const nav = tabNavRef.current;
     const container = resultScrollRef.current;
-    if (nav && container) container.scrollTop = nav.offsetTop; // 탭 전환 시 탭 콘텐츠 최상단으로
+    if (nav && container) {
+      // getBoundingClientRect로 실제 시각적 위치 기준 스크롤
+      const navTop = nav.getBoundingClientRect().top;
+      const containerTop = container.getBoundingClientRect().top;
+      container.scrollTop += navTop - containerTop;
+    }
   }, [activeTab]);
 
   const handlePartnershipSubmit = async (e: React.FormEvent) => {
