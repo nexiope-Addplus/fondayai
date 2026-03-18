@@ -34,6 +34,7 @@ function buildPrompt(surveyData: any, lang: string): string {
 
   if (lang === "en") {
     return `You are a dermatology specialist. Analyze the attached face photo and survey info (${surveyJson}) and respond ONLY in JSON format. Do not output any text other than JSON. All descriptive text fields (comment, aiComment, finding, desc, reason) must be written in English.
+IMPORTANT: Base your analysis primarily on what you observe in the photo. Use survey info (especially age) only as supplementary reference — if the photo shows different skin condition than the survey suggests, trust the photo.
 
 The scores array must contain all 10 items in this exact order (score: integer 0-100, comment: 1-sentence English interpretation):
 {"label":"종합 컨디션","score":number,"comment":"interpretation"}
@@ -67,6 +68,7 @@ Output format (follow this exact structure):
 
   if (lang === "ja") {
     return `あなたは皮膚科専門医です。添付の顔写真と調査情報(${surveyJson})を分析し、以下のJSON形式のみで回答してください。JSON以外のテキストは絶対に出力しないでください。すべての説明テキスト（comment、aiComment、finding、desc、reason）は日本語で記述してください。
+重要：分析は主に写真から観察できる内容を基準にしてください。調査情報（特に年齢）は補助的な参考情報としてのみ使用し、写真の状態と調査内容が異なる場合は写真を優先してください。
 
 scoresの配列は以下の10項目を順番通りにすべて含めてください（score: 0〜100の整数、comment: その項目の日本語1文解釈）：
 {"label":"종합 컨디션","score":数値,"comment":"解釈"}
@@ -100,6 +102,7 @@ nutritionTips: スキャンで最もスコアが低い項目に基づくパー�
 
   // Korean (default)
   return `당신은 피부과 전문의입니다. 첨부된 얼굴 사진과 설문 정보(${surveyJson})를 분석하여 아래 JSON 형식으로만 답하세요. JSON 외 다른 텍스트는 절대 출력하지 마세요.
+중요: 분석은 사진에서 실제로 관찰되는 내용을 최우선으로 하세요. 설문 정보(특히 나이)는 참고용으로만 활용하고, 사진 상태와 설문 내용이 다를 경우 사진을 기준으로 판단하세요.
 
 scores 배열은 반드시 아래 10개 항목을 순서대로 모두 포함해야 합니다 (score: 0~100 정수, comment: 해당 항목에 대한 한국어 해석 1문장):
 {"label":"종합 컨디션","score":숫자,"comment":"해석"}
