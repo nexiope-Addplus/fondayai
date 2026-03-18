@@ -5572,7 +5572,14 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
   const openLoginPopup = useCallback((provider: "kakao" | "line" | "google", returnTab?: string) => {
     if (returnTab) localStorage.setItem("fonday_return_tab", returnTab);
     if (analysisResult) localStorage.setItem("pendingResult", JSON.stringify({ analysisResult, surveyData, imageBase64 }));
-    window.location.href = `/auth/${provider}`;
+    if (provider === "line") {
+      // LINE은 iOS에서 LINE 앱 딥링크 → 콜백이 새 Safari 탭으로 열림
+      // window.open으로 PWA 창을 유지하고, 앱으로 돌아올 때 visibilitychange로 로그인 감지
+      localStorage.setItem("fonday_login_pending", "1");
+      window.open(`/auth/${provider}`, "_blank");
+    } else {
+      window.location.href = `/auth/${provider}`;
+    }
   }, [analysisResult, surveyData, imageBase64]);
 
   const handleGoogleLogin = () => openLoginPopup("google");
@@ -8318,24 +8325,36 @@ export default function SkinScanPage() {
       .catch(() => setUser(null));
   }, []);
 
-  // BroadcastChannel: 다른 탭/창에서 로그인 완료 시 현재 탭도 갱신 (iOS PWA LINE 로그인 대응)
+  // visibilitychange: LINE 로그인 후 PWA로 돌아올 때 자동 로그인 감지
+  // (iOS에서 LINE 앱 경유 → Safari 새탭 콜백 → PWA로 복귀 시 쿠키 공유로 자동 로그인)
   useEffect(() => {
-    let bc: BroadcastChannel | null = null;
-    try {
-      bc = new BroadcastChannel("fonday-auth");
-      bc.onmessage = (e) => {
-        if (e.data?.type === "login_complete") {
-          fetch("/api/user").then(r => r.ok ? r.json() : null).then(u => { if (u) setUser(u); });
+    const onVisible = () => {
+      if (document.visibilityState !== "visible") return;
+      if (!localStorage.getItem("fonday_login_pending")) return;
+      fetch("/api/user").then(r => r.ok ? r.json() : null).then(u => {
+        if (u) {
+          localStorage.removeItem("fonday_login_pending");
+          setUser(u);
         }
-      };
-    } catch {}
-    return () => { try { bc?.close(); } catch {} };
+      });
+    };
+    document.addEventListener("visibilitychange", onVisible);
+    window.addEventListener("focus", onVisible);
+    return () => {
+      document.removeEventListener("visibilitychange", onVisible);
+      window.removeEventListener("focus", onVisible);
+    };
   }, []);
 
   // 팝업 로그인 (DiaryTab·MyScreen 등에서 사용)
   const openLoginPopup = useCallback((provider: "kakao" | "line" | "google", returnTab?: string) => {
     if (returnTab) localStorage.setItem("fonday_return_tab", returnTab);
-    window.location.href = `/auth/${provider}`;
+    if (provider === "line") {
+      localStorage.setItem("fonday_login_pending", "1");
+      window.open(`/auth/${provider}`, "_blank");
+    } else {
+      window.location.href = `/auth/${provider}`;
+    }
   }, []);
 
   // 로그인 후 게스트 스캔 연결
