@@ -40,10 +40,22 @@
     "baumannSectionTitle": "What is Skin MBTI?",
     "baumannSectionDesc": "Based on the Baumann Skin Type classification (Dr. Leslie Baumann), used by dermatologists worldwide, your skin is analyzed across 4 axes: Oily/Dry (O/D), Sensitive/Resistant (S/R), Pigmented/Non-pigmented (P/N), and Wrinkle-prone/Tight (W/T). Just like MBTI, 4 letters reveal your unique skin identity.",
     "baumannAxes": [
-      { "label": "Moisture Balance", "desc": "O Oily · D Dry" },
-      { "label": "Sensitivity", "desc": "S Sensitive · R Resistant" },
-      { "label": "Pigmentation", "desc": "P Pigmented · N Non-pigmented" },
-      { "label": "Aging Tendency", "desc": "W Wrinkle-prone · T Tight" }
+      {
+        "label": "Moisture Balance",
+        "desc": "O Oily · D Dry"
+      },
+      {
+        "label": "Sensitivity",
+        "desc": "S Sensitive · R Resistant"
+      },
+      {
+        "label": "Pigmentation",
+        "desc": "P Pigmented · N Non-pigmented"
+      },
+      {
+        "label": "Aging Tendency",
+        "desc": "W Wrinkle-prone · T Tight"
+      }
     ],
     "howTitle": "How does AI skin analysis work?",
     "howSteps": [
@@ -83,9 +95,25 @@
     "female": "Female",
     "male": "Male",
     "age": "Age Group",
-    "ageGroups": ["Teens", "Early 20s", "Late 20s", "Early 30s", "Late 30s", "Early 40s", "Late 40s", "50s+"],
+    "ageGroups": [
+      "Teens",
+      "Early 20s",
+      "Late 20s",
+      "Early 30s",
+      "Late 30s",
+      "Early 40s",
+      "Late 40s",
+      "50s+"
+    ],
     "concerns": "Skin Concerns (multiple)",
-    "skinConcerns": ["Pores/Oil", "Wrinkles/Elasticity", "Acne/Sensitivity", "Spots/Pigmentation", "Dark Circles", "Dryness"],
+    "skinConcerns": [
+      "Pores/Oil",
+      "Wrinkles/Elasticity",
+      "Acne/Sensitivity",
+      "Spots/Pigmentation",
+      "Dark Circles",
+      "Dryness"
+    ],
     "startBtn": "Start AI Analysis"
   },
   "scanning": {
@@ -260,7 +288,11 @@
     "shareText": "My skin score today is {{score}} pts! My Baumann type is {{type}}.\n#Fonday #AISkinAnalysis #FondayAI",
     "challengeBtn": "Challenge a Friend",
     "challengeResult": "View Challenge Result",
-    "challengeLinkCopied": "Challenge link copied! Send it to your friend to compete."
+    "challengeLinkCopied": "Challenge link copied! Send it to your friend to compete.",
+    "viewBtn": "View",
+    "totalScans": "Total Scans",
+    "diaryView": "Open Diary",
+    "prevRecords": "Previous Records"
   },
   "diary": {
     "routineTitle": "Today's Routine"
@@ -342,7 +374,9 @@
         "diet": "Diet",
         "stress": "Stress",
         "outdoor": "Outdoor time"
-      }
+      },
+      "aiCareWarn": "Enable AI Care first.",
+      "pushWarn": "Enable AI Care and allow notifications. You can configure this in the Nutrition tab."
     },
     "partnership": {
       "title": "Brand Partnership Inquiry",
@@ -370,7 +404,7 @@
     "stored": "Right now, it's only saved on this device.",
     "loginDesc": "Log in to keep your points permanently\nand access them anywhere.",
     "kakao": "Save with Kakao",
-      "line": "Save with LINE",
+    "line": "Save with LINE",
     "google": "Save with Google",
     "later": "Later",
     "totalPoints": "Total {{n}}pts",
@@ -439,10 +473,22 @@
     "avoidDinner": "Dinner",
     "avoidWhy": "Why",
     "scoreAvoid": {
-      "hydration": { "foods": "Alcohol · Coffee · Salty soups", "why": "Low hydration — avoid foods that strip moisture from skin" },
-      "trouble": { "foods": "Dairy · Fast food · High-sugar foods", "why": "High trouble risk — avoid inflammation-triggering foods" },
-      "darkCircle": { "foods": "Alcohol · Caffeine · Salty snacks", "why": "Severe dark circles — avoid foods that impair circulation" },
-      "glow": { "foods": "Processed food · White rice · Refined carbs", "why": "Low skin glow — avoid foods that increase oxidative stress" }
+      "hydration": {
+        "foods": "Alcohol · Coffee · Salty soups",
+        "why": "Low hydration — avoid foods that strip moisture from skin"
+      },
+      "trouble": {
+        "foods": "Dairy · Fast food · High-sugar foods",
+        "why": "High trouble risk — avoid inflammation-triggering foods"
+      },
+      "darkCircle": {
+        "foods": "Alcohol · Caffeine · Salty snacks",
+        "why": "Severe dark circles — avoid foods that impair circulation"
+      },
+      "glow": {
+        "foods": "Processed food · White rice · Refined carbs",
+        "why": "Low skin glow — avoid foods that increase oxidative stress"
+      }
     },
     "avoidFoods": {
       "O": {
@@ -495,44 +541,140 @@
       }
     },
     "O": [
-      { "name": "Zinc", "foods": "Oysters · Pumpkin seeds · Brown rice · Tofu", "why": "Regulates sebum-producing enzymes to reduce shine and pore enlargement." },
-      { "name": "Vitamin B2 (Riboflavin)", "foods": "Eggs · Almonds · Dark leafy greens", "why": "Prevents over-activation of sebaceous glands and reduces oxidative stress." },
-      { "name": "Omega-3 Fatty Acids", "foods": "Salmon · Mackerel · Flaxseeds", "why": "Suppresses inflammatory sebum production to lower acne risk." }
+      {
+        "name": "Zinc",
+        "foods": "Oysters · Pumpkin seeds · Brown rice · Tofu",
+        "why": "Regulates sebum-producing enzymes to reduce shine and pore enlargement."
+      },
+      {
+        "name": "Vitamin B2 (Riboflavin)",
+        "foods": "Eggs · Almonds · Dark leafy greens",
+        "why": "Prevents over-activation of sebaceous glands and reduces oxidative stress."
+      },
+      {
+        "name": "Omega-3 Fatty Acids",
+        "foods": "Salmon · Mackerel · Flaxseeds",
+        "why": "Suppresses inflammatory sebum production to lower acne risk."
+      }
     ],
     "D": [
-      { "name": "Omega-3 Fatty Acids", "foods": "Salmon · Tuna · Avocado · Walnuts", "why": "Strengthens the skin lipid barrier to prevent transepidermal water loss (TEWL)." },
-      { "name": "Vitamin E (Tocopherol)", "foods": "Almonds · Olive oil · Sunflower seeds", "why": "Prevents cell membrane oxidation, improving dryness and flakiness." },
-      { "name": "Ceramide Precursors", "foods": "Sweet potato · Soy · Oats · Rice bran", "why": "Supplies lipid building blocks essential for skin barrier construction." }
+      {
+        "name": "Omega-3 Fatty Acids",
+        "foods": "Salmon · Tuna · Avocado · Walnuts",
+        "why": "Strengthens the skin lipid barrier to prevent transepidermal water loss (TEWL)."
+      },
+      {
+        "name": "Vitamin E (Tocopherol)",
+        "foods": "Almonds · Olive oil · Sunflower seeds",
+        "why": "Prevents cell membrane oxidation, improving dryness and flakiness."
+      },
+      {
+        "name": "Ceramide Precursors",
+        "foods": "Sweet potato · Soy · Oats · Rice bran",
+        "why": "Supplies lipid building blocks essential for skin barrier construction."
+      }
     ],
     "S": [
-      { "name": "Omega-3 Fatty Acids", "foods": "Salmon · Herring · Flaxseeds · Chia seeds", "why": "Inhibits pro-inflammatory prostaglandins to reduce redness." },
-      { "name": "Vitamin C", "foods": "Bell pepper · Strawberries · Broccoli · Kiwi", "why": "Antioxidant action calms skin irritation and histamine release." },
-      { "name": "Probiotics", "foods": "Yogurt · Kimchi · Miso · Kefir", "why": "Strengthens the gut-skin axis to reduce immune hypersensitivity." }
+      {
+        "name": "Omega-3 Fatty Acids",
+        "foods": "Salmon · Herring · Flaxseeds · Chia seeds",
+        "why": "Inhibits pro-inflammatory prostaglandins to reduce redness."
+      },
+      {
+        "name": "Vitamin C",
+        "foods": "Bell pepper · Strawberries · Broccoli · Kiwi",
+        "why": "Antioxidant action calms skin irritation and histamine release."
+      },
+      {
+        "name": "Probiotics",
+        "foods": "Yogurt · Kimchi · Miso · Kefir",
+        "why": "Strengthens the gut-skin axis to reduce immune hypersensitivity."
+      }
     ],
     "R": [
-      { "name": "Vitamin C", "foods": "Kiwi · Lemon · Bell pepper · Broccoli", "why": "Even resistant skin benefits from collagen synthesis support for long-term health." },
-      { "name": "Zinc", "foods": "Nuts · Whole grains · Tofu · Beef", "why": "A key mineral that maintains skin immunity and aids wound healing." },
-      { "name": "Antioxidant Complex", "foods": "Berries · Green tea · Dark chocolate", "why": "Protects skin cells from environmental stress and UV damage." }
+      {
+        "name": "Vitamin C",
+        "foods": "Kiwi · Lemon · Bell pepper · Broccoli",
+        "why": "Even resistant skin benefits from collagen synthesis support for long-term health."
+      },
+      {
+        "name": "Zinc",
+        "foods": "Nuts · Whole grains · Tofu · Beef",
+        "why": "A key mineral that maintains skin immunity and aids wound healing."
+      },
+      {
+        "name": "Antioxidant Complex",
+        "foods": "Berries · Green tea · Dark chocolate",
+        "why": "Protects skin cells from environmental stress and UV damage."
+      }
     ],
     "P": [
-      { "name": "Vitamin C", "foods": "Strawberries · Kiwi · Bell pepper · Lemon", "why": "Inhibits the tyrosinase enzyme to reduce melanin production and prevent dark spots." },
-      { "name": "Folic Acid (Vitamin B9)", "foods": "Spinach · Broccoli · Lentils · Asparagus", "why": "Promotes cell turnover to accelerate pigmentation recovery." },
-      { "name": "Vitamin E", "foods": "Almonds · Sunflower seeds · Olive oil", "why": "Prevents UV-induced oxidative damage that triggers spot formation." }
+      {
+        "name": "Vitamin C",
+        "foods": "Strawberries · Kiwi · Bell pepper · Lemon",
+        "why": "Inhibits the tyrosinase enzyme to reduce melanin production and prevent dark spots."
+      },
+      {
+        "name": "Folic Acid (Vitamin B9)",
+        "foods": "Spinach · Broccoli · Lentils · Asparagus",
+        "why": "Promotes cell turnover to accelerate pigmentation recovery."
+      },
+      {
+        "name": "Vitamin E",
+        "foods": "Almonds · Sunflower seeds · Olive oil",
+        "why": "Prevents UV-induced oxidative damage that triggers spot formation."
+      }
     ],
     "N": [
-      { "name": "Vitamin A (Beta-Carotene)", "foods": "Carrots · Sweet potato · Spinach · Eggs", "why": "Normalizes skin cell turnover for even skin tone." },
-      { "name": "Zinc", "foods": "Oysters · Beef · Pumpkin seeds · Cashews", "why": "Regulates cell growth and division to maintain even skin texture." },
-      { "name": "Selenium", "foods": "Brazil nuts · Tuna · Eggs · Brown rice", "why": "Promotes glutathione production to neutralize free radicals." }
+      {
+        "name": "Vitamin A (Beta-Carotene)",
+        "foods": "Carrots · Sweet potato · Spinach · Eggs",
+        "why": "Normalizes skin cell turnover for even skin tone."
+      },
+      {
+        "name": "Zinc",
+        "foods": "Oysters · Beef · Pumpkin seeds · Cashews",
+        "why": "Regulates cell growth and division to maintain even skin texture."
+      },
+      {
+        "name": "Selenium",
+        "foods": "Brazil nuts · Tuna · Eggs · Brown rice",
+        "why": "Promotes glutathione production to neutralize free radicals."
+      }
     ],
     "W": [
-      { "name": "Vitamin C", "foods": "Lemon · Bell pepper · Broccoli · Strawberries", "why": "Directly stimulates collagen synthesis to reduce fine lines and boost elasticity." },
-      { "name": "Collagen Peptides", "foods": "Bone broth · Chicken wings · Fish skin · Pork skin", "why": "Increases dermal collagen density to restore firmness and skin thickness." },
-      { "name": "Resveratrol (Antioxidant)", "foods": "Blueberries · Grapes · Dark chocolate · Pomegranate", "why": "Inhibits collagen-degrading MMP enzymes to slow aging." }
+      {
+        "name": "Vitamin C",
+        "foods": "Lemon · Bell pepper · Broccoli · Strawberries",
+        "why": "Directly stimulates collagen synthesis to reduce fine lines and boost elasticity."
+      },
+      {
+        "name": "Collagen Peptides",
+        "foods": "Bone broth · Chicken wings · Fish skin · Pork skin",
+        "why": "Increases dermal collagen density to restore firmness and skin thickness."
+      },
+      {
+        "name": "Resveratrol (Antioxidant)",
+        "foods": "Blueberries · Grapes · Dark chocolate · Pomegranate",
+        "why": "Inhibits collagen-degrading MMP enzymes to slow aging."
+      }
     ],
     "T": [
-      { "name": "Coenzyme Q10", "foods": "Oily fish · Nuts · Broccoli · Spinach", "why": "Boosts mitochondrial energy to maintain current elasticity and firmness." },
-      { "name": "Antioxidant Complex", "foods": "Berries · Pomegranate · Green tea · Dark chocolate", "why": "Fortifies the cellular defense barrier that keeps skin elastic." },
-      { "name": "Omega-3 Fatty Acids", "foods": "Salmon · Avocado · Flaxseeds · Walnuts", "why": "Maintains a healthy skin lipid barrier and prevents premature aging." }
+      {
+        "name": "Coenzyme Q10",
+        "foods": "Oily fish · Nuts · Broccoli · Spinach",
+        "why": "Boosts mitochondrial energy to maintain current elasticity and firmness."
+      },
+      {
+        "name": "Antioxidant Complex",
+        "foods": "Berries · Pomegranate · Green tea · Dark chocolate",
+        "why": "Fortifies the cellular defense barrier that keeps skin elastic."
+      },
+      {
+        "name": "Omega-3 Fatty Acids",
+        "foods": "Salmon · Avocado · Flaxseeds · Walnuts",
+        "why": "Maintains a healthy skin lipid barrier and prevents premature aging."
+      }
     ]
   },
   "ranking": {
@@ -578,44 +720,124 @@
     "aqi5": "Air Quality Very Poor",
     "tips": {
       "polluted": [
-        { "emoji": "😷", "title": "High Pollution — Double Cleanse", "body": "Fine particles clog pores. Use an oil cleanser first, then a foam cleanser, and follow with an antioxidant serum." },
-        { "emoji": "🫧", "title": "Shield Up Before Heading Out", "body": "On polluted days, apply a mineral sunscreen as a physical barrier. Cleanse immediately when you get home." }
+        {
+          "emoji": "😷",
+          "title": "High Pollution — Double Cleanse",
+          "body": "Fine particles clog pores. Use an oil cleanser first, then a foam cleanser, and follow with an antioxidant serum."
+        },
+        {
+          "emoji": "🫧",
+          "title": "Shield Up Before Heading Out",
+          "body": "On polluted days, apply a mineral sunscreen as a physical barrier. Cleanse immediately when you get home."
+        }
       ],
       "snowy": [
-        { "emoji": "❄️", "title": "Winter Skin Intensive Care", "body": "Snow reflects UV rays strongly. Strengthen your skin barrier with ceramide cream and don't skip sunscreen." },
-        { "emoji": "🧴", "title": "Watch Out for Snowmelt Water", "body": "Melted snow can irritate skin. After coming inside, cleanse with lukewarm water and apply a thick moisturizer." }
+        {
+          "emoji": "❄️",
+          "title": "Winter Skin Intensive Care",
+          "body": "Snow reflects UV rays strongly. Strengthen your skin barrier with ceramide cream and don't skip sunscreen."
+        },
+        {
+          "emoji": "🧴",
+          "title": "Watch Out for Snowmelt Water",
+          "body": "Melted snow can irritate skin. After coming inside, cleanse with lukewarm water and apply a thick moisturizer."
+        }
       ],
       "rainy": [
-        { "emoji": "🌧️", "title": "Rainy Day Light Moisture", "body": "High humidity can increase sebum. Swap heavy creams for a light gel moisturizer to keep skin balanced." },
-        { "emoji": "🌂", "title": "Exfoliate on Wet Days", "body": "Humidity causes skin cells to swell. A gentle weekly exfoliation helps clear away buildup and keeps pores clear." }
+        {
+          "emoji": "🌧️",
+          "title": "Rainy Day Light Moisture",
+          "body": "High humidity can increase sebum. Swap heavy creams for a light gel moisturizer to keep skin balanced."
+        },
+        {
+          "emoji": "🌂",
+          "title": "Exfoliate on Wet Days",
+          "body": "Humidity causes skin cells to swell. A gentle weekly exfoliation helps clear away buildup and keeps pores clear."
+        }
       ],
       "foggy": [
-        { "emoji": "🌫️", "title": "Foggy Day — Cleanse Well", "body": "Atmospheric particles can irritate pores. Do a thorough but gentle cleanse when you get home." },
-        { "emoji": "🛡️", "title": "Barrier Protection in Fog", "body": "Fine particles settle on skin in foggy conditions. Use a non-comedogenic sunscreen as a shield before going out." }
+        {
+          "emoji": "🌫️",
+          "title": "Foggy Day — Cleanse Well",
+          "body": "Atmospheric particles can irritate pores. Do a thorough but gentle cleanse when you get home."
+        },
+        {
+          "emoji": "🛡️",
+          "title": "Barrier Protection in Fog",
+          "body": "Fine particles settle on skin in foggy conditions. Use a non-comedogenic sunscreen as a shield before going out."
+        }
       ],
       "cold": [
-        { "emoji": "🧣", "title": "Cold Wind — Protect Your Barrier", "body": "Cold air strips moisture fast. Apply a ceramide-rich cream before heading out to shield your skin barrier." },
-        { "emoji": "🔥", "title": "Indoor Heating Dries Skin Too", "body": "Heating drops indoor humidity fast. Keep a facial mist on your desk and spritz throughout the day." }
+        {
+          "emoji": "🧣",
+          "title": "Cold Wind — Protect Your Barrier",
+          "body": "Cold air strips moisture fast. Apply a ceramide-rich cream before heading out to shield your skin barrier."
+        },
+        {
+          "emoji": "🔥",
+          "title": "Indoor Heating Dries Skin Too",
+          "body": "Heating drops indoor humidity fast. Keep a facial mist on your desk and spritz throughout the day."
+        }
       ],
       "sunny_hot": [
-        { "emoji": "🌞", "title": "Intense UV — Reapply Sunscreen!", "body": "Reapply SPF 50+ every 2 hours. Add a vitamin C serum in the morning for extra antioxidant defense." },
-        { "emoji": "🧴", "title": "Choose Cooling Suncare Today", "body": "Opt for water-resistant SPF in the heat. Touch up with powder sunscreen and blotting paper for easy reapplication." }
+        {
+          "emoji": "🌞",
+          "title": "Intense UV — Reapply Sunscreen!",
+          "body": "Reapply SPF 50+ every 2 hours. Add a vitamin C serum in the morning for extra antioxidant defense."
+        },
+        {
+          "emoji": "🧴",
+          "title": "Choose Cooling Suncare Today",
+          "body": "Opt for water-resistant SPF in the heat. Touch up with powder sunscreen and blotting paper for easy reapplication."
+        }
       ],
       "sunny": [
-        { "emoji": "☀️", "title": "Don't Skip Sunscreen", "body": "Clear days mean UVA/UVB exposure. Layer vitamin C serum under sunscreen for dual protection." },
-        { "emoji": "🌤️", "title": "Check Your UV Index", "body": "Any UV reading above 3 means sunscreen is non-negotiable — even through windows indoors." }
+        {
+          "emoji": "☀️",
+          "title": "Don't Skip Sunscreen",
+          "body": "Clear days mean UVA/UVB exposure. Layer vitamin C serum under sunscreen for dual protection."
+        },
+        {
+          "emoji": "🌤️",
+          "title": "Check Your UV Index",
+          "body": "Any UV reading above 3 means sunscreen is non-negotiable — even through windows indoors."
+        }
       ],
       "dry": [
-        { "emoji": "🌵", "title": "Low Humidity — Layer Moisture", "body": "Air is dry! Layer essence → serum → cream to lock in hydration throughout the day." },
-        { "emoji": "💧", "title": "Boost Indoor Humidity", "body": "Dry outdoor air affects indoors too. Run a humidifier and layer hyaluronic acid serum under your moisturizer." }
+        {
+          "emoji": "🌵",
+          "title": "Low Humidity — Layer Moisture",
+          "body": "Air is dry! Layer essence → serum → cream to lock in hydration throughout the day."
+        },
+        {
+          "emoji": "💧",
+          "title": "Boost Indoor Humidity",
+          "body": "Dry outdoor air affects indoors too. Run a humidifier and layer hyaluronic acid serum under your moisturizer."
+        }
       ],
       "humid": [
-        { "emoji": "💦", "title": "High Humidity — Go Light", "body": "Skip heavy creams and opt for a gel moisturizer or hydrating mist to keep skin comfortable." },
-        { "emoji": "🌿", "title": "Balance Oils with a BHA Toner", "body": "High humidity triggers excess sebum. A BHA toner helps manage shine — finish with a non-comedogenic SPF." }
+        {
+          "emoji": "💦",
+          "title": "High Humidity — Go Light",
+          "body": "Skip heavy creams and opt for a gel moisturizer or hydrating mist to keep skin comfortable."
+        },
+        {
+          "emoji": "🌿",
+          "title": "Balance Oils with a BHA Toner",
+          "body": "High humidity triggers excess sebum. A BHA toner helps manage shine — finish with a non-comedogenic SPF."
+        }
       ],
       "cloudy": [
-        { "emoji": "☁️", "title": "Cloudy Still Means UV", "body": "Clouds let through up to 80% of UV rays. Sunscreen is still essential on overcast days." },
-        { "emoji": "🔆", "title": "UVA Penetrates Through Clouds", "body": "Overcast skies don't block UVA rays. An SPF-infused primer or BB cream gives quick lightweight protection." }
+        {
+          "emoji": "☁️",
+          "title": "Cloudy Still Means UV",
+          "body": "Clouds let through up to 80% of UV rays. Sunscreen is still essential on overcast days."
+        },
+        {
+          "emoji": "🔆",
+          "title": "UVA Penetrates Through Clouds",
+          "body": "Overcast skies don't block UVA rays. An SPF-infused primer or BB cream gives quick lightweight protection."
+        }
       ]
     }
   },
@@ -693,14 +915,38 @@
     "share": "First result shared"
   },
   "baumann": {
-    "O": { "name": "Oily", "desc": "Active sebum production makes skin prone to shine and greasiness." },
-    "D": { "name": "Dry", "desc": "Low sebum production leads to tightness and dry patches." },
-    "S": { "name": "Sensitive", "desc": "Skin is prone to redness and breakouts from external irritants." },
-    "R": { "name": "Resistant", "desc": "Skin barrier is strong and resists external irritants well." },
-    "P": { "name": "Pigmented", "desc": "Prone to hyperpigmentation such as dark spots and melasma." },
-    "N": { "name": "Non-pigmented", "desc": "Low tendency for hyperpigmentation; even skin tone." },
-    "W": { "name": "Wrinkle-prone", "desc": "Reduced elasticity makes skin prone to fine lines." },
-    "T": { "name": "Tight", "desc": "Good skin elasticity with fewer visible wrinkles." }
+    "O": {
+      "name": "Oily",
+      "desc": "Active sebum production makes skin prone to shine and greasiness."
+    },
+    "D": {
+      "name": "Dry",
+      "desc": "Low sebum production leads to tightness and dry patches."
+    },
+    "S": {
+      "name": "Sensitive",
+      "desc": "Skin is prone to redness and breakouts from external irritants."
+    },
+    "R": {
+      "name": "Resistant",
+      "desc": "Skin barrier is strong and resists external irritants well."
+    },
+    "P": {
+      "name": "Pigmented",
+      "desc": "Prone to hyperpigmentation such as dark spots and melasma."
+    },
+    "N": {
+      "name": "Non-pigmented",
+      "desc": "Low tendency for hyperpigmentation; even skin tone."
+    },
+    "W": {
+      "name": "Wrinkle-prone",
+      "desc": "Reduced elasticity makes skin prone to fine lines."
+    },
+    "T": {
+      "name": "Tight",
+      "desc": "Good skin elasticity with fewer visible wrinkles."
+    }
   },
   "cosmetics": {
     "ctaTitle": "Register with a Product Photo",

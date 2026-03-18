@@ -152,6 +152,13 @@ const TEXT_SECONDARY = "#8C8070";
 const SCAN_FROM = "#E09882";
 const SCAN_TO = "#C97062";
 
+// 서버는 항상 한국어 라벨로 반환 → 클라이언트에서 scores.N 키로 번역
+const SCORE_LABEL_MAP: Record<string, number> = {
+  "종합 컨디션": 0, "수분 밸런스": 1, "붉은기 수준": 2, "모공 상태": 3,
+  "주름 및 탄력": 4, "잡티/색소침착": 5, "트러블 위험": 6,
+  "다크서클": 7, "피부 광채": 8, "피부결 균일도": 9,
+};
+
 // ─── Google AdSense 배너 ──────────────────────────────────────────
 // 주의: AdSense 대시보드에서 각 위치별로 별도 광고 단위를 생성 후 data-ad-slot 값을 개별 교체하세요.
 // 동일한 slot ID를 여러 위치에 쓰면 정책 위반이 될 수 있습니다.
@@ -3942,7 +3949,7 @@ function DiaryTab({ user, analysisResult, onBack }: { user: any; analysisResult:
                         <p className="text-[10px] font-black tracking-[0.16em] uppercase" style={{ color: SCAN_TO }}>{t("modal.diary.reminderTitle")}</p>
                         <p className="text-[16px] font-black mt-1 text-kr-pretty" style={{ color: DEEP_GREEN }}>{t("modal.diary.reminderHeadline")}</p>
                         <p className="text-[11px] text-stone-500 mt-1 leading-relaxed text-kr-pretty">
-                          {t("modal.diary.reminderDesc")} {aiCareSettings.enabled ? "" : "AI 밀착케어를 먼저 켜야 작동해요."}
+                          {t("modal.diary.reminderDesc")} {aiCareSettings.enabled ? "" : t("modal.diary.aiCareWarn")}
                         </p>
                       </div>
                       <button
@@ -3987,7 +3994,7 @@ function DiaryTab({ user, analysisResult, onBack }: { user: any; analysisResult:
                     </div>
                     {reminderPushWarn && (
                       <p className="text-[11px] text-amber-600 mt-1.5">
-                        먼저 AI 밀착케어를 켜고 알림을 허용해 주세요. 분석결과 → 영양 탭에서 설정할 수 있어요.
+                        {t("modal.diary.pushWarn")}
                       </p>
                     )}
                     <div className="flex items-center gap-2 mt-4">
@@ -4910,7 +4917,7 @@ function MyScreen({ user, onInstall, onBack }: { user: any; onInstall: () => voi
             </div>
             <div>
               <p className="text-[14px] font-bold" style={{ color: "#C97062" }}>Fonday 디바이스</p>
-              <p className="text-[11px] text-stone-400">피부 전용 측정 디바이스 알아보기</p>
+              <p className="text-[11px] text-stone-400">{t("result.deviceTeaser.sub")}</p>
             </div>
           </div>
           <ChevronRight className="w-4 h-4" style={{ color: "#C97062" }} />
@@ -6348,7 +6355,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
                       className="rounded-full px-2.5 py-1 text-[9px] font-black whitespace-nowrap"
                       style={{ background: "#FFF1EC", color: SCAN_TO }}
                     >
-                      {t("modal.analysis.title")} 보기
+                      {t("modal.analysis.title")} {t("result.viewBtn")}
                     </button>
                   </div>
                   <p className="text-[11px] text-stone-500 mt-2 leading-relaxed text-kr-pretty">
@@ -6446,7 +6453,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
                   <p className="text-[11px] text-stone-600 mt-1 leading-relaxed text-kr-pretty line-clamp-2">
                     {analysisResult.aiComment}
                   </p>
-                  <p className="text-[10px] font-black mt-2" style={{ color: SCAN_TO }}>{t("modal.analysis.title")} 보기</p>
+                  <p className="text-[10px] font-black mt-2" style={{ color: SCAN_TO }}>{t("modal.analysis.title")} {t("result.viewBtn")}</p>
                 </button>
               )}
             </div>
@@ -6729,20 +6736,20 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
                         <p className="text-[14px] font-black" style={{ color: SCAN_TO }}>{currentStreak.count || 1}🔥</p>
                       </div>
                       <div className="flex-1 rounded-2xl py-2 px-2 text-center" style={{ background: "#F0FDF4" }}>
-                        <p className="text-[9px] font-bold text-stone-400 mb-0.5">총 스캔</p>
+                        <p className="text-[9px] font-bold text-stone-400 mb-0.5">{t("result.totalScans")}</p>
                         <p className="text-[14px] font-black" style={{ color: "#059669" }}>{history.length + 1}</p>
                       </div>
                       <button onClick={(e) => { e.stopPropagation(); onOpenDiary?.(); }}
                         className="flex-1 rounded-2xl py-2 px-2 flex flex-col items-center justify-center gap-0.5 text-white active:scale-95 transition-all"
                         style={{ background: `linear-gradient(135deg, ${DEEP_GREEN}, #2D5F4F)` }}>
                         <BookOpen className="w-3.5 h-3.5" />
-                        <p className="text-[9px] font-black">일기 보기</p>
+                        <p className="text-[9px] font-black">{t("result.diaryView")}</p>
                       </button>
                     </div>
                     {/* 이전 측정 기록 미니 히스토리 */}
                     {history.length > 0 && (
                       <div className="mt-2.5 pt-2.5 border-t border-stone-100">
-                        <p className="text-[9px] font-bold text-stone-400 mb-1.5">이전 측정 기록</p>
+                        <p className="text-[9px] font-bold text-stone-400 mb-1.5">{t("result.prevRecords")}</p>
                         <div className="flex gap-1.5 overflow-x-auto pb-0.5">
                           {[...history].slice(0, 5).map((h: any, i: number) => {
                             const sc = parseInt(h.overallScore || "0", 10);
@@ -7021,7 +7028,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
                           <p className="text-[13px] font-black text-stone-800">{item.name}</p>
                           <span className="text-[9px] font-black rounded-full px-2 py-0.5 text-white shrink-0"
                             style={{ background: "linear-gradient(135deg, #8B5CF6, #7C3AED)" }}>
-                            {item.targetScore}
+                            {SCORE_LABEL_MAP[item.targetScore] !== undefined ? t(`scores.${SCORE_LABEL_MAP[item.targetScore]}`) : item.targetScore}
                           </span>
                         </div>
                         <p className="text-[10px] font-bold mb-0.5" style={{ color: "#7C3AED" }}>💊 {item.dose}</p>
