@@ -3862,21 +3862,21 @@ function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: any; analys
               </div>
               <div className="space-y-2 mt-6">
                 {i18n.language === "ko" ? (
-                  <Button onClick={() => onLogin ? onLogin("kakao", "diary") : (sessionStorage.setItem("fonday_return_tab", "diary"), window.location.href = "/auth/kakao")}
+                  <Button onClick={() => onLogin ? onLogin("kakao", "diary") : (localStorage.setItem("fonday_return_tab", "diary"), window.location.href = "/auth/kakao")}
                     className="w-full h-12 rounded-xl font-bold gap-2 border-0 shadow-sm text-[#3C1E1E]"
                     style={{ background: "#FEE500" }}>
                     <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path fillRule="evenodd" clipRule="evenodd" d="M9 1C4.582 1 1 3.79 1 7.222c0 2.154 1.386 4.045 3.484 5.14L3.62 15.5a.25.25 0 0 0 .368.274L7.9 13.39A9.63 9.63 0 0 0 9 13.444c4.418 0 8-2.791 8-6.222C17 3.79 13.418 1 9 1Z" fill="#3C1E1E"/></svg>
                     {t("result.login.kakao")}
                   </Button>
                 ) : (
-                  <Button onClick={() => onLogin ? onLogin("line", "diary") : (sessionStorage.setItem("fonday_return_tab", "diary"), window.location.href = "/auth/line")}
+                  <Button onClick={() => onLogin ? onLogin("line", "diary") : (localStorage.setItem("fonday_return_tab", "diary"), window.location.href = "/auth/line")}
                     className="w-full h-12 rounded-xl font-bold gap-2 border-0 shadow-sm text-white"
                     style={{ background: "#06C755" }}>
                     <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 1C4.582 1 1 3.79 1 7.222c0 2.03 1.09 3.84 2.8 5.04-.12.44-.77 2.96-.8 3.15a.2.2 0 0 0 .3.22l3.72-2.46c.6.09 1.3.14 1.98.14 4.418 0 8-2.791 8-6.222C17 3.79 13.418 1 9 1Z" fill="white"/></svg>
                     {t("result.login.line")}
                   </Button>
                 )}
-                <Button onClick={() => onLogin ? onLogin("google", "diary") : (sessionStorage.setItem("fonday_return_tab", "diary"), window.location.href = "/auth/google")}
+                <Button onClick={() => onLogin ? onLogin("google", "diary") : (localStorage.setItem("fonday_return_tab", "diary"), window.location.href = "/auth/google")}
                   className="w-full h-12 rounded-xl bg-white hover:bg-stone-50 font-bold text-zinc-700 gap-2 border border-stone-200 shadow-sm">
                   <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" className="w-4 h-4" />
                   {t("result.login.google")}
@@ -4833,21 +4833,21 @@ function MyScreen({ user, onInstall, onBack, onLogin }: { user: any; onInstall: 
               <p className="text-[12px] text-stone-400">{t("attendance.loginDesc")}</p>
             </div>
             {i18n.language === "ko" ? (
-              <button onClick={() => onLogin ? onLogin("kakao", "my") : (sessionStorage.setItem("fonday_return_tab", "my"), window.location.href = "/auth/kakao")}
+              <button onClick={() => onLogin ? onLogin("kakao", "my") : (localStorage.setItem("fonday_return_tab", "my"), window.location.href = "/auth/kakao")}
                 className="w-full h-11 rounded-xl font-bold text-[13px] gap-2 flex items-center justify-center border-0 text-[#3C1E1E]"
                 style={{ background: "#FEE500" }}>
                 <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path fillRule="evenodd" clipRule="evenodd" d="M9 1C4.582 1 1 3.79 1 7.222c0 2.154 1.386 4.045 3.484 5.14L3.62 15.5a.25.25 0 0 0 .368.274L7.9 13.39A9.63 9.63 0 0 0 9 13.444c4.418 0 8-2.791 8-6.222C17 3.79 13.418 1 9 1Z" fill="#3C1E1E"/></svg>
                 {t("attendance.kakao")}
               </button>
             ) : (
-              <button onClick={() => onLogin ? onLogin("line", "my") : (sessionStorage.setItem("fonday_return_tab", "my"), window.location.href = "/auth/line")}
+              <button onClick={() => onLogin ? onLogin("line", "my") : (localStorage.setItem("fonday_return_tab", "my"), window.location.href = "/auth/line")}
                 className="w-full h-11 rounded-xl font-bold text-[13px] gap-2 flex items-center justify-center border-0 text-white"
                 style={{ background: "#06C755" }}>
                 <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 1C4.582 1 1 3.79 1 7.222c0 2.03 1.09 3.84 2.8 5.04-.12.44-.77 2.96-.8 3.15a.2.2 0 0 0 .3.22l3.72-2.46c.6.09 1.3.14 1.98.14 4.418 0 8-2.791 8-6.222C17 3.79 13.418 1 9 1Z" fill="white"/></svg>
                 {t("attendance.line")}
               </button>
             )}
-            <button onClick={() => onLogin ? onLogin("google", "my") : (sessionStorage.setItem("fonday_return_tab", "my"), window.location.href = "/auth/google")}
+            <button onClick={() => onLogin ? onLogin("google", "my") : (localStorage.setItem("fonday_return_tab", "my"), window.location.href = "/auth/google")}
               className="w-full h-11 rounded-xl font-bold text-[13px] gap-2 border border-stone-200 bg-white text-stone-700 flex items-center justify-center">
               <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" className="w-4 h-4" />
               {t("attendance.google")}
@@ -5570,20 +5570,9 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
   }, []);
 
   const openLoginPopup = useCallback((provider: "kakao" | "line" | "google", returnTab?: string) => {
-    if (returnTab) sessionStorage.setItem("fonday_return_tab", returnTab);
-    if (analysisResult) sessionStorage.setItem("pendingResult", JSON.stringify({ analysisResult, surveyData, imageBase64 }));
-    const url = `/auth/${provider}`;
-    const w = 480, h = 620;
-    const left = Math.round((screen.width - w) / 2);
-    const top = Math.round((screen.height - h) / 2);
-    const popup = window.open(url, "fonday-login", `popup,width=${w},height=${h},left=${left},top=${top}`);
-    if (!popup || popup.closed) { window.location.href = url; return; }
-    const onMsg = (e: MessageEvent) => {
-      if (e.origin !== window.location.origin || e.data !== "fonday:login:success") return;
-      window.removeEventListener("message", onMsg);
-      fetch("/api/user").then(r => r.ok ? r.json() : null).then(u => setUser(u ?? null));
-    };
-    window.addEventListener("message", onMsg);
+    if (returnTab) localStorage.setItem("fonday_return_tab", returnTab);
+    if (analysisResult) localStorage.setItem("pendingResult", JSON.stringify({ analysisResult, surveyData, imageBase64 }));
+    window.location.href = `/auth/${provider}`;
   }, [analysisResult, surveyData, imageBase64]);
 
   const handleGoogleLogin = () => openLoginPopup("google");
@@ -8317,30 +8306,36 @@ export default function SkinScanPage() {
       .then(res => res.ok ? res.json() : null)
       .then(data => {
         setUser(data ?? null);
-        // 팝업 모드: 로그인 성공 시 부모에 알리고 팝업 닫기
-        if (data && justLoggedIn && window.opener && !window.opener.closed) {
-          try {
-            window.opener.postMessage("fonday:login:success", window.location.origin);
-            window.close();
-          } catch {}
+        if (data && justLoggedIn) {
+          // 팝업 모드: 부모에 알리고 닫기
+          if (window.opener && !window.opener.closed) {
+            try { window.opener.postMessage("fonday:login:success", window.location.origin); window.close(); } catch {}
+          }
+          // iOS PWA LINE 로그인: 새 Safari 탭 → BroadcastChannel로 원래 PWA 탭에 알림
+          try { const bc = new BroadcastChannel("fonday-auth"); bc.postMessage({ type: "login_complete" }); bc.close(); } catch {}
         }
       })
       .catch(() => setUser(null));
   }, []);
 
+  // BroadcastChannel: 다른 탭/창에서 로그인 완료 시 현재 탭도 갱신 (iOS PWA LINE 로그인 대응)
+  useEffect(() => {
+    let bc: BroadcastChannel | null = null;
+    try {
+      bc = new BroadcastChannel("fonday-auth");
+      bc.onmessage = (e) => {
+        if (e.data?.type === "login_complete") {
+          fetch("/api/user").then(r => r.ok ? r.json() : null).then(u => { if (u) setUser(u); });
+        }
+      };
+    } catch {}
+    return () => { try { bc?.close(); } catch {} };
+  }, []);
+
   // 팝업 로그인 (DiaryTab·MyScreen 등에서 사용)
   const openLoginPopup = useCallback((provider: "kakao" | "line" | "google", returnTab?: string) => {
-    if (returnTab) sessionStorage.setItem("fonday_return_tab", returnTab);
-    const url = `/auth/${provider}`;
-    const w = 480, h = 620;
-    const popup = window.open(url, "fonday-login", `popup,width=${w},height=${h},left=${Math.round((screen.width - w) / 2)},top=${Math.round((screen.height - h) / 2)}`);
-    if (!popup || popup.closed) { window.location.href = url; return; }
-    const onMsg = (e: MessageEvent) => {
-      if (e.origin !== window.location.origin || e.data !== "fonday:login:success") return;
-      window.removeEventListener("message", onMsg);
-      fetch("/api/user").then(r => r.ok ? r.json() : null).then(u => setUser(u ?? null));
-    };
-    window.addEventListener("message", onMsg);
+    if (returnTab) localStorage.setItem("fonday_return_tab", returnTab);
+    window.location.href = `/auth/${provider}`;
   }, []);
 
   // 로그인 후 게스트 스캔 연결
@@ -8403,7 +8398,7 @@ export default function SkinScanPage() {
   // OAuth 로그인 후 결과 화면 복원
   useEffect(() => {
     if (user === undefined || !user) return;
-    const saved = sessionStorage.getItem("pendingResult");
+    const saved = localStorage.getItem("pendingResult");
     if (saved) {
       try {
         const { analysisResult: ar, surveyData: sd, imageBase64: imgB64 } = JSON.parse(saved);
@@ -8414,12 +8409,12 @@ export default function SkinScanPage() {
           setScanState("result");
         }
       } catch { /* ignore */ }
-      sessionStorage.removeItem("pendingResult");
+      localStorage.removeItem("pendingResult");
     }
-    const returnTab = sessionStorage.getItem("fonday_return_tab");
+    const returnTab = localStorage.getItem("fonday_return_tab");
     if (returnTab) {
       setActiveTab(returnTab as TabId);
-      sessionStorage.removeItem("fonday_return_tab");
+      localStorage.removeItem("fonday_return_tab");
     }
   }, [user]);
 
