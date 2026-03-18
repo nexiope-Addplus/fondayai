@@ -5236,7 +5236,7 @@ function CosmeticsRegisterModal({ onClose, onSuccess }: { onClose: () => void; o
               ) : (
                 <div className="rounded-3xl bg-stone-50 border-2 border-dashed border-stone-200 flex flex-col items-center justify-center gap-3"
                   style={{ height: 220 }}>
-                  <span className="text-5xl">💄</span>
+                  <span className="text-5xl">🧴</span>
                   <p className="text-[13px] font-bold text-stone-400">{t("cosmetics.scanPhoto")}</p>
                   <p className="text-[11px] text-stone-300">제품 전면이 잘 보이게 찍어주세요</p>
                 </div>
@@ -5328,7 +5328,7 @@ function CosmeticsRegisterModal({ onClose, onSuccess }: { onClose: () => void; o
                   style={{ background: (!category || registering) ? "#9CA3AF" : `linear-gradient(135deg, ${DEEP_GREEN}, ${DEEP_GREEN_LIGHT})` }}>
                   {registering
                     ? <><div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" /> {t("cosmetics.registering")}</>
-                    : <><span>💄</span> {t("cosmetics.registerBtn")}</>}
+                    : <><span>🧴</span> {t("cosmetics.registerBtn")}</>}
                 </button>
               </div>
             </>
@@ -5847,10 +5847,14 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
   const goTo = (next: "routine" | "solution" | "nutrition") => {
     tabDirectionRef.current = TAB_ORDER[next] >= TAB_ORDER[activeTab] ? 1 : -1;
     setActiveTab(next);
+  };
+
+  // 탭 전환 시 탭 바 위치로 스크롤 (렌더 후 실행)
+  useEffect(() => {
     const nav = tabNavRef.current;
     const container = resultScrollRef.current;
     if (nav && container) container.scrollTo({ top: nav.offsetTop, behavior: "smooth" });
-  };
+  }, [activeTab]);
 
   const handlePartnershipSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -6594,23 +6598,27 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
                   <div className="rounded-[20px] p-3" style={{ background: "#F8FFFB", border: "1px solid #D8EFE4" }}>
                     <p className="text-[11px] font-black" style={{ color: DEEP_GREEN }}>{t("cosmetics.goodComboTitle")}</p>
                     <div className="mt-2 flex flex-wrap gap-1.5">
-                      {(routineGuide.goodMixes.length > 0 ? routineGuide.goodMixes : cosmeticsInsights.slice(0, 2).map((item) => item.title)).slice(0, 3).map((item, index) => (
+                      {routineGuide.goodMixes.length > 0 ? routineGuide.goodMixes.slice(0, 3).map((item, index) => (
                         <span key={`good-mix-${index}`} className="px-2.5 py-1 rounded-full text-[10px] font-bold"
                           style={{ background: "#ECFDF5", color: "#059669" }}>
                           {item}
                         </span>
-                      ))}
+                      )) : (
+                        <p className="text-[10px] text-stone-400 mt-1">{t("cosmetics.goodComboEmpty")}</p>
+                      )}
                     </div>
                   </div>
                   <div className="rounded-[20px] p-3" style={{ background: "#FFF8F2", border: "1px solid #F5DDCF" }}>
                     <p className="text-[11px] font-black" style={{ color: "#C2410C" }}>{t("cosmetics.cautionTitle")}</p>
                     <div className="mt-2 space-y-1.5">
-                      {(routineGuide.cautions.length > 0 ? routineGuide.cautions : cosmeticsInsights.slice(0, 2).map((item) => item.desc)).slice(0, 2).map((item, index) => (
+                      {routineGuide.cautions.length > 0 ? routineGuide.cautions.slice(0, 2).map((item, index) => (
                         <div key={`caution-note-${index}`} className="flex items-start gap-2">
                           <span className="text-[11px] font-black mt-0.5" style={{ color: "#EA580C" }}>!</span>
                           <p className="text-[11px] text-stone-600 leading-relaxed text-kr-pretty">{item}</p>
                         </div>
-                      ))}
+                      )) : (
+                        <p className="text-[10px] text-stone-400 mt-1">{t("cosmetics.cautionEmpty")}</p>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -6725,7 +6733,6 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
                   </Button>
           </CardContent>
         </Card>
-            <AdBanner slot="6349940752" />
             {/* 다음 탭 유도 */}
             <button
               onClick={() => goTo("solution")}
@@ -7410,7 +7417,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl shrink-0"
                   style={{ background: "linear-gradient(135deg, #1A3B2E, #2D5F4F)" }}>
-                  💄
+                  🧴
                 </div>
                 <div>
                   <p className="text-[16px] font-black" style={{ color: DEEP_GREEN }}>{t("cosmetics.loginGateTitle")}</p>
@@ -7898,11 +7905,6 @@ function MagazineTab() {
             </motion.div>
           )}
 
-          {/* 광고 (피처드 카드 아래) */}
-          <div className="px-5 mb-4">
-            <AdBanner slot="6349940752" />
-          </div>
-
           {/* 나머지 아티클 목록 */}
           <div className="px-5 space-y-3">
             {rest.map((article, idx) => (
@@ -7952,12 +7954,6 @@ function MagazineTab() {
                     </CardContent>
                   </Card>
                 </motion.div>
-                {/* 4번째 아티클 뒤 광고 */}
-                {idx === 3 && (
-                  <div className="mt-3">
-                    <AdBanner slot="6349940752" />
-                  </div>
-                )}
               </div>
             ))}
           </div>
