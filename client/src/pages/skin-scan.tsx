@@ -480,18 +480,21 @@ function CheckinSuccessSheet({ onKakao, onLine, onGoogle, onDismiss, user }: {
               <button onClick={onKakao}
                 className="w-full py-3.5 rounded-2xl text-[14px] font-black text-stone-800 flex items-center justify-center gap-2"
                 style={{ background: "#FEE500" }}>
-                <span>💬</span> {t("attendance.kakao")}
+                <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path fillRule="evenodd" clipRule="evenodd" d="M9 1C4.582 1 1 3.79 1 7.222c0 2.154 1.386 4.045 3.484 5.14L3.62 15.5a.25.25 0 0 0 .368.274L7.9 13.39A9.63 9.63 0 0 0 9 13.444c4.418 0 8-2.791 8-6.222C17 3.79 13.418 1 9 1Z" fill="#3C1E1E"/></svg>
+                {t("attendance.kakao")}
               </button>
             ) : (
               <button onClick={onLine}
                 className="w-full py-3.5 rounded-2xl text-[14px] font-black text-white flex items-center justify-center gap-2"
                 style={{ background: "#06C755" }}>
-                <span>💚</span> {t("attendance.line")}
+                <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 1C4.582 1 1 3.79 1 7.222c0 2.03 1.09 3.84 2.8 5.04-.12.44-.77 2.96-.8 3.15a.2.2 0 0 0 .3.22l3.72-2.46c.6.09 1.3.14 1.98.14 4.418 0 8-2.791 8-6.222C17 3.79 13.418 1 9 1Z" fill="white"/></svg>
+                {t("attendance.line")}
               </button>
             )}
             <button onClick={onGoogle}
               className="w-full py-3.5 rounded-2xl text-[14px] font-black border border-stone-200 text-stone-700 flex items-center justify-center gap-2 bg-white">
-              <span>G</span> {t("attendance.google")}
+              <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" className="w-4 h-4" />
+              {t("attendance.google")}
             </button>
             <button onClick={onDismiss}
               className="w-full py-2.5 text-[13px] font-semibold text-stone-400">
@@ -3859,20 +3862,23 @@ function DiaryTab({ user, analysisResult, onBack }: { user: any; analysisResult:
               </div>
               <div className="space-y-2 mt-6">
                 {i18n.language === "ko" ? (
-                  <Button onClick={() => { window.location.href = "/auth/kakao"; }}
+                  <Button onClick={() => { sessionStorage.setItem("fonday_return_tab", "diary"); window.location.href = "/auth/kakao"; }}
                     className="w-full h-12 rounded-xl font-bold gap-2 border-0 shadow-sm text-[#3C1E1E]"
                     style={{ background: "#FEE500" }}>
+                    <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path fillRule="evenodd" clipRule="evenodd" d="M9 1C4.582 1 1 3.79 1 7.222c0 2.154 1.386 4.045 3.484 5.14L3.62 15.5a.25.25 0 0 0 .368.274L7.9 13.39A9.63 9.63 0 0 0 9 13.444c4.418 0 8-2.791 8-6.222C17 3.79 13.418 1 9 1Z" fill="#3C1E1E"/></svg>
                     {t("result.login.kakao")}
                   </Button>
                 ) : (
-                  <Button onClick={() => { window.location.href = "/auth/line"; }}
+                  <Button onClick={() => { sessionStorage.setItem("fonday_return_tab", "diary"); window.location.href = "/auth/line"; }}
                     className="w-full h-12 rounded-xl font-bold gap-2 border-0 shadow-sm text-white"
                     style={{ background: "#06C755" }}>
+                    <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 1C4.582 1 1 3.79 1 7.222c0 2.03 1.09 3.84 2.8 5.04-.12.44-.77 2.96-.8 3.15a.2.2 0 0 0 .3.22l3.72-2.46c.6.09 1.3.14 1.98.14 4.418 0 8-2.791 8-6.222C17 3.79 13.418 1 9 1Z" fill="white"/></svg>
                     {t("result.login.line")}
                   </Button>
                 )}
-                <Button onClick={() => { window.location.href = "/auth/google"; }}
+                <Button onClick={() => { sessionStorage.setItem("fonday_return_tab", "diary"); window.location.href = "/auth/google"; }}
                   className="w-full h-12 rounded-xl bg-white hover:bg-stone-50 font-bold text-zinc-700 gap-2 border border-stone-200 shadow-sm">
+                  <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" className="w-4 h-4" />
                   {t("result.login.google")}
                 </Button>
               </div>
@@ -4792,7 +4798,27 @@ function MyScreen({ user, onInstall, onBack }: { user: any; onInstall: () => voi
               }
               <div>
                 <p className="text-[14px] font-bold text-stone-800">{user.username || user.email || "사용자"}</p>
-                <p className="text-[11px] text-stone-400">{user.email || ""}</p>
+                <div className="flex items-center gap-1.5 mt-0.5">
+                  {user.provider === "kakao" && (
+                    <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[10px] font-bold text-[#3C1E1E]" style={{ background: "#FEE500" }}>
+                      <svg width="10" height="10" viewBox="0 0 18 18" fill="none"><path fillRule="evenodd" clipRule="evenodd" d="M9 1C4.582 1 1 3.79 1 7.222c0 2.154 1.386 4.045 3.484 5.14L3.62 15.5a.25.25 0 0 0 .368.274L7.9 13.39A9.63 9.63 0 0 0 9 13.444c4.418 0 8-2.791 8-6.222C17 3.79 13.418 1 9 1Z" fill="#3C1E1E"/></svg>
+                      카카오
+                    </span>
+                  )}
+                  {user.provider === "line" && (
+                    <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[10px] font-bold text-white" style={{ background: "#06C755" }}>
+                      <svg width="10" height="10" viewBox="0 0 18 18" fill="none"><path d="M9 1C4.582 1 1 3.79 1 7.222c0 2.03 1.09 3.84 2.8 5.04-.12.44-.77 2.96-.8 3.15a.2.2 0 0 0 .3.22l3.72-2.46c.6.09 1.3.14 1.98.14 4.418 0 8-2.791 8-6.222C17 3.79 13.418 1 9 1Z" fill="white"/></svg>
+                      LINE
+                    </span>
+                  )}
+                  {user.provider === "google" && (
+                    <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[10px] font-bold text-stone-600 border border-stone-200 bg-white">
+                      <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" className="w-2.5 h-2.5" />
+                      Google
+                    </span>
+                  )}
+                  {user.email && <p className="text-[11px] text-stone-400">{user.email}</p>}
+                </div>
               </div>
             </div>
             <button onClick={handleLogout}
@@ -4807,20 +4833,23 @@ function MyScreen({ user, onInstall, onBack }: { user: any; onInstall: () => voi
               <p className="text-[12px] text-stone-400">{t("attendance.loginDesc")}</p>
             </div>
             {i18n.language === "ko" ? (
-              <button onClick={() => { window.location.href = "/auth/kakao"; }}
+              <button onClick={() => { sessionStorage.setItem("fonday_return_tab", "my"); window.location.href = "/auth/kakao"; }}
                 className="w-full h-11 rounded-xl font-bold text-[13px] gap-2 flex items-center justify-center border-0 text-[#3C1E1E]"
                 style={{ background: "#FEE500" }}>
+                <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path fillRule="evenodd" clipRule="evenodd" d="M9 1C4.582 1 1 3.79 1 7.222c0 2.154 1.386 4.045 3.484 5.14L3.62 15.5a.25.25 0 0 0 .368.274L7.9 13.39A9.63 9.63 0 0 0 9 13.444c4.418 0 8-2.791 8-6.222C17 3.79 13.418 1 9 1Z" fill="#3C1E1E"/></svg>
                 {t("attendance.kakao")}
               </button>
             ) : (
-              <button onClick={() => { window.location.href = "/auth/line"; }}
+              <button onClick={() => { sessionStorage.setItem("fonday_return_tab", "my"); window.location.href = "/auth/line"; }}
                 className="w-full h-11 rounded-xl font-bold text-[13px] gap-2 flex items-center justify-center border-0 text-white"
                 style={{ background: "#06C755" }}>
+                <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 1C4.582 1 1 3.79 1 7.222c0 2.03 1.09 3.84 2.8 5.04-.12.44-.77 2.96-.8 3.15a.2.2 0 0 0 .3.22l3.72-2.46c.6.09 1.3.14 1.98.14 4.418 0 8-2.791 8-6.222C17 3.79 13.418 1 9 1Z" fill="white"/></svg>
                 {t("attendance.line")}
               </button>
             )}
-            <button onClick={() => { window.location.href = "/auth/google"; }}
-              className="w-full h-11 rounded-xl font-bold text-[13px] border border-stone-200 bg-white text-stone-700 flex items-center justify-center">
+            <button onClick={() => { sessionStorage.setItem("fonday_return_tab", "my"); window.location.href = "/auth/google"; }}
+              className="w-full h-11 rounded-xl font-bold text-[13px] gap-2 border border-stone-200 bg-white text-stone-700 flex items-center justify-center">
+              <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" className="w-4 h-4" />
               {t("attendance.google")}
             </button>
           </div>
@@ -5541,15 +5570,15 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
   }, []);
 
   const handleGoogleLogin = () => {
-    sessionStorage.setItem("pendingResult", JSON.stringify({ analysisResult, surveyData, imageBase64 }));
+    if (analysisResult) sessionStorage.setItem("pendingResult", JSON.stringify({ analysisResult, surveyData, imageBase64 }));
     window.location.href = "/auth/google";
   };
   const handleKakaoLogin = () => {
-    sessionStorage.setItem("pendingResult", JSON.stringify({ analysisResult, surveyData, imageBase64 }));
+    if (analysisResult) sessionStorage.setItem("pendingResult", JSON.stringify({ analysisResult, surveyData, imageBase64 }));
     window.location.href = "/auth/kakao";
   };
   const handleLineLogin = () => {
-    sessionStorage.setItem("pendingResult", JSON.stringify({ analysisResult, surveyData, imageBase64 }));
+    if (analysisResult) sessionStorage.setItem("pendingResult", JSON.stringify({ analysisResult, surveyData, imageBase64 }));
     window.location.href = "/auth/line";
   };
   const isKo = i18n.language === "ko";
@@ -7499,19 +7528,21 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
               {/* 로그인 버튼 */}
               <div className="space-y-2.5">
                 {i18n.language === "ko" ? (
-                  <button onClick={() => { setShowCosmeticsGate(false); window.location.href = "/auth/kakao"; }}
+                  <button onClick={() => { setShowCosmeticsGate(false); sessionStorage.setItem("fonday_return_tab", "scan"); window.location.href = "/auth/kakao"; }}
                     className="w-full py-3.5 rounded-2xl text-[14px] font-black flex items-center justify-center gap-2"
                     style={{ background: "#FEE500", color: "#3C1E1E" }}>
-                    <span>💬</span> {t("cosmetics.loginGateKakao")}
+                    <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path fillRule="evenodd" clipRule="evenodd" d="M9 1C4.582 1 1 3.79 1 7.222c0 2.154 1.386 4.045 3.484 5.14L3.62 15.5a.25.25 0 0 0 .368.274L7.9 13.39A9.63 9.63 0 0 0 9 13.444c4.418 0 8-2.791 8-6.222C17 3.79 13.418 1 9 1Z" fill="#3C1E1E"/></svg>
+                    {t("cosmetics.loginGateKakao")}
                   </button>
                 ) : (
-                  <button onClick={() => { setShowCosmeticsGate(false); window.location.href = "/auth/line"; }}
+                  <button onClick={() => { setShowCosmeticsGate(false); sessionStorage.setItem("fonday_return_tab", "scan"); window.location.href = "/auth/line"; }}
                     className="w-full py-3.5 rounded-2xl text-[14px] font-black flex items-center justify-center gap-2 text-white"
                     style={{ background: "#06C755" }}>
-                    <span>💚</span> {t("cosmetics.loginGateLine")}
+                    <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 1C4.582 1 1 3.79 1 7.222c0 2.03 1.09 3.84 2.8 5.04-.12.44-.77 2.96-.8 3.15a.2.2 0 0 0 .3.22l3.72-2.46c.6.09 1.3.14 1.98.14 4.418 0 8-2.791 8-6.222C17 3.79 13.418 1 9 1Z" fill="white"/></svg>
+                    {t("cosmetics.loginGateLine")}
                   </button>
                 )}
-                <button onClick={() => { setShowCosmeticsGate(false); window.location.href = "/auth/google"; }}
+                <button onClick={() => { setShowCosmeticsGate(false); sessionStorage.setItem("fonday_return_tab", "scan"); window.location.href = "/auth/google"; }}
                   className="w-full py-3.5 rounded-2xl text-[14px] font-black flex items-center justify-center gap-2 bg-white border border-stone-200 text-stone-700">
                   <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" className="w-4 h-4" />
                   {t("cosmetics.loginGateGoogle")}
@@ -8338,15 +8369,23 @@ export default function SkinScanPage() {
   useEffect(() => {
     if (user === undefined || !user) return;
     const saved = sessionStorage.getItem("pendingResult");
-    if (!saved) return;
-    try {
-      const { analysisResult: ar, surveyData: sd, imageBase64: imgB64 } = JSON.parse(saved);
-      setAnalysisResult(ar);
-      setSurveyData(sd);
-      if (imgB64) setImageSrc(imgB64);
-      setScanState("result");
-    } catch { /* ignore */ }
-    sessionStorage.removeItem("pendingResult");
+    if (saved) {
+      try {
+        const { analysisResult: ar, surveyData: sd, imageBase64: imgB64 } = JSON.parse(saved);
+        if (ar) {
+          setAnalysisResult(ar);
+          setSurveyData(sd);
+          if (imgB64) setImageSrc(imgB64);
+          setScanState("result");
+        }
+      } catch { /* ignore */ }
+      sessionStorage.removeItem("pendingResult");
+    }
+    const returnTab = sessionStorage.getItem("fonday_return_tab");
+    if (returnTab) {
+      setActiveTab(returnTab as TabId);
+      sessionStorage.removeItem("fonday_return_tab");
+    }
   }, [user]);
 
   const handleCapture = useCallback((file: File) => {
