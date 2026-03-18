@@ -66,6 +66,7 @@
     "passport": "^0.7.0",
     "passport-google-oauth20": "^2.0.0",
     "passport-kakao": "^1.0.1",
+    "passport-line-auth": "^0.2.9",
     "passport-local": "^1.0.0",
     "pg": "^8.16.3",
     "react": "^18.3.1",

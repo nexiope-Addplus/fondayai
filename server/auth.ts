@@ -1,6 +1,7 @@
 import passport from "passport";
 import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 import { Strategy as KakaoStrategy } from "passport-kakao";
+import { Strategy as LineStrategy } from "passport-line-auth";
 import { Express } from "express";
 import session from "express-session";
 import MemoryStore from "memorystore";
@@ -97,6 +98,33 @@ export function setupAuth(app: Express) {
     )
   );
 
+  // LINE Strategy
+  passport.use(
+    new LineStrategy(
+      {
+        channelID: process.env.LINE_CHANNEL_ID || "2009518965",
+        channelSecret: process.env.LINE_CHANNEL_SECRET || "",
+        callbackURL: "/auth/line/callback",
+        scope: ["profile", "openid"],
+      },
+      async (_accessToken: string, _refreshToken: string, profile: any, done: any) => {
+        try {
+          let user = await storage.getUserByLineId(profile.id);
+          if (!user) {
+            user = await storage.createUser({
+              username: profile.displayName || `line_${profile.id}`,
+              lineId: profile.id,
+              avatar: profile.pictureUrl,
+            });
+          }
+          return done(null, user);
+        } catch (err) {
+          return done(err);
+        }
+      }
+    )
+  );
+
   // Auth Routes
   app.get("/auth/google", passport.authenticate("google", { scope: ["profile", "email"] }));
   app.get(
@@ -109,6 +137,13 @@ export function setupAuth(app: Express) {
   app.get(
     "/auth/kakao/callback",
     passport.authenticate("kakao", { failureRedirect: "/login" }),
+    (req, res) => res.redirect("/")
+  );
+
+  app.get("/auth/line", passport.authenticate("line"));
+  app.get(
+    "/auth/line/callback",
+    passport.authenticate("line", { failureRedirect: "/login" }),
     (req, res) => res.redirect("/")
   );
 

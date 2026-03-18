@@ -6,6 +6,7 @@ export interface IStorage {
   getUserByUsername(username: string): Promise<User | undefined>;
   getUserByGoogleId(googleId: string): Promise<User | undefined>;
   getUserByKakaoId(kakaoId: string): Promise<User | undefined>;
+  getUserByLineId(lineId: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
 
   createScan(scan: InsertScan): Promise<Scan>;
@@ -39,6 +40,10 @@ export class MemStorage implements IStorage {
     return Array.from(this.users.values()).find(u => u.kakaoId === kakaoId);
   }
 
+  async getUserByLineId(lineId: string): Promise<User | undefined> {
+    return Array.from(this.users.values()).find(u => u.lineId === lineId);
+  }
+
   async createUser(insertUser: InsertUser): Promise<User> {
     const id = randomUUID();
     const user: User = {
@@ -47,6 +52,7 @@ export class MemStorage implements IStorage {
       password: insertUser.password ?? null,
       googleId: insertUser.googleId ?? null,
       kakaoId: insertUser.kakaoId ?? null,
+      lineId: insertUser.lineId ?? null,
       email: insertUser.email ?? null,
       avatar: insertUser.avatar ?? null,
     };
