@@ -5931,11 +5931,16 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
     setActiveTab(next);
   };
 
-  // 탭 전환 시 탭 바 위치로 스크롤 (렌더 후 실행)
+  // 탭 전환 시 탭 바 위치로 스크롤 (초기 마운트 제외)
+  const tabMountedRef = useRef(false);
   useEffect(() => {
+    if (!tabMountedRef.current) {
+      tabMountedRef.current = true;
+      return; // 초기 로드: 스크롤 없이 최상단(10가지 점수)부터 보임
+    }
     const nav = tabNavRef.current;
     const container = resultScrollRef.current;
-    if (nav && container) container.scrollTo({ top: nav.offsetTop, behavior: "smooth" });
+    if (nav && container) container.scrollTop = nav.offsetTop; // instant
   }, [activeTab]);
 
   const handlePartnershipSubmit = async (e: React.FormEvent) => {
