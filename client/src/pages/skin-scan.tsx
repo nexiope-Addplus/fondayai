@@ -5940,7 +5940,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
     }
     const nav = tabNavRef.current;
     const container = resultScrollRef.current;
-    if (container) container.scrollTop = 0; // 탭 전환 시 최상단으로
+    if (nav && container) container.scrollTop = nav.offsetTop; // 탭 전환 시 탭 콘텐츠 최상단으로
   }, [activeTab]);
 
   const handlePartnershipSubmit = async (e: React.FormEvent) => {
