@@ -1417,6 +1417,7 @@ function MiniScoreBarIdle({ label, score, color, delay }: { label: string; score
 function ScanIdleScreen({ onScan }: { onScan: () => void }) {
   const { t } = useTranslation();
   const streak = getStreak();
+  const attendance = getAttendance();
   const daysSince = getDaysSinceLastScan();
   const [showCalendar, setShowCalendar] = useState(false);
   const [showBaumannExp, setShowBaumannExp] = useState(false);
@@ -1496,16 +1497,7 @@ function ScanIdleScreen({ onScan }: { onScan: () => void }) {
       onTouchEnd={handleTouchEnd}
     >
       {/* 상단 헤더 row */}
-      <div className="flex justify-between items-center mb-3 relative" style={{ zIndex: 1 }}>
-        <div className="flex items-center gap-2">
-          <AttendanceBadge onClick={() => setShowCalendar(true)} />
-          {streak.count >= 2 && (
-            <span className="text-[11px] font-bold px-2.5 py-1 rounded-full flex items-center gap-0.5"
-              style={{ background: "#FFF7ED", color: "#C2410C", border: "1px solid #FED7AA" }}>
-              <Flame className="w-3 h-3" style={{ color: "#C2410C" }} />{t("streak.badge", { count: streak.count })}
-            </span>
-          )}
-        </div>
+      <div className="flex justify-end items-center mb-3 relative" style={{ zIndex: 1 }}>
         <LangSwitcher />
       </div>
 
@@ -1590,10 +1582,10 @@ function ScanIdleScreen({ onScan }: { onScan: () => void }) {
             <span className="text-[10px] font-bold" style={{ color: DEEP_GREEN }}>{t("idle.heroBadge")}</span>
           </div>
         </div>
-        <h1 className="text-[28px] sm:text-[30px] font-black text-stone-800 leading-[1.08] mb-2 px-1">
+        <h1 className="text-[28px] sm:text-[30px] font-bold text-stone-800 leading-[1.08] mb-1.5 px-1">
           {t("idle.subtitle1")}<br />{t("idle.subtitle3")}
         </h1>
-        <p className="text-[13px] text-stone-500 px-1 mb-3.5">
+        <p className="text-[12px] text-stone-500 px-1 mb-3">
           {t("idle.subtitle4")}
         </p>
 
@@ -1660,6 +1652,39 @@ function ScanIdleScreen({ onScan }: { onScan: () => void }) {
               </div>
             </div>
           </div>
+        </div>
+      </motion.div>
+
+      <motion.div variants={fadeChild} className="mb-4 relative" style={{ zIndex: 1 }}>
+        <div className="grid grid-cols-[1fr_auto] gap-2">
+          <button
+            onClick={() => setShowCalendar(true)}
+            className="flex items-center justify-between gap-3 rounded-2xl px-3.5 py-3 text-left active:opacity-70"
+            style={{ background: "#FFFFFF", boxShadow: "0 8px 20px rgba(45,95,79,0.06)" }}
+          >
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="w-9 h-9 rounded-2xl flex items-center justify-center shrink-0" style={{ background: TINT_WARM }}>
+                <CalendarDays className="w-4.5 h-4.5" style={{ color: SCAN_TO }} />
+              </div>
+              <div className="min-w-0">
+                <p className="text-[12px] font-bold text-stone-800 truncate">{t("attendance.calendarTitle")}</p>
+                <p className="text-[11px] text-stone-500 truncate">{t("attendance.totalPoints", { n: attendance.totalPoints })}</p>
+              </div>
+            </div>
+            <ChevronRight className="w-4 h-4 text-stone-300 shrink-0" />
+          </button>
+          {streak.count >= 2 && (
+            <div
+              className="rounded-2xl px-3 py-2.5 flex flex-col justify-center min-w-[92px]"
+              style={{ background: "#FFF7ED", boxShadow: "0 8px 20px rgba(217,119,6,0.08)" }}
+            >
+              <div className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-[0.12em]" style={{ color: "#C2410C" }}>
+                <Flame className="w-3 h-3" />
+                streak
+              </div>
+              <p className="text-[12px] font-bold mt-1" style={{ color: "#9A3412" }}>{t("streak.badge", { count: streak.count })}</p>
+            </div>
+          )}
         </div>
       </motion.div>
 
@@ -3859,12 +3884,6 @@ function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: any; analys
     return (
       <div className="flex flex-col" style={{ background: "#F8F5F2", minHeight: "calc(100dvh - 64px)" }}>
         <div className="shrink-0 px-5 pt-5 pb-0" style={{ borderBottom: "1px solid #F0EDE8" }}>
-          {onBack && (
-            <button onClick={onBack}
-              className="flex items-center justify-center w-9 h-9 rounded-full bg-stone-100 text-stone-500 mb-3 active:opacity-70">
-              <ChevronLeft className="w-5 h-5" />
-            </button>
-          )}
           <div className="rounded-3xl p-5 mb-4 text-white"
             style={{ background: "linear-gradient(135deg, #2D5F4F 0%, #C97062 100%)" }}>
             <p className="text-[11px] font-bold tracking-widest uppercase mb-1 text-white/70">FONDAY</p>
@@ -3929,12 +3948,6 @@ function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: any; analys
     <div className="flex flex-col" style={{ background: "#F8F5F2", minHeight: "calc(100dvh - 64px)" }}>
       {/* 헤더 */}
       <div className="shrink-0 px-5 pt-5 pb-0" style={{ borderBottom: "1px solid #F0EDE8" }}>
-        {onBack && (
-          <button onClick={onBack}
-            className="flex items-center justify-center w-9 h-9 rounded-full bg-stone-100 text-stone-500 mb-3 active:opacity-70">
-            <ChevronLeft className="w-5 h-5" />
-          </button>
-        )}
         <div className="rounded-3xl p-5 mb-4"
           style={{ background: "#FFFFFF", boxShadow: "0 10px 28px rgba(45,95,79,0.08)" }}>
           <p className="text-[11px] font-bold tracking-widest uppercase mb-1" style={{ color: SCAN_TO }}>FONDAY</p>
@@ -4841,25 +4854,47 @@ function MyScreen({ user, onInstall, onBack, onLogin, onGoMagazine }: { user: an
   return (
     <div className="min-h-[calc(100dvh-64px)] pb-28" style={{ background: "#F8F5F2" }}>
       {/* 헤더 */}
-      <div className="px-5 pt-5 pb-6" style={{ borderBottom: "1px solid #F0EDE8" }}>
-        <button onClick={onBack} className="flex items-center gap-1.5 text-stone-400 mb-4 active:opacity-70">
-          <ChevronLeft className="w-5 h-5" />
-          <span className="text-[13px] font-semibold">{t("nav.scan")}</span>
-        </button>
-        <p className="text-[11px] font-bold tracking-widest uppercase mb-1" style={{ color: SCAN_TO }}>FONDAY</p>
-        <h1 className="text-2xl font-bold" style={{ color: DEEP_GREEN }}>{t("nav.my")}</h1>
+      <div className="px-5 pt-5 pb-0">
+        <div className="rounded-3xl p-5" style={{ background: "#FFFFFF", boxShadow: "0 10px 28px rgba(45,95,79,0.08)" }}>
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <p className="text-[11px] font-bold tracking-widest uppercase mb-1" style={{ color: SCAN_TO }}>FONDAY</p>
+              <h1 className="text-2xl font-bold" style={{ color: DEEP_GREEN }}>{t("nav.my")}</h1>
+              <p className="text-[12px] text-stone-500 mt-1">
+                {user ? (user.username || user.email || t("nav.my")) : t("attendance.loginDesc")}
+              </p>
+            </div>
+            <div className="rounded-2xl px-3 py-2 text-right shrink-0" style={{ background: TINT_WARM }}>
+              <p className="text-[10px] font-bold uppercase tracking-[0.12em]" style={{ color: SCAN_TO }}>points</p>
+              <p className="text-xl font-bold leading-none mt-1" style={{ color: DEEP_GREEN }}>{attendance.totalPoints}</p>
+            </div>
+          </div>
+          <div className="flex flex-wrap gap-2 mt-4">
+            <span className="rounded-full px-3 py-1 text-[10px] font-bold" style={{ background: `${DEEP_GREEN}10`, color: DEEP_GREEN }}>
+              {t("attendance.calendarTitle")}
+            </span>
+            <span className="rounded-full px-3 py-1 text-[10px] font-bold" style={{ background: TINT_WARM, color: SCAN_TO }}>
+              {t("attendance.totalPoints", { n: attendance.totalPoints })}
+            </span>
+            {user && (
+              <span className="rounded-full px-3 py-1 text-[10px] font-bold" style={{ background: "#F6F4FB", color: "#7C3AED" }}>
+                {t("cosmetics.ctaCount", { count: myCosmetics.length })}
+              </span>
+            )}
+          </div>
+        </div>
       </div>
 
       <div className="px-5 pt-5 space-y-3">
         {/* 프로필 */}
         {user ? (
-          <div className="flex items-center justify-between p-5 rounded-3xl bg-white">
+          <div className="flex items-center justify-between p-5 rounded-3xl bg-white" style={{ boxShadow: "0 8px 24px rgba(45,95,79,0.06)" }}>
             <div className="flex items-center gap-3">
               {user.avatar
                 ? <img src={user.avatar} className="w-10 h-10 rounded-full" />
                 : <div className="w-10 h-10 rounded-full flex items-center justify-center"
-                    style={{ background: `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})` }}>
-                    <User className="w-5 h-5 text-white" />
+                    style={{ background: TINT_WARM }}>
+                    <User className="w-5 h-5" style={{ color: SCAN_TO }} />
                   </div>
               }
               <div>
@@ -4888,12 +4923,13 @@ function MyScreen({ user, onInstall, onBack, onLogin, onGoMagazine }: { user: an
               </div>
             </div>
             <button onClick={handleLogout}
-              className="text-[12px] font-semibold text-stone-400 px-3 py-1.5 rounded-xl bg-stone-100 active:opacity-70">
+              className="text-[12px] font-semibold px-3 py-1.5 rounded-xl active:opacity-70"
+              style={{ background: TINT_WARM, color: SCAN_TO }}>
               {t("modal.diary.logout")}
             </button>
           </div>
         ) : (
-          <div className="p-5 rounded-3xl bg-white space-y-3">
+          <div className="p-5 rounded-3xl bg-white space-y-3" style={{ boxShadow: "0 8px 24px rgba(45,95,79,0.06)" }}>
             <div className="text-center mb-2">
               <p className="text-[14px] font-bold text-stone-700 mb-1">{t("report.loginRequired")}</p>
               <p className="text-[12px] text-stone-400">{t("attendance.loginDesc")}</p>
@@ -4923,10 +4959,11 @@ function MyScreen({ user, onInstall, onBack, onLogin, onGoMagazine }: { user: an
 
         {/* 출석 달력 */}
         <button onClick={() => setShowCalendar(true)}
-          className="w-full flex items-center justify-between p-5 rounded-3xl bg-white active:opacity-70">
+          className="w-full flex items-center justify-between p-5 rounded-3xl bg-white active:opacity-70"
+          style={{ boxShadow: "0 8px 24px rgba(45,95,79,0.06)" }}>
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-xl flex items-center justify-center"
-              style={{ background: `linear-gradient(135deg, ${SCAN_FROM}30, ${SCAN_TO}20)` }}>
+              style={{ background: TINT_WARM }}>
               <CalendarDays className="w-5 h-5" style={{ color: SCAN_TO }} />
             </div>
             <div className="text-left">
@@ -4938,10 +4975,10 @@ function MyScreen({ user, onInstall, onBack, onLogin, onGoMagazine }: { user: an
         </button>
 
         {/* 언어 설정 */}
-        <div className="flex items-center justify-between p-5 rounded-3xl bg-white">
+        <div className="flex items-center justify-between p-5 rounded-3xl bg-white" style={{ boxShadow: "0 8px 24px rgba(45,95,79,0.06)" }}>
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-stone-50 flex items-center justify-center">
-              <span className="text-[16px]">🌐</span>
+            <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: "#F6F4FB" }}>
+              <Sparkles className="w-4.5 h-4.5" style={{ color: "#7C3AED" }} />
             </div>
             <p className="text-[14px] font-bold text-stone-800">{t("nav.language")}</p>
           </div>
@@ -4949,9 +4986,9 @@ function MyScreen({ user, onInstall, onBack, onLogin, onGoMagazine }: { user: an
             {(["en", "ko", "ja"] as const).map(lang => (
               <button key={lang} onClick={() => i18n.changeLanguage(lang)}
                 className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all ${
-                  i18n.language === lang ? "text-white" : "text-stone-400 bg-stone-100"
+                  i18n.language === lang ? "" : "text-stone-400 bg-stone-100"
                 }`}
-                style={i18n.language === lang ? { background: `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})` } : {}}>
+                style={i18n.language === lang ? { background: TINT_WARM, color: SCAN_TO } : {}}>
                 {lang.toUpperCase()}
               </button>
             ))}
@@ -4961,9 +4998,10 @@ function MyScreen({ user, onInstall, onBack, onLogin, onGoMagazine }: { user: an
         {/* 화장품 루틴 목록 (로그인 시만) */}
         {user && (
           <button onClick={() => setShowMyCosmetics(true)}
-            className="w-full flex items-center gap-3 p-5 rounded-3xl bg-white active:opacity-70">
+            className="w-full flex items-center gap-3 p-5 rounded-3xl bg-white active:opacity-70"
+            style={{ boxShadow: "0 8px 24px rgba(45,95,79,0.06)" }}>
             <div className="w-9 h-9 rounded-xl flex items-center justify-center"
-              style={{ background: `${DEEP_GREEN}15` }}>
+              style={{ background: TINT_GREEN }}>
               <Droplets className="w-4.5 h-4.5" style={{ color: DEEP_GREEN }} />
             </div>
             <div className="flex-1 text-left">
@@ -4980,10 +5018,11 @@ function MyScreen({ user, onInstall, onBack, onLogin, onGoMagazine }: { user: an
 
         {/* 앱 설치 */}
         <button onClick={onInstall}
-          className="w-full flex items-center justify-between p-5 rounded-3xl bg-white active:opacity-70">
+          className="w-full flex items-center justify-between p-5 rounded-3xl bg-white active:opacity-70"
+          style={{ boxShadow: "0 8px 24px rgba(45,95,79,0.06)" }}>
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-stone-50 flex items-center justify-center">
-              <SmartphoneNfc className="w-5 h-5 text-stone-500" />
+            <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: "#FFF7ED" }}>
+              <SmartphoneNfc className="w-5 h-5" style={{ color: "#C2410C" }} />
             </div>
             <p className="text-[14px] font-bold text-stone-800">{t("nav.install")}</p>
           </div>
@@ -4992,10 +5031,11 @@ function MyScreen({ user, onInstall, onBack, onLogin, onGoMagazine }: { user: an
 
         {/* 매거진 */}
         <button onClick={onGoMagazine}
-          className="w-full flex items-center justify-between p-5 rounded-3xl bg-white active:opacity-70">
+          className="w-full flex items-center justify-between p-5 rounded-3xl bg-white active:opacity-70"
+          style={{ boxShadow: "0 8px 24px rgba(45,95,79,0.06)" }}>
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-stone-50 flex items-center justify-center">
-              <BookOpen className="w-5 h-5 text-stone-500" />
+            <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: "#F6F4FB" }}>
+              <BookOpen className="w-5 h-5" style={{ color: "#7C3AED" }} />
             </div>
             <p className="text-[14px] font-bold text-stone-800">{t("nav.magazine")}</p>
           </div>
@@ -5004,18 +5044,18 @@ function MyScreen({ user, onInstall, onBack, onLogin, onGoMagazine }: { user: an
         {/* Fonday 디바이스 링크 */}
         <a href="https://fonday.replit.app/" target="_blank" rel="noopener noreferrer"
           className="flex items-center justify-between px-4 py-3.5 rounded-2xl active:opacity-70 transition-opacity"
-          style={{ background: TINT_WARM }}>
+          style={{ background: "#FFFFFF", boxShadow: "0 8px 24px rgba(45,95,79,0.06)" }}>
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-xl flex items-center justify-center"
-              style={{ background: "linear-gradient(135deg, #E09882, #C97062)" }}>
-              <Zap className="w-5 h-5 text-white" />
+              style={{ background: TINT_WARM }}>
+              <Zap className="w-5 h-5" style={{ color: SCAN_TO }} />
             </div>
             <div>
-              <p className="text-[14px] font-bold" style={{ color: "#C97062" }}>{t("result.deviceTeaser.title")}</p>
+              <p className="text-[14px] font-bold" style={{ color: SCAN_TO }}>{t("result.deviceTeaser.title")}</p>
               <p className="text-[11px] text-stone-400">{t("result.deviceTeaser.sub")}</p>
             </div>
           </div>
-          <ChevronRight className="w-4 h-4" style={{ color: "#C97062" }} />
+          <ChevronRight className="w-4 h-4" style={{ color: SCAN_TO }} />
         </a>
       </div>
 
@@ -5065,13 +5105,13 @@ function SkinPredictionCard({ prediction, currentScore, onOpenDiary }: {
   const rewardPts = Math.max(goodDelta, 5);
 
   return (
-    <Card className="shadow-md rounded-3xl overflow-hidden bg-white/95">
+    <Card className="rounded-3xl overflow-hidden bg-white/95" style={{ boxShadow: "0 10px 28px rgba(45,95,79,0.08)" }}>
       <CardContent className="p-4">
         <div className="flex items-start justify-between gap-3 mb-3">
           <div className="flex items-center gap-2 min-w-0">
-            <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 text-base"
-              style={{ background: "#8B5CF6" }}>
-              🔮
+            <div className="w-9 h-9 rounded-2xl flex items-center justify-center shrink-0"
+              style={{ background: "#F6F4FB" }}>
+              <Bot className="w-4.5 h-4.5" style={{ color: "#7C3AED" }} />
             </div>
             <div className="min-w-0">
               <p className="text-sm font-bold" style={{ color: DEEP_GREEN }}>{t("result.prediction.title")}</p>
@@ -5157,7 +5197,7 @@ function SkinPredictionCard({ prediction, currentScore, onOpenDiary }: {
               <Button
                 onClick={onOpenDiary}
                 className="rounded-full h-8 px-3 text-xs font-semibold shadow-none"
-                style={{ background: `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})` }}
+                style={{ background: "#FFFFFF", color: SCAN_TO, border: "1px solid #E9D5FF" }}
               >
                 {t("result.prediction.diaryButton")}
               </Button>
@@ -6558,23 +6598,28 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
                 </p>
               </div>
             </div>
-            <div className="mt-3 rounded-3xl p-3"
-              style={{ background: TINT_WARM }}>
-                <div className="flex items-center justify-between gap-3">
-                  <div className="min-w-0">
-                    <p className="text-[10px] font-bold uppercase tracking-[0.16em]" style={{ color: SCAN_TO }}>{t("result.baumannLabel")}</p>
-                    <div className="flex items-center gap-2 mt-1">
-                      <p className="text-lg font-bold leading-none" style={{ color: DEEP_GREEN }}>{finalType}</p>
-                      <button onClick={() => setShowBaumannInfo(v => !v)}
-                        className="text-[10px] font-bold px-2.5 py-1 rounded-full transition-all"
-                        style={{ background: `${SCAN_TO}18`, color: SCAN_TO }}>
-                        {showBaumannInfo ? t("result.baumannFold") : t("result.baumannExpand")}
-                      </button>
+            <div className="mt-3 rounded-3xl p-3.5"
+              style={{ background: "#FFFFFF", boxShadow: "0 8px 24px rgba(45,95,79,0.06)" }}>
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex items-start gap-3 min-w-0">
+                    <div className="w-11 h-11 rounded-2xl flex items-center justify-center shrink-0" style={{ background: TINT_WARM }}>
+                      <Microscope className="w-5 h-5" style={{ color: SCAN_TO }} />
                     </div>
-                    <p className="text-[11px] font-medium mt-1 text-stone-500 text-kr-pretty">{t("result.mbtiSub")}</p>
+                    <div className="min-w-0">
+                      <p className="text-[10px] font-bold uppercase tracking-[0.16em]" style={{ color: SCAN_TO }}>{t("result.baumannLabel")}</p>
+                      <div className="flex items-center gap-2 mt-1 flex-wrap">
+                        <p className="text-lg font-bold leading-none" style={{ color: DEEP_GREEN }}>{finalType}</p>
+                        <button onClick={() => setShowBaumannInfo(v => !v)}
+                          className="text-[10px] font-bold px-2.5 py-1 rounded-full transition-all"
+                          style={{ background: TINT_WARM, color: SCAN_TO }}>
+                          {showBaumannInfo ? t("result.baumannFold") : t("result.baumannExpand")}
+                        </button>
+                      </div>
+                      <p className="text-[11px] font-medium mt-1 text-stone-500 text-kr-pretty">{t("result.mbtiSub")}</p>
+                    </div>
                   </div>
                   <div className="rounded-full px-3 py-1 text-[10px] font-bold shrink-0 flex items-center gap-0.5"
-                    style={{ background: `${DEEP_GREEN}10`, color: DEEP_GREEN }}>
+                    style={{ background: TINT_GREEN, color: DEEP_GREEN }}>
                     <Flame className="w-3 h-3" style={{ color: SCAN_TO }} />{t("streak.badge", { count: currentStreak.count || 1 })}
                   </div>
                 </div>
