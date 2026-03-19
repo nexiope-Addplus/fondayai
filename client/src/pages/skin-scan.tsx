@@ -3859,6 +3859,85 @@ function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: any; analys
       ? `${diaryReport.triggerSignals[0].label} ${diaryReport.triggerSignals[0].diff > 0 ? `+${diaryReport.triggerSignals[0].diff}` : diaryReport.triggerSignals[0].diff}`
       : diaryReport.seasonGuide,
   ].filter(Boolean).slice(0, 3);
+  const keyConcern = diaryReport.focusConcerns[0]?.key;
+  const reportStatusLabel = reportLang === "ko"
+    ? keyConcern === "redness" ? "민감 관리 우선"
+      : keyConcern === "pigmentation" ? "색소 변동 주의"
+      : keyConcern === "hydration" ? "장벽 회복 우선"
+      : diaryReport.trendKey === "trendUp" ? "안정 회복 단계"
+      : "집중 관리 구간"
+    : reportLang === "ja"
+      ? keyConcern === "redness" ? "敏感管理優先"
+        : keyConcern === "pigmentation" ? "色素変動注意"
+        : keyConcern === "hydration" ? "バリア回復優先"
+        : diaryReport.trendKey === "trendUp" ? "安定回復段階"
+        : "集中管理区間"
+      : keyConcern === "redness" ? "Sensitivity first"
+        : keyConcern === "pigmentation" ? "Pigment watch"
+        : keyConcern === "hydration" ? "Barrier recovery first"
+        : diaryReport.trendKey === "trendUp" ? "Stable recovery phase"
+        : "Focused care phase";
+  const consultantHeadline = reportLang === "ko"
+    ? `${diaryReport.focusConcerns[0]?.titles.ko || "기초 컨디션"} 중심으로 흐름을 먼저 잡아야 하는 주간입니다.`
+    : reportLang === "ja"
+      ? `${diaryReport.focusConcerns[0]?.titles.ja || "基礎コンディション"}を軸に整える週です。`
+      : `This week should center on stabilizing ${diaryReport.focusConcerns[0]?.titles.en || "your baseline condition"}.`;
+  const causeEstimateItems = [
+    diaryReport.triggerSignals[0]
+      ? (reportLang === "ko"
+          ? `${diaryReport.triggerSignals[0].label}이 있는 날 이후 점수 변동폭이 ${Math.abs(diaryReport.triggerSignals[0].diff)}점 정도 벌어졌습니다.`
+          : reportLang === "ja"
+            ? `${diaryReport.triggerSignals[0].label}がある日にスコア変動が約${Math.abs(diaryReport.triggerSignals[0].diff)}点広がりました。`
+            : `Score volatility widens by about ${Math.abs(diaryReport.triggerSignals[0].diff)} points on days tagged with ${diaryReport.triggerSignals[0].label}.`)
+      : "",
+    weeklyReport.incompleteDays > 1
+      ? (reportLang === "ko"
+          ? `루틴 체크가 끊긴 날이 ${weeklyReport.incompleteDays}일 있어 관리 일관성이 흔들렸습니다.`
+          : reportLang === "ja"
+            ? `ルーティン記録が途切れた日が${weeklyReport.incompleteDays}日あり、管理の一貫性が落ちました。`
+            : `Routine adherence dropped on ${weeklyReport.incompleteDays} days, reducing consistency.`)
+      : "",
+    diaryReport.topCauseTags[0]
+      ? (reportLang === "ko"
+          ? `${diaryReport.topCauseTags[0]} 패턴이 반복되어 생활 변수 영향이 같이 보입니다.`
+          : reportLang === "ja"
+            ? `${diaryReport.topCauseTags[0]}パターンが繰り返され、生活要因の影響も見えます。`
+            : `${diaryReport.topCauseTags[0]} keeps recurring, suggesting a lifestyle driver as well.`)
+      : "",
+  ].filter(Boolean).slice(0, 3);
+  const avoidMistakes = [
+    ...(routineGuide.cautions.slice(0, 2)),
+    reportLang === "ko"
+      ? "좋아졌다고 바로 기능성 루틴 강도를 올리지 마세요."
+      : reportLang === "ja"
+        ? "少し良くなったからといってすぐに強い機能性ケアへ戻さないでください。"
+        : "Do not jump back into stronger actives as soon as things start to look better.",
+  ].slice(0, 3);
+  const routineAdjustPlan = {
+    keep: diaryReport.routineHighlights.strong,
+    reduce: diaryReport.routineHighlights.watch,
+    add: diaryReport.ingredientPlan[0]
+      ? (reportLang === "ko"
+          ? `${diaryReport.ingredientPlan[0].name} 중심 루틴을 천천히 추가`
+          : reportLang === "ja"
+            ? `${diaryReport.ingredientPlan[0].name}中心のケアをゆっくり追加`
+            : `Slowly add a ${diaryReport.ingredientPlan[0].name}-focused step`)
+      : diaryReport.copy.notEnough,
+  };
+  const lifestyleSupportItems = [
+    analysisResult?.nutritionTips?.hydrationGoal || "",
+    diaryReport.seasonGuide,
+    reportLang === "ko"
+      ? "수면과 자외선 노출 변수를 같이 관리하면 점수 변동폭을 줄이기 쉽습니다."
+      : reportLang === "ja"
+        ? "睡眠と紫外線の変数を一緒に整えるとスコア変動を抑えやすくなります。"
+        : "Managing sleep and UV exposure together will usually reduce score volatility.",
+  ].filter(Boolean).slice(0, 2);
+  const closingComment = reportLang === "ko"
+    ? "이번 주는 더 많이 하는 것보다, 흔들리지 않게 유지하는 것이 핵심입니다."
+    : reportLang === "ja"
+      ? "今週は増やすことより、ぶれずに維持することが重要です。"
+      : "This week is less about doing more and more about staying steady.";
 
   useEffect(() => {
     if (!reminderSettings.enabled) return;
@@ -4192,10 +4271,10 @@ function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: any; analys
                           {reportConsultText.brief}
                         </p>
                         <p className="text-[20px] font-black mt-1 text-kr-pretty" style={{ color: DEEP_GREEN }}>
-                          {diaryReport.copy.title}
+                          {reportLang === "ko" ? "이번 주 피부 컨설팅" : reportLang === "ja" ? "今週の肌コンサルティング" : "This Week's Skin Consult"}
                         </p>
                         <p className="text-[11px] text-stone-500 mt-1 leading-relaxed text-kr-pretty">
-                          {reportConsultText.briefSub}
+                          {consultantHeadline}
                         </p>
                       </div>
                       <div className="rounded-3xl px-3 py-2 text-right shrink-0"
@@ -4203,6 +4282,11 @@ function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: any; analys
                         <p className="text-[10px] font-bold text-stone-500 whitespace-nowrap">{diaryReport.copy.period}</p>
                         <p className="text-sm font-bold mt-1" style={{ color: DEEP_GREEN }}>{diaryReport.periodLabel}</p>
                       </div>
+                    </div>
+                    <div className="mt-3 flex justify-start">
+                      <span className="rounded-full px-3 py-1 text-[10px] font-bold" style={{ background: "#FFFFFF", color: SCAN_TO }}>
+                        {reportStatusLabel}
+                      </span>
                     </div>
 
                     <div className="grid grid-cols-3 gap-2 mt-4">
@@ -4247,6 +4331,24 @@ function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: any; analys
                           {diaryReport.routineDesc}
                         </p>
                       </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card className="border-none rounded-3xl shadow-sm overflow-hidden" style={{ background: "#FFFFFF" }}>
+                  <CardContent className="p-4">
+                    <p className="text-xs font-semibold uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>
+                      {reportConsultText.causes}
+                    </p>
+                    <div className="space-y-2.5 mt-3">
+                      {causeEstimateItems.map((item, index) => (
+                        <div key={`${item}-${index}`} className="rounded-2xl p-3 flex items-start gap-3" style={{ background: "#F8F5F2" }}>
+                          <div className="w-7 h-7 rounded-xl flex items-center justify-center shrink-0 text-[11px] font-bold" style={{ background: "#FFFFFF", color: SCAN_TO }}>
+                            {index + 1}
+                          </div>
+                          <p className="text-[12px] text-stone-700 leading-relaxed text-kr-pretty">{item}</p>
+                        </div>
+                      ))}
                     </div>
                   </CardContent>
                 </Card>
@@ -4471,6 +4573,38 @@ function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: any; analys
                         </div>
                       )}
                     </div>
+                    <div className="grid gap-3 mt-3 md:grid-cols-3">
+                      <div className="rounded-2xl p-3" style={{ background: TINT_GREEN }}>
+                        <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-emerald-700">{reportLang === "ko" ? "유지" : reportLang === "ja" ? "維持" : "Keep"}</p>
+                        <p className="text-[12px] font-semibold mt-2 text-stone-700 text-kr-pretty">{routineAdjustPlan.keep}</p>
+                      </div>
+                      <div className="rounded-2xl p-3" style={{ background: TINT_WARM }}>
+                        <p className="text-[10px] font-bold uppercase tracking-[0.12em]" style={{ color: SCAN_TO }}>{reportLang === "ko" ? "줄이기" : reportLang === "ja" ? "減らす" : "Reduce"}</p>
+                        <p className="text-[12px] font-semibold mt-2 text-stone-700 text-kr-pretty">{routineAdjustPlan.reduce}</p>
+                      </div>
+                      <div className="rounded-2xl p-3" style={{ background: "#F6F4FB" }}>
+                        <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-[#7C3AED]">{reportLang === "ko" ? "추가" : reportLang === "ja" ? "追加" : "Add"}</p>
+                        <p className="text-[12px] font-semibold mt-2 text-stone-700 text-kr-pretty">{routineAdjustPlan.add}</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card className="border-none rounded-3xl shadow-sm overflow-hidden" style={{ background: "#FFFFFF" }}>
+                  <CardContent className="p-4">
+                    <p className="text-xs font-semibold uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>
+                      {reportLang === "ko" ? "피해야 할 실수" : reportLang === "ja" ? "避けたいミス" : "Avoid This Week"}
+                    </p>
+                    <div className="space-y-2.5 mt-3">
+                      {avoidMistakes.map((item, index) => (
+                        <div key={`${item}-${index}`} className="rounded-2xl p-3 flex items-start gap-3" style={{ background: "#FFF7ED" }}>
+                          <div className="w-7 h-7 rounded-xl flex items-center justify-center shrink-0 text-[11px] font-bold" style={{ background: "#FFFFFF", color: "#C2410C" }}>
+                            !
+                          </div>
+                          <p className="text-[12px] text-stone-700 leading-relaxed text-kr-pretty">{item}</p>
+                        </div>
+                      ))}
+                    </div>
                   </CardContent>
                 </Card>
 
@@ -4480,7 +4614,13 @@ function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: any; analys
                       <p className="text-xs font-semibold uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>
                         {reportConsultText.lifestyle}
                       </p>
-                      <p className="text-[13px] text-stone-600 mt-3 leading-relaxed text-kr-pretty">{diaryReport.seasonGuide}</p>
+                      <div className="space-y-2.5 mt-3">
+                        {lifestyleSupportItems.map((item, index) => (
+                          <div key={`${item}-${index}`} className="rounded-2xl p-3" style={{ background: index === 0 ? "#F5F9FF" : TINT_NEUTRAL }}>
+                            <p className="text-[12px] text-stone-600 leading-relaxed text-kr-pretty">{item}</p>
+                          </div>
+                        ))}
+                      </div>
                     </CardContent>
                   </Card>
 
@@ -4531,6 +4671,15 @@ function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: any; analys
                         <p className="text-2xl font-bold mt-1" style={{ color: DEEP_GREEN }}>{diaryReport.forecast.week2}</p>
                       </div>
                     </div>
+                  </CardContent>
+                </Card>
+
+                <Card className="border-none rounded-3xl shadow-sm overflow-hidden" style={{ background: "#FFFFFF" }}>
+                  <CardContent className="p-4">
+                    <p className="text-xs font-semibold uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>
+                      {reportLang === "ko" ? "마무리 코멘트" : reportLang === "ja" ? "締めコメント" : "Closing note"}
+                    </p>
+                    <p className="text-[13px] text-stone-700 mt-3 leading-relaxed text-kr-pretty">{closingComment}</p>
                   </CardContent>
                 </Card>
               </div>
