@@ -4888,7 +4888,7 @@ function MyScreen({ user, onInstall, onBack, onLogin, onGoMagazine }: { user: an
       <div className="px-5 pt-5 space-y-3">
         {/* 프로필 */}
         {user ? (
-          <div className="flex items-center justify-between p-5 rounded-3xl bg-white" style={{ boxShadow: "0 8px 24px rgba(45,95,79,0.06)" }}>
+          <div className="flex items-center justify-between p-4 rounded-2xl bg-white" style={{ boxShadow: "0 8px 24px rgba(45,95,79,0.06)" }}>
             <div className="flex items-center gap-3">
               {user.avatar
                 ? <img src={user.avatar} className="w-10 h-10 rounded-full" />
@@ -4929,7 +4929,7 @@ function MyScreen({ user, onInstall, onBack, onLogin, onGoMagazine }: { user: an
             </button>
           </div>
         ) : (
-          <div className="p-5 rounded-3xl bg-white space-y-3" style={{ boxShadow: "0 8px 24px rgba(45,95,79,0.06)" }}>
+          <div className="p-4 rounded-2xl bg-white space-y-3" style={{ boxShadow: "0 8px 24px rgba(45,95,79,0.06)" }}>
             <div className="text-center mb-2">
               <p className="text-[14px] font-bold text-stone-700 mb-1">{t("report.loginRequired")}</p>
               <p className="text-[12px] text-stone-400">{t("attendance.loginDesc")}</p>
@@ -4959,7 +4959,7 @@ function MyScreen({ user, onInstall, onBack, onLogin, onGoMagazine }: { user: an
 
         {/* 출석 달력 */}
         <button onClick={() => setShowCalendar(true)}
-          className="w-full flex items-center justify-between p-5 rounded-3xl bg-white active:opacity-70"
+          className="w-full flex items-center justify-between p-4 rounded-2xl bg-white active:opacity-70"
           style={{ boxShadow: "0 8px 24px rgba(45,95,79,0.06)" }}>
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-xl flex items-center justify-center"
@@ -4975,7 +4975,7 @@ function MyScreen({ user, onInstall, onBack, onLogin, onGoMagazine }: { user: an
         </button>
 
         {/* 언어 설정 */}
-        <div className="flex items-center justify-between p-5 rounded-3xl bg-white" style={{ boxShadow: "0 8px 24px rgba(45,95,79,0.06)" }}>
+        <div className="flex items-center justify-between p-4 rounded-2xl bg-white" style={{ boxShadow: "0 8px 24px rgba(45,95,79,0.06)" }}>
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: "#F6F4FB" }}>
               <Sparkles className="w-4.5 h-4.5" style={{ color: "#7C3AED" }} />
@@ -4998,7 +4998,7 @@ function MyScreen({ user, onInstall, onBack, onLogin, onGoMagazine }: { user: an
         {/* 화장품 루틴 목록 (로그인 시만) */}
         {user && (
           <button onClick={() => setShowMyCosmetics(true)}
-            className="w-full flex items-center gap-3 p-5 rounded-3xl bg-white active:opacity-70"
+            className="w-full flex items-center gap-3 p-4 rounded-2xl bg-white active:opacity-70"
             style={{ boxShadow: "0 8px 24px rgba(45,95,79,0.06)" }}>
             <div className="w-9 h-9 rounded-xl flex items-center justify-center"
               style={{ background: TINT_GREEN }}>
@@ -5018,7 +5018,7 @@ function MyScreen({ user, onInstall, onBack, onLogin, onGoMagazine }: { user: an
 
         {/* 앱 설치 */}
         <button onClick={onInstall}
-          className="w-full flex items-center justify-between p-5 rounded-3xl bg-white active:opacity-70"
+          className="w-full flex items-center justify-between p-4 rounded-2xl bg-white active:opacity-70"
           style={{ boxShadow: "0 8px 24px rgba(45,95,79,0.06)" }}>
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: "#FFF7ED" }}>
@@ -5031,7 +5031,7 @@ function MyScreen({ user, onInstall, onBack, onLogin, onGoMagazine }: { user: an
 
         {/* 매거진 */}
         <button onClick={onGoMagazine}
-          className="w-full flex items-center justify-between p-5 rounded-3xl bg-white active:opacity-70"
+          className="w-full flex items-center justify-between p-4 rounded-2xl bg-white active:opacity-70"
           style={{ boxShadow: "0 8px 24px rgba(45,95,79,0.06)" }}>
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: "#F6F4FB" }}>
@@ -6582,11 +6582,11 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
             </div>
             <div className="grid grid-cols-2 gap-1.5 mt-3">
               <div className="col-span-2 rounded-2xl px-4 py-3" style={{ background: TINT_WARM }}>
-                <div className="min-w-0">
-                  <p className="text-[9px] font-bold uppercase tracking-[0.12em] text-stone-400">{t("result.overall")}</p>
-                  <p className="text-[40px] font-black leading-none mt-0.5" style={{ color: SCAN_TO }}>{overallScore}</p>
+                <div className="min-w-0 flex items-end justify-center gap-2">
+                  <p className="text-[11px] font-bold tracking-[0.02em] text-stone-500">{t("result.overall")} :</p>
+                  <p className="text-[34px] font-black leading-none" style={{ color: SCAN_TO }}>{overallScore}{t("result.scoreSuffix")}</p>
                 </div>
-                <p className="text-[11px] text-stone-600 mt-1 leading-snug text-kr-pretty">
+                <p className="text-[11px] text-stone-600 mt-1.5 leading-snug text-kr-pretty text-center">
                   {weakestSummary || t("result.actionCard.phaseRecord")}
                 </p>
               </div>
@@ -7047,24 +7047,24 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
             <div className="space-y-3">
 
             <div className="flex items-center gap-2 mb-1">
-              <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: TINT_GREEN }}>
+              <div className="w-9 h-9 rounded-2xl flex items-center justify-center" style={{ background: TINT_GREEN }}>
                 <Leaf className="w-4 h-4" style={{ color: DEEP_GREEN }} />
               </div>
               <div>
-                <p className="text-sm font-bold" style={{ color: DEEP_GREEN }}>{t("modal.improvements.title")}</p>
+                <p className="text-[10px] font-bold uppercase tracking-[0.14em]" style={{ color: DEEP_GREEN }}>{t("modal.improvements.title")}</p>
                 <p className="text-[11px] text-stone-400">{t("modal.improvements.sub")}</p>
               </div>
             </div>
             {(analysisResult?.improvements ?? []).slice(0, 3).map((item: { title: string; desc: string }, i: number) => (
               <motion.div key={i} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.08 }} className="flex gap-3 p-4 rounded-2xl"
-                style={{ background: i === 0 ? TINT_WARM : i === 1 ? TINT_GREEN : "#F6F4FB" }}>
+                style={{ background: "#FFFFFF", boxShadow: "0 8px 24px rgba(45,95,79,0.06)" }}>
                 <div className="shrink-0">
-                  <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-semibold"
-                    style={{ background: "#FFFFFF", color: i === 0 ? SCAN_TO : i === 1 ? DEEP_GREEN : "#7C3AED" }}>
+                  <div className="w-9 h-9 rounded-2xl flex items-center justify-center text-xs font-semibold"
+                    style={{ background: i === 0 ? TINT_WARM : i === 1 ? TINT_GREEN : "#F6F4FB", color: i === 0 ? SCAN_TO : i === 1 ? DEEP_GREEN : "#7C3AED" }}>
                     {i + 1}
                   </div>
-                  <p className="text-[9px] font-semibold text-center mt-0.5"
+                  <p className="text-[9px] font-semibold text-center mt-1"
                     style={{ color: i === 0 ? SCAN_TO : i === 1 ? DEEP_GREEN : "#7C3AED" }}>STEP</p>
                 </div>
                 <div>
@@ -7079,16 +7079,18 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
             {(analysisResult?.cosmetics ?? []).length > 0 && (
               <>
                 <div className="flex items-center gap-2 pt-2 pb-1">
-                  <Sparkles className="w-4 h-4" style={{ color: SCAN_TO }} />
-                  <p className="text-sm font-bold" style={{ color: DEEP_GREEN }}>{t("modal.improvements.cosmetics")}</p>
+                  <div className="w-9 h-9 rounded-2xl flex items-center justify-center" style={{ background: TINT_WARM }}>
+                    <Sparkles className="w-4 h-4" style={{ color: SCAN_TO }} />
+                  </div>
+                  <p className="text-[10px] font-bold uppercase tracking-[0.14em]" style={{ color: DEEP_GREEN }}>{t("modal.improvements.cosmetics")}</p>
                 </div>
                 {(analysisResult.cosmetics as { type: string; key: string; reason: string }[]).map((item, i) => (
                   <motion.div key={`c-${i}`} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.3 + i * 0.07 }}
                     className="flex items-start gap-3 p-4 rounded-2xl"
-                    style={{ background: "#FFF7ED" }}>
+                    style={{ background: "#FFFFFF", boxShadow: "0 8px 24px rgba(45,95,79,0.06)" }}>
                     <div className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0"
-                      style={{ background: "#FFFFFF" }}>
+                      style={{ background: "#FFF7ED" }}>
                       <Star className="w-4 h-4" style={{ color: "#D97706" }} />
                     </div>
                     <div>
@@ -7212,13 +7214,13 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
         {activeTab === "nutrition" && (
           <motion.div key="nutrition" custom={tabDirectionRef.current} variants={tabSlideVariants}
             initial="enter" animate="center" exit="exit" transition={{ duration: 0.2, ease: "easeInOut" }}>
-          <div className="space-y-3">
+          <div className="space-y-4">
             <div className="flex items-center gap-2 mb-1">
-              <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: "#F6F4FB" }}>
-                <Sparkles className="w-4 h-4" style={{ color: "#7C3AED" }} />
+              <div className="w-9 h-9 rounded-2xl flex items-center justify-center" style={{ background: "#F6F4FB" }}>
+                <Utensils className="w-4 h-4" style={{ color: "#7C3AED" }} />
               </div>
               <div>
-                <p className="text-sm font-bold" style={{ color: "#7C3AED" }}>{t("nutrients.supplementsTitle")}</p>
+                <p className="text-[10px] font-bold uppercase tracking-[0.14em]" style={{ color: "#7C3AED" }}>{t("nutrients.supplementsTitle")}</p>
                 <p className="text-[11px] text-stone-400">{t("nutrients.supplementsSub")}</p>
               </div>
             </div>
@@ -7236,8 +7238,10 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
                     <motion.div key={i} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: i * 0.07 }}
                       className="flex items-start gap-3 p-3.5 rounded-2xl"
-                      style={{ background: "#F6F4FB" }}>
-                      <span className="text-2xl shrink-0 mt-0.5">{item.emoji}</span>
+                      style={{ background: "#FFFFFF", boxShadow: "0 8px 24px rgba(45,95,79,0.06)" }}>
+                      <div className="w-10 h-10 rounded-2xl flex items-center justify-center shrink-0 mt-0.5" style={{ background: "#F6F4FB" }}>
+                        <span className="text-xl">{item.emoji}</span>
+                      </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-0.5 flex-wrap">
                           <p className="text-sm font-bold text-stone-800">{item.name}</p>
@@ -7255,9 +7259,11 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
 
                 {/* 수분 목표 */}
                 {analysisResult.nutritionTips.hydrationGoal && (
-                  <div className="flex items-center gap-3 rounded-2xl px-4 py-3"
-                    style={{ background: "#F5F9FF" }}>
-                    <span className="text-xl shrink-0">💧</span>
+                  <div className="flex items-center gap-3 rounded-2xl px-4 py-3.5"
+                    style={{ background: "#FFFFFF", boxShadow: "0 8px 24px rgba(45,95,79,0.06)" }}>
+                    <div className="w-10 h-10 rounded-2xl flex items-center justify-center shrink-0" style={{ background: "#F5F9FF" }}>
+                      <span className="text-xl">💧</span>
+                    </div>
                     <div>
                       <p className="text-[10px] font-semibold text-blue-600 mb-0.5">{t("nutrients.hydrationLabel")}</p>
                       <p className="text-[12px] text-stone-600 leading-relaxed">{analysisResult.nutritionTips.hydrationGoal}</p>
@@ -7268,14 +7274,18 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
                 {/* 피해야 할 것 */}
                 <div className="pt-1">
                   <div className="flex items-center gap-2 mb-3 pt-2 border-t border-stone-100">
-                    <AlertCircle className="w-4 h-4 text-amber-500 shrink-0" />
-                    <p className="text-sm font-bold" style={{ color: "#D97706" }}>{t("nutrients.avoidTitle")}</p>
+                    <div className="w-9 h-9 rounded-2xl flex items-center justify-center" style={{ background: "#FFF7ED" }}>
+                      <AlertCircle className="w-4 h-4 text-amber-500 shrink-0" />
+                    </div>
+                    <p className="text-[10px] font-bold uppercase tracking-[0.14em]" style={{ color: "#D97706" }}>{t("nutrients.avoidTitle")}</p>
                   </div>
                   <div className="space-y-3">
                     {analysisResult.nutritionTips.avoidFoods.map((item: { emoji: string; food: string; reason: string }, idx: number) => (
                       <div key={idx} className="flex items-start gap-3 p-3 rounded-2xl"
-                        style={{ background: "#FFF7ED" }}>
-                        <span className="text-xl shrink-0">{item.emoji}</span>
+                        style={{ background: "#FFFFFF", boxShadow: "0 8px 24px rgba(45,95,79,0.06)" }}>
+                        <div className="w-10 h-10 rounded-2xl flex items-center justify-center shrink-0" style={{ background: "#FFF7ED" }}>
+                          <span className="text-xl">{item.emoji}</span>
+                        </div>
                         <div className="flex-1 min-w-0">
                           <p className="text-[12px] font-bold text-stone-700 mb-0.5">{item.food}</p>
                           <p className="text-[11px] text-stone-400">{item.reason}</p>
@@ -7304,12 +7314,12 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
       </motion.div>
 
       {/* ── 하단 고정 액션바 ── */}
-      <div className="fixed left-0 right-0 z-[50] flex items-center gap-2.5 px-4 py-3 bg-white/95 backdrop-blur-md border-t border-stone-100"
+      <div className="fixed left-0 right-0 z-[50] flex items-center gap-2 px-4 py-3 bg-white/95 backdrop-blur-md border-t border-stone-100"
         style={{ bottom: 60, boxShadow: "0 -4px 16px rgba(0,0,0,0.06)" }}>
         {/* 공유 */}
         <Button onClick={handleShare} disabled={shareLoading}
-          className="flex-1 h-12 rounded-2xl font-semibold flex items-center justify-center gap-1.5"
-          style={{ background: TINT_NEUTRAL, color: DEEP_GREEN }}>
+          className="flex-1 h-12 rounded-2xl font-semibold flex items-center justify-center gap-1.5 border"
+          style={{ background: "#FFFFFF", color: DEEP_GREEN, borderColor: "#D6E7DF" }}>
           {shareLoading
             ? <div className="w-4 h-4 border-2 border-stone-300 border-t-stone-600 rounded-full animate-spin" />
             : <><Share2 className="w-4 h-4" /><span className="text-[12px]">{t("result.share")}</span></>}
@@ -7317,16 +7327,16 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
         {/* 챌린지 */}
         {pendingChallengeToken ? (
           <Button onClick={() => { sessionStorage.removeItem('battleChallengeToken'); window.location.href = `/battle/${pendingChallengeToken}`; }}
-            className="flex-1 h-12 rounded-2xl font-semibold flex items-center justify-center gap-1.5"
-            style={{ background: "#F6F4FB", color: "#7C3AED" }}>
+            className="flex-1 h-12 rounded-2xl font-semibold flex items-center justify-center gap-1.5 border"
+            style={{ background: "#FFFFFF", color: "#7C3AED", borderColor: "#E9DDFF" }}>
             <Trophy className="w-4 h-4" /><span className="text-[12px]">{t("result.challengeResult")}</span>
           </Button>
         ) : (
           <Button
             className="flex-1 h-12 rounded-2xl font-semibold flex items-center justify-center gap-1"
             style={currentShareToken
-              ? { background: TINT_WARM, color: SCAN_TO }
-              : { background: "#F3F4F6", color: "#9CA3AF" }}
+              ? { background: "#FFFFFF", color: SCAN_TO, border: `1px solid ${SCAN_TO}33` }
+              : { background: "#F8FAFC", color: "#9CA3AF", border: "1px solid #E5E7EB" }}
             disabled={!currentShareToken}
             onClick={() => {
               if (!currentShareToken) return;
