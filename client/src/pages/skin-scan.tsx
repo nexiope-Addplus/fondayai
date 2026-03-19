@@ -1248,35 +1248,42 @@ function MissionCard() {
   const incomplete = missionItems.filter(m => !m.done);
   const complete = missionItems.filter(m => m.done);
   const visible = expanded ? missionItems : [...incomplete.slice(0, 3), ...complete.slice(0, 1)].slice(0, 4);
+  const focusedItems = incomplete.length > 0 ? incomplete : complete;
 
   return (
     <motion.div variants={fadeChild} className="mb-4">
-      <div className="bg-white rounded-2xl px-4 py-3.5"
-        style={{ boxShadow: "0 2px 12px rgba(180,130,110,0.08)" }}>
-        <div className="flex items-center justify-between mb-3">
-          <p className="text-sm font-bold" style={{ color: DEEP_GREEN }}>{t("mission.title")}</p>
-          <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full text-white"
-            style={{ background: "#F59E0B" }}>
+      <div className="rounded-2xl px-4 py-3.5"
+        style={{ background: "#FFFFFF", boxShadow: "0 2px 10px rgba(45,95,79,0.06)" }}>
+        <div className="flex items-start justify-between gap-3 mb-3">
+          <div className="min-w-0">
+            <p className="text-sm font-semibold" style={{ color: DEEP_GREEN }}>{t("mission.title")}</p>
+            <p className="text-[11px] text-stone-500 mt-1 leading-relaxed">
+              {focusedItems.slice(0, 2).map(({ id }) => t(`mission.${id}`)).join(" · ")}
+            </p>
+          </div>
+          <span className="text-[11px] font-semibold px-2.5 py-1 rounded-full shrink-0"
+            style={{ background: "#FFF7ED", color: "#B45309" }}>
             {t("mission.points", { n: missions.totalPoints })}
           </span>
         </div>
-        <div className="space-y-3">
+        <div className="space-y-2">
           {visible.map(({ id, done, points }) => (
-            <div key={id} className="flex items-center justify-between py-1.5 border-b border-stone-50 last:border-0">
-              <div className="flex items-center gap-2">
+            <div key={id} className="flex items-center justify-between gap-3 rounded-2xl px-3 py-2.5"
+              style={{ background: done ? "#FAFAF9" : TINT_NEUTRAL }}>
+              <div className="flex items-center gap-2 min-w-0">
                 {done ? <CheckCircle2 className="w-4 h-4 text-emerald-500" /> : <Lock className="w-4 h-4 text-stone-300" />}
-                <span className={`text-[12px] font-semibold ${done ? "text-stone-400 line-through" : "text-stone-700"}`}>
+                <span className={`text-[12px] font-medium truncate ${done ? "text-stone-400 line-through" : "text-stone-700"}`}>
                   {t(`mission.${id}`)}
                 </span>
               </div>
-              <span className="text-[11px] font-bold text-amber-500">+{points}pt</span>
+              <span className="text-[11px] font-semibold shrink-0 text-amber-600">+{points}pt</span>
             </div>
           ))}
         </div>
         {missionItems.length > 4 && (
           <button
             onClick={() => setExpanded(e => !e)}
-            className="mt-2 w-full text-[11px] font-semibold text-stone-400 text-center py-1"
+            className="mt-2 w-full text-[11px] font-medium text-stone-400 text-center py-1"
           >
             {expanded ? t("mission.hide") : t("mission.showAll")}
           </button>
@@ -1509,22 +1516,6 @@ function ScanIdleScreen({ onScan }: { onScan: () => void }) {
             style={{ animation: pullY >= 70 ? "spin 0.6s linear infinite" : "none" }} />
         </div>
       )}
-      {/* ── Aurora 배경 blobs ── */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden" style={{ zIndex: 0 }}>
-        <motion.div className="absolute rounded-full"
-          style={{ width: 280, height: 280, background: `${SCAN_FROM}18`, filter: "blur(50px)", top: -60, left: -60 }}
-          animate={{ x: [0, 30, -10, 0], y: [0, 20, 40, 0] }}
-          transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }} />
-        <motion.div className="absolute rounded-full"
-          style={{ width: 200, height: 200, background: "#F3D4C818", filter: "blur(40px)", top: 80, right: -40 }}
-          animate={{ x: [0, -20, 10, 0], y: [0, 30, -10, 0] }}
-          transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }} />
-        <motion.div className="absolute rounded-full"
-          style={{ width: 240, height: 240, background: `${SCAN_TO}12`, filter: "blur(50px)", bottom: 200, left: "20%" }}
-          animate={{ x: [0, -15, 20, 0], y: [0, -20, 15, 0] }}
-          transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }} />
-      </div>
-
       {/* 날씨 기반 그리팅 + 날씨 팁 통합 카드 */}
       {(() => {
         const hour = new Date().getHours();
@@ -1589,83 +1580,82 @@ function ScanIdleScreen({ onScan }: { onScan: () => void }) {
 
       {/* ── 헤더 + 히어로 미리보기 ── */}
       <motion.div variants={fadeChild} className="mb-4 relative" style={{ zIndex: 1 }}>
-        <div className="flex items-center justify-between gap-2 mb-3">
-          <div className="flex items-center gap-1.5 px-3 py-1 rounded-full"
-            style={{ background: `${SCAN_FROM}22`, border: `1px solid ${SCAN_FROM}50` }}>
-            <Sparkles className="w-3 h-3" style={{ color: SCAN_TO }} />
-            <span className="text-[11px] font-bold tracking-widest uppercase" style={{ color: SCAN_TO }}>FONDAY AI</span>
-          </div>
-          <div className="px-3 py-1 rounded-full bg-white/80 border border-white/70 shadow-[0_8px_24px_rgba(189,133,111,0.12)]">
-            <span className="text-[10px] font-bold" style={{ color: DEEP_GREEN }}>{t("idle.heroBadge")}</span>
-          </div>
+        <div className="flex items-center gap-2 mb-3 px-1">
+          <span className="text-[10px] font-semibold tracking-[0.18em] uppercase" style={{ color: SCAN_TO }}>FONDAY AI</span>
+          <span className="text-[10px] text-stone-300">/</span>
+          <span className="text-[10px] font-medium uppercase tracking-[0.14em] text-stone-500">{t("idle.heroBadge")}</span>
         </div>
-        <h1 className="text-[28px] sm:text-[30px] font-black text-stone-800 leading-[1.08] mb-2 px-1">
+        <h1 className="text-[28px] sm:text-[30px] font-bold text-stone-800 leading-[1.08] mb-2 px-1">
           {t("idle.subtitle1")}<br />{t("idle.subtitle3")}
         </h1>
-        <p className="text-[13px] text-stone-500 px-1 mb-3.5">
+        <p className="text-[13px] text-stone-500 px-1 mb-4 leading-relaxed">
           {t("idle.subtitle4")}
         </p>
 
-        <div className="rounded-3xl p-3 border border-white/70 sm:rounded-3xl sm:p-3.5"
-          style={{ background: "rgba(255,255,255,0.84)", boxShadow: "0 18px 44px rgba(160,120,100,0.15)", backdropFilter: "blur(14px)" }}>
-          <div className="flex items-center justify-between mb-3">
+        <div className="rounded-3xl p-4 sm:p-[18px]"
+          style={{ background: "#FFFFFF", boxShadow: "0 10px 28px rgba(45,95,79,0.08)" }}>
+          <div className="flex items-center justify-between mb-3.5">
             <div>
-              <div className="text-[11px] font-bold text-stone-700">{t("idle.previewTitle")}</div>
-              <div className="text-[9px] text-stone-400">{t("idle.previewSub")}</div>
+              <div className="text-[11px] font-semibold text-stone-700">{t("idle.previewTitle")}</div>
+              <div className="text-[10px] text-stone-400 mt-0.5">{t("idle.previewSub")}</div>
             </div>
-            <div className="flex items-center gap-1.5 px-2 py-1 rounded-full max-w-[52%] sm:max-w-none"
-              style={{ background: `${SCAN_FROM}16`, color: SCAN_TO }}>
+            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full max-w-[52%] sm:max-w-none"
+              style={{ background: TINT_WARM, color: SCAN_TO }}>
               <Heart className="w-3 h-3 shrink-0" />
-              <span className="text-[9.5px] leading-tight font-bold text-right break-keep">{t("idle.socialCount", { n: socialCount.toLocaleString() })}</span>
+              <span className="text-[10px] leading-tight font-medium text-right break-keep">{t("idle.socialCount", { n: socialCount.toLocaleString() })}</span>
             </div>
           </div>
-          <div className="grid grid-cols-[116px_1fr] gap-2.5 items-stretch sm:grid-cols-[132px_1fr] sm:gap-3">
-            <div className="relative rounded-3xl overflow-hidden min-h-[168px] bg-stone-100 sm:rounded-3xl sm:min-h-[176px]">
+          <div className="grid gap-4 items-start md:grid-cols-[132px_1fr]">
+            <div className="relative rounded-[28px] overflow-hidden h-[182px] bg-stone-100 md:h-full">
               <img
                 src="/face-model.png"
                 alt="preview"
                 className="w-full h-full object-cover"
                 style={{ objectPosition: "center top" }}
               />
-              <motion.div className="absolute left-0 right-0 h-[2px] z-10"
-                style={{ background: `linear-gradient(90deg, transparent 0%, ${SCAN_TO}CC 40%, ${SCAN_FROM} 50%, ${SCAN_TO}CC 60%, transparent 100%)` }}
+              <motion.div className="absolute left-0 right-0 h-[1px] z-10"
+                style={{ background: `linear-gradient(90deg, transparent 0%, ${SCAN_TO}66 40%, ${SCAN_FROM} 50%, ${SCAN_TO}66 60%, transparent 100%)` }}
                 animate={{ top: ["5%", "88%", "5%"] }}
                 transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }} />
               <div className="absolute inset-x-0 bottom-0 h-24"
-                style={{ background: "linear-gradient(to top, rgba(20,20,20,0.55), transparent)" }} />
-              <div className="absolute top-3 left-3 w-7 h-7 border-t-2 border-l-2 rounded-tl-lg" style={{ borderColor: SCAN_TO }} />
-              <div className="absolute top-3 right-3 w-7 h-7 border-t-2 border-r-2 rounded-tr-lg" style={{ borderColor: SCAN_TO }} />
+                style={{ background: "linear-gradient(to top, rgba(28,25,23,0.52), transparent)" }} />
               <div className="absolute bottom-3 left-3 text-white">
-                <p className="text-[8px] sm:text-[9px] font-bold uppercase tracking-[0.16em] text-white/75">{t("idle.heroMbtiLabel")}</p>
-                <p className="text-[22px] sm:text-2xl font-bold leading-none">OSNT</p>
+                <p className="text-[8px] sm:text-[9px] font-semibold uppercase tracking-[0.16em] text-white/75">{t("idle.heroMbtiLabel")}</p>
+                <p className="text-[22px] sm:text-2xl font-semibold leading-none mt-1">OSNT</p>
               </div>
             </div>
-            <div className="flex flex-col">
-              <div className="rounded-3xl px-2.5 py-2.5 mb-2.5 sm:rounded-3xl sm:px-3"
-                style={{ background: `${SCAN_FROM}10`, border: `1px solid ${SCAN_FROM}24` }}>
+            <div className="space-y-3">
+              <div className="rounded-[28px] px-3.5 py-3"
+                style={{ background: TINT_NEUTRAL }}>
                 <div className="flex items-center justify-between gap-2">
-                  <p className="text-[10px] font-bold uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>{t("idle.heroBenefitsTitle")}</p>
-                  <span className="text-[9px] font-bold uppercase tracking-[0.14em]" style={{ color: TEXT_SECONDARY }}>{t("idle.heroTag")}</span>
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>{t("idle.heroBenefitsTitle")}</p>
+                  <span className="text-[9px] font-medium uppercase tracking-[0.14em]" style={{ color: TEXT_SECONDARY }}>{t("idle.heroTag")}</span>
                 </div>
-                <div className="grid grid-cols-1 gap-2 mt-2">
-                  <div className="flex items-center gap-2 text-[11px] font-semibold text-stone-700">
-                    <Badge className="h-5 rounded-full px-2 text-[9px]" style={{ background: "#F3E8E2", color: SCAN_TO }}>{t("result.baumannLabel")}</Badge>
-                    <span>{t("idle.heroBenefit1")}</span>
+                <div className="grid grid-cols-1 gap-2.5 mt-3">
+                  <div className="flex items-start gap-2 text-[12px] text-stone-700">
+                    <span className="mt-[2px] h-1.5 w-1.5 rounded-full shrink-0" style={{ background: SCAN_TO }} />
+                    <span className="leading-relaxed">{t("idle.heroBenefit1")}</span>
                   </div>
-                  <div className="flex items-center gap-2 text-[11px] font-semibold text-stone-700">
-                    <Badge className="h-5 rounded-full px-2 text-[9px]" style={{ background: "#E7F7F0", color: DEEP_GREEN }}>{t("result.scores")}</Badge>
-                    <span>{t("idle.heroBenefit2")}</span>
+                  <div className="flex items-start gap-2 text-[12px] text-stone-700">
+                    <span className="mt-[2px] h-1.5 w-1.5 rounded-full shrink-0" style={{ background: DEEP_GREEN }} />
+                    <span className="leading-relaxed">{t("idle.heroBenefit2")}</span>
                   </div>
-                  <div className="flex items-center gap-2 text-[11px] font-semibold text-stone-700">
-                    <Badge className="h-5 rounded-full px-2 text-[9px]" style={{ background: "#FFF2E8", color: "#C2410C" }}>{t("result.skinAge")}</Badge>
-                    <span>{t("idle.heroBenefit3")}</span>
+                  <div className="flex items-start gap-2 text-[12px] text-stone-700">
+                    <span className="mt-[2px] h-1.5 w-1.5 rounded-full shrink-0" style={{ background: "#C2410C" }} />
+                    <span className="leading-relaxed">{t("idle.heroBenefit3")}</span>
                   </div>
                 </div>
               </div>
-              <div className="flex flex-col gap-1.5">
-                {PREVIEW_SCORES.map(({ idx, score, color }, i) => (
-                  <MiniScoreBarIdle key={idx} label={t(`scores.${idx}`)} score={score} color={color} delay={500 + i * 100} />
-                ))}
+              <div className="rounded-[28px] px-3.5 py-3"
+                style={{ background: "#FFFFFF", border: "1px solid #F1E8E2" }}>
+                <p className="text-[10px] font-semibold uppercase tracking-[0.14em] mb-2" style={{ color: DEEP_GREEN }}>
+                  {t("result.scores")}
+                </p>
+                <div className="flex flex-col gap-2">
+                  {PREVIEW_SCORES.map(({ idx, score, color }, i) => (
+                    <MiniScoreBarIdle key={idx} label={t(`scores.${idx}`)} score={score} color={color} delay={500 + i * 100} />
+                  ))}
+                </div>
               </div>
             </div>
           </div>
@@ -1716,8 +1706,8 @@ function ScanIdleScreen({ onScan }: { onScan: () => void }) {
 
       {/* 단계 표시 */}
       <motion.div variants={fadeChild} className="mb-4 relative" style={{ zIndex: 1 }}>
-        <div className="bg-white/90 rounded-2xl px-3 py-2"
-          style={{ boxShadow: "0 2px 12px rgba(180,130,110,0.08)", backdropFilter: "blur(8px)" }}>
+        <div className="bg-white rounded-2xl px-3 py-2.5"
+          style={{ boxShadow: "0 2px 10px rgba(45,95,79,0.06)" }}>
           <p className="text-[9px] font-semibold text-stone-400 text-center mb-2 tracking-widest uppercase">
             {t("idle.stepsTitle")}
           </p>
@@ -1727,12 +1717,12 @@ function ScanIdleScreen({ onScan }: { onScan: () => void }) {
                 <div className="flex flex-col items-center gap-1 flex-1">
                   <div className="w-8 h-8 rounded-full flex items-center justify-center text-sm"
                     style={step.active
-                      ? { background: `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})`, boxShadow: `0 4px 14px ${SCAN_FROM}44` }
-                      : { background: "#EDE6DE" }}>
-                    <step.Icon className="w-4 h-4" style={{ color: step.active ? "white" : "#A9998E" }} />
+                      ? { background: TINT_WARM }
+                      : { background: "#F4F4F5" }}>
+                    <step.Icon className="w-4 h-4" style={{ color: step.active ? SCAN_TO : "#A9998E" }} />
                   </div>
                   <div className="text-center">
-                    <div className="text-[10px] font-bold text-stone-700">{step.title}</div>
+                    <div className="text-[10px] font-semibold text-stone-700">{step.title}</div>
                     <div className="text-[9px] text-stone-400 mt-0.5 leading-tight">{step.sub}</div>
                   </div>
                 </div>
@@ -1745,10 +1735,10 @@ function ScanIdleScreen({ onScan }: { onScan: () => void }) {
 
       {/* 개인정보 보호 배지 */}
       <motion.div variants={fadeChild} className="mb-4 relative" style={{ zIndex: 1 }}>
-        <div className="flex items-center justify-center gap-1.5 px-3.5 py-2.5 rounded-2xl border"
-          style={{ background: "#F0FAF6", borderColor: "#C5E5DA" }}>
+        <div className="flex items-center justify-center gap-1.5 px-3.5 py-2.5 rounded-2xl"
+          style={{ background: TINT_GREEN }}>
           <Lock className="w-3.5 h-3.5 flex-shrink-0" style={{ color: DEEP_GREEN }} />
-          <span className="text-[11px] font-semibold" style={{ color: DEEP_GREEN }}>{t("idle.privacy")}</span>
+          <span className="text-[11px] font-medium" style={{ color: DEEP_GREEN }}>{t("idle.privacy")}</span>
         </div>
       </motion.div>
 
@@ -1757,14 +1747,14 @@ function ScanIdleScreen({ onScan }: { onScan: () => void }) {
         <motion.button
           onClick={onScan}
           className="w-full py-4 sm:py-[18px] rounded-2xl text-white text-[15px] sm:text-[16px] font-bold tracking-tight"
-          style={{ background: `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})` }}
+          style={{ background: DEEP_GREEN }}
           whileHover={{ scale: 1.01 }}
           whileTap={{ scale: 0.97 }}
           animate={{
             boxShadow: [
-              `0 8px 28px ${SCAN_FROM}44`,
-              `0 12px 40px ${SCAN_FROM}70`,
-              `0 8px 28px ${SCAN_FROM}44`,
+              `0 8px 22px rgba(45,95,79,0.16)`,
+              `0 10px 28px rgba(45,95,79,0.22)`,
+              `0 8px 22px rgba(45,95,79,0.16)`,
             ],
           }}
           transition={{ duration: 2.5, repeat: Infinity }}
@@ -5957,6 +5947,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
     center: { x: 0, opacity: 1 },
     exit: (dir: number) => ({ x: dir * -30, opacity: 0 }),
   };
+  const TAB_SEQUENCE = ["routine", "solution", "nutrition"] as const;
   const TAB_ORDER = { routine: 0, solution: 1, nutrition: 2 } as const;
   const goTo = (next: "routine" | "solution" | "nutrition") => {
     tabDirectionRef.current = TAB_ORDER[next] >= TAB_ORDER[activeTab] ? 1 : -1;
@@ -6441,14 +6432,14 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
             style={{ borderColor: SCAN_TO, color: SCAN_TO }}>
             <Camera className="w-4 h-4" /> {t("result.back")}
           </Button>
-          <h2 className="text-xl font-black tracking-tight" style={{ color: DEEP_GREEN }}>{t("result.title")}</h2>
+          <h2 className="text-xl font-bold tracking-tight" style={{ color: DEEP_GREEN }}>{t("result.title")}</h2>
         </div>
 
         {/* 압축형 결과 헤더 */}
-        <Card className="overflow-hidden border-none shadow-2xl rounded-3xl"
+        <Card className="overflow-hidden border-none shadow-[0_12px_32px_rgba(45,95,79,0.08)] rounded-3xl"
           style={{ background: "#FFFFFF" }}>
-          <CardContent className="p-3.5">
-            <div className="grid grid-cols-[92px_1fr] gap-2.5 items-start sm:grid-cols-[104px_1fr] sm:gap-3">
+          <CardContent className="p-4">
+            <div className="grid grid-cols-[92px_1fr] gap-3 items-start sm:grid-cols-[104px_1fr]">
               <div>
                 <div className="relative rounded-3xl overflow-hidden h-[120px] bg-stone-100 sm:rounded-3xl sm:h-[132px]">
                   <img src={faceCroppedSrc || imageSrc} className="w-full h-full object-cover" style={{ objectPosition: "center 50%" }} />
@@ -6459,76 +6450,78 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
                 </div>
                 <div className="mt-2 rounded-2xl px-2.5 py-2 text-center"
                   style={{ background: TINT_WARM }}>
-                  <p className="text-[8px] font-black uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>{t("result.baumannLabel")}</p>
-                  <p className="text-lg font-bold leading-none mt-1" style={{ color: SCAN_TO }}>{finalType}</p>
+                  <p className="text-[8px] font-semibold uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>{t("result.baumannLabel")}</p>
+                  <p className="text-lg font-semibold leading-none mt-1" style={{ color: SCAN_TO }}>{finalType}</p>
                 </div>
               </div>
 
-              <div className="flex flex-col">
-                <div className="rounded-3xl px-2.5 py-2.5 mb-2.5 sm:rounded-3xl sm:px-3"
-                  style={{ background: `${SCAN_FROM}10`, border: `1px solid ${SCAN_FROM}24` }}>
-                  <div className="flex items-center justify-between gap-2">
-                    <p className="text-[10px] font-bold uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>{t("result.scores")}</p>
-                    <button
-                      onClick={() => setShowAnalysis(true)}
-                      className="rounded-full px-2.5 py-1 text-[9px] font-bold whitespace-nowrap"
-                      style={{ background: TINT_WARM, color: SCAN_TO }}
-                    >
-                      {t("modal.analysis.title")} {t("result.viewBtn")}
-                    </button>
+              <div className="min-w-0">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="text-[10px] font-semibold uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>{t("result.todayAction")}</p>
+                    <p className="text-lg font-bold leading-tight mt-1 text-stone-800 text-kr-pretty">
+                      {weakestSummary || t("result.scores")}
+                    </p>
+                    <p className="text-[11px] text-stone-500 mt-2 leading-relaxed text-kr-pretty">
+                      {scoreDelta !== null
+                        ? scoreDelta > 0
+                          ? `${t("result.overall")} +${scoreDelta}`
+                          : scoreDelta < 0
+                          ? `${t("result.overall")} -${Math.abs(scoreDelta)}`
+                          : `${t("result.overall")} ${overallScore}`
+                        : `${t("result.actionCard.phaseRecord")} · ${t("result.baumannLabel")} ${finalType}`}
+                    </p>
                   </div>
-                  <p className="text-[11px] text-stone-500 mt-2 leading-relaxed text-kr-pretty">
-                    {scoreDelta !== null
-                      ? scoreDelta > 0
-                        ? `${t("result.overall")} +${scoreDelta}`
-                        : scoreDelta < 0
-                        ? `${t("result.overall")} -${Math.abs(scoreDelta)}`
-                        : `${t("result.overall")} ${overallScore}`
-                      : `${t("result.actionCard.phaseRecord")} · ${weakestSummary || t("result.scores")}`}
-                  </p>
+                  <button
+                    onClick={() => setShowAnalysis(true)}
+                    className="rounded-full px-3 py-1.5 text-[10px] font-semibold whitespace-nowrap shrink-0"
+                    style={{ background: TINT_NEUTRAL, color: DEEP_GREEN }}
+                  >
+                    {t("modal.analysis.title")} {t("result.viewBtn")}
+                  </button>
                 </div>
-                <div className="flex flex-col gap-1.5">
+                <div className="grid grid-cols-3 gap-2 mt-3.5">
+                  <div className="rounded-2xl px-2.5 py-3 text-left" style={{ background: TINT_WARM }}>
+                    <p className="text-[9px] font-semibold uppercase tracking-[0.12em] text-stone-400">{t("result.overall")}</p>
+                    <p className="text-[28px] font-bold leading-none mt-2" style={{ color: SCAN_TO }}>{overallScore}</p>
+                  </div>
+                  <div className="rounded-2xl px-2.5 py-3 text-left" style={{ background: "#F6F4FB" }}>
+                    <p className="text-[9px] font-semibold uppercase tracking-[0.12em] text-stone-400">{t("result.skinAge")}</p>
+                    <p className="text-[28px] font-bold leading-none mt-2" style={{ color: "#7C3AED" }}>
+                      {analysisResult?.skinAge && analysisResult.skinAge > 0 ? analysisResult.skinAge : "—"}
+                    </p>
+                  </div>
+                  <div className="rounded-2xl px-2.5 py-3 text-left" style={{ background: "#FFF8EE" }}>
+                    <p className="text-[9px] font-semibold uppercase tracking-[0.12em] text-stone-400">{t("ranking.topLabel")}</p>
+                    <p className="text-[22px] font-bold leading-none mt-2" style={{ color: "#D97706" }}>
+                      {rankingData && rankingData.myPercentile !== undefined ? t("ranking.myPercentile", { percent: rankingData.myPercentile }) : "—"}
+                    </p>
+                  </div>
+                </div>
+                <div className="flex flex-col gap-2.5 mt-3.5">
                   {previewScoreItems.map(({ idx, score, color }: { idx: number; score: number; color: string }, i: number) => (
                     <MiniScoreBarIdle key={idx} label={t(`scores.${idx}`)} score={score} color={color} delay={i * 80} />
                   ))}
                 </div>
               </div>
             </div>
-            <div className="grid grid-cols-3 gap-2 mt-3">
-              <div className="rounded-2xl px-2 py-4 flex flex-col items-center justify-center text-center" style={{ background: TINT_WARM }}>
-                <p className="text-[9px] font-bold uppercase tracking-[0.12em] text-stone-400">{t("result.overall")}</p>
-                <p className="text-[40px] font-black leading-none mt-1.5" style={{ color: SCAN_TO }}>{overallScore}</p>
-              </div>
-              <div className="rounded-2xl px-2 py-4 flex flex-col items-center justify-center text-center" style={{ background: "#F7F3FF", border: "1px solid #E9DDFF" }}>
-                <p className="text-[9px] font-bold uppercase tracking-[0.12em] text-stone-400">{t("result.skinAge")}</p>
-                <p className="text-[40px] font-black leading-none mt-1.5" style={{ color: "#7C3AED" }}>
-                  {analysisResult?.skinAge && analysisResult.skinAge > 0 ? analysisResult.skinAge : "—"}
-                </p>
-              </div>
-              <div className="rounded-2xl px-2 py-4 flex flex-col items-center justify-center text-center" style={{ background: "#FFF8EE", border: "1px solid #F4E2C4" }}>
-                <p className="text-[9px] font-bold uppercase tracking-[0.12em] text-stone-400">{t("ranking.topLabel")}</p>
-                <p className="text-[34px] font-black leading-none mt-1.5" style={{ color: "#D97706" }}>
-                  {rankingData && rankingData.myPercentile !== undefined ? t("ranking.myPercentile", { percent: rankingData.myPercentile }) : "—"}
-                </p>
-              </div>
-            </div>
             <div className="mt-3 rounded-3xl p-3"
-              style={{ background: TINT_WARM }}>
+              style={{ background: TINT_NEUTRAL }}>
                 <div className="flex items-center justify-between gap-3">
                   <div className="min-w-0">
-                    <p className="text-[10px] font-bold uppercase tracking-[0.16em]" style={{ color: SCAN_TO }}>{t("result.baumannLabel")}</p>
+                    <p className="text-[10px] font-semibold uppercase tracking-[0.16em]" style={{ color: SCAN_TO }}>{t("result.baumannLabel")}</p>
                     <div className="flex items-center gap-2 mt-1">
                       <p className="text-lg font-bold leading-none" style={{ color: DEEP_GREEN }}>{finalType}</p>
                       <button onClick={() => setShowBaumannInfo(v => !v)}
-                        className="text-[10px] font-bold px-2.5 py-1 rounded-full transition-all"
-                        style={{ background: `${SCAN_TO}18`, color: SCAN_TO }}>
+                        className="text-[10px] font-medium px-2.5 py-1 rounded-full transition-all"
+                        style={{ background: "#FFFFFF", color: SCAN_TO }}>
                         {showBaumannInfo ? t("result.baumannFold") : t("result.baumannExpand")}
                       </button>
                     </div>
-                    <p className="text-[11px] font-medium mt-1 text-stone-500 text-kr-pretty">{t("result.mbtiSub")}</p>
+                    <p className="text-[11px] mt-1 text-stone-500 text-kr-pretty">{t("result.mbtiSub")}</p>
                   </div>
                   <div className="rounded-full px-3 py-1 text-[10px] font-bold shrink-0 flex items-center gap-0.5"
-                    style={{ background: `${DEEP_GREEN}10`, color: DEEP_GREEN }}>
+                    style={{ background: "#FFFFFF", color: DEEP_GREEN }}>
                     <Flame className="w-3 h-3" style={{ color: SCAN_TO }} />{t("streak.badge", { count: currentStreak.count || 1 })}
                   </div>
                 </div>
@@ -6566,13 +6559,13 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
                 <button
                   onClick={() => setShowAnalysis(true)}
                   className="mt-3 block w-full rounded-2xl px-3 py-2.5 text-left"
-                  style={{ background: "#FFFFFF", border: "1px solid #F0E2DA" }}
+                  style={{ background: "#FFFFFF" }}
                 >
-                  <p className="text-[10px] font-bold uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>{t("result.aiComment")}</p>
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>{t("result.aiComment")}</p>
                   <p className="text-[11px] text-stone-600 mt-1 leading-relaxed text-kr-pretty line-clamp-2">
                     {analysisResult.aiComment}
                   </p>
-                  <p className="text-[10px] font-bold mt-2" style={{ color: SCAN_TO }}>{t("modal.analysis.title")} {t("result.viewBtn")}</p>
+                  <p className="text-[10px] font-semibold mt-2" style={{ color: DEEP_GREEN }}>{t("modal.analysis.title")} {t("result.viewBtn")}</p>
                 </button>
               )}
             </div>
@@ -6584,11 +6577,11 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
           const top = (analysisResult.improvements as { title: string; desc: string }[])[0];
           return (
             <motion.div variants={fadeChild} className="rounded-3xl p-4"
-              style={{ background: TINT_WARM }}>
+              style={{ background: "#FFFFFF", boxShadow: "0 8px 24px rgba(45,95,79,0.06)" }}>
               <div className="flex items-center gap-2 mb-2">
                 <div className="w-7 h-7 rounded-xl flex items-center justify-center text-sm shrink-0"
-                  style={{ background: `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})` }}><Target className="w-5 h-5 text-white" /></div>
-                <p className="text-[10px] font-bold uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>
+                  style={{ background: TINT_WARM }}><Target className="w-4 h-4" style={{ color: SCAN_TO }} /></div>
+                <p className="text-[10px] font-semibold uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>
                   {t("result.todayAction")}
                 </p>
               </div>
@@ -6599,21 +6592,21 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
         })()}
 
         {/* ── 3탭 네비게이션 ── */}
-        <div ref={tabNavRef} className="rounded-3xl p-2.5 sticky top-0 z-20 backdrop-blur-md"
-          style={{ background: "linear-gradient(180deg, rgba(255,249,246,0.97) 0%, rgba(255,255,255,0.97) 100%)" }}>
+        <div ref={tabNavRef} className="rounded-3xl p-2 sticky top-0 z-20 backdrop-blur-md"
+          style={{ background: "rgba(248,245,242,0.94)", boxShadow: "0 8px 20px rgba(45,95,79,0.05)" }}>
           <div className="flex gap-2">
             {([
-              { id: "routine" as const,   label: t("result.tab.routine"),   icon: <CheckCircle2 className="w-4 h-4" />, from: "#10B981", to: "#047857",  inactiveBg: TINT_GREEN, inactiveText: "#059669" },
-              { id: "solution" as const,  label: t("result.tab.solution"),  icon: <Leaf className="w-4 h-4" />,         from: SCAN_FROM, to: SCAN_TO,   inactiveBg: "#FFF6F1", inactiveText: "#C97062" },
-              { id: "nutrition" as const, label: t("result.tab.nutrition"), icon: <Utensils className="w-4 h-4" />,     from: "#F97316", to: "#C2410C", inactiveBg: "#FFF7ED", inactiveText: "#C2410C" },
-            ]).map(({ id, label, icon, from, to, inactiveBg, inactiveText }) => {
+              { id: "routine" as const,   label: t("result.tab.routine"),   icon: <CheckCircle2 className="w-4 h-4" />, activeBg: TINT_GREEN, activeText: DEEP_GREEN },
+              { id: "solution" as const,  label: t("result.tab.solution"),  icon: <Leaf className="w-4 h-4" />,         activeBg: TINT_WARM, activeText: SCAN_TO },
+              { id: "nutrition" as const, label: t("result.tab.nutrition"), icon: <Utensils className="w-4 h-4" />,     activeBg: "#FFF7ED", activeText: "#C2410C" },
+            ]).map(({ id, label, icon, activeBg, activeText }) => {
               const isActive = activeTab === id;
               return (
                 <button key={id} onClick={() => goTo(id)}
-                  className="flex-1 flex flex-col items-center gap-1 py-3 rounded-3xl text-xs font-semibold transition-all"
+                  className="flex-1 flex items-center justify-center gap-2 py-3 rounded-3xl text-xs font-medium transition-all"
                   style={isActive
-                    ? { background: `linear-gradient(135deg, ${from}, ${to})`, color: "white", boxShadow: `0 4px 14px ${to}55` }
-                    : { background: inactiveBg, color: inactiveText, border: `1.5px solid ${to}40` }}>
+                    ? { background: activeBg, color: activeText }
+                    : { background: "#FFFFFF", color: "#A8A29E" }}>
                   {icon}
                   <span>{label}</span>
                 </button>
@@ -6629,9 +6622,9 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
             if (startX == null) return;
             const diff = e.changedTouches[0].clientX - startX;
             if (Math.abs(diff) < 40) return;
-            const cur = TAB_ORDER.indexOf(activeTab);
-            if (diff < 0 && cur < TAB_ORDER.length - 1) goTo(TAB_ORDER[cur + 1]);
-            else if (diff > 0 && cur > 0) goTo(TAB_ORDER[cur - 1]);
+            const cur = TAB_SEQUENCE.indexOf(activeTab);
+            if (diff < 0 && cur < TAB_SEQUENCE.length - 1) goTo(TAB_SEQUENCE[cur + 1]);
+            else if (diff > 0 && cur > 0) goTo(TAB_SEQUENCE[cur - 1]);
           }}>
         <AnimatePresence mode="wait" initial={false} custom={tabDirectionRef.current}>
         {/* ── 루틴 탭 ── */}
@@ -6645,7 +6638,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
           <motion.div
             initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }}
             className="rounded-3xl p-4 flex items-start gap-3"
-            style={{ background: TINT_WARM }}
+            style={{ background: "#FFFFFF", boxShadow: "0 8px 24px rgba(45,95,79,0.06)" }}
           >
             <span className="text-xl shrink-0 mt-0.5">✨</span>
             <div className="flex-1 min-w-0">
@@ -6653,8 +6646,8 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
               <p className="text-[11px] text-stone-500 leading-relaxed text-kr-pretty">{t("result.onboarding.sub")}</p>
               <button
                 onClick={() => { localStorage.setItem("fonday_onboarding_done", "1"); setShowOnboarding(false); }}
-                className="mt-2 text-xs font-semibold rounded-full px-3 py-1 text-white"
-                style={{ background: "linear-gradient(135deg, #f87171, #C97062)" }}
+                className="mt-2 text-xs font-medium rounded-full px-3 py-1"
+                style={{ background: TINT_WARM, color: SCAN_TO }}
               >
                 {t("result.onboarding.dismiss")}
               </button>
@@ -6663,7 +6656,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
         )}
 
         {/* 퀘스트 / 미션 카드 */}
-        <Card className="rounded-3xl overflow-hidden shadow-[0_12px_30px_rgba(201,112,98,0.12)] bg-white">
+        <Card className="rounded-3xl overflow-hidden shadow-[0_8px_24px_rgba(45,95,79,0.06)] bg-white">
           <CardContent className="p-3.5">
             <div className="min-w-0">
               <p className="text-xs font-semibold tracking-[0.16em] uppercase" style={{ color: SCAN_TO }}>{t("result.actionCard.missionEyebrow")}</p>
@@ -6673,7 +6666,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
             <div className="h-2 rounded-full bg-stone-100 overflow-hidden mt-3">
               <motion.div
                 className="h-full rounded-full"
-                style={{ background: `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})` }}
+                style={{ background: DEEP_GREEN }}
                 initial={{ width: 0 }}
                 animate={{ width: `${questProgressPct}%` }}
                 transition={{ duration: 0.6, ease: "easeOut" }}
@@ -6687,8 +6680,8 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
               </p>
               <button
                 onClick={() => setShowQuestSheet(true)}
-                className="rounded-full px-3 py-1.5 text-[10px] font-bold shrink-0 text-white"
-                style={{ background: `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})` }}
+                className="rounded-full px-3 py-1.5 text-[10px] font-medium shrink-0"
+                style={{ background: TINT_WARM, color: SCAN_TO }}
               >
                 {t("result.actionCard.questTitle", { done: essentialQuests.filter((quest) => quest.done).length, total: essentialQuests.length })}
               </button>
@@ -6697,7 +6690,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
         </Card>
 
         {/* 루틴 체크 카드 */}
-        <Card className="shadow-md rounded-3xl overflow-hidden bg-white">
+        <Card className="shadow-[0_8px_24px_rgba(45,95,79,0.06)] rounded-3xl overflow-hidden bg-white">
           <CardContent className="p-4">
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
@@ -6715,7 +6708,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
               <Button
                 onClick={handleDiaryEntry}
                 className="rounded-full h-8 px-3 text-xs font-semibold shadow-none shrink-0"
-                style={{ background: `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})` }}
+                style={{ background: TINT_NEUTRAL, color: DEEP_GREEN }}
               >
                 {t("result.actionCard.diaryButton")}
               </Button>
@@ -6725,7 +6718,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
               <button
                 onClick={() => setRoutinePeriodCompletion("AM", morningRoutineItems)}
                 className="w-full flex items-center justify-between gap-3 rounded-2xl px-3.5 py-3 text-left"
-                style={{ background: "#F7FBFA", border: "1px solid #DDECE7" }}
+                style={{ background: TINT_GREEN }}
               >
                 <div className="flex items-center gap-2 min-w-0">
                   <Sun className="w-4 h-4 shrink-0" style={{ color: DEEP_GREEN }} />
@@ -6756,7 +6749,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
             </div>
 
             {(routineGuide.goodMixes.length > 0 || routineGuide.cautions.length > 0 || cosmeticsInsights.length > 0) && (
-              <div className="mt-4 rounded-3xl p-4" style={{ background: "#FFFFFF" }}>
+              <div className="mt-4 rounded-3xl p-4" style={{ background: TINT_NEUTRAL }}>
                 <div className="flex items-center justify-between gap-3 mb-3">
                   <div>
                     <p className="text-xs font-semibold uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>{t("cosmetics.insightTitle")}</p>
@@ -6764,19 +6757,19 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
                   </div>
                   <button
                     onClick={() => user ? setShowCosmeticsRegister(true) : setShowCosmeticsGate(true)}
-                    className="rounded-full px-3 py-1.5 text-[10px] font-bold text-white whitespace-nowrap"
-                    style={{ background: DEEP_GREEN }}
+                    className="rounded-full px-3 py-1.5 text-[10px] font-medium whitespace-nowrap"
+                    style={{ background: "#FFFFFF", color: DEEP_GREEN }}
                   >
                     + {t("cosmetics.scanBtn")}
                   </button>
                 </div>
                 {myCosmetics.length > 0 && (
                   <div className="grid gap-3 md:grid-cols-2">
-                    <div className="rounded-3xl p-3" style={{ background: "#F8FFFB", border: "1px solid #D8EFE4" }}>
+                    <div className="rounded-3xl p-3" style={{ background: "#FFFFFF" }}>
                       <p className="text-xs font-semibold" style={{ color: DEEP_GREEN }}>{t("cosmetics.goodComboTitle")}</p>
                       <div className="mt-2 flex flex-wrap gap-1.5">
                         {routineGuide.goodMixes.length > 0 ? routineGuide.goodMixes.slice(0, 3).map((item, index) => (
-                          <span key={`good-mix-${index}`} className="px-2.5 py-1 rounded-full text-[10px] font-bold"
+                          <span key={`good-mix-${index}`} className="px-2.5 py-1 rounded-full text-[10px] font-medium"
                             style={{ background: TINT_GREEN, color: "#059669" }}>
                             {item}
                           </span>
@@ -6785,7 +6778,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
                         )}
                       </div>
                     </div>
-                    <div className="rounded-3xl p-3" style={{ background: "#FFF8F2", border: "1px solid #F5DDCF" }}>
+                    <div className="rounded-3xl p-3" style={{ background: "#FFFFFF" }}>
                       <p className="text-xs font-semibold" style={{ color: "#C2410C" }}>{t("cosmetics.cautionTitle")}</p>
                       <div className="mt-2 space-y-1.5">
                         {routineGuide.cautions.length > 0 ? routineGuide.cautions.slice(0, 2).map((item, index) => (
@@ -6810,7 +6803,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
               <div className="h-16 rounded-3xl bg-stone-100 animate-pulse" />
             ) : user ? (
               <motion.div whileTap={{ scale: 0.98 }} onClick={() => onOpenDiary?.()} className="cursor-pointer">
-                <Card className="rounded-3xl overflow-hidden" style={{ background: "#FDFCFB", border: "1.5px solid #DDD4CB", boxShadow: "0 2px 12px rgba(150,110,90,0.10)" }}>
+                <Card className="rounded-3xl overflow-hidden" style={{ background: "#FFFFFF", boxShadow: "0 8px 24px rgba(45,95,79,0.06)" }}>
                   <CardContent className="p-4">
                     <div className="flex items-center gap-3">
                       <div className="w-11 h-11 rounded-2xl flex items-center justify-center shrink-0"
@@ -6875,7 +6868,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
                             const label = `${d.getMonth() + 1}/${d.getDate()}`;
                             return (
                               <div key={i} className="flex flex-col items-center shrink-0 px-2.5 py-1.5 rounded-xl"
-                                style={{ background: "#F5F2EE", minWidth: 36 }}>
+                                style={{ background: TINT_NEUTRAL, minWidth: 36 }}>
                                 <p className="text-xs font-semibold" style={{ color: SCAN_TO }}>{sc}</p>
                                 <p className="text-[8px] text-stone-400 mt-0.5">{label}</p>
                               </div>
@@ -6889,7 +6882,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
               </motion.div>
             ) : (
               <div ref={loginPromptRef}>
-              <Card className="border-2 border-dashed rounded-3xl p-6 text-center" style={{ borderColor: "#F5D5CC", background: "#FDF8F7" }}>
+              <Card className="rounded-3xl p-6 text-center" style={{ background: "#FFFFFF", boxShadow: "0 8px 24px rgba(45,95,79,0.06)" }}>
                 <CardHeader className="p-0 mb-4">
                   <CardTitle className="text-lg font-bold" style={{ color: DEEP_GREEN }}>{t("result.login.title")}</CardTitle>
                   <CardDescription className="text-xs">{t("result.login.desc")}</CardDescription>
@@ -6906,8 +6899,8 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
             {/* 다음 탭 유도 */}
             <button
               onClick={() => goTo("solution")}
-              className="w-full flex items-center justify-center gap-2 py-3.5 rounded-2xl text-sm font-bold text-white transition-all active:scale-95"
-              style={{ background: `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})` }}>
+              className="w-full flex items-center justify-center gap-2 py-3.5 rounded-2xl text-sm font-medium transition-all active:scale-95"
+              style={{ background: TINT_WARM, color: SCAN_TO }}>
               <Leaf className="w-4 h-4" />
               <span>{t("result.tab.solution")} →</span>
             </button>
@@ -6925,10 +6918,10 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
           <div className="space-y-4">
 
             {/* 화장품 스캔 배너 */}
-            <div className="flex items-center gap-3 px-4 py-3.5 rounded-2xl border"
-              style={{ background: "#F0F7F5", borderColor: "#C5DFD8" }}>
+            <div className="flex items-center gap-3 px-4 py-3.5 rounded-2xl"
+              style={{ background: TINT_GREEN }}>
               <div className="w-10 h-10 rounded-2xl flex items-center justify-center shrink-0"
-                style={{ background: `${DEEP_GREEN}14`, color: DEEP_GREEN }}>
+                style={{ background: "#FFFFFF", color: DEEP_GREEN }}>
                 <ScanLine className="w-5 h-5" />
               </div>
               <div className="flex-1 min-w-0">
@@ -6936,8 +6929,8 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
                 <p className="text-[11px] text-stone-400 leading-tight text-kr-pretty">{t("cosmetics.ctaBannerSub")}</p>
               </div>
               {user && cosmeticCount > 0 && (
-                <span className="text-[11px] font-bold px-2 py-1 rounded-full"
-                  style={{ background: `${DEEP_GREEN}15`, color: DEEP_GREEN }}>
+                <span className="text-[11px] font-medium px-2 py-1 rounded-full"
+                  style={{ background: "#FFFFFF", color: DEEP_GREEN }}>
                   {t("cosmetics.ctaCount", { count: cosmeticCount })}
                 </span>
               )}
@@ -6951,8 +6944,8 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
             <div className="space-y-3">
 
             <div className="flex items-center gap-2 mb-1">
-              <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: DEEP_GREEN }}>
-                <Leaf className="w-4 h-4 text-white" />
+              <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: TINT_GREEN }}>
+                <Leaf className="w-4 h-4" style={{ color: DEEP_GREEN }} />
               </div>
               <div>
                 <p className="text-sm font-bold" style={{ color: DEEP_GREEN }}>{t("modal.improvements.title")}</p>
@@ -6961,14 +6954,14 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
             </div>
             {(analysisResult?.improvements ?? []).slice(0, 3).map((item: { title: string; desc: string }, i: number) => (
               <motion.div key={i} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.08 }} className="flex gap-3 p-4 rounded-2xl border"
-                style={{ background: i === 0 ? "#FDF1EE" : i === 1 ? "#F0F7F5" : "#F5F0FF", borderColor: i === 0 ? "#F5D5CC" : i === 1 ? "#C5DFD8" : "#DDD5F5" }}>
+                transition={{ delay: i * 0.08 }} className="flex gap-3 p-4 rounded-2xl"
+                style={{ background: i === 0 ? TINT_WARM : i === 1 ? TINT_GREEN : "#F6F4FB" }}>
                 <div className="shrink-0">
-                  <div className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-semibold"
-                    style={{ background: i === 0 ? `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})` : i === 1 ? DEEP_GREEN : "#8B5CF6" }}>
+                  <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-semibold"
+                    style={{ background: "#FFFFFF", color: i === 0 ? SCAN_TO : i === 1 ? DEEP_GREEN : "#7C3AED" }}>
                     {i + 1}
                   </div>
-                  <p className="text-[9px] font-bold text-center mt-0.5"
+                  <p className="text-[9px] font-semibold text-center mt-0.5"
                     style={{ color: i === 0 ? SCAN_TO : i === 1 ? DEEP_GREEN : "#7C3AED" }}>STEP</p>
                 </div>
                 <div>
@@ -7117,8 +7110,8 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
             initial="enter" animate="center" exit="exit" transition={{ duration: 0.2, ease: "easeInOut" }}>
           <div className="space-y-3">
             <div className="flex items-center gap-2 mb-1">
-              <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: "#8B5CF6" }}>
-                <Sparkles className="w-4 h-4 text-white" />
+              <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: "#F6F4FB" }}>
+                <Sparkles className="w-4 h-4" style={{ color: "#7C3AED" }} />
               </div>
               <div>
                 <p className="text-sm font-bold" style={{ color: "#7C3AED" }}>{t("nutrients.supplementsTitle")}</p>
@@ -7139,17 +7132,17 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
                     <motion.div key={i} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: i * 0.07 }}
                       className="flex items-start gap-3 p-3.5 rounded-2xl"
-                      style={{ background: "linear-gradient(135deg, #F5F3FF, #FAF8FF)", border: "1px solid #DDD6FE" }}>
+                      style={{ background: "#F6F4FB" }}>
                       <span className="text-2xl shrink-0 mt-0.5">{item.emoji}</span>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-0.5 flex-wrap">
                           <p className="text-sm font-bold text-stone-800">{item.name}</p>
-                          <span className="text-[9px] font-bold rounded-full px-2 py-0.5 text-white shrink-0"
-                            style={{ background: "#8B5CF6" }}>
+                          <span className="text-[9px] font-medium rounded-full px-2 py-0.5 shrink-0"
+                            style={{ background: "#FFFFFF", color: "#7C3AED" }}>
                             {SCORE_LABEL_MAP[item.targetScore] !== undefined ? t(`scores.${SCORE_LABEL_MAP[item.targetScore]}`) : item.targetScore}
                           </span>
                         </div>
-                        <p className="text-[10px] font-bold mb-0.5 flex items-center gap-0.5" style={{ color: "#7C3AED" }}><Pill className="w-3 h-3 inline mr-0.5" /> {item.dose}</p>
+                        <p className="text-[10px] font-semibold mb-0.5 flex items-center gap-0.5" style={{ color: "#7C3AED" }}><Pill className="w-3 h-3 inline mr-0.5" /> {item.dose}</p>
                         <p className="text-[11px] text-stone-500 leading-relaxed">{item.reason}</p>
                       </div>
                     </motion.div>
@@ -7159,10 +7152,10 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
                 {/* 수분 목표 */}
                 {analysisResult.nutritionTips.hydrationGoal && (
                   <div className="flex items-center gap-3 rounded-2xl px-4 py-3"
-                    style={{ background: "#EFF6FF", border: "1px solid #BFDBFE" }}>
+                    style={{ background: "#F5F9FF" }}>
                     <span className="text-xl shrink-0">💧</span>
                     <div>
-                      <p className="text-[10px] font-bold text-blue-600 mb-0.5">{t("nutrients.hydrationLabel")}</p>
+                      <p className="text-[10px] font-semibold text-blue-600 mb-0.5">{t("nutrients.hydrationLabel")}</p>
                       <p className="text-[12px] text-stone-600 leading-relaxed">{analysisResult.nutritionTips.hydrationGoal}</p>
                     </div>
                   </div>
@@ -7177,7 +7170,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
                   <div className="space-y-3">
                     {analysisResult.nutritionTips.avoidFoods.map((item: { emoji: string; food: string; reason: string }, idx: number) => (
                       <div key={idx} className="flex items-start gap-3 p-3 rounded-2xl"
-                        style={{ background: "#FFF7ED", border: "1px solid #FED7AA" }}>
+                        style={{ background: "#FFF7ED" }}>
                         <span className="text-xl shrink-0">{item.emoji}</span>
                         <div className="flex-1 min-w-0">
                           <p className="text-[12px] font-bold text-stone-700 mb-0.5">{item.food}</p>
@@ -7211,23 +7204,24 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
         style={{ bottom: 60, boxShadow: "0 -4px 16px rgba(0,0,0,0.06)" }}>
         {/* 공유 */}
         <Button onClick={handleShare} disabled={shareLoading}
-          className="flex-1 h-12 rounded-2xl text-white font-bold bg-gradient-to-r from-[#f09433] via-[#bc1888] to-[#8a3ab9] flex items-center justify-center gap-1.5">
+          className="flex-1 h-12 rounded-2xl font-semibold flex items-center justify-center gap-1.5"
+          style={{ background: TINT_NEUTRAL, color: DEEP_GREEN }}>
           {shareLoading
-            ? <div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+            ? <div className="w-4 h-4 border-2 border-stone-300 border-t-stone-600 rounded-full animate-spin" />
             : <><Share2 className="w-4 h-4" /><span className="text-[12px]">{t("result.share")}</span></>}
         </Button>
         {/* 챌린지 */}
         {pendingChallengeToken ? (
           <Button onClick={() => { sessionStorage.removeItem('battleChallengeToken'); window.location.href = `/battle/${pendingChallengeToken}`; }}
-            className="flex-1 h-12 rounded-2xl text-white font-bold flex items-center justify-center gap-1.5"
-            style={{ background: "linear-gradient(135deg, #7C3AED, #6D28D9)" }}>
+            className="flex-1 h-12 rounded-2xl font-semibold flex items-center justify-center gap-1.5"
+            style={{ background: "#F6F4FB", color: "#7C3AED" }}>
             <Trophy className="w-4 h-4" /><span className="text-[12px]">{t("result.challengeResult")}</span>
           </Button>
         ) : (
           <Button
-            className="flex-1 h-12 rounded-2xl font-bold flex items-center justify-center gap-1"
+            className="flex-1 h-12 rounded-2xl font-semibold flex items-center justify-center gap-1"
             style={currentShareToken
-              ? { background: "linear-gradient(135deg, #ec4899, #f43f5e)", color: "white" }
+              ? { background: TINT_WARM, color: SCAN_TO }
               : { background: "#F3F4F6", color: "#9CA3AF" }}
             disabled={!currentShareToken}
             onClick={() => {
@@ -7280,12 +7274,12 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
               <div className="flex-1 overflow-y-auto overscroll-contain">
                 <div className="px-6 pb-8 space-y-3">
                   {analysisResult?.aiComment && (
-                    <div className="p-4 rounded-2xl border"
-                      style={{ background: "#FFF7F2", borderColor: "#F2DDD4" }}>
+                    <div className="p-4 rounded-2xl"
+                      style={{ background: TINT_WARM }}>
                       <div className="flex items-center gap-2 mb-2">
                         <div className="w-7 h-7 rounded-xl flex items-center justify-center"
-                          style={{ background: `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})` }}>
-                          <Sparkles className="w-3.5 h-3.5 text-white" />
+                          style={{ background: "#FFFFFF" }}>
+                          <Sparkles className="w-3.5 h-3.5" style={{ color: SCAN_TO }} />
                         </div>
                         <p className="text-sm font-bold" style={{ color: DEEP_GREEN }}>{t("result.aiComment")}</p>
                       </div>
@@ -7319,9 +7313,9 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
                         <Activity className="w-4 h-4" style={{ color: DEEP_GREEN }} />
                         <p className="text-sm font-bold" style={{ color: DEEP_GREEN }}>{t("modal.analysis.skinReport")}</p>
                       </div>
-                      <div className="grid grid-cols-2 gap-2">
-                        {(analysisResult!.skinReport as { area: string; finding: string }[]).map((item, i) => (
-                          <div key={i} className="p-3 rounded-2xl bg-stone-50">
+                        <div className="grid grid-cols-2 gap-2">
+                          {(analysisResult!.skinReport as { area: string; finding: string }[]).map((item, i) => (
+                          <div key={i} className="p-3 rounded-2xl" style={{ background: TINT_NEUTRAL }}>
                             <p className="text-xs font-semibold mb-1" style={{ color: DEEP_GREEN_LIGHT }}>{item.area}</p>
                             <p className="text-[11px] text-stone-500 leading-snug">{item.finding}</p>
                           </div>
@@ -7400,14 +7394,14 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
                     <motion.div key={i}
                       initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: i * 0.08 }}
-                      className="flex gap-3 p-4 rounded-2xl border"
-                      style={{ background: i === 0 ? "#FDF1EE" : i === 1 ? "#F0F7F5" : "#F5F0FF", borderColor: i === 0 ? "#F5D5CC" : i === 1 ? "#C5DFD8" : "#DDD5F5" }}>
+                      className="flex gap-3 p-4 rounded-2xl"
+                      style={{ background: i === 0 ? TINT_WARM : i === 1 ? TINT_GREEN : "#F6F4FB" }}>
                       <div className="shrink-0">
-                        <div className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-semibold"
-                          style={{ background: i === 0 ? `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})` : i === 1 ? DEEP_GREEN : "#8B5CF6" }}>
+                        <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-semibold"
+                          style={{ background: "#FFFFFF", color: i === 0 ? SCAN_TO : i === 1 ? DEEP_GREEN : "#7C3AED" }}>
                           {i + 1}
                         </div>
-                        <p className="text-[9px] font-bold text-center mt-0.5"
+                        <p className="text-[9px] font-semibold text-center mt-0.5"
                           style={{ color: i === 0 ? SCAN_TO : i === 1 ? DEEP_GREEN : "#7C3AED" }}>
                           STEP
                         </p>
@@ -7433,16 +7427,17 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
                         <motion.div key={`c-${i}`}
                           initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
                           transition={{ delay: 0.3 + i * 0.07 }}
-                          className="flex items-start gap-3 p-4 rounded-2xl bg-amber-50 border border-amber-100">
+                          className="flex items-start gap-3 p-4 rounded-2xl"
+                          style={{ background: "#FFF7ED" }}>
                           <div className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0"
-                            style={{ background: "#F59E0B" }}>
-                            <Star className="w-4 h-4 text-white" />
+                            style={{ background: "#FFFFFF" }}>
+                            <Star className="w-4 h-4" style={{ color: "#D97706" }} />
                           </div>
                           <div>
                             <div className="flex items-center gap-1.5 mb-0.5">
                               <span className="text-sm font-bold text-stone-800">{item.type}</span>
-                              <span className="text-[10px] px-1.5 py-0.5 rounded-full font-bold text-white"
-                                style={{ background: "#D97706" }}>{item.key}</span>
+                              <span className="text-[10px] px-1.5 py-0.5 rounded-full font-medium"
+                                style={{ background: "#FFFFFF", color: "#D97706" }}>{item.key}</span>
                             </div>
                             <p className="text-[12px] text-stone-500 leading-relaxed">{item.reason}</p>
                           </div>
@@ -7500,14 +7495,14 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
                       <motion.div key={letter}
                         initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: i * 0.08 }}
-                        className="flex gap-3 p-4 rounded-2xl border"
-                        style={{ background: `${color}0D`, borderColor: `${color}33` }}>
+                        className="flex gap-3 p-4 rounded-2xl"
+                        style={{ background: `${color}0D` }}>
                         <div className="shrink-0">
                           <div className="w-8 h-8 rounded-full flex items-center justify-center text-base"
-                            style={{ background: `${color}22` }}>
+                            style={{ background: "#FFFFFF" }}>
                             {NUTRIENT_ICONS[letter]}
                           </div>
-                          <p className="text-[9px] font-bold text-center mt-0.5" style={{ color }}>{letter}</p>
+                          <p className="text-[9px] font-semibold text-center mt-0.5" style={{ color }}>{letter}</p>
                         </div>
                         <div className="flex-1 min-w-0">
                           <p className="text-[13px] font-bold mb-0.5" style={{ color }}>{nutrient.name}</p>
@@ -7527,7 +7522,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
                       <p className="text-sm font-bold" style={{ color: "#D97706" }}>{t("nutrients.avoidTitle")}</p>
                     </div>
                     {/* 점심 */}
-                    <div className="rounded-2xl p-4 mb-2.5" style={{ background: "#FFF7ED", border: "1px solid #FED7AA" }}>
+                    <div className="rounded-2xl p-4 mb-2.5" style={{ background: "#FFF7ED" }}>
                       <div className="flex items-center gap-1.5 mb-2.5">
                         <Sun className="w-4 h-4 text-orange-500 shrink-0" />
                         <span className="text-xs font-semibold text-orange-700">{t("nutrients.avoidLunch")}</span>
@@ -7545,7 +7540,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
                       </div>
                     </div>
                     {/* 저녁 */}
-                    <div className="rounded-2xl p-4" style={{ background: "#F5F3FF", border: "1px solid #DDD6FE" }}>
+                    <div className="rounded-2xl p-4" style={{ background: "#F6F4FB" }}>
                       <div className="flex items-center gap-1.5 mb-2.5">
                         <Moon className="w-4 h-4 text-violet-500 shrink-0" />
                         <span className="text-xs font-semibold text-violet-700">{t("nutrients.avoidDinner")}</span>
