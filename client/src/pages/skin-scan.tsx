@@ -6580,30 +6580,25 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
                 </div>
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-2 mt-3">
-              <div className="col-span-2 rounded-2xl px-4 py-4" style={{ background: TINT_WARM }}>
-                <div className="flex items-end justify-between gap-3">
-                  <div className="min-w-0">
-                    <p className="text-[9px] font-bold uppercase tracking-[0.12em] text-stone-400">{t("result.overall")}</p>
-                    <p className="text-[42px] font-black leading-none mt-1.5" style={{ color: SCAN_TO }}>{overallScore}</p>
-                  </div>
-                  <div className="text-right shrink-0">
-                    <p className="text-[10px] font-bold" style={{ color: DEEP_GREEN }}>{t("result.scores")}</p>
-                  </div>
+            <div className="grid grid-cols-2 gap-1.5 mt-3">
+              <div className="col-span-2 rounded-2xl px-4 py-3.5" style={{ background: TINT_WARM }}>
+                <div className="min-w-0">
+                  <p className="text-[9px] font-bold uppercase tracking-[0.12em] text-stone-400">{t("result.overall")}</p>
+                  <p className="text-[40px] font-black leading-none mt-1" style={{ color: SCAN_TO }}>{overallScore}</p>
                 </div>
-                <p className="text-[11px] text-stone-600 mt-2 leading-snug text-kr-pretty">
+                <p className="text-[11px] text-stone-600 mt-1.5 leading-snug text-kr-pretty">
                   {weakestSummary || t("result.actionCard.phaseRecord")}
                 </p>
               </div>
-              <div className="rounded-2xl px-3 py-4 flex flex-col justify-center min-w-0" style={{ background: "#F7F3FF", border: "1px solid #E9DDFF" }}>
+              <div className="rounded-2xl px-3 py-3 flex flex-col justify-center min-w-0" style={{ background: "#F7F3FF", border: "1px solid #E9DDFF" }}>
                 <p className="text-[9px] font-bold uppercase tracking-[0.12em] text-stone-400">{t("result.skinAge")}</p>
-                <p className="text-[28px] font-bold leading-none mt-2" style={{ color: "#7C3AED" }}>
+                <p className="text-[26px] font-bold leading-none mt-1.5" style={{ color: "#7C3AED" }}>
                   {analysisResult?.skinAge && analysisResult.skinAge > 0 ? analysisResult.skinAge : "—"}
                 </p>
               </div>
-              <div className="rounded-2xl px-3 py-4 flex flex-col justify-center min-w-0" style={{ background: "#FFF8EE", border: "1px solid #F4E2C4" }}>
+              <div className="rounded-2xl px-3 py-3 flex flex-col justify-center min-w-0" style={{ background: "#FFF8EE", border: "1px solid #F4E2C4" }}>
                 <p className="text-[9px] font-bold uppercase tracking-[0.12em] text-stone-400">{t("ranking.topLabel")}</p>
-                <p className="text-[22px] font-bold leading-none mt-2 break-keep" style={{ color: "#D97706" }}>
+                <p className="text-[20px] font-bold leading-none mt-1.5 break-keep" style={{ color: "#D97706" }}>
                   {rankingData && rankingData.myPercentile !== undefined ? t("ranking.myPercentile", { percent: rankingData.myPercentile }) : "—"}
                 </p>
               </div>
