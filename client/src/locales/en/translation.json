@@ -430,7 +430,12 @@
     "step1": "Tap the <b>Share button (□↑)</b> at the bottom.",
     "step2": "Select <b>\"Add to Home Screen\"</b>.",
     "step3": "Tap <b>\"Add\"</b> in the top right — done!",
-    "close": "Close"
+    "close": "Close",
+    "popupTitle": "Get the Fonday App",
+    "popupDesc": "Add to your home screen for quick access to your daily skin scan",
+    "popupBtn": "Add to Home Screen",
+    "popupIosBtn": "Show me how",
+    "popupDismiss": "Maybe later"
   },
   "report": {
     "title": "My Skin Report",

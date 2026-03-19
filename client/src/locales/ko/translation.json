@@ -430,7 +430,12 @@
     "step1": "하단 <b>공유 버튼(□↑)</b>을 탭해요.",
     "step2": "<b>\"홈 화면에 추가\"</b>를 선택해요.",
     "step3": "오른쪽 위 <b>\"추가\"</b>를 탭하면 완료!",
-    "close": "닫기"
+    "close": "닫기",
+    "popupTitle": "Fonday 앱으로 즐기기",
+    "popupDesc": "홈 화면에 추가하면 언제든지 빠르게 피부 스캔을 시작할 수 있어요",
+    "popupBtn": "홈 화면에 추가",
+    "popupIosBtn": "설치 방법 보기",
+    "popupDismiss": "괜찮아요"
   },
   "report": {
     "title": "내 피부 리포트",
