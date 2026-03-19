@@ -411,10 +411,10 @@ function AttendanceCalendarModal({ onClose }: { onClose: () => void }) {
         <div className="w-10 h-1 rounded-full bg-stone-200 mx-auto mb-5" />
         {/* 헤더 */}
         <div className="flex items-center justify-between mb-1">
-          <h2 className="text-[16px] font-black" style={{ color: DEEP_GREEN }}>{t("attendance.calendarTitle")}</h2>
+          <h2 className="text-base font-bold" style={{ color: DEEP_GREEN }}>{t("attendance.calendarTitle")}</h2>
           <div className="flex items-center gap-1.5">
             <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full text-white"
-              style={{ background: "linear-gradient(135deg, #F59E0B, #D97706)" }}>
+              style={{ background: "#F59E0B" }}>
               {t("attendance.totalPoints", { n: data.totalPoints })}
             </span>
           </div>
@@ -483,7 +483,7 @@ function CheckinSuccessSheet({ onKakao, onLine, onGoogle, onDismiss, user }: {
             style={{ background: "linear-gradient(135deg, #E09882, #C97062)" }}>
             <CheckCircle2 className="w-7 h-7 text-white" />
           </div>
-          <h2 className="text-[18px] font-black text-stone-800 mb-1">{t("attendance.title")}</h2>
+          <h2 className="text-lg font-bold text-stone-800 mb-1">{t("attendance.title")}</h2>
         </div>
 
         {!user && (
@@ -607,7 +607,7 @@ function PushPromptSheet({ onAllow, onDismiss, isLoading }: { onAllow: () => voi
           <>
             <div className="text-center mb-5">
               <Smartphone className="w-10 h-10 mx-auto mb-2" style={{ color: DEEP_GREEN }} />
-              <h3 className="font-black text-stone-800 text-[18px] mt-2">{t("pushPrompt.iosTitle")}</h3>
+              <h3 className="font-bold text-stone-800 text-lg mt-2">{t("pushPrompt.iosTitle")}</h3>
               <p className="text-stone-500 text-[13px] mt-1.5 leading-relaxed">{t("pushPrompt.iosDesc")}</p>
             </div>
             <div className="space-y-3.5 mb-5">
@@ -623,7 +623,7 @@ function PushPromptSheet({ onAllow, onDismiss, isLoading }: { onAllow: () => voi
           <>
             <div className="text-center mb-6">
               <Bell className="w-10 h-10 mx-auto mb-2" style={{ color: DEEP_GREEN }} />
-              <h3 className="font-black text-stone-800 text-[18px] mt-2">{t("pushPrompt.title")}</h3>
+              <h3 className="font-bold text-stone-800 text-lg mt-2">{t("pushPrompt.title")}</h3>
               <p className="text-stone-500 text-[13px] mt-1.5 leading-relaxed">{t("pushPrompt.desc")}</p>
               {isAndroid() && (
                 <span className="inline-block mt-2 text-[11px] bg-emerald-50 text-emerald-600 px-2 py-0.5 rounded-full font-medium">Android</span>
@@ -633,7 +633,7 @@ function PushPromptSheet({ onAllow, onDismiss, isLoading }: { onAllow: () => voi
               onClick={onAllow}
               disabled={isLoading}
               className="w-full py-4 rounded-2xl font-bold text-white text-[15px] mb-2"
-              style={{ background: `linear-gradient(135deg, ${DEEP_GREEN}, ${DEEP_GREEN_LIGHT})` }}
+              style={{ background: DEEP_GREEN }}
             >
               {isLoading ? "..." : t("pushPrompt.allow")}
             </button>
@@ -1256,7 +1256,7 @@ function MissionCard() {
         <div className="flex items-center justify-between mb-3">
           <p className="text-sm font-bold" style={{ color: DEEP_GREEN }}>{t("mission.title")}</p>
           <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full text-white"
-            style={{ background: "linear-gradient(135deg, #F59E0B, #D97706)" }}>
+            style={{ background: "#F59E0B" }}>
             {t("mission.points", { n: missions.totalPoints })}
           </span>
         </div>
@@ -1344,7 +1344,7 @@ function WeatherTipCard({ compact, weather: weatherProp }: { compact?: boolean; 
         style={{ background: TINT_GREEN, boxShadow: "0 2px 12px rgba(45,95,79,0.08)" }}
       >
         <div className="absolute top-0 right-0 w-20 h-20 rounded-bl-full opacity-20"
-          style={{ background: `linear-gradient(135deg, ${DEEP_GREEN_LIGHT}, ${DEEP_GREEN})` }} />
+          style={{ background: DEEP_GREEN }} />
         <div className="flex items-center gap-1.5 mb-2.5">
           <div className="w-4 h-4 rounded-full flex items-center justify-center"
             style={{ background: DEEP_GREEN }}>
@@ -1637,7 +1637,7 @@ function ScanIdleScreen({ onScan }: { onScan: () => void }) {
               <div className="absolute top-3 right-3 w-7 h-7 border-t-2 border-r-2 rounded-tr-lg" style={{ borderColor: SCAN_TO }} />
               <div className="absolute bottom-3 left-3 text-white">
                 <p className="text-[8px] sm:text-[9px] font-bold uppercase tracking-[0.16em] text-white/75">{t("idle.heroMbtiLabel")}</p>
-                <p className="text-[22px] sm:text-[24px] font-black leading-none">OSNT</p>
+                <p className="text-[22px] sm:text-2xl font-bold leading-none">OSNT</p>
               </div>
             </div>
             <div className="flex flex-col">
@@ -2957,7 +2957,7 @@ function InlineTodos({ dateStr }: { dateStr: string }) {
       <div className="flex items-center justify-between mb-2">
         <p className="text-[11px] font-bold text-stone-500"><ClipboardList className="w-3 h-3 inline mr-1" />{t("diary.routineTitle")}</p>
         <span className="text-[10px] px-2 py-0.5 rounded-full"
-          style={{ background: doneCount === todos.length ? "#ECFDF5" : "#F9F9F9",
+          style={{ background: doneCount === todos.length ? TINT_GREEN : "#F9F9F9",
             color: doneCount === todos.length ? "#059669" : "#B0A898" }}>
           {doneCount}/{todos.length}
         </span>
@@ -3013,7 +3013,7 @@ function InlineMemo({ dateStr }: { dateStr: string }) {
                 className="px-2.5 py-1 rounded-full text-[10px] font-bold transition-colors"
                 style={selected
                   ? { background: `${SCAN_FROM}20`, color: SCAN_TO, border: `1px solid ${SCAN_FROM}55` }
-                  : { background: "#F6F3EE", color: "#9A8F80" }}
+                  : { background: TINT_NEUTRAL, color: "#9A8F80" }}
               >
                 {getCauseTagLabel(t, tag)}
               </button>
@@ -3021,7 +3021,7 @@ function InlineMemo({ dateStr }: { dateStr: string }) {
           })}
         </div>
         {autoSuggestions.length > 0 && (
-          <div className="mt-2 rounded-xl px-3 py-2" style={{ background: "#F6F3EE" }}>
+          <div className="mt-2 rounded-xl px-3 py-2" style={{ background: TINT_NEUTRAL }}>
             <p className="text-[10px] font-bold text-stone-400 mb-1">{t("modal.diary.autoTag")}</p>
             <div className="flex flex-wrap gap-1.5">
               {autoSuggestions.map((tag) => (
@@ -3062,7 +3062,7 @@ function InlineMemo({ dateStr }: { dateStr: string }) {
             <div className="flex flex-wrap gap-1.5 mt-2">
               {tags.map((tag) => (
                 <span key={tag} className="px-2 py-0.5 rounded-full text-[10px] font-bold"
-                  style={{ background: "#F6F3EE", color: "#9A8F80" }}>
+                  style={{ background: TINT_NEUTRAL, color: "#9A8F80" }}>
                   {getCauseTagLabel(t, tag)}
                 </span>
               ))}
@@ -3121,7 +3121,7 @@ function DiaryRoutinePreviewCard({ routineGuide, dateStr }: { routineGuide: Retu
       title: t("result.actionCard.phaseMorning"),
       icon: Sun,
       accent: DEEP_GREEN,
-      bg: "#F7FBFA",
+      bg: TINT_GREEN,
       border: "#DDECE7",
       items: routineGuide.amSteps,
       period: "AM" as const,
@@ -3131,7 +3131,7 @@ function DiaryRoutinePreviewCard({ routineGuide, dateStr }: { routineGuide: Retu
       title: t("result.actionCard.phaseEvening"),
       icon: Moon,
       accent: SCAN_TO,
-      bg: "#FFF8F4",
+      bg: TINT_WARM,
       border: "#F1DED7",
       items: routineGuide.pmSteps,
       period: "PM" as const,
@@ -3143,7 +3143,7 @@ function DiaryRoutinePreviewCard({ routineGuide, dateStr }: { routineGuide: Retu
       <div className="rounded-3xl border bg-white shadow-sm" style={{  }}>
         <div className="p-5">
           <p className="text-[10px] font-bold tracking-[0.16em] uppercase" style={{ color: SCAN_TO }}>{t("diary.routineTitle")}</p>
-          <p className="text-[16px] font-black mt-1 text-kr-pretty" style={{ color: DEEP_GREEN }}>{t("modal.diary.todayRoutineTitle")}</p>
+          <p className="text-base font-bold mt-1 text-kr-pretty" style={{ color: DEEP_GREEN }}>{t("modal.diary.todayRoutineTitle")}</p>
           <p className="text-[11px] text-stone-500 mt-1">{t("modal.diary.todayRoutineDesc")}</p>
           <div className="grid gap-3 mt-4 md:grid-cols-2">
             {sections.map(({ key, title, icon: Icon, accent, bg, border, items, period }) => {
@@ -3266,7 +3266,7 @@ function DiaryCalendarView({ allEntries }: { allEntries: { dateStr: string; scor
                 <div
                   className="min-h-[14px] rounded-full px-1.5 text-[9px] font-bold leading-[14px]"
                   style={{
-                    background: todoProgress.done === todoProgress.total ? "#ECFDF5" : "#F6F3EE",
+                    background: todoProgress.done === todoProgress.total ? TINT_GREEN : TINT_NEUTRAL,
                     color: todoProgress.done === todoProgress.total ? "#059669" : "#9A8F80",
                   }}
                 >
@@ -3621,7 +3621,7 @@ function DiaryFullView({ history, analysisResult, overallScore, finalType, curre
                             .map(([type, count], ri) => (
                               <div key={type} className="flex-1 p-3 rounded-2xl text-center bg-white">
                                 <span className="text-[13px]">{["🥇","🥈","🥉"][ri]}</span>
-                                <p className="text-[18px] font-black mt-0.5" style={{ color: SCAN_TO }}>{type}</p>
+                                <p className="text-lg font-bold mt-0.5" style={{ color: SCAN_TO }}>{type}</p>
                                 <p className="text-[10px] text-stone-400">{count as number}{t("ranking.people")}</p>
                               </div>
                             ))}
@@ -3851,7 +3851,7 @@ function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: any; analys
           <div className="rounded-3xl p-5 mb-4 text-white"
             style={{ background: "linear-gradient(135deg, #2D5F4F 0%, #C97062 100%)" }}>
             <p className="text-[11px] font-bold tracking-widest uppercase mb-1 text-white/70">FONDAY</p>
-            <h1 className="text-[24px] font-black">{t("modal.diary.title")} ✦</h1>
+            <h1 className="text-2xl font-bold">{t("modal.diary.title")} ✦</h1>
             <p className="text-[12px] text-white/80 mt-2 text-kr-pretty">{t("result.login.desc")}</p>
           </div>
         </div>
@@ -3863,20 +3863,20 @@ function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: any; analys
                 style={{ background: `linear-gradient(135deg, ${DEEP_GREEN}, ${SCAN_TO})` }}>
                 <Lock className="w-6 h-6" />
               </div>
-              <p className="text-[22px] font-black mt-4" style={{ color: DEEP_GREEN }}>{t("result.login.title")}</p>
+              <p className="text-2xl font-bold mt-4" style={{ color: DEEP_GREEN }}>{t("result.login.title")}</p>
               <p className="text-[12px] text-stone-500 mt-2 leading-relaxed text-kr-pretty">{t("result.login.desc")}</p>
               <div className="grid grid-cols-3 gap-2.5 mt-5 text-left">
-                <div className="rounded-2xl p-3" style={{ background: "#FFF1EC" }}>
+                <div className="rounded-2xl p-3" style={{ background: TINT_WARM }}>
                   <p className="text-[10px] font-bold text-stone-500">{t("result.diary.avg7d")}</p>
-                  <p className="text-[18px] font-black mt-1" style={{ color: SCAN_TO }}>--</p>
+                  <p className="text-lg font-bold mt-1" style={{ color: SCAN_TO }}>--</p>
                 </div>
                 <div className="rounded-2xl p-3" style={{ background: "#F5F3FF" }}>
                   <p className="text-[10px] font-bold text-stone-500">{t("modal.diary.timelineTab")}</p>
-                  <p className="text-[18px] font-black mt-1" style={{ color: "#7C3AED" }}>--</p>
+                  <p className="text-lg font-bold mt-1" style={{ color: "#7C3AED" }}>--</p>
                 </div>
-                <div className="rounded-2xl p-3" style={{ background: "#ECFDF5" }}>
+                <div className="rounded-2xl p-3" style={{ background: TINT_GREEN }}>
                   <p className="text-[10px] font-bold text-stone-500">{t("modal.diary.calendarTab")}</p>
-                  <p className="text-[18px] font-black mt-1" style={{ color: "#059669" }}>--</p>
+                  <p className="text-lg font-bold mt-1" style={{ color: "#059669" }}>--</p>
                 </div>
               </div>
               <div className="space-y-3 mt-6">
@@ -3921,26 +3921,26 @@ function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: any; analys
         <div className="rounded-3xl p-5 mb-4 text-white"
           style={{ background: "linear-gradient(135deg, #2D5F4F 0%, #C97062 100%)" }}>
           <p className="text-[11px] font-bold tracking-widest uppercase mb-1 text-white/70">FONDAY</p>
-          <h1 className="text-[24px] font-black">{t("modal.diary.title")} ✦</h1>
+          <h1 className="text-2xl font-bold">{t("modal.diary.title")} ✦</h1>
           <p className="text-[12px] text-white/80 mt-2 text-kr-pretty">
             {finalType ? `${finalType} · ` : ""}{totalRecords > 0 ? `${t("modal.diary.countLabel", { count: totalRecords })}` : t("result.diary.firstRecord")}
           </p>
           <div className="grid grid-cols-3 gap-2.5 mt-4">
             <div className="rounded-2xl p-3 bg-white/10 border border-white/12 text-center">
               <p className="text-[10px] font-bold text-white/70 whitespace-nowrap">{t("result.overall")}</p>
-              <p className="text-[22px] font-black mt-1">{overallScore || "—"}</p>
+              <p className="text-2xl font-bold mt-1">{overallScore || "—"}</p>
             </div>
             <div className="rounded-2xl p-3 bg-white/10 border border-white/12 text-center">
               <p className="text-[10px] font-bold text-white/70 whitespace-nowrap">{t("result.diary.avg7d")}</p>
-              <p className="text-[22px] font-black mt-1">{avgScore || "—"}</p>
+              <p className="text-2xl font-bold mt-1">{avgScore || "—"}</p>
             </div>
             <div className="rounded-2xl p-3 bg-white/10 border border-white/12 text-center">
               <p className="text-[10px] font-bold text-white/70 whitespace-nowrap">{t("diary.routineTitle")}</p>
-              <p className="text-[22px] font-black mt-1">{diaryTodoProgress.total > 0 ? `${diaryTodoProgress.done}/${diaryTodoProgress.total}` : (diaryMemoReady ? "1/1" : "0/1")}</p>
+              <p className="text-2xl font-bold mt-1">{diaryTodoProgress.total > 0 ? `${diaryTodoProgress.done}/${diaryTodoProgress.total}` : (diaryMemoReady ? "1/1" : "0/1")}</p>
             </div>
           </div>
         </div>
-        <div className="flex gap-2 p-2 rounded-3xl mb-3" style={{ background: "#FFF8F4" }}>
+        <div className="flex gap-2 p-2 rounded-3xl mb-3" style={{ background: TINT_WARM }}>
           {tabs.map(({ id, label }) => (
             <button key={id} onClick={() => setTab(id)}
               className={`flex-1 py-2.5 text-[12px] font-bold transition-all rounded-2xl ${
@@ -3972,7 +3972,7 @@ function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: any; analys
                     <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0">
                         <p className="text-[10px] font-bold tracking-[0.16em] uppercase" style={{ color: SCAN_TO }}>{t("modal.diary.reminderTitle")}</p>
-                        <p className="text-[16px] font-black mt-1 text-kr-pretty" style={{ color: DEEP_GREEN }}>{t("modal.diary.reminderHeadline")}</p>
+                        <p className="text-base font-bold mt-1 text-kr-pretty" style={{ color: DEEP_GREEN }}>{t("modal.diary.reminderHeadline")}</p>
                         <p className="text-[11px] text-stone-500 mt-1 leading-relaxed text-kr-pretty">
                           {t("modal.diary.reminderDesc")} {aiCareSettings.enabled ? "" : t("modal.diary.aiCareWarn")}
                         </p>
@@ -4011,8 +4011,8 @@ function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: any; analys
                         }}
                         className="shrink-0 rounded-full px-3 py-1.5 text-xs font-semibold"
                         style={reminderSettings.enabled
-                          ? { background: "#ECFDF5", color: "#059669" }
-                          : { background: "#F6F3EE", color: "#9A8F80" }}
+                          ? { background: TINT_GREEN, color: "#059669" }
+                          : { background: TINT_NEUTRAL, color: "#9A8F80" }}
                       >
                         {reminderSettings.enabled ? "ON" : "OFF"}
                       </button>
@@ -4044,7 +4044,7 @@ function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: any; analys
                             className="px-3 py-1.5 rounded-full text-[11px] font-bold"
                             style={selected
                               ? { background: `${SCAN_FROM}20`, color: SCAN_TO }
-                              : { background: "#F6F3EE", color: "#9A8F80" }}
+                              : { background: TINT_NEUTRAL, color: "#9A8F80" }}
                           >
                             {option.label}
                           </button>
@@ -4126,7 +4126,7 @@ function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: any; analys
                         {diaryReport.copy.executive}
                       </p>
                       <div className="flex items-center justify-center gap-2 mt-1">
-                        <p className="text-[18px] font-black" style={{ color: DEEP_GREEN }}>
+                        <p className="text-lg font-bold" style={{ color: DEEP_GREEN }}>
                           {diaryReport.copy[diaryReport.trendKey]}
                         </p>
                         <div className="px-3 py-1.5 rounded-full text-[10px] font-bold"
@@ -4172,7 +4172,7 @@ function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: any; analys
                       <CardContent className="p-4">
                         <div className="flex items-start justify-between gap-3">
                           <div className="min-w-0">
-                            <p className="text-[15px] font-black text-kr-pretty" style={{ color: concern.accent }}>{concern.titles[reportLang]}</p>
+                            <p className="text-[15px] font-bold text-kr-pretty" style={{ color: concern.accent }}>{concern.titles[reportLang]}</p>
                             <p className="text-[12px] text-stone-500 mt-1 leading-relaxed">{concern.summaries[reportLang]}</p>
                           </div>
                           <div className="rounded-2xl px-3 py-2 shrink-0 text-right"
@@ -4216,7 +4216,7 @@ function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: any; analys
                       </p>
                       <div className="space-y-3 mt-3">
                         {diaryReport.procedurePlan.map((item) => (
-                          <div key={item.name} className="rounded-2xl p-3 border" style={{ borderColor: `${item.accent}20`, background: "#FFFCFA" }}>
+                          <div key={item.name} className="rounded-2xl p-3 border" style={{ borderColor: `${item.accent}20`, background: "#FFFFFF" }}>
                             <div className="flex items-center justify-between gap-2">
                               <p className="text-sm font-bold" style={{ color: DEEP_GREEN }}>{item.name}</p>
                               <span className="text-[10px] font-bold px-2 py-1 rounded-full" style={{ background: `${item.accent}12`, color: item.accent }}>
@@ -4246,7 +4246,7 @@ function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: any; analys
                               <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-emerald-600">{reportDetailText.positiveFlow}</p>
                               <div className="space-y-3 mt-2">
                                 {diaryReport.ingredientSignals.filter((item) => item.delta >= 0).slice(0, 3).map((item) => (
-                                  <div key={`good-${item.ingredient}`} className="rounded-[16px] p-3" style={{ background: "#ECFDF5" }}>
+                                  <div key={`good-${item.ingredient}`} className="rounded-[16px] p-3" style={{ background: TINT_GREEN }}>
                                     <div className="flex items-center justify-between gap-2">
                                       <p className="text-sm font-bold text-emerald-700">{item.ingredient}</p>
                                       <span className="text-[10px] font-bold text-emerald-600">+{item.delta}</span>
@@ -4259,7 +4259,7 @@ function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: any; analys
                               <p className="text-[10px] font-bold uppercase tracking-[0.12em]" style={{ color: SCAN_TO }}>{reportDetailText.cautionFlow}</p>
                               <div className="space-y-3 mt-2">
                                 {diaryReport.ingredientSignals.filter((item) => item.delta < 0).slice(0, 3).map((item) => (
-                                  <div key={`bad-${item.ingredient}`} className="rounded-[16px] p-3" style={{ background: "#FFF1EC" }}>
+                                  <div key={`bad-${item.ingredient}`} className="rounded-[16px] p-3" style={{ background: TINT_WARM }}>
                                     <div className="flex items-center justify-between gap-2">
                                       <p className="text-sm font-bold" style={{ color: SCAN_TO }}>{item.ingredient}</p>
                                       <span className="text-[10px] font-bold" style={{ color: SCAN_TO }}>{item.delta}</span>
@@ -4283,7 +4283,7 @@ function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: any; analys
                       </p>
                       <div className="space-y-3 mt-3">
                         {diaryReport.recoveryGuide.map((item: string) => (
-                          <div key={item} className="rounded-2xl p-3" style={{ background: "#F7FAF8" }}>
+                          <div key={item} className="rounded-2xl p-3" style={{ background: TINT_NEUTRAL }}>
                             <p className="text-[12px] text-stone-600 leading-relaxed">{item}</p>
                           </div>
                         ))}
@@ -4298,15 +4298,15 @@ function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: any; analys
                       {diaryReport.copy.routine}
                     </p>
                     <div className="grid gap-3 mt-3 md:grid-cols-2">
-                      <div className="rounded-3xl p-4" style={{ background: "#FFF8F4" }}>
+                      <div className="rounded-3xl p-4" style={{ background: TINT_WARM }}>
                         <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-stone-400">{diaryReport.copy.routineGood}</p>
                         <p className="text-sm font-bold mt-2 text-kr-pretty" style={{ color: DEEP_GREEN }}>{diaryReport.routineHighlights.strong}</p>
                       </div>
-                      <div className="rounded-3xl p-4" style={{ background: "#F6F3EE" }}>
+                      <div className="rounded-3xl p-4" style={{ background: TINT_NEUTRAL }}>
                         <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-stone-400">{diaryReport.copy.routineWatch}</p>
                         <p className="text-sm font-bold mt-2 text-kr-pretty" style={{ color: "#8C8070" }}>{diaryReport.routineHighlights.watch}</p>
                       </div>
-                      <div className="rounded-3xl p-4" style={{ background: "#FFF1EC" }}>
+                      <div className="rounded-3xl p-4" style={{ background: TINT_WARM }}>
                         <p className="text-[10px] font-bold uppercase tracking-[0.12em]" style={{ color: SCAN_TO }}>{diaryReport.copy.memoSignals}</p>
                         <div className="flex flex-wrap gap-1.5 mt-3">
                           {(diaryReport.keywordSummary.length > 0 ? diaryReport.keywordSummary : [diaryReport.copy.notEnough]).map((item) => (
@@ -4327,7 +4327,7 @@ function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: any; analys
                         </div>
                       </div>
                     </div>
-                    <div className="rounded-3xl p-4 mt-3" style={{ background: "#F7FAF8" }}>
+                    <div className="rounded-3xl p-4 mt-3" style={{ background: TINT_NEUTRAL }}>
                       <p className="text-[10px] font-bold uppercase tracking-[0.12em]" style={{ color: DEEP_GREEN }}>
                         {diaryReport.copy.cosmeticsSignal}
                       </p>
@@ -4335,7 +4335,7 @@ function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: any; analys
                       {routineGuide.cautions.length > 0 && (
                         <div className="flex flex-wrap gap-1.5 mt-3">
                           {routineGuide.cautions.slice(0, 2).map((item) => (
-                            <span key={item} className="px-2.5 py-1 rounded-full text-[10px] font-bold" style={{ background: "#FFF1EC", color: SCAN_TO }}>
+                            <span key={item} className="px-2.5 py-1 rounded-full text-[10px] font-bold" style={{ background: TINT_WARM, color: SCAN_TO }}>
                               {item}
                             </span>
                           ))}
@@ -4362,7 +4362,7 @@ function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: any; analys
                       </p>
                       <div className="space-y-3 mt-3">
                         {diaryReport.triggerSignals.length > 0 ? diaryReport.triggerSignals.map((item) => (
-                          <div key={item.tag} className="rounded-2xl p-3" style={{ background: item.diff <= 0 ? "#FFF1EC" : "#ECFDF5" }}>
+                          <div key={item.tag} className="rounded-2xl p-3" style={{ background: item.diff <= 0 ? TINT_WARM : TINT_GREEN }}>
                             <div className="flex items-center justify-between gap-2">
                               <p className="text-sm font-bold" style={{ color: item.diff <= 0 ? SCAN_TO : "#059669" }}>{item.label}</p>
                               <span className="text-[10px] font-bold" style={{ color: item.diff <= 0 ? SCAN_TO : "#059669" }}>
@@ -4395,11 +4395,11 @@ function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: any; analys
                     <div className="grid grid-cols-2 gap-3 mt-4">
                       <div className="rounded-2xl p-3" style={{ background: "#FFFFFF" }}>
                         <p className="text-[10px] font-bold text-stone-400">WEEK 1</p>
-                        <p className="text-[22px] font-black mt-1" style={{ color: SCAN_TO }}>{diaryReport.forecast.week1}</p>
+                        <p className="text-2xl font-bold mt-1" style={{ color: SCAN_TO }}>{diaryReport.forecast.week1}</p>
                       </div>
                       <div className="rounded-2xl p-3" style={{ background: "#FFFFFF" }}>
                         <p className="text-[10px] font-bold text-stone-400">WEEK 2</p>
-                        <p className="text-[22px] font-black mt-1" style={{ color: DEEP_GREEN }}>{diaryReport.forecast.week2}</p>
+                        <p className="text-2xl font-bold mt-1" style={{ color: DEEP_GREEN }}>{diaryReport.forecast.week2}</p>
                       </div>
                     </div>
                   </CardContent>
@@ -4524,7 +4524,7 @@ function MyCosmeticsModal({ onClose, onAddNew }: { onClose: () => void; onAddNew
       key: "am",
       title: t("result.actionCard.phaseMorning"),
       accent: DEEP_GREEN,
-      bg: "#F6FBF9",
+      bg: TINT_GREEN,
       border: "#D7ECE4",
       items: routineGuide.am,
     },
@@ -4532,7 +4532,7 @@ function MyCosmeticsModal({ onClose, onAddNew }: { onClose: () => void; onAddNew
       key: "pm",
       title: t("result.actionCard.phaseEvening"),
       accent: SCAN_TO,
-      bg: "#FFF7F2",
+      bg: TINT_WARM,
       border: "#F4DDD3",
       items: routineGuide.pm,
     },
@@ -4550,7 +4550,7 @@ function MyCosmeticsModal({ onClose, onAddNew }: { onClose: () => void; onAddNew
         <div className="sticky top-0 bg-white/95 backdrop-blur-md px-6 pt-5 pb-4 border-b border-stone-100 z-10">
           <div className="w-10 h-1 rounded-full bg-stone-200 mx-auto mb-4" />
           <div className="flex items-center justify-between">
-            <p className="text-[16px] font-black" style={{ color: DEEP_GREEN }}>{t("cosmetics.myTitle")}</p>
+            <p className="text-base font-bold" style={{ color: DEEP_GREEN }}>{t("cosmetics.myTitle")}</p>
             <button onClick={onClose} className="w-8 h-8 rounded-full bg-stone-100 flex items-center justify-center text-stone-400 text-sm">✕</button>
           </div>
         </div>
@@ -4575,7 +4575,7 @@ function MyCosmeticsModal({ onClose, onAddNew }: { onClose: () => void; onAddNew
                 <div className="flex items-start justify-between gap-3">
                   <div>
                     <p className="text-[10px] font-bold tracking-[0.16em] uppercase" style={{ color: SCAN_TO }}>{t("cosmetics.myTitle")}</p>
-                    <p className="text-[18px] font-black mt-1" style={{ color: DEEP_GREEN }}>{t("cosmetics.boardHeadline")}</p>
+                    <p className="text-lg font-bold mt-1" style={{ color: DEEP_GREEN }}>{t("cosmetics.boardHeadline")}</p>
                     <p className="text-[11px] text-stone-400 mt-1">{t("cosmetics.boardSub")}</p>
                   </div>
                   <span className="px-2.5 py-1 rounded-full text-[10px] font-bold"
@@ -4587,7 +4587,7 @@ function MyCosmeticsModal({ onClose, onAddNew }: { onClose: () => void; onAddNew
                 <div className="flex flex-wrap gap-1.5 mt-4">
                   {quickInsights.slice(0, 3).map((item) => (
                     <span key={item} className="px-2.5 py-1 rounded-full text-[10px] font-bold"
-                      style={{ background: "#FFF4EE", color: SCAN_TO, border: "1px solid #F3DED6" }}>
+                      style={{ background: TINT_WARM, color: SCAN_TO }}>
                       {item}
                     </span>
                   ))}
@@ -4596,10 +4596,10 @@ function MyCosmeticsModal({ onClose, onAddNew }: { onClose: () => void; onAddNew
 
               <div className="grid gap-3">
                 {sections.map(({ key, title, accent, bg, border, items }) => (
-                  <div key={key} className="rounded-3xl p-4 border" style={{ background: bg, borderColor: border }}>
+                  <div key={key} className="rounded-3xl p-4" style={{ background: bg }}>
                     <div className="flex items-center justify-between gap-3 mb-3">
                       <div>
-                        <p className="text-[15px] font-black" style={{ color: DEEP_GREEN }}>{title}</p>
+                        <p className="text-[15px] font-bold" style={{ color: DEEP_GREEN }}>{title}</p>
                         <p className="text-[11px] text-stone-400">
                           {items.length > 0 ? t("cosmetics.boardStepCount", { count: items.length }) : t(key === "am" ? "cosmetics.routineEmptyAm" : "cosmetics.routineEmptyPm")}
                         </p>
@@ -4632,12 +4632,12 @@ function MyCosmeticsModal({ onClose, onAddNew }: { onClose: () => void; onAddNew
               <div className="rounded-3xl p-4 bg-white">
                 <div className="flex items-center justify-between gap-3 mb-3">
                   <div>
-                    <p className="text-[15px] font-black" style={{ color: DEEP_GREEN }}>{t("cosmetics.collectionTitle")}</p>
+                    <p className="text-[15px] font-bold" style={{ color: DEEP_GREEN }}>{t("cosmetics.collectionTitle")}</p>
                     <p className="text-[11px] text-stone-400">{t("cosmetics.collectionSub")}</p>
                   </div>
                   <button onClick={onAddNew}
                     className="px-3 py-1.5 rounded-full text-[10px] font-bold text-white"
-                    style={{ background: `linear-gradient(135deg, ${DEEP_GREEN}, ${DEEP_GREEN_LIGHT})` }}>
+                    style={{ background: DEEP_GREEN }}>
                     + {t("cosmetics.ctaBtn")}
                   </button>
                 </div>
@@ -4684,7 +4684,7 @@ function MyCosmeticsModal({ onClose, onAddNew }: { onClose: () => void; onAddNew
           {!loading && list.length === 0 && (
             <button onClick={onAddNew}
               className="w-full py-4 rounded-2xl font-black text-[14px] text-white flex items-center justify-center gap-2 mt-2"
-              style={{ background: `linear-gradient(135deg, ${DEEP_GREEN}, ${DEEP_GREEN_LIGHT})` }}>
+              style={{ background: DEEP_GREEN }}>
               <span>+</span> {t("cosmetics.ctaBtn")}
             </button>
           )}
@@ -4708,7 +4708,7 @@ function MyCosmeticsModal({ onClose, onAddNew }: { onClose: () => void; onAddNew
                     </div>
                 }
                 <div className="min-w-0 flex-1">
-                  <p className="text-[18px] font-black text-stone-800 text-kr-pretty">{selectedItem.name}</p>
+                  <p className="text-lg font-bold text-stone-800 text-kr-pretty">{selectedItem.name}</p>
                   <p className="text-[12px] text-stone-400 mt-1">{selectedItem.brand || t("cosmetics.noBrand")}</p>
                   <div className="flex flex-wrap gap-1.5 mt-2">
                     <span className="px-2.5 py-1 rounded-full text-[10px] font-bold"
@@ -4730,17 +4730,17 @@ function MyCosmeticsModal({ onClose, onAddNew }: { onClose: () => void; onAddNew
               </div>
 
               <div className="grid grid-cols-2 gap-2.5 mt-5">
-                <div className="rounded-2xl p-3" style={{ background: "#F8FAF9" }}>
+                <div className="rounded-2xl p-3" style={{ background: TINT_NEUTRAL }}>
                   <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-stone-400">{t("cosmetics.openedLabel")}</p>
                   <p className="text-xs font-semibold mt-1" style={{ color: DEEP_GREEN }}>{selectedItem.opened_at || t("cosmetics.detailUnknown")}</p>
                 </div>
-                <div className="rounded-2xl p-3" style={{ background: "#FFF8F4" }}>
+                <div className="rounded-2xl p-3" style={{ background: TINT_WARM }}>
                   <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-stone-400">{t("cosmetics.detailStatusLabel")}</p>
                   <p className="text-xs font-semibold mt-1" style={{ color: SCAN_TO }}>{t("cosmetics.detailStatusActive")}</p>
                 </div>
               </div>
 
-              <div className="mt-4 rounded-3xl p-4" style={{ background: "#FFFCFA", border: "1px solid #F2E7E2" }}>
+              <div className="mt-4 rounded-3xl p-4" style={{ background: "#FFFFFF" }}>
                 <p className="text-xs font-semibold uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>{t("cosmetics.ingredientsLabel")}</p>
                 <p className="text-[12px] text-stone-600 mt-2 leading-relaxed whitespace-pre-wrap text-kr-pretty">
                   {selectedItem.ingredients?.trim() || t("cosmetics.ingredientsEmpty")}
@@ -4758,7 +4758,7 @@ function MyCosmeticsModal({ onClose, onAddNew }: { onClose: () => void; onAddNew
                 <button
                   onClick={() => setSelectedItem(null)}
                   className="flex-1 py-3.5 rounded-2xl font-bold text-sm text-white"
-                  style={{ background: `linear-gradient(135deg, ${DEEP_GREEN}, ${DEEP_GREEN_LIGHT})` }}
+                  style={{ background: DEEP_GREEN }}
                 >
                   {t("cosmetics.confirm")}
                 </button>
@@ -4800,7 +4800,7 @@ function MyScreen({ user, onInstall, onBack, onLogin, onGoMagazine }: { user: an
           <span className="text-[13px] font-semibold">{t("nav.scan")}</span>
         </button>
         <p className="text-[11px] font-bold tracking-widest uppercase mb-1" style={{ color: SCAN_TO }}>FONDAY</p>
-        <h1 className="text-[22px] font-black" style={{ color: DEEP_GREEN }}>{t("nav.my")}</h1>
+        <h1 className="text-2xl font-bold" style={{ color: DEEP_GREEN }}>{t("nav.my")}</h1>
       </div>
 
       <div className="px-5 pt-5 space-y-3">
@@ -5023,7 +5023,7 @@ function SkinPredictionCard({ prediction, currentScore, onOpenDiary }: {
         <div className="flex items-start justify-between gap-3 mb-3">
           <div className="flex items-center gap-2 min-w-0">
             <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 text-base"
-              style={{ background: "linear-gradient(135deg, #A78BFA, #7C3AED)" }}>
+              style={{ background: "#8B5CF6" }}>
               🔮
             </div>
             <div className="min-w-0">
@@ -5282,7 +5282,7 @@ function CosmeticsRegisterModal({ onClose, onSuccess }: { onClose: () => void; o
         <div className="sticky top-0 bg-white/95 backdrop-blur-md px-6 pt-5 pb-4 border-b border-stone-100 z-10">
           <div className="w-10 h-1 rounded-full bg-stone-200 mx-auto mb-4" />
           <div className="flex items-center justify-between">
-            <p className="text-[16px] font-black" style={{ color: DEEP_GREEN }}>
+            <p className="text-base font-bold" style={{ color: DEEP_GREEN }}>
               {step === 1 ? t("cosmetics.scanPhoto") : t("cosmetics.confirm")}
             </p>
             <button onClick={onClose} className="w-8 h-8 rounded-full bg-stone-100 flex items-center justify-center text-stone-400 text-sm">✕</button>
@@ -5426,7 +5426,7 @@ function CosmeticsRegisterModal({ onClose, onSuccess }: { onClose: () => void; o
               initial={{ y: 80 }} animate={{ y: 0 }} exit={{ y: 80 }}>
               <div className="w-10 h-1 rounded-full bg-stone-200 mx-auto mb-5" />
               <div className="flex justify-center mb-3"><Ban className="w-10 h-10 text-stone-300" /></div>
-              <p className="text-[16px] font-black text-stone-800 text-center mb-2">{t("cosmetics.notSkincareTitle")}</p>
+              <p className="text-base font-bold text-stone-800 text-center mb-2">{t("cosmetics.notSkincareTitle")}</p>
               <p className="text-[13px] text-stone-500 text-center leading-relaxed whitespace-pre-line mb-5">
                 {t("cosmetics.notSkincareDesc", { type: nonSkincareType })}
               </p>
@@ -5437,7 +5437,7 @@ function CosmeticsRegisterModal({ onClose, onSuccess }: { onClose: () => void; o
                 </button>
                 <button onClick={() => { setShowNonSkincareAlert(false); onClose(); }}
                   className="w-full py-3.5 rounded-2xl text-sm font-bold text-white"
-                  style={{ background: `linear-gradient(135deg, ${DEEP_GREEN}, ${DEEP_GREEN_LIGHT})` }}>
+                  style={{ background: DEEP_GREEN }}>
                   {t("cosmetics.notSkincareSkip")}
                 </button>
               </div>
@@ -6325,7 +6325,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -40 }}
           className="fixed top-16 left-1/2 z-[999] -translate-x-1/2 px-6 py-3 rounded-2xl shadow-xl text-white font-bold text-[15px] text-center"
-          style={{ background: "linear-gradient(135deg, #F59E0B, #D97706)" }}
+          style={{ background: "#F59E0B" }}
         >
           {t("streak.milestone", { count: streakMilestone })}
         </motion.div>
@@ -6370,7 +6370,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
                 <img src="/icon-192.png" alt="Fonday" className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
               </div>
               <div>
-                <p className="font-black text-[16px]" style={{ color: "#2D5F4F" }}>{t("install.popupTitle")}</p>
+                <p className="font-bold text-base" style={{ color: "#2D5F4F" }}>{t("install.popupTitle")}</p>
                 <p className="text-[13px] text-stone-500 mt-0.5">{t("install.popupDesc")}</p>
               </div>
             </div>
@@ -6458,9 +6458,9 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
                   <div className="absolute bottom-3 right-3 w-7 h-7 border-b-2 border-r-2 rounded-br-lg" style={{ borderColor: SCAN_TO }} />
                 </div>
                 <div className="mt-2 rounded-2xl px-2.5 py-2 text-center"
-                  style={{ background: "#FFF1EC", border: "1px solid #F3DDD6" }}>
+                  style={{ background: TINT_WARM }}>
                   <p className="text-[8px] font-black uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>{t("result.baumannLabel")}</p>
-                  <p className="text-[18px] font-black leading-none mt-1" style={{ color: SCAN_TO }}>{finalType}</p>
+                  <p className="text-lg font-bold leading-none mt-1" style={{ color: SCAN_TO }}>{finalType}</p>
                 </div>
               </div>
 
@@ -6472,7 +6472,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
                     <button
                       onClick={() => setShowAnalysis(true)}
                       className="rounded-full px-2.5 py-1 text-[9px] font-bold whitespace-nowrap"
-                      style={{ background: "#FFF1EC", color: SCAN_TO }}
+                      style={{ background: TINT_WARM, color: SCAN_TO }}
                     >
                       {t("modal.analysis.title")} {t("result.viewBtn")}
                     </button>
@@ -6495,7 +6495,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
               </div>
             </div>
             <div className="grid grid-cols-3 gap-2 mt-3">
-              <div className="rounded-2xl px-2 py-4 flex flex-col items-center justify-center text-center" style={{ background: "#FFF4EE", border: "1px solid #F3DED6" }}>
+              <div className="rounded-2xl px-2 py-4 flex flex-col items-center justify-center text-center" style={{ background: TINT_WARM }}>
                 <p className="text-[9px] font-bold uppercase tracking-[0.12em] text-stone-400">{t("result.overall")}</p>
                 <p className="text-[40px] font-black leading-none mt-1.5" style={{ color: SCAN_TO }}>{overallScore}</p>
               </div>
@@ -6518,7 +6518,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
                   <div className="min-w-0">
                     <p className="text-[10px] font-bold uppercase tracking-[0.16em]" style={{ color: SCAN_TO }}>{t("result.baumannLabel")}</p>
                     <div className="flex items-center gap-2 mt-1">
-                      <p className="text-[18px] font-black leading-none" style={{ color: DEEP_GREEN }}>{finalType}</p>
+                      <p className="text-lg font-bold leading-none" style={{ color: DEEP_GREEN }}>{finalType}</p>
                       <button onClick={() => setShowBaumannInfo(v => !v)}
                         className="text-[10px] font-bold px-2.5 py-1 rounded-full transition-all"
                         style={{ background: `${SCAN_TO}18`, color: SCAN_TO }}>
@@ -6603,7 +6603,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
           style={{ background: "linear-gradient(180deg, rgba(255,249,246,0.97) 0%, rgba(255,255,255,0.97) 100%)" }}>
           <div className="flex gap-2">
             {([
-              { id: "routine" as const,   label: t("result.tab.routine"),   icon: <CheckCircle2 className="w-4 h-4" />, from: "#10B981", to: "#047857",  inactiveBg: "#ECFDF5", inactiveText: "#059669" },
+              { id: "routine" as const,   label: t("result.tab.routine"),   icon: <CheckCircle2 className="w-4 h-4" />, from: "#10B981", to: "#047857",  inactiveBg: TINT_GREEN, inactiveText: "#059669" },
               { id: "solution" as const,  label: t("result.tab.solution"),  icon: <Leaf className="w-4 h-4" />,         from: SCAN_FROM, to: SCAN_TO,   inactiveBg: "#FFF6F1", inactiveText: "#C97062" },
               { id: "nutrition" as const, label: t("result.tab.nutrition"), icon: <Utensils className="w-4 h-4" />,     from: "#F97316", to: "#C2410C", inactiveBg: "#FFF7ED", inactiveText: "#C2410C" },
             ]).map(({ id, label, icon, from, to, inactiveBg, inactiveText }) => {
@@ -6645,7 +6645,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
           <motion.div
             initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }}
             className="rounded-3xl p-4 flex items-start gap-3"
-            style={{ background: "#FFF5F0", border: "1px solid #F3DDD6" }}
+            style={{ background: TINT_WARM }}
           >
             <span className="text-xl shrink-0 mt-0.5">✨</span>
             <div className="flex-1 min-w-0">
@@ -6667,7 +6667,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
           <CardContent className="p-3.5">
             <div className="min-w-0">
               <p className="text-xs font-semibold tracking-[0.16em] uppercase" style={{ color: SCAN_TO }}>{t("result.actionCard.missionEyebrow")}</p>
-              <p className="text-[16px] font-black mt-1 text-kr-pretty" style={{ color: DEEP_GREEN }}>{t("result.actionCard.title")}</p>
+              <p className="text-base font-bold mt-1 text-kr-pretty" style={{ color: DEEP_GREEN }}>{t("result.actionCard.title")}</p>
               <p className="text-[11px] text-stone-500 mt-1.5 leading-relaxed text-kr-pretty">{questStatusDetail}</p>
             </div>
             <div className="h-2 rounded-full bg-stone-100 overflow-hidden mt-3">
@@ -6741,7 +6741,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
               <button
                 onClick={() => setRoutinePeriodCompletion("PM", eveningRoutineItems)}
                 className="w-full flex items-center justify-between gap-3 rounded-2xl px-3.5 py-3 text-left"
-                style={{ background: "#FFF8F4" }}
+                style={{ background: TINT_WARM }}
               >
                 <div className="flex items-center gap-2 min-w-0">
                   <Moon className="w-4 h-4 shrink-0" style={{ color: SCAN_TO }} />
@@ -6756,7 +6756,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
             </div>
 
             {(routineGuide.goodMixes.length > 0 || routineGuide.cautions.length > 0 || cosmeticsInsights.length > 0) && (
-              <div className="mt-4 rounded-3xl p-4" style={{ background: "#FFFCFA", border: "1px solid #F2E7E2" }}>
+              <div className="mt-4 rounded-3xl p-4" style={{ background: "#FFFFFF" }}>
                 <div className="flex items-center justify-between gap-3 mb-3">
                   <div>
                     <p className="text-xs font-semibold uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>{t("cosmetics.insightTitle")}</p>
@@ -6765,7 +6765,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
                   <button
                     onClick={() => user ? setShowCosmeticsRegister(true) : setShowCosmeticsGate(true)}
                     className="rounded-full px-3 py-1.5 text-[10px] font-bold text-white whitespace-nowrap"
-                    style={{ background: `linear-gradient(135deg, ${DEEP_GREEN}, ${DEEP_GREEN_LIGHT})` }}
+                    style={{ background: DEEP_GREEN }}
                   >
                     + {t("cosmetics.scanBtn")}
                   </button>
@@ -6777,7 +6777,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
                       <div className="mt-2 flex flex-wrap gap-1.5">
                         {routineGuide.goodMixes.length > 0 ? routineGuide.goodMixes.slice(0, 3).map((item, index) => (
                           <span key={`good-mix-${index}`} className="px-2.5 py-1 rounded-full text-[10px] font-bold"
-                            style={{ background: "#ECFDF5", color: "#059669" }}>
+                            style={{ background: TINT_GREEN, color: "#059669" }}>
                             {item}
                           </span>
                         )) : (
@@ -6814,7 +6814,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
                   <CardContent className="p-4">
                     <div className="flex items-center gap-3">
                       <div className="w-11 h-11 rounded-2xl flex items-center justify-center shrink-0"
-                        style={{ background: `linear-gradient(135deg, ${DEEP_GREEN_LIGHT}, ${DEEP_GREEN})` }}>
+                        style={{ background: DEEP_GREEN }}>
                         <LineChartIcon className="w-5 h-5 text-white" />
                       </div>
                       <div className="flex-1 min-w-0">
@@ -6849,7 +6849,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
                     })()}
                     {/* 하단 stat pills */}
                     <div className="flex gap-2 mt-2">
-                      <div className="flex-1 rounded-2xl py-2 px-2 text-center" style={{ background: "#FFF5F0" }}>
+                      <div className="flex-1 rounded-2xl py-2 px-2 text-center" style={{ background: TINT_WARM }}>
                         <p className="text-[9px] font-bold text-stone-400 mb-0.5">{t("result.diary.streak")}</p>
                         <p className="text-sm font-bold flex items-center justify-center gap-0.5" style={{ color: SCAN_TO }}>{currentStreak.count || 1}<Flame className="w-3.5 h-3.5 inline ml-0.5" style={{ color: SCAN_TO }} /></p>
                       </div>
@@ -6943,7 +6943,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
               )}
               <button onClick={() => user ? setShowCosmeticsRegister(true) : setShowCosmeticsGate(true)}
                 className="shrink-0 px-4 py-2 rounded-xl text-white text-xs font-semibold"
-                style={{ background: `linear-gradient(135deg, ${DEEP_GREEN}, ${DEEP_GREEN_LIGHT})` }}>
+                style={{ background: DEEP_GREEN }}>
                 + {t("cosmetics.scanBtn")}
               </button>
             </div>
@@ -6951,7 +6951,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
             <div className="space-y-3">
 
             <div className="flex items-center gap-2 mb-1">
-              <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: `linear-gradient(135deg, ${DEEP_GREEN_LIGHT}, ${DEEP_GREEN})` }}>
+              <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: DEEP_GREEN }}>
                 <Leaf className="w-4 h-4 text-white" />
               </div>
               <div>
@@ -6965,7 +6965,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
                 style={{ background: i === 0 ? "#FDF1EE" : i === 1 ? "#F0F7F5" : "#F5F0FF", borderColor: i === 0 ? "#F5D5CC" : i === 1 ? "#C5DFD8" : "#DDD5F5" }}>
                 <div className="shrink-0">
                   <div className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-semibold"
-                    style={{ background: i === 0 ? `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})` : i === 1 ? `linear-gradient(135deg, ${DEEP_GREEN_LIGHT}, ${DEEP_GREEN})` : "linear-gradient(135deg, #A78BFA, #7C3AED)" }}>
+                    style={{ background: i === 0 ? `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})` : i === 1 ? DEEP_GREEN : "#8B5CF6" }}>
                     {i + 1}
                   </div>
                   <p className="text-[9px] font-bold text-center mt-0.5"
@@ -6991,7 +6991,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
                     transition={{ delay: 0.3 + i * 0.07 }}
                     className="flex items-start gap-3 p-4 rounded-2xl bg-amber-50 border border-amber-100">
                     <div className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0"
-                      style={{ background: "linear-gradient(135deg, #F59E0B, #D97706)" }}>
+                      style={{ background: "#F59E0B" }}>
                       <Star className="w-4 h-4 text-white" />
                     </div>
                     <div>
@@ -7017,11 +7017,11 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
             )}
 
             {/* ── AI 밀착케어 ── */}
-            <div className="rounded-3xl p-4" style={{ background: "#FFFBF7", border: "1px solid #F3E4D8" }}>
+            <div className="rounded-3xl p-4" style={{ background: "#FFFFFF" }}>
               <div className="flex items-center justify-between gap-3">
                 <div className="flex items-center gap-2.5">
                   <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
-                    style={{ background: "linear-gradient(135deg, #FEF3C7, #FDE68A)" }}>
+                    style={{ background: "#FEF3C7" }}>
                     <Bot className="w-5 h-5" style={{ color: "#D97706" }} />
                   </div>
                   <div>
@@ -7033,7 +7033,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
                   className="shrink-0 rounded-full px-3 py-1.5 text-xs font-semibold"
                   style={pushSubscribed
                     ? { background: `${DEEP_GREEN}18`, color: DEEP_GREEN, border: `1px solid ${DEEP_GREEN}33` }
-                    : { background: "linear-gradient(135deg, #F59E0B, #D97706)", color: "white" }}>
+                    : { background: "#F59E0B", color: "white" }}>
                   {pushLoading ? "..." : pushSubscribed ? aiCareLabels.on : aiCareLabels.off}
                 </button>
               </div>
@@ -7053,7 +7053,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
                       className="rounded-full px-3 py-1 text-xs font-semibold"
                       style={aiCareSettings[key]
                         ? { background: `${SCAN_FROM}20`, color: SCAN_TO, border: `1px solid ${SCAN_TO}33` }
-                        : { background: "#F6F3EE", color: "#9A8F80", border: "1px solid #ECE6DE" }}>
+                        : { background: TINT_NEUTRAL, color: "#9A8F80", border: "1px solid #ECE6DE" }}>
                       {label}
                     </button>
                   ))}
@@ -7117,7 +7117,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
             initial="enter" animate="center" exit="exit" transition={{ duration: 0.2, ease: "easeInOut" }}>
           <div className="space-y-3">
             <div className="flex items-center gap-2 mb-1">
-              <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: "linear-gradient(135deg, #8B5CF6, #7C3AED)" }}>
+              <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: "#8B5CF6" }}>
                 <Sparkles className="w-4 h-4 text-white" />
               </div>
               <div>
@@ -7145,7 +7145,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
                         <div className="flex items-center gap-2 mb-0.5 flex-wrap">
                           <p className="text-sm font-bold text-stone-800">{item.name}</p>
                           <span className="text-[9px] font-bold rounded-full px-2 py-0.5 text-white shrink-0"
-                            style={{ background: "linear-gradient(135deg, #8B5CF6, #7C3AED)" }}>
+                            style={{ background: "#8B5CF6" }}>
                             {SCORE_LABEL_MAP[item.targetScore] !== undefined ? t(`scores.${SCORE_LABEL_MAP[item.targetScore]}`) : item.targetScore}
                           </span>
                         </div>
@@ -7380,7 +7380,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-2">
                     <div className="w-9 h-9 rounded-xl flex items-center justify-center"
-                      style={{ background: `linear-gradient(135deg, ${DEEP_GREEN_LIGHT}, ${DEEP_GREEN})` }}>
+                      style={{ background: DEEP_GREEN }}>
                       <Leaf className="w-4 h-4 text-white" />
                     </div>
                     <div>
@@ -7404,7 +7404,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
                       style={{ background: i === 0 ? "#FDF1EE" : i === 1 ? "#F0F7F5" : "#F5F0FF", borderColor: i === 0 ? "#F5D5CC" : i === 1 ? "#C5DFD8" : "#DDD5F5" }}>
                       <div className="shrink-0">
                         <div className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-semibold"
-                          style={{ background: i === 0 ? `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})` : i === 1 ? `linear-gradient(135deg, ${DEEP_GREEN_LIGHT}, ${DEEP_GREEN})` : "linear-gradient(135deg, #A78BFA, #7C3AED)" }}>
+                          style={{ background: i === 0 ? `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})` : i === 1 ? DEEP_GREEN : "#8B5CF6" }}>
                           {i + 1}
                         </div>
                         <p className="text-[9px] font-bold text-center mt-0.5"
@@ -7435,7 +7435,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
                           transition={{ delay: 0.3 + i * 0.07 }}
                           className="flex items-start gap-3 p-4 rounded-2xl bg-amber-50 border border-amber-100">
                           <div className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0"
-                            style={{ background: `linear-gradient(135deg, #F59E0B, #D97706)` }}>
+                            style={{ background: "#F59E0B" }}>
                             <Star className="w-4 h-4 text-white" />
                           </div>
                           <div>
@@ -7476,7 +7476,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-2">
                     <div className="w-9 h-9 rounded-xl flex items-center justify-center"
-                      style={{ background: "linear-gradient(135deg, #F59E0B, #D97706)" }}>
+                      style={{ background: "#F59E0B" }}>
                       <Utensils className="w-4 h-4 text-white" />
                     </div>
                     <div>
@@ -7590,7 +7590,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
                   🧴
                 </div>
                 <div>
-                  <p className="text-[16px] font-black" style={{ color: DEEP_GREEN }}>{t("cosmetics.loginGateTitle")}</p>
+                  <p className="text-base font-bold" style={{ color: DEEP_GREEN }}>{t("cosmetics.loginGateTitle")}</p>
                   <p className="text-[12px] text-stone-400 font-semibold">{t("cosmetics.loginGateSubtitle")}</p>
                 </div>
               </div>
@@ -7680,9 +7680,9 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
               onClick={(e) => e.stopPropagation()}
             >
               <div className="w-10 h-1 rounded-full bg-stone-200 mx-auto mb-5" />
-              <p className="text-[16px] font-black text-center" style={{ color: DEEP_GREEN }}>{t("cosmetics.routineUpdateTitle")}</p>
+              <p className="text-base font-bold text-center" style={{ color: DEEP_GREEN }}>{t("cosmetics.routineUpdateTitle")}</p>
               <p className="text-[12px] text-stone-500 text-center mt-2 leading-relaxed text-kr-pretty">{t("cosmetics.routineUpdateDesc")}</p>
-              <div className="mt-5 rounded-3xl p-4" style={{ background: "#F8FAF9", border: "1px solid #E5EEEA" }}>
+              <div className="mt-5 rounded-3xl p-4" style={{ background: TINT_NEUTRAL }}>
                 <div className="grid grid-cols-2 gap-2.5">
                   <div className="rounded-2xl p-3" style={{ background: "#FFFFFF", border: "1px solid #DCE9E4" }}>
                     <p className="text-[10px] font-bold uppercase tracking-[0.14em]" style={{ color: DEEP_GREEN }}>{t("cosmetics.amBtn")}</p>
@@ -7723,7 +7723,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
                     setShowRoutineUpdateSheet(false);
                   }}
                   className="flex-1 py-3.5 rounded-2xl text-sm font-bold text-white"
-                  style={{ background: `linear-gradient(135deg, ${DEEP_GREEN}, ${DEEP_GREEN_LIGHT})` }}
+                  style={{ background: DEEP_GREEN }}
                 >
                   {t("cosmetics.routineUpdateApply")}
                 </button>
@@ -7749,7 +7749,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
               <div className="flex items-center justify-between gap-3 mb-4">
                 <div>
                   <p className="text-xs font-semibold uppercase tracking-[0.16em]" style={{ color: SCAN_TO }}>{t("result.actionCard.questEyebrow")}</p>
-                  <p className="text-[16px] font-black mt-1" style={{ color: DEEP_GREEN }}>{t("result.actionCard.questTitle", { done: questDoneCount, total: questBoard.length })}</p>
+                  <p className="text-base font-bold mt-1" style={{ color: DEEP_GREEN }}>{t("result.actionCard.questTitle", { done: questDoneCount, total: questBoard.length })}</p>
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="rounded-full px-3 py-1 text-[10px] font-bold"
@@ -7800,7 +7800,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
               onClick={e => e.stopPropagation()}>
               <div className="w-10 h-1 rounded-full bg-stone-200 mx-auto mb-6" />
               <div className="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-5"
-                style={{ background: `linear-gradient(135deg, ${DEEP_GREEN}, ${DEEP_GREEN_LIGHT})` }}>
+                style={{ background: DEEP_GREEN }}>
                 <Sparkles className="w-7 h-7 text-white" />
               </div>
               {isPartnerSuccess ? (
@@ -7829,7 +7829,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
                       className="w-full px-4 py-3.5 rounded-xl focus:outline-none focus:ring-2 text-sm resize-none" />
                     <Button disabled={isPartnerSubmitting} type="submit"
                       className="w-full h-14 rounded-2xl font-bold text-[15px] text-white"
-                      style={{ background: `linear-gradient(135deg, ${DEEP_GREEN}, ${DEEP_GREEN_LIGHT})` }}>
+                      style={{ background: DEEP_GREEN }}>
                       {isPartnerSubmitting ? t("modal.partnership.submitting") : t("modal.partnership.submit")}
                     </Button>
                   </form>
@@ -8062,7 +8062,7 @@ function MagazineTab() {
                     <span className="text-[10px] text-stone-400">·</span>
                     <span className="text-[10px] text-stone-400">{t("magazine.readTime", { time: featured.readTime })}</span>
                   </div>
-                  <h2 className="text-[16px] font-black leading-snug mb-2" style={{ color: DEEP_GREEN }}>
+                  <h2 className="text-base font-bold leading-snug mb-2" style={{ color: DEEP_GREEN }}>
                     {featured.title}
                   </h2>
                   <p className="text-[11px] text-stone-500 leading-relaxed line-clamp-2">{featured.summary}</p>
@@ -8246,7 +8246,7 @@ function ReportTab({ user }: { user: any }) {
                 </div>
                 {lastScan.skinAge && (
                   <div className="w-[72px] h-[72px] rounded-2xl flex flex-col items-center justify-center text-white shadow-lg shrink-0"
-                    style={{ background: "linear-gradient(135deg, #A78BFA, #7C3AED)" }}>
+                    style={{ background: "#8B5CF6" }}>
                     <span className="text-3xl font-black leading-none">{lastScan.skinAge}</span>
                     <span className="text-[9px] font-bold opacity-80 mt-1">{t("report.skinAge")}</span>
                   </div>
