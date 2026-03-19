@@ -6581,24 +6581,24 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
               </div>
             </div>
             <div className="grid grid-cols-2 gap-1.5 mt-3">
-              <div className="col-span-2 rounded-2xl px-4 py-3" style={{ background: TINT_WARM }}>
+              <div className="col-span-2 rounded-2xl px-4 py-3.5" style={{ background: TINT_WARM }}>
                 <div className="min-w-0 flex items-end justify-center gap-2">
-                  <p className="text-[11px] font-bold tracking-[0.02em] text-stone-500">{t("result.overall")} :</p>
-                  <p className="text-[34px] font-black leading-none" style={{ color: SCAN_TO }}>{overallScore}{t("result.scoreSuffix")}</p>
+                  <p className="text-[15px] font-bold tracking-[-0.01em] text-stone-600">{t("result.overall")} :</p>
+                  <p className="text-[36px] font-black leading-none" style={{ color: SCAN_TO }}>{overallScore}{t("result.scoreSuffix")}</p>
                 </div>
                 <p className="text-[11px] text-stone-600 mt-1.5 leading-snug text-kr-pretty text-center">
                   {weakestSummary || t("result.actionCard.phaseRecord")}
                 </p>
               </div>
               <div className="rounded-2xl px-3 py-3 flex flex-col items-center justify-center text-center min-w-0" style={{ background: "#F7F3FF", border: "1px solid #E9DDFF" }}>
-                <p className="text-[9px] font-bold uppercase tracking-[0.12em] text-stone-400 text-center">{t("result.skinAge")}</p>
-                <p className="text-[26px] font-bold leading-none mt-1.5" style={{ color: "#7C3AED" }}>
+                <p className="text-[10px] font-bold uppercase tracking-[0.08em] text-stone-400 text-center">{t("result.skinAge")}</p>
+                <p className="text-[27px] font-bold leading-none mt-1.5" style={{ color: "#7C3AED" }}>
                   {analysisResult?.skinAge && analysisResult.skinAge > 0 ? analysisResult.skinAge : "—"}
                 </p>
               </div>
               <div className="rounded-2xl px-3 py-3 flex flex-col items-center justify-center text-center min-w-0" style={{ background: "#FFF8EE", border: "1px solid #F4E2C4" }}>
-                <p className="text-[9px] font-bold uppercase tracking-[0.12em] text-stone-400 text-center">{t("ranking.topLabel")}</p>
-                <p className="text-[20px] font-bold leading-none mt-1.5 break-keep text-center" style={{ color: "#D97706" }}>
+                <p className="text-[10px] font-bold uppercase tracking-[0.08em] text-stone-400 text-center">{t("ranking.topLabel")}</p>
+                <p className="text-[21px] font-bold leading-none mt-1.5 break-keep text-center" style={{ color: "#D97706" }}>
                   {rankingData && rankingData.myPercentile !== undefined ? t("ranking.myPercentile", { percent: rankingData.myPercentile }) : "—"}
                 </p>
               </div>
