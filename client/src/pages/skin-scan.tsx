@@ -3817,6 +3817,48 @@ function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: any; analys
           positiveFlow: "Positive signals",
           cautionFlow: "Signals to watch",
         };
+  const reportConsultText = reportLang === "ko"
+    ? {
+        brief: "상담실장 브리핑",
+        briefSub: "최근 스캔과 일기 기록을 바탕으로 이번 주 피부 흐름을 상담 메모처럼 정리했습니다.",
+        insight: "상담실장 해석",
+        priorities: "이번 주 우선 과제",
+        causes: "원인 추정",
+        consultantPlan: "상담실장 제안",
+        routineAdjust: "루틴 조정 제안",
+        lifestyle: "생활 변수 해석",
+        procedureGuide: "시술 후 회복 가이드",
+      }
+    : reportLang === "ja"
+      ? {
+          brief: "カウンセリング要約",
+          briefSub: "直近のスキャンと日記記録をもとに、今週の肌 흐름を相談メモのように整理しました。",
+          insight: "カウンセラー解釈",
+          priorities: "今週の優先課題",
+          causes: "原因推定",
+          consultantPlan: "カウンセラー提案",
+          routineAdjust: "ルーティン調整提案",
+          lifestyle: "生活要因の解釈",
+          procedureGuide: "施術後の回復ガイド",
+        }
+      : {
+          brief: "Consult Brief",
+          briefSub: "This week is framed like a real skin consultation, using your recent scans and diary notes.",
+          insight: "Consultant interpretation",
+          priorities: "Top priorities this week",
+          causes: "Likely drivers",
+          consultantPlan: "Consultant recommendations",
+          routineAdjust: "Routine adjustments",
+          lifestyle: "Lifestyle interpretation",
+          procedureGuide: "Post-procedure recovery guide",
+        };
+  const consultantActionItems = [
+    diaryReport.routineHighlights.strong,
+    diaryReport.ingredientPlan[0]?.reason || diaryReport.copy.notEnough,
+    diaryReport.triggerSignals[0]
+      ? `${diaryReport.triggerSignals[0].label} ${diaryReport.triggerSignals[0].diff > 0 ? `+${diaryReport.triggerSignals[0].diff}` : diaryReport.triggerSignals[0].diff}`
+      : diaryReport.seasonGuide,
+  ].filter(Boolean).slice(0, 3);
 
   useEffect(() => {
     if (!reminderSettings.enabled) return;
@@ -4147,13 +4189,13 @@ function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: any; analys
                     <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0">
                         <p className="text-[10px] font-bold tracking-[0.16em] uppercase" style={{ color: SCAN_TO }}>
-                          {diaryReport.copy.deck}
+                          {reportConsultText.brief}
                         </p>
                         <p className="text-[20px] font-black mt-1 text-kr-pretty" style={{ color: DEEP_GREEN }}>
                           {diaryReport.copy.title}
                         </p>
                         <p className="text-[11px] text-stone-500 mt-1 leading-relaxed text-kr-pretty">
-                          {diaryReport.copy.subtitle}
+                          {reportConsultText.briefSub}
                         </p>
                       </div>
                       <div className="rounded-3xl px-3 py-2 text-right shrink-0"
@@ -4177,24 +4219,52 @@ function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: any; analys
                         <p className="text-[20px] font-black mt-1" style={{ color: "#0F766E" }}>{diaryReport.adherence}</p>
                       </div>
                     </div>
+                  </CardContent>
+                </Card>
 
-                    <div className="rounded-3xl p-4 mt-4 text-center" style={{ background: "#FFFFFF" }}>
-                      <p className="text-[10px] font-bold uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>
-                        {diaryReport.copy.executive}
-                      </p>
-                      <div className="flex items-center justify-center gap-2 mt-1">
-                        <p className="text-lg font-bold" style={{ color: DEEP_GREEN }}>
-                          {diaryReport.copy[diaryReport.trendKey]}
-                        </p>
-                        <div className="px-3 py-1.5 rounded-full text-[10px] font-bold"
-                          style={{ background: `${SCAN_FROM}18`, color: SCAN_TO }}>
-                          {diaryReport.trendDesc}
-                        </div>
+                <Card className="border-none rounded-3xl shadow-sm overflow-hidden" style={{ background: "#FFFFFF" }}>
+                  <CardContent className="p-5">
+                    <div className="flex items-start gap-3">
+                      <div className="w-10 h-10 rounded-2xl flex items-center justify-center shrink-0" style={{ background: TINT_WARM }}>
+                        <Sparkles className="w-4 h-4" style={{ color: SCAN_TO }} />
                       </div>
-                      <p className="text-[13px] text-stone-600 mt-3 leading-relaxed text-kr-pretty">
-                        {diaryReport.executiveSummary}
-                      </p>
-                      <p className="text-[11px] text-stone-500 mt-3">{diaryReport.routineDesc}</p>
+                      <div className="min-w-0">
+                        <p className="text-[10px] font-bold uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>
+                          {reportConsultText.insight}
+                        </p>
+                        <div className="flex items-center gap-2 mt-1 flex-wrap">
+                          <p className="text-base font-bold text-kr-pretty" style={{ color: DEEP_GREEN }}>
+                            {diaryReport.copy[diaryReport.trendKey]}
+                          </p>
+                          <span className="px-2.5 py-1 rounded-full text-[10px] font-bold" style={{ background: `${SCAN_FROM}18`, color: SCAN_TO }}>
+                            {diaryReport.trendDesc}
+                          </span>
+                        </div>
+                        <p className="text-[13px] text-stone-600 mt-3 leading-relaxed text-kr-pretty">
+                          {diaryReport.executiveSummary}
+                        </p>
+                        <p className="text-[11px] text-stone-500 mt-2 leading-relaxed text-kr-pretty">
+                          {diaryReport.routineDesc}
+                        </p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card className="border-none rounded-3xl shadow-sm overflow-hidden" style={{ background: "#FFFFFF" }}>
+                  <CardContent className="p-4">
+                    <p className="text-xs font-semibold uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>
+                      {reportConsultText.priorities}
+                    </p>
+                    <div className="space-y-2.5 mt-3">
+                      {consultantActionItems.map((item, index) => (
+                        <div key={`${item}-${index}`} className="rounded-2xl p-3 flex items-start gap-3" style={{ background: index === 0 ? TINT_WARM : index === 1 ? TINT_GREEN : "#F6F4FB" }}>
+                          <div className="w-7 h-7 rounded-xl flex items-center justify-center shrink-0 text-[11px] font-bold" style={{ background: "#FFFFFF", color: index === 0 ? SCAN_TO : index === 1 ? DEEP_GREEN : "#7C3AED" }}>
+                            {index + 1}
+                          </div>
+                          <p className="text-[12px] text-stone-700 leading-relaxed text-kr-pretty">{item}</p>
+                        </div>
+                      ))}
                     </div>
                   </CardContent>
                 </Card>
@@ -4222,7 +4292,7 @@ function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: any; analys
 
                 <div className="space-y-3">
                   <p className="text-xs font-semibold uppercase tracking-[0.14em] px-1" style={{ color: SCAN_TO }}>
-                    {diaryReport.copy.priority}
+                    {reportLang === "ko" ? "핵심 관찰" : reportLang === "ja" ? "主要観察" : "Key observations"}
                   </p>
                   {diaryReport.focusConcerns.map((concern) => (
                     <Card key={concern.key} className="border-none rounded-3xl shadow-sm overflow-hidden" style={{ background: "#FFFFFF" }}>
@@ -4252,6 +4322,7 @@ function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: any; analys
                       <p className="text-xs font-semibold uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>
                         {diaryReport.copy.ingredients}
                       </p>
+                      <p className="text-[11px] text-stone-500 mt-1 text-kr-pretty">{reportLang === "ko" ? "상담실장이 우선 추천하는 성분 처방입니다." : reportLang === "ja" ? "優先して勧めたい成分処方です。" : "Top ingredient prescriptions a consultant would prioritize."}</p>
                       <div className="space-y-3 mt-3">
                         {diaryReport.ingredientPlan.map((item) => (
                           <div key={item.name} className="rounded-2xl p-3" style={{ background: `${item.accent}10` }}>
@@ -4271,6 +4342,7 @@ function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: any; analys
                       <p className="text-xs font-semibold uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>
                         {diaryReport.copy.procedures}
                       </p>
+                      <p className="text-[11px] text-stone-500 mt-1 text-kr-pretty">{reportLang === "ko" ? "시술이 필요하다면 상담실에서 먼저 검토할 만한 방향입니다." : reportLang === "ja" ? "施術を考えるなら先に相談しやすい方向です。" : "If procedures are on the table, these are the first directions worth discussing."}</p>
                       <div className="space-y-3 mt-3">
                         {diaryReport.procedurePlan.map((item) => (
                           <div key={item.name} className="rounded-2xl p-3 border" style={{ borderColor: `${item.accent}20`, background: "#FFFFFF" }}>
@@ -4293,7 +4365,7 @@ function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: any; analys
                   <Card className="border-none rounded-3xl shadow-sm overflow-hidden" style={{ background: "#FFFFFF" }}>
                     <CardContent className="p-4">
                       <p className="text-xs font-semibold uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>
-                        {reportDetailText.ingredientTrack}
+                        {reportLang === "ko" ? "성분 반응 추적" : reportDetailText.ingredientTrack}
                       </p>
                       <p className="text-[11px] text-stone-500 mt-1">{reportDetailText.ingredientTrackSub}</p>
                       <div className="space-y-3 mt-3">
@@ -4336,7 +4408,7 @@ function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: any; analys
                   <Card className="border-none rounded-3xl shadow-sm overflow-hidden" style={{ background: "#FFFFFF" }}>
                     <CardContent className="p-4">
                       <p className="text-xs font-semibold uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>
-                        {reportDetailText.recoveryGuide}
+                        {reportConsultText.procedureGuide}
                       </p>
                       <div className="space-y-3 mt-3">
                         {diaryReport.recoveryGuide.map((item: string) => (
@@ -4352,7 +4424,7 @@ function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: any; analys
                 <Card className="border-none rounded-3xl shadow-sm overflow-hidden" style={{ background: "#FFFFFF" }}>
                   <CardContent className="p-4">
                     <p className="text-xs font-semibold uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>
-                      {diaryReport.copy.routine}
+                      {reportConsultText.routineAdjust}
                     </p>
                     <div className="grid gap-3 mt-3 md:grid-cols-2">
                       <div className="rounded-3xl p-4" style={{ background: TINT_WARM }}>
@@ -4406,7 +4478,7 @@ function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: any; analys
                   <Card className="border-none rounded-3xl shadow-sm overflow-hidden" style={{ background: "#FFFFFF" }}>
                     <CardContent className="p-4">
                       <p className="text-xs font-semibold uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>
-                        {reportDetailText.seasonImpact}
+                        {reportConsultText.lifestyle}
                       </p>
                       <p className="text-[13px] text-stone-600 mt-3 leading-relaxed text-kr-pretty">{diaryReport.seasonGuide}</p>
                     </CardContent>
@@ -4415,7 +4487,7 @@ function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: any; analys
                   <Card className="border-none rounded-3xl shadow-sm overflow-hidden" style={{ background: "#FFFFFF" }}>
                     <CardContent className="p-4">
                       <p className="text-xs font-semibold uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>
-                        {reportDetailText.triggerCorrelation}
+                        {reportConsultText.causes}
                       </p>
                       <div className="space-y-3 mt-3">
                         {diaryReport.triggerSignals.length > 0 ? diaryReport.triggerSignals.map((item) => (
