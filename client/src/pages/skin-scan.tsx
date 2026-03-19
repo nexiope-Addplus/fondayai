@@ -3935,25 +3935,25 @@ function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: any; analys
             <ChevronLeft className="w-5 h-5" />
           </button>
         )}
-        <div className="rounded-3xl p-5 mb-4 text-white"
-          style={{ background: "linear-gradient(135deg, #2D5F4F 0%, #C97062 100%)" }}>
-          <p className="text-[11px] font-bold tracking-widest uppercase mb-1 text-white/70">FONDAY</p>
-          <h1 className="text-2xl font-bold">{t("modal.diary.title")} ✦</h1>
-          <p className="text-[12px] text-white/80 mt-2 text-kr-pretty">
+        <div className="rounded-3xl p-5 mb-4"
+          style={{ background: "#FFFFFF", boxShadow: "0 10px 28px rgba(45,95,79,0.08)" }}>
+          <p className="text-[11px] font-bold tracking-widest uppercase mb-1" style={{ color: SCAN_TO }}>FONDAY</p>
+          <h1 className="text-2xl font-bold" style={{ color: DEEP_GREEN }}>{t("modal.diary.title")}</h1>
+          <p className="text-[12px] text-stone-500 mt-2 text-kr-pretty">
             {finalType ? `${finalType} · ` : ""}{totalRecords > 0 ? `${t("modal.diary.countLabel", { count: totalRecords })}` : t("result.diary.firstRecord")}
           </p>
           <div className="grid grid-cols-3 gap-2.5 mt-4">
-            <div className="rounded-2xl p-3 bg-white/10 border border-white/12 text-center">
-              <p className="text-[10px] font-bold text-white/70 whitespace-nowrap">{t("result.overall")}</p>
-              <p className="text-2xl font-bold mt-1">{overallScore || "—"}</p>
+            <div className="rounded-2xl p-3 text-center" style={{ background: TINT_WARM }}>
+              <p className="text-[10px] font-bold text-stone-400 whitespace-nowrap">{t("result.overall")}</p>
+              <p className="text-2xl font-bold mt-1" style={{ color: SCAN_TO }}>{overallScore || "—"}</p>
             </div>
-            <div className="rounded-2xl p-3 bg-white/10 border border-white/12 text-center">
-              <p className="text-[10px] font-bold text-white/70 whitespace-nowrap">{t("result.diary.avg7d")}</p>
-              <p className="text-2xl font-bold mt-1">{avgScore || "—"}</p>
+            <div className="rounded-2xl p-3 text-center" style={{ background: "#F6F4FB" }}>
+              <p className="text-[10px] font-bold text-stone-400 whitespace-nowrap">{t("result.diary.avg7d")}</p>
+              <p className="text-2xl font-bold mt-1" style={{ color: "#7C3AED" }}>{avgScore || "—"}</p>
             </div>
-            <div className="rounded-2xl p-3 bg-white/10 border border-white/12 text-center">
-              <p className="text-[10px] font-bold text-white/70 whitespace-nowrap">{t("diary.routineTitle")}</p>
-              <p className="text-2xl font-bold mt-1">{diaryTodoProgress.total > 0 ? `${diaryTodoProgress.done}/${diaryTodoProgress.total}` : (diaryMemoReady ? "1/1" : "0/1")}</p>
+            <div className="rounded-2xl p-3 text-center" style={{ background: TINT_GREEN }}>
+              <p className="text-[10px] font-bold text-stone-400 whitespace-nowrap">{t("diary.routineTitle")}</p>
+              <p className="text-2xl font-bold mt-1" style={{ color: DEEP_GREEN }}>{diaryTodoProgress.total > 0 ? `${diaryTodoProgress.done}/${diaryTodoProgress.total}` : (diaryMemoReady ? "1/1" : "0/1")}</p>
             </div>
           </div>
         </div>
@@ -3961,14 +3961,22 @@ function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: any; analys
 
       {/* 콘텐츠 */}
       <div ref={diaryScrollRef} className="flex-1 overflow-y-auto overscroll-contain pb-24">
-        <div ref={diaryTabNavRef} className="px-5 pt-2 pb-0 sticky top-0 z-20" style={{ background: "#F8F5F2" }}>
-          <div className="flex gap-2 p-2 rounded-3xl mb-3" style={{ background: TINT_WARM }}>
+        <div ref={diaryTabNavRef} className="px-5 pt-2 pb-0 sticky top-0 z-20" style={{ background: "rgba(248,245,242,0.94)" }}>
+          <div className="flex gap-2 p-2 rounded-3xl mb-3" style={{ background: "#FFFFFF", boxShadow: "0 8px 20px rgba(45,95,79,0.05)" }}>
             {tabs.map(({ id, label }) => (
               <button key={id} onClick={() => goToDiaryTab(id)}
-                className={`flex-1 py-2.5 text-[12px] font-bold transition-all rounded-2xl ${
-                  tab === id ? "text-white shadow-md" : "text-stone-400"
+                className={`flex-1 py-2.5 text-[12px] font-medium transition-all rounded-2xl ${
+                  tab === id ? "shadow-sm" : "text-stone-400"
                 }`}
-                style={tab === id ? { background: `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})` } : { background: "transparent" }}>
+                style={tab === id
+                  ? id === "calendar"
+                    ? { background: TINT_GREEN, color: DEEP_GREEN }
+                    : id === "timeline"
+                    ? { background: TINT_WARM, color: SCAN_TO }
+                    : id === "report"
+                    ? { background: "#F6F4FB", color: "#7C3AED" }
+                    : { background: "#FFF7ED", color: "#C2410C" }
+                  : { background: "transparent" }}>
                 {label}
               </button>
             ))}
@@ -5998,6 +6006,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
   };
   const TAB_SEQUENCE = ["routine", "solution", "nutrition"] as const;
   const TAB_ORDER = { routine: 0, solution: 1, nutrition: 2 } as const;
+  const tabContentRef = useRef<HTMLDivElement | null>(null);
   const goTo = (next: "routine" | "solution" | "nutrition") => {
     tabDirectionRef.current = TAB_ORDER[next] >= TAB_ORDER[activeTab] ? 1 : -1;
     setActiveTab(next);
@@ -6010,10 +6019,10 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
       tabMountedRef.current = true;
       return; // 초기 로드: 스크롤 없이 최상단(10가지 점수)부터 보임
     }
-    const nav = tabNavRef.current;
+    const content = tabContentRef.current;
     const container = resultScrollRef.current;
-    if (nav && container) {
-      container.scrollTo({ top: nav.offsetTop - 12, behavior: "smooth" });
+    if (content && container) {
+      container.scrollTo({ top: content.offsetTop - 8, behavior: "smooth" });
     }
   }, [activeTab]);
 
@@ -6659,7 +6668,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
           </div>
         </div>
 
-        <div className="overflow-hidden"
+        <div ref={tabContentRef} className="overflow-hidden"
           onTouchStart={(e) => { (e.currentTarget as any)._touchX = e.touches[0].clientX; }}
           onTouchEnd={(e) => {
             const startX = (e.currentTarget as any)._touchX;
@@ -7026,15 +7035,16 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
                 {(analysisResult.cosmetics as { type: string; key: string; reason: string }[]).map((item, i) => (
                   <motion.div key={`c-${i}`} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.3 + i * 0.07 }}
-                    className="flex items-start gap-3 p-4 rounded-2xl bg-amber-50 border border-amber-100">
+                    className="flex items-start gap-3 p-4 rounded-2xl"
+                    style={{ background: "#FFF7ED" }}>
                     <div className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0"
-                      style={{ background: "#F59E0B" }}>
-                      <Star className="w-4 h-4 text-white" />
+                      style={{ background: "#FFFFFF" }}>
+                      <Star className="w-4 h-4" style={{ color: "#D97706" }} />
                     </div>
                     <div>
                       <div className="flex items-center gap-1.5 mb-0.5">
                         <span className="text-sm font-bold text-stone-800">{item.type}</span>
-                        <span className="text-[10px] px-1.5 py-0.5 rounded-full font-bold text-white" style={{ background: "#D97706" }}>{item.key}</span>
+                        <span className="text-[10px] px-1.5 py-0.5 rounded-full font-medium" style={{ background: "#FFFFFF", color: "#D97706" }}>{item.key}</span>
                       </div>
                       <p className="text-[12px] text-stone-500 leading-relaxed">{item.reason}</p>
                     </div>
@@ -7070,7 +7080,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
                   className="shrink-0 rounded-full px-3 py-1.5 text-xs font-semibold"
                   style={pushSubscribed
                     ? { background: `${DEEP_GREEN}18`, color: DEEP_GREEN, border: `1px solid ${DEEP_GREEN}33` }
-                    : { background: "#F59E0B", color: "white" }}>
+                    : { background: TINT_NEUTRAL, color: SCAN_TO }}>
                   {pushLoading ? "..." : pushSubscribed ? aiCareLabels.on : aiCareLabels.off}
                 </button>
               </div>
@@ -7100,7 +7110,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
 
             {/* ── Fonday 디바이스 티저 (잠금 → 기대감 카드) ── */}
             <div className="rounded-3xl overflow-hidden"
-              style={{ background: TINT_WARM }}>
+              style={{ background: "#FFFFFF", boxShadow: "0 8px 24px rgba(45,95,79,0.06)" }}>
               <div className="p-5">
                 <div className="flex items-start justify-between gap-3 mb-4">
                   <div>
@@ -7130,8 +7140,8 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
                   })}
                 </div>
                 <Button onClick={() => setShowWaitlist(true)}
-                  className="w-full h-11 rounded-xl text-white text-[12px] font-bold"
-                  style={{ background: `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})` }}>
+                  className="w-full h-11 rounded-xl text-[12px] font-semibold"
+                  style={{ background: TINT_WARM, color: SCAN_TO }}>
                   <span className="flex items-center gap-1.5">{t("result.earlybird")} <ArrowRight className="w-4 h-4" /></span>
                 </Button>
               </div>
@@ -7139,8 +7149,8 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
             {/* 다음 탭 유도 */}
             <button
               onClick={() => goTo("nutrition")}
-              className="w-full flex items-center justify-center gap-2 py-3.5 rounded-2xl text-sm font-bold text-white transition-all active:scale-95"
-              style={{ background: "linear-gradient(135deg, #F97316, #C2410C)" }}>
+              className="w-full flex items-center justify-center gap-2 py-3.5 rounded-2xl text-sm font-medium transition-all active:scale-95"
+              style={{ background: "#FFF7ED", color: "#C2410C" }}>
               <Utensils className="w-4 h-4" />
               <span>{t("result.tab.nutrition")} →</span>
             </button>
