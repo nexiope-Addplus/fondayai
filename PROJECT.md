@@ -304,6 +304,60 @@ CREATE TABLE IF NOT EXISTS cosmetics (
   - `0 9 * * *`
   - `0 11-13 * * *`
 
+### F. 디자인 시스템/결과 UX 2차 정리 (2026-03-19)
+- 대상 파일: `client/src/pages/skin-scan.tsx`, `client/src/index.css`
+- 최근 일련의 커밋으로 스캔/결과/일기/My 화면 전반의 시각 톤을 재정리함
+- 큰 방향:
+  - gradient/강한 배지/과한 그림자 남발을 줄이고 `white + tint + soft shadow` 문법으로 통일
+  - 정보량을 줄이는 대신 `첫 화면에 필요한 정보`와 `펼쳐볼 정보`의 위계를 분리
+  - 결과 화면 탭 전환을 슬라이드 기반으로 유지하면서 탭별 읽기 흐름을 더 명확히 정리
+
+### G. Idle 화면 재배치
+- `ScanIdleScreen`
+  - 상단 최우선 정보가 다시 스캔 CTA/히어로가 되도록 재배치
+  - `오늘 출석 완료`, `연속 출석`은 최상단 주인공 자리에서 빼고 히어로 아래 보조 정보 스트립으로 이동
+  - 헤더 카피는 유지하되, 길어진 설명 때문에 CTA가 아래로 밀리는 문제를 완화
+- 현재 의도:
+  - 첫 인상은 “지금 스캔하라”
+  - 출석/포인트는 보조 동기부여 요소
+
+### H. 결과 화면 재정리
+- `ResultScreen`
+  - 상단 결과부는 너무 밋밋해졌던 정리 버전에서 일부 임팩트를 복원
+  - 점수 3카드/요약 구조는 유지하되, `나의 피부 MBTI` 카드를 새 톤에 맞게 다시 정리
+  - MBTI 카드는 화이트 카드 + tint 아이콘 + 낮은 강조 버튼 문법으로 통일
+- 결과 하단 3탭:
+  - `routine / solution / nutrition` 탭 이동은 슬라이드 유지
+  - 탭 변경 시 해당 탭 콘텐츠 시작점으로 스크롤되도록 로직 반영
+  - `solution`, `nutrition` 카드도 flat tint/white 기반으로 추가 정리
+- `AI 피부 예측` 카드:
+  - 기존 이모지 아이콘을 제거하고 Lucide 아이콘(`Bot`)으로 통일
+  - CTA도 강한 gradient 대신 현재 결과 화면 톤에 맞는 화이트/보더 스타일로 조정
+
+### I. Diary 탭 / My 탭 구조 정리
+- `DiaryTab`
+  - `calendar / timeline / report / ranking` 내부 슬라이드 탭 구조 적용
+  - 루트 탭 관점에서 중복되는 상단 백버튼은 제거
+  - 상단 히어로/탭 바를 결과 탭과 비슷한 밀도의 카드 문법으로 통일
+- `MyScreen`
+  - 기존에는 새 디자인 톤이 거의 반영되지 않았음
+  - 현재는 헤더, 프로필, 출석/설정/설치/매거진/디바이스 카드까지 `white + tint + soft shadow` 계열로 재정리
+  - 루트 탭 구조라 상단 `홈/뒤로` 버튼은 제거
+
+### J. UX 판단 기준 메모
+- `idle` 최상단에 출석 상태를 강하게 두는 것은 메인 행동(스캔)을 흐릴 가능성이 큼
+- `Diary`, `My`는 하단 탭이 이미 1차 내비게이션이므로 상단 백버튼은 대체로 불필요
+- 다크모드는 장기적으로 고려 가능하지만, 현재 우선순위는 아님
+  - 피부 사진/분석 결과 신뢰감은 기본적으로 라이트 모드에서 더 잘 살아남
+  - 먼저 라이트 경험 완성도를 올리는 쪽이 우선
+
+### K. 현재 남아 있는 기술 이슈
+- `npm run check`는 여전히 실패하지만, 최근 UI 수정으로 새 오류를 만든 상태는 아님
+- 남아 있는 기존 타입 이슈:
+  - `client/src/pages/skin-scan.tsx`: `Set` iteration 관련 TS2802
+  - `server/auth.ts`: `passport-google-oauth20`, `passport-kakao`, `passport-line-auth` 선언 누락 및 implicit any
+  - `server/routes.ts`: `Set` iteration 관련 TS2802
+
 ---
 
 ## 6. 인증 시스템
@@ -492,6 +546,10 @@ git push origin main
 
 | 커밋 | 내용 |
 |------|------|
+| 55d4af9 | refactor(ui): idle/My/MBTI 재정리 + 루트 탭 백버튼 제거 + AI 예측 아이콘 통일 |
+| f0d18a6 | refactor(ui): 결과 3탭 톤/스크롤 동작 정렬 |
+| 80c023e | refactor(ui): idle/결과 상단 임팩트 복원 + Diary 내부 슬라이드 탭 추가 |
+| 1e6a897 | refactor(ui): scan/result 경험의 시각적 강도 정리 |
 | 0c07009 | feat(cosmetics): 내 화장품 루틴 보드형 개편 + 성분 상세 시트/저장 추가 |
 | b26991f | feat(diary): 피부일기 탭을 달력 중심 독립 페이지형으로 정리 |
 | afa0913 | fix(diary): 달력 우선 배치 + 오늘 루틴 완료형 UI 정리 |
