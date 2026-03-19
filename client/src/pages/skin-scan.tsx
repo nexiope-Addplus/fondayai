@@ -1580,82 +1580,83 @@ function ScanIdleScreen({ onScan }: { onScan: () => void }) {
 
       {/* ── 헤더 + 히어로 미리보기 ── */}
       <motion.div variants={fadeChild} className="mb-4 relative" style={{ zIndex: 1 }}>
-        <div className="flex items-center gap-2 mb-3 px-1">
-          <span className="text-[10px] font-semibold tracking-[0.18em] uppercase" style={{ color: SCAN_TO }}>FONDAY AI</span>
-          <span className="text-[10px] text-stone-300">/</span>
-          <span className="text-[10px] font-medium uppercase tracking-[0.14em] text-stone-500">{t("idle.heroBadge")}</span>
+        <div className="flex items-center justify-between gap-2 mb-3">
+          <div className="flex items-center gap-1.5 px-3 py-1 rounded-full"
+            style={{ background: `${SCAN_FROM}22`, border: `1px solid ${SCAN_FROM}50` }}>
+            <Sparkles className="w-3 h-3" style={{ color: SCAN_TO }} />
+            <span className="text-[11px] font-bold tracking-widest uppercase" style={{ color: SCAN_TO }}>FONDAY AI</span>
+          </div>
+          <div className="px-3 py-1 rounded-full bg-white/80 border border-white/70 shadow-[0_8px_24px_rgba(189,133,111,0.12)]">
+            <span className="text-[10px] font-bold" style={{ color: DEEP_GREEN }}>{t("idle.heroBadge")}</span>
+          </div>
         </div>
-        <h1 className="text-[28px] sm:text-[30px] font-bold text-stone-800 leading-[1.08] mb-2 px-1">
+        <h1 className="text-[28px] sm:text-[30px] font-black text-stone-800 leading-[1.08] mb-2 px-1">
           {t("idle.subtitle1")}<br />{t("idle.subtitle3")}
         </h1>
-        <p className="text-[13px] text-stone-500 px-1 mb-4 leading-relaxed">
+        <p className="text-[13px] text-stone-500 px-1 mb-3.5">
           {t("idle.subtitle4")}
         </p>
 
-        <div className="rounded-3xl p-4 sm:p-[18px]"
-          style={{ background: "#FFFFFF", boxShadow: "0 10px 28px rgba(45,95,79,0.08)" }}>
-          <div className="flex items-center justify-between mb-3.5">
+        <div className="rounded-3xl p-3 border border-white/70 sm:rounded-3xl sm:p-3.5"
+          style={{ background: "rgba(255,255,255,0.84)", boxShadow: "0 18px 44px rgba(160,120,100,0.15)", backdropFilter: "blur(14px)" }}>
+          <div className="flex items-center justify-between mb-3">
             <div>
-              <div className="text-[11px] font-semibold text-stone-700">{t("idle.previewTitle")}</div>
-              <div className="text-[10px] text-stone-400 mt-0.5">{t("idle.previewSub")}</div>
+              <div className="text-[11px] font-bold text-stone-700">{t("idle.previewTitle")}</div>
+              <div className="text-[9px] text-stone-400">{t("idle.previewSub")}</div>
             </div>
-            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full max-w-[52%] sm:max-w-none"
-              style={{ background: TINT_WARM, color: SCAN_TO }}>
+            <div className="flex items-center gap-1.5 px-2 py-1 rounded-full max-w-[52%] sm:max-w-none"
+              style={{ background: `${SCAN_FROM}16`, color: SCAN_TO }}>
               <Heart className="w-3 h-3 shrink-0" />
-              <span className="text-[10px] leading-tight font-medium text-right break-keep">{t("idle.socialCount", { n: socialCount.toLocaleString() })}</span>
+              <span className="text-[9.5px] leading-tight font-bold text-right break-keep">{t("idle.socialCount", { n: socialCount.toLocaleString() })}</span>
             </div>
           </div>
-          <div className="grid gap-4 items-start md:grid-cols-[132px_1fr]">
-            <div className="relative rounded-[28px] overflow-hidden h-[182px] bg-stone-100 md:h-full">
+          <div className="grid grid-cols-[116px_1fr] gap-2.5 items-stretch sm:grid-cols-[132px_1fr] sm:gap-3">
+            <div className="relative rounded-3xl overflow-hidden min-h-[168px] bg-stone-100 sm:rounded-3xl sm:min-h-[176px]">
               <img
                 src="/face-model.png"
                 alt="preview"
                 className="w-full h-full object-cover"
                 style={{ objectPosition: "center top" }}
               />
-              <motion.div className="absolute left-0 right-0 h-[1px] z-10"
-                style={{ background: `linear-gradient(90deg, transparent 0%, ${SCAN_TO}66 40%, ${SCAN_FROM} 50%, ${SCAN_TO}66 60%, transparent 100%)` }}
+              <motion.div className="absolute left-0 right-0 h-[2px] z-10"
+                style={{ background: `linear-gradient(90deg, transparent 0%, ${SCAN_TO}CC 40%, ${SCAN_FROM} 50%, ${SCAN_TO}CC 60%, transparent 100%)` }}
                 animate={{ top: ["5%", "88%", "5%"] }}
                 transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }} />
               <div className="absolute inset-x-0 bottom-0 h-24"
-                style={{ background: "linear-gradient(to top, rgba(28,25,23,0.52), transparent)" }} />
+                style={{ background: "linear-gradient(to top, rgba(20,20,20,0.55), transparent)" }} />
+              <div className="absolute top-3 left-3 w-7 h-7 border-t-2 border-l-2 rounded-tl-lg" style={{ borderColor: SCAN_TO }} />
+              <div className="absolute top-3 right-3 w-7 h-7 border-t-2 border-r-2 rounded-tr-lg" style={{ borderColor: SCAN_TO }} />
               <div className="absolute bottom-3 left-3 text-white">
-                <p className="text-[8px] sm:text-[9px] font-semibold uppercase tracking-[0.16em] text-white/75">{t("idle.heroMbtiLabel")}</p>
-                <p className="text-[22px] sm:text-2xl font-semibold leading-none mt-1">OSNT</p>
+                <p className="text-[8px] sm:text-[9px] font-bold uppercase tracking-[0.16em] text-white/75">{t("idle.heroMbtiLabel")}</p>
+                <p className="text-[22px] sm:text-2xl font-bold leading-none">OSNT</p>
               </div>
             </div>
-            <div className="space-y-3">
-              <div className="rounded-[28px] px-3.5 py-3"
-                style={{ background: TINT_NEUTRAL }}>
+            <div className="flex flex-col">
+              <div className="rounded-3xl px-2.5 py-2.5 mb-2.5 sm:rounded-3xl sm:px-3"
+                style={{ background: `${SCAN_FROM}10`, border: `1px solid ${SCAN_FROM}24` }}>
                 <div className="flex items-center justify-between gap-2">
-                  <p className="text-[10px] font-semibold uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>{t("idle.heroBenefitsTitle")}</p>
-                  <span className="text-[9px] font-medium uppercase tracking-[0.14em]" style={{ color: TEXT_SECONDARY }}>{t("idle.heroTag")}</span>
+                  <p className="text-[10px] font-bold uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>{t("idle.heroBenefitsTitle")}</p>
+                  <span className="text-[9px] font-bold uppercase tracking-[0.14em]" style={{ color: TEXT_SECONDARY }}>{t("idle.heroTag")}</span>
                 </div>
-                <div className="grid grid-cols-1 gap-2.5 mt-3">
-                  <div className="flex items-start gap-2 text-[12px] text-stone-700">
-                    <span className="mt-[2px] h-1.5 w-1.5 rounded-full shrink-0" style={{ background: SCAN_TO }} />
-                    <span className="leading-relaxed">{t("idle.heroBenefit1")}</span>
+                <div className="grid grid-cols-1 gap-2 mt-2">
+                  <div className="flex items-center gap-2 text-[11px] font-semibold text-stone-700">
+                    <Badge className="h-5 rounded-full px-2 text-[9px]" style={{ background: "#F3E8E2", color: SCAN_TO }}>{t("result.baumannLabel")}</Badge>
+                    <span>{t("idle.heroBenefit1")}</span>
                   </div>
-                  <div className="flex items-start gap-2 text-[12px] text-stone-700">
-                    <span className="mt-[2px] h-1.5 w-1.5 rounded-full shrink-0" style={{ background: DEEP_GREEN }} />
-                    <span className="leading-relaxed">{t("idle.heroBenefit2")}</span>
+                  <div className="flex items-center gap-2 text-[11px] font-semibold text-stone-700">
+                    <Badge className="h-5 rounded-full px-2 text-[9px]" style={{ background: "#E7F7F0", color: DEEP_GREEN }}>{t("result.scores")}</Badge>
+                    <span>{t("idle.heroBenefit2")}</span>
                   </div>
-                  <div className="flex items-start gap-2 text-[12px] text-stone-700">
-                    <span className="mt-[2px] h-1.5 w-1.5 rounded-full shrink-0" style={{ background: "#C2410C" }} />
-                    <span className="leading-relaxed">{t("idle.heroBenefit3")}</span>
+                  <div className="flex items-center gap-2 text-[11px] font-semibold text-stone-700">
+                    <Badge className="h-5 rounded-full px-2 text-[9px]" style={{ background: "#FFF2E8", color: "#C2410C" }}>{t("result.skinAge")}</Badge>
+                    <span>{t("idle.heroBenefit3")}</span>
                   </div>
                 </div>
               </div>
-              <div className="rounded-[28px] px-3.5 py-3"
-                style={{ background: "#FFFFFF", border: "1px solid #F1E8E2" }}>
-                <p className="text-[10px] font-semibold uppercase tracking-[0.14em] mb-2" style={{ color: DEEP_GREEN }}>
-                  {t("result.scores")}
-                </p>
-                <div className="flex flex-col gap-2">
-                  {PREVIEW_SCORES.map(({ idx, score, color }, i) => (
-                    <MiniScoreBarIdle key={idx} label={t(`scores.${idx}`)} score={score} color={color} delay={500 + i * 100} />
-                  ))}
-                </div>
+              <div className="flex flex-col gap-1.5">
+                {PREVIEW_SCORES.map(({ idx, score, color }, i) => (
+                  <MiniScoreBarIdle key={idx} label={t(`scores.${idx}`)} score={score} color={color} delay={500 + i * 100} />
+                ))}
               </div>
             </div>
           </div>
@@ -3827,6 +3828,32 @@ function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: any; analys
     { id: "report", label: t("modal.diary.reportTab") },
     { id: "ranking", label: t("modal.diary.rankingTab") },
   ];
+  const diaryTabSequence = ["calendar", "timeline", "report", "ranking"] as const;
+  const diaryTabOrder = { calendar: 0, timeline: 1, report: 2, ranking: 3 } as const;
+  const diaryTabDirectionRef = useRef(1);
+  const diaryTabNavRef = useRef<HTMLDivElement | null>(null);
+  const diaryScrollRef = useRef<HTMLDivElement | null>(null);
+  const diaryTabSlideVariants = {
+    enter: (dir: number) => ({ x: dir * 28, opacity: 0 }),
+    center: { x: 0, opacity: 1 },
+    exit: (dir: number) => ({ x: dir * -28, opacity: 0 }),
+  };
+  const goToDiaryTab = (next: "calendar" | "timeline" | "report" | "ranking") => {
+    diaryTabDirectionRef.current = diaryTabOrder[next] >= diaryTabOrder[tab] ? 1 : -1;
+    setTab(next);
+  };
+  const diaryTabMountedRef = useRef(false);
+  useEffect(() => {
+    if (!diaryTabMountedRef.current) {
+      diaryTabMountedRef.current = true;
+      return;
+    }
+    const nav = diaryTabNavRef.current;
+    const container = diaryScrollRef.current;
+    if (nav && container) {
+      container.scrollTo({ top: nav.offsetTop - 12, behavior: "smooth" });
+    }
+  }, [tab]);
 
   if (!user) {
     return (
@@ -3930,30 +3957,45 @@ function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: any; analys
             </div>
           </div>
         </div>
-        <div className="flex gap-2 p-2 rounded-3xl mb-3" style={{ background: TINT_WARM }}>
-          {tabs.map(({ id, label }) => (
-            <button key={id} onClick={() => setTab(id)}
-              className={`flex-1 py-2.5 text-[12px] font-bold transition-all rounded-2xl ${
-                tab === id ? "text-white shadow-md" : "text-stone-400"
-              }`}
-              style={tab === id ? { background: `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})` } : { background: "transparent" }}>
-              {label}
-            </button>
-          ))}
-        </div>
       </div>
 
       {/* 콘텐츠 */}
-      <div className="flex-1 overflow-hidden pb-24">
-        <AnimatePresence mode="wait">
+      <div ref={diaryScrollRef} className="flex-1 overflow-y-auto overscroll-contain pb-24">
+        <div ref={diaryTabNavRef} className="px-5 pt-2 pb-0 sticky top-0 z-20" style={{ background: "#F8F5F2" }}>
+          <div className="flex gap-2 p-2 rounded-3xl mb-3" style={{ background: TINT_WARM }}>
+            {tabs.map(({ id, label }) => (
+              <button key={id} onClick={() => goToDiaryTab(id)}
+                className={`flex-1 py-2.5 text-[12px] font-bold transition-all rounded-2xl ${
+                  tab === id ? "text-white shadow-md" : "text-stone-400"
+                }`}
+                style={tab === id ? { background: `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})` } : { background: "transparent" }}>
+                {label}
+              </button>
+            ))}
+          </div>
+        </div>
+        <div className="overflow-hidden"
+          onTouchStart={(e) => { (e.currentTarget as any)._touchX = e.touches[0].clientX; }}
+          onTouchEnd={(e) => {
+            const startX = (e.currentTarget as any)._touchX;
+            if (startX == null) return;
+            const diff = e.changedTouches[0].clientX - startX;
+            if (Math.abs(diff) < 40) return;
+            const cur = diaryTabSequence.indexOf(tab);
+            if (diff < 0 && cur < diaryTabSequence.length - 1) goToDiaryTab(diaryTabSequence[cur + 1]);
+            else if (diff > 0 && cur > 0) goToDiaryTab(diaryTabSequence[cur - 1]);
+          }}>
+        <AnimatePresence mode="wait" initial={false} custom={diaryTabDirectionRef.current}>
           {tab === "calendar" && (
             <motion.div
               key="cal"
-              initial={{ opacity: 0, x: 28 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -28 }}
+              custom={diaryTabDirectionRef.current}
+              variants={diaryTabSlideVariants}
+              initial="enter"
+              animate="center"
+              exit="exit"
               transition={{ duration: 0.22, ease: "easeOut" }}
-              className="h-full overflow-y-auto overscroll-contain"
+              className="min-h-full"
             >
               <DiaryCalendarView allEntries={allEntries} />
               <div className="px-5 pt-3">
@@ -4050,11 +4092,13 @@ function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: any; analys
           {tab === "timeline" && (
             <motion.div
               key="tl"
-              initial={{ opacity: 0, x: 28 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -28 }}
+              custom={diaryTabDirectionRef.current}
+              variants={diaryTabSlideVariants}
+              initial="enter"
+              animate="center"
+              exit="exit"
               transition={{ duration: 0.22, ease: "easeOut" }}
-              className="h-full overflow-y-auto overscroll-contain"
+              className="min-h-full"
             >
               {loading ? (
                 <div className="py-20 text-center"><p className="text-[12px] text-stone-400">...</p></div>
@@ -4067,11 +4111,13 @@ function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: any; analys
           {tab === "report" && (
             <motion.div
               key="report"
-              initial={{ opacity: 0, x: 28 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -28 }}
+              custom={diaryTabDirectionRef.current}
+              variants={diaryTabSlideVariants}
+              initial="enter"
+              animate="center"
+              exit="exit"
               transition={{ duration: 0.22, ease: "easeOut" }}
-              className="h-full overflow-y-auto overscroll-contain"
+              className="min-h-full"
             >
               <div className="px-5 pt-4 pb-8 space-y-4">
                 <Card className="border-none rounded-3xl overflow-hidden shadow-sm"
@@ -4400,11 +4446,13 @@ function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: any; analys
           {tab === "ranking" && (
             <motion.div
               key="rank"
-              initial={{ opacity: 0, x: 28 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -28 }}
+              custom={diaryTabDirectionRef.current}
+              variants={diaryTabSlideVariants}
+              initial="enter"
+              animate="center"
+              exit="exit"
               transition={{ duration: 0.22, ease: "easeOut" }}
-              className="h-full overflow-y-auto overscroll-contain"
+              className="min-h-full"
             >
               <div className="px-5 pb-8 space-y-4 pt-4">
                 {!rankingData ? (
@@ -4471,8 +4519,9 @@ function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: any; analys
                 )}
               </div>
             </motion.div>
-          )}
+        )}
         </AnimatePresence>
+        </div>
       </div>
     </div>
   );
@@ -5964,10 +6013,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
     const nav = tabNavRef.current;
     const container = resultScrollRef.current;
     if (nav && container) {
-      // getBoundingClientRect로 실제 시각적 위치 기준 스크롤
-      const navTop = nav.getBoundingClientRect().top;
-      const containerTop = container.getBoundingClientRect().top;
-      container.scrollTop += navTop - containerTop;
+      container.scrollTo({ top: nav.offsetTop - 12, behavior: "smooth" });
     }
   }, [activeTab]);
 
@@ -6432,14 +6478,14 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
             style={{ borderColor: SCAN_TO, color: SCAN_TO }}>
             <Camera className="w-4 h-4" /> {t("result.back")}
           </Button>
-          <h2 className="text-xl font-bold tracking-tight" style={{ color: DEEP_GREEN }}>{t("result.title")}</h2>
+          <h2 className="text-xl font-black tracking-tight" style={{ color: DEEP_GREEN }}>{t("result.title")}</h2>
         </div>
 
         {/* 압축형 결과 헤더 */}
-        <Card className="overflow-hidden border-none shadow-[0_12px_32px_rgba(45,95,79,0.08)] rounded-3xl"
+        <Card className="overflow-hidden border-none shadow-2xl rounded-3xl"
           style={{ background: "#FFFFFF" }}>
-          <CardContent className="p-4">
-            <div className="grid grid-cols-[92px_1fr] gap-3 items-start sm:grid-cols-[104px_1fr]">
+          <CardContent className="p-3.5">
+            <div className="grid grid-cols-[92px_1fr] gap-2.5 items-start sm:grid-cols-[104px_1fr] sm:gap-3">
               <div>
                 <div className="relative rounded-3xl overflow-hidden h-[120px] bg-stone-100 sm:rounded-3xl sm:h-[132px]">
                   <img src={faceCroppedSrc || imageSrc} className="w-full h-full object-cover" style={{ objectPosition: "center 50%" }} />
@@ -6450,78 +6496,76 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
                 </div>
                 <div className="mt-2 rounded-2xl px-2.5 py-2 text-center"
                   style={{ background: TINT_WARM }}>
-                  <p className="text-[8px] font-semibold uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>{t("result.baumannLabel")}</p>
-                  <p className="text-lg font-semibold leading-none mt-1" style={{ color: SCAN_TO }}>{finalType}</p>
+                  <p className="text-[8px] font-black uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>{t("result.baumannLabel")}</p>
+                  <p className="text-lg font-bold leading-none mt-1" style={{ color: SCAN_TO }}>{finalType}</p>
                 </div>
               </div>
 
-              <div className="min-w-0">
-                <div className="flex items-start justify-between gap-3">
-                  <div className="min-w-0">
-                    <p className="text-[10px] font-semibold uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>{t("result.todayAction")}</p>
-                    <p className="text-lg font-bold leading-tight mt-1 text-stone-800 text-kr-pretty">
-                      {weakestSummary || t("result.scores")}
-                    </p>
-                    <p className="text-[11px] text-stone-500 mt-2 leading-relaxed text-kr-pretty">
-                      {scoreDelta !== null
-                        ? scoreDelta > 0
-                          ? `${t("result.overall")} +${scoreDelta}`
-                          : scoreDelta < 0
-                          ? `${t("result.overall")} -${Math.abs(scoreDelta)}`
-                          : `${t("result.overall")} ${overallScore}`
-                        : `${t("result.actionCard.phaseRecord")} · ${t("result.baumannLabel")} ${finalType}`}
-                    </p>
+              <div className="flex flex-col">
+                <div className="rounded-3xl px-2.5 py-2.5 mb-2.5 sm:rounded-3xl sm:px-3"
+                  style={{ background: `${SCAN_FROM}10`, border: `1px solid ${SCAN_FROM}24` }}>
+                  <div className="flex items-center justify-between gap-2">
+                    <p className="text-[10px] font-bold uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>{t("result.scores")}</p>
+                    <button
+                      onClick={() => setShowAnalysis(true)}
+                      className="rounded-full px-2.5 py-1 text-[9px] font-bold whitespace-nowrap"
+                      style={{ background: TINT_WARM, color: SCAN_TO }}
+                    >
+                      {t("modal.analysis.title")} {t("result.viewBtn")}
+                    </button>
                   </div>
-                  <button
-                    onClick={() => setShowAnalysis(true)}
-                    className="rounded-full px-3 py-1.5 text-[10px] font-semibold whitespace-nowrap shrink-0"
-                    style={{ background: TINT_NEUTRAL, color: DEEP_GREEN }}
-                  >
-                    {t("modal.analysis.title")} {t("result.viewBtn")}
-                  </button>
+                  <p className="text-[11px] text-stone-500 mt-2 leading-relaxed text-kr-pretty">
+                    {scoreDelta !== null
+                      ? scoreDelta > 0
+                        ? `${t("result.overall")} +${scoreDelta}`
+                        : scoreDelta < 0
+                        ? `${t("result.overall")} -${Math.abs(scoreDelta)}`
+                        : `${t("result.overall")} ${overallScore}`
+                      : `${t("result.actionCard.phaseRecord")} · ${weakestSummary || t("result.scores")}`}
+                  </p>
                 </div>
-                <div className="grid grid-cols-3 gap-2 mt-3.5">
-                  <div className="rounded-2xl px-2.5 py-3 text-left" style={{ background: TINT_WARM }}>
-                    <p className="text-[9px] font-semibold uppercase tracking-[0.12em] text-stone-400">{t("result.overall")}</p>
-                    <p className="text-[28px] font-bold leading-none mt-2" style={{ color: SCAN_TO }}>{overallScore}</p>
-                  </div>
-                  <div className="rounded-2xl px-2.5 py-3 text-left" style={{ background: "#F6F4FB" }}>
-                    <p className="text-[9px] font-semibold uppercase tracking-[0.12em] text-stone-400">{t("result.skinAge")}</p>
-                    <p className="text-[28px] font-bold leading-none mt-2" style={{ color: "#7C3AED" }}>
-                      {analysisResult?.skinAge && analysisResult.skinAge > 0 ? analysisResult.skinAge : "—"}
-                    </p>
-                  </div>
-                  <div className="rounded-2xl px-2.5 py-3 text-left" style={{ background: "#FFF8EE" }}>
-                    <p className="text-[9px] font-semibold uppercase tracking-[0.12em] text-stone-400">{t("ranking.topLabel")}</p>
-                    <p className="text-[22px] font-bold leading-none mt-2" style={{ color: "#D97706" }}>
-                      {rankingData && rankingData.myPercentile !== undefined ? t("ranking.myPercentile", { percent: rankingData.myPercentile }) : "—"}
-                    </p>
-                  </div>
-                </div>
-                <div className="flex flex-col gap-2.5 mt-3.5">
+                <div className="flex flex-col gap-1.5">
                   {previewScoreItems.map(({ idx, score, color }: { idx: number; score: number; color: string }, i: number) => (
                     <MiniScoreBarIdle key={idx} label={t(`scores.${idx}`)} score={score} color={color} delay={i * 80} />
                   ))}
                 </div>
               </div>
             </div>
+            <div className="grid grid-cols-3 gap-2 mt-3">
+              <div className="rounded-2xl px-2 py-4 flex flex-col items-center justify-center text-center" style={{ background: TINT_WARM }}>
+                <p className="text-[9px] font-bold uppercase tracking-[0.12em] text-stone-400">{t("result.overall")}</p>
+                <p className="text-[40px] font-black leading-none mt-1.5" style={{ color: SCAN_TO }}>{overallScore}</p>
+              </div>
+              <div className="rounded-2xl px-2 py-4 flex flex-col items-center justify-center text-center" style={{ background: "#F7F3FF", border: "1px solid #E9DDFF" }}>
+                <p className="text-[9px] font-bold uppercase tracking-[0.12em] text-stone-400">{t("result.skinAge")}</p>
+                <p className="text-[40px] font-black leading-none mt-1.5" style={{ color: "#7C3AED" }}>
+                  {analysisResult?.skinAge && analysisResult.skinAge > 0 ? analysisResult.skinAge : "—"}
+                </p>
+              </div>
+              <div className="rounded-2xl px-2 py-4 flex flex-col items-center justify-center text-center" style={{ background: "#FFF8EE", border: "1px solid #F4E2C4" }}>
+                <p className="text-[9px] font-bold uppercase tracking-[0.12em] text-stone-400">{t("ranking.topLabel")}</p>
+                <p className="text-[34px] font-black leading-none mt-1.5" style={{ color: "#D97706" }}>
+                  {rankingData && rankingData.myPercentile !== undefined ? t("ranking.myPercentile", { percent: rankingData.myPercentile }) : "—"}
+                </p>
+              </div>
+            </div>
             <div className="mt-3 rounded-3xl p-3"
-              style={{ background: TINT_NEUTRAL }}>
+              style={{ background: TINT_WARM }}>
                 <div className="flex items-center justify-between gap-3">
                   <div className="min-w-0">
-                    <p className="text-[10px] font-semibold uppercase tracking-[0.16em]" style={{ color: SCAN_TO }}>{t("result.baumannLabel")}</p>
+                    <p className="text-[10px] font-bold uppercase tracking-[0.16em]" style={{ color: SCAN_TO }}>{t("result.baumannLabel")}</p>
                     <div className="flex items-center gap-2 mt-1">
                       <p className="text-lg font-bold leading-none" style={{ color: DEEP_GREEN }}>{finalType}</p>
                       <button onClick={() => setShowBaumannInfo(v => !v)}
-                        className="text-[10px] font-medium px-2.5 py-1 rounded-full transition-all"
-                        style={{ background: "#FFFFFF", color: SCAN_TO }}>
+                        className="text-[10px] font-bold px-2.5 py-1 rounded-full transition-all"
+                        style={{ background: `${SCAN_TO}18`, color: SCAN_TO }}>
                         {showBaumannInfo ? t("result.baumannFold") : t("result.baumannExpand")}
                       </button>
                     </div>
-                    <p className="text-[11px] mt-1 text-stone-500 text-kr-pretty">{t("result.mbtiSub")}</p>
+                    <p className="text-[11px] font-medium mt-1 text-stone-500 text-kr-pretty">{t("result.mbtiSub")}</p>
                   </div>
                   <div className="rounded-full px-3 py-1 text-[10px] font-bold shrink-0 flex items-center gap-0.5"
-                    style={{ background: "#FFFFFF", color: DEEP_GREEN }}>
+                    style={{ background: `${DEEP_GREEN}10`, color: DEEP_GREEN }}>
                     <Flame className="w-3 h-3" style={{ color: SCAN_TO }} />{t("streak.badge", { count: currentStreak.count || 1 })}
                   </div>
                 </div>
@@ -6559,13 +6603,13 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
                 <button
                   onClick={() => setShowAnalysis(true)}
                   className="mt-3 block w-full rounded-2xl px-3 py-2.5 text-left"
-                  style={{ background: "#FFFFFF" }}
+                  style={{ background: "#FFFFFF", border: "1px solid #F0E2DA" }}
                 >
-                  <p className="text-[10px] font-semibold uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>{t("result.aiComment")}</p>
+                  <p className="text-[10px] font-bold uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>{t("result.aiComment")}</p>
                   <p className="text-[11px] text-stone-600 mt-1 leading-relaxed text-kr-pretty line-clamp-2">
                     {analysisResult.aiComment}
                   </p>
-                  <p className="text-[10px] font-semibold mt-2" style={{ color: DEEP_GREEN }}>{t("modal.analysis.title")} {t("result.viewBtn")}</p>
+                  <p className="text-[10px] font-bold mt-2" style={{ color: SCAN_TO }}>{t("modal.analysis.title")} {t("result.viewBtn")}</p>
                 </button>
               )}
             </div>
