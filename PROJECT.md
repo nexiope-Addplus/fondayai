@@ -326,13 +326,21 @@ CREATE TABLE IF NOT EXISTS cosmetics (
   - 상단 결과부는 너무 밋밋해졌던 정리 버전에서 일부 임팩트를 복원
   - 점수 3카드/요약 구조는 유지하되, `나의 피부 MBTI` 카드를 새 톤에 맞게 다시 정리
   - MBTI 카드는 화이트 카드 + tint 아이콘 + 낮은 강조 버튼 문법으로 통일
+  - 종합점수 / 피부나이 / 순위 상단 카드는 여러 차례 미세조정함
+    - 모바일에서 깨지던 레이아웃 수정
+    - `종합점수 : ??점` 구조로 정리
+    - 종합점수는 메인 카드, 피부나이/순위는 서브 카드 위계로 재정렬
+    - 최종적으로 종합점수는 가운데 정렬, 라벨 타이포도 키워서 숫자와 밸런스를 맞춤
 - 결과 하단 3탭:
   - `routine / solution / nutrition` 탭 이동은 슬라이드 유지
   - 탭 변경 시 해당 탭 콘텐츠 시작점으로 스크롤되도록 로직 반영
   - `solution`, `nutrition` 카드도 flat tint/white 기반으로 추가 정리
+  - 마지막 폴리싱에서 두 탭의 섹션 헤더, 카드 패딩, 아이콘 박스, shadow 강도를 더 같은 시스템으로 맞춤
 - `AI 피부 예측` 카드:
   - 기존 이모지 아이콘을 제거하고 Lucide 아이콘(`Bot`)으로 통일
   - CTA도 강한 gradient 대신 현재 결과 화면 톤에 맞는 화이트/보더 스타일로 조정
+ - 결과 하단 고정 CTA:
+   - 초기의 강한 강조 버튼 문법에서 벗어나, 화면 본문 카드 시스템과 어울리는 bordered button 톤으로 정리
 
 ### I. Diary 탭 / My 탭 구조 정리
 - `DiaryTab`
@@ -343,6 +351,7 @@ CREATE TABLE IF NOT EXISTS cosmetics (
   - 기존에는 새 디자인 톤이 거의 반영되지 않았음
   - 현재는 헤더, 프로필, 출석/설정/설치/매거진/디바이스 카드까지 `white + tint + soft shadow` 계열로 재정리
   - 루트 탭 구조라 상단 `홈/뒤로` 버튼은 제거
+  - 마지막 폴리싱에서 `rounded-2xl + p-4 + soft shadow` 기준으로 카드 반경/패딩까지 통일
 
 ### J. UX 판단 기준 메모
 - `idle` 최상단에 출석 상태를 강하게 두는 것은 메인 행동(스캔)을 흐릴 가능성이 큼
@@ -546,6 +555,13 @@ git push origin main
 
 | 커밋 | 내용 |
 |------|------|
+| c338636 | refactor(result): 결과 상단 종합점수/라벨 타이포 미세 조정 |
+| d8cada7 | refactor(ui): 결과/솔루션/영양/My 화면 카드 시스템 최종 폴리싱 |
+| 47c9ebb | refactor(result): 결과 상단 카드 정렬/간격 마감 조정 |
+| a22c23c | refactor(result): 결과 상단 3카드 여백 축소 |
+| 7d2550d | fix(result): 모바일에서 깨지던 상단 지표 카드 레이아웃 복원 |
+| 61f1a7c | refactor(result): 종합점수 메인 카드, 피부나이/순위 서브 카드 구조로 재정렬 |
+| cf2e4bf | docs: PROJECT.md에 3월 UI 리파인먼트 내역 정리 |
 | 55d4af9 | refactor(ui): idle/My/MBTI 재정리 + 루트 탭 백버튼 제거 + AI 예측 아이콘 통일 |
 | f0d18a6 | refactor(ui): 결과 3탭 톤/스크롤 동작 정렬 |
 | 80c023e | refactor(ui): idle/결과 상단 임팩트 복원 + Diary 내부 슬라이드 탭 추가 |
