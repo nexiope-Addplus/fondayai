@@ -160,6 +160,9 @@ const DEEP_GREEN_LIGHT = "#3D7A66";
 const TEXT_SECONDARY = "#8C8070";
 const SCAN_FROM = "#E09882";
 const SCAN_TO = "#C97062";
+const TINT_WARM = "#FDF3F0";
+const TINT_GREEN = "#F0F7F4";
+const TINT_NEUTRAL = "#F7F5F2";
 
 // 서버는 항상 한국어 라벨로 반환 → 클라이언트에서 scores.N 키로 번역
 const SCORE_LABEL_MAP: Record<string, number> = {
@@ -494,21 +497,21 @@ function CheckinSuccessSheet({ onKakao, onLine, onGoogle, onDismiss, user }: {
           <div className="flex flex-col gap-2.5">
             {i18n.language === "ko" ? (
               <button onClick={onKakao}
-                className="w-full py-3.5 rounded-2xl text-[14px] font-black text-stone-800 flex items-center justify-center gap-2"
+                className="w-full py-3.5 rounded-2xl text-sm font-bold text-stone-800 flex items-center justify-center gap-2"
                 style={{ background: "#FEE500" }}>
                 <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path fillRule="evenodd" clipRule="evenodd" d="M9 1C4.582 1 1 3.79 1 7.222c0 2.154 1.386 4.045 3.484 5.14L3.62 15.5a.25.25 0 0 0 .368.274L7.9 13.39A9.63 9.63 0 0 0 9 13.444c4.418 0 8-2.791 8-6.222C17 3.79 13.418 1 9 1Z" fill="#3C1E1E"/></svg>
                 {t("attendance.kakao")}
               </button>
             ) : (
               <button onClick={onLine}
-                className="w-full py-3.5 rounded-2xl text-[14px] font-black text-white flex items-center justify-center gap-2"
+                className="w-full py-3.5 rounded-2xl text-sm font-bold text-white flex items-center justify-center gap-2"
                 style={{ background: "#06C755" }}>
                 <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 1C4.582 1 1 3.79 1 7.222c0 2.03 1.09 3.84 2.8 5.04-.12.44-.77 2.96-.8 3.15a.2.2 0 0 0 .3.22l3.72-2.46c.6.09 1.3.14 1.98.14 4.418 0 8-2.791 8-6.222C17 3.79 13.418 1 9 1Z" fill="white"/></svg>
                 {t("attendance.line")}
               </button>
             )}
             <button onClick={onGoogle}
-              className="w-full py-3.5 rounded-2xl text-[14px] font-black border border-stone-200 text-stone-700 flex items-center justify-center gap-2 bg-white">
+              className="w-full py-3.5 rounded-2xl text-sm font-bold text-stone-700 flex items-center justify-center gap-2 bg-white">
               <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" className="w-4 h-4" />
               {t("attendance.google")}
             </button>
@@ -537,7 +540,7 @@ function AttendanceBadge({ onClick }: { onClick: () => void }) {
   const checkedToday = data.dates.includes(today);
   return (
     <button onClick={onClick}
-      className="flex items-center gap-1 bg-white/80 backdrop-blur-sm rounded-full px-2.5 py-1.5 shadow-sm border border-stone-100 transition-all active:scale-95">
+      className="flex items-center gap-1 bg-white/80 backdrop-blur-sm rounded-full px-2.5 py-1.5 shadow-sm transition-all active:scale-95">
       <CalendarDays className="w-3.5 h-3.5" style={{ color: checkedToday ? SCAN_TO : "#B0A898" }} />
       <span className="text-[11px] font-bold" style={{ color: checkedToday ? SCAN_TO : "#B0A898" }}>
         {checkedToday ? t("attendance.alreadyChecked") : t("attendance.checkIn")}
@@ -607,7 +610,7 @@ function PushPromptSheet({ onAllow, onDismiss, isLoading }: { onAllow: () => voi
               <h3 className="font-black text-stone-800 text-[18px] mt-2">{t("pushPrompt.iosTitle")}</h3>
               <p className="text-stone-500 text-[13px] mt-1.5 leading-relaxed">{t("pushPrompt.iosDesc")}</p>
             </div>
-            <div className="space-y-2.5 mb-5">
+            <div className="space-y-3.5 mb-5">
               {([1, 2, 3] as const).map(n => (
                 <div key={n} className="flex items-center gap-3 bg-stone-50 rounded-2xl px-4 py-3">
                   <span className="w-6 h-6 rounded-full bg-stone-200 text-stone-600 text-[12px] font-bold flex items-center justify-center flex-shrink-0">{n}</span>
@@ -1034,7 +1037,7 @@ function LangSwitcher() {
   const langs = ["EN", "KO", "JA"];
   const current = (i18nHook.language || "en").toUpperCase();
   return (
-    <div className="flex items-center gap-0.5 bg-white/80 backdrop-blur-sm rounded-full px-2 py-1 shadow-sm border border-stone-100">
+    <div className="flex items-center gap-0.5 bg-white/80 backdrop-blur-sm rounded-full px-2 py-1 shadow-sm">
       {langs.map((lang, idx) => (
         <button
           key={lang}
@@ -1248,16 +1251,16 @@ function MissionCard() {
 
   return (
     <motion.div variants={fadeChild} className="mb-4">
-      <div className="bg-white rounded-2xl px-4 py-3.5 border border-stone-100"
+      <div className="bg-white rounded-2xl px-4 py-3.5"
         style={{ boxShadow: "0 2px 12px rgba(180,130,110,0.08)" }}>
         <div className="flex items-center justify-between mb-3">
-          <p className="text-[13px] font-black" style={{ color: DEEP_GREEN }}>{t("mission.title")}</p>
+          <p className="text-sm font-bold" style={{ color: DEEP_GREEN }}>{t("mission.title")}</p>
           <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full text-white"
             style={{ background: "linear-gradient(135deg, #F59E0B, #D97706)" }}>
             {t("mission.points", { n: missions.totalPoints })}
           </span>
         </div>
-        <div className="space-y-2">
+        <div className="space-y-3">
           {visible.map(({ id, done, points }) => (
             <div key={id} className="flex items-center justify-between py-1.5 border-b border-stone-50 last:border-0">
               <div className="flex items-center gap-2">
@@ -1317,17 +1320,17 @@ function WeatherTipCard({ compact, weather: weatherProp }: { compact?: boolean; 
   if (compact) {
     return (
       <div className="px-3.5 py-2.5 border-t border-stone-100/80"
-        style={{ background: "linear-gradient(135deg, #EAF4F0 0%, #F0FAF6 100%)" }}>
+        style={{ background: TINT_GREEN }}>
         <div className="flex items-start gap-2.5">
           <span className="text-xl leading-none flex-shrink-0 mt-0.5">{tip.emoji}</span>
           <div className="flex-1 min-w-0">
-            <p className="text-[12px] font-black text-stone-700 leading-tight">{tip.title}</p>
+            <p className="text-xs font-semibold text-stone-700 leading-tight">{tip.title}</p>
             <p className="text-[10.5px] text-stone-500 leading-relaxed mt-0.5">{tip.body}</p>
           </div>
           <div className="flex flex-col items-end gap-1 shrink-0">
             <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full text-white"
               style={{ background: DEEP_GREEN }}>{weather.temp}°C</span>
-            {aqiLabel && <span className="text-[9px] font-semibold px-1.5 py-0.5 rounded-full bg-white/70 text-stone-500 border border-stone-200">{aqiLabel}</span>}
+            {aqiLabel && <span className="text-[9px] font-semibold px-1.5 py-0.5 rounded-full bg-white/70 text-stone-500">{aqiLabel}</span>}
           </div>
         </div>
       </div>
@@ -1337,8 +1340,8 @@ function WeatherTipCard({ compact, weather: weatherProp }: { compact?: boolean; 
   return (
     <motion.div variants={fadeChild} className="mb-4">
       <div
-        className="rounded-2xl p-4 border border-stone-100 overflow-hidden relative"
-        style={{ background: "linear-gradient(135deg, #EAF4F0 0%, #F0FAF6 100%)", boxShadow: "0 2px 12px rgba(45,95,79,0.08)" }}
+        className="rounded-2xl p-4 overflow-hidden relative"
+        style={{ background: TINT_GREEN, boxShadow: "0 2px 12px rgba(45,95,79,0.08)" }}
       >
         <div className="absolute top-0 right-0 w-20 h-20 rounded-bl-full opacity-20"
           style={{ background: `linear-gradient(135deg, ${DEEP_GREEN_LIGHT}, ${DEEP_GREEN})` }} />
@@ -1355,7 +1358,7 @@ function WeatherTipCard({ compact, weather: weatherProp }: { compact?: boolean; 
         <div className="flex items-start gap-3">
           <span className="text-3xl leading-none flex-shrink-0">{tip.emoji}</span>
           <div className="flex-1 min-w-0">
-            <p className="text-[13px] font-black text-stone-800 mb-1 leading-tight">{tip.title}</p>
+            <p className="text-sm font-bold text-stone-800 mb-1 leading-tight">{tip.title}</p>
             <p className="text-[11.5px] text-stone-500 leading-relaxed">{tip.body}</p>
           </div>
         </div>
@@ -1365,11 +1368,11 @@ function WeatherTipCard({ compact, weather: weatherProp }: { compact?: boolean; 
             style={{ background: DEEP_GREEN }}>
             {weather.temp}°C
           </span>
-          <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-white/70 text-stone-600 border border-stone-200">
+          <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-white/70 text-stone-600">
             {t("weather.humidity", { val: weather.humidity })}
           </span>
           {aqiLabel && (
-            <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-white/70 text-stone-600 border border-stone-200">
+            <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-white/70 text-stone-600">
               {aqiLabel}
             </span>
           )}
@@ -1603,7 +1606,7 @@ function ScanIdleScreen({ onScan }: { onScan: () => void }) {
           {t("idle.subtitle4")}
         </p>
 
-        <div className="rounded-[28px] p-3 border border-white/70 sm:rounded-[30px] sm:p-3.5"
+        <div className="rounded-3xl p-3 border border-white/70 sm:rounded-3xl sm:p-3.5"
           style={{ background: "rgba(255,255,255,0.84)", boxShadow: "0 18px 44px rgba(160,120,100,0.15)", backdropFilter: "blur(14px)" }}>
           <div className="flex items-center justify-between mb-3">
             <div>
@@ -1617,7 +1620,7 @@ function ScanIdleScreen({ onScan }: { onScan: () => void }) {
             </div>
           </div>
           <div className="grid grid-cols-[116px_1fr] gap-2.5 items-stretch sm:grid-cols-[132px_1fr] sm:gap-3">
-            <div className="relative rounded-[22px] overflow-hidden min-h-[168px] bg-stone-100 sm:rounded-[24px] sm:min-h-[176px]">
+            <div className="relative rounded-3xl overflow-hidden min-h-[168px] bg-stone-100 sm:rounded-3xl sm:min-h-[176px]">
               <img
                 src="/face-model.png"
                 alt="preview"
@@ -1638,11 +1641,11 @@ function ScanIdleScreen({ onScan }: { onScan: () => void }) {
               </div>
             </div>
             <div className="flex flex-col">
-              <div className="rounded-[20px] px-2.5 py-2.5 mb-2.5 sm:rounded-[22px] sm:px-3"
+              <div className="rounded-3xl px-2.5 py-2.5 mb-2.5 sm:rounded-3xl sm:px-3"
                 style={{ background: `${SCAN_FROM}10`, border: `1px solid ${SCAN_FROM}24` }}>
                 <div className="flex items-center justify-between gap-2">
-                  <p className="text-[10px] font-black uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>{t("idle.heroBenefitsTitle")}</p>
-                  <span className="text-[9px] font-black uppercase tracking-[0.14em]" style={{ color: TEXT_SECONDARY }}>{t("idle.heroTag")}</span>
+                  <p className="text-[10px] font-bold uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>{t("idle.heroBenefitsTitle")}</p>
+                  <span className="text-[9px] font-bold uppercase tracking-[0.14em]" style={{ color: TEXT_SECONDARY }}>{t("idle.heroTag")}</span>
                 </div>
                 <div className="grid grid-cols-1 gap-2 mt-2">
                   <div className="flex items-center gap-2 text-[11px] font-semibold text-stone-700">
@@ -1671,12 +1674,12 @@ function ScanIdleScreen({ onScan }: { onScan: () => void }) {
 
       {/* 바우만 설명 더보기 accordion */}
       <motion.div variants={fadeChild} className="mb-4 relative" style={{ zIndex: 1 }}>
-        <div className="rounded-2xl border border-stone-100 bg-white/90" style={{ backdropFilter: "blur(8px)" }}>
+        <div className="rounded-2xl bg-white/90" style={{ backdropFilter: "blur(8px)" }}>
           <button onClick={() => setShowBaumannExp(v => !v)}
             className="w-full flex items-center justify-between px-4 py-3">
             <div className="flex items-center gap-2">
               <Activity className="w-4 h-4" />
-              <p className="text-[13px] font-black text-stone-800">{t("idle.baumannSectionTitle")}</p>
+              <p className="text-sm font-bold text-stone-800">{t("idle.baumannSectionTitle")}</p>
             </div>
             <div className="flex items-center gap-1.5">
               {!showBaumannExp && <span className="text-[10px] font-bold text-stone-400">O/D · S/R · P/N · W/T</span>}
@@ -1692,7 +1695,7 @@ function ScanIdleScreen({ onScan }: { onScan: () => void }) {
                 <div className="space-y-1.5 mb-3">
                   {(t("idle.baumannAxes", { returnObjects: true }) as any[]).map((ax: any, i: number) => (
                     <div key={i} className="flex items-center gap-3 p-2.5 rounded-xl bg-stone-50">
-                      <p className="text-[11px] font-black text-stone-600 w-16 shrink-0">{ax.label}</p>
+                      <p className="text-xs font-semibold text-stone-600 w-16 shrink-0">{ax.label}</p>
                       <p className="text-[11px] text-stone-400">{ax.desc}</p>
                     </div>
                   ))}
@@ -1713,7 +1716,7 @@ function ScanIdleScreen({ onScan }: { onScan: () => void }) {
 
       {/* 단계 표시 */}
       <motion.div variants={fadeChild} className="mb-4 relative" style={{ zIndex: 1 }}>
-        <div className="bg-white/90 rounded-2xl px-3 py-2 border border-stone-100"
+        <div className="bg-white/90 rounded-2xl px-3 py-2"
           style={{ boxShadow: "0 2px 12px rgba(180,130,110,0.08)", backdropFilter: "blur(8px)" }}>
           <p className="text-[9px] font-semibold text-stone-400 text-center mb-2 tracking-widest uppercase">
             {t("idle.stepsTitle")}
@@ -1753,7 +1756,7 @@ function ScanIdleScreen({ onScan }: { onScan: () => void }) {
       <motion.div variants={fadeChild} className="mt-auto relative" style={{ zIndex: 1 }}>
         <motion.button
           onClick={onScan}
-          className="w-full py-4 sm:py-[18px] rounded-[18px] text-white text-[15px] sm:text-[16px] font-bold tracking-tight"
+          className="w-full py-4 sm:py-[18px] rounded-2xl text-white text-[15px] sm:text-[16px] font-bold tracking-tight"
           style={{ background: `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})` }}
           whileHover={{ scale: 1.01 }}
           whileTap={{ scale: 0.97 }}
@@ -1921,7 +1924,7 @@ function ScanningScreen({ imageSrc }: { imageSrc: string | null }) {
           </div>
         </div>
       </div>
-      <div className="mt-8 text-center space-y-2">
+      <div className="mt-8 text-center space-y-3">
         <AnimatePresence mode="wait">
           <motion.p key={textIdx} className="font-bold text-xl text-stone-800"
             initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.3 }}>
@@ -2959,7 +2962,7 @@ function InlineTodos({ dateStr }: { dateStr: string }) {
           {doneCount}/{todos.length}
         </span>
       </div>
-      <div className="space-y-2">
+      <div className="space-y-3">
         {todos.map((todo, i) => (
           <button key={i} onClick={() => toggle(i)} className="flex items-center gap-2.5 w-full text-left">
             <div className={`w-4 h-4 rounded-[5px] border-2 flex items-center justify-center shrink-0 transition-all
@@ -2995,7 +2998,7 @@ function InlineMemo({ dateStr }: { dateStr: string }) {
     return (
       <div className="mt-3 pt-3 border-t border-[#F0EDE8]">
         <textarea
-          className="w-full text-[12px] text-stone-600 bg-[#FAF9F7] rounded-xl p-2.5 resize-none outline-none border border-[#F0EDE8] focus:border-[#E09882] transition-colors"
+          className="w-full text-[12px] text-stone-600 bg-[#FAF9F7] rounded-xl p-2.5 resize-none outline-none focus:border-[#E09882] transition-colors"
           rows={3} maxLength={100}
           placeholder={t("modal.diary.memoPlaceholder")}
           value={text} onChange={e => setText(e.target.value)} autoFocus
@@ -3010,7 +3013,7 @@ function InlineMemo({ dateStr }: { dateStr: string }) {
                 className="px-2.5 py-1 rounded-full text-[10px] font-bold transition-colors"
                 style={selected
                   ? { background: `${SCAN_FROM}20`, color: SCAN_TO, border: `1px solid ${SCAN_FROM}55` }
-                  : { background: "#F6F3EE", color: "#9A8F80", border: "1px solid #ECE4DC" }}
+                  : { background: "#F6F3EE", color: "#9A8F80" }}
               >
                 {getCauseTagLabel(t, tag)}
               </button>
@@ -3137,18 +3140,18 @@ function DiaryRoutinePreviewCard({ routineGuide, dateStr }: { routineGuide: Retu
 
   return (
     <div className="px-5 pt-4">
-      <div className="rounded-[28px] border bg-white shadow-sm" style={{ borderColor: "#F0E6E0" }}>
+      <div className="rounded-3xl border bg-white shadow-sm" style={{  }}>
         <div className="p-5">
-          <p className="text-[10px] font-black tracking-[0.16em] uppercase" style={{ color: SCAN_TO }}>{t("diary.routineTitle")}</p>
+          <p className="text-[10px] font-bold tracking-[0.16em] uppercase" style={{ color: SCAN_TO }}>{t("diary.routineTitle")}</p>
           <p className="text-[16px] font-black mt-1 text-kr-pretty" style={{ color: DEEP_GREEN }}>{t("modal.diary.todayRoutineTitle")}</p>
           <p className="text-[11px] text-stone-500 mt-1">{t("modal.diary.todayRoutineDesc")}</p>
           <div className="grid gap-3 mt-4 md:grid-cols-2">
             {sections.map(({ key, title, icon: Icon, accent, bg, border, items, period }) => {
               const completed = isSectionComplete(period, items);
               return (
-              <div key={key} className="rounded-[24px] p-4" style={{ background: bg, border: `1px solid ${border}` }}>
+              <div key={key} className="rounded-3xl p-4" style={{ background: bg, border: `1px solid ${border}` }}>
                 <div className="flex items-center justify-between gap-2 mb-3">
-                  <p className="text-[14px] font-black" style={{ color: DEEP_GREEN }}>{title}</p>
+                  <p className="text-sm font-bold" style={{ color: DEEP_GREEN }}>{title}</p>
                   <Icon className="w-5 h-5" style={{ color: accent }} />
                 </div>
                 {items.length > 0 ? (
@@ -3161,7 +3164,7 @@ function DiaryRoutinePreviewCard({ routineGuide, dateStr }: { routineGuide: Retu
                       className="mt-3 w-full rounded-2xl bg-white border px-3.5 py-3 flex items-center justify-between gap-3"
                       style={{ borderColor: `${accent}20` }}
                     >
-                      <p className="text-[12px] font-black" style={{ color: accent }}>{title} 완료</p>
+                      <p className="text-xs font-semibold" style={{ color: accent }}>{title} 완료</p>
                       <div className={`w-5 h-5 rounded-[6px] border-2 flex items-center justify-center shrink-0 ${
                         completed ? "border-emerald-400 bg-emerald-400" : "border-stone-200 bg-white"
                       }`}>
@@ -3219,12 +3222,12 @@ function DiaryCalendarView({ allEntries }: { allEntries: { dateStr: string; scor
     <div className="px-5 pb-8 pt-4">
       <div className="flex items-center justify-between mb-4">
         <button onClick={() => setViewDate(new Date(year, month - 1, 1))}
-          className="w-8 h-8 flex items-center justify-center rounded-full bg-white border border-[#F0EDE8] text-stone-400">
+          className="w-8 h-8 flex items-center justify-center rounded-full bg-white text-stone-400">
           <ChevronLeft className="w-4 h-4" />
         </button>
-        <span className="text-[14px] font-black" style={{ color: DEEP_GREEN }}>{monthLabel}</span>
+        <span className="text-sm font-bold" style={{ color: DEEP_GREEN }}>{monthLabel}</span>
         <button onClick={() => setViewDate(new Date(year, month + 1, 1))}
-          className="w-8 h-8 flex items-center justify-center rounded-full bg-white border border-[#F0EDE8] text-stone-400">
+          className="w-8 h-8 flex items-center justify-center rounded-full bg-white text-stone-400">
           <ChevronRight className="w-4 h-4" />
         </button>
       </div>
@@ -3287,7 +3290,7 @@ function DiaryCalendarView({ allEntries }: { allEntries: { dateStr: string; scor
 
       {selectedEntry && (
         <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
-          className="mt-4 p-4 rounded-[24px] border shadow-sm" style={{ background: "linear-gradient(180deg, #FFFAF9 0%, #FFFFFF 100%)", borderColor: "#F0EDE8" }}>
+          className="mt-4 p-5 rounded-3xl shadow-sm" style={{ background: "#FFFFFF" }}>
           <div className="flex items-center justify-between mb-3">
             <span className="text-[11px] font-medium text-stone-400 tracking-wide">{selectedEntry.dateStr}</span>
             {selectedEntry.score > 0 && (
@@ -3389,7 +3392,7 @@ function DiaryTimeline({ history, analysisResult, overallScore, finalType, curre
       {history.length >= 1 && (
         <div className="mb-5">
           <p className="text-[10px] font-bold text-stone-300 tracking-widest uppercase mb-2">{t("modal.diary.graphTitle")}</p>
-          <div className="h-36 rounded-[24px] bg-white px-2 pt-2 border border-[#F0EDE8]"
+          <div className="h-36 rounded-3xl bg-white px-2 pt-2"
             style={{ boxShadow: "0 2px 12px rgba(180,130,110,0.06)" }}>
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={[...historyEntries.slice().reverse().map(e => ({
@@ -3447,7 +3450,7 @@ function DiaryTimeline({ history, analysisResult, overallScore, finalType, curre
                         style={{ background: entry.isToday ? SCAN_TO : "#D4C5BC",
                           boxShadow: `0 0 0 2px ${entry.isToday ? SCAN_TO + "30" : "#E8E0D820"}` }} />
                     </div>
-                    <div className="flex-1 rounded-[24px] p-4 border"
+                    <div className="flex-1 rounded-3xl p-4 border"
                       style={{
                         background: entry.isToday ? "#FFFAF9" : "#FFFFFF",
                         borderColor: entry.isToday ? `${SCAN_FROM}50` : "#F0EDE8",
@@ -3516,7 +3519,7 @@ function DiaryFullView({ history, analysisResult, overallScore, finalType, curre
 
   return (
     <motion.div className="fixed inset-0 z-[200] flex flex-col max-w-md mx-auto"
-      style={{ background: "#FBF9F7" }}
+      style={{ background: "#F8F5F2" }}
       initial={{ x: "100%" }} animate={{ x: 0 }} exit={{ x: "100%" }}
       transition={{ type: "spring", damping: 30, stiffness: 300 }}>
 
@@ -3528,7 +3531,7 @@ function DiaryFullView({ history, analysisResult, overallScore, finalType, curre
             <span className="text-[13px] font-semibold">{t("modal.diary.title")}</span>
           </button>
           <div className="flex items-center gap-2">
-            {user?.avatar && <img src={user.avatar} className="w-7 h-7 rounded-full border border-stone-100" />}
+            {user?.avatar && <img src={user.avatar} className="w-7 h-7 rounded-full" />}
             <button onClick={onLogout} className="text-[10px] text-stone-300 underline">
               {t("modal.diary.logout")}
             </button>
@@ -3568,7 +3571,7 @@ function DiaryFullView({ history, analysisResult, overallScore, finalType, curre
                 ) : (
                   <>
                     {rankingData.myPercentile !== undefined ? (
-                      <div className="p-5 rounded-2xl text-center border border-[#F0EDE8]"
+                      <div className="p-5 rounded-2xl text-center"
                         style={{ background: `linear-gradient(135deg, ${SCAN_FROM}20, ${SCAN_TO}10)` }}>
                         <p className="text-[11px] text-stone-500 mb-1">{t("ranking.myRankLabel")}</p>
                         <p className="text-4xl font-black" style={{ color: SCAN_TO }}>
@@ -3584,7 +3587,7 @@ function DiaryFullView({ history, analysisResult, overallScore, finalType, curre
                     )}
                     <div>
                       <p className="text-[11px] font-bold text-stone-400 mb-3">{t("ranking.distribution")}</p>
-                      <div className="space-y-2">
+                      <div className="space-y-3">
                         {rankingData.scoreDistribution.map((band, bi) => {
                           const maxCount = Math.max(...rankingData.scoreDistribution.map(d => d.count), 1);
                           const barPct = Math.round((band.count / maxCount) * 100);
@@ -3616,7 +3619,7 @@ function DiaryFullView({ history, analysisResult, overallScore, finalType, curre
                             .sort(([, a], [, b]) => (b as number) - (a as number))
                             .slice(0, 3)
                             .map(([type, count], ri) => (
-                              <div key={type} className="flex-1 p-3 rounded-2xl text-center bg-white border border-[#F0EDE8]">
+                              <div key={type} className="flex-1 p-3 rounded-2xl text-center bg-white">
                                 <span className="text-[13px]">{["🥇","🥈","🥉"][ri]}</span>
                                 <p className="text-[18px] font-black mt-0.5" style={{ color: SCAN_TO }}>{type}</p>
                                 <p className="text-[10px] text-stone-400">{count as number}{t("ranking.people")}</p>
@@ -3626,11 +3629,11 @@ function DiaryFullView({ history, analysisResult, overallScore, finalType, curre
                       </div>
                     )}
                     <div className="grid grid-cols-2 gap-2">
-                      <div className="p-3 rounded-2xl bg-white border border-[#F0EDE8] text-center">
+                      <div className="p-3 rounded-2xl bg-white text-center">
                         <p className="text-[11px] text-stone-400">{t("ranking.avgScore")}</p>
                         <p className="text-xl font-black" style={{ color: DEEP_GREEN }}>{rankingData.avgScore}</p>
                       </div>
-                      <div className="p-3 rounded-2xl bg-white border border-[#F0EDE8] text-center">
+                      <div className="p-3 rounded-2xl bg-white text-center">
                         <p className="text-[11px] text-stone-400">{t("ranking.topScore")}</p>
                         <p className="text-xl font-black" style={{ color: "#D97706" }}>{rankingData.topScore}</p>
                       </div>
@@ -3837,7 +3840,7 @@ function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: any; analys
 
   if (!user) {
     return (
-      <div className="flex flex-col" style={{ background: "#FBF9F7", minHeight: "calc(100dvh - 64px)" }}>
+      <div className="flex flex-col" style={{ background: "#F8F5F2", minHeight: "calc(100dvh - 64px)" }}>
         <div className="shrink-0 px-5 pt-5 pb-0" style={{ borderBottom: "1px solid #F0EDE8" }}>
           {onBack && (
             <button onClick={onBack}
@@ -3845,7 +3848,7 @@ function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: any; analys
               <ChevronLeft className="w-5 h-5" />
             </button>
           )}
-          <div className="rounded-[28px] p-5 mb-4 text-white"
+          <div className="rounded-3xl p-5 mb-4 text-white"
             style={{ background: "linear-gradient(135deg, #2D5F4F 0%, #C97062 100%)" }}>
             <p className="text-[11px] font-bold tracking-widest uppercase mb-1 text-white/70">FONDAY</p>
             <h1 className="text-[24px] font-black">{t("modal.diary.title")} ✦</h1>
@@ -3853,10 +3856,10 @@ function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: any; analys
           </div>
         </div>
         <div className="flex-1 px-5 py-6">
-          <Card className="border-none rounded-[30px] shadow-md overflow-hidden"
-            style={{ background: "linear-gradient(180deg, #FFF8F4 0%, #FFFFFF 100%)" }}>
+          <Card className="border-none rounded-3xl shadow-md overflow-hidden"
+            style={{ background: TINT_WARM }}>
             <CardContent className="p-6 text-center">
-              <div className="w-14 h-14 rounded-[20px] mx-auto flex items-center justify-center text-white"
+              <div className="w-14 h-14 rounded-3xl mx-auto flex items-center justify-center text-white"
                 style={{ background: `linear-gradient(135deg, ${DEEP_GREEN}, ${SCAN_TO})` }}>
                 <Lock className="w-6 h-6" />
               </div>
@@ -3876,7 +3879,7 @@ function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: any; analys
                   <p className="text-[18px] font-black mt-1" style={{ color: "#059669" }}>--</p>
                 </div>
               </div>
-              <div className="space-y-2 mt-6">
+              <div className="space-y-3 mt-6">
                 {i18n.language === "ko" ? (
                   <Button onClick={() => onLogin ? onLogin("kakao", "diary") : (localStorage.setItem("fonday_return_tab", "diary"), window.location.href = "/auth/kakao")}
                     className="w-full h-12 rounded-xl font-bold gap-2 border-0 shadow-sm text-[#3C1E1E]"
@@ -3893,7 +3896,7 @@ function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: any; analys
                   </Button>
                 )}
                 <Button onClick={() => onLogin ? onLogin("google", "diary") : (localStorage.setItem("fonday_return_tab", "diary"), window.location.href = "/auth/google")}
-                  className="w-full h-12 rounded-xl bg-white hover:bg-stone-50 font-bold text-zinc-700 gap-2 border border-stone-200 shadow-sm">
+                  className="w-full h-12 rounded-xl bg-white hover:bg-stone-50 font-bold text-zinc-700 gap-2 shadow-sm">
                   <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" className="w-4 h-4" />
                   {t("result.login.google")}
                 </Button>
@@ -3906,7 +3909,7 @@ function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: any; analys
   }
 
   return (
-    <div className="flex flex-col" style={{ background: "#FBF9F7", minHeight: "calc(100dvh - 64px)" }}>
+    <div className="flex flex-col" style={{ background: "#F8F5F2", minHeight: "calc(100dvh - 64px)" }}>
       {/* 헤더 */}
       <div className="shrink-0 px-5 pt-5 pb-0" style={{ borderBottom: "1px solid #F0EDE8" }}>
         {onBack && (
@@ -3915,7 +3918,7 @@ function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: any; analys
             <ChevronLeft className="w-5 h-5" />
           </button>
         )}
-        <div className="rounded-[28px] p-5 mb-4 text-white"
+        <div className="rounded-3xl p-5 mb-4 text-white"
           style={{ background: "linear-gradient(135deg, #2D5F4F 0%, #C97062 100%)" }}>
           <p className="text-[11px] font-bold tracking-widest uppercase mb-1 text-white/70">FONDAY</p>
           <h1 className="text-[24px] font-black">{t("modal.diary.title")} ✦</h1>
@@ -3937,10 +3940,10 @@ function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: any; analys
             </div>
           </div>
         </div>
-        <div className="flex gap-2 p-2 rounded-[24px] mb-3" style={{ background: "#FFF8F4" }}>
+        <div className="flex gap-2 p-2 rounded-3xl mb-3" style={{ background: "#FFF8F4" }}>
           {tabs.map(({ id, label }) => (
             <button key={id} onClick={() => setTab(id)}
-              className={`flex-1 py-2.5 text-[12px] font-bold transition-all rounded-[18px] ${
+              className={`flex-1 py-2.5 text-[12px] font-bold transition-all rounded-2xl ${
                 tab === id ? "text-white shadow-md" : "text-stone-400"
               }`}
               style={tab === id ? { background: `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})` } : { background: "transparent" }}>
@@ -3964,11 +3967,11 @@ function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: any; analys
             >
               <DiaryCalendarView allEntries={allEntries} />
               <div className="px-5 pt-3">
-                <Card className="border-none rounded-[28px] overflow-hidden shadow-sm" style={{ background: "#FFFFFF" }}>
+                <Card className="border-none rounded-3xl overflow-hidden shadow-sm" style={{ background: "#FFFFFF" }}>
                   <CardContent className="p-5">
                     <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0">
-                        <p className="text-[10px] font-black tracking-[0.16em] uppercase" style={{ color: SCAN_TO }}>{t("modal.diary.reminderTitle")}</p>
+                        <p className="text-[10px] font-bold tracking-[0.16em] uppercase" style={{ color: SCAN_TO }}>{t("modal.diary.reminderTitle")}</p>
                         <p className="text-[16px] font-black mt-1 text-kr-pretty" style={{ color: DEEP_GREEN }}>{t("modal.diary.reminderHeadline")}</p>
                         <p className="text-[11px] text-stone-500 mt-1 leading-relaxed text-kr-pretty">
                           {t("modal.diary.reminderDesc")} {aiCareSettings.enabled ? "" : t("modal.diary.aiCareWarn")}
@@ -4006,7 +4009,7 @@ function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: any; analys
                           saveAICareSettings(nextCare);
                           syncReminderToServer(next);
                         }}
-                        className="shrink-0 rounded-full px-3 py-1.5 text-[11px] font-black"
+                        className="shrink-0 rounded-full px-3 py-1.5 text-xs font-semibold"
                         style={reminderSettings.enabled
                           ? { background: "#ECFDF5", color: "#059669" }
                           : { background: "#F6F3EE", color: "#9A8F80" }}
@@ -4081,12 +4084,12 @@ function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: any; analys
               className="h-full overflow-y-auto overscroll-contain"
             >
               <div className="px-5 pt-4 pb-8 space-y-4">
-                <Card className="border-none rounded-[28px] overflow-hidden shadow-sm"
-                  style={{ background: "linear-gradient(135deg, #FEF3EC 0%, #FFFDFB 60%, #F2F7F4 100%)" }}>
+                <Card className="border-none rounded-3xl overflow-hidden shadow-sm"
+                  style={{ background: TINT_WARM }}>
                   <CardContent className="p-5">
                     <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0">
-                        <p className="text-[10px] font-black tracking-[0.16em] uppercase" style={{ color: SCAN_TO }}>
+                        <p className="text-[10px] font-bold tracking-[0.16em] uppercase" style={{ color: SCAN_TO }}>
                           {diaryReport.copy.deck}
                         </p>
                         <p className="text-[20px] font-black mt-1 text-kr-pretty" style={{ color: DEEP_GREEN }}>
@@ -4096,37 +4099,37 @@ function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: any; analys
                           {diaryReport.copy.subtitle}
                         </p>
                       </div>
-                      <div className="rounded-[22px] px-3 py-2 text-right shrink-0"
-                        style={{ background: "#FFFFFFAA", border: "1px solid #F1E6DE" }}>
+                      <div className="rounded-3xl px-3 py-2 text-right shrink-0"
+                        style={{ background: "#FFFFFFAA" }}>
                         <p className="text-[10px] font-bold text-stone-500 whitespace-nowrap">{diaryReport.copy.period}</p>
-                        <p className="text-[14px] font-black mt-1" style={{ color: DEEP_GREEN }}>{diaryReport.periodLabel}</p>
+                        <p className="text-sm font-bold mt-1" style={{ color: DEEP_GREEN }}>{diaryReport.periodLabel}</p>
                       </div>
                     </div>
 
                     <div className="grid grid-cols-3 gap-2 mt-4">
-                      <div className="rounded-2xl p-3 text-center" style={{ background: "#FFFFFF", border: "1px solid #F2E7DF" }}>
+                      <div className="rounded-2xl p-3 text-center" style={{ background: "#FFFFFF" }}>
                         <p className="text-[10px] font-bold text-stone-400">{diaryReport.copy.scans}</p>
                         <p className="text-[20px] font-black mt-1" style={{ color: DEEP_GREEN }}>{diaryReport.scanCount}</p>
                       </div>
-                      <div className="rounded-2xl p-3 text-center" style={{ background: "#FFFFFF", border: "1px solid #F2E7DF" }}>
+                      <div className="rounded-2xl p-3 text-center" style={{ background: "#FFFFFF" }}>
                         <p className="text-[10px] font-bold text-stone-400">{diaryReport.copy.diary}</p>
                         <p className="text-[20px] font-black mt-1" style={{ color: SCAN_TO }}>{diaryReport.memoCount}</p>
                       </div>
-                      <div className="rounded-2xl p-3 text-center" style={{ background: "#FFFFFF", border: "1px solid #F2E7DF" }}>
+                      <div className="rounded-2xl p-3 text-center" style={{ background: "#FFFFFF" }}>
                         <p className="text-[10px] font-bold text-stone-400">{diaryReport.copy.adherence}</p>
                         <p className="text-[20px] font-black mt-1" style={{ color: "#0F766E" }}>{diaryReport.adherence}</p>
                       </div>
                     </div>
 
-                    <div className="rounded-[22px] p-4 mt-4 text-center" style={{ background: "#FFFFFF", border: "1px solid #F2E7DF" }}>
-                      <p className="text-[10px] font-black uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>
+                    <div className="rounded-3xl p-4 mt-4 text-center" style={{ background: "#FFFFFF" }}>
+                      <p className="text-[10px] font-bold uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>
                         {diaryReport.copy.executive}
                       </p>
                       <div className="flex items-center justify-center gap-2 mt-1">
                         <p className="text-[18px] font-black" style={{ color: DEEP_GREEN }}>
                           {diaryReport.copy[diaryReport.trendKey]}
                         </p>
-                        <div className="px-3 py-1.5 rounded-full text-[10px] font-black"
+                        <div className="px-3 py-1.5 rounded-full text-[10px] font-bold"
                           style={{ background: `${SCAN_FROM}18`, color: SCAN_TO }}>
                           {diaryReport.trendDesc}
                         </div>
@@ -4139,9 +4142,9 @@ function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: any; analys
                   </CardContent>
                 </Card>
 
-                <Card className="border-none rounded-[24px] shadow-sm overflow-hidden" style={{ background: "#FFFFFF" }}>
+                <Card className="border-none rounded-3xl shadow-sm overflow-hidden" style={{ background: "#FFFFFF" }}>
                   <CardContent className="p-4">
-                    <p className="text-[11px] font-black uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>
+                    <p className="text-xs font-semibold uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>
                       {reportDetailText.radarTitle}
                     </p>
                     <p className="text-[11px] text-stone-500 mt-1">{reportDetailText.radarSub}</p>
@@ -4161,11 +4164,11 @@ function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: any; analys
                 </Card>
 
                 <div className="space-y-3">
-                  <p className="text-[11px] font-black uppercase tracking-[0.14em] px-1" style={{ color: SCAN_TO }}>
+                  <p className="text-xs font-semibold uppercase tracking-[0.14em] px-1" style={{ color: SCAN_TO }}>
                     {diaryReport.copy.priority}
                   </p>
                   {diaryReport.focusConcerns.map((concern) => (
-                    <Card key={concern.key} className="border-none rounded-[24px] shadow-sm overflow-hidden" style={{ background: "#FFFFFF" }}>
+                    <Card key={concern.key} className="border-none rounded-3xl shadow-sm overflow-hidden" style={{ background: "#FFFFFF" }}>
                       <CardContent className="p-4">
                         <div className="flex items-start justify-between gap-3">
                           <div className="min-w-0">
@@ -4187,16 +4190,16 @@ function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: any; analys
                 </div>
 
                 <div className="grid gap-3 md:grid-cols-2">
-                  <Card className="border-none rounded-[24px] shadow-sm overflow-hidden" style={{ background: "#FFFFFF" }}>
+                  <Card className="border-none rounded-3xl shadow-sm overflow-hidden" style={{ background: "#FFFFFF" }}>
                     <CardContent className="p-4">
-                      <p className="text-[11px] font-black uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>
+                      <p className="text-xs font-semibold uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>
                         {diaryReport.copy.ingredients}
                       </p>
                       <div className="space-y-3 mt-3">
                         {diaryReport.ingredientPlan.map((item) => (
-                          <div key={item.name} className="rounded-[18px] p-3" style={{ background: `${item.accent}10` }}>
+                          <div key={item.name} className="rounded-2xl p-3" style={{ background: `${item.accent}10` }}>
                             <div className="flex items-center justify-between gap-2">
-                              <p className="text-[13px] font-black" style={{ color: item.accent }}>{item.name}</p>
+                              <p className="text-sm font-bold" style={{ color: item.accent }}>{item.name}</p>
                               <span className="text-[10px] font-bold px-2 py-1 rounded-full bg-white/80 text-stone-500">{item.concern}</span>
                             </div>
                             <p className="text-[11px] text-stone-600 mt-2 leading-relaxed">{item.reason}</p>
@@ -4206,16 +4209,16 @@ function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: any; analys
                     </CardContent>
                   </Card>
 
-                  <Card className="border-none rounded-[24px] shadow-sm overflow-hidden" style={{ background: "#FFFFFF" }}>
+                  <Card className="border-none rounded-3xl shadow-sm overflow-hidden" style={{ background: "#FFFFFF" }}>
                     <CardContent className="p-4">
-                      <p className="text-[11px] font-black uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>
+                      <p className="text-xs font-semibold uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>
                         {diaryReport.copy.procedures}
                       </p>
                       <div className="space-y-3 mt-3">
                         {diaryReport.procedurePlan.map((item) => (
-                          <div key={item.name} className="rounded-[18px] p-3 border" style={{ borderColor: `${item.accent}20`, background: "#FFFCFA" }}>
+                          <div key={item.name} className="rounded-2xl p-3 border" style={{ borderColor: `${item.accent}20`, background: "#FFFCFA" }}>
                             <div className="flex items-center justify-between gap-2">
-                              <p className="text-[13px] font-black" style={{ color: DEEP_GREEN }}>{item.name}</p>
+                              <p className="text-sm font-bold" style={{ color: DEEP_GREEN }}>{item.name}</p>
                               <span className="text-[10px] font-bold px-2 py-1 rounded-full" style={{ background: `${item.accent}12`, color: item.accent }}>
                                 {diaryReport.copy.recommended}
                               </span>
@@ -4230,9 +4233,9 @@ function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: any; analys
                 </div>
 
                 <div className="grid gap-3 md:grid-cols-2">
-                  <Card className="border-none rounded-[24px] shadow-sm overflow-hidden" style={{ background: "#FFFFFF" }}>
+                  <Card className="border-none rounded-3xl shadow-sm overflow-hidden" style={{ background: "#FFFFFF" }}>
                     <CardContent className="p-4">
-                      <p className="text-[11px] font-black uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>
+                      <p className="text-xs font-semibold uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>
                         {reportDetailText.ingredientTrack}
                       </p>
                       <p className="text-[11px] text-stone-500 mt-1">{reportDetailText.ingredientTrackSub}</p>
@@ -4240,12 +4243,12 @@ function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: any; analys
                         {diaryReport.ingredientSignals.length > 0 ? (
                           <>
                             <div>
-                              <p className="text-[10px] font-black uppercase tracking-[0.12em] text-emerald-600">{reportDetailText.positiveFlow}</p>
-                              <div className="space-y-2 mt-2">
+                              <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-emerald-600">{reportDetailText.positiveFlow}</p>
+                              <div className="space-y-3 mt-2">
                                 {diaryReport.ingredientSignals.filter((item) => item.delta >= 0).slice(0, 3).map((item) => (
                                   <div key={`good-${item.ingredient}`} className="rounded-[16px] p-3" style={{ background: "#ECFDF5" }}>
                                     <div className="flex items-center justify-between gap-2">
-                                      <p className="text-[13px] font-black text-emerald-700">{item.ingredient}</p>
+                                      <p className="text-sm font-bold text-emerald-700">{item.ingredient}</p>
                                       <span className="text-[10px] font-bold text-emerald-600">+{item.delta}</span>
                                     </div>
                                   </div>
@@ -4253,12 +4256,12 @@ function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: any; analys
                               </div>
                             </div>
                             <div>
-                              <p className="text-[10px] font-black uppercase tracking-[0.12em]" style={{ color: SCAN_TO }}>{reportDetailText.cautionFlow}</p>
-                              <div className="space-y-2 mt-2">
+                              <p className="text-[10px] font-bold uppercase tracking-[0.12em]" style={{ color: SCAN_TO }}>{reportDetailText.cautionFlow}</p>
+                              <div className="space-y-3 mt-2">
                                 {diaryReport.ingredientSignals.filter((item) => item.delta < 0).slice(0, 3).map((item) => (
                                   <div key={`bad-${item.ingredient}`} className="rounded-[16px] p-3" style={{ background: "#FFF1EC" }}>
                                     <div className="flex items-center justify-between gap-2">
-                                      <p className="text-[13px] font-black" style={{ color: SCAN_TO }}>{item.ingredient}</p>
+                                      <p className="text-sm font-bold" style={{ color: SCAN_TO }}>{item.ingredient}</p>
                                       <span className="text-[10px] font-bold" style={{ color: SCAN_TO }}>{item.delta}</span>
                                     </div>
                                   </div>
@@ -4273,14 +4276,14 @@ function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: any; analys
                     </CardContent>
                   </Card>
 
-                  <Card className="border-none rounded-[24px] shadow-sm overflow-hidden" style={{ background: "#FFFFFF" }}>
+                  <Card className="border-none rounded-3xl shadow-sm overflow-hidden" style={{ background: "#FFFFFF" }}>
                     <CardContent className="p-4">
-                      <p className="text-[11px] font-black uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>
+                      <p className="text-xs font-semibold uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>
                         {reportDetailText.recoveryGuide}
                       </p>
-                      <div className="space-y-2 mt-3">
+                      <div className="space-y-3 mt-3">
                         {diaryReport.recoveryGuide.map((item: string) => (
-                          <div key={item} className="rounded-[18px] p-3" style={{ background: "#F7FAF8", border: "1px solid #E5F0EB" }}>
+                          <div key={item} className="rounded-2xl p-3" style={{ background: "#F7FAF8" }}>
                             <p className="text-[12px] text-stone-600 leading-relaxed">{item}</p>
                           </div>
                         ))}
@@ -4289,22 +4292,22 @@ function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: any; analys
                   </Card>
                 </div>
 
-                <Card className="border-none rounded-[24px] shadow-sm overflow-hidden" style={{ background: "#FFFFFF" }}>
+                <Card className="border-none rounded-3xl shadow-sm overflow-hidden" style={{ background: "#FFFFFF" }}>
                   <CardContent className="p-4">
-                    <p className="text-[11px] font-black uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>
+                    <p className="text-xs font-semibold uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>
                       {diaryReport.copy.routine}
                     </p>
                     <div className="grid gap-3 mt-3 md:grid-cols-2">
-                      <div className="rounded-[20px] p-4" style={{ background: "#FFF8F4" }}>
-                        <p className="text-[10px] font-black uppercase tracking-[0.12em] text-stone-400">{diaryReport.copy.routineGood}</p>
-                        <p className="text-[13px] font-black mt-2 text-kr-pretty" style={{ color: DEEP_GREEN }}>{diaryReport.routineHighlights.strong}</p>
+                      <div className="rounded-3xl p-4" style={{ background: "#FFF8F4" }}>
+                        <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-stone-400">{diaryReport.copy.routineGood}</p>
+                        <p className="text-sm font-bold mt-2 text-kr-pretty" style={{ color: DEEP_GREEN }}>{diaryReport.routineHighlights.strong}</p>
                       </div>
-                      <div className="rounded-[20px] p-4" style={{ background: "#F6F3EE" }}>
-                        <p className="text-[10px] font-black uppercase tracking-[0.12em] text-stone-400">{diaryReport.copy.routineWatch}</p>
-                        <p className="text-[13px] font-black mt-2 text-kr-pretty" style={{ color: "#8C8070" }}>{diaryReport.routineHighlights.watch}</p>
+                      <div className="rounded-3xl p-4" style={{ background: "#F6F3EE" }}>
+                        <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-stone-400">{diaryReport.copy.routineWatch}</p>
+                        <p className="text-sm font-bold mt-2 text-kr-pretty" style={{ color: "#8C8070" }}>{diaryReport.routineHighlights.watch}</p>
                       </div>
-                      <div className="rounded-[20px] p-4" style={{ background: "#FFF1EC" }}>
-                        <p className="text-[10px] font-black uppercase tracking-[0.12em]" style={{ color: SCAN_TO }}>{diaryReport.copy.memoSignals}</p>
+                      <div className="rounded-3xl p-4" style={{ background: "#FFF1EC" }}>
+                        <p className="text-[10px] font-bold uppercase tracking-[0.12em]" style={{ color: SCAN_TO }}>{diaryReport.copy.memoSignals}</p>
                         <div className="flex flex-wrap gap-1.5 mt-3">
                           {(diaryReport.keywordSummary.length > 0 ? diaryReport.keywordSummary : [diaryReport.copy.notEnough]).map((item) => (
                             <span key={item} className="px-2.5 py-1 rounded-full text-[10px] font-bold" style={{ background: "#FFFFFF", color: SCAN_TO }}>
@@ -4313,8 +4316,8 @@ function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: any; analys
                           ))}
                         </div>
                       </div>
-                      <div className="rounded-[20px] p-4" style={{ background: "#F5F3FF" }}>
-                        <p className="text-[10px] font-black uppercase tracking-[0.12em] text-[#7C3AED]">{diaryReport.copy.causeSignals}</p>
+                      <div className="rounded-3xl p-4" style={{ background: "#F5F3FF" }}>
+                        <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-[#7C3AED]">{diaryReport.copy.causeSignals}</p>
                         <div className="flex flex-wrap gap-1.5 mt-3">
                           {(diaryReport.topCauseTags.length > 0 ? diaryReport.topCauseTags : [diaryReport.copy.notEnough]).map((item) => (
                             <span key={item} className="px-2.5 py-1 rounded-full text-[10px] font-bold" style={{ background: "#FFFFFF", color: "#7C3AED" }}>
@@ -4324,8 +4327,8 @@ function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: any; analys
                         </div>
                       </div>
                     </div>
-                    <div className="rounded-[20px] p-4 mt-3" style={{ background: "#F7FAF8", border: "1px solid #E5F0EB" }}>
-                      <p className="text-[10px] font-black uppercase tracking-[0.12em]" style={{ color: DEEP_GREEN }}>
+                    <div className="rounded-3xl p-4 mt-3" style={{ background: "#F7FAF8" }}>
+                      <p className="text-[10px] font-bold uppercase tracking-[0.12em]" style={{ color: DEEP_GREEN }}>
                         {diaryReport.copy.cosmeticsSignal}
                       </p>
                       <p className="text-[12px] text-stone-600 mt-2 leading-relaxed">{diaryReport.cosmeticsSignal}</p>
@@ -4343,25 +4346,25 @@ function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: any; analys
                 </Card>
 
                 <div className="grid gap-3 md:grid-cols-2">
-                  <Card className="border-none rounded-[24px] shadow-sm overflow-hidden" style={{ background: "#FFFFFF" }}>
+                  <Card className="border-none rounded-3xl shadow-sm overflow-hidden" style={{ background: "#FFFFFF" }}>
                     <CardContent className="p-4">
-                      <p className="text-[11px] font-black uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>
+                      <p className="text-xs font-semibold uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>
                         {reportDetailText.seasonImpact}
                       </p>
                       <p className="text-[13px] text-stone-600 mt-3 leading-relaxed text-kr-pretty">{diaryReport.seasonGuide}</p>
                     </CardContent>
                   </Card>
 
-                  <Card className="border-none rounded-[24px] shadow-sm overflow-hidden" style={{ background: "#FFFFFF" }}>
+                  <Card className="border-none rounded-3xl shadow-sm overflow-hidden" style={{ background: "#FFFFFF" }}>
                     <CardContent className="p-4">
-                      <p className="text-[11px] font-black uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>
+                      <p className="text-xs font-semibold uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>
                         {reportDetailText.triggerCorrelation}
                       </p>
-                      <div className="space-y-2 mt-3">
+                      <div className="space-y-3 mt-3">
                         {diaryReport.triggerSignals.length > 0 ? diaryReport.triggerSignals.map((item) => (
-                          <div key={item.tag} className="rounded-[18px] p-3" style={{ background: item.diff <= 0 ? "#FFF1EC" : "#ECFDF5" }}>
+                          <div key={item.tag} className="rounded-2xl p-3" style={{ background: item.diff <= 0 ? "#FFF1EC" : "#ECFDF5" }}>
                             <div className="flex items-center justify-between gap-2">
-                              <p className="text-[13px] font-black" style={{ color: item.diff <= 0 ? SCAN_TO : "#059669" }}>{item.label}</p>
+                              <p className="text-sm font-bold" style={{ color: item.diff <= 0 ? SCAN_TO : "#059669" }}>{item.label}</p>
                               <span className="text-[10px] font-bold" style={{ color: item.diff <= 0 ? SCAN_TO : "#059669" }}>
                                 {item.diff > 0 ? `+${item.diff}` : item.diff}
                               </span>
@@ -4375,26 +4378,26 @@ function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: any; analys
                   </Card>
                 </div>
 
-                <Card className="border-none rounded-[24px] shadow-sm overflow-hidden" style={{ background: "linear-gradient(135deg, #F0F9F4 0%, #FFFFFF 100%)" }}>
+                <Card className="border-none rounded-3xl shadow-sm overflow-hidden" style={{ background: TINT_GREEN }}>
                   <CardContent className="p-4">
                     <div className="flex items-start justify-between gap-3">
                       <div>
-                        <p className="text-[11px] font-black uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>
+                        <p className="text-xs font-semibold uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>
                           {reportDetailText.forecastTitle}
                         </p>
                         <p className="text-[13px] text-stone-600 mt-2 leading-relaxed text-kr-pretty">{diaryReport.forecast.note}</p>
                       </div>
-                      <div className="rounded-[22px] px-3 py-2 shrink-0 text-right" style={{ background: "#FFFFFF", border: "1px solid #DCEFE5" }}>
+                      <div className="rounded-3xl px-3 py-2 shrink-0 text-right" style={{ background: "#FFFFFF" }}>
                         <p className="text-[10px] font-bold text-stone-400">WEEK 2</p>
                         <p className="text-[20px] font-black mt-1" style={{ color: DEEP_GREEN }}>{diaryReport.forecast.week2}</p>
                       </div>
                     </div>
                     <div className="grid grid-cols-2 gap-3 mt-4">
-                      <div className="rounded-[18px] p-3" style={{ background: "#FFFFFF", border: "1px solid #E5F0EB" }}>
+                      <div className="rounded-2xl p-3" style={{ background: "#FFFFFF" }}>
                         <p className="text-[10px] font-bold text-stone-400">WEEK 1</p>
                         <p className="text-[22px] font-black mt-1" style={{ color: SCAN_TO }}>{diaryReport.forecast.week1}</p>
                       </div>
-                      <div className="rounded-[18px] p-3" style={{ background: "#FFFFFF", border: "1px solid #E5F0EB" }}>
+                      <div className="rounded-2xl p-3" style={{ background: "#FFFFFF" }}>
                         <p className="text-[10px] font-bold text-stone-400">WEEK 2</p>
                         <p className="text-[22px] font-black mt-1" style={{ color: DEEP_GREEN }}>{diaryReport.forecast.week2}</p>
                       </div>
@@ -4419,7 +4422,7 @@ function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: any; analys
                 ) : (
                   <>
                     {rankingData.myPercentile !== undefined ? (
-                      <div className="p-5 rounded-2xl text-center border border-[#F0EDE8]"
+                      <div className="p-5 rounded-2xl text-center"
                         style={{ background: `linear-gradient(135deg, ${SCAN_FROM}20, ${SCAN_TO}10)` }}>
                         <p className="text-[11px] text-stone-500 mb-1">{t("ranking.myRankLabel")}</p>
                         <p className="text-4xl font-black" style={{ color: SCAN_TO }}>
@@ -4435,7 +4438,7 @@ function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: any; analys
                     )}
                     <div>
                       <p className="text-[11px] font-bold text-stone-400 mb-3">{t("ranking.distribution")}</p>
-                      <div className="space-y-2">
+                      <div className="space-y-3">
                         {rankingData.scoreDistribution.map((band, bi) => {
                           const maxCount = Math.max(...rankingData.scoreDistribution.map(d => d.count), 1);
                           const barPct = Math.round((band.count / maxCount) * 100);
@@ -4466,8 +4469,8 @@ function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: any; analys
                           {Object.entries(rankingData.baumannDistribution)
                             .sort(([,a],[,b]) => b - a).slice(0, 3)
                             .map(([type, count]) => (
-                              <div key={type} className="flex items-center gap-2 px-3 py-2 rounded-xl border border-[#F0EDE8] bg-white">
-                                <span className="text-[14px] font-black" style={{ color: SCAN_TO }}>{type}</span>
+                              <div key={type} className="flex items-center gap-2 px-3 py-2 rounded-xl bg-white">
+                                <span className="text-sm font-bold" style={{ color: SCAN_TO }}>{type}</span>
                                 <span className="text-[11px] text-stone-400">{count}{t("ranking.people")}</span>
                               </div>
                             ))}
@@ -4552,7 +4555,7 @@ function MyCosmeticsModal({ onClose, onAddNew }: { onClose: () => void; onAddNew
           </div>
         </div>
 
-        <div className="px-5 pt-4 space-y-2">
+        <div className="px-5 pt-4 space-y-3">
           {loading ? (
             <div className="flex justify-center py-10">
               <div className="w-6 h-6 border-2 border-stone-200 border-t-stone-400 rounded-full animate-spin" />
@@ -4568,14 +4571,14 @@ function MyCosmeticsModal({ onClose, onAddNew }: { onClose: () => void; onAddNew
             </div>
           ) : (
             <>
-              <div className="rounded-[30px] p-5 border border-[#E8DFD8]" style={{ background: "linear-gradient(180deg, #FFFCFA 0%, #FFFFFF 100%)" }}>
+              <div className="rounded-3xl p-5" style={{ background: "#FFFFFF" }}>
                 <div className="flex items-start justify-between gap-3">
                   <div>
-                    <p className="text-[10px] font-black tracking-[0.16em] uppercase" style={{ color: SCAN_TO }}>{t("cosmetics.myTitle")}</p>
+                    <p className="text-[10px] font-bold tracking-[0.16em] uppercase" style={{ color: SCAN_TO }}>{t("cosmetics.myTitle")}</p>
                     <p className="text-[18px] font-black mt-1" style={{ color: DEEP_GREEN }}>{t("cosmetics.boardHeadline")}</p>
                     <p className="text-[11px] text-stone-400 mt-1">{t("cosmetics.boardSub")}</p>
                   </div>
-                  <span className="px-2.5 py-1 rounded-full text-[10px] font-black"
+                  <span className="px-2.5 py-1 rounded-full text-[10px] font-bold"
                     style={{ background: `${SCAN_FROM}16`, color: SCAN_TO }}>
                     {t("cosmetics.ctaCount", { count: list.length })}
                   </span>
@@ -4593,7 +4596,7 @@ function MyCosmeticsModal({ onClose, onAddNew }: { onClose: () => void; onAddNew
 
               <div className="grid gap-3">
                 {sections.map(({ key, title, accent, bg, border, items }) => (
-                  <div key={key} className="rounded-[28px] p-4 border" style={{ background: bg, borderColor: border }}>
+                  <div key={key} className="rounded-3xl p-4 border" style={{ background: bg, borderColor: border }}>
                     <div className="flex items-center justify-between gap-3 mb-3">
                       <div>
                         <p className="text-[15px] font-black" style={{ color: DEEP_GREEN }}>{title}</p>
@@ -4602,7 +4605,7 @@ function MyCosmeticsModal({ onClose, onAddNew }: { onClose: () => void; onAddNew
                         </p>
                       </div>
                     </div>
-                    <div className="space-y-2">
+                    <div className="space-y-3">
                       {items.map((item, index) => (
                         <button
                           key={`${key}-${item.id}`}
@@ -4610,12 +4613,12 @@ function MyCosmeticsModal({ onClose, onAddNew }: { onClose: () => void; onAddNew
                           className="w-full rounded-2xl bg-white border px-3.5 py-3 flex items-center gap-3 text-left"
                           style={{ borderColor: `${accent}20` }}
                         >
-                          <span className="w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-black text-white shrink-0"
+                          <span className="w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-bold text-white shrink-0"
                             style={{ background: accent }}>
                             {index + 1}
                           </span>
                           <div className="min-w-0 flex-1">
-                            <p className="text-[12px] font-black truncate" style={{ color: DEEP_GREEN }}>{t(`cosmetics.categories.${item.category}`)}</p>
+                            <p className="text-xs font-semibold truncate" style={{ color: DEEP_GREEN }}>{t(`cosmetics.categories.${item.category}`)}</p>
                             <p className="text-[11px] text-stone-400 truncate">{item.name}</p>
                           </div>
                           <ChevronRight className="w-4 h-4 text-stone-300 shrink-0" />
@@ -4626,14 +4629,14 @@ function MyCosmeticsModal({ onClose, onAddNew }: { onClose: () => void; onAddNew
                 ))}
               </div>
 
-              <div className="rounded-[30px] p-4 border border-[#ECE4DC] bg-white">
+              <div className="rounded-3xl p-4 bg-white">
                 <div className="flex items-center justify-between gap-3 mb-3">
                   <div>
                     <p className="text-[15px] font-black" style={{ color: DEEP_GREEN }}>{t("cosmetics.collectionTitle")}</p>
                     <p className="text-[11px] text-stone-400">{t("cosmetics.collectionSub")}</p>
                   </div>
                   <button onClick={onAddNew}
-                    className="px-3 py-1.5 rounded-full text-[10px] font-black text-white"
+                    className="px-3 py-1.5 rounded-full text-[10px] font-bold text-white"
                     style={{ background: `linear-gradient(135deg, ${DEEP_GREEN}, ${DEEP_GREEN_LIGHT})` }}>
                     + {t("cosmetics.ctaBtn")}
                   </button>
@@ -4643,7 +4646,7 @@ function MyCosmeticsModal({ onClose, onAddNew }: { onClose: () => void; onAddNew
                     <button
                       key={item.id}
                       onClick={() => setSelectedItem(item)}
-                      className="rounded-[24px] p-3 bg-stone-50 border border-stone-100 text-left shadow-[0_4px_14px_rgba(0,0,0,0.03)]"
+                      className="rounded-3xl p-3 bg-stone-50 text-left shadow-[0_4px_14px_rgba(0,0,0,0.03)]"
                     >
                       {item.image_thumbnail
                         ? <img src={item.image_thumbnail} className="w-full h-28 rounded-2xl object-cover bg-stone-200" />
@@ -4652,7 +4655,7 @@ function MyCosmeticsModal({ onClose, onAddNew }: { onClose: () => void; onAddNew
                           </div>
                       }
                       <div className="mt-3">
-                        <p className="text-[12px] font-black text-stone-800 truncate">{item.name}</p>
+                        <p className="text-xs font-semibold text-stone-800 truncate">{item.name}</p>
                         <p className="text-[11px] text-stone-400 truncate">{item.brand || t("cosmetics.noBrand")}</p>
                         <div className="flex flex-wrap gap-1.5 mt-2">
                           <span className="px-2 py-1 rounded-full text-[9px] font-bold"
@@ -4699,8 +4702,8 @@ function MyCosmeticsModal({ onClose, onAddNew }: { onClose: () => void; onAddNew
               <div className="w-10 h-1 rounded-full bg-stone-200 mx-auto mb-5" />
               <div className="flex items-start gap-3">
                 {selectedItem.image_thumbnail
-                  ? <img src={selectedItem.image_thumbnail} className="w-20 h-20 rounded-[22px] object-cover bg-stone-100 shrink-0" />
-                  : <div className="w-20 h-20 rounded-[22px] bg-stone-100 flex items-center justify-center shrink-0">
+                  ? <img src={selectedItem.image_thumbnail} className="w-20 h-20 rounded-3xl object-cover bg-stone-100 shrink-0" />
+                  : <div className="w-20 h-20 rounded-3xl bg-stone-100 flex items-center justify-center shrink-0">
                       <Droplets className="w-8 h-8 text-stone-400" />
                     </div>
                 }
@@ -4727,18 +4730,18 @@ function MyCosmeticsModal({ onClose, onAddNew }: { onClose: () => void; onAddNew
               </div>
 
               <div className="grid grid-cols-2 gap-2.5 mt-5">
-                <div className="rounded-2xl p-3" style={{ background: "#F8FAF9", border: "1px solid #E4ECE8" }}>
-                  <p className="text-[10px] font-black uppercase tracking-[0.14em] text-stone-400">{t("cosmetics.openedLabel")}</p>
-                  <p className="text-[12px] font-black mt-1" style={{ color: DEEP_GREEN }}>{selectedItem.opened_at || t("cosmetics.detailUnknown")}</p>
+                <div className="rounded-2xl p-3" style={{ background: "#F8FAF9" }}>
+                  <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-stone-400">{t("cosmetics.openedLabel")}</p>
+                  <p className="text-xs font-semibold mt-1" style={{ color: DEEP_GREEN }}>{selectedItem.opened_at || t("cosmetics.detailUnknown")}</p>
                 </div>
-                <div className="rounded-2xl p-3" style={{ background: "#FFF8F4", border: "1px solid #F1DED7" }}>
-                  <p className="text-[10px] font-black uppercase tracking-[0.14em] text-stone-400">{t("cosmetics.detailStatusLabel")}</p>
-                  <p className="text-[12px] font-black mt-1" style={{ color: SCAN_TO }}>{t("cosmetics.detailStatusActive")}</p>
+                <div className="rounded-2xl p-3" style={{ background: "#FFF8F4" }}>
+                  <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-stone-400">{t("cosmetics.detailStatusLabel")}</p>
+                  <p className="text-xs font-semibold mt-1" style={{ color: SCAN_TO }}>{t("cosmetics.detailStatusActive")}</p>
                 </div>
               </div>
 
-              <div className="mt-4 rounded-[24px] p-4" style={{ background: "#FFFCFA", border: "1px solid #F2E7E2" }}>
-                <p className="text-[11px] font-black uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>{t("cosmetics.ingredientsLabel")}</p>
+              <div className="mt-4 rounded-3xl p-4" style={{ background: "#FFFCFA", border: "1px solid #F2E7E2" }}>
+                <p className="text-xs font-semibold uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>{t("cosmetics.ingredientsLabel")}</p>
                 <p className="text-[12px] text-stone-600 mt-2 leading-relaxed whitespace-pre-wrap text-kr-pretty">
                   {selectedItem.ingredients?.trim() || t("cosmetics.ingredientsEmpty")}
                 </p>
@@ -4748,13 +4751,13 @@ function MyCosmeticsModal({ onClose, onAddNew }: { onClose: () => void; onAddNew
                 <button
                   onClick={() => handleDelete(selectedItem.id)}
                   disabled={deletingId === selectedItem.id}
-                  className="flex-1 py-3.5 rounded-2xl font-bold text-[13px] border border-stone-200 text-stone-600 bg-stone-50 disabled:opacity-40"
+                  className="flex-1 py-3.5 rounded-2xl font-bold text-[13px] text-stone-600 bg-stone-50 disabled:opacity-40"
                 >
                   {deletingId === selectedItem.id ? "..." : t("cosmetics.deleteConfirm")}
                 </button>
                 <button
                   onClick={() => setSelectedItem(null)}
-                  className="flex-1 py-3.5 rounded-2xl font-black text-[13px] text-white"
+                  className="flex-1 py-3.5 rounded-2xl font-bold text-sm text-white"
                   style={{ background: `linear-gradient(135deg, ${DEEP_GREEN}, ${DEEP_GREEN_LIGHT})` }}
                 >
                   {t("cosmetics.confirm")}
@@ -4789,7 +4792,7 @@ function MyScreen({ user, onInstall, onBack, onLogin, onGoMagazine }: { user: an
   };
 
   return (
-    <div className="min-h-[calc(100dvh-64px)] pb-28" style={{ background: "#FAF9F6" }}>
+    <div className="min-h-[calc(100dvh-64px)] pb-28" style={{ background: "#F8F5F2" }}>
       {/* 헤더 */}
       <div className="px-5 pt-5 pb-6" style={{ borderBottom: "1px solid #F0EDE8" }}>
         <button onClick={onBack} className="flex items-center gap-1.5 text-stone-400 mb-4 active:opacity-70">
@@ -4803,10 +4806,10 @@ function MyScreen({ user, onInstall, onBack, onLogin, onGoMagazine }: { user: an
       <div className="px-5 pt-5 space-y-3">
         {/* 프로필 */}
         {user ? (
-          <div className="flex items-center justify-between p-4 rounded-2xl bg-white border border-stone-100">
+          <div className="flex items-center justify-between p-5 rounded-3xl bg-white">
             <div className="flex items-center gap-3">
               {user.avatar
-                ? <img src={user.avatar} className="w-10 h-10 rounded-full border border-stone-100" />
+                ? <img src={user.avatar} className="w-10 h-10 rounded-full" />
                 : <div className="w-10 h-10 rounded-full flex items-center justify-center"
                     style={{ background: `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})` }}>
                     <User className="w-5 h-5 text-white" />
@@ -4828,7 +4831,7 @@ function MyScreen({ user, onInstall, onBack, onLogin, onGoMagazine }: { user: an
                     </span>
                   )}
                   {user.provider === "google" && (
-                    <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[10px] font-bold text-stone-600 border border-stone-200 bg-white">
+                    <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[10px] font-bold text-stone-600 bg-white">
                       <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" className="w-2.5 h-2.5" />
                       Google
                     </span>
@@ -4843,7 +4846,7 @@ function MyScreen({ user, onInstall, onBack, onLogin, onGoMagazine }: { user: an
             </button>
           </div>
         ) : (
-          <div className="p-5 rounded-2xl bg-white border border-stone-100 space-y-3">
+          <div className="p-5 rounded-3xl bg-white space-y-3">
             <div className="text-center mb-2">
               <p className="text-[14px] font-bold text-stone-700 mb-1">{t("report.loginRequired")}</p>
               <p className="text-[12px] text-stone-400">{t("attendance.loginDesc")}</p>
@@ -4864,7 +4867,7 @@ function MyScreen({ user, onInstall, onBack, onLogin, onGoMagazine }: { user: an
               </button>
             )}
             <button onClick={() => onLogin ? onLogin("google", "my") : (localStorage.setItem("fonday_return_tab", "my"), window.location.href = "/auth/google")}
-              className="w-full h-11 rounded-xl font-bold text-[13px] gap-2 border border-stone-200 bg-white text-stone-700 flex items-center justify-center">
+              className="w-full h-11 rounded-xl font-bold text-[13px] gap-2 bg-white text-stone-700 flex items-center justify-center">
               <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" className="w-4 h-4" />
               {t("attendance.google")}
             </button>
@@ -4873,7 +4876,7 @@ function MyScreen({ user, onInstall, onBack, onLogin, onGoMagazine }: { user: an
 
         {/* 출석 달력 */}
         <button onClick={() => setShowCalendar(true)}
-          className="w-full flex items-center justify-between p-4 rounded-2xl bg-white border border-stone-100 active:opacity-70">
+          className="w-full flex items-center justify-between p-5 rounded-3xl bg-white active:opacity-70">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-xl flex items-center justify-center"
               style={{ background: `linear-gradient(135deg, ${SCAN_FROM}30, ${SCAN_TO}20)` }}>
@@ -4888,7 +4891,7 @@ function MyScreen({ user, onInstall, onBack, onLogin, onGoMagazine }: { user: an
         </button>
 
         {/* 언어 설정 */}
-        <div className="flex items-center justify-between p-4 rounded-2xl bg-white border border-stone-100">
+        <div className="flex items-center justify-between p-5 rounded-3xl bg-white">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-xl bg-stone-50 flex items-center justify-center">
               <span className="text-[16px]">🌐</span>
@@ -4911,7 +4914,7 @@ function MyScreen({ user, onInstall, onBack, onLogin, onGoMagazine }: { user: an
         {/* 화장품 루틴 목록 (로그인 시만) */}
         {user && (
           <button onClick={() => setShowMyCosmetics(true)}
-            className="w-full flex items-center gap-3 p-4 rounded-2xl bg-white border border-stone-100 active:opacity-70">
+            className="w-full flex items-center gap-3 p-5 rounded-3xl bg-white active:opacity-70">
             <div className="w-9 h-9 rounded-xl flex items-center justify-center"
               style={{ background: `${DEEP_GREEN}15` }}>
               <Droplets className="w-4.5 h-4.5" style={{ color: DEEP_GREEN }} />
@@ -4930,7 +4933,7 @@ function MyScreen({ user, onInstall, onBack, onLogin, onGoMagazine }: { user: an
 
         {/* 앱 설치 */}
         <button onClick={onInstall}
-          className="w-full flex items-center justify-between p-4 rounded-2xl bg-white border border-stone-100 active:opacity-70">
+          className="w-full flex items-center justify-between p-5 rounded-3xl bg-white active:opacity-70">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-xl bg-stone-50 flex items-center justify-center">
               <SmartphoneNfc className="w-5 h-5 text-stone-500" />
@@ -4942,7 +4945,7 @@ function MyScreen({ user, onInstall, onBack, onLogin, onGoMagazine }: { user: an
 
         {/* 매거진 */}
         <button onClick={onGoMagazine}
-          className="w-full flex items-center justify-between p-4 rounded-2xl bg-white border border-stone-100 active:opacity-70">
+          className="w-full flex items-center justify-between p-5 rounded-3xl bg-white active:opacity-70">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-xl bg-stone-50 flex items-center justify-center">
               <BookOpen className="w-5 h-5 text-stone-500" />
@@ -4954,7 +4957,7 @@ function MyScreen({ user, onInstall, onBack, onLogin, onGoMagazine }: { user: an
         {/* Fonday 디바이스 링크 */}
         <a href="https://fonday.replit.app/" target="_blank" rel="noopener noreferrer"
           className="flex items-center justify-between px-4 py-3.5 rounded-2xl active:opacity-70 transition-opacity"
-          style={{ background: "linear-gradient(135deg, #FFF1EC, #FFEDE6)", border: "1px solid #F3DDD6" }}>
+          style={{ background: TINT_WARM }}>
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-xl flex items-center justify-center"
               style={{ background: "linear-gradient(135deg, #E09882, #C97062)" }}>
@@ -5015,7 +5018,7 @@ function SkinPredictionCard({ prediction, currentScore, onOpenDiary }: {
   const rewardPts = Math.max(goodDelta, 5);
 
   return (
-    <Card className="border border-[#EADFD8] shadow-md rounded-3xl overflow-hidden bg-white/95">
+    <Card className="shadow-md rounded-3xl overflow-hidden bg-white/95">
       <CardContent className="p-4">
         <div className="flex items-start justify-between gap-3 mb-3">
           <div className="flex items-center gap-2 min-w-0">
@@ -5024,27 +5027,27 @@ function SkinPredictionCard({ prediction, currentScore, onOpenDiary }: {
               🔮
             </div>
             <div className="min-w-0">
-              <p className="text-[13px] font-black" style={{ color: DEEP_GREEN }}>{t("result.prediction.title")}</p>
+              <p className="text-sm font-bold" style={{ color: DEEP_GREEN }}>{t("result.prediction.title")}</p>
               <p className="text-[11px] text-stone-400">{t("result.prediction.currentScore", { score: currentScore })}</p>
             </div>
           </div>
           <div className="rounded-2xl px-3 py-2 text-right shrink-0"
             style={{ background: "#F5F3FF", border: "1px solid #E9D5FF" }}>
-            <p className="text-[10px] font-black text-violet-500">{t("result.prediction.rewardLabel")}</p>
+            <p className="text-[10px] font-bold text-violet-500">{t("result.prediction.rewardLabel")}</p>
             <p className="text-[20px] font-black leading-none text-violet-700">+{rewardPts}</p>
             <p className="text-[9px] text-violet-400 mt-1">{t("result.prediction.rewardSub")}</p>
           </div>
         </div>
 
         <div className="flex items-center justify-between gap-3 mb-3">
-          <p className="text-[12px] font-black text-kr-pretty" style={{ color: DEEP_GREEN }}>
+          <p className="text-xs font-semibold text-kr-pretty" style={{ color: DEEP_GREEN }}>
             {t("result.prediction.missionTitle")}
           </p>
           <div className="flex items-center gap-1.5 shrink-0">
-            <span className="rounded-full px-2.5 py-1 text-[9px] font-black text-violet-600 bg-violet-50 border border-violet-100">
+            <span className="rounded-full px-2.5 py-1 text-[9px] font-bold text-violet-600 bg-violet-50 border border-violet-100">
               {t("result.prediction.daysAfter", { days: good.days })}
             </span>
-            <span className="rounded-full px-2.5 py-1 text-[9px] font-black text-stone-500 bg-stone-50 border border-stone-200">
+            <span className="rounded-full px-2.5 py-1 text-[9px] font-bold text-stone-500 bg-stone-50">
               {t("result.prediction.disclaimer")}
             </span>
           </div>
@@ -5054,17 +5057,17 @@ function SkinPredictionCard({ prediction, currentScore, onOpenDiary }: {
           <div className="rounded-2xl p-4" style={{ background: "#F0FDF4", border: "1px solid #BBF7D0" }}>
             <div className="flex items-start justify-between gap-3 mb-3">
               <div className="min-w-0">
-                <p className="text-[10px] font-black text-emerald-600">{t("result.prediction.bestRoute")}</p>
-                <p className="text-[12px] font-black text-emerald-700 text-kr-pretty">{good.scenario}</p>
+                <p className="text-[10px] font-bold text-emerald-600">{t("result.prediction.bestRoute")}</p>
+                <p className="text-xs font-semibold text-emerald-700 text-kr-pretty">{good.scenario}</p>
                 <p className="text-[11px] text-stone-400 mt-0.5">{t("result.prediction.goodCaption")}</p>
               </div>
               <div className="text-right shrink-0">
                 <p className="text-[28px] font-black leading-none text-emerald-600">{good.score}</p>
-                <p className="text-[11px] font-black text-emerald-500 mt-0.5">+{goodDelta}</p>
+                <p className="text-xs font-semibold text-emerald-500 mt-0.5">+{goodDelta}</p>
               </div>
             </div>
-            <p className="text-[10px] font-black text-emerald-700 mb-2">{t("result.prediction.routine")}</p>
-            <div className="space-y-2">
+            <p className="text-[10px] font-bold text-emerald-700 mb-2">{t("result.prediction.routine")}</p>
+            <div className="space-y-3">
               {good.routine?.map((r, i) => (
                 <div key={i} className="flex items-center gap-2 rounded-xl bg-white/70 px-3 py-2">
                   <CheckCircle2 className="w-3.5 h-3.5 shrink-0 text-emerald-500" />
@@ -5076,16 +5079,16 @@ function SkinPredictionCard({ prediction, currentScore, onOpenDiary }: {
           <div className="rounded-2xl p-4" style={{ background: "#FFF7ED", border: "1px solid #FED7AA" }}>
             <div className="flex items-start justify-between gap-3 mb-3">
               <div className="min-w-0">
-                <p className="text-[10px] font-black text-orange-500">{t("result.prediction.riskRoute")}</p>
-                <p className="text-[12px] font-black text-orange-700 text-kr-pretty">{bad.scenario}</p>
+                <p className="text-[10px] font-bold text-orange-500">{t("result.prediction.riskRoute")}</p>
+                <p className="text-xs font-semibold text-orange-700 text-kr-pretty">{bad.scenario}</p>
                 <p className="text-[11px] text-stone-400 mt-0.5">{t("result.prediction.badCaption")}</p>
               </div>
               <div className="text-right shrink-0">
                 <p className="text-[28px] font-black leading-none text-orange-500">{bad.score}</p>
-                <p className="text-[11px] font-black text-orange-400 mt-0.5">-{Math.abs(badDelta)}</p>
+                <p className="text-xs font-semibold text-orange-400 mt-0.5">-{Math.abs(badDelta)}</p>
               </div>
             </div>
-            <p className="text-[10px] font-black text-orange-700 mb-2">{t("result.prediction.risks")}</p>
+            <p className="text-[10px] font-bold text-orange-700 mb-2">{t("result.prediction.risks")}</p>
             <div className="flex flex-wrap gap-1.5">
               {bad.risks?.map((r, i) => (
                 <span key={i} className="rounded-full bg-white/80 px-2.5 py-1 text-[10px] font-bold text-stone-600 text-kr-pretty">
@@ -5100,13 +5103,13 @@ function SkinPredictionCard({ prediction, currentScore, onOpenDiary }: {
           style={{ background: "#FAF5FF", border: "1px solid #E9D5FF" }}>
           <p className="text-[11px] text-stone-500 leading-snug text-kr-pretty">{t("result.prediction.diaryHint")}</p>
           <div className="flex items-center gap-2 shrink-0">
-            <span className="rounded-full bg-violet-100 px-2.5 py-1 text-[10px] font-black text-violet-600">
+            <span className="rounded-full bg-violet-100 px-2.5 py-1 text-[10px] font-bold text-violet-600">
               {t("result.prediction.questHint")}
             </span>
             {onOpenDiary && (
               <Button
                 onClick={onOpenDiary}
-                className="rounded-full h-8 px-3 text-[11px] font-black shadow-none"
+                className="rounded-full h-8 px-3 text-xs font-semibold shadow-none"
                 style={{ background: `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})` }}
               >
                 {t("result.prediction.diaryButton")}
@@ -5321,11 +5324,11 @@ function CosmeticsRegisterModal({ onClose, onSuccess }: { onClose: () => void; o
 
               <div className="flex gap-2">
                 <button onClick={() => cameraInputRef.current?.click()}
-                  className="flex-1 py-3.5 rounded-2xl text-[13px] font-bold border border-stone-200 bg-stone-50 text-stone-700 flex items-center justify-center gap-1.5 active:opacity-70">
+                  className="flex-1 py-3.5 rounded-2xl text-[13px] font-bold bg-stone-50 text-stone-700 flex items-center justify-center gap-1.5 active:opacity-70">
                   📷 {t("cosmetics.scanPhoto")}
                 </button>
                 <button onClick={() => galleryInputRef.current?.click()}
-                  className="flex-1 py-3.5 rounded-2xl text-[13px] font-bold border border-stone-200 bg-stone-50 text-stone-700 flex items-center justify-center gap-1.5 active:opacity-70">
+                  className="flex-1 py-3.5 rounded-2xl text-[13px] font-bold bg-stone-50 text-stone-700 flex items-center justify-center gap-1.5 active:opacity-70">
                   🖼 {t("cosmetics.orGallery")}
                 </button>
               </div>
@@ -5347,16 +5350,16 @@ function CosmeticsRegisterModal({ onClose, onSuccess }: { onClose: () => void; o
                 {capturedImage && (
                   <img src={capturedImage} className="w-20 h-20 rounded-2xl object-cover bg-stone-100 shrink-0" />
                 )}
-                <div className="flex-1 min-w-0 space-y-2">
+                <div className="flex-1 min-w-0 space-y-3">
                   <div>
                     <label className="text-[10px] font-bold text-stone-400 uppercase tracking-wider mb-1 block">제품명</label>
                     <input value={name} onChange={e => setName(e.target.value)}
-                      className="w-full px-3 py-2.5 rounded-xl border border-stone-200 text-[13px] font-medium text-stone-800 outline-none focus:border-[#2D5F4F] bg-stone-50" />
+                      className="w-full px-3 py-2.5 rounded-xl text-[13px] font-medium text-stone-800 outline-none focus:border-[#2D5F4F] bg-stone-50" />
                   </div>
                   <div>
                     <label className="text-[10px] font-bold text-stone-400 uppercase tracking-wider mb-1 block">브랜드</label>
                     <input value={brand} onChange={e => setBrand(e.target.value)}
-                      className="w-full px-3 py-2.5 rounded-xl border border-stone-200 text-[13px] font-medium text-stone-800 outline-none focus:border-[#2D5F4F] bg-stone-50" />
+                      className="w-full px-3 py-2.5 rounded-xl text-[13px] font-medium text-stone-800 outline-none focus:border-[#2D5F4F] bg-stone-50" />
                   </div>
                 </div>
               </div>
@@ -5381,7 +5384,7 @@ function CosmeticsRegisterModal({ onClose, onSuccess }: { onClose: () => void; o
               <div>
                 <label className="text-[11px] font-bold text-stone-400 uppercase tracking-wider mb-2 block">{t("cosmetics.openedLabel")}</label>
                 <input type="date" value={openedAt} onChange={e => setOpenedAt(e.target.value)}
-                  className="w-full px-4 py-3.5 rounded-2xl border border-stone-200 text-[14px] font-medium text-stone-800 outline-none focus:border-[#2D5F4F] bg-stone-50" />
+                  className="w-full px-4 py-3.5 rounded-2xl text-[14px] font-medium text-stone-800 outline-none focus:border-[#2D5F4F] bg-stone-50" />
               </div>
 
               <div>
@@ -5391,13 +5394,13 @@ function CosmeticsRegisterModal({ onClose, onSuccess }: { onClose: () => void; o
                   onChange={e => setIngredients(e.target.value)}
                   rows={3}
                   placeholder={t("cosmetics.ingredientsPlaceholder")}
-                  className="w-full px-4 py-3 rounded-2xl border border-stone-200 text-[13px] font-medium text-stone-800 outline-none focus:border-[#2D5F4F] bg-stone-50 resize-none"
+                  className="w-full px-4 py-3 rounded-2xl text-[13px] font-medium text-stone-800 outline-none focus:border-[#2D5F4F] bg-stone-50 resize-none"
                 />
               </div>
 
               <div className="flex gap-2">
                 <button onClick={() => setStep(1)}
-                  className="flex-1 py-4 rounded-2xl font-bold text-[13px] border border-stone-200 text-stone-600 bg-stone-50">
+                  className="flex-1 py-4 rounded-2xl font-bold text-[13px] text-stone-600 bg-stone-50">
                   {t("cosmetics.retake")}
                 </button>
                 <button onClick={handleRegister} disabled={!category || registering}
@@ -5427,13 +5430,13 @@ function CosmeticsRegisterModal({ onClose, onSuccess }: { onClose: () => void; o
               <p className="text-[13px] text-stone-500 text-center leading-relaxed whitespace-pre-line mb-5">
                 {t("cosmetics.notSkincareDesc", { type: nonSkincareType })}
               </p>
-              <div className="space-y-2.5">
+              <div className="space-y-3.5">
                 <button onClick={() => { setShowNonSkincareAlert(false); setStep(2); }}
-                  className="w-full py-3.5 rounded-2xl text-[13px] font-bold border border-stone-200 text-stone-600 bg-stone-50">
+                  className="w-full py-3.5 rounded-2xl text-[13px] font-bold text-stone-600 bg-stone-50">
                   {t("cosmetics.notSkincareKeep")}
                 </button>
                 <button onClick={() => { setShowNonSkincareAlert(false); onClose(); }}
-                  className="w-full py-3.5 rounded-2xl text-[13px] font-black text-white"
+                  className="w-full py-3.5 rounded-2xl text-sm font-bold text-white"
                   style={{ background: `linear-gradient(135deg, ${DEEP_GREEN}, ${DEEP_GREEN_LIGHT})` }}>
                   {t("cosmetics.notSkincareSkip")}
                 </button>
@@ -6337,7 +6340,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
           initial={{ opacity: 0, y: 60, scale: 0.9 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: 60, scale: 0.9 }}
-          className="fixed bottom-24 left-1/2 z-[999] -translate-x-1/2 px-6 py-4 rounded-2xl shadow-xl bg-white border border-stone-100 flex flex-col items-center gap-1 min-w-[200px]"
+          className="fixed bottom-24 left-1/2 z-[999] -translate-x-1/2 px-6 py-4 rounded-2xl shadow-xl bg-white flex flex-col items-center gap-1 min-w-[200px]"
           style={{ boxShadow: "0 8px 32px rgba(0,0,0,0.18)" }}
         >
           <Target className="w-6 h-6" />
@@ -6443,11 +6446,11 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
 
         {/* 압축형 결과 헤더 */}
         <Card className="overflow-hidden border-none shadow-2xl rounded-3xl"
-          style={{ background: "linear-gradient(180deg, #FFFCFA 0%, #FFFFFF 100%)" }}>
+          style={{ background: "#FFFFFF" }}>
           <CardContent className="p-3.5">
             <div className="grid grid-cols-[92px_1fr] gap-2.5 items-start sm:grid-cols-[104px_1fr] sm:gap-3">
               <div>
-                <div className="relative rounded-[22px] overflow-hidden h-[120px] bg-stone-100 sm:rounded-[24px] sm:h-[132px]">
+                <div className="relative rounded-3xl overflow-hidden h-[120px] bg-stone-100 sm:rounded-3xl sm:h-[132px]">
                   <img src={faceCroppedSrc || imageSrc} className="w-full h-full object-cover" style={{ objectPosition: "center 50%" }} />
                   <div className="absolute top-3 left-3 w-7 h-7 border-t-2 border-l-2 rounded-tl-lg" style={{ borderColor: SCAN_TO }} />
                   <div className="absolute top-3 right-3 w-7 h-7 border-t-2 border-r-2 rounded-tr-lg" style={{ borderColor: SCAN_TO }} />
@@ -6462,13 +6465,13 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
               </div>
 
               <div className="flex flex-col">
-                <div className="rounded-[20px] px-2.5 py-2.5 mb-2.5 sm:rounded-[22px] sm:px-3"
+                <div className="rounded-3xl px-2.5 py-2.5 mb-2.5 sm:rounded-3xl sm:px-3"
                   style={{ background: `${SCAN_FROM}10`, border: `1px solid ${SCAN_FROM}24` }}>
                   <div className="flex items-center justify-between gap-2">
-                    <p className="text-[10px] font-black uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>{t("result.scores")}</p>
+                    <p className="text-[10px] font-bold uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>{t("result.scores")}</p>
                     <button
                       onClick={() => setShowAnalysis(true)}
-                      className="rounded-full px-2.5 py-1 text-[9px] font-black whitespace-nowrap"
+                      className="rounded-full px-2.5 py-1 text-[9px] font-bold whitespace-nowrap"
                       style={{ background: "#FFF1EC", color: SCAN_TO }}
                     >
                       {t("modal.analysis.title")} {t("result.viewBtn")}
@@ -6492,28 +6495,28 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
               </div>
             </div>
             <div className="grid grid-cols-3 gap-2 mt-3">
-              <div className="rounded-[18px] px-2 py-4 flex flex-col items-center justify-center text-center" style={{ background: "#FFF4EE", border: "1px solid #F3DED6" }}>
-                <p className="text-[9px] font-black uppercase tracking-[0.12em] text-stone-400">{t("result.overall")}</p>
+              <div className="rounded-2xl px-2 py-4 flex flex-col items-center justify-center text-center" style={{ background: "#FFF4EE", border: "1px solid #F3DED6" }}>
+                <p className="text-[9px] font-bold uppercase tracking-[0.12em] text-stone-400">{t("result.overall")}</p>
                 <p className="text-[40px] font-black leading-none mt-1.5" style={{ color: SCAN_TO }}>{overallScore}</p>
               </div>
-              <div className="rounded-[18px] px-2 py-4 flex flex-col items-center justify-center text-center" style={{ background: "#F7F3FF", border: "1px solid #E9DDFF" }}>
-                <p className="text-[9px] font-black uppercase tracking-[0.12em] text-stone-400">{t("result.skinAge")}</p>
+              <div className="rounded-2xl px-2 py-4 flex flex-col items-center justify-center text-center" style={{ background: "#F7F3FF", border: "1px solid #E9DDFF" }}>
+                <p className="text-[9px] font-bold uppercase tracking-[0.12em] text-stone-400">{t("result.skinAge")}</p>
                 <p className="text-[40px] font-black leading-none mt-1.5" style={{ color: "#7C3AED" }}>
                   {analysisResult?.skinAge && analysisResult.skinAge > 0 ? analysisResult.skinAge : "—"}
                 </p>
               </div>
-              <div className="rounded-[18px] px-2 py-4 flex flex-col items-center justify-center text-center" style={{ background: "#FFF8EE", border: "1px solid #F4E2C4" }}>
-                <p className="text-[9px] font-black uppercase tracking-[0.12em] text-stone-400">{t("ranking.topLabel")}</p>
+              <div className="rounded-2xl px-2 py-4 flex flex-col items-center justify-center text-center" style={{ background: "#FFF8EE", border: "1px solid #F4E2C4" }}>
+                <p className="text-[9px] font-bold uppercase tracking-[0.12em] text-stone-400">{t("ranking.topLabel")}</p>
                 <p className="text-[34px] font-black leading-none mt-1.5" style={{ color: "#D97706" }}>
                   {rankingData && rankingData.myPercentile !== undefined ? t("ranking.myPercentile", { percent: rankingData.myPercentile }) : "—"}
                 </p>
               </div>
             </div>
-            <div className="mt-3 rounded-[22px] p-3"
-              style={{ background: "linear-gradient(180deg, #FFF7F2 0%, #FFFCFA 100%)", border: "1px solid #F2E3DB" }}>
+            <div className="mt-3 rounded-3xl p-3"
+              style={{ background: TINT_WARM }}>
                 <div className="flex items-center justify-between gap-3">
                   <div className="min-w-0">
-                    <p className="text-[10px] font-black uppercase tracking-[0.16em]" style={{ color: SCAN_TO }}>{t("result.baumannLabel")}</p>
+                    <p className="text-[10px] font-bold uppercase tracking-[0.16em]" style={{ color: SCAN_TO }}>{t("result.baumannLabel")}</p>
                     <div className="flex items-center gap-2 mt-1">
                       <p className="text-[18px] font-black leading-none" style={{ color: DEEP_GREEN }}>{finalType}</p>
                       <button onClick={() => setShowBaumannInfo(v => !v)}
@@ -6524,7 +6527,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
                     </div>
                     <p className="text-[11px] font-medium mt-1 text-stone-500 text-kr-pretty">{t("result.mbtiSub")}</p>
                   </div>
-                  <div className="rounded-full px-3 py-1 text-[10px] font-black shrink-0 flex items-center gap-0.5"
+                  <div className="rounded-full px-3 py-1 text-[10px] font-bold shrink-0 flex items-center gap-0.5"
                     style={{ background: `${DEEP_GREEN}10`, color: DEEP_GREEN }}>
                     <Flame className="w-3 h-3" style={{ color: SCAN_TO }} />{t("streak.badge", { count: currentStreak.count || 1 })}
                   </div>
@@ -6551,7 +6554,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
                       return (
                         <div key={letter} className="rounded-2xl p-2.5"
                           style={{ background: `${color}10`, border: `1px solid ${color}20` }}>
-                          <p className="text-[12px] font-black" style={{ color }}>{letter} — {t(`baumann.${letter}.name`)}</p>
+                          <p className="text-xs font-semibold" style={{ color }}>{letter} — {t(`baumann.${letter}.name`)}</p>
                           <p className="text-[10px] text-stone-500 mt-0.5 leading-relaxed">{t(`baumann.${letter}.desc`)}</p>
                         </div>
                       );
@@ -6565,11 +6568,11 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
                   className="mt-3 block w-full rounded-2xl px-3 py-2.5 text-left"
                   style={{ background: "#FFFFFF", border: "1px solid #F0E2DA" }}
                 >
-                  <p className="text-[10px] font-black uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>{t("result.aiComment")}</p>
+                  <p className="text-[10px] font-bold uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>{t("result.aiComment")}</p>
                   <p className="text-[11px] text-stone-600 mt-1 leading-relaxed text-kr-pretty line-clamp-2">
                     {analysisResult.aiComment}
                   </p>
-                  <p className="text-[10px] font-black mt-2" style={{ color: SCAN_TO }}>{t("modal.analysis.title")} {t("result.viewBtn")}</p>
+                  <p className="text-[10px] font-bold mt-2" style={{ color: SCAN_TO }}>{t("modal.analysis.title")} {t("result.viewBtn")}</p>
                 </button>
               )}
             </div>
@@ -6580,23 +6583,23 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
         {(analysisResult?.improvements ?? []).length > 0 && (() => {
           const top = (analysisResult.improvements as { title: string; desc: string }[])[0];
           return (
-            <motion.div variants={fadeChild} className="rounded-[20px] p-4"
-              style={{ background: "linear-gradient(135deg, #FFF5F0, #FFF9F7)", border: "1px solid #F3DDD6" }}>
+            <motion.div variants={fadeChild} className="rounded-3xl p-4"
+              style={{ background: TINT_WARM }}>
               <div className="flex items-center gap-2 mb-2">
                 <div className="w-7 h-7 rounded-xl flex items-center justify-center text-sm shrink-0"
                   style={{ background: `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})` }}><Target className="w-5 h-5 text-white" /></div>
-                <p className="text-[10px] font-black uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>
+                <p className="text-[10px] font-bold uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>
                   {t("result.todayAction")}
                 </p>
               </div>
-              <p className="text-[14px] font-black text-stone-800 leading-tight mb-1">{top.title}</p>
+              <p className="text-sm font-bold text-stone-800 leading-tight mb-1">{top.title}</p>
               <p className="text-[11px] text-stone-500 leading-relaxed">{top.desc}</p>
             </motion.div>
           );
         })()}
 
         {/* ── 3탭 네비게이션 ── */}
-        <div ref={tabNavRef} className="rounded-[28px] p-2.5 border border-[#F0E6E0] sticky top-0 z-20 backdrop-blur-md"
+        <div ref={tabNavRef} className="rounded-3xl p-2.5 sticky top-0 z-20 backdrop-blur-md"
           style={{ background: "linear-gradient(180deg, rgba(255,249,246,0.97) 0%, rgba(255,255,255,0.97) 100%)" }}>
           <div className="flex gap-2">
             {([
@@ -6607,7 +6610,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
               const isActive = activeTab === id;
               return (
                 <button key={id} onClick={() => goTo(id)}
-                  className="flex-1 flex flex-col items-center gap-1 py-3 rounded-[20px] text-[12px] font-black transition-all"
+                  className="flex-1 flex flex-col items-center gap-1 py-3 rounded-3xl text-xs font-semibold transition-all"
                   style={isActive
                     ? { background: `linear-gradient(135deg, ${from}, ${to})`, color: "white", boxShadow: `0 4px 14px ${to}55` }
                     : { background: inactiveBg, color: inactiveText, border: `1.5px solid ${to}40` }}>
@@ -6646,11 +6649,11 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
           >
             <span className="text-xl shrink-0 mt-0.5">✨</span>
             <div className="flex-1 min-w-0">
-              <p className="text-[13px] font-black text-stone-800 mb-0.5">{t("result.onboarding.title")}</p>
+              <p className="text-sm font-bold text-stone-800 mb-0.5">{t("result.onboarding.title")}</p>
               <p className="text-[11px] text-stone-500 leading-relaxed text-kr-pretty">{t("result.onboarding.sub")}</p>
               <button
                 onClick={() => { localStorage.setItem("fonday_onboarding_done", "1"); setShowOnboarding(false); }}
-                className="mt-2 text-[11px] font-black rounded-full px-3 py-1 text-white"
+                className="mt-2 text-xs font-semibold rounded-full px-3 py-1 text-white"
                 style={{ background: "linear-gradient(135deg, #f87171, #C97062)" }}
               >
                 {t("result.onboarding.dismiss")}
@@ -6660,10 +6663,10 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
         )}
 
         {/* 퀘스트 / 미션 카드 */}
-        <Card className="border border-[#EADFD8] rounded-3xl overflow-hidden shadow-[0_12px_30px_rgba(201,112,98,0.12)] bg-white">
+        <Card className="rounded-3xl overflow-hidden shadow-[0_12px_30px_rgba(201,112,98,0.12)] bg-white">
           <CardContent className="p-3.5">
             <div className="min-w-0">
-              <p className="text-[11px] font-black tracking-[0.16em] uppercase" style={{ color: SCAN_TO }}>{t("result.actionCard.missionEyebrow")}</p>
+              <p className="text-xs font-semibold tracking-[0.16em] uppercase" style={{ color: SCAN_TO }}>{t("result.actionCard.missionEyebrow")}</p>
               <p className="text-[16px] font-black mt-1 text-kr-pretty" style={{ color: DEEP_GREEN }}>{t("result.actionCard.title")}</p>
               <p className="text-[11px] text-stone-500 mt-1.5 leading-relaxed text-kr-pretty">{questStatusDetail}</p>
             </div>
@@ -6684,7 +6687,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
               </p>
               <button
                 onClick={() => setShowQuestSheet(true)}
-                className="rounded-full px-3 py-1.5 text-[10px] font-black shrink-0 text-white"
+                className="rounded-full px-3 py-1.5 text-[10px] font-bold shrink-0 text-white"
                 style={{ background: `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})` }}
               >
                 {t("result.actionCard.questTitle", { done: essentialQuests.filter((quest) => quest.done).length, total: essentialQuests.length })}
@@ -6694,11 +6697,11 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
         </Card>
 
         {/* 루틴 체크 카드 */}
-        <Card className="border border-[#E6ECE8] shadow-md rounded-3xl overflow-hidden bg-white">
+        <Card className="shadow-md rounded-3xl overflow-hidden bg-white">
           <CardContent className="p-4">
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
-                <p className="text-[11px] font-black uppercase tracking-[0.16em]" style={{ color: DEEP_GREEN }}>{t("diary.routineTitle")}</p>
+                <p className="text-xs font-semibold uppercase tracking-[0.16em]" style={{ color: DEEP_GREEN }}>{t("diary.routineTitle")}</p>
                 <div className="mt-1 space-y-0.5">
                   <p className="text-[13px] font-bold leading-snug flex items-center gap-1" style={{ color: DEEP_GREEN }}>
                     <Sun className="w-3.5 h-3.5 shrink-0" />{t("cosmetics.amBtn")}: {morningRoutineItems.join(" + ")}
@@ -6711,7 +6714,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
               </div>
               <Button
                 onClick={handleDiaryEntry}
-                className="rounded-full h-8 px-3 text-[11px] font-black shadow-none shrink-0"
+                className="rounded-full h-8 px-3 text-xs font-semibold shadow-none shrink-0"
                 style={{ background: `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})` }}
               >
                 {t("result.actionCard.diaryButton")}
@@ -6738,7 +6741,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
               <button
                 onClick={() => setRoutinePeriodCompletion("PM", eveningRoutineItems)}
                 className="w-full flex items-center justify-between gap-3 rounded-2xl px-3.5 py-3 text-left"
-                style={{ background: "#FFF8F4", border: "1px solid #F1DED7" }}
+                style={{ background: "#FFF8F4" }}
               >
                 <div className="flex items-center gap-2 min-w-0">
                   <Moon className="w-4 h-4 shrink-0" style={{ color: SCAN_TO }} />
@@ -6753,15 +6756,15 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
             </div>
 
             {(routineGuide.goodMixes.length > 0 || routineGuide.cautions.length > 0 || cosmeticsInsights.length > 0) && (
-              <div className="mt-4 rounded-[24px] p-4" style={{ background: "#FFFCFA", border: "1px solid #F2E7E2" }}>
+              <div className="mt-4 rounded-3xl p-4" style={{ background: "#FFFCFA", border: "1px solid #F2E7E2" }}>
                 <div className="flex items-center justify-between gap-3 mb-3">
                   <div>
-                    <p className="text-[11px] font-black uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>{t("cosmetics.insightTitle")}</p>
+                    <p className="text-xs font-semibold uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>{t("cosmetics.insightTitle")}</p>
                     <p className="text-[11px] text-stone-400">{t("cosmetics.ctaCount", { count: cosmeticCount })}</p>
                   </div>
                   <button
                     onClick={() => user ? setShowCosmeticsRegister(true) : setShowCosmeticsGate(true)}
-                    className="rounded-full px-3 py-1.5 text-[10px] font-black text-white whitespace-nowrap"
+                    className="rounded-full px-3 py-1.5 text-[10px] font-bold text-white whitespace-nowrap"
                     style={{ background: `linear-gradient(135deg, ${DEEP_GREEN}, ${DEEP_GREEN_LIGHT})` }}
                   >
                     + {t("cosmetics.scanBtn")}
@@ -6769,8 +6772,8 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
                 </div>
                 {myCosmetics.length > 0 && (
                   <div className="grid gap-3 md:grid-cols-2">
-                    <div className="rounded-[20px] p-3" style={{ background: "#F8FFFB", border: "1px solid #D8EFE4" }}>
-                      <p className="text-[11px] font-black" style={{ color: DEEP_GREEN }}>{t("cosmetics.goodComboTitle")}</p>
+                    <div className="rounded-3xl p-3" style={{ background: "#F8FFFB", border: "1px solid #D8EFE4" }}>
+                      <p className="text-xs font-semibold" style={{ color: DEEP_GREEN }}>{t("cosmetics.goodComboTitle")}</p>
                       <div className="mt-2 flex flex-wrap gap-1.5">
                         {routineGuide.goodMixes.length > 0 ? routineGuide.goodMixes.slice(0, 3).map((item, index) => (
                           <span key={`good-mix-${index}`} className="px-2.5 py-1 rounded-full text-[10px] font-bold"
@@ -6782,12 +6785,12 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
                         )}
                       </div>
                     </div>
-                    <div className="rounded-[20px] p-3" style={{ background: "#FFF8F2", border: "1px solid #F5DDCF" }}>
-                      <p className="text-[11px] font-black" style={{ color: "#C2410C" }}>{t("cosmetics.cautionTitle")}</p>
+                    <div className="rounded-3xl p-3" style={{ background: "#FFF8F2", border: "1px solid #F5DDCF" }}>
+                      <p className="text-xs font-semibold" style={{ color: "#C2410C" }}>{t("cosmetics.cautionTitle")}</p>
                       <div className="mt-2 space-y-1.5">
                         {routineGuide.cautions.length > 0 ? routineGuide.cautions.slice(0, 2).map((item, index) => (
                           <div key={`caution-note-${index}`} className="flex items-start gap-2">
-                            <span className="text-[11px] font-black mt-0.5" style={{ color: "#EA580C" }}>!</span>
+                            <span className="text-xs font-semibold mt-0.5" style={{ color: "#EA580C" }}>!</span>
                             <p className="text-[11px] text-stone-600 leading-relaxed text-kr-pretty">{item}</p>
                           </div>
                         )) : (
@@ -6815,12 +6818,12 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
                         <LineChartIcon className="w-5 h-5 text-white" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-[13px] font-black" style={{ color: DEEP_GREEN }}>{t("result.diary.title")}</p>
+                        <p className="text-sm font-bold" style={{ color: DEEP_GREEN }}>{t("result.diary.title")}</p>
                         <p className="text-[11px] text-stone-400">
                           {t("result.diary.scanCount", { n: history.filter((h: any) => new Date(h.createdAt).toISOString().slice(0, 10) !== todayStr()).length + 1 })}
                         </p>
                       </div>
-                      {user.avatar && <img src={user.avatar} className="w-7 h-7 rounded-full border border-stone-100 shrink-0" />}
+                      {user.avatar && <img src={user.avatar} className="w-7 h-7 rounded-full shrink-0" />}
                     </div>
                     {/* 점수 변화 강조 — 서버 history 기반 delta */}
                     {(() => {
@@ -6848,17 +6851,17 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
                     <div className="flex gap-2 mt-2">
                       <div className="flex-1 rounded-2xl py-2 px-2 text-center" style={{ background: "#FFF5F0" }}>
                         <p className="text-[9px] font-bold text-stone-400 mb-0.5">{t("result.diary.streak")}</p>
-                        <p className="text-[14px] font-black flex items-center justify-center gap-0.5" style={{ color: SCAN_TO }}>{currentStreak.count || 1}<Flame className="w-3.5 h-3.5 inline ml-0.5" style={{ color: SCAN_TO }} /></p>
+                        <p className="text-sm font-bold flex items-center justify-center gap-0.5" style={{ color: SCAN_TO }}>{currentStreak.count || 1}<Flame className="w-3.5 h-3.5 inline ml-0.5" style={{ color: SCAN_TO }} /></p>
                       </div>
                       <div className="flex-1 rounded-2xl py-2 px-2 text-center" style={{ background: "#F0FDF4" }}>
                         <p className="text-[9px] font-bold text-stone-400 mb-0.5">{t("result.totalScans")}</p>
-                        <p className="text-[14px] font-black" style={{ color: "#059669" }}>{history.length + 1}</p>
+                        <p className="text-sm font-bold" style={{ color: "#059669" }}>{history.length + 1}</p>
                       </div>
                       <button onClick={(e) => { e.stopPropagation(); onOpenDiary?.(); }}
                         className="flex-1 rounded-2xl py-2 px-2 flex flex-col items-center justify-center gap-0.5 text-white active:scale-95 transition-all"
                         style={{ background: `linear-gradient(135deg, ${DEEP_GREEN}, #2D5F4F)` }}>
                         <BookOpen className="w-3.5 h-3.5" />
-                        <p className="text-[9px] font-black">{t("result.diaryView")}</p>
+                        <p className="text-[9px] font-bold">{t("result.diaryView")}</p>
                       </button>
                     </div>
                     {/* 이전 측정 기록 미니 히스토리 */}
@@ -6873,7 +6876,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
                             return (
                               <div key={i} className="flex flex-col items-center shrink-0 px-2.5 py-1.5 rounded-xl"
                                 style={{ background: "#F5F2EE", minWidth: 36 }}>
-                                <p className="text-[11px] font-black" style={{ color: SCAN_TO }}>{sc}</p>
+                                <p className="text-xs font-semibold" style={{ color: SCAN_TO }}>{sc}</p>
                                 <p className="text-[8px] text-stone-400 mt-0.5">{label}</p>
                               </div>
                             );
@@ -6891,10 +6894,10 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
                   <CardTitle className="text-lg font-bold" style={{ color: DEEP_GREEN }}>{t("result.login.title")}</CardTitle>
                   <CardDescription className="text-xs">{t("result.login.desc")}</CardDescription>
                 </CardHeader>
-                <CardContent className="p-0 space-y-2">
+                <CardContent className="p-0 space-y-3">
                   {socialLoginButton}
                   <Button onClick={handleGoogleLogin}
-                    className="w-full h-12 rounded-xl bg-white hover:bg-stone-50 font-bold text-zinc-700 gap-2 border border-stone-200 shadow-sm">
+                    className="w-full h-12 rounded-xl bg-white hover:bg-stone-50 font-bold text-zinc-700 gap-2 shadow-sm">
                     <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" className="w-4 h-4" />
                     {t("result.login.google")}
                   </Button>
@@ -6903,7 +6906,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
             {/* 다음 탭 유도 */}
             <button
               onClick={() => goTo("solution")}
-              className="w-full flex items-center justify-center gap-2 py-3.5 rounded-2xl text-[13px] font-black text-white transition-all active:scale-95"
+              className="w-full flex items-center justify-center gap-2 py-3.5 rounded-2xl text-sm font-bold text-white transition-all active:scale-95"
               style={{ background: `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})` }}>
               <Leaf className="w-4 h-4" />
               <span>{t("result.tab.solution")} →</span>
@@ -6929,7 +6932,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
                 <ScanLine className="w-5 h-5" />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-[13px] font-black leading-tight text-kr-pretty" style={{ color: DEEP_GREEN }}>{t("cosmetics.ctaTitle")}</p>
+                <p className="text-sm font-bold leading-tight text-kr-pretty" style={{ color: DEEP_GREEN }}>{t("cosmetics.ctaTitle")}</p>
                 <p className="text-[11px] text-stone-400 leading-tight text-kr-pretty">{t("cosmetics.ctaBannerSub")}</p>
               </div>
               {user && cosmeticCount > 0 && (
@@ -6939,7 +6942,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
                 </span>
               )}
               <button onClick={() => user ? setShowCosmeticsRegister(true) : setShowCosmeticsGate(true)}
-                className="shrink-0 px-4 py-2 rounded-xl text-white text-[12px] font-black"
+                className="shrink-0 px-4 py-2 rounded-xl text-white text-xs font-semibold"
                 style={{ background: `linear-gradient(135deg, ${DEEP_GREEN}, ${DEEP_GREEN_LIGHT})` }}>
                 + {t("cosmetics.scanBtn")}
               </button>
@@ -6952,7 +6955,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
                 <Leaf className="w-4 h-4 text-white" />
               </div>
               <div>
-                <p className="text-[13px] font-black" style={{ color: DEEP_GREEN }}>{t("modal.improvements.title")}</p>
+                <p className="text-sm font-bold" style={{ color: DEEP_GREEN }}>{t("modal.improvements.title")}</p>
                 <p className="text-[11px] text-stone-400">{t("modal.improvements.sub")}</p>
               </div>
             </div>
@@ -6961,7 +6964,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
                 transition={{ delay: i * 0.08 }} className="flex gap-3 p-4 rounded-2xl border"
                 style={{ background: i === 0 ? "#FDF1EE" : i === 1 ? "#F0F7F5" : "#F5F0FF", borderColor: i === 0 ? "#F5D5CC" : i === 1 ? "#C5DFD8" : "#DDD5F5" }}>
                 <div className="shrink-0">
-                  <div className="w-8 h-8 rounded-full flex items-center justify-center text-white text-[11px] font-black"
+                  <div className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-semibold"
                     style={{ background: i === 0 ? `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})` : i === 1 ? `linear-gradient(135deg, ${DEEP_GREEN_LIGHT}, ${DEEP_GREEN})` : "linear-gradient(135deg, #A78BFA, #7C3AED)" }}>
                     {i + 1}
                   </div>
@@ -6981,7 +6984,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
               <>
                 <div className="flex items-center gap-2 pt-2 pb-1">
                   <Sparkles className="w-4 h-4" style={{ color: SCAN_TO }} />
-                  <p className="text-[13px] font-black" style={{ color: DEEP_GREEN }}>{t("modal.improvements.cosmetics")}</p>
+                  <p className="text-sm font-bold" style={{ color: DEEP_GREEN }}>{t("modal.improvements.cosmetics")}</p>
                 </div>
                 {(analysisResult.cosmetics as { type: string; key: string; reason: string }[]).map((item, i) => (
                   <motion.div key={`c-${i}`} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
@@ -6993,7 +6996,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
                     </div>
                     <div>
                       <div className="flex items-center gap-1.5 mb-0.5">
-                        <span className="text-[13px] font-black text-stone-800">{item.type}</span>
+                        <span className="text-sm font-bold text-stone-800">{item.type}</span>
                         <span className="text-[10px] px-1.5 py-0.5 rounded-full font-bold text-white" style={{ background: "#D97706" }}>{item.key}</span>
                       </div>
                       <p className="text-[12px] text-stone-500 leading-relaxed">{item.reason}</p>
@@ -7014,7 +7017,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
             )}
 
             {/* ── AI 밀착케어 ── */}
-            <div className="rounded-[20px] p-4" style={{ background: "#FFFBF7", border: "1px solid #F3E4D8" }}>
+            <div className="rounded-3xl p-4" style={{ background: "#FFFBF7", border: "1px solid #F3E4D8" }}>
               <div className="flex items-center justify-between gap-3">
                 <div className="flex items-center gap-2.5">
                   <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
@@ -7022,12 +7025,12 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
                     <Bot className="w-5 h-5" style={{ color: "#D97706" }} />
                   </div>
                   <div>
-                    <p className="text-[13px] font-black" style={{ color: SCAN_TO }}>{aiCareLabels.title}</p>
+                    <p className="text-sm font-bold" style={{ color: SCAN_TO }}>{aiCareLabels.title}</p>
                     <p className="text-[10px] text-stone-400 mt-0.5">{aiCareLabels.schedule}</p>
                   </div>
                 </div>
                 <button onClick={() => handlePushToggle()} disabled={pushLoading}
-                  className="shrink-0 rounded-full px-3 py-1.5 text-[11px] font-black"
+                  className="shrink-0 rounded-full px-3 py-1.5 text-xs font-semibold"
                   style={pushSubscribed
                     ? { background: `${DEEP_GREEN}18`, color: DEEP_GREEN, border: `1px solid ${DEEP_GREEN}33` }
                     : { background: "linear-gradient(135deg, #F59E0B, #D97706)", color: "white" }}>
@@ -7047,7 +7050,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
                   ] as const).map(([key, label]) => (
                     <button key={key}
                       onClick={() => updateAICareOption(key, !aiCareSettings[key])}
-                      className="rounded-full px-3 py-1 text-[11px] font-black"
+                      className="rounded-full px-3 py-1 text-xs font-semibold"
                       style={aiCareSettings[key]
                         ? { background: `${SCAN_FROM}20`, color: SCAN_TO, border: `1px solid ${SCAN_TO}33` }
                         : { background: "#F6F3EE", color: "#9A8F80", border: "1px solid #ECE6DE" }}>
@@ -7059,17 +7062,17 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
             </div>
 
             {/* ── Fonday 디바이스 티저 (잠금 → 기대감 카드) ── */}
-            <div className="rounded-[24px] overflow-hidden border"
-              style={{ background: "linear-gradient(135deg, #FFF8F5 0%, #FFF1EC 100%)", borderColor: "#F3DDD6" }}>
+            <div className="rounded-3xl overflow-hidden"
+              style={{ background: TINT_WARM }}>
               <div className="p-5">
                 <div className="flex items-start justify-between gap-3 mb-4">
                   <div>
-                    <p className="text-[10px] font-black uppercase tracking-[0.18em]" style={{ color: SCAN_TO }}>COMING SOON</p>
+                    <p className="text-[10px] font-bold uppercase tracking-[0.18em]" style={{ color: SCAN_TO }}>COMING SOON</p>
                     <p className="text-[17px] font-black mt-1" style={{ color: DEEP_GREEN }}>{t("result.deviceTeaser.title")}</p>
                     <p className="text-[11px] text-stone-400 mt-1">{t("result.deviceTeaser.sub")}</p>
                   </div>
                   <div className="w-12 h-12 rounded-2xl flex items-center justify-center shrink-0"
-                    style={{ background: "linear-gradient(135deg, #FFEDE6, #FFD9CD)" }}>
+                    style={{ background: TINT_WARM }}>
                     <Microscope className="w-6 h-6" style={{ color: "#C97062" }} />
                   </div>
                 </div>
@@ -7099,7 +7102,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
             {/* 다음 탭 유도 */}
             <button
               onClick={() => goTo("nutrition")}
-              className="w-full flex items-center justify-center gap-2 py-3.5 rounded-2xl text-[13px] font-black text-white transition-all active:scale-95"
+              className="w-full flex items-center justify-center gap-2 py-3.5 rounded-2xl text-sm font-bold text-white transition-all active:scale-95"
               style={{ background: "linear-gradient(135deg, #F97316, #C2410C)" }}>
               <Utensils className="w-4 h-4" />
               <span>{t("result.tab.nutrition")} →</span>
@@ -7118,7 +7121,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
                 <Sparkles className="w-4 h-4 text-white" />
               </div>
               <div>
-                <p className="text-[13px] font-black" style={{ color: "#7C3AED" }}>{t("nutrients.supplementsTitle")}</p>
+                <p className="text-sm font-bold" style={{ color: "#7C3AED" }}>{t("nutrients.supplementsTitle")}</p>
                 <p className="text-[11px] text-stone-400">{t("nutrients.supplementsSub")}</p>
               </div>
             </div>
@@ -7131,7 +7134,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
             ) : (
               <>
                 {/* 영양제 추천 */}
-                <div className="space-y-2">
+                <div className="space-y-3">
                   {analysisResult.nutritionTips.supplements.map((item: { emoji: string; name: string; dose: string; reason: string; targetScore: string }, i: number) => (
                     <motion.div key={i} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: i * 0.07 }}
@@ -7140,8 +7143,8 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
                       <span className="text-2xl shrink-0 mt-0.5">{item.emoji}</span>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-0.5 flex-wrap">
-                          <p className="text-[13px] font-black text-stone-800">{item.name}</p>
-                          <span className="text-[9px] font-black rounded-full px-2 py-0.5 text-white shrink-0"
+                          <p className="text-sm font-bold text-stone-800">{item.name}</p>
+                          <span className="text-[9px] font-bold rounded-full px-2 py-0.5 text-white shrink-0"
                             style={{ background: "linear-gradient(135deg, #8B5CF6, #7C3AED)" }}>
                             {SCORE_LABEL_MAP[item.targetScore] !== undefined ? t(`scores.${SCORE_LABEL_MAP[item.targetScore]}`) : item.targetScore}
                           </span>
@@ -7159,7 +7162,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
                     style={{ background: "#EFF6FF", border: "1px solid #BFDBFE" }}>
                     <span className="text-xl shrink-0">💧</span>
                     <div>
-                      <p className="text-[10px] font-black text-blue-600 mb-0.5">{t("nutrients.hydrationLabel")}</p>
+                      <p className="text-[10px] font-bold text-blue-600 mb-0.5">{t("nutrients.hydrationLabel")}</p>
                       <p className="text-[12px] text-stone-600 leading-relaxed">{analysisResult.nutritionTips.hydrationGoal}</p>
                     </div>
                   </div>
@@ -7169,9 +7172,9 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
                 <div className="pt-1">
                   <div className="flex items-center gap-2 mb-3 pt-2 border-t border-stone-100">
                     <AlertCircle className="w-4 h-4 text-amber-500 shrink-0" />
-                    <p className="text-[13px] font-black" style={{ color: "#D97706" }}>{t("nutrients.avoidTitle")}</p>
+                    <p className="text-sm font-bold" style={{ color: "#D97706" }}>{t("nutrients.avoidTitle")}</p>
                   </div>
-                  <div className="space-y-2">
+                  <div className="space-y-3">
                     {analysisResult.nutritionTips.avoidFoods.map((item: { emoji: string; food: string; reason: string }, idx: number) => (
                       <div key={idx} className="flex items-start gap-3 p-3 rounded-2xl"
                         style={{ background: "#FFF7ED", border: "1px solid #FED7AA" }}>
@@ -7284,7 +7287,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
                           style={{ background: `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})` }}>
                           <Sparkles className="w-3.5 h-3.5 text-white" />
                         </div>
-                        <p className="text-[13px] font-black" style={{ color: DEEP_GREEN }}>{t("result.aiComment")}</p>
+                        <p className="text-sm font-bold" style={{ color: DEEP_GREEN }}>{t("result.aiComment")}</p>
                       </div>
                       <p className="text-[13px] text-stone-600 leading-relaxed text-kr-pretty">{analysisResult.aiComment}</p>
                     </div>
@@ -7297,13 +7300,13 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
                       <motion.div key={i}
                         initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: i * 0.05 }}
-                        className="p-4 rounded-2xl border border-stone-100 bg-stone-50">
+                        className="p-4 rounded-2xl bg-stone-50">
                         <div className="flex items-center gap-2 mb-1.5">
                           <div className="w-6 h-6 rounded-full flex items-center justify-center bg-white shadow-sm shrink-0">
                             <Icon className="w-3 h-3" style={{ color }} />
                           </div>
-                          <span className="text-[12px] font-black" style={{ color }}>{t(`scores.${i}`)}</span>
-                          <span className="ml-auto text-[12px] font-black" style={{ color }}>{item.score}{t("result.scoreSuffix")}</span>
+                          <span className="text-xs font-semibold" style={{ color }}>{t(`scores.${i}`)}</span>
+                          <span className="ml-auto text-xs font-semibold" style={{ color }}>{item.score}{t("result.scoreSuffix")}</span>
                         </div>
                         <p className="text-[13px] text-stone-600 leading-relaxed">{item.comment || "-"}</p>
                       </motion.div>
@@ -7314,12 +7317,12 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
                     <div className="pt-1">
                       <div className="flex items-center gap-2 mb-3">
                         <Activity className="w-4 h-4" style={{ color: DEEP_GREEN }} />
-                        <p className="text-[13px] font-black" style={{ color: DEEP_GREEN }}>{t("modal.analysis.skinReport")}</p>
+                        <p className="text-sm font-bold" style={{ color: DEEP_GREEN }}>{t("modal.analysis.skinReport")}</p>
                       </div>
                       <div className="grid grid-cols-2 gap-2">
                         {(analysisResult!.skinReport as { area: string; finding: string }[]).map((item, i) => (
-                          <div key={i} className="p-3 rounded-2xl border border-stone-100 bg-stone-50">
-                            <p className="text-[12px] font-black mb-1" style={{ color: DEEP_GREEN_LIGHT }}>{item.area}</p>
+                          <div key={i} className="p-3 rounded-2xl bg-stone-50">
+                            <p className="text-xs font-semibold mb-1" style={{ color: DEEP_GREEN_LIGHT }}>{item.area}</p>
                             <p className="text-[11px] text-stone-500 leading-snug">{item.finding}</p>
                           </div>
                         ))}
@@ -7330,7 +7333,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
                   <div className="pt-1">
                     <div className="flex items-center gap-2 mb-3">
                       <Shield className="w-4 h-4" style={{ color: DEEP_GREEN }} />
-                      <p className="text-[13px] font-black" style={{ color: DEEP_GREEN }}>
+                      <p className="text-sm font-bold" style={{ color: DEEP_GREEN }}>
                         {t("modal.analysis.baumannDetail", { type: finalType })}
                       </p>
                     </div>
@@ -7400,7 +7403,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
                       className="flex gap-3 p-4 rounded-2xl border"
                       style={{ background: i === 0 ? "#FDF1EE" : i === 1 ? "#F0F7F5" : "#F5F0FF", borderColor: i === 0 ? "#F5D5CC" : i === 1 ? "#C5DFD8" : "#DDD5F5" }}>
                       <div className="shrink-0">
-                        <div className="w-8 h-8 rounded-full flex items-center justify-center text-white text-[11px] font-black"
+                        <div className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-semibold"
                           style={{ background: i === 0 ? `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})` : i === 1 ? `linear-gradient(135deg, ${DEEP_GREEN_LIGHT}, ${DEEP_GREEN})` : "linear-gradient(135deg, #A78BFA, #7C3AED)" }}>
                           {i + 1}
                         </div>
@@ -7424,7 +7427,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
                     <>
                       <div className="flex items-center gap-2 pt-2 pb-1">
                         <Sparkles className="w-4 h-4" style={{ color: SCAN_TO }} />
-                        <p className="text-[13px] font-black" style={{ color: DEEP_GREEN }}>{t("modal.improvements.cosmetics")}</p>
+                        <p className="text-sm font-bold" style={{ color: DEEP_GREEN }}>{t("modal.improvements.cosmetics")}</p>
                       </div>
                       {(analysisResult.cosmetics as { type: string; key: string; reason: string }[]).map((item, i) => (
                         <motion.div key={`c-${i}`}
@@ -7437,7 +7440,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
                           </div>
                           <div>
                             <div className="flex items-center gap-1.5 mb-0.5">
-                              <span className="text-[13px] font-black text-stone-800">{item.type}</span>
+                              <span className="text-sm font-bold text-stone-800">{item.type}</span>
                               <span className="text-[10px] px-1.5 py-0.5 rounded-full font-bold text-white"
                                 style={{ background: "#D97706" }}>{item.key}</span>
                             </div>
@@ -7504,7 +7507,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
                             style={{ background: `${color}22` }}>
                             {NUTRIENT_ICONS[letter]}
                           </div>
-                          <p className="text-[9px] font-black text-center mt-0.5" style={{ color }}>{letter}</p>
+                          <p className="text-[9px] font-bold text-center mt-0.5" style={{ color }}>{letter}</p>
                         </div>
                         <div className="flex-1 min-w-0">
                           <p className="text-[13px] font-bold mb-0.5" style={{ color }}>{nutrient.name}</p>
@@ -7521,18 +7524,18 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
                   <div className="pt-1">
                     <div className="flex items-center gap-2 mb-3 pt-2 border-t border-stone-100">
                       <AlertCircle className="w-4 h-4 text-amber-500 shrink-0" />
-                      <p className="text-[13px] font-black" style={{ color: "#D97706" }}>{t("nutrients.avoidTitle")}</p>
+                      <p className="text-sm font-bold" style={{ color: "#D97706" }}>{t("nutrients.avoidTitle")}</p>
                     </div>
                     {/* 점심 */}
                     <div className="rounded-2xl p-4 mb-2.5" style={{ background: "#FFF7ED", border: "1px solid #FED7AA" }}>
                       <div className="flex items-center gap-1.5 mb-2.5">
                         <Sun className="w-4 h-4 text-orange-500 shrink-0" />
-                        <span className="text-[12px] font-black text-orange-700">{t("nutrients.avoidLunch")}</span>
+                        <span className="text-xs font-semibold text-orange-700">{t("nutrients.avoidLunch")}</span>
                       </div>
-                      <div className="space-y-2">
+                      <div className="space-y-3">
                         {avoidLunch.map(({ food, why }, idx) => (
                           <div key={idx} className="flex gap-2 items-start">
-                            <span className="text-[11px] font-black text-orange-400 shrink-0 mt-0.5">✕</span>
+                            <span className="text-xs font-semibold text-orange-400 shrink-0 mt-0.5">✕</span>
                             <div>
                               <p className="text-[12px] font-bold text-stone-700">{food}</p>
                               <p className="text-[11px] text-stone-400">{why}</p>
@@ -7545,12 +7548,12 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
                     <div className="rounded-2xl p-4" style={{ background: "#F5F3FF", border: "1px solid #DDD6FE" }}>
                       <div className="flex items-center gap-1.5 mb-2.5">
                         <Moon className="w-4 h-4 text-violet-500 shrink-0" />
-                        <span className="text-[12px] font-black text-violet-700">{t("nutrients.avoidDinner")}</span>
+                        <span className="text-xs font-semibold text-violet-700">{t("nutrients.avoidDinner")}</span>
                       </div>
-                      <div className="space-y-2">
+                      <div className="space-y-3">
                         {avoidDinner.map(({ food, why }, idx) => (
                           <div key={idx} className="flex gap-2 items-start">
-                            <span className="text-[11px] font-black text-violet-400 shrink-0 mt-0.5">✕</span>
+                            <span className="text-xs font-semibold text-violet-400 shrink-0 mt-0.5">✕</span>
                             <div>
                               <p className="text-[12px] font-bold text-stone-700">{food}</p>
                               <p className="text-[11px] text-stone-400">{why}</p>
@@ -7594,7 +7597,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
               {/* 설명 */}
               <p className="text-[13px] text-stone-600 mb-3 leading-relaxed">{t("cosmetics.loginGateDesc")}</p>
               {/* 기능 목록 */}
-              <div className="rounded-2xl p-4 mb-5 space-y-2.5" style={{ background: "#F0F7F5" }}>
+              <div className="rounded-2xl p-4 mb-5 space-y-3.5" style={{ background: "#F0F7F5" }}>
                 {[
                   t("cosmetics.loginGateBullet1"),
                   t("cosmetics.loginGateBullet2"),
@@ -7605,31 +7608,31 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
                   <div key={i} className="flex items-center gap-2">
                     <div className="w-5 h-5 rounded-full flex items-center justify-center shrink-0"
                       style={{ background: DEEP_GREEN }}>
-                      <span className="text-white text-[10px] font-black">✓</span>
+                      <span className="text-white text-[10px] font-bold">✓</span>
                     </div>
                     <span className="text-[12px] text-stone-700 font-medium">{b}</span>
                   </div>
                 ))}
               </div>
               {/* 로그인 버튼 */}
-              <div className="space-y-2.5">
+              <div className="space-y-3.5">
                 {i18n.language === "ko" ? (
                   <button onClick={() => { setShowCosmeticsGate(false); openLoginPopup("kakao", "scan"); }}
-                    className="w-full py-3.5 rounded-2xl text-[14px] font-black flex items-center justify-center gap-2"
+                    className="w-full py-3.5 rounded-2xl text-sm font-bold flex items-center justify-center gap-2"
                     style={{ background: "#FEE500", color: "#3C1E1E" }}>
                     <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path fillRule="evenodd" clipRule="evenodd" d="M9 1C4.582 1 1 3.79 1 7.222c0 2.154 1.386 4.045 3.484 5.14L3.62 15.5a.25.25 0 0 0 .368.274L7.9 13.39A9.63 9.63 0 0 0 9 13.444c4.418 0 8-2.791 8-6.222C17 3.79 13.418 1 9 1Z" fill="#3C1E1E"/></svg>
                     {t("cosmetics.loginGateKakao")}
                   </button>
                 ) : (
                   <button onClick={() => { setShowCosmeticsGate(false); openLoginPopup("line", "scan"); }}
-                    className="w-full py-3.5 rounded-2xl text-[14px] font-black flex items-center justify-center gap-2 text-white"
+                    className="w-full py-3.5 rounded-2xl text-sm font-bold flex items-center justify-center gap-2 text-white"
                     style={{ background: "#06C755" }}>
                     <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 1C4.582 1 1 3.79 1 7.222c0 2.03 1.09 3.84 2.8 5.04-.12.44-.77 2.96-.8 3.15a.2.2 0 0 0 .3.22l3.72-2.46c.6.09 1.3.14 1.98.14 4.418 0 8-2.791 8-6.222C17 3.79 13.418 1 9 1Z" fill="white"/></svg>
                     {t("cosmetics.loginGateLine")}
                   </button>
                 )}
                 <button onClick={() => { setShowCosmeticsGate(false); openLoginPopup("google", "scan"); }}
-                  className="w-full py-3.5 rounded-2xl text-[14px] font-black flex items-center justify-center gap-2 bg-white border border-stone-200 text-stone-700">
+                  className="w-full py-3.5 rounded-2xl text-sm font-bold flex items-center justify-center gap-2 bg-white text-stone-700">
                   <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" className="w-4 h-4" />
                   {t("cosmetics.loginGateGoogle")}
                 </button>
@@ -7682,11 +7685,11 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
               <div className="mt-5 rounded-3xl p-4" style={{ background: "#F8FAF9", border: "1px solid #E5EEEA" }}>
                 <div className="grid grid-cols-2 gap-2.5">
                   <div className="rounded-2xl p-3" style={{ background: "#FFFFFF", border: "1px solid #DCE9E4" }}>
-                    <p className="text-[10px] font-black uppercase tracking-[0.14em]" style={{ color: DEEP_GREEN }}>{t("cosmetics.amBtn")}</p>
+                    <p className="text-[10px] font-bold uppercase tracking-[0.14em]" style={{ color: DEEP_GREEN }}>{t("cosmetics.amBtn")}</p>
                     <div className="mt-2 space-y-1.5">
                       {morningRoutineItems.map((item, index) => (
                         <div key={`suggest-am-${index}`} className="flex items-center gap-2">
-                          <span className="w-5 h-5 rounded-full flex items-center justify-center text-[9px] font-black text-white shrink-0"
+                          <span className="w-5 h-5 rounded-full flex items-center justify-center text-[9px] font-bold text-white shrink-0"
                             style={{ background: DEEP_GREEN }}>{index + 1}</span>
                           <p className="text-[11px] font-semibold text-stone-700 leading-tight text-kr-pretty">{item}</p>
                         </div>
@@ -7694,11 +7697,11 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
                     </div>
                   </div>
                   <div className="rounded-2xl p-3" style={{ background: "#FFFFFF", border: "1px solid #F2DED6" }}>
-                    <p className="text-[10px] font-black uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>{t("cosmetics.pmBtn")}</p>
+                    <p className="text-[10px] font-bold uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>{t("cosmetics.pmBtn")}</p>
                     <div className="mt-2 space-y-1.5">
                       {eveningRoutineItems.map((item, index) => (
                         <div key={`suggest-pm-${index}`} className="flex items-center gap-2">
-                          <span className="w-5 h-5 rounded-full flex items-center justify-center text-[9px] font-black text-white shrink-0"
+                          <span className="w-5 h-5 rounded-full flex items-center justify-center text-[9px] font-bold text-white shrink-0"
                             style={{ background: SCAN_TO }}>{index + 1}</span>
                           <p className="text-[11px] font-semibold text-stone-700 leading-tight text-kr-pretty">{item}</p>
                         </div>
@@ -7710,7 +7713,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
               <div className="flex gap-2 mt-5">
                 <button
                   onClick={() => setShowRoutineUpdateSheet(false)}
-                  className="flex-1 py-3.5 rounded-2xl text-[13px] font-bold border border-stone-200 text-stone-600 bg-stone-50"
+                  className="flex-1 py-3.5 rounded-2xl text-[13px] font-bold text-stone-600 bg-stone-50"
                 >
                   {t("cosmetics.routineUpdateKeep")}
                 </button>
@@ -7719,7 +7722,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
                     saveDiaryTodos(todayStr(), routineUpdateItems.map((text) => ({ text, done: false })));
                     setShowRoutineUpdateSheet(false);
                   }}
-                  className="flex-1 py-3.5 rounded-2xl text-[13px] font-black text-white"
+                  className="flex-1 py-3.5 rounded-2xl text-sm font-bold text-white"
                   style={{ background: `linear-gradient(135deg, ${DEEP_GREEN}, ${DEEP_GREEN_LIGHT})` }}
                 >
                   {t("cosmetics.routineUpdateApply")}
@@ -7745,11 +7748,11 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
               <div className="w-10 h-1 rounded-full bg-stone-200 mx-auto mb-4" />
               <div className="flex items-center justify-between gap-3 mb-4">
                 <div>
-                  <p className="text-[11px] font-black uppercase tracking-[0.16em]" style={{ color: SCAN_TO }}>{t("result.actionCard.questEyebrow")}</p>
+                  <p className="text-xs font-semibold uppercase tracking-[0.16em]" style={{ color: SCAN_TO }}>{t("result.actionCard.questEyebrow")}</p>
                   <p className="text-[16px] font-black mt-1" style={{ color: DEEP_GREEN }}>{t("result.actionCard.questTitle", { done: questDoneCount, total: questBoard.length })}</p>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="rounded-full px-3 py-1 text-[10px] font-black"
+                  <span className="rounded-full px-3 py-1 text-[10px] font-bold"
                     style={{ background: "#FFF7ED", color: "#D97706" }}>
                     {totalPoints}pt
                   </span>
@@ -7762,7 +7765,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
                   </button>
                 </div>
               </div>
-              <div className="space-y-2">
+              <div className="space-y-3">
                 {questBoard.map((quest) => (
                   <div key={`sheet-${quest.id}`} className="flex items-center gap-3 rounded-2xl px-3 py-3"
                     style={{ background: quest.done ? "#F8FFFB" : "#FFFFFF", border: `1px solid ${quest.done ? "#DDF5E8" : "#F3E7E3"}` }}>
@@ -7772,8 +7775,8 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between gap-2">
-                        <p className="text-[12px] font-black leading-[1.4] text-kr-pretty" style={{ color: DEEP_GREEN }}>{quest.label}</p>
-                        <span className="text-[10px] font-black" style={{ color: quest.done ? "#059669" : quest.accent }}>{quest.reward}</span>
+                        <p className="text-xs font-semibold leading-[1.4] text-kr-pretty" style={{ color: DEEP_GREEN }}>{quest.label}</p>
+                        <span className="text-[10px] font-bold" style={{ color: quest.done ? "#059669" : quest.accent }}>{quest.reward}</span>
                       </div>
                       <p className="text-[10px] text-stone-500 mt-0.5 leading-[1.45] text-kr-pretty">{quest.detail}</p>
                     </div>
@@ -7813,17 +7816,17 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
                   <form onSubmit={handlePartnershipSubmit} className="space-y-3">
                     <input type="text" required placeholder={t("modal.partnership.name")} value={partnerForm.name}
                       onChange={e => setPartnerForm(p => ({ ...p, name: e.target.value }))}
-                      className="w-full px-4 py-3.5 rounded-xl border border-stone-200 focus:outline-none focus:ring-2 text-sm" />
+                      className="w-full px-4 py-3.5 rounded-xl focus:outline-none focus:ring-2 text-sm" />
                     <input type="text" required placeholder={t("modal.partnership.company")} value={partnerForm.company}
                       onChange={e => setPartnerForm(p => ({ ...p, company: e.target.value }))}
-                      className="w-full px-4 py-3.5 rounded-xl border border-stone-200 focus:outline-none focus:ring-2 text-sm" />
+                      className="w-full px-4 py-3.5 rounded-xl focus:outline-none focus:ring-2 text-sm" />
                     <input type="email" required placeholder={t("modal.partnership.email")} value={partnerForm.email}
                       onChange={e => setPartnerForm(p => ({ ...p, email: e.target.value }))}
-                      className="w-full px-4 py-3.5 rounded-xl border border-stone-200 focus:outline-none focus:ring-2 text-sm" />
+                      className="w-full px-4 py-3.5 rounded-xl focus:outline-none focus:ring-2 text-sm" />
                     <textarea required placeholder={t("modal.partnership.message")} value={partnerForm.message}
                       onChange={e => setPartnerForm(p => ({ ...p, message: e.target.value }))}
                       rows={3}
-                      className="w-full px-4 py-3.5 rounded-xl border border-stone-200 focus:outline-none focus:ring-2 text-sm resize-none" />
+                      className="w-full px-4 py-3.5 rounded-xl focus:outline-none focus:ring-2 text-sm resize-none" />
                     <Button disabled={isPartnerSubmitting} type="submit"
                       className="w-full h-14 rounded-2xl font-bold text-[15px] text-white"
                       style={{ background: `linear-gradient(135deg, ${DEEP_GREEN}, ${DEEP_GREEN_LIGHT})` }}>
@@ -7864,7 +7867,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
                   <form onSubmit={handleWaitlistSubmit} className="space-y-4">
                     <input type="email" required placeholder={t("modal.waitlist.email")} value={email}
                       onChange={e => setEmail(e.target.value)}
-                      className="w-full px-4 py-3.5 rounded-xl border border-stone-200 focus:outline-none focus:ring-2 focus:ring-rose-200" />
+                      className="w-full px-4 py-3.5 rounded-xl focus:outline-none focus:ring-2 focus:ring-rose-200" />
                     <Button disabled={isSubmitting} type="submit"
                       className="w-full h-14 rounded-2xl font-bold text-[15px] text-white"
                       style={{ background: `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})` }}>
@@ -7934,7 +7937,7 @@ function ArticleModal({ article, onClose }: { article: MagazineArticle; onClose:
             <span style={{ fontSize: 52 }}>{article.emoji}</span>
           </div>
           <div className="absolute top-3 left-3">
-            <span className="text-[10px] font-black text-white/90 bg-black/20 backdrop-blur-sm px-2 py-1 rounded-full">
+            <span className="text-[10px] font-bold text-white/90 bg-black/20 backdrop-blur-sm px-2 py-1 rounded-full">
               {article.tag}
             </span>
           </div>
@@ -7951,7 +7954,7 @@ function ArticleModal({ article, onClose }: { article: MagazineArticle; onClose:
 
             {/* 저자 정보 */}
             <div className="flex items-center gap-2.5 py-3 border-y border-stone-100">
-              <div className="w-8 h-8 rounded-full flex items-center justify-center text-white text-[11px] font-black shrink-0"
+              <div className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-semibold shrink-0"
                 style={{ background: `linear-gradient(135deg, ${article.bgFrom}, ${article.bgTo})` }}>
                 {article.author[0]}
               </div>
@@ -7966,7 +7969,7 @@ function ArticleModal({ article, onClose }: { article: MagazineArticle; onClose:
             {article.body.map((section, i) => (
               <div key={i} className="space-y-1.5">
                 {section.heading && (
-                  <h3 className="text-[14px] font-black" style={{ color: DEEP_GREEN_LIGHT }}>{section.heading}</h3>
+                  <h3 className="text-sm font-bold" style={{ color: DEEP_GREEN_LIGHT }}>{section.heading}</h3>
                 )}
                 <p className="text-[13px] text-stone-600 leading-relaxed">{section.text}</p>
               </div>
@@ -8044,7 +8047,7 @@ function MagazineTab() {
                   <div className="absolute bottom-0 left-0 right-0 h-24"
                     style={{ background: "linear-gradient(to top, rgba(0,0,0,0.25), transparent)" }} />
                   <div className="absolute top-4 left-4">
-                    <span className="text-[10px] font-black text-white bg-white/20 backdrop-blur-sm px-2.5 py-1 rounded-full">
+                    <span className="text-[10px] font-bold text-white bg-white/20 backdrop-blur-sm px-2.5 py-1 rounded-full">
                       ★ FEATURED
                     </span>
                   </div>
@@ -8052,7 +8055,7 @@ function MagazineTab() {
                 {/* 텍스트 영역 */}
                 <div className="px-5 pb-5 pt-3 bg-white/95">
                   <div className="flex items-center gap-1.5 mb-2">
-                    <span className="text-[10px] font-black px-2 py-0.5 rounded-full"
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full"
                       style={{ background: `${featured.bgFrom}22`, color: featured.bgTo }}>
                       {featured.tag}
                     </span>
@@ -8107,12 +8110,12 @@ function MagazineTab() {
                       <div className="flex-1 p-3.5 flex flex-col justify-between">
                         <div>
                           <div className="flex items-center gap-1.5 mb-1">
-                            <span className="text-[9px] font-black px-1.5 py-0.5 rounded-full"
+                            <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full"
                               style={{ background: `${article.bgFrom}22`, color: article.bgTo }}>
                               {article.tag}
                             </span>
                           </div>
-                          <h3 className="text-[13px] font-black leading-snug line-clamp-2 mb-1" style={{ color: DEEP_GREEN }}>
+                          <h3 className="text-sm font-bold leading-snug line-clamp-2 mb-1" style={{ color: DEEP_GREEN }}>
                             {article.title}
                           </h3>
                           <p className="text-[10px] text-stone-400 line-clamp-2 leading-relaxed">{article.summary}</p>
@@ -8173,7 +8176,7 @@ function ReportTab({ user }: { user: any }) {
           <h2 className="text-xl font-black mb-1" style={{ color: DEEP_GREEN }}>{t("report.title")}</h2>
           <p className="text-sm text-stone-400">{t("report.loginRequired")}</p>
         </div>
-        <div className="w-full space-y-2">
+        <div className="w-full space-y-3">
           {i18n.language === "ko" ? (
             <Button onClick={() => { window.location.href = "/auth/kakao"; }}
               className="w-full h-12 rounded-xl font-bold gap-2 border-0 text-[#3C1E1E]" style={{ background: "#FEE500" }}>
@@ -8192,7 +8195,7 @@ function ReportTab({ user }: { user: any }) {
             </Button>
           )}
           <Button onClick={() => { window.location.href = "/auth/google"; }}
-            className="w-full h-12 rounded-xl bg-white hover:bg-stone-50 font-bold text-zinc-700 gap-2 border border-stone-200 shadow-sm">
+            className="w-full h-12 rounded-xl bg-white hover:bg-stone-50 font-bold text-zinc-700 gap-2 shadow-sm">
             <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" className="w-4 h-4" />
             {t("report.googleLogin")}
           </Button>
@@ -8278,7 +8281,7 @@ function ReportTab({ user }: { user: any }) {
                     style={{ background: `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})` }}>
                     <Sparkles className="w-4 h-4 text-white" />
                   </div>
-                  <p className="text-[13px] font-black" style={{ color: DEEP_GREEN }}>{t("report.aiComment")}</p>
+                  <p className="text-sm font-bold" style={{ color: DEEP_GREEN }}>{t("report.aiComment")}</p>
                 </div>
                 <p className="text-[13px] text-stone-600 leading-relaxed">{lastScan.aiComment}</p>
               </CardContent>
@@ -8291,7 +8294,7 @@ function ReportTab({ user }: { user: any }) {
           <motion.div variants={fadeChild}>
             <Card className="border-none shadow-md rounded-3xl">
               <CardHeader className="pb-1 pt-5 px-5">
-                <p className="text-[13px] font-black" style={{ color: DEEP_GREEN }}>{t("result.scores")}</p>
+                <p className="text-sm font-bold" style={{ color: DEEP_GREEN }}>{t("result.scores")}</p>
               </CardHeader>
               <CardContent className="px-5 pb-5 space-y-4">
                 {lastScan.scores.map((item: any, i: number) => {
@@ -8642,15 +8645,15 @@ export default function SkinScanPage() {
                 <p className="text-center text-sm text-stone-400 mb-6">{t("install.desc")}</p>
                 <div className="space-y-3 mb-6">
                   <div className="flex items-start gap-3 p-3 rounded-2xl bg-stone-50">
-                    <span className="w-6 h-6 rounded-full bg-[#C97062] text-white text-[11px] font-black flex items-center justify-center shrink-0 mt-0.5">1</span>
+                    <span className="w-6 h-6 rounded-full bg-[#C97062] text-white text-xs font-semibold flex items-center justify-center shrink-0 mt-0.5">1</span>
                     <p className="text-[13px] text-stone-600" dangerouslySetInnerHTML={{ __html: t("install.step1") }} />
                   </div>
                   <div className="flex items-start gap-3 p-3 rounded-2xl bg-stone-50">
-                    <span className="w-6 h-6 rounded-full bg-[#C97062] text-white text-[11px] font-black flex items-center justify-center shrink-0 mt-0.5">2</span>
+                    <span className="w-6 h-6 rounded-full bg-[#C97062] text-white text-xs font-semibold flex items-center justify-center shrink-0 mt-0.5">2</span>
                     <p className="text-[13px] text-stone-600" dangerouslySetInnerHTML={{ __html: t("install.step2") }} />
                   </div>
                   <div className="flex items-start gap-3 p-3 rounded-2xl bg-stone-50">
-                    <span className="w-6 h-6 rounded-full bg-[#C97062] text-white text-[11px] font-black flex items-center justify-center shrink-0 mt-0.5">3</span>
+                    <span className="w-6 h-6 rounded-full bg-[#C97062] text-white text-xs font-semibold flex items-center justify-center shrink-0 mt-0.5">3</span>
                     <p className="text-[13px] text-stone-600" dangerouslySetInnerHTML={{ __html: t("install.step3") }} />
                   </div>
                 </div>

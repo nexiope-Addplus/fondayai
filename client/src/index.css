@@ -50,14 +50,14 @@
   --font-serif: Georgia, serif;
   --font-mono: Menlo, monospace;
   --radius: .5rem;
-  --shadow-2xs: 0px 2px 0px 0px hsl(210 8% 8% / 0.00);
-  --shadow-xs: 0px 2px 0px 0px hsl(210 8% 8% / 0.00);
-  --shadow-sm: 0px 2px 0px 0px hsl(210 8% 8% / 0.00), 0px 1px 2px -1px hsl(210 8% 8% / 0.00);
-  --shadow: 0px 2px 0px 0px hsl(210 8% 8% / 0.00), 0px 1px 2px -1px hsl(210 8% 8% / 0.00);
-  --shadow-md: 0px 2px 0px 0px hsl(210 8% 8% / 0.00), 0px 2px 4px -1px hsl(210 8% 8% / 0.00);
-  --shadow-lg: 0px 2px 0px 0px hsl(210 8% 8% / 0.00), 0px 4px 6px -1px hsl(210 8% 8% / 0.00);
-  --shadow-xl: 0px 2px 0px 0px hsl(210 8% 8% / 0.00), 0px 8px 10px -1px hsl(210 8% 8% / 0.00);
-  --shadow-2xl: 0px 2px 0px 0px hsl(210 8% 8% / 0.00);
+  --shadow-2xs: 0 1px 4px rgba(0,0,0,0.04);
+  --shadow-xs: 0 1px 6px rgba(0,0,0,0.05);
+  --shadow-sm: 0 2px 8px rgba(0,0,0,0.06);
+  --shadow: 0 2px 12px rgba(0,0,0,0.08);
+  --shadow-md: 0 4px 16px rgba(0,0,0,0.10);
+  --shadow-lg: 0 6px 24px rgba(0,0,0,0.12);
+  --shadow-xl: 0 8px 32px rgba(0,0,0,0.14);
+  --shadow-2xl: 0 12px 48px rgba(0,0,0,0.18);
   --tracking-normal: 0em;
   --spacing: 0.25rem;
 
