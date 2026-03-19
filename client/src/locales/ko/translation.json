@@ -903,7 +903,7 @@
     "iosStep3": "앱 실행 후 알림 설정"
   },
   "streak": {
-    "badge": "🔥 {{count}}일 연속",
+    "badge": "{{count}}일 연속",
     "comeback3": "🌿 {{days}}일 전 스캔이에요. 피부 상태 확인할까요?",
     "comeback7": "⚠️ {{days}}일 만에 오셨네요! 많이 바뀌었을 거예요.",
     "milestone": "🔥 {{count}}일 연속 달성!",

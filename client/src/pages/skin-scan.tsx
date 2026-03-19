@@ -47,6 +47,8 @@ import {
   Crown,
   Ban,
   Droplet,
+  Microscope,
+  Bot,
 } from "lucide-react";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Legend } from 'recharts';
 import { Button } from "@/components/ui/button";
@@ -1488,9 +1490,9 @@ function ScanIdleScreen({ onScan }: { onScan: () => void }) {
         <div className="flex items-center gap-2">
           <AttendanceBadge onClick={() => setShowCalendar(true)} />
           {streak.count >= 2 && (
-            <span className="text-[11px] font-bold px-2.5 py-1 rounded-full"
+            <span className="text-[11px] font-bold px-2.5 py-1 rounded-full flex items-center gap-0.5"
               style={{ background: "#FFF7ED", color: "#C2410C", border: "1px solid #FED7AA" }}>
-              {t("streak.badge", { count: streak.count })}
+              <Flame className="w-3 h-3" style={{ color: "#C2410C" }} />{t("streak.badge", { count: streak.count })}
             </span>
           )}
         </div>
@@ -3519,7 +3521,7 @@ function DiaryFullView({ history, analysisResult, overallScore, finalType, curre
       transition={{ type: "spring", damping: 30, stiffness: 300 }}>
 
       {/* 헤더 */}
-      <div className="shrink-0 px-5 pt-12 pb-0" style={{ borderBottom: "1px solid #F0EDE8" }}>
+      <div className="shrink-0 px-5 pt-5 pb-0" style={{ borderBottom: "1px solid #F0EDE8" }}>
         <div className="flex items-center justify-between mb-4">
           <button onClick={onClose} className="flex items-center gap-1.5 text-stone-500 active:opacity-70">
             <ChevronLeft className="w-5 h-5" />
@@ -3836,7 +3838,7 @@ function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: any; analys
   if (!user) {
     return (
       <div className="flex flex-col" style={{ background: "#FBF9F7", minHeight: "calc(100dvh - 64px)" }}>
-        <div className="shrink-0 px-5 pt-12 pb-0" style={{ borderBottom: "1px solid #F0EDE8" }}>
+        <div className="shrink-0 px-5 pt-5 pb-0" style={{ borderBottom: "1px solid #F0EDE8" }}>
           {onBack && (
             <button onClick={onBack}
               className="flex items-center justify-center w-9 h-9 rounded-full bg-stone-100 text-stone-500 mb-3 active:opacity-70">
@@ -3906,7 +3908,7 @@ function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: any; analys
   return (
     <div className="flex flex-col" style={{ background: "#FBF9F7", minHeight: "calc(100dvh - 64px)" }}>
       {/* 헤더 */}
-      <div className="shrink-0 px-5 pt-12 pb-0" style={{ borderBottom: "1px solid #F0EDE8" }}>
+      <div className="shrink-0 px-5 pt-5 pb-0" style={{ borderBottom: "1px solid #F0EDE8" }}>
         {onBack && (
           <button onClick={onBack}
             className="flex items-center justify-center w-9 h-9 rounded-full bg-stone-100 text-stone-500 mb-3 active:opacity-70">
@@ -4766,7 +4768,7 @@ function MyCosmeticsModal({ onClose, onAddNew }: { onClose: () => void; onAddNew
   );
 }
 
-function MyScreen({ user, onInstall, onBack, onLogin }: { user: any; onInstall: () => void; onBack: () => void; onLogin?: (p: "kakao"|"line"|"google", tab: string) => void }) {
+function MyScreen({ user, onInstall, onBack, onLogin, onGoMagazine }: { user: any; onInstall: () => void; onBack: () => void; onLogin?: (p: "kakao"|"line"|"google", tab: string) => void; onGoMagazine?: () => void }) {
   const { t, i18n } = useTranslation();
   const [showCalendar, setShowCalendar] = useState(false);
   const [showMyCosmetics, setShowMyCosmetics] = useState(false);
@@ -4789,7 +4791,7 @@ function MyScreen({ user, onInstall, onBack, onLogin }: { user: any; onInstall: 
   return (
     <div className="min-h-[calc(100dvh-64px)] pb-28" style={{ background: "#FAF9F6" }}>
       {/* 헤더 */}
-      <div className="px-5 pt-12 pb-6" style={{ borderBottom: "1px solid #F0EDE8" }}>
+      <div className="px-5 pt-5 pb-6" style={{ borderBottom: "1px solid #F0EDE8" }}>
         <button onClick={onBack} className="flex items-center gap-1.5 text-stone-400 mb-4 active:opacity-70">
           <ChevronLeft className="w-5 h-5" />
           <span className="text-[13px] font-semibold">{t("nav.scan")}</span>
@@ -4939,7 +4941,7 @@ function MyScreen({ user, onInstall, onBack, onLogin }: { user: any; onInstall: 
         </button>
 
         {/* 매거진 */}
-        <a href="https://fonday.replit.app/" target="_blank" rel="noopener noreferrer"
+        <button onClick={onGoMagazine}
           className="w-full flex items-center justify-between p-4 rounded-2xl bg-white border border-stone-100 active:opacity-70">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-xl bg-stone-50 flex items-center justify-center">
@@ -4948,7 +4950,7 @@ function MyScreen({ user, onInstall, onBack, onLogin }: { user: any; onInstall: 
             <p className="text-[14px] font-bold text-stone-800">{t("nav.magazine")}</p>
           </div>
           <ChevronRight className="w-4 h-4 text-stone-300" />
-        </a>
+        </button>
         {/* Fonday 디바이스 링크 */}
         <a href="https://fonday.replit.app/" target="_blank" rel="noopener noreferrer"
           className="flex items-center justify-between px-4 py-3.5 rounded-2xl active:opacity-70 transition-opacity"
@@ -6522,9 +6524,9 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
                     </div>
                     <p className="text-[11px] font-medium mt-1 text-stone-500 text-kr-pretty">{t("result.mbtiSub")}</p>
                   </div>
-                  <div className="rounded-full px-3 py-1 text-[10px] font-black shrink-0"
+                  <div className="rounded-full px-3 py-1 text-[10px] font-black shrink-0 flex items-center gap-0.5"
                     style={{ background: `${DEEP_GREEN}10`, color: DEEP_GREEN }}>
-                    {t("streak.badge", { count: currentStreak.count || 1 })}
+                    <Flame className="w-3 h-3" style={{ color: SCAN_TO }} />{t("streak.badge", { count: currentStreak.count || 1 })}
                   </div>
                 </div>
               <div className="flex flex-wrap gap-1.5 mt-2.5">
@@ -6698,11 +6700,11 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
               <div className="min-w-0">
                 <p className="text-[11px] font-black uppercase tracking-[0.16em]" style={{ color: DEEP_GREEN }}>{t("diary.routineTitle")}</p>
                 <div className="mt-1 space-y-0.5">
-                  <p className="text-[13px] font-bold leading-snug" style={{ color: DEEP_GREEN }}>
-                    🌅 {t("cosmetics.amBtn")}: {morningRoutineItems.join(" + ")}
+                  <p className="text-[13px] font-bold leading-snug flex items-center gap-1" style={{ color: DEEP_GREEN }}>
+                    <Sun className="w-3.5 h-3.5 shrink-0" />{t("cosmetics.amBtn")}: {morningRoutineItems.join(" + ")}
                   </p>
-                  <p className="text-[13px] font-bold leading-snug" style={{ color: SCAN_TO }}>
-                    🌙 {t("cosmetics.pmBtn")}: {eveningRoutineItems.join(" + ")}
+                  <p className="text-[13px] font-bold leading-snug flex items-center gap-1" style={{ color: SCAN_TO }}>
+                    <Moon className="w-3.5 h-3.5 shrink-0" />{t("cosmetics.pmBtn")}: {eveningRoutineItems.join(" + ")}
                   </p>
                 </div>
                 <p className="text-[11px] text-stone-500 mt-1">{t("cosmetics.routineCoachDesc")}</p>
@@ -7015,9 +7017,9 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
             <div className="rounded-[20px] p-4" style={{ background: "#FFFBF7", border: "1px solid #F3E4D8" }}>
               <div className="flex items-center justify-between gap-3">
                 <div className="flex items-center gap-2.5">
-                  <div className="w-9 h-9 rounded-xl flex items-center justify-center text-lg shrink-0"
+                  <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
                     style={{ background: "linear-gradient(135deg, #FEF3C7, #FDE68A)" }}>
-                    🤖
+                    <Bot className="w-5 h-5" style={{ color: "#D97706" }} />
                   </div>
                   <div>
                     <p className="text-[13px] font-black" style={{ color: SCAN_TO }}>{aiCareLabels.title}</p>
@@ -7066,9 +7068,9 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
                     <p className="text-[17px] font-black mt-1" style={{ color: DEEP_GREEN }}>{t("result.deviceTeaser.title")}</p>
                     <p className="text-[11px] text-stone-400 mt-1">{t("result.deviceTeaser.sub")}</p>
                   </div>
-                  <div className="w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 text-2xl"
+                  <div className="w-12 h-12 rounded-2xl flex items-center justify-center shrink-0"
                     style={{ background: "linear-gradient(135deg, #FFEDE6, #FFD9CD)" }}>
-                    🔬
+                    <Microscope className="w-6 h-6" style={{ color: "#C97062" }} />
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-2 mb-4">
@@ -7518,13 +7520,13 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
                   {/* 오늘 피해야 할 음식 */}
                   <div className="pt-1">
                     <div className="flex items-center gap-2 mb-3 pt-2 border-t border-stone-100">
-                      <span className="text-base">⚠️</span>
+                      <AlertCircle className="w-4 h-4 text-amber-500 shrink-0" />
                       <p className="text-[13px] font-black" style={{ color: "#D97706" }}>{t("nutrients.avoidTitle")}</p>
                     </div>
                     {/* 점심 */}
                     <div className="rounded-2xl p-4 mb-2.5" style={{ background: "#FFF7ED", border: "1px solid #FED7AA" }}>
                       <div className="flex items-center gap-1.5 mb-2.5">
-                        <span className="text-sm">☀️</span>
+                        <Sun className="w-4 h-4 text-orange-500 shrink-0" />
                         <span className="text-[12px] font-black text-orange-700">{t("nutrients.avoidLunch")}</span>
                       </div>
                       <div className="space-y-2">
@@ -7542,7 +7544,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
                     {/* 저녁 */}
                     <div className="rounded-2xl p-4" style={{ background: "#F5F3FF", border: "1px solid #DDD6FE" }}>
                       <div className="flex items-center gap-1.5 mb-2.5">
-                        <span className="text-sm">🌙</span>
+                        <Moon className="w-4 h-4 text-violet-500 shrink-0" />
                         <span className="text-[12px] font-black text-violet-700">{t("nutrients.avoidDinner")}</span>
                       </div>
                       <div className="space-y-2">
@@ -8617,7 +8619,7 @@ export default function SkinScanPage() {
           )}
           {activeTab === "my" && (
             <motion.div key="my" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-              <MyScreen user={user} onInstall={handleInstall} onBack={() => setActiveTab("scan")} onLogin={openLoginPopup} />
+              <MyScreen user={user} onInstall={handleInstall} onBack={() => setActiveTab("scan")} onLogin={openLoginPopup} onGoMagazine={() => setActiveTab("magazine")} />
             </motion.div>
           )}
         </AnimatePresence>

@@ -903,7 +903,7 @@
     "iosStep3": "Open the app and enable notifications"
   },
   "streak": {
-    "badge": "🔥 {{count}}-day streak",
+    "badge": "{{count}}-day streak",
     "comeback3": "🌿 You scanned {{days}} days ago. Ready to check your skin?",
     "comeback7": "⚠️ {{days}} days since your last scan! A lot may have changed.",
     "milestone": "🔥 {{count}}-day streak achieved!",
