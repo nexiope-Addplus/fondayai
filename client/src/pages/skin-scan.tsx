@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback, useEffect } from "react";
+import React, { useState, useRef, useCallback, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import i18n from "../i18n";
 import { motion, AnimatePresence, useDragControls } from "framer-motion";
@@ -40,6 +40,13 @@ import {
   Trophy,
   CalendarDays,
   CheckCircle2,
+  Bell,
+  Smartphone,
+  ClipboardList,
+  Pill,
+  Crown,
+  Ban,
+  Droplet,
 } from "lucide-react";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Legend } from 'recharts';
 import { Button } from "@/components/ui/button";
@@ -195,8 +202,15 @@ const NUTRIENT_COLORS: Record<string, string> = {
   O: "#4A7C6E", D: "#3B82C4", S: "#E05A3A", R: "#10B981",
   P: "#F59E0B", N: "#8B5CF6", W: "#C97062", T: "#10B981",
 };
-const NUTRIENT_ICONS: Record<string, string> = {
-  O: "🧴", D: "💧", S: "🌿", R: "🛡️", P: "🍋", N: "✨", W: "⏳", T: "💪",
+const NUTRIENT_ICONS: Record<string, React.ReactNode> = {
+  O: <Droplets className="w-4 h-4" />,
+  D: <Droplet className="w-4 h-4" />,
+  S: <Leaf className="w-4 h-4" />,
+  R: <Shield className="w-4 h-4" />,
+  P: <Eye className="w-4 h-4" />,
+  N: <Sparkles className="w-4 h-4" />,
+  W: <Clock className="w-4 h-4" />,
+  T: <Zap className="w-4 h-4" />,
 };
 
 
@@ -587,7 +601,7 @@ function PushPromptSheet({ onAllow, onDismiss, isLoading }: { onAllow: () => voi
         {showIOSGuide ? (
           <>
             <div className="text-center mb-5">
-              <span className="text-4xl">📱</span>
+              <Smartphone className="w-10 h-10 mx-auto mb-2" style={{ color: DEEP_GREEN }} />
               <h3 className="font-black text-stone-800 text-[18px] mt-2">{t("pushPrompt.iosTitle")}</h3>
               <p className="text-stone-500 text-[13px] mt-1.5 leading-relaxed">{t("pushPrompt.iosDesc")}</p>
             </div>
@@ -603,7 +617,7 @@ function PushPromptSheet({ onAllow, onDismiss, isLoading }: { onAllow: () => voi
         ) : (
           <>
             <div className="text-center mb-6">
-              <span className="text-4xl">🔔</span>
+              <Bell className="w-10 h-10 mx-auto mb-2" style={{ color: DEEP_GREEN }} />
               <h3 className="font-black text-stone-800 text-[18px] mt-2">{t("pushPrompt.title")}</h3>
               <p className="text-stone-500 text-[13px] mt-1.5 leading-relaxed">{t("pushPrompt.desc")}</p>
               {isAndroid() && (
@@ -1245,7 +1259,7 @@ function MissionCard() {
           {visible.map(({ id, done, points }) => (
             <div key={id} className="flex items-center justify-between py-1.5 border-b border-stone-50 last:border-0">
               <div className="flex items-center gap-2">
-                <span className="text-base">{done ? "✅" : "🔒"}</span>
+                {done ? <CheckCircle2 className="w-4 h-4 text-emerald-500" /> : <Lock className="w-4 h-4 text-stone-300" />}
                 <span className={`text-[12px] font-semibold ${done ? "text-stone-400 line-through" : "text-stone-700"}`}>
                   {t(`mission.${id}`)}
                 </span>
@@ -1449,9 +1463,9 @@ function ScanIdleScreen({ onScan }: { onScan: () => void }) {
   ];
 
   const STEPS = [
-    { icon: "📋", title: t("idle.step1"), sub: t("idle.step1Sub"), active: true },
-    { icon: "📸", title: t("idle.step2"), sub: t("idle.step2Sub"), active: false },
-    { icon: "🧬", title: t("idle.step3"), sub: t("idle.step3Sub"), active: false },
+    { Icon: ClipboardList, title: t("idle.step1"), sub: t("idle.step1Sub"), active: true },
+    { Icon: Camera, title: t("idle.step2"), sub: t("idle.step2Sub"), active: false },
+    { Icon: Activity, title: t("idle.step3"), sub: t("idle.step3Sub"), active: false },
   ];
 
   return (
@@ -1659,7 +1673,7 @@ function ScanIdleScreen({ onScan }: { onScan: () => void }) {
           <button onClick={() => setShowBaumannExp(v => !v)}
             className="w-full flex items-center justify-between px-4 py-3">
             <div className="flex items-center gap-2">
-              <span className="text-base">🧬</span>
+              <Activity className="w-4 h-4" />
               <p className="text-[13px] font-black text-stone-800">{t("idle.baumannSectionTitle")}</p>
             </div>
             <div className="flex items-center gap-1.5">
@@ -1710,7 +1724,7 @@ function ScanIdleScreen({ onScan }: { onScan: () => void }) {
                     style={step.active
                       ? { background: `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})`, boxShadow: `0 4px 14px ${SCAN_FROM}44` }
                       : { background: "#EDE6DE" }}>
-                    {step.icon}
+                    <step.Icon className="w-4 h-4" style={{ color: step.active ? "white" : "#A9998E" }} />
                   </div>
                   <div className="text-center">
                     <div className="text-[10px] font-bold text-stone-700">{step.title}</div>
@@ -2936,7 +2950,7 @@ function InlineTodos({ dateStr }: { dateStr: string }) {
   return (
     <div className="mb-3 pb-3 border-b border-[#F0EDE8]">
       <div className="flex items-center justify-between mb-2">
-        <p className="text-[11px] font-bold text-stone-500">📋 {t("diary.routineTitle")}</p>
+        <p className="text-[11px] font-bold text-stone-500"><ClipboardList className="w-3 h-3 inline mr-1" />{t("diary.routineTitle")}</p>
         <span className="text-[10px] px-2 py-0.5 rounded-full"
           style={{ background: doneCount === todos.length ? "#ECFDF5" : "#F9F9F9",
             color: doneCount === todos.length ? "#059669" : "#B0A898" }}>
@@ -5406,7 +5420,7 @@ function CosmeticsRegisterModal({ onClose, onSuccess }: { onClose: () => void; o
             <motion.div className="relative bg-white rounded-t-[28px] w-full max-w-md p-6 pb-8"
               initial={{ y: 80 }} animate={{ y: 0 }} exit={{ y: 80 }}>
               <div className="w-10 h-1 rounded-full bg-stone-200 mx-auto mb-5" />
-              <div className="text-4xl text-center mb-3">🙅‍♀️</div>
+              <div className="flex justify-center mb-3"><Ban className="w-10 h-10 text-stone-300" /></div>
               <p className="text-[16px] font-black text-stone-800 text-center mb-2">{t("cosmetics.notSkincareTitle")}</p>
               <p className="text-[13px] text-stone-500 text-center leading-relaxed whitespace-pre-line mb-5">
                 {t("cosmetics.notSkincareDesc", { type: nonSkincareType })}
@@ -6324,7 +6338,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
           className="fixed bottom-24 left-1/2 z-[999] -translate-x-1/2 px-6 py-4 rounded-2xl shadow-xl bg-white border border-stone-100 flex flex-col items-center gap-1 min-w-[200px]"
           style={{ boxShadow: "0 8px 32px rgba(0,0,0,0.18)" }}
         >
-          <span className="text-2xl">🎯</span>
+          <Target className="w-6 h-6" />
           <p className="font-black text-stone-800 text-[14px]">{t("mission.newAchieve")}</p>
           <p className="text-[12px] text-stone-500">{t(`mission.${missionPops[0]}`)}</p>
         </motion.div>
@@ -6568,7 +6582,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
               style={{ background: "linear-gradient(135deg, #FFF5F0, #FFF9F7)", border: "1px solid #F3DDD6" }}>
               <div className="flex items-center gap-2 mb-2">
                 <div className="w-7 h-7 rounded-xl flex items-center justify-center text-sm shrink-0"
-                  style={{ background: `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})` }}>🎯</div>
+                  style={{ background: `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})` }}><Target className="w-5 h-5 text-white" /></div>
                 <p className="text-[10px] font-black uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>
                   {t("result.todayAction")}
                 </p>
@@ -6832,7 +6846,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
                     <div className="flex gap-2 mt-2">
                       <div className="flex-1 rounded-2xl py-2 px-2 text-center" style={{ background: "#FFF5F0" }}>
                         <p className="text-[9px] font-bold text-stone-400 mb-0.5">{t("result.diary.streak")}</p>
-                        <p className="text-[14px] font-black" style={{ color: SCAN_TO }}>{currentStreak.count || 1}🔥</p>
+                        <p className="text-[14px] font-black flex items-center justify-center gap-0.5" style={{ color: SCAN_TO }}>{currentStreak.count || 1}<Flame className="w-3.5 h-3.5 inline ml-0.5" style={{ color: SCAN_TO }} /></p>
                       </div>
                       <div className="flex-1 rounded-2xl py-2 px-2 text-center" style={{ background: "#F0FDF4" }}>
                         <p className="text-[9px] font-bold text-stone-400 mb-0.5">{t("result.totalScans")}</p>
@@ -7109,7 +7123,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
 
             {!analysisResult?.nutritionTips ? (
               <div className="flex flex-col items-center justify-center gap-2 py-10 text-stone-400">
-                <span className="text-3xl">💊</span>
+                <Pill className="w-7 h-7" style={{ color: "#7C3AED" }} />
                 <p className="text-[12px]">{t("nutrients.loadingTips")}</p>
               </div>
             ) : (
@@ -7130,7 +7144,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
                             {SCORE_LABEL_MAP[item.targetScore] !== undefined ? t(`scores.${SCORE_LABEL_MAP[item.targetScore]}`) : item.targetScore}
                           </span>
                         </div>
-                        <p className="text-[10px] font-bold mb-0.5" style={{ color: "#7C3AED" }}>💊 {item.dose}</p>
+                        <p className="text-[10px] font-bold mb-0.5 flex items-center gap-0.5" style={{ color: "#7C3AED" }}><Pill className="w-3 h-3 inline mr-0.5" /> {item.dose}</p>
                         <p className="text-[11px] text-stone-500 leading-relaxed">{item.reason}</p>
                       </div>
                     </motion.div>
@@ -7152,7 +7166,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
                 {/* 피해야 할 것 */}
                 <div className="pt-1">
                   <div className="flex items-center gap-2 mb-3 pt-2 border-t border-stone-100">
-                    <span className="text-base">⚠️</span>
+                    <AlertCircle className="w-4 h-4 text-amber-500 shrink-0" />
                     <p className="text-[13px] font-black" style={{ color: "#D97706" }}>{t("nutrients.avoidTitle")}</p>
                   </div>
                   <div className="space-y-2">
@@ -7221,7 +7235,7 @@ function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, im
                 navigator.clipboard.writeText(shareUrl).then(() => alert(t("result.challengeLinkCopied")));
               }
             }}>
-            <span className="text-base">👑</span><span className="text-[12px]">{t("result.challengeShort")}</span>
+            <Crown className="w-4 h-4" /><span className="text-[12px]">{t("result.challengeShort")}</span>
           </Button>
         )}
       </div>
@@ -8325,7 +8339,7 @@ function ReportTab({ user }: { user: any }) {
                 }
               }}
             >
-              <span className="text-2xl">👑</span> 친구에게 피부 챌린지 보내기
+              <Crown className="w-6 h-6" /> 친구에게 피부 챌린지 보내기
             </Button>
           </motion.div>
         )}
