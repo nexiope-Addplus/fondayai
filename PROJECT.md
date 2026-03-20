@@ -51,7 +51,8 @@
 | DB | Cloudflare D1 (SQLite) — `fonday-db` |
 | KV | Cloudflare Workers KV — 스캔 히스토리, 푸시 구독 |
 | Worker | Cloudflare Worker (`worker-api.js`) — 크론 푸시 발송 |
-| 도메인 | GitHub → Cloudflare Pages 자동 배포 (main 브랜치) |
+| 서비스 도메인 | `fondayai.com` / `www.fondayai.com` → main 브랜치 자동 배포 |
+| 개발 도메인 | `fondayai.pages.dev` → dev 브랜치 자동 배포 |
 
 ---
 
@@ -733,21 +734,72 @@ export const onRequest = async (context: any) => {
 
 ## 12. Git / 배포 워크플로우
 
-```bash
-# 개발 후 배포
-git add <파일들>
-git commit -m "feat/fix/chore: 설명"
-git push origin main
-# → Cloudflare Pages 자동 빌드 & 배포 (약 1~2분)
+### 브랜치 구조 (2026-03-20 변경)
+```
+dev 브랜치   →  fondayai.pages.dev  (개발/테스트용)
+main 브랜치  →  fondayai.com        (서비스용)
 ```
 
-- **브랜치**: `main` 단일 브랜치 운영
+### 개발 플로우
+```bash
+# 1. 평소 작업은 dev 브랜치에서
+git checkout dev
+git add <파일들>
+git commit -m "feat/fix/chore: 설명"
+git push origin dev
+# → fondayai.pages.dev 에 자동 배포 (약 1~2분)
+
+# 2. 테스트 완료 후 서비스에 반영
+git checkout main
+git merge dev
+git push origin main
+# → fondayai.com 에 자동 배포 (약 1~2분)
+git checkout dev  # 다시 dev로
+```
+
 - **커밋 컨벤션**: `feat:` / `fix:` / `chore:` / `refactor:`
 - client + server + functions 변경은 **같은 커밋**에 포함
+- Claude Code는 기본적으로 `dev` 브랜치에서 작업 후 요청 시 main에 merge
 
 ---
 
-## 13. 최근 커밋 히스토리 (주요)
+## 13. 주요 업데이트 (2026-03-20 — 도메인/배포 세팅)
+
+### A. fondayai.com 도메인 등록 및 연결
+- Cloudflare Registrar에서 `fondayai.com` 구매
+- Cloudflare Pages `fondayai` 프로젝트에 `fondayai.com` / `www.fondayai.com` 커스텀 도메인 연결
+- DNS CNAME 레코드 추가 (fondayai.pages.dev → fondayai.com)
+- SSL 인증서 자동 발급 완료
+
+### B. 개발/서비스 브랜치 분리
+- `dev` 브랜치 생성 및 Cloudflare Pages Preview 브랜치로 지정
+- `main` → 서비스 (`fondayai.com`), `dev` → 개발 (`fondayai.pages.dev`)
+
+### C. OG 메타태그 도메인 교체
+- `client/index.html`의 canonical, og:url, og:image, twitter:image, JSON-LD url
+- `fondayai.pages.dev` → `fondayai.com` 으로 전부 교체
+
+### D. 화장품 루틴 AI 최적화 (2026-03-20)
+- `POST /api/cosmetics/optimize-routine` 엔드포인트 추가 (서버)
+- Gemini 2.5 Flash로 성분 충돌 분석 (레티놀+AHA/BHA, 비타민C+레티놀 등)
+- AM/PM 루틴을 바르는 순서(1번~)로 정렬 표시
+- 충돌 성분 조합은 하단 경고 카드로 이유/해결방법 표시
+- AI 분석 실패 또는 대기 중에는 카테고리 기반 정렬로 fallback
+
+### E. 미완료 — OAuth 콘솔 업데이트 필요
+아직 각 OAuth 콘솔에 `fondayai.com` 콜백 URL이 추가되지 않음. 로그인 기능 테스트 전 반드시 필요:
+- Google Cloud Console → 승인된 리디렉션 URI에 `https://fondayai.com/auth/google/callback` 추가
+- 카카오 디벨로퍼스 → 리디렉션 URI `https://fondayai.com/auth/kakao/callback` 추가
+- (LINE 사용 시) LINE Developers → `https://fondayai.com/auth/line/callback` 추가
+
+### F. 미완료 — JWT_SECRET 보안 강화 필요
+- 현재 `functions/` 폴더 전체에 `"fonday-secret-key"` fallback 하드코딩됨
+- Cloudflare Pages → Settings → Environment variables → Production 탭에 `JWT_SECRET=랜덤값` 설정 필요
+- `SESSION_SECRET`도 동일하게 설정 필요
+
+---
+
+## 14. 최근 커밋 히스토리 (주요)
 
 | 커밋 | 내용 |
 |------|------|
