@@ -1,0 +1,137 @@
+import React, { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
+import { motion } from "framer-motion";
+import { Sun } from "lucide-react";
+import { DEEP_GREEN, TINT_GREEN, TEXT_SECONDARY, fadeChild } from "./constants";
+import type { WeatherData } from "./types";
+import { getWeatherTipKey } from "./utils";
+
+// ─── 날씨 연동 데일리 팁 카드 ─────────────────────────────────────
+export function WeatherTipCard({ compact, weather: weatherProp }: {
+  compact?: boolean;
+  weather?: WeatherData | null;
+} = {}) {
+  const { t } = useTranslation();
+  const [internalWeather, setInternalWeather] = useState<WeatherData | null>(null);
+  const [denied, setDenied] = useState(false);
+
+  useEffect(() => {
+    if (weatherProp !== undefined) return; // 외부에서 prop으로 전달된 경우 내부 fetch 스킵
+    if (!navigator.geolocation) return;
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const { latitude: lat, longitude: lon } = pos.coords;
+        fetch(`/api/weather?lat=${lat}&lon=${lon}`)
+          .then((r) => r.ok ? r.json() : null)
+          .then((data) => { if (data && !data.error) setInternalWeather(data as WeatherData); })
+          .catch(() => {});
+      },
+      () => setDenied(true),
+      { timeout: 8000 }
+    );
+  }, [weatherProp]);
+
+  const weather = weatherProp ?? internalWeather;
+  if (denied || !weather) return null;
+
+  const tipKey = getWeatherTipKey(weather);
+  const tipRaw = t(`weather.tips.${tipKey}`, { returnObjects: true });
+  const tipArr = Array.isArray(tipRaw) ? tipRaw : [tipRaw];
+  const dayIdx = Math.floor(Date.now() / 86400000) % tipArr.length;
+  const tip = tipArr[dayIdx] as { emoji: string; title: string; body: string };
+  const aqiLabel = weather.aqi ? t(`weather.aqi${weather.aqi}`) : null;
+
+  if (compact) {
+    return (
+      <div className="px-3.5 py-2.5 border-t border-stone-100/80"
+        style={{ background: TINT_GREEN }}>
+        <div className="flex items-start gap-2.5">
+          <span className="text-xl leading-none flex-shrink-0 mt-0.5">{tip.emoji}</span>
+          <div className="flex-1 min-w-0">
+            <p className="text-xs font-semibold text-stone-700 leading-tight">{tip.title}</p>
+            <p className="text-[10.5px] text-stone-500 leading-relaxed mt-0.5">{tip.body}</p>
+          </div>
+          <div className="flex flex-col items-end gap-1 shrink-0">
+            <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full text-white"
+              style={{ background: DEEP_GREEN }}>{weather.temp}°C</span>
+            {aqiLabel && <span className="text-[9px] font-semibold px-1.5 py-0.5 rounded-full bg-white/70 text-stone-500">{aqiLabel}</span>}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <motion.div variants={fadeChild} className="mb-4">
+      <div
+        className="rounded-2xl p-4 overflow-hidden relative"
+        style={{ background: TINT_GREEN, boxShadow: "0 2px 12px rgba(45,95,79,0.08)" }}
+      >
+        <div className="absolute top-0 right-0 w-20 h-20 rounded-bl-full opacity-20"
+          style={{ background: DEEP_GREEN }} />
+        <div className="flex items-center gap-1.5 mb-2.5">
+          <div className="w-4 h-4 rounded-full flex items-center justify-center"
+            style={{ background: DEEP_GREEN }}>
+            <Sun className="w-2.5 h-2.5 text-white" />
+          </div>
+          <span className="text-[10px] font-bold tracking-widest uppercase" style={{ color: DEEP_GREEN }}>
+            {t("weather.cardTitle")}
+          </span>
+        </div>
+
+        <div className="flex items-start gap-3">
+          <span className="text-3xl leading-none flex-shrink-0">{tip.emoji}</span>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-bold text-stone-800 mb-1 leading-tight">{tip.title}</p>
+            <p className="text-[11.5px] text-stone-500 leading-relaxed">{tip.body}</p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2 mt-3 flex-wrap">
+          <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full text-white"
+            style={{ background: DEEP_GREEN }}>
+            {weather.temp}°C
+          </span>
+          <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-white/70 text-stone-600">
+            {t("weather.humidity", { val: weather.humidity })}
+          </span>
+          {aqiLabel && (
+            <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-white/70 text-stone-600">
+              {aqiLabel}
+            </span>
+          )}
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
+// ─── idle 미리보기 점수 바 ────────────────────────────────────────
+export function MiniScoreBarIdle({ label, score, color, delay }: {
+  label: string;
+  score: number;
+  color: string;
+  delay: number;
+}) {
+  const [animated, setAnimated] = useState(false);
+  useEffect(() => {
+    const timer = setTimeout(() => setAnimated(true), delay);
+    return () => clearTimeout(timer);
+  }, [delay]);
+  return (
+    <div className="flex items-center gap-2">
+      <span className="text-[10px] flex-shrink-0 w-[74px] whitespace-nowrap" style={{ color: TEXT_SECONDARY }}>{label}</span>
+      <div className="flex-1 h-[5px] rounded-full overflow-hidden" style={{ background: "#E8E0D8" }}>
+        <div
+          className="h-full rounded-full"
+          style={{
+            width: animated ? `${score}%` : "0%",
+            background: `linear-gradient(90deg, ${color}99, ${color})`,
+            transition: "width 0.8s cubic-bezier(0.22, 1, 0.36, 1)",
+          }}
+        />
+      </div>
+      <span className="text-[11px] font-bold flex-shrink-0 w-6 text-right" style={{ color }}>{score}</span>
+    </div>
+  );
+}
