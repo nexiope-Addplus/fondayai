@@ -28,6 +28,7 @@ import {
   getDiaryTodos, saveDiaryTodos, getDiaryTodoProgress, initDiaryTodosFromRoutine,
   getReminderSettings, saveReminderSettings, syncReminderToServer,
   buildCosmeticsInsights, buildRoutineGuide,
+  parseFoodOptions, pickFoodOption, dedupeFoods,
 } from "./utils";
 import { SkinPredictionCard } from "./SkinPredictionCard";
 import { ResultDiaryCard } from "./ResultDiaryCard";
@@ -557,32 +558,6 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
     : firstIncompleteQuest
       ? t("result.actionCard.statusNext", { tasks: firstIncompleteQuest.label })
       : "";
-
-  const parseFoodOptions = (value?: string): string[] => {
-    if (!value) return [];
-    const delimiter = value.includes("|") ? "|" : "·";
-    return value
-      .split(delimiter)
-      .map((item) => item.trim())
-      .filter(Boolean);
-  };
-
-  const pickFoodOption = (value: string | undefined, seed: number, fallbackIndex = 0): string | null => {
-    const options = parseFoodOptions(value);
-    if (options.length === 0) return null;
-    const normalizedSeed = Math.abs(Math.round(seed));
-    return options[normalizedSeed % options.length] ?? options[Math.min(fallbackIndex, options.length - 1)] ?? null;
-  };
-
-  const dedupeFoods = (items: ({ food: string; why: string } | null)[]) => {
-    const seen = new Set<string>();
-    return items.filter((item): item is { food: string; why: string } => {
-      if (!item?.food) return false;
-      if (seen.has(item.food)) return false;
-      seen.add(item.food);
-      return true;
-    });
-  };
 
   // 날짜 기반 시드 — 매일 다른 음식 추천 (YYYYMMDD 정수)
   const dailySeed = (() => {

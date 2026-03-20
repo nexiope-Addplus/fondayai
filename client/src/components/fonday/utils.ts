@@ -1265,3 +1265,26 @@ export function compressThumbnail(base64: string, maxSize = 300): Promise<string
     img.src = base64;
   });
 }
+
+export function parseFoodOptions(value?: string): string[] {
+  if (!value) return [];
+  const delimiter = value.includes("|") ? "|" : "·";
+  return value.split(delimiter).map((item) => item.trim()).filter(Boolean);
+}
+
+export function pickFoodOption(value: string | undefined, seed: number, fallbackIndex = 0): string | null {
+  const options = parseFoodOptions(value);
+  if (options.length === 0) return null;
+  const normalizedSeed = Math.abs(Math.round(seed));
+  return options[normalizedSeed % options.length] ?? options[Math.min(fallbackIndex, options.length - 1)] ?? null;
+}
+
+export function dedupeFoods(items: ({ food: string; why: string } | null)[]): { food: string; why: string }[] {
+  const seen = new Set<string>();
+  return items.filter((item): item is { food: string; why: string } => {
+    if (!item?.food) return false;
+    if (seen.has(item.food)) return false;
+    seen.add(item.food);
+    return true;
+  });
+}
