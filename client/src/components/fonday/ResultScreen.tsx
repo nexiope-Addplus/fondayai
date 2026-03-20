@@ -15,42 +15,29 @@ import {
   TINT_WARM, TINT_GREEN, TINT_NEUTRAL, SCORE_LABEL_MAP, NUTRIENT_COLORS,
   SCORE_COLORS, fadeChild, stagger, tabSlideVariants, MISSION_POINTS,
 } from "./constants";
-import type { CosmeticItem, StreakData, RankingData, MissionState, TodoItem, AICareSettings } from "./types";
+import type { CosmeticItem, StreakData, RankingData, MissionState, TodoItem } from "./types";
 import {
-  buildPushScoreSummary, buildBaumannTypeFromResult, todayStr,
+  todayStr,
   getStreak, updateStreak,
   getMissions, checkAndCompleteMissions,
   getAttendance, checkinToday,
-  shouldShowPushPrompt, dismissPushPrompt,
   markChallengeUsed, markShareUsed,
   getDiaryMemo,
-  getAICareSettings, saveAICareSettings,
   getDiaryTodos, saveDiaryTodos, getDiaryTodoProgress, initDiaryTodosFromRoutine,
-  getReminderSettings, saveReminderSettings, syncReminderToServer,
   buildCosmeticsInsights, buildRoutineGuide,
-  parseFoodOptions, pickFoodOption, dedupeFoods,
+  pickFoodOption, dedupeFoods,
 } from "./utils";
 import { SkinPredictionCard } from "./SkinPredictionCard";
 import { ResultDiaryCard } from "./ResultDiaryCard";
 import { ResultLoginCard } from "./ResultLoginCard";
-import { ResultNutrientsSheet } from "./ResultNutrientsSheet";
-import { ResultImprovementsSheet } from "./ResultImprovementsSheet";
-import { ResultAnalysisSheet } from "./ResultAnalysisSheet";
-import { ResultCosmeticsGateSheet } from "./ResultCosmeticsGateSheet";
 import { ResultActionBar } from "./ResultActionBar";
-import { ResultQuestSheet } from "./ResultQuestSheet";
-import { PartnershipModal } from "./PartnershipModal";
-import { CheckinSuccessSheet } from "./CheckinSuccessSheet";
-import { PushPromptSheet } from "./PushPromptSheet";
-import { CosmeticsRegisterModal } from "./MyScreen";
 import { ResultRoutineTab } from "./ResultRoutineTab";
 import { ResultSolutionTab } from "./ResultSolutionTab";
 import { ResultNutritionTab } from "./ResultNutritionTab";
-import { PwaInstallPopup } from "./PwaInstallPopup";
-import { RoutineUpdateSheet } from "./RoutineUpdateSheet";
-import { WaitlistModal } from "./WaitlistModal";
 import { useAICareSettings } from "./useAICareSettings";
 import { ResultHeaderCard } from "./ResultHeaderCard";
+import { ResultOverlayPopups } from "./ResultOverlayPopups";
+import { ResultModals } from "./ResultModals";
 
 // ─── 피부 예측 카드 ────────────────────────────────────────────────
 export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, imageBase64, onBack, onGoMagazine, onOpenDiary, user, deferredPrompt, onShowInstallGuide }: any) {
@@ -707,78 +694,24 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
 
   return (
     <>
-    {/* 스트릭 마일스톤 팝업 */}
-    <AnimatePresence>
-      {streakMilestone && (
-        <motion.div
-          key="milestone"
-          initial={{ opacity: 0, y: -40 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -40 }}
-          className="fixed top-16 left-1/2 z-[999] -translate-x-1/2 px-6 py-3 rounded-2xl shadow-xl text-white font-bold text-[15px] text-center"
-          style={{ background: "#F59E0B" }}
-        >
-          {t("streak.milestone", { count: streakMilestone })}
-        </motion.div>
-      )}
-    </AnimatePresence>
-
-    {/* 미션 달성 팝업 */}
-    <AnimatePresence>
-      {missionPops.length > 0 && (
-        <motion.div
-          key="missionpop"
-          initial={{ opacity: 0, y: 60, scale: 0.9 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          exit={{ opacity: 0, y: 60, scale: 0.9 }}
-          className="fixed bottom-24 left-1/2 z-[999] -translate-x-1/2 px-6 py-4 rounded-2xl shadow-xl bg-white flex flex-col items-center gap-1 min-w-[200px]"
-          style={{ boxShadow: "0 8px 32px rgba(0,0,0,0.18)" }}
-        >
-          <Target className="w-6 h-6" />
-          <p className="font-black text-stone-800 text-[14px]">{t("mission.newAchieve")}</p>
-          <p className="text-[12px] text-stone-500">{t(`mission.${missionPops[0]}`)}</p>
-        </motion.div>
-      )}
-    </AnimatePresence>
-
-    {/* PWA 설치 팝업 */}
-    <PwaInstallPopup
-      open={showPwaPopup}
-      onDismiss={() => { setShowPwaPopup(false); localStorage.setItem("fonday_pwa_dismissed", "1"); }}
+    <ResultOverlayPopups
+      streakMilestone={streakMilestone}
+      missionPops={missionPops}
+      showPwaPopup={showPwaPopup}
+      setShowPwaPopup={setShowPwaPopup}
       deferredPrompt={deferredPrompt}
       onShowInstallGuide={onShowInstallGuide}
+      showCheckinSheet={showCheckinSheet}
+      setShowCheckinSheet={setShowCheckinSheet}
+      user={user}
+      handleKakaoLogin={handleKakaoLogin}
+      handleLineLogin={handleLineLogin}
+      handleGoogleLogin={handleGoogleLogin}
+      showPushPrompt={showPushPrompt}
+      setShowPushPrompt={setShowPushPrompt}
+      pushLoading={pushLoading}
+      handlePushToggle={handlePushToggle}
     />
-
-    {/* 출석 체크인 팝업 */}
-    <AnimatePresence>
-      {showCheckinSheet && (
-        <CheckinSuccessSheet
-          user={user}
-          onKakao={() => { setShowCheckinSheet(false); handleKakaoLogin(); }}
-          onLine={() => { setShowCheckinSheet(false); handleLineLogin(); }}
-          onGoogle={() => { setShowCheckinSheet(false); handleGoogleLogin(); }}
-          onDismiss={() => setShowCheckinSheet(false)}
-        />
-      )}
-    </AnimatePresence>
-
-    {/* 푸시 구독 유도 바텀시트 */}
-    <AnimatePresence>
-      {showPushPrompt && (
-        <PushPromptSheet
-          isLoading={pushLoading}
-          onAllow={async () => {
-            await handlePushToggle();
-            dismissPushPrompt();
-            setShowPushPrompt(false);
-          }}
-          onDismiss={() => {
-            dismissPushPrompt();
-            setShowPushPrompt(false);
-          }}
-        />
-      )}
-    </AnimatePresence>
 
     {/* ── 공유 슬라이드는 서버사이드(generate-share.ts)에서 생성됨 ── */}
     <div ref={resultScrollRef} className="h-[calc(100dvh-60px)] overflow-y-auto">
@@ -975,92 +908,52 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
         }}
       />
 
-      <ResultAnalysisSheet
-        open={showAnalysis}
-        onClose={() => setShowAnalysis(false)}
+      <ResultModals
+        showAnalysis={showAnalysis}
+        setShowAnalysis={setShowAnalysis}
         aiComment={analysisResult?.aiComment}
         scores={scores}
         skinReport={(analysisResult?.skinReport as { area: string; finding: string }[]) ?? []}
         finalType={finalType}
-      />
-
-      <ResultImprovementsSheet
-        open={showImprovements}
-        onClose={() => setShowImprovements(false)}
+        showImprovements={showImprovements}
+        setShowImprovements={setShowImprovements}
         improvements={(analysisResult?.improvements as { title: string; desc: string }[]) ?? []}
         cosmetics={(analysisResult?.cosmetics as { type: string; key: string; reason: string }[]) ?? []}
-      />
-
-      <ResultNutrientsSheet
-        open={showNutrients}
-        onClose={() => setShowNutrients(false)}
-        finalType={finalType}
+        showNutrients={showNutrients}
+        setShowNutrients={setShowNutrients}
         avoidLunch={avoidLunch}
         avoidDinner={avoidDinner}
-      />
-
-      <ResultCosmeticsGateSheet
-        open={showCosmeticsGate}
+        showCosmeticsGate={showCosmeticsGate}
+        setShowCosmeticsGate={setShowCosmeticsGate}
         language={i18n.language}
-        onClose={() => setShowCosmeticsGate(false)}
-        onLogin={(provider) => {
-          setShowCosmeticsGate(false);
-          openLoginPopup(provider, "scan");
-        }}
-      />
-
-      {/* 화장품 등록 모달 */}
-      <AnimatePresence>
-        {showCosmeticsRegister && (
-          <CosmeticsRegisterModal
-            onClose={() => setShowCosmeticsRegister(false)}
-            onSuccess={() => {
-              setShowCosmeticsRegister(false);
-              void refreshCosmetics({ openRoutineUpdate: true });
-            }}
-          />
-        )}
-      </AnimatePresence>
-
-      <RoutineUpdateSheet
-        open={showRoutineUpdateSheet}
-        onClose={() => setShowRoutineUpdateSheet(false)}
+        onLoginFromGate={(provider) => openLoginPopup(provider, "scan")}
+        showCosmeticsRegister={showCosmeticsRegister}
+        setShowCosmeticsRegister={setShowCosmeticsRegister}
+        refreshCosmetics={refreshCosmetics}
+        showRoutineUpdateSheet={showRoutineUpdateSheet}
+        setShowRoutineUpdateSheet={setShowRoutineUpdateSheet}
         morningRoutineItems={morningRoutineItems}
         eveningRoutineItems={eveningRoutineItems}
-        onApply={() => {
-          saveDiaryTodos(todayStr(), routineUpdateItems.map((text) => ({ text, done: false })));
-          setShowRoutineUpdateSheet(false);
-        }}
-      />
-
-      <ResultQuestSheet
-        open={showQuestSheet}
-        onClose={() => setShowQuestSheet(false)}
+        routineUpdateItems={routineUpdateItems}
+        showQuestSheet={showQuestSheet}
+        setShowQuestSheet={setShowQuestSheet}
         totalPoints={totalPoints}
-        doneCount={questDoneCount}
-        totalCount={questBoard.length}
+        questDoneCount={questDoneCount}
         questBoard={questBoard}
-      />
-
-      <PartnershipModal
-        open={showPartnership}
-        onClose={() => setShowPartnership(false)}
-        form={partnerForm}
-        onFormChange={setPartnerForm}
-        onSubmit={handlePartnershipSubmit}
-        submitting={isPartnerSubmitting}
-        success={isPartnerSuccess}
-      />
-
-      {/* 얼리버드 모달 */}
-      <WaitlistModal
-        open={showWaitlist}
-        onClose={() => setShowWaitlist(false)}
+        showPartnership={showPartnership}
+        setShowPartnership={setShowPartnership}
+        partnerForm={partnerForm}
+        setPartnerForm={setPartnerForm}
+        handlePartnershipSubmit={handlePartnershipSubmit}
+        isPartnerSubmitting={isPartnerSubmitting}
+        isPartnerSuccess={isPartnerSuccess}
+        showWaitlist={showWaitlist}
+        setShowWaitlist={setShowWaitlist}
         email={email}
-        onEmailChange={setEmail}
+        setEmail={setEmail}
         isSubmitting={isSubmitting}
         isSuccess={isSuccess}
-        onSubmit={handleWaitlistSubmit}
+        handleWaitlistSubmit={handleWaitlistSubmit}
       />
     </div>
     </>
