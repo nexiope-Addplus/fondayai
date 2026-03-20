@@ -17,7 +17,7 @@ export const onRequest = async (context: any) => {
 
   let ogTitle = "Fonday AI - 피부 챌린지!";
   let ogDescription = "내 피부 점수를 확인하고 친구와 겨뤄보세요.";
-  let ogImage = "https://fonday.ai/og-default.png"; // Fallback image
+  let ogImage = "https://fondayai.com/og-image.webp"; // Fallback image
 
   try {
     if (env.SCANS_KV && token) {
