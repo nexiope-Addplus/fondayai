@@ -62,8 +62,56 @@
 ├── client/
 │   ├── src/
 │   │   ├── pages/
-│   │   │   ├── skin-scan.tsx        ★ 메인 UI (6000줄+, 전체 앱 UI)
+│   │   │   ├── skin-scan.tsx        ★ 메인 UI 진입점 (463줄 — 리팩토링 완료)
 │   │   │   └── battle.tsx           피부 챌린지 페이지
+│   │   ├── components/fonday/       ★ 분리된 컴포넌트 모음
+│   │   │   ├── ResultScreen.tsx     결과 화면 진입점 (961줄)
+│   │   │   ├── ResultHeaderCard.tsx 결과 상단 요약 카드
+│   │   │   ├── ResultOverlayPopups.tsx 플로팅 팝업 (스트릭/미션/PWA/체크인/푸시)
+│   │   │   ├── ResultModals.tsx     모든 바텀시트·모달 모음
+│   │   │   ├── ResultRoutineTab.tsx 결과 루틴 탭 콘텐츠
+│   │   │   ├── ResultSolutionTab.tsx 결과 솔루션 탭 콘텐츠
+│   │   │   ├── ResultNutritionTab.tsx 결과 영양 탭 콘텐츠
+│   │   │   ├── useAICareSettings.ts AI 밀착케어 푸시 설정 훅
+│   │   │   ├── PwaInstallPopup.tsx  PWA 설치 팝업
+│   │   │   ├── RoutineUpdateSheet.tsx 루틴 업데이트 시트
+│   │   │   ├── WaitlistModal.tsx    얼리버드 웨이트리스트 모달
+│   │   │   ├── DiaryTab.tsx         피부 일기 탭 (593줄)
+│   │   │   ├── DiaryReportTab.tsx   일기 리포트 탭 콘텐츠 (619줄)
+│   │   │   ├── DiaryHelpers.tsx     일기 탭 내부 헬퍼 컴포넌트들
+│   │   │   │                        (InlineTodos, InlineMemo,
+│   │   │   │                         DiaryRoutinePreviewCard,
+│   │   │   │                         DiaryCalendarView,
+│   │   │   │                         DiaryTimeline, DiaryFullView)
+│   │   │   ├── MyScreen.tsx         마이 화면 (289줄)
+│   │   │   ├── AttendanceCalendarModal.tsx 출석 달력 모달
+│   │   │   ├── MyCosmeticsModal.tsx 내 화장품 목록 모달
+│   │   │   ├── CosmeticsRegisterModal.tsx 화장품 등록 모달
+│   │   │   ├── ScanIdleScreen.tsx   스캔 대기 화면
+│   │   │   ├── ScanningScreen.tsx   분석 중 화면
+│   │   │   ├── SurveyScreen.tsx     설문 화면
+│   │   │   ├── MagazineTab.tsx      매거진 탭
+│   │   │   ├── ReportTab.tsx        리포트 탭
+│   │   │   ├── BottomNav.tsx        하단 네비게이션
+│   │   │   ├── CameraCapture.tsx    카메라 캡처
+│   │   │   ├── FaceMeshOverlay.tsx  얼굴 메시 오버레이
+│   │   │   ├── WeatherTipCard.tsx   날씨 팁 카드
+│   │   │   ├── SkinPredictionCard.tsx 피부 예측 카드
+│   │   │   ├── ResultDiaryCard.tsx  결과 일기 카드
+│   │   │   ├── ResultLoginCard.tsx  결과 로그인 유도 카드
+│   │   │   ├── ResultNutrientsSheet.tsx 영양 시트
+│   │   │   ├── ResultImprovementsSheet.tsx 개선 시트
+│   │   │   ├── ResultAnalysisSheet.tsx 분석 시트
+│   │   │   ├── ResultCosmeticsGateSheet.tsx 화장품 게이트 시트
+│   │   │   ├── ResultActionBar.tsx  결과 액션바
+│   │   │   ├── ResultQuestSheet.tsx 퀘스트 시트
+│   │   │   ├── PartnershipModal.tsx 제휴 모달
+│   │   │   ├── CheckinSuccessSheet.tsx 출석 성공 시트
+│   │   │   ├── PushPromptSheet.tsx  푸시 알림 유도 시트
+│   │   │   ├── MissionCard.tsx      미션 카드
+│   │   │   ├── types.ts             공용 타입 정의
+│   │   │   ├── constants.ts         색상/상수
+│   │   │   └── utils.ts             공용 유틸 함수
 │   │   ├── locales/
 │   │   │   ├── ko/translation.json  ★ 한국어 번역
 │   │   │   ├── en/translation.json  ★ 영어 번역
@@ -373,6 +421,69 @@ CREATE TABLE IF NOT EXISTS cosmetics (
   - `server/auth.ts`: `passport-google-oauth20`, `passport-kakao`, `passport-line-auth` 선언 누락 및 implicit any
   - `server/routes.ts`: `Set` iteration 관련 TS2802
 
+### L. skin-scan 리팩토링 중간 복구 상태 (2026-03-19)
+- 목적:
+  - 거대한 `client/src/pages/skin-scan.tsx`를 `client/src/components/fonday/` 하위 모듈로 분리
+- 생성된 리팩토링 파일:
+  - `client/src/components/fonday/DiaryTab.tsx`
+  - `client/src/components/fonday/MagazineTab.tsx`
+  - `client/src/components/fonday/MyScreen.tsx`
+  - `client/src/components/fonday/types.ts`
+  - `client/src/components/fonday/constants.ts`
+  - `client/src/components/fonday/utils.ts`
+- 중간에 멈췄을 때 문제:
+  - `DiaryTab.tsx`가 사실상 원본 내용을 복사만 한 상태라 import/공용 헬퍼 연결이 거의 없었음
+  - `skin-scan.tsx`에서도 `ReportConcernKey`, `syncReminderToServer`가 빠진 채 참조되고 있었음
+  - 그 결과 `npm run check`에서 `DiaryTab.tsx` 중심의 대량 `Cannot find name ...` 오류가 발생했음
+- 이번 세션에서 복구한 내용:
+  - `client/src/components/fonday/types.ts`
+    - `ReportConcernKey` 추가
+  - `client/src/components/fonday/utils.ts`
+    - `buildDiaryReportModel` 공용화
+    - `syncReminderToServer` 공용화
+  - `client/src/components/fonday/DiaryTab.tsx`
+    - React / i18n / framer-motion / recharts / shadcn / shared utils import 복구
+    - `export function DiaryTab` 형태로 정리
+    - 랭킹 배지 문구 렌더링 오류 수정
+  - `client/src/pages/skin-scan.tsx`
+    - 공용 `ReportConcernKey`, `syncReminderToServer` 다시 연결
+- 현재 결과:
+  - 리팩토링 때문에 새로 생겼던 `DiaryTab` 관련 타입 오류는 해소됨
+  - 실제 다이어리 화면 렌더링도 이제 `client/src/components/fonday/DiaryTab.tsx`를 사용하도록 전환됨
+  - 이후 baseline 타입 오류도 정리되어 `npm run check`가 통과하는 상태가 됨
+- 이번 추가 진행:
+  - `skin-scan.tsx` 안의 죽은 로컬 diary 구현은 1차 중복 제거 완료
+  - 제거된 로컬 함수:
+    - `InlineTodos`
+    - `InlineMemo`
+    - `DiaryRoutinePreviewCard`
+    - `DiaryCalendarView`
+    - `DiaryTimeline`
+    - `DiaryFullView`
+    - 로컬 `DiaryTab`
+  - 현재 `skin-scan.tsx`는 실제로 추출된 `client/src/components/fonday/DiaryTab.tsx`만 사용함
+  - `npm run check` 통과
+  - `MagazineTab`, `MyScreen`, `AttendanceCalendarModal`, `CosmeticsRegisterModal`은 이미 추출 컴포넌트 기준으로 실제 사용 중이었고, `skin-scan.tsx` 안에 별도 로컬 중복 구현은 남아 있지 않음을 확인
+  - diary 분리 이후 `skin-scan.tsx`에 남아 있던 미사용 diary helper import도 정리함
+  - baseline 타입 오류 정리:
+    - `client/src/pages/skin-scan.tsx`의 `Set` spread를 `Array.from(new Set(...))`로 변경
+    - `server/routes.ts`의 `Set` spread를 `Array.from(new Set(...))`로 변경
+    - `server/auth.ts`의 OAuth callback 파라미터 타입 보강
+    - `server/passport-auth.d.ts` 추가로 passport 관련 외부 모듈 선언 보강
+- 아직 남은 구조 작업:
+  - 다음 단계는 `skin-scan.tsx` 자체를 더 작은 결과/스캔/공유/모달 단위로 나눌지 판단하는 것
+  - 즉, 현재는 “Diary 분리 + 중복 제거 + My/Magazine 사용 전환 확인 + baseline 타입 정리”까지 끝났고, 다음 단계는 더 큰 화면 단위 분리 여부를 정하는 것
+  - 결과 화면 분리 1차:
+    - `client/src/components/fonday/SkinPredictionCard.tsx` 추출 완료
+    - `skin-scan.tsx`는 해당 예측 카드를 import 해서 사용하도록 전환
+    - 이어서 `client/src/components/fonday/ResultDiaryCard.tsx` 추출 완료
+    - 결과 화면의 로그인된 `피부일기 요약 카드`는 이제 추출 컴포넌트로 사용
+    - 이어서 `client/src/components/fonday/ResultLoginCard.tsx` 추출 완료
+    - 결과 화면의 비로그인 유도 카드도 추출 컴포넌트로 사용
+    - 이어서 `client/src/components/fonday/ResultNutrientsSheet.tsx` 추출 완료
+    - 결과 화면의 `showNutrients` 바텀시트는 추출 컴포넌트로 사용
+    - 이 시점 `skin-scan.tsx`는 약 4125줄 수준까지 축소
+
 ---
 
 ## 6. 인증 시스템
@@ -504,11 +615,16 @@ export const onRequest = async (context: any) => {
 };
 ```
 
-### skin-scan.tsx 규모
-- **6000줄 이상**의 단일 파일 — 전체 앱 UI가 여기 있음
-- 컴포넌트 순서: 유틸함수 → 작은 컴포넌트 → 큰 컴포넌트(MyScreen, ResultScreen, SkinScanPage 순)
-- 수정 전 반드시 해당 섹션 주변 코드를 먼저 읽을 것
-- 최근 변경이 결과 화면(ResultScreen)에 많이 몰려 있으므로, 상단 요약/미션 허브/루틴 카드/모달 구조를 같이 읽고 수정하는 편이 안전합니다
+### skin-scan.tsx 규모 (리팩토링 완료)
+- **463줄** — `client/src/components/fonday/` 하위로 전체 분리 완료
+- `skin-scan.tsx`는 이제 진입점 역할만 하며, 실제 화면 컴포넌트는 모두 `components/fonday/`에 있음
+- 주요 화면별 파일:
+  - **ResultScreen.tsx** (961줄): 결과 화면 상태 관리 + 레이아웃
+  - **DiaryTab.tsx** (593줄): 피부 일기 탭 (달력/타임라인/리포트/랭킹)
+  - **DiaryReportTab.tsx** (619줄): 일기 리포트 탭 콘텐츠
+  - **DiaryHelpers.tsx** (754줄): 일기 탭 내부 서브 컴포넌트들
+  - **MyScreen.tsx** (289줄): 마이 화면
+- 수정 시 해당 컴포넌트 파일을 직접 편집할 것
 
 ### D1 테이블 마이그레이션
 - 코드로 자동 마이그레이션 없음 — Cloudflare D1 콘솔에서 수동 실행 필요
@@ -517,6 +633,80 @@ export const onRequest = async (context: any) => {
 ---
 
 ## 11. TODO / 다음 작업
+
+### Refactor 진행 상태 (2026-03-20 완료)
+
+#### 완료된 리팩토링 전체 요약
+
+| 파일 | 리팩토링 전 | 리팩토링 후 |
+|------|------------|------------|
+| `skin-scan.tsx` | 6000+ 줄 | **463줄** |
+| `ResultScreen.tsx` | (skin-scan 내부) | **961줄** |
+| `DiaryTab.tsx` | (skin-scan 내부 → 1883줄) | **593줄** |
+| `MyScreen.tsx` | (skin-scan 내부 → 924줄) | **289줄** |
+
+#### Stage 1~2: skin-scan.tsx 1차 분리 (3766줄까지)
+- `types.ts`, `constants.ts`, `utils.ts` 공통 모듈 생성
+- `ScanIdleScreen`, `ScanningScreen`, `SurveyScreen`, `CameraCapture`, `BottomNav` 추출
+- `MagazineTab`, `ReportTab` 추출
+- `MyScreen`, `AttendanceCalendarModal`, `CosmeticsRegisterModal` 추출
+- `SkinPredictionCard`, `ResultDiaryCard`, `ResultLoginCard` 추출
+- `ResultNutrientsSheet`, `ResultImprovementsSheet`, `ResultAnalysisSheet` 추출
+- `ResultCosmeticsGateSheet`, `ResultActionBar`, `ResultQuestSheet` 추출
+- `PartnershipModal`, `CheckinSuccessSheet`, `PushPromptSheet`, `MissionCard` 추출
+
+#### Stage 3: ResultScreen 추출 (skin-scan.tsx → 463줄)
+- `ResultScreen.tsx` (1939줄)로 결과 화면 전체 분리
+
+#### Stage 4: ResultScreen 내부 분리 (1939 → 1406줄)
+- `ResultRoutineTab.tsx` — 루틴 탭 콘텐츠
+- `ResultSolutionTab.tsx` — 솔루션 탭 콘텐츠
+- `ResultNutritionTab.tsx` — 영양 탭 콘텐츠
+- `PwaInstallPopup.tsx` — PWA 설치 팝업
+- `RoutineUpdateSheet.tsx` — 루틴 업데이트 시트
+- `WaitlistModal.tsx` — 얼리버드 모달
+
+#### Stage 5: DiaryTab 내부 분리 (1883 → 1176줄)
+- `DiaryHelpers.tsx` — InlineTodos, InlineMemo, DiaryRoutinePreviewCard, DiaryCalendarView, DiaryTimeline, DiaryFullView (6개 헬퍼)
+
+#### Stage 6: MyScreen 분리 (924 → 289줄)
+- `AttendanceCalendarModal.tsx` — 출석 달력 모달
+- `MyCosmeticsModal.tsx` — 내 화장품 목록 모달
+- `CosmeticsRegisterModal.tsx` — 화장품 등록 모달
+- MyScreen.tsx에서 backward-compat re-export 유지
+
+#### Stage 7: DiaryTab 2차 분리 (1176 → 593줄)
+- `DiaryReportTab.tsx` (619줄) — 리포트 탭 전체 콘텐츠 + computed vars 추출
+
+#### Stage 8: ResultScreen 2차 분리 (1406 → 961줄)
+- `useAICareSettings.ts` (222줄) — AI 밀착케어 푸시 알림 상태 훅
+- `ResultHeaderCard.tsx` (197줄) — 결과 상단 요약 카드 컴포넌트
+- `ResultOverlayPopups.tsx` (112줄) — 플로팅 팝업들 (스트릭/미션/PWA/체크인/푸시)
+- `ResultModals.tsx` (164줄) — 모든 바텀시트·모달 컴포넌트 집합
+- `utils.ts` — `parseFoodOptions`, `pickFoodOption`, `dedupeFoods` 이동
+
+#### 현재 상태 (2026-03-20)
+- `npm run check` (tsc) **통과**
+- 전체 `components/fonday/` 파일 수: 40개
+- 주요 파일 줄수: `ResultScreen.tsx` 961줄, `DiaryTab.tsx` 593줄
+
+#### 추가 진행 예정 (다음 세션)
+아래 작업은 현 세션 사용량 부족으로 중단. 다음 세션에서 이어서 진행 가능.
+
+1. **`useShareHandler` 훅 추출** (약 100줄 절감)
+   - `handleShare` 함수 전체 (ResultScreen.tsx 내 lines ~605-706)
+   - 의존: `analysisResult`, `rankingData`, `finalType`, `overallScore`, `avoidLunch`, `avoidDinner`, `t`, `i18n`
+   - 반환: `{ handleShare, shareLoading }`
+
+2. **`useQuestBoard` 훅 추출** (약 60줄 절감)
+   - `questBoard`, `essentialQuests`, `questDoneCount`, `questProgressPct` 등 computed values
+   - 의존: `missionState`, `routineComplete`, `todayHasMemo`, `overallScore`, `currentStreak`, `t`
+
+3. **`useRoutineTodos` 훅 추출** (약 40줄 절감)
+   - `getRoutineTodoState`, `isRoutinePeriodComplete`, `setRoutinePeriodCompletion`
+   - 의존: `todayRoutineTodos`, `setTodayRoutineTodos`, `saveDiaryTodos`, `todayStr`
+
+위 3개 모두 완료 시 ResultScreen.tsx 약 760줄 수준까지 감소 예상.
 
 ### 즉시 필요
 - [ ] 기존에 `both` 로 저장된 화장품 데이터를 카테고리 기반 기본 시간대로 정리할지 결정
