@@ -415,11 +415,12 @@ CREATE TABLE IF NOT EXISTS cosmetics (
   - 먼저 라이트 경험 완성도를 올리는 쪽이 우선
 
 ### K. 현재 남아 있는 기술 이슈
-- `npm run check`는 여전히 실패하지만, 최근 UI 수정으로 새 오류를 만든 상태는 아님
-- 남아 있는 기존 타입 이슈:
-  - `client/src/pages/skin-scan.tsx`: `Set` iteration 관련 TS2802
-  - `server/auth.ts`: `passport-google-oauth20`, `passport-kakao`, `passport-line-auth` 선언 누락 및 implicit any
-  - `server/routes.ts`: `Set` iteration 관련 TS2802
+- 2026-03-20 기준 `npm run check` (tsc) 통과
+- 이번 세션에서 정리된 항목:
+  - `server/auth.ts`: `passport-google-oauth20`, `passport-kakao`, `passport-line-auth` 선언 누락 보강
+  - `server/auth.ts`: Google/Kakao OAuth callback 파라미터 타입 보강
+  - `server/routes.ts`: `Set` spread를 `Array.from(new Set(...))`로 변경해 TS2802 해소
+- 현재 기준으로 별도 타입 오류는 재현되지 않음
 
 ### L. skin-scan 리팩토링 중간 복구 상태 (2026-03-19)
 - 목적:
@@ -713,9 +714,8 @@ export const onRequest = async (context: any) => {
 - [ ] 결과 화면 상단 카드에서 얼굴 crop을 실기기 기준으로 한 번 더 미세조정
 - [ ] `오늘 목표`와 아침/저녁 루틴 카드의 정보 밀도를 더 줄일지 검토
 - [ ] MyScreen 화장품 상세 시트에 성분 OCR/자동 추출까지 붙일지 결정 (현재는 수동 입력)
-- [ ] D1 Console 테스트 크론 (`*/30 * * * *`) 삭제
+- [ ] Worker 실제 크론 스케줄과 `PROJECT.md` 문서 설명을 최종 기준으로 한 번 더 일치시킬 것
 - [ ] 공유 이미지 실기기 테스트 (WASM CDN 로드 확인)
-- [ ] `server/auth.ts` 타입 선언 누락 정리 (`passport-google-oauth20`, `passport-kakao`, implicit any)
 
 ### Phase 2.5 — 아침 리포트 이메일 (다음 우선순위)
 - Resend API 연동

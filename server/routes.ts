@@ -599,7 +599,9 @@ ingredients: 사진에 전성분 텍스트가 보이면 그대로 추출. 안 �
     if (existing) {
       if ((existing.streak?.count ?? 0) > (streak?.count ?? 0)) merged.streak = existing.streak;
       if (existing.attendance?.dates && attendance?.dates) {
-        const unionDates = [...new Set([...existing.attendance.dates, ...attendance.dates])];
+        const unionDates = Array.from(
+          new Set([...existing.attendance.dates, ...attendance.dates])
+        );
         merged.attendance = { dates: unionDates, totalPoints: unionDates.length * 3 };
       }
     }

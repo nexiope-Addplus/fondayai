@@ -8,6 +8,30 @@ import MemoryStore from "memorystore";
 import { storage } from "./storage";
 import { User } from "@shared/schema";
 
+type AuthDone = (error: unknown, user?: User | false) => void;
+
+type GoogleProfile = {
+  id: string;
+  displayName?: string;
+  emails?: Array<{ value?: string }>;
+  photos?: Array<{ value?: string }>;
+};
+
+type KakaoProfile = {
+  id: string | number;
+  displayName?: string;
+  _json?: {
+    kakao_account?: { email?: string };
+    properties?: { profile_image?: string };
+  };
+};
+
+type LineProfile = {
+  id: string;
+  displayName?: string;
+  pictureUrl?: string;
+};
+
 export function setupAuth(app: Express) {
   const SessionStore = MemoryStore(session);
   const sessionSettings: session.SessionOptions = {
@@ -52,7 +76,12 @@ export function setupAuth(app: Express) {
         clientSecret: process.env.GOOGLE_CLIENT_SECRET || "YOUR_GOOGLE_CLIENT_SECRET",
         callbackURL: "/auth/google/callback",
       },
-      async (_accessToken, _refreshToken, profile, done) => {
+      async (
+        _accessToken: string,
+        _refreshToken: string,
+        profile: GoogleProfile,
+        done: AuthDone
+      ) => {
         try {
           let user = await storage.getUserByGoogleId(profile.id);
           if (!user) {
@@ -79,7 +108,12 @@ export function setupAuth(app: Express) {
         clientSecret: process.env.KAKAO_CLIENT_SECRET || "YOUR_KAKAO_CLIENT_SECRET", // 카카오는 secret이 선택사항입니다.
         callbackURL: "/auth/kakao/callback",
       },
-      async (_accessToken, _refreshToken, profile, done) => {
+      async (
+        _accessToken: string,
+        _refreshToken: string,
+        profile: KakaoProfile,
+        done: AuthDone
+      ) => {
         try {
           let user = await storage.getUserByKakaoId(profile.id.toString());
           if (!user) {
@@ -107,7 +141,12 @@ export function setupAuth(app: Express) {
         callbackURL: "/auth/line/callback",
         scope: ["profile", "openid"],
       },
-      async (_accessToken: string, _refreshToken: string, profile: any, done: any) => {
+      async (
+        _accessToken: string,
+        _refreshToken: string,
+        profile: LineProfile,
+        done: AuthDone
+      ) => {
         try {
           let user = await storage.getUserByLineId(profile.id);
           if (!user) {
