@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronRight, Droplets } from "lucide-react";
+import { ChevronRight, Droplets, AlertTriangle } from "lucide-react";
 import type { CosmeticItem } from "./types";
 import {
   DEEP_GREEN,
@@ -11,22 +11,46 @@ import {
   TINT_NEUTRAL,
   TINT_WARM,
 } from "./constants";
-import { buildRoutineGuide, inferCosmeticTimeOfDay } from "./utils";
+import { inferCosmeticTimeOfDay } from "./utils";
+
+interface OptimizedRoutine {
+  am: { id: string; order: number }[];
+  pm: { id: string; order: number }[];
+  conflicts: { productNames: string[]; reason: string; resolution: string }[];
+}
 
 export function MyCosmeticsModal({ onClose, onAddNew }: { onClose: () => void; onAddNew: () => void }) {
   const { t } = useTranslation();
   const [list, setList] = useState<CosmeticItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [optimizing, setOptimizing] = useState(false);
+  const [optimized, setOptimized] = useState<OptimizedRoutine | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [selectedItem, setSelectedItem] = useState<CosmeticItem | null>(null);
-  const routineGuide = buildRoutineGuide(list, t);
 
   useEffect(() => {
     fetch("/api/cosmetics").then(r => r.json()).then(data => {
-      setList(Array.isArray(data) ? data : []);
+      const items = Array.isArray(data) ? data : [];
+      setList(items);
       setLoading(false);
+      if (items.length > 0) {
+        setOptimizing(true);
+        fetch("/api/cosmetics/optimize-routine", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ cosmetics: items }),
+        }).then(r => r.json()).then(result => {
+          if (result.am || result.pm) setOptimized(result);
+        }).catch(() => {}).finally(() => setOptimizing(false));
+      }
     }).catch(() => setLoading(false));
   }, []);
+
+  const getOrderedItems = (period: "am" | "pm"): CosmeticItem[] => {
+    if (!optimized) return [];
+    const orderedIds = optimized[period].sort((a, b) => a.order - b.order);
+    return orderedIds.map(({ id }) => list.find(c => c.id === id)).filter(Boolean) as CosmeticItem[];
+  };
 
   const handleDelete = async (id: string) => {
     setDeletingId(id);
@@ -39,26 +63,23 @@ export function MyCosmeticsModal({ onClose, onAddNew }: { onClose: () => void; o
   const quickInsights = [
     list[0] ? t("cosmetics.boardRecent", { name: list[0].name }) : null,
     !list.some((item) => item.category === "선크림") ? t("cosmetics.insightSunscreenTitle") : null,
-    routineGuide.pm.length === 0 ? t("cosmetics.boardNeedPm") : null,
-    routineGuide.cautions[0] ?? null,
+    optimized?.conflicts?.[0] ? `⚠️ ${optimized.conflicts[0].productNames.join(" + ")} 충돌` : null,
   ].filter(Boolean) as string[];
 
   const sections = [
     {
-      key: "am",
+      key: "am" as const,
       title: t("result.actionCard.phaseMorning"),
       accent: DEEP_GREEN,
       bg: TINT_GREEN,
       border: "#D7ECE4",
-      items: routineGuide.am,
     },
     {
-      key: "pm",
+      key: "pm" as const,
       title: t("result.actionCard.phaseEvening"),
       accent: SCAN_TO,
       bg: TINT_WARM,
       border: "#F4DDD3",
-      items: routineGuide.pm,
     },
   ];
 
@@ -119,38 +140,66 @@ export function MyCosmeticsModal({ onClose, onAddNew }: { onClose: () => void; o
               </div>
 
               <div className="grid gap-3">
-                {sections.map(({ key, title, accent, bg, border, items }) => (
-                  <div key={key} className="rounded-3xl p-4" style={{ background: bg }}>
-                    <div className="flex items-center justify-between gap-3 mb-3">
-                      <div>
-                        <p className="text-[15px] font-bold" style={{ color: DEEP_GREEN }}>{title}</p>
-                        <p className="text-[11px] text-stone-400">
-                          {items.length > 0 ? t("cosmetics.boardStepCount", { count: items.length }) : t(key === "am" ? "cosmetics.routineEmptyAm" : "cosmetics.routineEmptyPm")}
-                        </p>
+                {sections.map(({ key, title, accent, bg }) => {
+                  const items = getOrderedItems(key);
+                  return (
+                    <div key={key} className="rounded-3xl p-4" style={{ background: bg }}>
+                      <div className="flex items-center justify-between gap-3 mb-3">
+                        <div>
+                          <p className="text-[15px] font-bold" style={{ color: DEEP_GREEN }}>{title}</p>
+                          <p className="text-[11px] text-stone-400">
+                            {optimizing
+                              ? "성분 분석 중..."
+                              : items.length > 0
+                              ? t("cosmetics.boardStepCount", { count: items.length })
+                              : t(key === "am" ? "cosmetics.routineEmptyAm" : "cosmetics.routineEmptyPm")}
+                          </p>
+                        </div>
+                        {optimizing && (
+                          <div className="w-4 h-4 border-2 border-stone-200 border-t-stone-400 rounded-full animate-spin shrink-0" />
+                        )}
+                      </div>
+                      <div className="space-y-3">
+                        {items.map((item, index) => (
+                          <button
+                            key={`${key}-${item.id}`}
+                            onClick={() => setSelectedItem(item)}
+                            className="w-full rounded-2xl bg-white border px-3.5 py-3 flex items-center gap-3 text-left"
+                            style={{ borderColor: `${accent}20` }}
+                          >
+                            <span className="w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-bold text-white shrink-0"
+                              style={{ background: accent }}>
+                              {index + 1}
+                            </span>
+                            <div className="min-w-0 flex-1">
+                              <p className="text-xs font-semibold truncate" style={{ color: DEEP_GREEN }}>{t(`cosmetics.categories.${item.category}`)}</p>
+                              <p className="text-[11px] text-stone-400 truncate">{item.name}</p>
+                            </div>
+                            <ChevronRight className="w-4 h-4 text-stone-300 shrink-0" />
+                          </button>
+                        ))}
                       </div>
                     </div>
-                    <div className="space-y-3">
-                      {items.map((item, index) => (
-                        <button
-                          key={`${key}-${item.id}`}
-                          onClick={() => setSelectedItem(item)}
-                          className="w-full rounded-2xl bg-white border px-3.5 py-3 flex items-center gap-3 text-left"
-                          style={{ borderColor: `${accent}20` }}
-                        >
-                          <span className="w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-bold text-white shrink-0"
-                            style={{ background: accent }}>
-                            {index + 1}
-                          </span>
-                          <div className="min-w-0 flex-1">
-                            <p className="text-xs font-semibold truncate" style={{ color: DEEP_GREEN }}>{t(`cosmetics.categories.${item.category}`)}</p>
-                            <p className="text-[11px] text-stone-400 truncate">{item.name}</p>
-                          </div>
-                          <ChevronRight className="w-4 h-4 text-stone-300 shrink-0" />
-                        </button>
+                  );
+                })}
+
+                {optimized?.conflicts && optimized.conflicts.length > 0 && (
+                  <div className="rounded-3xl p-4" style={{ background: "#FFF8F0" }}>
+                    <div className="flex items-center gap-2 mb-3">
+                      <AlertTriangle className="w-4 h-4 shrink-0" style={{ color: SCAN_TO }} />
+                      <p className="text-[13px] font-bold" style={{ color: SCAN_TO }}>성분 충돌 주의</p>
+                    </div>
+                    <div className="space-y-2.5">
+                      {optimized.conflicts.map((c, i) => (
+                        <div key={i} className="rounded-2xl bg-white p-3">
+                          <p className="text-[11px] font-bold text-stone-700 mb-0.5">{c.productNames.join(" + ")}</p>
+                          <p className="text-[11px] text-stone-500">{c.reason}</p>
+                          {c.resolution && <p className="text-[11px] mt-1 font-medium" style={{ color: DEEP_GREEN }}>{c.resolution}</p>}
+                        </div>
                       ))}
                     </div>
                   </div>
-                ))}
+                )}
               </div>
 
               <div className="rounded-3xl p-4 bg-white">
