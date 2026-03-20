@@ -11,7 +11,7 @@ import {
   TINT_NEUTRAL,
   TINT_WARM,
 } from "./constants";
-import { inferCosmeticTimeOfDay, buildRoutineGuide } from "./utils";
+import { inferCosmeticTimeOfDay, buildRoutineGuide, buildRepresentativeRoutine } from "./utils";
 
 interface OptimizedRoutine {
   am: { id: string; order: number }[];
@@ -47,13 +47,14 @@ export function MyCosmeticsModal({ onClose, onAddNew }: { onClose: () => void; o
   }, []);
 
   const fallbackGuide = buildRoutineGuide(list, t);
+  const routinePlan = buildRepresentativeRoutine(list, t, optimized ? {
+    am: optimized.am?.map((item) => item.id),
+    pm: optimized.pm?.map((item) => item.id),
+    conflicts: optimized.conflicts,
+  } : undefined);
 
   const getOrderedItems = (period: "am" | "pm"): CosmeticItem[] => {
-    if (optimized) {
-      const orderedIds = [...optimized[period]].sort((a, b) => a.order - b.order);
-      return orderedIds.map(({ id }) => list.find(c => c.id === id)).filter(Boolean) as CosmeticItem[];
-    }
-    return fallbackGuide[period];
+    return routinePlan[period];
   };
 
   const handleDelete = async (id: string) => {
@@ -67,7 +68,7 @@ export function MyCosmeticsModal({ onClose, onAddNew }: { onClose: () => void; o
   const quickInsights = [
     list[0] ? t("cosmetics.boardRecent", { name: list[0].name }) : null,
     !list.some((item) => item.category === "선크림") ? t("cosmetics.insightSunscreenTitle") : null,
-    optimized?.conflicts?.[0] ? `⚠️ ${optimized.conflicts[0].productNames.join(" + ")} 충돌` : null,
+    routinePlan.conflicts[0] ? `⚠️ ${routinePlan.conflicts[0].productNames.join(" + ")}` : null,
   ].filter(Boolean) as string[];
 
   const sections = [
@@ -120,7 +121,7 @@ export function MyCosmeticsModal({ onClose, onAddNew }: { onClose: () => void; o
             </div>
           ) : (
             <>
-              <div className="rounded-3xl p-5" style={{ background: "#FFFFFF" }}>
+              <div className="rounded-[28px] border p-5" style={{ background: "#FFFFFF", borderColor: "#F1E9E1", boxShadow: "0 10px 26px rgba(45,95,79,0.05)" }}>
                 <div className="flex items-start justify-between gap-3">
                   <div>
                     <p className="text-[10px] font-bold tracking-[0.16em] uppercase" style={{ color: SCAN_TO }}>{t("cosmetics.myTitle")}</p>
@@ -141,24 +142,41 @@ export function MyCosmeticsModal({ onClose, onAddNew }: { onClose: () => void; o
                     </span>
                   ))}
                 </div>
+
+                <div className="mt-4 rounded-[24px] p-4" style={{ background: "#FAF7F3" }}>
+                  <div className="flex items-center justify-between gap-3">
+                    <div>
+                      <p className="text-[13px] font-bold" style={{ color: DEEP_GREEN }}>{t("cosmetics.routineRepresentativeTitle")}</p>
+                      <p className="text-[11px] text-stone-400 mt-1">{t("cosmetics.routineRepresentativeDesc")}</p>
+                    </div>
+                    <span className="px-2.5 py-1 rounded-full text-[10px] font-bold" style={{ background: `${DEEP_GREEN}12`, color: DEEP_GREEN }}>
+                      {t("cosmetics.routineRepresentativeBadge")}
+                    </span>
+                  </div>
+                </div>
               </div>
 
               <div className="grid gap-3">
                 {sections.map(({ key, title, accent, bg }) => {
                   const items = getOrderedItems(key);
                   return (
-                    <div key={key} className="rounded-3xl p-4" style={{ background: bg }}>
+                    <div key={key} className="rounded-[28px] border p-4" style={{ background: "#FFFFFF", borderColor: key === "am" ? "#DDEBE5" : "#F2DED5", boxShadow: "0 10px 24px rgba(45,95,79,0.05)" }}>
                       <div className="flex items-center justify-between gap-3 mb-3">
                         <div>
                           <p className="text-[15px] font-bold" style={{ color: DEEP_GREEN }}>{title}</p>
                           <p className="text-[11px] text-stone-400">
                             {optimizing
-                              ? "성분 분석 중..."
+                              ? t("cosmetics.routineOptimizing")
                               : items.length > 0
                               ? t("cosmetics.boardStepCount", { count: items.length })
                               : t(key === "am" ? "cosmetics.routineEmptyAm" : "cosmetics.routineEmptyPm")}
                           </p>
                         </div>
+                        {!optimizing && items.length > 0 && (
+                          <span className="px-2.5 py-1 rounded-full text-[10px] font-bold" style={{ background: bg, color: accent }}>
+                            {t("cosmetics.routineRepresentativeBadge")}
+                          </span>
+                        )}
                         {optimizing && (
                           <div className="w-4 h-4 border-2 border-stone-200 border-t-stone-400 rounded-full animate-spin shrink-0" />
                         )}
@@ -187,14 +205,17 @@ export function MyCosmeticsModal({ onClose, onAddNew }: { onClose: () => void; o
                   );
                 })}
 
-                {optimized?.conflicts && optimized.conflicts.length > 0 && (
-                  <div className="rounded-3xl p-4" style={{ background: "#FFF8F0" }}>
+                {routinePlan.conflicts.length > 0 && (
+                  <div className="rounded-[28px] border p-4" style={{ background: "#FFF8F0", borderColor: "#F7E1D1" }}>
                     <div className="flex items-center gap-2 mb-3">
                       <AlertTriangle className="w-4 h-4 shrink-0" style={{ color: SCAN_TO }} />
-                      <p className="text-[13px] font-bold" style={{ color: SCAN_TO }}>성분 충돌 주의</p>
+                      <div>
+                        <p className="text-[13px] font-bold" style={{ color: SCAN_TO }}>{t("cosmetics.routineConflictTitle")}</p>
+                        <p className="text-[11px] text-stone-400 mt-0.5">{t("cosmetics.routineConflictDesc")}</p>
+                      </div>
                     </div>
                     <div className="space-y-2.5">
-                      {optimized.conflicts.map((c, i) => (
+                      {routinePlan.conflicts.map((c, i) => (
                         <div key={i} className="rounded-2xl bg-white p-3">
                           <p className="text-[11px] font-bold text-stone-700 mb-0.5">{c.productNames.join(" + ")}</p>
                           <p className="text-[11px] text-stone-500">{c.reason}</p>
@@ -206,7 +227,7 @@ export function MyCosmeticsModal({ onClose, onAddNew }: { onClose: () => void; o
                 )}
               </div>
 
-              <div className="rounded-3xl p-4 bg-white">
+              <div className="rounded-[28px] border p-4 bg-white" style={{ borderColor: "#F1E9E1", boxShadow: "0 10px 24px rgba(45,95,79,0.05)" }}>
                 <div className="flex items-center justify-between gap-3 mb-3">
                   <div>
                     <p className="text-[15px] font-bold" style={{ color: DEEP_GREEN }}>{t("cosmetics.collectionTitle")}</p>

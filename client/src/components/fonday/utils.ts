@@ -1209,6 +1209,194 @@ export function buildRoutineGuide(cosmetics: CosmeticItem[], t: (key: string, op
   };
 }
 
+type RoutineConflictDetail = {
+  ids: string[];
+  productNames: string[];
+  reason: string;
+  resolution: string;
+};
+
+const RETINOID_PATTERNS = [/retinol/i, /retinal/i, /retinoid/i, /레티놀/i, /레티날/i, /레티노이드/i, /レチノ/i];
+const EXFOLIANT_PATTERNS = [/aha/i, /bha/i, /pha/i, /glycolic/i, /lactic/i, /salicylic/i, /mandelic/i, /글라이콜릭/i, /락틱/i, /살리실릭/i, /만델릭/i, /角質/i];
+const VITAMIN_C_PATTERNS = [/vitamin c/i, /ascorb/i, /비타민\s*c/i, /아스코르브/i, /ビタミン\s*c/i];
+const NIACINAMIDE_PATTERNS = [/niacinamide/i, /나이아신아마이드/i, /ナイアシンアミド/i];
+
+function matchesIngredientPattern(item: CosmeticItem, patterns: RegExp[]) {
+  const haystack = `${item.name || ""}\n${item.ingredients || ""}\n${item.category || ""}`;
+  return patterns.some((pattern) => pattern.test(haystack));
+}
+
+function getItemPeriods(item: CosmeticItem): ("am" | "pm")[] {
+  if (item.time_of_day === "am") return ["am"];
+  if (item.time_of_day === "pm") return ["pm"];
+  if (item.time_of_day === "both") {
+    const defaults = CATEGORY_DEFAULT_TIME[item.category] || ["am", "pm"];
+    return defaults.length > 0 ? defaults : ["am", "pm"];
+  }
+  return CATEGORY_DEFAULT_TIME[item.category] || ["pm"];
+}
+
+function compareCosmeticPriority(a: CosmeticItem, b: CosmeticItem) {
+  const aIndex = CATEGORY_ORDER.indexOf(a.category);
+  const bIndex = CATEGORY_ORDER.indexOf(b.category);
+  const normalizedA = aIndex === -1 ? CATEGORY_ORDER.length : aIndex;
+  const normalizedB = bIndex === -1 ? CATEGORY_ORDER.length : bIndex;
+
+  if (normalizedA !== normalizedB) return normalizedA - normalizedB;
+
+  const aIngredientScore = parseIngredientTokens(a.ingredients).length;
+  const bIngredientScore = parseIngredientTokens(b.ingredients).length;
+  if (aIngredientScore !== bIngredientScore) return bIngredientScore - aIngredientScore;
+
+  const aImageScore = a.image_thumbnail ? 1 : 0;
+  const bImageScore = b.image_thumbnail ? 1 : 0;
+  if (aImageScore !== bImageScore) return bImageScore - aImageScore;
+
+  return a.name.localeCompare(b.name, "ko");
+}
+
+function getConflictMeta(
+  a: CosmeticItem,
+  b: CosmeticItem,
+  period: "am" | "pm",
+  t: (key: string, options?: any) => string
+): RoutineConflictDetail | null {
+  const aRetinoid = matchesIngredientPattern(a, RETINOID_PATTERNS);
+  const bRetinoid = matchesIngredientPattern(b, RETINOID_PATTERNS);
+  const aExfoliant = a.category === "각질케어" || matchesIngredientPattern(a, EXFOLIANT_PATTERNS);
+  const bExfoliant = b.category === "각질케어" || matchesIngredientPattern(b, EXFOLIANT_PATTERNS);
+  const aVitaminC = matchesIngredientPattern(a, VITAMIN_C_PATTERNS);
+  const bVitaminC = matchesIngredientPattern(b, VITAMIN_C_PATTERNS);
+  const aNiacinamide = matchesIngredientPattern(a, NIACINAMIDE_PATTERNS);
+  const bNiacinamide = matchesIngredientPattern(b, NIACINAMIDE_PATTERNS);
+
+  if ((aRetinoid && bExfoliant) || (bRetinoid && aExfoliant)) {
+    return {
+      ids: [a.id, b.id],
+      productNames: [a.name, b.name],
+      reason: t("cosmetics.conflictRetinoidExfoliant"),
+      resolution: t("cosmetics.conflictResolutionSeparate"),
+    };
+  }
+
+  if ((aRetinoid && bVitaminC) || (bRetinoid && aVitaminC)) {
+    return {
+      ids: [a.id, b.id],
+      productNames: [a.name, b.name],
+      reason: t("cosmetics.conflictRetinoidVitaminC"),
+      resolution: t("cosmetics.conflictResolutionAmPm"),
+    };
+  }
+
+  if ((aVitaminC && bExfoliant) || (bVitaminC && aExfoliant)) {
+    return {
+      ids: [a.id, b.id],
+      productNames: [a.name, b.name],
+      reason: t("cosmetics.conflictVitaminCExfoliant"),
+      resolution: t("cosmetics.conflictResolutionAlternate"),
+    };
+  }
+
+  if (aExfoliant && bExfoliant) {
+    return {
+      ids: [a.id, b.id],
+      productNames: [a.name, b.name],
+      reason: t("cosmetics.cautionOverExfoliate"),
+      resolution: period === "am" ? t("cosmetics.conflictResolutionPmOnly") : t("cosmetics.conflictResolutionAlternate"),
+    };
+  }
+
+  if ((aNiacinamide && bVitaminC) || (bNiacinamide && aVitaminC)) {
+    return {
+      ids: [a.id, b.id],
+      productNames: [a.name, b.name],
+      reason: t("cosmetics.conflictNiacinamideVitaminC"),
+      resolution: t("cosmetics.conflictResolutionSeparate"),
+    };
+  }
+
+  return null;
+}
+
+function buildRepresentativePeriod(
+  sourceItems: CosmeticItem[],
+  period: "am" | "pm",
+  t: (key: string, options?: any) => string
+) {
+  const selected: CosmeticItem[] = [];
+  const conflicts: RoutineConflictDetail[] = [];
+  const usedCategories = new Set<string>();
+
+  for (const item of sourceItems) {
+    if (usedCategories.has(item.category)) continue;
+
+    const conflict = selected
+      .map((picked) => getConflictMeta(picked, item, period, t))
+      .find(Boolean) || null;
+
+    if (conflict) {
+      conflicts.push(conflict);
+      continue;
+    }
+
+    selected.push(item);
+    usedCategories.add(item.category);
+  }
+
+  return { items: selected, conflicts };
+}
+
+export function buildRepresentativeRoutine(
+  cosmetics: CosmeticItem[],
+  t: (key: string, options?: any) => string,
+  preferred?: { am?: string[]; pm?: string[]; conflicts?: { productNames?: string[]; reason?: string; resolution?: string }[] | null }
+) {
+  const preferredIds = new Set([...(preferred?.am || []), ...(preferred?.pm || [])]);
+  const baseSorted = [...cosmetics].sort(compareCosmeticPriority);
+
+  const getSourceItems = (period: "am" | "pm") => {
+    const preferredItems = (preferred?.[period] || [])
+      .map((id) => cosmetics.find((item) => item.id === id))
+      .filter(Boolean) as CosmeticItem[];
+
+    const remainder = baseSorted.filter((item) => !preferredIds.has(item.id) && getItemPeriods(item).includes(period));
+    const explicit = preferredItems.filter((item) => getItemPeriods(item).includes(period));
+
+    return [...explicit, ...remainder];
+  };
+
+  const amResult = buildRepresentativePeriod(getSourceItems("am"), "am", t);
+  const pmResult = buildRepresentativePeriod(getSourceItems("pm"), "pm", t);
+
+  const mergedConflicts = [
+    ...(preferred?.conflicts || []).map((conflict) => ({
+      ids: [],
+      productNames: conflict.productNames || [],
+      reason: conflict.reason || "",
+      resolution: conflict.resolution || "",
+    })),
+    ...amResult.conflicts,
+    ...pmResult.conflicts,
+  ].filter((conflict) => conflict.reason || conflict.productNames.length > 0);
+
+  const dedupedConflicts: RoutineConflictDetail[] = [];
+  const seen = new Set<string>();
+  for (const conflict of mergedConflicts) {
+    const key = `${[...conflict.productNames].sort().join("|")}::${conflict.reason}::${conflict.resolution}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    dedupedConflicts.push(conflict);
+  }
+
+  return {
+    am: amResult.items,
+    pm: pmResult.items,
+    amSteps: amResult.items.map((item) => t(`cosmetics.categories.${item.category}`)),
+    pmSteps: pmResult.items.map((item) => t(`cosmetics.categories.${item.category}`)),
+    conflicts: dedupedConflicts,
+  };
+}
+
 // ─── 이미지 처리 ──────────────────────────────────────────────────────────────
 
 export async function cropFaceFromImage(src: string): Promise<string> {

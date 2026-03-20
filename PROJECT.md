@@ -757,6 +757,8 @@ git push origin main
 git checkout dev  # 다시 dev로
 ```
 
+- **배포 원칙**: 모든 작업은 우선 `dev` 브랜치와 `fondayai.pages.dev` 에 먼저 반영해서 확인한 뒤, 이상이 없을 때만 `main` 으로 올려 `fondayai.com` 에 반영
+- 즉, 기본 작업 대상은 항상 `dev` 이고, `main` 반영은 별도 확인 후 진행
 - **커밋 컨벤션**: `feat:` / `fix:` / `chore:` / `refactor:`
 - client + server + functions 변경은 **같은 커밋**에 포함
 - Claude Code는 기본적으로 `dev` 브랜치에서 작업 후 요청 시 main에 merge
