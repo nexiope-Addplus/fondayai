@@ -11,7 +11,7 @@ import {
   TINT_NEUTRAL,
   TINT_WARM,
 } from "./constants";
-import { inferCosmeticTimeOfDay } from "./utils";
+import { inferCosmeticTimeOfDay, buildRoutineGuide } from "./utils";
 
 interface OptimizedRoutine {
   am: { id: string; order: number }[];
@@ -46,10 +46,14 @@ export function MyCosmeticsModal({ onClose, onAddNew }: { onClose: () => void; o
     }).catch(() => setLoading(false));
   }, []);
 
+  const fallbackGuide = buildRoutineGuide(list, t);
+
   const getOrderedItems = (period: "am" | "pm"): CosmeticItem[] => {
-    if (!optimized) return [];
-    const orderedIds = optimized[period].sort((a, b) => a.order - b.order);
-    return orderedIds.map(({ id }) => list.find(c => c.id === id)).filter(Boolean) as CosmeticItem[];
+    if (optimized) {
+      const orderedIds = [...optimized[period]].sort((a, b) => a.order - b.order);
+      return orderedIds.map(({ id }) => list.find(c => c.id === id)).filter(Boolean) as CosmeticItem[];
+    }
+    return fallbackGuide[period];
   };
 
   const handleDelete = async (id: string) => {
