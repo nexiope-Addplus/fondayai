@@ -786,16 +786,19 @@ git checkout dev  # 다시 dev로
 - 충돌 성분 조합은 하단 경고 카드로 이유/해결방법 표시
 - AI 분석 실패 또는 대기 중에는 카테고리 기반 정렬로 fallback
 
-### E. 미완료 — OAuth 콘솔 업데이트 필요
+### E. Cloudflare Functions optimize-routine 추가
+- `functions/api/cosmetics/optimize-routine.ts` 생성
+- `server/routes.ts`와 동일한 Gemini 성분 충돌 분석 로직
+- 프로덕션(`fondayai.com`)에서 AI 루틴 최적화 정상 동작
+
+### F. 미완료 — OAuth 콘솔 업데이트 필요
 아직 각 OAuth 콘솔에 `fondayai.com` 콜백 URL이 추가되지 않음. 로그인 기능 테스트 전 반드시 필요:
 - Google Cloud Console → 승인된 리디렉션 URI에 `https://fondayai.com/auth/google/callback` 추가
 - 카카오 디벨로퍼스 → 리디렉션 URI `https://fondayai.com/auth/kakao/callback` 추가
 - (LINE 사용 시) LINE Developers → `https://fondayai.com/auth/line/callback` 추가
 
-### F. 미완료 — JWT_SECRET 보안 강화 필요
-- 현재 `functions/` 폴더 전체에 `"fonday-secret-key"` fallback 하드코딩됨
-- Cloudflare Pages → Settings → Environment variables → Production 탭에 `JWT_SECRET=랜덤값` 설정 필요
-- `SESSION_SECRET`도 동일하게 설정 필요
+### G. JWT_SECRET / SESSION_SECRET 보안 강화 완료
+- Cloudflare Pages Production 환경변수에 `JWT_SECRET`, `SESSION_SECRET` 랜덤값(64자) 설정 완료 (API로 자동 설정)
 
 ---
 
