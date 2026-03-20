@@ -11,7 +11,7 @@ import {
   TINT_NEUTRAL,
   TINT_WARM,
 } from "./constants";
-import { inferCosmeticTimeOfDay, buildRoutineGuide, buildRepresentativeRoutine } from "./utils";
+import { inferCosmeticTimeOfDay, buildRoutineGuide, buildRepresentativeRoutine, buildCosmeticCorrelationSignals } from "./utils";
 
 interface OptimizedRoutine {
   am: { id: string; order: number }[];
@@ -19,7 +19,7 @@ interface OptimizedRoutine {
   conflicts: { productNames: string[]; reason: string; resolution: string }[];
 }
 
-export function MyCosmeticsModal({ onClose, onAddNew }: { onClose: () => void; onAddNew: () => void }) {
+export function MyCosmeticsModal({ onClose, onAddNew, scans = [] }: { onClose: () => void; onAddNew: () => void; scans?: any[] }) {
   const { t } = useTranslation();
   const [list, setList] = useState<CosmeticItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -52,6 +52,8 @@ export function MyCosmeticsModal({ onClose, onAddNew }: { onClose: () => void; o
     pm: optimized.pm?.map((item) => item.id),
     conflicts: optimized.conflicts,
   } : undefined);
+  const productSignals = buildCosmeticCorrelationSignals(list, scans, t);
+  const selectedSignal = selectedItem ? productSignals.find((signal) => signal.itemId === selectedItem.id) || null : null;
 
   const getOrderedItems = (period: "am" | "pm"): CosmeticItem[] => {
     return routinePlan[period];
@@ -154,6 +156,33 @@ export function MyCosmeticsModal({ onClose, onAddNew }: { onClose: () => void; o
                     </span>
                   </div>
                 </div>
+
+                {productSignals.length > 0 && (
+                  <div className="mt-3 rounded-[24px] p-4" style={{ background: "#F7FAFC" }}>
+                    <div className="flex items-center justify-between gap-3">
+                      <div>
+                        <p className="text-[13px] font-bold" style={{ color: DEEP_GREEN }}>{t("cosmetics.signalSectionTitle")}</p>
+                        <p className="text-[11px] text-stone-400 mt-1">{t("cosmetics.signalSectionDesc")}</p>
+                      </div>
+                      <span className="px-2.5 py-1 rounded-full text-[10px] font-bold" style={{ background: "#EEF4FF", color: "#4A7C6E" }}>
+                        {t("cosmetics.signalWindow")}
+                      </span>
+                    </div>
+                    <div className="mt-3 space-y-2">
+                      {productSignals.slice(0, 2).map((signal) => (
+                        <div key={signal.itemId} className="rounded-2xl bg-white px-3 py-3">
+                          <div className="flex items-center justify-between gap-2">
+                            <p className="text-[12px] font-semibold text-stone-800 truncate">{signal.itemName}</p>
+                            <span className="rounded-full px-2 py-0.5 text-[9px] font-bold shrink-0" style={{ background: `${DEEP_GREEN}10`, color: DEEP_GREEN }}>
+                              {t(`cosmetics.signalConfidence.${signal.confidence}`)}
+                            </span>
+                          </div>
+                          <p className="text-[11px] mt-1 text-kr-pretty" style={{ color: SCAN_TO }}>{signal.note}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
 
               <div className="grid gap-3">
@@ -255,6 +284,11 @@ export function MyCosmeticsModal({ onClose, onAddNew }: { onClose: () => void; o
                       <div className="mt-3">
                         <p className="text-xs font-semibold text-stone-800 truncate">{item.name}</p>
                         <p className="text-[11px] text-stone-400 truncate">{item.brand || t("cosmetics.noBrand")}</p>
+                        {productSignals.find((signal) => signal.itemId === item.id) && (
+                          <p className="text-[10px] mt-2 line-clamp-2 text-kr-pretty" style={{ color: SCAN_TO }}>
+                            {productSignals.find((signal) => signal.itemId === item.id)?.note}
+                          </p>
+                        )}
                         <div className="flex flex-wrap gap-1.5 mt-2">
                           <span className="px-2 py-1 rounded-full text-[9px] font-bold"
                             style={{ background: `${DEEP_GREEN}12`, color: DEEP_GREEN }}>
@@ -343,6 +377,54 @@ export function MyCosmeticsModal({ onClose, onAddNew }: { onClose: () => void; o
                 <p className="text-[12px] text-stone-600 mt-2 leading-relaxed whitespace-pre-wrap text-kr-pretty">
                   {selectedItem.ingredients?.trim() || t("cosmetics.ingredientsEmpty")}
                 </p>
+              </div>
+
+              <div className="mt-4 rounded-3xl p-4" style={{ background: "#F7FAFC" }}>
+                <div className="flex items-center justify-between gap-3">
+                  <p className="text-xs font-semibold uppercase tracking-[0.14em]" style={{ color: DEEP_GREEN }}>{t("cosmetics.signalCardTitle")}</p>
+                  {selectedSignal && (
+                    <span className="px-2 py-0.5 rounded-full text-[9px] font-bold" style={{ background: `${DEEP_GREEN}12`, color: DEEP_GREEN }}>
+                      {t(`cosmetics.signalConfidence.${selectedSignal.confidence}`)}
+                    </span>
+                  )}
+                </div>
+                {selectedSignal ? (
+                  <>
+                    <p className="text-[13px] font-semibold mt-2 text-kr-pretty" style={{ color: SCAN_TO }}>{selectedSignal.note}</p>
+                    <div className="grid grid-cols-2 gap-2.5 mt-4">
+                      <div className="rounded-2xl bg-white p-3">
+                        <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-stone-400">{t("cosmetics.signalMetricLabel")}</p>
+                        <p className="text-xs font-semibold mt-1" style={{ color: DEEP_GREEN }}>
+                          {selectedSignal.topScoreIndex !== null ? t(`scores.${selectedSignal.topScoreIndex}`) : t("cosmetics.signalMetricFallback")}
+                        </p>
+                        <p className="text-[11px] mt-1" style={{ color: SCAN_TO }}>
+                          {selectedSignal.topScoreDelta !== null
+                            ? `${selectedSignal.topScoreDelta > 0 ? "+" : ""}${Math.round(selectedSignal.topScoreDelta)}`
+                            : "—"}
+                        </p>
+                      </div>
+                      <div className="rounded-2xl bg-white p-3">
+                        <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-stone-400">{t("cosmetics.signalObservedLabel")}</p>
+                        <p className="text-xs font-semibold mt-1" style={{ color: DEEP_GREEN }}>
+                          {t("cosmetics.signalObservedValue", { count: selectedSignal.afterCount, days: Math.min(selectedSignal.daysTracked, 14) })}
+                        </p>
+                        <p className="text-[11px] mt-1 text-stone-400">
+                          {t("cosmetics.signalBaselineValue", { count: selectedSignal.beforeCount })}
+                        </p>
+                      </div>
+                    </div>
+                    {selectedSignal.coUsedProducts.length > 0 && (
+                      <div className="mt-3 rounded-2xl bg-white p-3">
+                        <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-stone-400">{t("cosmetics.signalCoUsedLabel")}</p>
+                        <p className="text-[11px] text-stone-600 mt-1 text-kr-pretty">
+                          {selectedSignal.coUsedProducts.join(", ")}
+                        </p>
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <p className="text-[12px] text-stone-500 mt-2 text-kr-pretty">{t("cosmetics.signalEmpty")}</p>
+                )}
               </div>
 
               <div className="flex gap-2 mt-5">

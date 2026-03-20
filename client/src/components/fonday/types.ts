@@ -59,6 +59,7 @@ export interface CosmeticItem {
   category: string;
   time_of_day?: "am" | "pm" | "both";
   opened_at?: string | null;
+  created_at?: string;
   image_thumbnail?: string;
   ingredients?: string;
   status?: string;

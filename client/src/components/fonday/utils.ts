@@ -22,6 +22,7 @@ import {
   CATEGORY_FILTERS,
   DEEP_GREEN,
   SCAN_TO,
+  SCORE_LABEL_MAP,
 } from "./constants";
 
 // ─── 빌드 헬퍼 ───────────────────────────────────────────────────────────────
@@ -1127,6 +1128,176 @@ export function buildCosmeticsInsights(
   }
 
   return insights.slice(0, 3);
+}
+
+type CosmeticSignalScan = {
+  createdAt?: string;
+  overallScore?: string | number;
+  scores?: Array<{ label?: string; score?: number | string }> | string;
+};
+
+export type CosmeticCorrelationSignal = {
+  itemId: string;
+  itemName: string;
+  category: string;
+  startedAt: string | null;
+  daysTracked: number;
+  beforeCount: number;
+  afterCount: number;
+  confidence: "early" | "building" | "strong";
+  overallDelta: number | null;
+  topScoreIndex: number | null;
+  topScoreDelta: number | null;
+  secondaryScoreIndex: number | null;
+  secondaryScoreDelta: number | null;
+  coUsedProducts: string[];
+  note: string;
+};
+
+function parseScanScores(scan: CosmeticSignalScan) {
+  try {
+    if (Array.isArray(scan.scores)) return scan.scores;
+    if (typeof scan.scores === "string") return JSON.parse(scan.scores);
+  } catch {}
+  return [];
+}
+
+function getScanTimestamp(scan: CosmeticSignalScan) {
+  const raw = scan.createdAt;
+  if (!raw) return null;
+  const time = new Date(raw).getTime();
+  return Number.isNaN(time) ? null : time;
+}
+
+function getCosmeticStartTimestamp(item: CosmeticItem) {
+  const raw = item.opened_at || item.created_at || null;
+  if (!raw) return null;
+  const time = new Date(raw).getTime();
+  return Number.isNaN(time) ? null : time;
+}
+
+function average(values: number[]) {
+  if (values.length === 0) return null;
+  return values.reduce((sum, value) => sum + value, 0) / values.length;
+}
+
+export function buildCosmeticCorrelationSignals(
+  cosmetics: CosmeticItem[],
+  scans: CosmeticSignalScan[],
+  t: (key: string, options?: any) => string,
+): CosmeticCorrelationSignal[] {
+  if (cosmetics.length === 0 || scans.length === 0) return [];
+
+  const sortedScans = [...scans]
+    .map((scan) => ({ scan, ts: getScanTimestamp(scan) }))
+    .filter((entry): entry is { scan: CosmeticSignalScan; ts: number } => entry.ts !== null)
+    .sort((a, b) => a.ts - b.ts);
+
+  return cosmetics
+    .map((item) => {
+      const startTs = getCosmeticStartTimestamp(item);
+      if (!startTs) return null;
+
+      const baselineScans = sortedScans
+        .filter(({ ts }) => ts < startTs)
+        .slice(-3)
+        .map(({ scan }) => scan);
+
+      const afterScans = sortedScans
+        .filter(({ ts }) => ts >= startTs && ts <= startTs + 14 * 86400000)
+        .map(({ scan }) => scan);
+
+      if (afterScans.length === 0) return null;
+
+      const baselineOverall = average(
+        baselineScans.map((scan) => Number(scan.overallScore) || 0).filter((value) => value > 0)
+      );
+      const afterOverall = average(
+        afterScans.map((scan) => Number(scan.overallScore) || 0).filter((value) => value > 0)
+      );
+
+      const deltas = Array.from({ length: 10 }, (_, index) => {
+        const label = Object.entries(SCORE_LABEL_MAP).find(([, mapped]) => mapped === index)?.[0] || "";
+        const beforeValues = baselineScans
+          .map((scan) => Number(parseScanScores(scan)[index]?.score) || 0)
+          .filter((value) => value > 0);
+        const afterValues = afterScans
+          .map((scan) => Number(parseScanScores(scan)[index]?.score) || 0)
+          .filter((value) => value > 0);
+        const beforeMean = average(beforeValues);
+        const afterMean = average(afterValues);
+        return {
+          index,
+          label,
+          delta: beforeMean !== null && afterMean !== null ? afterMean - beforeMean : null,
+        };
+      }).filter((item) => item.delta !== null) as Array<{ index: number; label: string; delta: number }>;
+
+      const sortedPositive = [...deltas]
+        .filter((item) => item.index !== 0)
+        .sort((a, b) => Math.abs(b.delta) - Math.abs(a.delta));
+
+      const top = sortedPositive[0] || null;
+      const second = sortedPositive[1] || null;
+      const coUsedProducts = cosmetics
+        .filter((other) => other.id !== item.id)
+        .filter((other) => {
+          const otherTs = getCosmeticStartTimestamp(other);
+          return otherTs !== null && otherTs <= startTs;
+        })
+        .map((other) => other.name)
+        .slice(0, 3);
+
+      const confidence: CosmeticCorrelationSignal["confidence"] =
+        baselineScans.length >= 2 && afterScans.length >= 2
+          ? "strong"
+          : baselineScans.length >= 1 && afterScans.length >= 2
+          ? "building"
+          : "early";
+
+      const daysTracked = Math.max(1, Math.floor((Date.now() - startTs) / 86400000) + 1);
+      const overallDelta = baselineOverall !== null && afterOverall !== null ? afterOverall - baselineOverall : null;
+      const mainMetricLabel = top ? t(`scores.${top.index}`) : null;
+
+      let note = t("cosmetics.signalNoteEarly");
+      if (top && top.delta >= 4) {
+        note = t("cosmetics.signalNotePositive", { metric: mainMetricLabel, delta: Math.round(top.delta) });
+      } else if (top && top.delta <= -4) {
+        note = t("cosmetics.signalNoteNegative", { metric: mainMetricLabel, delta: Math.abs(Math.round(top.delta)) });
+      } else if (overallDelta !== null && overallDelta >= 4) {
+        note = t("cosmetics.signalNoteOverallPositive", { delta: Math.round(overallDelta) });
+      } else if (overallDelta !== null && overallDelta <= -4) {
+        note = t("cosmetics.signalNoteOverallNegative", { delta: Math.abs(Math.round(overallDelta)) });
+      }
+
+      if (coUsedProducts.length >= 2) {
+        note = `${note} ${t("cosmetics.signalNoteCoUsed", { count: coUsedProducts.length })}`;
+      }
+
+      return {
+        itemId: item.id,
+        itemName: item.name,
+        category: item.category,
+        startedAt: item.opened_at || item.created_at || null,
+        daysTracked,
+        beforeCount: baselineScans.length,
+        afterCount: afterScans.length,
+        confidence,
+        overallDelta: overallDelta !== null ? Math.round(overallDelta * 10) / 10 : null,
+        topScoreIndex: top?.index ?? null,
+        topScoreDelta: top ? Math.round(top.delta * 10) / 10 : null,
+        secondaryScoreIndex: second?.index ?? null,
+        secondaryScoreDelta: second ? Math.round(second.delta * 10) / 10 : null,
+        coUsedProducts,
+        note,
+      };
+    })
+    .filter(Boolean)
+    .sort((a, b) => {
+      const aAbs = Math.max(Math.abs(a!.topScoreDelta || 0), Math.abs(a!.overallDelta || 0));
+      const bAbs = Math.max(Math.abs(b!.topScoreDelta || 0), Math.abs(b!.overallDelta || 0));
+      return bAbs - aAbs;
+    }) as CosmeticCorrelationSignal[];
 }
 
 // ─── 화장품 루틴 정렬/추론 ───────────────────────────────────────────────────

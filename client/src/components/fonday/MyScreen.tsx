@@ -18,7 +18,7 @@ import {
   TINT_WARM,
   TINT_GREEN,
 } from "./constants";
-import { getAttendance, buildRepresentativeRoutine } from "./utils";
+import { getAttendance, buildRepresentativeRoutine, buildCosmeticCorrelationSignals } from "./utils";
 import { AttendanceCalendarModal } from "./AttendanceCalendarModal";
 import { MyCosmeticsModal } from "./MyCosmeticsModal";
 import { CosmeticsRegisterModal } from "./CosmeticsRegisterModal";
@@ -33,13 +33,19 @@ export function MyScreen({ user, onInstall, onBack, onLogin, onGoMagazine }: { u
   const [showMyCosmetics, setShowMyCosmetics] = useState(false);
   const [showCosmeticsRegister, setShowCosmeticsRegister] = useState(false);
   const [myCosmetics, setMyCosmetics] = useState<any[]>([]);
+  const [scanHistory, setScanHistory] = useState<any[]>([]);
   const attendance = getAttendance();
   const routinePreview = buildRepresentativeRoutine(myCosmetics, t);
+  const productSignals = buildCosmeticCorrelationSignals(myCosmetics, scanHistory, t);
+  const topProductSignal = productSignals[0] || null;
 
   useEffect(() => {
     if (user) {
       fetch("/api/cosmetics").then(r => r.json()).then(data => {
         setMyCosmetics(Array.isArray(data) ? data : []);
+      }).catch(() => {});
+      fetch("/api/scans").then(r => r.json()).then(data => {
+        setScanHistory(Array.isArray(data) ? data : []);
       }).catch(() => {});
     }
   }, [user]);
@@ -239,6 +245,19 @@ export function MyScreen({ user, onInstall, onBack, onLogin, onGoMagazine }: { u
                     <p className="text-[10px] text-stone-500 mt-0.5 line-clamp-2">{routinePreview.conflicts[0].reason}</p>
                   </div>
                 )}
+
+                {topProductSignal && (
+                  <div className="mt-3 rounded-2xl px-3 py-3" style={{ background: "#F8FAFD" }}>
+                    <div className="flex items-center justify-between gap-2">
+                      <p className="text-[11px] font-bold" style={{ color: DEEP_GREEN }}>{t("cosmetics.signalTopTitle")}</p>
+                      <span className="rounded-full px-2 py-0.5 text-[9px] font-bold" style={{ background: `${SCAN_TO}12`, color: SCAN_TO }}>
+                        {t(`cosmetics.signalConfidence.${topProductSignal.confidence}`)}
+                      </span>
+                    </div>
+                    <p className="text-[12px] font-semibold text-stone-800 mt-2 text-kr-pretty">{topProductSignal.itemName}</p>
+                    <p className="text-[11px] mt-1 text-kr-pretty" style={{ color: SCAN_TO }}>{topProductSignal.note}</p>
+                  </div>
+                )}
               </div>
               <ChevronRight className="w-4 h-4 text-stone-300 shrink-0 mt-1" />
             </div>
@@ -299,6 +318,7 @@ export function MyScreen({ user, onInstall, onBack, onLogin, onGoMagazine }: { u
           <MyCosmeticsModal
             onClose={() => setShowMyCosmetics(false)}
             onAddNew={() => { setShowMyCosmetics(false); setShowCosmeticsRegister(true); }}
+            scans={scanHistory}
           />
         )}
       </AnimatePresence>
@@ -312,6 +332,9 @@ export function MyScreen({ user, onInstall, onBack, onLogin, onGoMagazine }: { u
               setShowCosmeticsRegister(false);
               fetch("/api/cosmetics").then(r => r.json()).then(data => {
                 setMyCosmetics(Array.isArray(data) ? data : []);
+              }).catch(() => {});
+              fetch("/api/scans").then(r => r.json()).then(data => {
+                setScanHistory(Array.isArray(data) ? data : []);
               }).catch(() => {});
             }}
           />
