@@ -1391,6 +1391,11 @@ const RETINOID_PATTERNS = [/retinol/i, /retinal/i, /retinoid/i, /레티놀/i, /�
 const EXFOLIANT_PATTERNS = [/aha/i, /bha/i, /pha/i, /glycolic/i, /lactic/i, /salicylic/i, /mandelic/i, /글라이콜릭/i, /락틱/i, /살리실릭/i, /만델릭/i, /角質/i];
 const VITAMIN_C_PATTERNS = [/vitamin c/i, /ascorb/i, /비타민\s*c/i, /아스코르브/i, /ビタミン\s*c/i];
 const NIACINAMIDE_PATTERNS = [/niacinamide/i, /나이아신아마이드/i, /ナイアシンアミド/i];
+const REPRESENTATIVE_LIMIT: Record<"am" | "pm", number> = { am: 4, pm: 5 };
+const PERIOD_PRIORITY: Record<"am" | "pm", string[]> = {
+  am: ["클렌저", "세럼", "크림", "선크림", "토너", "진정케어", "장벽케어", "아이크림", "각질케어"],
+  pm: ["클렌저", "토너", "각질케어", "세럼", "진정케어", "장벽케어", "크림", "아이크림", "선크림"],
+};
 
 function matchesIngredientPattern(item: CosmeticItem, patterns: RegExp[]) {
   const haystack = `${item.name || ""}\n${item.ingredients || ""}\n${item.category || ""}`;
@@ -1514,7 +1519,15 @@ function buildRepresentativePeriod(
     usedCategories.add(item.category);
   }
 
-  return { items: selected, conflicts };
+  const prioritized = [...selected].sort((a, b) => {
+    const aIndex = PERIOD_PRIORITY[period].indexOf(a.category);
+    const bIndex = PERIOD_PRIORITY[period].indexOf(b.category);
+    const normalizedA = aIndex === -1 ? PERIOD_PRIORITY[period].length : aIndex;
+    const normalizedB = bIndex === -1 ? PERIOD_PRIORITY[period].length : bIndex;
+    return normalizedA - normalizedB;
+  });
+
+  return { items: prioritized.slice(0, REPRESENTATIVE_LIMIT[period]), conflicts };
 }
 
 export function buildRepresentativeRoutine(

@@ -440,6 +440,20 @@ export async function registerRoutes(
 
   // 화장품 사진 → Gemini Vision으로 제품 자동 분류 (인증 불필요)
   app.post("/api/cosmetics/classify", async (req, res) => {
+    const ALLOWED_CATEGORIES = new Set([
+      "클렌저",
+      "토너",
+      "세럼",
+      "크림",
+      "선크림",
+      "각질케어",
+      "진정케어",
+      "장벽케어",
+      "아이크림",
+      "기타스킨케어",
+      "스킨케어아님",
+    ]);
+    const normalizeCategory = (category?: string) => (!category || !ALLOWED_CATEGORIES.has(category) ? "기타스킨케어" : category);
     const { imageBase64 } = req.body;
     if (!imageBase64) return res.status(400).json({ error: "imageBase64 필요" });
     const apiKey = process.env.GOOGLE_API_KEY;
@@ -450,20 +464,31 @@ export async function registerRoutes(
       const imageData = imageBase64.replace(/^data:image\/\w+;base64,/, "");
       const mimeType = imageBase64.startsWith("data:image/png") ? "image/png" : "image/jpeg";
       const prompt = `이 화장품 제품 사진을 분석하세요.
+반드시 사진에서 직접 읽히는 정보만 사용하세요. 보이지 않는 브랜드/제품명/전성분을 추정해서 지어내면 안 됩니다.
 JSON으로만 응답하세요 (다른 텍스트 절대 금지):
-{"name":"제품명","brand":"브랜드명","category":"카테고리","isSkincareRelevant":true,"productType":"","ingredients":"전성분"}
+{"name":"제품명","brand":"브랜드명","category":"카테고리","isSkincareRelevant":true,"productType":"","ingredients":"전성분","confidence":"high|medium|low"}
 카테고리는 반드시 다음 중 하나: 클렌저|토너|세럼|크림|선크림|각질케어|진정케어|장벽케어|아이크림|기타스킨케어|스킨케어아님
-스킨케어아님이면 isSkincareRelevant=false, productType에 제품 종류 기입 (예: 파운데이션)
-ingredients: 사진에 전성분 텍스트가 보이면 그대로 추출. 안 보이면 제품명+브랜드 기반으로 알려진 주요 성분을 쉼표로 나열. 알 수 없으면 빈 문자열.`;
+규칙:
+1. 제품명/브랜드는 사진에서 읽히는 경우만 기입. 불명확하면 빈 문자열.
+2. 전성분은 사진에 실제로 보이는 경우만 추출. 보이지 않으면 절대 추정하지 말고 빈 문자열.
+3. 메이크업, 향수, 헤어제품, 바디제품이면 isSkincareRelevant=false 와 category="스킨케어아님" 으로 반환.
+4. 스킨케어 제품이지만 정확한 분류가 애매하면 category="기타스킨케어".
+5. confidence는 사진에서 텍스트/제품 유형이 얼마나 분명한지 high|medium|low 중 하나로 반환.`;
       const result = await model.generateContent([
         { inlineData: { mimeType, data: imageData } },
         prompt
       ]);
       const text = result.response.text();
       const parsed = parseGeminiJson(text);
+      parsed.category = normalizeCategory(parsed.category);
+      if (parsed.category === "스킨케어아님") parsed.isSkincareRelevant = false;
+      if (!["high", "medium", "low"].includes(parsed.confidence)) parsed.confidence = "low";
+      if (typeof parsed.ingredients !== "string") parsed.ingredients = "";
+      if (typeof parsed.name !== "string") parsed.name = "";
+      if (typeof parsed.brand !== "string") parsed.brand = "";
       res.json(parsed);
     } catch {
-      res.json({ name: "", brand: "", category: "기타스킨케어", isSkincareRelevant: true, productType: "" });
+      res.json({ name: "", brand: "", category: "기타스킨케어", isSkincareRelevant: true, productType: "", ingredients: "", confidence: "low" });
     }
   });
 

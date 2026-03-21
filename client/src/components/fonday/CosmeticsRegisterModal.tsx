@@ -22,6 +22,7 @@ export function CosmeticsRegisterModal({ onClose, onSuccess }: { onClose: () => 
   const [category, setCategory] = useState<string>("");
   const [openedAt, setOpenedAt] = useState(new Date().toISOString().slice(0, 10));
   const [ingredients, setIngredients] = useState("");
+  const [analysisConfidence, setAnalysisConfidence] = useState<"high" | "medium" | "low">("low");
   const [registering, setRegistering] = useState(false);
   const [showNonSkincareAlert, setShowNonSkincareAlert] = useState(false);
   const [nonSkincareType, setNonSkincareType] = useState("");
@@ -50,6 +51,7 @@ export function CosmeticsRegisterModal({ onClose, onSuccess }: { onClose: () => 
         body: JSON.stringify({ imageBase64: compressed }),
       });
       const data = await res.json();
+      setAnalysisConfidence(data.confidence === "high" || data.confidence === "medium" ? data.confidence : "low");
       if (!data.isSkincareRelevant) {
         setNonSkincareType(data.productType || data.name || "");
         setShowNonSkincareAlert(true);
@@ -66,6 +68,7 @@ export function CosmeticsRegisterModal({ onClose, onSuccess }: { onClose: () => 
       }
     } catch {
       setCategory("기타스킨케어");
+      setAnalysisConfidence("low");
       setStep(2);
     }
     setAnalyzing(false);
@@ -195,6 +198,14 @@ export function CosmeticsRegisterModal({ onClose, onSuccess }: { onClose: () => 
               </div>
 
               {/* 카테고리 */}
+              <div className="rounded-2xl px-4 py-3" style={{ background: analysisConfidence === "high" ? "#F0F7F4" : "#FFF7ED" }}>
+                <p className="text-[11px] font-semibold text-kr-pretty" style={{ color: analysisConfidence === "high" ? DEEP_GREEN : SCAN_TO }}>
+                  {analysisConfidence === "high"
+                    ? "사진에서 읽힌 정보를 기준으로 자동 분류했어요. 틀리면 아래에서 수정해 주세요."
+                    : "자동 인식 정확도가 높지 않아요. 제품명, 카테고리, 전성분을 꼭 한 번 확인해 주세요."}
+                </p>
+              </div>
+
               <div>
                 <label className="text-[11px] font-bold text-stone-400 uppercase tracking-wider mb-2 block">{t("cosmetics.categoryLabel")}</label>
                 <div className="grid grid-cols-3 gap-2">

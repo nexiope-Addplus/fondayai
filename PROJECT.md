@@ -802,12 +802,71 @@ git checkout dev  # 다시 dev로
 ### G. JWT_SECRET / SESSION_SECRET 보안 강화 완료
 - Cloudflare Pages Production 환경변수에 `JWT_SECRET`, `SESSION_SECRET` 랜덤값(64자) 설정 완료 (API로 자동 설정)
 
+### H. My 탭 화장품 루틴 보드 단순화 (2026-03-20)
+- `client/src/components/fonday/MyScreen.tsx`
+  - My 탭의 `내 화장품 루틴` 진입 카드를 단순 목록형에서 보드형 요약 카드로 변경
+  - 아침/저녁 대표 루틴 단계 수와 충돌 주의 1건을 바로 미리 볼 수 있게 수정
+- `client/src/components/fonday/MyCosmeticsModal.tsx`
+  - 화장품 루틴 보드를 기존 “등록 제품 전부 나열” 방식에서 `카테고리당 대표 제품 1개` 중심으로 재구성
+  - 성분 충돌 가능성이 큰 조합은 메인 루틴에서 제외하고 별도 주의 카드에서 설명
+- `client/src/components/fonday/utils.ts`
+  - 대표 제품 선별 + 충돌 제외용 `buildRepresentativeRoutine` 로직 추가
+  - 레티노이드/각질케어, 레티노이드/비타민C, 비타민C/각질케어, 복수 각질 케어 등을 필터링
+- `server/routes.ts`, `functions/api/cosmetics/optimize-routine.ts`
+  - Gemini 프롬프트를 `대표 제품 1개씩 + 과한 단계 제외` 방향으로 수정
+- 관련 커밋:
+  - `2728d31` `feat(my): simplify cosmetics routine board`
+
+### I. 화장품-스캔 상관 신호 1차 구현 (2026-03-20)
+- 문제의식:
+  - 화장품 등록 데이터와 스캔 데이터는 쌓이지만, “이 제품 등록 후 어떤 점수가 어떻게 움직였는지” 연결 화면이 없어서 구독 가치가 약함
+- 구현 방향:
+  - 강한 인과 표현 대신 `개인 상관 신호`로 우선 구현
+  - 제품의 `opened_at` 또는 `created_at` 시점을 기준으로 전후 14일 스캔 흐름 비교
+  - 표현 예시는 “최근 14일 안에서 수분 밸런스가 평균 n점 더 좋게 나타남” 수준으로 유지
+  - 같이 사용한 제품 수를 함께 보여 단독 효과로 과장되지 않도록 함
+- 적용 위치:
+  - `client/src/components/fonday/MyScreen.tsx`
+    - My 탭 카드 안에 `스캔과 가장 강하게 함께 움직인 제품` 요약 신호 추가
+  - `client/src/components/fonday/MyCosmeticsModal.tsx`
+    - 상단에 `제품-스캔 상관 신호` 섹션 추가
+    - 제품 카드/상세 시트 안에 개별 제품 신호, 관찰 스캔 수, 같이 사용한 제품 표시
+  - `client/src/components/fonday/utils.ts`
+    - `buildCosmeticCorrelationSignals` 계산 로직 추가
+    - 신호 등급: `early` / `building` / `strong`
+  - `client/src/components/fonday/types.ts`
+    - `CosmeticItem.created_at` 추가
+  - `client/src/locales/{ko,en,ja}/translation.json`
+    - 상관 신호용 문구 추가
+- 현재 제약:
+  - 아직은 `상관 신호`이며 엄격한 인과 추정은 아님
+  - 제품을 동시에 여러 개 쓰는 경우 `같이 쓰던 제품`만 노출하고 정교한 보정은 하지 않음
+  - 화장품 삭제/중단 이력 기반의 정밀 노출 모델은 아직 없음
+- 검증:
+  - `npm run check` 통과
+- 관련 커밋:
+  - `923cf4a` `feat(my): add cosmetic scan correlation signals`
+
+### J. 다음 세션에서 이어볼 우선 확인 항목
+- `dev` 배포 페이지(`fondayai.pages.dev`)에서 My 탭 실기기 확인
+  - 카드 밀도
+  - 제품-스캔 상관 신호 문구 길이
+  - 스캔 데이터가 적을 때 empty state 자연스러운지
+- 상관 신호 고도화 후보
+  - 사용자가 카테고리 대표 제품을 직접 고정하는 기능
+  - 충돌 제품에 대해 `아침으로 이동 / 저녁으로 이동 / 격일 사용` 빠른 액션 제공
+  - 제품별 반응 기록과 Diary 메모 연결
+  - 장기적으로는 제품별 `노출 시작/중단` 이력 저장 후 신호 정밀도 향상
+
 ---
 
 ## 14. 최근 커밋 히스토리 (주요)
 
 | 커밋 | 내용 |
 |------|------|
+| 923cf4a | feat(my): 화장품-스캔 상관 신호를 My 탭/모달/상세 시트에 추가 |
+| 2728d31 | feat(my): My 탭 화장품 루틴 보드를 대표 제품 1개 중심으로 단순화 |
+| 6ad4089 | fix(seo): robots/sitemap 도메인을 fondayai.com 기준으로 정리 |
 | 5770ea0 | feat(report): Diary 리포트에 상담실장형 섹션(우선과제/원인추정/피해야할실수/루틴조정 등) 확장 |
 | 7bc8f02 | refactor(report): Diary 리포트 탭을 상담 브리핑 흐름으로 재설계 |
 | 704ad4c | docs: 3월 UI 최종 폴리싱 내용 PROJECT.md 반영 |
