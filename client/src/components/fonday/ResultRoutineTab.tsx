@@ -215,7 +215,7 @@ export function ResultRoutineTab(props: any) {
 
         <Card className="rounded-3xl overflow-hidden shadow-[0_8px_24px_rgba(45,95,79,0.06)] bg-white">
           <CardContent className="p-4">
-            <div>
+            <div className="min-w-0">
               <p className="text-xs font-semibold uppercase tracking-[0.16em]" style={{ color: SCAN_TO }}>
                 {t("result.hub.eyebrow")}
               </p>
@@ -229,7 +229,7 @@ export function ResultRoutineTab(props: any) {
             <div className="grid grid-cols-3 gap-2 mt-3">
               <button
                 onClick={onGoRoutineTab}
-                className="rounded-2xl p-3 text-left"
+                className="rounded-2xl p-3 text-left min-w-0"
                 style={{ background: TINT_GREEN }}
               >
                 <Droplets className="w-4 h-4 mb-2" style={{ color: DEEP_GREEN }} />
@@ -237,7 +237,7 @@ export function ResultRoutineTab(props: any) {
               </button>
               <button
                 onClick={onGoDiaryTab}
-                className="rounded-2xl p-3 text-left"
+                className="rounded-2xl p-3 text-left min-w-0"
                 style={{ background: TINT_WARM }}
               >
                 <BookOpen className="w-4 h-4 mb-2" style={{ color: SCAN_TO }} />
@@ -245,7 +245,7 @@ export function ResultRoutineTab(props: any) {
               </button>
               <button
                 onClick={onGoMyTab}
-                className="rounded-2xl p-3 text-left"
+                className="rounded-2xl p-3 text-left min-w-0"
                 style={{ background: TINT_NEUTRAL }}
               >
                 <User className="w-4 h-4 mb-2" style={{ color: DEEP_GREEN }} />

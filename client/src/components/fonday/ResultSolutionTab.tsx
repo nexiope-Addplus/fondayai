@@ -20,8 +20,8 @@ export function ResultSolutionTab(props: any) {
   return (
           <div className="space-y-4">
 
-            <div className="rounded-3xl p-4" style={{ background: "#FAF8F5", border: "1px solid #F1E9E1" }}>
-              <div>
+            <div className="rounded-3xl p-4 overflow-hidden" style={{ background: "#FAF8F5", border: "1px solid #F1E9E1" }}>
+              <div className="min-w-0">
                 <p className="text-[10px] font-bold uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>
                   {t("result.hub.eyebrow")}
                 </p>
@@ -35,21 +35,21 @@ export function ResultSolutionTab(props: any) {
               <div className="grid grid-cols-3 gap-2 mt-3">
                 <button
                   onClick={onGoRoutineTab}
-                  className="rounded-2xl p-3 text-left bg-white"
+                  className="rounded-2xl p-3 text-left bg-white min-w-0"
                 >
                   <Droplets className="w-4 h-4 mb-2" style={{ color: DEEP_GREEN }} />
                   <p className="text-[12px] font-bold" style={{ color: DEEP_GREEN }}>{t("nav.routine")}</p>
                 </button>
                 <button
                   onClick={onGoDiscoverTab}
-                  className="rounded-2xl p-3 text-left bg-white"
+                  className="rounded-2xl p-3 text-left bg-white min-w-0"
                 >
                   <Search className="w-4 h-4 mb-2" style={{ color: SCAN_TO }} />
                   <p className="text-[12px] font-bold" style={{ color: SCAN_TO }}>{t("nav.magazine")}</p>
                 </button>
                 <button
                   onClick={onGoMyTab}
-                  className="rounded-2xl p-3 text-left bg-white"
+                  className="rounded-2xl p-3 text-left bg-white min-w-0"
                 >
                   <User className="w-4 h-4 mb-2 text-stone-700" />
                   <p className="text-[12px] font-bold text-stone-800">{t("nav.my")}</p>

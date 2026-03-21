@@ -761,10 +761,10 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
           );
         })()}
 
-        <motion.div variants={fadeChild} className="rounded-3xl p-4"
+        <motion.div variants={fadeChild} className="rounded-3xl p-4 overflow-hidden"
           style={{ background: "#FFFFFF", boxShadow: "0 8px 24px rgba(45,95,79,0.06)" }}>
           <div className="flex items-start justify-between gap-3 mb-3">
-            <div>
+            <div className="min-w-0 flex-1">
               <p className="text-[10px] font-semibold uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>
                 {t("result.hub.eyebrow")}
               </p>
@@ -775,11 +775,11 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
                 {t("result.hub.desc")}
               </p>
             </div>
-            <div className="rounded-2xl px-3 py-2 text-right shrink-0" style={{ background: TINT_GREEN }}>
+            <div className="rounded-2xl px-3 py-2 text-right shrink-0 max-w-[42%] sm:max-w-[180px]" style={{ background: TINT_GREEN }}>
               <p className="text-[10px] font-bold uppercase tracking-[0.12em]" style={{ color: DEEP_GREEN }}>
                 {t("result.hub.today")}
               </p>
-              <p className="text-[12px] font-bold mt-1" style={{ color: DEEP_GREEN }}>{todayFocus}</p>
+              <p className="text-[12px] font-bold mt-1 break-keep leading-snug" style={{ color: DEEP_GREEN }}>{todayFocus}</p>
             </div>
           </div>
           <div className="grid grid-cols-2 gap-2">
@@ -792,12 +792,12 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
               <button
                 key={item.key}
                 onClick={item.action}
-                className="rounded-2xl p-3 text-left"
+                className="rounded-2xl p-3 text-left min-w-0"
                 style={{ background: item.bg }}
               >
                 {item.icon}
                 <p className="text-[12px] font-bold mt-2 text-stone-800">{item.label}</p>
-                <p className="text-[11px] text-stone-500 mt-1 text-kr-pretty">{item.sub}</p>
+                <p className="text-[11px] text-stone-500 mt-1 text-kr-pretty break-keep leading-snug">{item.sub}</p>
               </button>
             ))}
           </div>
