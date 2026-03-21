@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Sparkles, Heart, Lock, CalendarDays, Activity,
-  ClipboardList, Camera, ChevronDown, ChevronRight, Flame, Compass, User, Droplets, BookOpen,
+  ClipboardList, Camera, ChevronDown, ChevronRight, Flame,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -108,11 +108,6 @@ export function ScanIdleScreen({
     { Icon: ClipboardList, title: t("idle.step1"), sub: t("idle.step1Sub"), active: true },
     { Icon: Camera, title: t("idle.step2"), sub: t("idle.step2Sub"), active: false },
     { Icon: Activity, title: t("idle.step3"), sub: t("idle.step3Sub"), active: false },
-  ];
-  const FLOW_STEPS = [
-    { Icon: Activity, title: t("idle.flowStep1Title"), desc: t("idle.flowStep1Desc"), tone: TINT_GREEN, color: DEEP_GREEN },
-    { Icon: Sparkles, title: t("idle.flowStep2Title"), desc: t("idle.flowStep2Desc"), tone: TINT_WARM, color: SCAN_TO },
-    { Icon: ClipboardList, title: t("idle.flowStep3Title"), desc: t("idle.flowStep3Desc"), tone: "#F4F0FB", color: "#6D4CC2" },
   ];
   const previousScan = recentScans[1] ?? null;
   const latestScoreDelta = latestScan && previousScan
@@ -450,75 +445,6 @@ export function ScanIdleScreen({
                 </div>
                 {i < 2 && <div className="text-stone-200 text-sm pt-2 flex-shrink-0">›</div>}
               </div>
-            ))}
-          </div>
-        </div>
-      </motion.div>
-
-      <motion.div variants={fadeChild} className="mb-4 relative" style={{ zIndex: 1 }}>
-        <div className="rounded-2xl bg-white px-4 py-4" style={{ boxShadow: "0 8px 20px rgba(45,95,79,0.06)" }}>
-          <div className="flex items-center justify-between gap-3 mb-3">
-            <div>
-              <p className="text-[11px] font-bold tracking-[0.14em] uppercase" style={{ color: SCAN_TO }}>
-                {t("idle.flowEyebrow")}
-              </p>
-              <p className="text-[15px] font-bold text-stone-800 mt-1">{t("idle.flowTitle")}</p>
-            </div>
-            <span className="px-2.5 py-1 rounded-full text-[10px] font-bold" style={{ background: `${SCAN_FROM}12`, color: SCAN_TO }}>
-              {t("nav.scan")} → {t("nav.routine")} → {t("nav.diary")}
-            </span>
-          </div>
-          <div className="space-y-2.5">
-            {FLOW_STEPS.map(({ Icon, title, desc, tone, color }, index) => (
-              <div key={title} className="rounded-2xl px-3 py-3 flex items-start gap-3" style={{ background: "#FAF8F5" }}>
-                <div className="w-9 h-9 rounded-2xl flex items-center justify-center shrink-0" style={{ background: tone }}>
-                  <Icon className="w-4.5 h-4.5" style={{ color }} />
-                </div>
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-center gap-2">
-                    <span className="text-[10px] font-bold uppercase tracking-[0.12em]" style={{ color }}>
-                      {index + 1}
-                    </span>
-                    <p className="text-[12px] font-bold text-stone-800">{title}</p>
-                  </div>
-                  <p className="text-[11px] text-stone-500 mt-1 text-kr-pretty">{desc}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </motion.div>
-
-      <motion.div variants={fadeChild} className="mb-4 relative" style={{ zIndex: 1 }}>
-        <div className="rounded-2xl bg-white px-4 py-4" style={{ boxShadow: "0 8px 20px rgba(45,95,79,0.06)" }}>
-          <div className="flex items-center justify-between gap-3 mb-3">
-            <div>
-              <p className="text-[11px] font-bold tracking-[0.14em] uppercase" style={{ color: SCAN_TO }}>
-                {t("idle.shortcutEyebrow")}
-              </p>
-              <p className="text-[15px] font-bold text-stone-800 mt-1">{t("idle.shortcutTitle")}</p>
-            </div>
-            <span className="px-2.5 py-1 rounded-full text-[10px] font-bold" style={{ background: `${SCAN_FROM}12`, color: SCAN_TO }}>
-              {t("idle.shortcutBadge")}
-            </span>
-          </div>
-          <div className="grid grid-cols-2 gap-2">
-            {[
-              { key: "routine", label: t("nav.routine"), sub: t("idle.shortcutRoutine"), icon: <Droplets className="w-4 h-4" style={{ color: DEEP_GREEN }} />, action: onOpenRoutine, bg: TINT_GREEN },
-              { key: "diary", label: t("nav.diary"), sub: t("idle.shortcutDiary"), icon: <BookOpen className="w-4 h-4" style={{ color: SCAN_TO }} />, action: onOpenDiary, bg: TINT_WARM },
-              { key: "discover", label: t("nav.magazine"), sub: t("idle.shortcutDiscover"), icon: <Compass className="w-4 h-4 text-[#7C3AED]" />, action: onOpenDiscover, bg: "#F7F4FB" },
-              { key: "my", label: t("nav.my"), sub: t("idle.shortcutMy"), icon: <User className="w-4 h-4" style={{ color: DEEP_GREEN }} />, action: onOpenMy, bg: "#F8FAFD" },
-            ].map((item) => (
-              <button
-                key={item.key}
-                onClick={item.action}
-                className="rounded-2xl p-3 text-left min-w-0 min-h-[108px] flex flex-col"
-                style={{ background: item.bg }}
-              >
-                {item.icon}
-                <p className="text-[12px] font-bold mt-2 text-stone-800">{item.label}</p>
-                <p className="text-[11px] text-stone-500 mt-1 leading-snug text-left">{item.sub}</p>
-              </button>
             ))}
           </div>
         </div>

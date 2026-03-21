@@ -6,7 +6,7 @@ import {
   Camera, ScanLine, AlertCircle, Shield, Sun, Moon,
   Sparkles, ArrowRight, Heart, Droplets, Target,
   Leaf, Star, Thermometer, Utensils, CheckCircle2, Pill,
-  Bot, BookOpen, Search, User,
+  Bot, BookOpen, Search, User, Compass,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
