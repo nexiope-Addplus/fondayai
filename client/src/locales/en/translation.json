@@ -1,6 +1,7 @@
 {
   "nav": {
     "scan": "Home",
+    "routine": "Routine",
     "diary": "Diary",
     "my": "MY",
     "report": "Report",

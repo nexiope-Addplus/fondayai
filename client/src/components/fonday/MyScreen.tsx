@@ -1,9 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { AnimatePresence } from "framer-motion";
 import {
   Sparkles,
-  Droplets,
   Zap,
   User,
   ChevronRight,
@@ -13,15 +12,11 @@ import {
 } from "lucide-react";
 import {
   DEEP_GREEN,
-  SCAN_FROM,
   SCAN_TO,
   TINT_WARM,
-  TINT_GREEN,
 } from "./constants";
-import { getAttendance, buildRepresentativeRoutine, buildCosmeticCorrelationSignals } from "./utils";
+import { getAttendance } from "./utils";
 import { AttendanceCalendarModal } from "./AttendanceCalendarModal";
-import { MyCosmeticsModal } from "./MyCosmeticsModal";
-import { CosmeticsRegisterModal } from "./CosmeticsRegisterModal";
 
 // Re-export for backward compatibility
 export { AttendanceCalendarModal } from "./AttendanceCalendarModal";
@@ -30,25 +25,7 @@ export { CosmeticsRegisterModal } from "./CosmeticsRegisterModal";
 export function MyScreen({ user, onInstall, onBack, onLogin, onGoMagazine }: { user: any; onInstall: () => void; onBack: () => void; onLogin?: (p: "kakao"|"line"|"google", tab: string) => void; onGoMagazine?: () => void }) {
   const { t, i18n } = useTranslation();
   const [showCalendar, setShowCalendar] = useState(false);
-  const [showMyCosmetics, setShowMyCosmetics] = useState(false);
-  const [showCosmeticsRegister, setShowCosmeticsRegister] = useState(false);
-  const [myCosmetics, setMyCosmetics] = useState<any[]>([]);
-  const [scanHistory, setScanHistory] = useState<any[]>([]);
   const attendance = getAttendance();
-  const routinePreview = buildRepresentativeRoutine(myCosmetics, t);
-  const productSignals = buildCosmeticCorrelationSignals(myCosmetics, scanHistory, t);
-  const topProductSignal = productSignals[0] || null;
-
-  useEffect(() => {
-    if (user) {
-      fetch("/api/cosmetics").then(r => r.json()).then(data => {
-        setMyCosmetics(Array.isArray(data) ? data : []);
-      }).catch(() => {});
-      fetch("/api/scans").then(r => r.json()).then(data => {
-        setScanHistory(Array.isArray(data) ? data : []);
-      }).catch(() => {});
-    }
-  }, [user]);
 
   const handleLogout = () => {
     fetch('/api/logout', { method: 'POST' }).then(() => window.location.reload());
@@ -79,11 +56,6 @@ export function MyScreen({ user, onInstall, onBack, onLogin, onGoMagazine }: { u
             <span className="rounded-full px-3 py-1 text-[10px] font-bold" style={{ background: TINT_WARM, color: SCAN_TO }}>
               {t("attendance.totalPoints", { n: attendance.totalPoints })}
             </span>
-            {user && (
-              <span className="rounded-full px-3 py-1 text-[10px] font-bold" style={{ background: "#F6F4FB", color: "#7C3AED" }}>
-                {t("cosmetics.ctaCount", { count: myCosmetics.length })}
-              </span>
-            )}
           </div>
         </div>
       </div>
@@ -198,72 +170,6 @@ export function MyScreen({ user, onInstall, onBack, onLogin, onGoMagazine }: { u
           </div>
         </div>
 
-        {/* 화장품 루틴 목록 (로그인 시만) */}
-        {user && (
-          <button onClick={() => setShowMyCosmetics(true)}
-            className="w-full rounded-[28px] bg-white p-4 active:opacity-70 text-left"
-            style={{ boxShadow: "0 8px 24px rgba(45,95,79,0.06)" }}>
-            <div className="flex items-start gap-3">
-              <div className="w-10 h-10 rounded-2xl flex items-center justify-center shrink-0"
-                style={{ background: TINT_GREEN }}>
-                <Droplets className="w-5 h-5" style={{ color: DEEP_GREEN }} />
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <p className="text-[14px] font-bold text-stone-800">{t("cosmetics.myTitle")}</p>
-                    <p className="text-[11px] text-stone-400 mt-1">
-                      {myCosmetics.length > 0
-                        ? t("cosmetics.routineRepresentativeDesc")
-                        : t("cosmetics.myEmpty")}
-                    </p>
-                  </div>
-                  <span className="rounded-full px-2.5 py-1 text-[10px] font-bold shrink-0"
-                    style={{ background: `${DEEP_GREEN}12`, color: DEEP_GREEN }}>
-                    {t("cosmetics.ctaCount", { count: myCosmetics.length })}
-                  </span>
-                </div>
-
-                <div className="grid grid-cols-2 gap-2 mt-3">
-                  <div className="rounded-2xl p-3" style={{ background: "#F6FBF8" }}>
-                    <p className="text-[10px] font-bold uppercase tracking-[0.12em]" style={{ color: DEEP_GREEN }}>{t("cosmetics.amBtn")}</p>
-                    <p className="text-lg font-bold mt-1" style={{ color: DEEP_GREEN }}>{routinePreview.am.length}</p>
-                    <p className="text-[11px] text-stone-400 mt-1">{t("cosmetics.boardStepCount", { count: routinePreview.am.length })}</p>
-                  </div>
-                  <div className="rounded-2xl p-3" style={{ background: "#FFF7F3" }}>
-                    <p className="text-[10px] font-bold uppercase tracking-[0.12em]" style={{ color: SCAN_TO }}>{t("cosmetics.pmBtn")}</p>
-                    <p className="text-lg font-bold mt-1" style={{ color: SCAN_TO }}>{routinePreview.pm.length}</p>
-                    <p className="text-[11px] text-stone-400 mt-1">{t("cosmetics.boardStepCount", { count: routinePreview.pm.length })}</p>
-                  </div>
-                </div>
-
-                {routinePreview.conflicts[0] && (
-                  <div className="mt-3 rounded-2xl px-3 py-2" style={{ background: "#FFF8F0" }}>
-                    <p className="text-[11px] font-semibold" style={{ color: SCAN_TO }}>
-                      {routinePreview.conflicts[0].productNames.join(" + ")}
-                    </p>
-                    <p className="text-[10px] text-stone-500 mt-0.5 line-clamp-2">{routinePreview.conflicts[0].reason}</p>
-                  </div>
-                )}
-
-                {topProductSignal && (
-                  <div className="mt-3 rounded-2xl px-3 py-3" style={{ background: "#F8FAFD" }}>
-                    <div className="flex items-center justify-between gap-2">
-                      <p className="text-[11px] font-bold" style={{ color: DEEP_GREEN }}>{t("cosmetics.signalTopTitle")}</p>
-                      <span className="rounded-full px-2 py-0.5 text-[9px] font-bold" style={{ background: `${SCAN_TO}12`, color: SCAN_TO }}>
-                        {t(`cosmetics.signalConfidence.${topProductSignal.confidence}`)}
-                      </span>
-                    </div>
-                    <p className="text-[12px] font-semibold text-stone-800 mt-2 text-kr-pretty">{topProductSignal.itemName}</p>
-                    <p className="text-[11px] mt-1 text-kr-pretty" style={{ color: SCAN_TO }}>{topProductSignal.note}</p>
-                  </div>
-                )}
-              </div>
-              <ChevronRight className="w-4 h-4 text-stone-300 shrink-0 mt-1" />
-            </div>
-          </button>
-        )}
-
         {/* 앱 설치 */}
         <button onClick={onInstall}
           className="w-full flex items-center justify-between p-4 rounded-2xl bg-white active:opacity-70"
@@ -310,35 +216,6 @@ export function MyScreen({ user, onInstall, onBack, onLogin, onGoMagazine }: { u
       {/* 출석 달력 모달 */}
       <AnimatePresence>
         {showCalendar && <AttendanceCalendarModal onClose={() => setShowCalendar(false)} />}
-      </AnimatePresence>
-
-      {/* 내 화장품 목록 모달 */}
-      <AnimatePresence>
-        {showMyCosmetics && (
-          <MyCosmeticsModal
-            onClose={() => setShowMyCosmetics(false)}
-            onAddNew={() => { setShowMyCosmetics(false); setShowCosmeticsRegister(true); }}
-            scans={scanHistory}
-          />
-        )}
-      </AnimatePresence>
-
-      {/* 화장품 등록 모달 (MyScreen에서 열기) */}
-      <AnimatePresence>
-        {showCosmeticsRegister && (
-          <CosmeticsRegisterModal
-            onClose={() => setShowCosmeticsRegister(false)}
-            onSuccess={() => {
-              setShowCosmeticsRegister(false);
-              fetch("/api/cosmetics").then(r => r.json()).then(data => {
-                setMyCosmetics(Array.isArray(data) ? data : []);
-              }).catch(() => {});
-              fetch("/api/scans").then(r => r.json()).then(data => {
-                setScanHistory(Array.isArray(data) ? data : []);
-              }).catch(() => {});
-            }}
-          />
-        )}
       </AnimatePresence>
     </div>
   );

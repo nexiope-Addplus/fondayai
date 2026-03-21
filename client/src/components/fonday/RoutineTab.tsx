@@ -1,0 +1,497 @@
+import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
+import { AnimatePresence, motion } from "framer-motion";
+import { ChevronRight, Droplets, AlertTriangle, Plus, Sparkles } from "lucide-react";
+import type { CosmeticItem } from "./types";
+import {
+  DEEP_GREEN,
+  SCAN_FROM,
+  SCAN_TO,
+  TINT_GREEN,
+  TINT_WARM,
+  TINT_NEUTRAL,
+} from "./constants";
+import {
+  inferCosmeticTimeOfDay,
+  buildRepresentativeRoutine,
+  buildCosmeticCorrelationSignals,
+} from "./utils";
+import { CosmeticsRegisterModal } from "./CosmeticsRegisterModal";
+
+interface OptimizedRoutine {
+  am: { id: string; order: number }[];
+  pm: { id: string; order: number }[];
+  conflicts: { productNames: string[]; reason: string; resolution: string }[];
+}
+
+export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao" | "line" | "google", tab: string) => void }) {
+  const { t, i18n } = useTranslation();
+  const [list, setList] = useState<CosmeticItem[]>([]);
+  const [scans, setScans] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [optimizing, setOptimizing] = useState(false);
+  const [optimized, setOptimized] = useState<OptimizedRoutine | null>(null);
+  const [showRegister, setShowRegister] = useState(false);
+  const [selectedItem, setSelectedItem] = useState<CosmeticItem | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+
+  const loadData = async () => {
+    if (!user) {
+      setLoading(false);
+      return;
+    }
+    setLoading(true);
+    try {
+      const [cosmeticsRes, scansRes] = await Promise.all([
+        fetch("/api/cosmetics"),
+        fetch("/api/scans"),
+      ]);
+      const [cosmeticsData, scansData] = await Promise.all([
+        cosmeticsRes.json().catch(() => []),
+        scansRes.json().catch(() => []),
+      ]);
+      const items = Array.isArray(cosmeticsData) ? cosmeticsData : [];
+      setList(items);
+      setScans(Array.isArray(scansData) ? scansData : []);
+
+      if (items.length > 0) {
+        setOptimizing(true);
+        fetch("/api/cosmetics/optimize-routine", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ cosmetics: items }),
+        })
+          .then((r) => r.json())
+          .then((result) => {
+            if (result.am || result.pm) setOptimized(result);
+          })
+          .catch(() => {})
+          .finally(() => setOptimizing(false));
+      } else {
+        setOptimized(null);
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadData().catch(() => setLoading(false));
+  }, [user]);
+
+  const routinePlan = buildRepresentativeRoutine(
+    list,
+    t,
+    optimized
+      ? {
+          am: optimized.am?.map((item) => item.id),
+          pm: optimized.pm?.map((item) => item.id),
+          conflicts: optimized.conflicts,
+        }
+      : undefined,
+  );
+  const productSignals = buildCosmeticCorrelationSignals(list, scans, t);
+  const topSignal = productSignals[0] || null;
+  const selectedSignal = selectedItem ? productSignals.find((signal) => signal.itemId === selectedItem.id) || null : null;
+
+  const sections = [
+    {
+      key: "am" as const,
+      title: t("result.actionCard.phaseMorning"),
+      accent: DEEP_GREEN,
+      bg: TINT_GREEN,
+    },
+    {
+      key: "pm" as const,
+      title: t("result.actionCard.phaseEvening"),
+      accent: SCAN_TO,
+      bg: TINT_WARM,
+    },
+  ];
+
+  const handleDelete = async (id: string) => {
+    setDeletingId(id);
+    await fetch(`/api/cosmetics/${id}`, { method: "DELETE" }).catch(() => {});
+    setList((prev) => prev.filter((item) => item.id !== id));
+    setSelectedItem((prev) => (prev?.id === id ? null : prev));
+    setDeletingId(null);
+  };
+
+  if (!user) {
+    return (
+      <div className="min-h-[calc(100dvh-64px)] px-5 pt-6 pb-28">
+        <div className="rounded-[28px] bg-white p-6 text-center" style={{ boxShadow: "0 10px 28px rgba(45,95,79,0.08)" }}>
+          <div className="w-14 h-14 rounded-3xl mx-auto mb-4 flex items-center justify-center" style={{ background: TINT_GREEN }}>
+            <Droplets className="w-7 h-7" style={{ color: DEEP_GREEN }} />
+          </div>
+          <p className="text-[11px] font-bold tracking-widest uppercase mb-2" style={{ color: SCAN_TO }}>{t("nav.routine")}</p>
+          <h2 className="text-xl font-bold" style={{ color: DEEP_GREEN }}>{t("cosmetics.myTitle")}</h2>
+          <p className="text-[13px] text-stone-500 mt-2 text-kr-pretty">
+            화장품 등록, AM/PM 루틴, 제품별 피부 변화 신호를 한 곳에서 확인하세요.
+          </p>
+          <div className="space-y-2 mt-5 text-left">
+            <div className="rounded-2xl px-4 py-3" style={{ background: "#F8FAFD" }}>
+              <p className="text-[12px] font-semibold text-stone-800">{t("cosmetics.routineRepresentativeTitle")}</p>
+            </div>
+            <div className="rounded-2xl px-4 py-3" style={{ background: "#F8FAFD" }}>
+              <p className="text-[12px] font-semibold text-stone-800">{t("cosmetics.signalSectionTitle")}</p>
+            </div>
+          </div>
+          <div className="mt-5 space-y-3">
+            {i18n.language === "ko" ? (
+              <button
+                onClick={() => onLogin ? onLogin("kakao", "routine") : (localStorage.setItem("fonday_return_tab", "routine"), window.location.href = "/auth/kakao")}
+                className="w-full h-11 rounded-xl font-bold text-[13px] flex items-center justify-center border-0 text-[#3C1E1E]"
+                style={{ background: "#FEE500" }}
+              >
+                {t("attendance.kakao")}
+              </button>
+            ) : (
+              <button
+                onClick={() => onLogin ? onLogin("line", "routine") : (localStorage.setItem("fonday_return_tab", "routine"), window.location.href = "/auth/line")}
+                className="w-full h-11 rounded-xl font-bold text-[13px] flex items-center justify-center border-0 text-white"
+                style={{ background: "#06C755" }}
+              >
+                {t("attendance.line")}
+              </button>
+            )}
+            <button
+              onClick={() => onLogin ? onLogin("google", "routine") : (localStorage.setItem("fonday_return_tab", "routine"), window.location.href = "/auth/google")}
+              className="w-full h-11 rounded-xl font-bold text-[13px] bg-white text-stone-700 flex items-center justify-center"
+            >
+              {t("attendance.google")}
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-[calc(100dvh-64px)] px-5 pt-5 pb-28" style={{ background: "#F8F5F2" }}>
+      <div className="rounded-3xl p-5 bg-white" style={{ boxShadow: "0 10px 28px rgba(45,95,79,0.08)" }}>
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <p className="text-[11px] font-bold tracking-widest uppercase mb-1" style={{ color: SCAN_TO }}>{t("nav.routine")}</p>
+            <h1 className="text-2xl font-bold" style={{ color: DEEP_GREEN }}>{t("cosmetics.myTitle")}</h1>
+            <p className="text-[12px] text-stone-500 mt-1 text-kr-pretty">
+              대표 루틴, 충돌 주의, 제품별 피부 변화 신호를 한 번에 정리합니다.
+            </p>
+          </div>
+          <button
+            onClick={() => setShowRegister(true)}
+            className="w-11 h-11 rounded-2xl flex items-center justify-center shrink-0"
+            style={{ background: `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})` }}
+          >
+            <Plus className="w-5 h-5 text-white" />
+          </button>
+        </div>
+
+        <div className="grid grid-cols-2 gap-3 mt-4">
+          <div className="rounded-2xl p-4" style={{ background: "#F6FBF8" }}>
+            <p className="text-[10px] font-bold uppercase tracking-[0.12em]" style={{ color: DEEP_GREEN }}>{t("cosmetics.amBtn")}</p>
+            <p className="text-2xl font-bold mt-1" style={{ color: DEEP_GREEN }}>{routinePlan.am.length}</p>
+            <p className="text-[11px] text-stone-400 mt-1">{t("cosmetics.boardStepCount", { count: routinePlan.am.length })}</p>
+          </div>
+          <div className="rounded-2xl p-4" style={{ background: "#FFF7F3" }}>
+            <p className="text-[10px] font-bold uppercase tracking-[0.12em]" style={{ color: SCAN_TO }}>{t("cosmetics.pmBtn")}</p>
+            <p className="text-2xl font-bold mt-1" style={{ color: SCAN_TO }}>{routinePlan.pm.length}</p>
+            <p className="text-[11px] text-stone-400 mt-1">{t("cosmetics.boardStepCount", { count: routinePlan.pm.length })}</p>
+          </div>
+        </div>
+
+        {topSignal && (
+          <div className="mt-4 rounded-2xl p-4" style={{ background: "#F7FAFC" }}>
+            <div className="flex items-center justify-between gap-2">
+              <p className="text-[11px] font-bold" style={{ color: DEEP_GREEN }}>{t("cosmetics.signalTopTitle")}</p>
+              <span className="rounded-full px-2 py-0.5 text-[9px] font-bold" style={{ background: `${SCAN_TO}12`, color: SCAN_TO }}>
+                {t(`cosmetics.signalConfidence.${topSignal.confidence}`)}
+              </span>
+            </div>
+            <p className="text-[13px] font-semibold text-stone-800 mt-2">{topSignal.itemName}</p>
+            <p className="text-[11px] mt-1 text-kr-pretty" style={{ color: SCAN_TO }}>{topSignal.note}</p>
+          </div>
+        )}
+      </div>
+
+      <div className="space-y-3 mt-4">
+        {loading ? (
+          <div className="flex justify-center py-12">
+            <div className="w-6 h-6 border-2 border-stone-200 border-t-stone-400 rounded-full animate-spin" />
+          </div>
+        ) : list.length === 0 ? (
+          <div className="rounded-[28px] bg-white p-8 text-center" style={{ boxShadow: "0 10px 24px rgba(45,95,79,0.05)" }}>
+            <div className="w-14 h-14 rounded-3xl mx-auto mb-3 flex items-center justify-center" style={{ background: `${DEEP_GREEN}12`, color: DEEP_GREEN }}>
+              <Droplets className="w-7 h-7" />
+            </div>
+            <p className="text-[14px] font-bold text-stone-700 mb-1">{t("cosmetics.myEmpty")}</p>
+            <p className="text-[12px] text-stone-400">{t("cosmetics.myEmptyDesc")}</p>
+          </div>
+        ) : (
+          <>
+            {productSignals.length > 0 && (
+              <div className="rounded-[28px] border p-4 bg-white" style={{ borderColor: "#F1E9E1", boxShadow: "0 10px 24px rgba(45,95,79,0.05)" }}>
+                <div className="flex items-center justify-between gap-3 mb-3">
+                  <div>
+                    <p className="text-[15px] font-bold" style={{ color: DEEP_GREEN }}>{t("cosmetics.signalSectionTitle")}</p>
+                    <p className="text-[11px] text-stone-400">{t("cosmetics.signalSectionDesc")}</p>
+                  </div>
+                  <span className="px-2.5 py-1 rounded-full text-[10px] font-bold" style={{ background: "#EEF4FF", color: "#4A7C6E" }}>
+                    {t("cosmetics.signalWindow")}
+                  </span>
+                </div>
+                <div className="space-y-2.5">
+                  {productSignals.slice(0, 3).map((signal) => (
+                    <div key={signal.itemId} className="rounded-2xl p-3" style={{ background: "#F8FAFD" }}>
+                      <div className="flex items-center justify-between gap-2">
+                        <p className="text-[12px] font-semibold text-stone-800">{signal.itemName}</p>
+                        <span className="rounded-full px-2 py-0.5 text-[9px] font-bold" style={{ background: `${DEEP_GREEN}12`, color: DEEP_GREEN }}>
+                          {t(`cosmetics.signalConfidence.${signal.confidence}`)}
+                        </span>
+                      </div>
+                      <p className="text-[11px] mt-1 text-kr-pretty" style={{ color: SCAN_TO }}>{signal.note}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <div className="grid gap-3">
+              {sections.map(({ key, title, accent, bg }) => (
+                <div key={key} className="rounded-[28px] border p-4 bg-white" style={{ borderColor: key === "am" ? "#DDEBE5" : "#F2DED5", boxShadow: "0 10px 24px rgba(45,95,79,0.05)" }}>
+                  <div className="flex items-center justify-between gap-3 mb-3">
+                    <div>
+                      <p className="text-[15px] font-bold" style={{ color: DEEP_GREEN }}>{title}</p>
+                      <p className="text-[11px] text-stone-400">
+                        {optimizing
+                          ? t("cosmetics.routineOptimizing")
+                          : routinePlan[key].length > 0
+                          ? t("cosmetics.boardStepCount", { count: routinePlan[key].length })
+                          : t(key === "am" ? "cosmetics.routineEmptyAm" : "cosmetics.routineEmptyPm")}
+                      </p>
+                    </div>
+                    {!optimizing && routinePlan[key].length > 0 && (
+                      <span className="px-2.5 py-1 rounded-full text-[10px] font-bold" style={{ background: bg, color: accent }}>
+                        {t("cosmetics.routineRepresentativeBadge")}
+                      </span>
+                    )}
+                  </div>
+                  <div className="space-y-3">
+                    {routinePlan[key].map((item, index) => (
+                      <button
+                        key={`${key}-${item.id}`}
+                        onClick={() => setSelectedItem(item)}
+                        className="w-full rounded-2xl bg-white border px-3.5 py-3 flex items-center gap-3 text-left"
+                        style={{ borderColor: `${accent}20` }}
+                      >
+                        <span className="w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-bold text-white shrink-0" style={{ background: accent }}>
+                          {index + 1}
+                        </span>
+                        <div className="min-w-0 flex-1">
+                          <p className="text-xs font-semibold truncate" style={{ color: DEEP_GREEN }}>{t(`cosmetics.categories.${item.category}`)}</p>
+                          <p className="text-[11px] text-stone-400 truncate">{item.name}</p>
+                        </div>
+                        <ChevronRight className="w-4 h-4 text-stone-300 shrink-0" />
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {routinePlan.conflicts.length > 0 && (
+              <div className="rounded-[28px] border p-4" style={{ background: "#FFF8F0", borderColor: "#F7E1D1" }}>
+                <div className="flex items-center gap-2 mb-3">
+                  <AlertTriangle className="w-4 h-4 shrink-0" style={{ color: SCAN_TO }} />
+                  <div>
+                    <p className="text-[13px] font-bold" style={{ color: SCAN_TO }}>{t("cosmetics.routineConflictTitle")}</p>
+                    <p className="text-[11px] text-stone-400 mt-0.5">{t("cosmetics.routineConflictDesc")}</p>
+                  </div>
+                </div>
+                <div className="space-y-2.5">
+                  {routinePlan.conflicts.map((conflict, index) => (
+                    <div key={index} className="rounded-2xl bg-white p-3">
+                      <p className="text-[11px] font-bold text-stone-700 mb-0.5">{conflict.productNames.join(" + ")}</p>
+                      <p className="text-[11px] text-stone-500">{conflict.reason}</p>
+                      {conflict.resolution && <p className="text-[11px] mt-1 font-medium" style={{ color: DEEP_GREEN }}>{conflict.resolution}</p>}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <div className="rounded-[28px] border p-4 bg-white" style={{ borderColor: "#F1E9E1", boxShadow: "0 10px 24px rgba(45,95,79,0.05)" }}>
+              <div className="flex items-center justify-between gap-3 mb-3">
+                <div>
+                  <p className="text-[15px] font-bold" style={{ color: DEEP_GREEN }}>{t("cosmetics.collectionTitle")}</p>
+                  <p className="text-[11px] text-stone-400">{t("cosmetics.collectionSub")}</p>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-2.5">
+                {list.map((item) => {
+                  const signal = productSignals.find((entry) => entry.itemId === item.id) || null;
+                  return (
+                    <button
+                      key={item.id}
+                      onClick={() => setSelectedItem(item)}
+                      className="rounded-3xl p-3 bg-stone-50 text-left shadow-[0_4px_14px_rgba(0,0,0,0.03)]"
+                    >
+                      {item.image_thumbnail ? (
+                        <img src={item.image_thumbnail} className="w-full h-28 rounded-2xl object-cover bg-stone-200" />
+                      ) : (
+                        <div className="w-full h-28 rounded-2xl bg-stone-100 flex items-center justify-center">
+                          <Droplets className="w-7 h-7 text-stone-400" />
+                        </div>
+                      )}
+                      <div className="mt-3">
+                        <p className="text-xs font-semibold text-stone-800 truncate">{item.name}</p>
+                        <p className="text-[11px] text-stone-400 truncate">{item.brand || t("cosmetics.noBrand")}</p>
+                        {signal && <p className="text-[10px] mt-2 line-clamp-2 text-kr-pretty" style={{ color: SCAN_TO }}>{signal.note}</p>}
+                        <div className="flex flex-wrap gap-1.5 mt-2">
+                          <span className="px-2 py-1 rounded-full text-[9px] font-bold" style={{ background: `${DEEP_GREEN}12`, color: DEEP_GREEN }}>
+                            {t(`cosmetics.categories.${item.category}`)}
+                          </span>
+                          <span className="px-2 py-1 rounded-full text-[9px] font-bold" style={{ background: `${SCAN_FROM}14`, color: SCAN_TO }}>
+                            {item.time_of_day === "am"
+                              ? t("cosmetics.amBtn")
+                              : item.time_of_day === "pm"
+                              ? t("cosmetics.pmBtn")
+                              : inferCosmeticTimeOfDay(item.category) === "am"
+                              ? t("cosmetics.amBtn")
+                              : t("cosmetics.pmBtn")}
+                          </span>
+                        </div>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          </>
+        )}
+      </div>
+
+      <button
+        onClick={() => setShowRegister(true)}
+        className="fixed bottom-24 right-5 z-40 w-14 h-14 rounded-full shadow-xl flex items-center justify-center"
+        style={{ background: `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})` }}
+      >
+        <Plus className="w-6 h-6 text-white" />
+      </button>
+
+      <AnimatePresence>
+        {showRegister && (
+          <CosmeticsRegisterModal
+            onClose={() => setShowRegister(false)}
+            onSuccess={() => {
+              setShowRegister(false);
+              loadData().catch(() => {});
+            }}
+          />
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {selectedItem && (
+          <motion.div className="fixed inset-0 z-[130] flex items-end justify-center" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+            <div className="absolute inset-0 bg-black/30" onClick={() => setSelectedItem(null)} />
+            <motion.div
+              className="relative bg-white rounded-t-[32px] w-full max-w-md p-6 pb-8"
+              initial={{ y: 120 }}
+              animate={{ y: 0 }}
+              exit={{ y: 120 }}
+              transition={{ type: "spring", damping: 28, stiffness: 280 }}
+            >
+              <div className="w-10 h-1 rounded-full bg-stone-200 mx-auto mb-5" />
+              <div className="flex items-start gap-3">
+                {selectedItem.image_thumbnail ? (
+                  <img src={selectedItem.image_thumbnail} className="w-20 h-20 rounded-3xl object-cover bg-stone-100 shrink-0" />
+                ) : (
+                  <div className="w-20 h-20 rounded-3xl bg-stone-100 flex items-center justify-center shrink-0">
+                    <Droplets className="w-8 h-8 text-stone-400" />
+                  </div>
+                )}
+                <div className="min-w-0 flex-1">
+                  <p className="text-lg font-bold text-stone-800 text-kr-pretty">{selectedItem.name}</p>
+                  <p className="text-[12px] text-stone-400 mt-1">{selectedItem.brand || t("cosmetics.noBrand")}</p>
+                  <div className="flex flex-wrap gap-1.5 mt-2">
+                    <span className="px-2.5 py-1 rounded-full text-[10px] font-bold" style={{ background: `${DEEP_GREEN}12`, color: DEEP_GREEN }}>
+                      {t(`cosmetics.categories.${selectedItem.category}`)}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-2.5 mt-5">
+                <div className="rounded-2xl p-3" style={{ background: TINT_NEUTRAL }}>
+                  <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-stone-400">{t("cosmetics.openedLabel")}</p>
+                  <p className="text-xs font-semibold mt-1" style={{ color: DEEP_GREEN }}>{selectedItem.opened_at || t("cosmetics.detailUnknown")}</p>
+                </div>
+                <div className="rounded-2xl p-3" style={{ background: TINT_WARM }}>
+                  <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-stone-400">{t("cosmetics.detailStatusLabel")}</p>
+                  <p className="text-xs font-semibold mt-1" style={{ color: SCAN_TO }}>{t("cosmetics.detailStatusActive")}</p>
+                </div>
+              </div>
+
+              <div className="mt-4 rounded-3xl p-4 bg-white">
+                <p className="text-xs font-semibold uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>{t("cosmetics.ingredientsLabel")}</p>
+                <p className="text-[12px] text-stone-600 mt-2 leading-relaxed whitespace-pre-wrap text-kr-pretty">
+                  {selectedItem.ingredients?.trim() || t("cosmetics.ingredientsEmpty")}
+                </p>
+              </div>
+
+              <div className="mt-4 rounded-3xl p-4" style={{ background: "#F7FAFC" }}>
+                <div className="flex items-center justify-between gap-3">
+                  <p className="text-xs font-semibold uppercase tracking-[0.14em]" style={{ color: DEEP_GREEN }}>{t("cosmetics.signalCardTitle")}</p>
+                  {selectedSignal && (
+                    <span className="px-2 py-0.5 rounded-full text-[9px] font-bold" style={{ background: `${DEEP_GREEN}12`, color: DEEP_GREEN }}>
+                      {t(`cosmetics.signalConfidence.${selectedSignal.confidence}`)}
+                    </span>
+                  )}
+                </div>
+                {selectedSignal ? (
+                  <>
+                    <p className="text-[13px] font-semibold mt-2 text-kr-pretty" style={{ color: SCAN_TO }}>{selectedSignal.note}</p>
+                    <div className="grid grid-cols-2 gap-2.5 mt-4">
+                      <div className="rounded-2xl bg-white p-3">
+                        <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-stone-400">{t("cosmetics.signalMetricLabel")}</p>
+                        <p className="text-xs font-semibold mt-1" style={{ color: DEEP_GREEN }}>
+                          {selectedSignal.topScoreIndex !== null ? t(`scores.${selectedSignal.topScoreIndex}`) : t("cosmetics.signalMetricFallback")}
+                        </p>
+                      </div>
+                      <div className="rounded-2xl bg-white p-3">
+                        <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-stone-400">{t("cosmetics.signalObservedLabel")}</p>
+                        <p className="text-xs font-semibold mt-1" style={{ color: DEEP_GREEN }}>
+                          {t("cosmetics.signalObservedValue", { count: selectedSignal.afterCount, days: Math.min(selectedSignal.daysTracked, 14) })}
+                        </p>
+                      </div>
+                    </div>
+                  </>
+                ) : (
+                  <p className="text-[12px] text-stone-500 mt-2 text-kr-pretty">{t("cosmetics.signalEmpty")}</p>
+                )}
+              </div>
+
+              <div className="flex gap-2 mt-5">
+                <button
+                  onClick={() => handleDelete(selectedItem.id)}
+                  disabled={deletingId === selectedItem.id}
+                  className="flex-1 py-3.5 rounded-2xl font-bold text-[13px] text-stone-600 bg-stone-50 disabled:opacity-40"
+                >
+                  {deletingId === selectedItem.id ? "..." : t("cosmetics.deleteConfirm")}
+                </button>
+                <button
+                  onClick={() => setSelectedItem(null)}
+                  className="flex-1 py-3.5 rounded-2xl font-bold text-sm text-white"
+                  style={{ background: DEEP_GREEN }}
+                >
+                  {t("cosmetics.confirm")}
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}

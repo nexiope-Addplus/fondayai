@@ -1,6 +1,6 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { Camera, BookOpen, FileText, User } from "lucide-react";
+import { House, Droplets, BookOpen, FileText, User } from "lucide-react";
 import { SCAN_TO } from "./constants";
 import type { TabId, ScanState } from "./types";
 
@@ -44,8 +44,9 @@ export function BottomNav({ active, onChange, scanState }: {
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-2xl border-t border-stone-100">
       <div className="max-w-md mx-auto px-2">
-        <div className="grid grid-cols-4 h-[64px]">
-          {btn("scan", <Camera className="w-5 h-5" />, t("nav.scan"))}
+        <div className="grid grid-cols-5 h-[64px]">
+          {btn("scan", <House className="w-5 h-5" />, t("nav.scan"))}
+          {btn("routine", <Droplets className="w-5 h-5" />, t("nav.routine"))}
           {btn("diary", <BookOpen className="w-5 h-5" />, t("nav.diary"))}
           {btn("magazine", <FileText className="w-5 h-5" />, t("nav.magazine"))}
           {btn("my", <User className="w-5 h-5" />, t("nav.my"))}

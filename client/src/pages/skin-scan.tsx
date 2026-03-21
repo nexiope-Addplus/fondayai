@@ -85,7 +85,7 @@ import {
 } from "../components/fonday/utils";
 import { DiaryTab as ExtractedDiaryTab } from "../components/fonday/DiaryTab";
 import { MagazineTab } from "../components/fonday/MagazineTab";
-import { MyScreen, AttendanceCalendarModal, CosmeticsRegisterModal } from "../components/fonday/MyScreen";
+import { MyScreen } from "../components/fonday/MyScreen";
 import { SkinPredictionCard } from "../components/fonday/SkinPredictionCard";
 import { ResultDiaryCard } from "../components/fonday/ResultDiaryCard";
 import { ResultLoginCard } from "../components/fonday/ResultLoginCard";
@@ -106,8 +106,8 @@ import { FaceMeshOverlay } from "../components/fonday/FaceMeshOverlay";
 import { ScanIdleScreen } from "../components/fonday/ScanIdleScreen";
 import { SurveyScreen } from "../components/fonday/SurveyScreen";
 import { ScanningScreen } from "../components/fonday/ScanningScreen";
-import { ReportTab } from "../components/fonday/ReportTab";
 import { ResultScreen } from "../components/fonday/ResultScreen";
+import { RoutineTab } from "../components/fonday/RoutineTab";
 
 
 // ─── Google AdSense 배너 ──────────────────────────────────────────
@@ -402,6 +402,11 @@ export default function SkinScanPage() {
           {activeTab === "diary" && (
             <motion.div key="diary" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
               <ExtractedDiaryTab user={user} analysisResult={analysisResult} onBack={() => setActiveTab("scan")} onLogin={openLoginPopup} />
+            </motion.div>
+          )}
+          {activeTab === "routine" && (
+            <motion.div key="routine" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+              <RoutineTab user={user} onLogin={openLoginPopup} />
             </motion.div>
           )}
           {activeTab === "magazine" && (
