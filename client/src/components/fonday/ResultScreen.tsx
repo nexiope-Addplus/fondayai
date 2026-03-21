@@ -31,9 +31,6 @@ import { SkinPredictionCard } from "./SkinPredictionCard";
 import { ResultDiaryCard } from "./ResultDiaryCard";
 import { ResultLoginCard } from "./ResultLoginCard";
 import { ResultActionBar } from "./ResultActionBar";
-import { ResultRoutineTab } from "./ResultRoutineTab";
-import { ResultSolutionTab } from "./ResultSolutionTab";
-import { ResultNutritionTab } from "./ResultNutritionTab";
 import { useAICareSettings } from "./useAICareSettings";
 import { ResultHeaderCard } from "./ResultHeaderCard";
 import { ResultOverlayPopups } from "./ResultOverlayPopups";
@@ -98,9 +95,6 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
   const [showOnboarding, setShowOnboarding] = useState(() => !localStorage.getItem("fonday_onboarding_done"));
   const [showQuestSheet, setShowQuestSheet] = useState(false);
   const [showPwaPopup, setShowPwaPopup] = useState(false);
-  const routineSectionRef = useRef<HTMLDivElement | null>(null);
-  const solutionSectionRef = useRef<HTMLDivElement | null>(null);
-  const nutritionSectionRef = useRef<HTMLDivElement | null>(null);
 
   // PWA 설치 팝업: 결과 진입 후 4초 뒤 자동 표시
   useEffect(() => {
@@ -361,13 +355,6 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
     if (!el) return;
     el.style.overflow = (showAnalysis || showImprovements) ? 'hidden' : 'auto';
   }, [showAnalysis, showImprovements]);
-
-  const scrollToSection = (ref: React.RefObject<HTMLDivElement | null>) => {
-    const container = resultScrollRef.current;
-    const target = ref.current;
-    if (!container || !target) return;
-    container.scrollTo({ top: target.offsetTop - 12, behavior: "smooth" });
-  };
 
   const handlePartnershipSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -802,132 +789,36 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
           </div>
         </motion.div>
 
-        <div className="rounded-3xl p-2 sticky top-0 z-20 backdrop-blur-md"
-          style={{ background: "rgba(248,245,242,0.94)", boxShadow: "0 8px 20px rgba(45,95,79,0.05)" }}>
+        <motion.div variants={fadeChild} className="rounded-3xl p-4"
+          style={{ background: "#FFFFFF", boxShadow: "0 8px 24px rgba(45,95,79,0.06)" }}>
+          <div className="flex items-start justify-between gap-3 mb-3">
+            <div>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.14em]" style={{ color: DEEP_GREEN }}>
+                {t("result.actionCard.eyebrow")}
+              </p>
+              <p className="text-[15px] font-bold mt-1 text-stone-800">{t("result.actionCard.title")}</p>
+              <p className="text-[11px] text-stone-500 mt-1 text-kr-pretty">{t("result.actionCard.subtitle")}</p>
+            </div>
+            <div className="rounded-2xl px-3 py-2 text-right shrink-0" style={{ background: "#FAF8F5" }}>
+              <p className="text-[10px] text-stone-400">{t("result.actionCard.progressCount")}</p>
+              <p className="text-[16px] font-bold mt-1" style={{ color: DEEP_GREEN }}>{completedRoutinePhases}/2</p>
+            </div>
+          </div>
           <div className="grid grid-cols-3 gap-2">
-            <button
-              onClick={() => scrollToSection(routineSectionRef)}
-              className="flex items-center justify-center gap-2 py-3 rounded-3xl text-xs font-medium"
-              style={{ background: TINT_GREEN, color: DEEP_GREEN }}
-            >
-              <CheckCircle2 className="w-4 h-4" />
-              <span>{t("result.tab.routine")}</span>
-            </button>
-            <button
-              onClick={() => scrollToSection(solutionSectionRef)}
-              className="flex items-center justify-center gap-2 py-3 rounded-3xl text-xs font-medium"
-              style={{ background: TINT_WARM, color: SCAN_TO }}
-            >
-              <Leaf className="w-4 h-4" />
-              <span>{t("result.tab.solution")}</span>
-            </button>
-            <button
-              onClick={() => scrollToSection(nutritionSectionRef)}
-              className="flex items-center justify-center gap-2 py-3 rounded-3xl text-xs font-medium"
-              style={{ background: "#FFF7ED", color: "#C2410C" }}
-            >
-              <Utensils className="w-4 h-4" />
-              <span>{t("result.tab.nutrition")}</span>
-            </button>
-          </div>
-        </div>
-
-        <div ref={routineSectionRef} className="overflow-hidden mt-5">
-          <div className="flex items-center justify-between gap-3 mb-3 px-1">
-            <div>
-              <p className="text-[10px] font-semibold uppercase tracking-[0.14em]" style={{ color: DEEP_GREEN }}>{t("result.tab.routine")}</p>
-              <p className="text-[14px] font-bold mt-1 text-stone-800">{t("result.actionCard.subtitle")}</p>
+            <div className="rounded-2xl p-3" style={{ background: TINT_GREEN }}>
+              <p className="text-[10px] text-stone-500">{t("result.tab.routine")}</p>
+              <p className="text-[12px] font-bold mt-1" style={{ color: DEEP_GREEN }}>{morningRoutineItems[0] || t("result.actionCard.fallbackFocus")}</p>
             </div>
-            <button
-              onClick={() => scrollToSection(solutionSectionRef)}
-              className="rounded-full px-3 py-1.5 text-[10px] font-semibold"
-              style={{ background: TINT_GREEN, color: DEEP_GREEN }}
-            >
-              {t("result.tab.solution")} →
-            </button>
-          </div>
-          <ResultRoutineTab
-            showOnboarding={showOnboarding}
-            setShowOnboarding={setShowOnboarding}
-            history={history}
-            questStatusDetail={questStatusDetail}
-            nextStreakGoal={nextStreakGoal}
-            daysToGoal={daysToGoal}
-            nextStreakReward={nextStreakReward}
-            questProgressPct={questProgressPct}
-            essentialQuests={essentialQuests}
-            setShowQuestSheet={setShowQuestSheet}
-            morningRoutineItems={morningRoutineItems}
-            eveningRoutineItems={eveningRoutineItems}
-            morningRoutineComplete={morningRoutineComplete}
-            eveningRoutineComplete={eveningRoutineComplete}
-            setRoutinePeriodCompletion={setRoutinePeriodCompletion}
-            handleDiaryEntry={handleDiaryEntry}
-            routineGuide={routineGuide}
-            cosmeticsInsights={cosmeticsInsights}
-            cosmeticCount={cosmeticCount}
-            user={user}
-            setShowCosmeticsRegister={setShowCosmeticsRegister}
-            setShowCosmeticsGate={setShowCosmeticsGate}
-            myCosmetics={myCosmetics}
-            overallScore={overallScore}
-            previousScore={previousScore}
-            currentStreak={currentStreak}
-            onOpenDiary={onOpenDiary}
-            loginPromptRef={loginPromptRef}
-            socialLoginButton={socialLoginButton}
-            handleGoogleLogin={handleGoogleLogin}
-            goTo={() => scrollToSection(solutionSectionRef)}
-            onGoRoutineTab={onGoRoutine}
-            onGoDiaryTab={onOpenDiary}
-            onGoMyTab={onGoMy}
-          />
-          </div>
-
-        <div ref={solutionSectionRef} className="mt-5">
-          <div className="flex items-center justify-between gap-3 mb-3 px-1">
-            <div>
-              <p className="text-[10px] font-semibold uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>{t("result.tab.solution")}</p>
-              <p className="text-[14px] font-bold mt-1 text-stone-800">{t("result.solutionsSub")}</p>
+            <div className="rounded-2xl p-3" style={{ background: TINT_WARM }}>
+              <p className="text-[10px] text-stone-500">{t("result.tab.solution")}</p>
+              <p className="text-[12px] font-bold mt-1" style={{ color: SCAN_TO }}>{analysisResult?.cosmetics?.[0]?.type || t("result.solutions")}</p>
             </div>
-            <button
-              onClick={() => scrollToSection(nutritionSectionRef)}
-              className="rounded-full px-3 py-1.5 text-[10px] font-semibold"
-              style={{ background: TINT_WARM, color: SCAN_TO }}
-            >
-              {t("result.hub.nutritionCta")}
-            </button>
-          </div>
-          <ResultSolutionTab
-            user={user}
-            cosmeticCount={cosmeticCount}
-            setShowCosmeticsRegister={setShowCosmeticsRegister}
-            setShowCosmeticsGate={setShowCosmeticsGate}
-            analysisResult={analysisResult}
-            handleDiaryEntry={handleDiaryEntry}
-            pushSubscribed={pushSubscribed}
-            pushLoading={pushLoading}
-            handlePushToggle={handlePushToggle}
-            aiCareSettings={aiCareSettings}
-            updateAICareOption={updateAICareOption}
-            aiCareLabels={aiCareLabels}
-            setShowWaitlist={setShowWaitlist}
-            goTo={() => scrollToSection(nutritionSectionRef)}
-            onGoRoutineTab={onGoRoutine}
-            onGoDiscoverTab={onGoMagazine}
-            onGoMyTab={onGoMy}
-          />
-        </div>
-
-        <div ref={nutritionSectionRef} className="mt-5">
-          <div className="flex items-center justify-between gap-3 mb-3 px-1">
-            <div>
-              <p className="text-[10px] font-semibold uppercase tracking-[0.14em]" style={{ color: "#7C3AED" }}>{t("result.tab.nutrition")}</p>
-              <p className="text-[14px] font-bold mt-1 text-stone-800">{t("nutrients.sectionSub")}</p>
+            <div className="rounded-2xl p-3" style={{ background: "#F7F4FB" }}>
+              <p className="text-[10px] text-stone-500">{t("result.tab.nutrition")}</p>
+              <p className="text-[12px] font-bold mt-1 text-stone-800">{weakestSummary || t("nutrients.sectionTitle")}</p>
             </div>
           </div>
-          <ResultNutritionTab analysisResult={analysisResult} />
-        </div>
+        </motion.div>
 
         {/* ── 제휴 텍스트 링크 ── */}
         <div className="pt-2 pb-1 text-center">
