@@ -40,13 +40,17 @@ export function ScanIdleScreen({
   const [pullY, setPullY] = useState(0);
   const [idleWeather, setIdleWeather] = useState<WeatherData | null>(null);
   const [latestScan, setLatestScan] = useState<any | null>(null);
+  const [recentScans, setRecentScans] = useState<any[]>([]);
   const touchStartY = useRef(0);
 
   useEffect(() => {
     fetch("/api/scans")
       .then((res) => (res.ok ? res.json() : []))
       .then((data) => {
-        if (Array.isArray(data) && data.length > 0) setLatestScan(data[0]);
+        if (Array.isArray(data)) {
+          setRecentScans(data);
+          if (data.length > 0) setLatestScan(data[0]);
+        }
       })
       .catch(() => setLatestScan(null));
   }, []);
@@ -110,6 +114,13 @@ export function ScanIdleScreen({
     { Icon: Sparkles, title: t("idle.flowStep2Title"), desc: t("idle.flowStep2Desc"), tone: TINT_WARM, color: SCAN_TO },
     { Icon: ClipboardList, title: t("idle.flowStep3Title"), desc: t("idle.flowStep3Desc"), tone: "#F4F0FB", color: "#6D4CC2" },
   ];
+  const previousScan = recentScans[1] ?? null;
+  const latestScoreDelta = latestScan && previousScan
+    ? Number(latestScan.overallScore || 0) - Number(previousScan.overallScore || 0)
+    : null;
+  const latestWeakMetric = Array.isArray(latestScan?.scores) && latestScan.scores.length > 1
+    ? [...latestScan.scores].slice(1).sort((a: any, b: any) => Number(a.score) - Number(b.score))[0]
+    : null;
 
   return (
     <>
@@ -320,6 +331,23 @@ export function ScanIdleScreen({
                     : "—"}
                 </p>
               </div>
+            </div>
+            <div className="flex flex-wrap gap-2 mt-3">
+              {latestScoreDelta !== null && (
+                <span className="rounded-full px-2.5 py-1 text-[10px] font-bold" style={{ background: latestScoreDelta >= 0 ? "#E8F5EC" : "#FFF7ED", color: latestScoreDelta >= 0 ? "#2D7D46" : "#C2410C" }}>
+                  {latestScoreDelta >= 0 ? "+" : ""}{latestScoreDelta}{t("result.scoreSuffix")}
+                </span>
+              )}
+              {latestWeakMetric?.label && (
+                <span className="rounded-full px-2.5 py-1 text-[10px] font-bold" style={{ background: "#F7F4FB", color: "#6D4CC2" }}>
+                  {t("idle.latestFocus", { concern: latestWeakMetric.label })}
+                </span>
+              )}
+              {daysSince !== null && (
+                <span className="rounded-full px-2.5 py-1 text-[10px] font-bold" style={{ background: "#F8FAFD", color: DEEP_GREEN }}>
+                  {t("idle.latestRecency", { days: daysSince })}
+                </span>
+              )}
             </div>
           </div>
         )}

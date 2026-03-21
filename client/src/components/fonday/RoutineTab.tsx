@@ -93,6 +93,8 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
   const productSignals = buildCosmeticCorrelationSignals(list, scans, t);
   const topSignal = productSignals[0] || null;
   const selectedSignal = selectedItem ? productSignals.find((signal) => signal.itemId === selectedItem.id) || null : null;
+  const strongestSignalCount = productSignals.filter((signal) => signal.confidence === "strong").length;
+  const positiveSignalCount = productSignals.filter((signal) => (signal.topScoreDelta ?? signal.overallDelta ?? 0) >= 0).length;
   const routineStats = [
     {
       key: "products",
@@ -321,6 +323,20 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
               <p className="text-[11px] mt-2 text-stone-500 text-kr-pretty">{t("cosmetics.signalEmpty")}</p>
             )}
           </div>
+          <div className="grid grid-cols-3 gap-2 mt-3">
+            <div className="rounded-2xl p-3" style={{ background: "#FFFFFF" }}>
+              <p className="text-[10px] text-stone-400">{t("cosmetics.effectStrongLabel")}</p>
+              <p className="text-[18px] font-bold mt-1" style={{ color: DEEP_GREEN }}>{strongestSignalCount}</p>
+            </div>
+            <div className="rounded-2xl p-3" style={{ background: "#FFFFFF" }}>
+              <p className="text-[10px] text-stone-400">{t("cosmetics.effectPositiveLabel")}</p>
+              <p className="text-[18px] font-bold mt-1" style={{ color: SCAN_TO }}>{positiveSignalCount}</p>
+            </div>
+            <div className="rounded-2xl p-3" style={{ background: "#FFFFFF" }}>
+              <p className="text-[10px] text-stone-400">{t("cosmetics.effectTrackedProductsLabel")}</p>
+              <p className="text-[18px] font-bold mt-1 text-stone-800">{productSignals.length}</p>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -424,7 +440,10 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
                   </span>
                 </div>
                 <div className="space-y-2.5">
-                  {productSignals.slice(0, 3).map((signal) => (
+                  {productSignals.slice(0, 3).map((signal) => {
+                    const deltaValue = signal.topScoreDelta ?? signal.overallDelta ?? 0;
+                    const positive = deltaValue >= 0;
+                    return (
                     <div key={signal.itemId} className="rounded-2xl p-3" style={{ background: "#F8FAFD" }}>
                       <div className="flex items-center justify-between gap-2">
                         <p className="text-[12px] font-semibold text-stone-800">{signal.itemName}</p>
@@ -433,8 +452,17 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
                         </span>
                       </div>
                       <p className="text-[11px] mt-1 text-kr-pretty" style={{ color: SCAN_TO }}>{signal.note}</p>
+                      <div className="mt-3 h-2 rounded-full bg-white overflow-hidden">
+                        <div
+                          className="h-full rounded-full"
+                          style={{
+                            width: `${Math.min(100, Math.max(14, Math.abs(deltaValue) * 6))}%`,
+                            background: positive ? DEEP_GREEN : SCAN_TO,
+                          }}
+                        />
+                      </div>
                     </div>
-                  ))}
+                  )})}
                 </div>
               </div>
             )}

@@ -801,6 +801,20 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
               </button>
             ))}
           </div>
+          <div className="grid grid-cols-3 gap-2 mt-3">
+            <div className="rounded-2xl px-3 py-2.5" style={{ background: "#FAF8F5" }}>
+              <p className="text-[10px] text-stone-400">{t("result.hub.summary1")}</p>
+              <p className="text-[12px] font-bold mt-1 text-stone-800">{t("nav.routine")}</p>
+            </div>
+            <div className="rounded-2xl px-3 py-2.5" style={{ background: "#FAF8F5" }}>
+              <p className="text-[10px] text-stone-400">{t("result.hub.summary2")}</p>
+              <p className="text-[12px] font-bold mt-1 text-stone-800">{t("nav.diary")}</p>
+            </div>
+            <div className="rounded-2xl px-3 py-2.5" style={{ background: "#FAF8F5" }}>
+              <p className="text-[10px] text-stone-400">{t("result.hub.summary3")}</p>
+              <p className="text-[12px] font-bold mt-1 text-stone-800">{t("nav.my")}</p>
+            </div>
+          </div>
         </motion.div>
 
         {/* ── 3탭 네비게이션 ── */}

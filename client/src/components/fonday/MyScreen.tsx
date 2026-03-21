@@ -65,12 +65,16 @@ export function MyScreen({
 
   const latestScan = scans[0] ?? null;
   const historyPreview = scans.slice(0, 4);
+  const previousScan = scans[1] ?? null;
   const latestScores = useMemo(() => {
     if (!latestScan?.scores || !Array.isArray(latestScan.scores)) return [];
     return [...latestScan.scores]
       .sort((a: any, b: any) => Number(a.score) - Number(b.score))
       .slice(0, 3);
   }, [latestScan]);
+  const latestDelta = latestScan && previousScan
+    ? Number(latestScan.overallScore || 0) - Number(previousScan.overallScore || 0)
+    : null;
 
   const handleLogout = () => {
     fetch('/api/logout', { method: 'POST' }).then(() => window.location.reload());
@@ -265,6 +269,20 @@ export function MyScreen({
                     <p className="text-[10px] text-stone-400">{t("result.baumannLabel")}</p>
                     <p className="text-xl font-bold mt-1 text-stone-800">{latestScan.baumannType || "—"}</p>
                   </div>
+                </div>
+              ) : null}
+              {latestScan ? (
+                <div className="flex flex-wrap gap-2 mt-3">
+                  {latestDelta !== null && (
+                    <span className="rounded-full px-2.5 py-1 text-[10px] font-bold" style={{ background: latestDelta >= 0 ? "#E8F5EC" : "#FFF7ED", color: latestDelta >= 0 ? "#2D7D46" : "#C2410C" }}>
+                      {t("my.reportDelta", { delta: latestDelta >= 0 ? `+${latestDelta}` : `${latestDelta}` })}
+                    </span>
+                  )}
+                  {latestScores[0]?.label && (
+                    <span className="rounded-full px-2.5 py-1 text-[10px] font-bold" style={{ background: "#F7F4FB", color: "#6D4CC2" }}>
+                      {t("my.reportFocus", { concern: latestScores[0].label })}
+                    </span>
+                  )}
                 </div>
               ) : null}
             </div>
