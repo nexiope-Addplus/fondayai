@@ -159,88 +159,44 @@ export function MagazineTab() {
             </h1>
           </motion.div>
 
-          <motion.div variants={fadeChild} className="px-5 grid gap-3 mb-5">
-            <div className="rounded-3xl bg-white p-4" style={{ boxShadow: "0 10px 24px rgba(45,95,79,0.06)" }}>
-              <div className="flex items-start justify-between gap-3">
-                <div>
-                  <p className="text-[11px] font-bold tracking-[0.14em] uppercase" style={{ color: SCAN_TO }}>
-                    {t("discover.rankingEyebrow")}
-                  </p>
-                  <p className="text-[16px] font-bold mt-1" style={{ color: DEEP_GREEN }}>
-                    {t("discover.rankingTitle")}
-                  </p>
-                  <p className="text-[12px] text-stone-500 mt-1 leading-snug">
-                    {rankingData ? t("ranking.totalData", { count: rankingData.totalScans }) : t("discover.rankingEmpty")}
-                  </p>
-                </div>
-                <div className="w-10 h-10 rounded-2xl flex items-center justify-center shrink-0" style={{ background: TINT_GREEN }}>
-                  <BarChart3 className="w-5 h-5" style={{ color: DEEP_GREEN }} />
-                </div>
-              </div>
-              {rankingData && (
-                <div className="grid grid-cols-3 gap-2 mt-4">
-                  <div className="rounded-2xl p-3" style={{ background: "#F6FBF8" }}>
-                    <p className="text-[10px] text-stone-400">{t("ranking.avgScore")}</p>
-                    <p className="text-lg font-bold mt-1" style={{ color: DEEP_GREEN }}>{rankingData.avgScore}</p>
+          <motion.div variants={fadeChild} className="px-5 mb-5">
+            <div className="grid grid-cols-2 gap-3">
+              <div className="rounded-3xl bg-white p-4" style={{ boxShadow: "0 10px 24px rgba(45,95,79,0.06)" }}>
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="w-9 h-9 rounded-2xl flex items-center justify-center shrink-0" style={{ background: TINT_GREEN }}>
+                    <BarChart3 className="w-4.5 h-4.5" style={{ color: DEEP_GREEN }} />
                   </div>
-                  <div className="rounded-2xl p-3" style={{ background: "#FFF7F3" }}>
-                    <p className="text-[10px] text-stone-400">{t("ranking.topScore")}</p>
-                    <p className="text-lg font-bold mt-1" style={{ color: SCAN_TO }}>{rankingData.topScore}</p>
-                  </div>
-                  <div className="rounded-2xl p-3" style={{ background: "#F7F4FB" }}>
-                    <p className="text-[10px] text-stone-400">{t("ranking.topLabel")}</p>
-                    <p className="text-lg font-bold mt-1 text-stone-800">
-                      {rankingData.myPercentile !== undefined ? t("ranking.myPercentile", { percent: rankingData.myPercentile }) : "—"}
+                  <div className="min-w-0">
+                    <p className="text-[11px] font-bold text-stone-800">{t("discover.rankingTitle")}</p>
+                    <p className="text-[10px] text-stone-400">
+                      {rankingData ? t("ranking.totalData", { count: rankingData.totalScans }) : t("discover.rankingEmpty")}
                     </p>
                   </div>
                 </div>
-              )}
-            </div>
-
-            <div className="rounded-3xl bg-white p-4" style={{ boxShadow: "0 10px 24px rgba(45,95,79,0.06)" }}>
-              <div className="flex items-start justify-between gap-3">
-                <div>
-                  <p className="text-[11px] font-bold tracking-[0.14em] uppercase" style={{ color: SCAN_TO }}>
-                    {t("discover.nutritionEyebrow")}
-                  </p>
-                  <p className="text-[16px] font-bold mt-1" style={{ color: DEEP_GREEN }}>
-                    {t("discover.nutritionTitle")}
-                  </p>
-                </div>
-                <div className="w-10 h-10 rounded-2xl flex items-center justify-center shrink-0" style={{ background: TINT_WARM }}>
-                  <Salad className="w-5 h-5" style={{ color: SCAN_TO }} />
-                </div>
+                <p className="text-[22px] font-bold" style={{ color: DEEP_GREEN }}>
+                  {rankingData?.myPercentile !== undefined ? `${rankingData.myPercentile}%` : "—"}
+                </p>
+                <p className="text-[11px] text-stone-400 mt-1">{t("ranking.topLabel")}</p>
               </div>
-              {weakestScores.length > 0 ? (
-                <div className="space-y-2 mt-4">
-                  {weakestScores.map((item: any, index: number) => (
-                    <div key={`${item.label}-${index}`} className="rounded-2xl p-3" style={{ background: "#FFF9F7" }}>
-                      <div className="flex items-center justify-between gap-3">
-                        <p className="text-[12px] font-semibold text-stone-800">{item.label}</p>
-                        <span className="text-[12px] font-bold" style={{ color: SCAN_TO }}>{item.score}{t("result.scoreSuffix")}</span>
-                      </div>
-                      <p className="text-[11px] text-stone-500 mt-1 leading-snug">
-                        {t("discover.nutritionHint", { concern: item.label })}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="mt-4 rounded-2xl p-3" style={{ background: "#F8FAFD" }}>
-                  <p className="text-[12px] text-stone-500">{t("discover.nutritionEmpty")}</p>
-                </div>
-              )}
-            </div>
 
-            <div className="rounded-3xl p-4" style={{ background: "linear-gradient(135deg, #FFF6F1, #F7FBF8)", border: "1px solid #F1E9E1" }}>
-              <div className="flex items-start gap-3">
-                <div className="w-10 h-10 rounded-2xl flex items-center justify-center shrink-0" style={{ background: "#FFFFFF" }}>
-                  <Sparkles className="w-5 h-5" style={{ color: SCAN_TO }} />
+              <div className="rounded-3xl bg-white p-4" style={{ boxShadow: "0 10px 24px rgba(45,95,79,0.06)" }}>
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="w-9 h-9 rounded-2xl flex items-center justify-center shrink-0" style={{ background: TINT_WARM }}>
+                    <Salad className="w-4.5 h-4.5" style={{ color: SCAN_TO }} />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-[11px] font-bold text-stone-800">{t("discover.nutritionTitle")}</p>
+                    <p className="text-[10px] text-stone-400">{t("discover.feedTitle")}</p>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-[12px] font-bold" style={{ color: DEEP_GREEN }}>{t("discover.feedTitle")}</p>
-                  <p className="text-[11px] text-stone-500 mt-1 leading-snug">{t("discover.feedDesc")}</p>
-                </div>
+                {weakestScores[0] ? (
+                  <>
+                    <p className="text-[14px] font-bold text-stone-800">{weakestScores[0].label}</p>
+                    <p className="text-[11px] mt-1" style={{ color: SCAN_TO }}>{weakestScores[0].score}{t("result.scoreSuffix")}</p>
+                  </>
+                ) : (
+                  <p className="text-[11px] text-stone-400">{t("discover.nutritionEmpty")}</p>
+                )}
               </div>
             </div>
           </motion.div>

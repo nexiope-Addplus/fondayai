@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { AnimatePresence, motion } from "framer-motion";
-import { ChevronRight, Droplets, AlertTriangle, Plus, Sparkles, ClipboardList, ScanLine } from "lucide-react";
+import { ChevronRight, Droplets, AlertTriangle, Plus, Sparkles } from "lucide-react";
 import type { CosmeticItem } from "./types";
 import {
   DEEP_GREEN,
@@ -118,12 +118,6 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
       color: "#6D4CC2",
     },
   ];
-  const routineFlow = [
-    { Icon: ClipboardList, title: t("cosmetics.flowStep1Title"), desc: t("cosmetics.flowStep1Desc"), tone: TINT_GREEN, color: DEEP_GREEN },
-    { Icon: ScanLine, title: t("cosmetics.flowStep2Title"), desc: t("cosmetics.flowStep2Desc"), tone: TINT_WARM, color: SCAN_TO },
-    { Icon: Sparkles, title: t("cosmetics.flowStep3Title"), desc: t("cosmetics.flowStep3Desc"), tone: "#F4F0FB", color: "#6D4CC2" },
-  ];
-
   const sections = [
     {
       key: "am" as const,
@@ -257,7 +251,7 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
             <p className="text-[11px] font-bold tracking-widest uppercase mb-1" style={{ color: SCAN_TO }}>{t("nav.routine")}</p>
             <h1 className="text-2xl font-bold" style={{ color: DEEP_GREEN }}>{t("cosmetics.myTitle")}</h1>
             <p className="text-[12px] text-stone-500 mt-1 text-kr-pretty">
-              대표 루틴, 충돌 주의, 제품별 피부 변화 신호를 한 번에 정리합니다.
+              등록한 제품과 오늘 루틴을 정리합니다.
             </p>
           </div>
           <button
@@ -281,6 +275,15 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
             <p className="text-[11px] text-stone-400 mt-1">{t("cosmetics.boardStepCount", { count: routinePlan.pm.length })}</p>
           </div>
         </div>
+
+        <button
+          onClick={() => setShowRegister(true)}
+          className="w-full mt-4 rounded-2xl px-4 py-3 flex items-center justify-center gap-2 text-[13px] font-semibold"
+          style={{ background: TINT_GREEN, color: DEEP_GREEN }}
+        >
+          <Plus className="w-4 h-4" />
+          {t("cosmetics.scanBtn")}
+        </button>
 
         <div className="mt-4 rounded-3xl p-4" style={{ background: "#FAF8F5", border: "1px solid #F1E9E1" }}>
           <div className="flex items-start justify-between gap-3">
@@ -355,36 +358,6 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
           </div>
         ) : (
           <>
-            <div className="rounded-[28px] border p-4 bg-white" style={{ borderColor: "#E8EEE9", boxShadow: "0 10px 24px rgba(45,95,79,0.05)" }}>
-              <div className="flex items-start justify-between gap-3 mb-3">
-                <div>
-                  <p className="text-[15px] font-bold" style={{ color: DEEP_GREEN }}>{t("cosmetics.flowTitle")}</p>
-                  <p className="text-[11px] text-stone-400">{t("cosmetics.flowDesc")}</p>
-                </div>
-                <span className="px-2.5 py-1 rounded-full text-[10px] font-bold" style={{ background: `${DEEP_GREEN}10`, color: DEEP_GREEN }}>
-                  {t("nav.scan")} → {t("nav.routine")} → {t("nav.diary")}
-                </span>
-              </div>
-              <div className="space-y-2.5">
-                {routineFlow.map(({ Icon, title, desc, tone, color }, index) => (
-                  <div key={title} className="rounded-2xl p-3 flex items-start gap-3" style={{ background: "#FAF8F5" }}>
-                    <div className="w-9 h-9 rounded-2xl flex items-center justify-center shrink-0" style={{ background: tone }}>
-                      <Icon className="w-4.5 h-4.5" style={{ color }} />
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <div className="flex items-center gap-2">
-                        <span className="text-[10px] font-bold uppercase tracking-[0.12em]" style={{ color }}>
-                          {index + 1}
-                        </span>
-                        <p className="text-[12px] font-bold text-stone-800">{title}</p>
-                      </div>
-                      <p className="text-[11px] text-stone-500 mt-1 text-kr-pretty">{desc}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
             <div className="grid gap-3">
               {sections.map(({ key, title, accent, bg }) => (
                 <div key={key} className="rounded-[28px] border p-4 bg-white" style={{ borderColor: key === "am" ? "#DDEBE5" : "#F2DED5", boxShadow: "0 10px 24px rgba(45,95,79,0.05)" }}>
