@@ -4,10 +4,12 @@ export const onRequest = async (context: any) => {
   const { request, env } = context;
   const url = new URL(request.url);
   const homeUrl = `${url.origin}/`;
+  const errorRedirect = (stage: string) =>
+    Response.redirect(`${homeUrl}?login_error=${encodeURIComponent(stage)}`, 302);
   const code = url.searchParams.get("code");
 
   if (!code) {
-    return Response.redirect(homeUrl, 302);
+    return errorRedirect("google_missing_code");
   }
 
   try {
@@ -26,7 +28,7 @@ export const onRequest = async (context: any) => {
 
     if (!tokenRes.ok) {
       console.error("[Google OAuth] token exchange failed:", await tokenRes.text());
-      return Response.redirect(homeUrl, 302);
+      return errorRedirect("google_token_exchange");
     }
 
     const tokens: any = await tokenRes.json();
@@ -37,7 +39,7 @@ export const onRequest = async (context: any) => {
     });
 
     if (!userRes.ok) {
-      return Response.redirect(homeUrl, 302);
+      return errorRedirect("google_user_info");
     }
 
     const googleUser: any = await userRes.json();
@@ -63,6 +65,6 @@ export const onRequest = async (context: any) => {
     });
   } catch (e: any) {
     console.error("[Google OAuth] callback error:", e.message);
-    return Response.redirect(homeUrl, 302);
+    return errorRedirect("google_callback_exception");
   }
 };

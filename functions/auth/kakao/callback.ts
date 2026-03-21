@@ -4,10 +4,12 @@ export const onRequest = async (context: any) => {
   const { request, env } = context;
   const url = new URL(request.url);
   const homeUrl = `${url.origin}/`;
+  const errorRedirect = (stage: string) =>
+    Response.redirect(`${homeUrl}?login_error=${encodeURIComponent(stage)}`, 302);
   const code = url.searchParams.get("code");
 
   if (!code) {
-    return Response.redirect(homeUrl, 302);
+    return errorRedirect("kakao_missing_code");
   }
 
   try {
@@ -30,7 +32,7 @@ export const onRequest = async (context: any) => {
 
     if (!tokenRes.ok) {
       console.error("[Kakao OAuth] token exchange failed:", await tokenRes.text());
-      return Response.redirect(homeUrl, 302);
+      return errorRedirect("kakao_token_exchange");
     }
 
     const tokens: any = await tokenRes.json();
@@ -42,7 +44,7 @@ export const onRequest = async (context: any) => {
 
     if (!userRes.ok) {
       console.error("[Kakao OAuth] user info failed:", await userRes.text());
-      return Response.redirect(homeUrl, 302);
+      return errorRedirect("kakao_user_info");
     }
 
     const kakaoUser: any = await userRes.json();
@@ -69,6 +71,6 @@ export const onRequest = async (context: any) => {
     });
   } catch (e: any) {
     console.error("[Kakao OAuth] callback error:", e.message);
-    return Response.redirect(homeUrl, 302);
+    return errorRedirect("kakao_callback_exception");
   }
 };
