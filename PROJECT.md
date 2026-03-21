@@ -52,7 +52,7 @@
 | KV | Cloudflare Workers KV — 스캔 히스토리, 푸시 구독 |
 | Worker | Cloudflare Worker (`worker-api.js`) — 크론 푸시 발송 |
 | 서비스 도메인 | `fondayai.com` / `www.fondayai.com` → main 브랜치 자동 배포 |
-| 개발 도메인 | `fondayai.pages.dev` → dev 브랜치 자동 배포 |
+| 개발 확인 URL | Cloudflare Pages Preview 배포 URL 사용 (`dev.<project>.pages.dev` 또는 `<hash>.<project>.pages.dev`) |
 
 ---
 
@@ -736,8 +736,8 @@ export const onRequest = async (context: any) => {
 
 ### 브랜치 구조 (2026-03-20 변경)
 ```
-dev 브랜치   →  fondayai.pages.dev  (개발/테스트용)
-main 브랜치  →  fondayai.com        (서비스용)
+dev 브랜치   →  Cloudflare Pages Preview / branch alias URL  (개발/테스트용)
+main 브랜치  →  fondayai.com / fondayai.pages.dev            (서비스용)
 ```
 
 ### 개발 플로우
@@ -747,21 +747,23 @@ git checkout dev
 git add <파일들>
 git commit -m "feat/fix/chore: 설명"
 git push origin dev
-# → fondayai.pages.dev 에 자동 배포 (약 1~2분)
+# → Cloudflare Pages preview 배포 생성 (약 1~2분)
+# → 확인 URL은 대시보드의 branch alias 또는 preview URL 사용
 
 # 2. 테스트 완료 후 서비스에 반영
 git checkout main
 git merge dev
 git push origin main
-# → fondayai.com 에 자동 배포 (약 1~2분)
+# → fondayai.com / fondayai.pages.dev 에 자동 배포 (약 1~2분)
 git checkout dev  # 다시 dev로
 ```
 
-- **배포 원칙**: 모든 작업은 우선 `dev` 브랜치와 `fondayai.pages.dev` 에 먼저 반영해서 확인한 뒤, 이상이 없을 때만 `main` 으로 올려 `fondayai.com` 에 반영
+- **배포 원칙**: 모든 작업은 우선 `dev` 브랜치 preview 배포에서 먼저 확인한 뒤, 이상이 없을 때만 `main` 으로 올려 `fondayai.com` 에 반영
 - 즉, 기본 작업 대상은 항상 `dev` 이고, `main` 반영은 별도 확인 후 진행
 - **커밋 컨벤션**: `feat:` / `fix:` / `chore:` / `refactor:`
 - client + server + functions 변경은 **같은 커밋**에 포함
 - Claude Code는 기본적으로 `dev` 브랜치에서 작업 후 요청 시 main에 merge
+- 참고: `fondayai.pages.dev` 는 root Pages 도메인이므로 production(main) 배포를 가리킬 수 있음. dev 확인 시에는 Cloudflare Pages 대시보드에 표시되는 preview URL을 사용.
 
 ---
 
@@ -775,7 +777,8 @@ git checkout dev  # 다시 dev로
 
 ### B. 개발/서비스 브랜치 분리
 - `dev` 브랜치 생성 및 Cloudflare Pages Preview 브랜치로 지정
-- `main` → 서비스 (`fondayai.com`), `dev` → 개발 (`fondayai.pages.dev`)
+- `main` → 서비스 (`fondayai.com`, root `fondayai.pages.dev`)
+- `dev` → 개발 (Cloudflare Pages preview URL 또는 branch alias URL)
 
 ### C. OG 메타태그 도메인 교체
 - `client/index.html`의 canonical, og:url, og:image, twitter:image, JSON-LD url
