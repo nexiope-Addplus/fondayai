@@ -52,7 +52,7 @@
 | KV | Cloudflare Workers KV — 스캔 히스토리, 푸시 구독 |
 | Worker | Cloudflare Worker (`worker-api.js`) — 크론 푸시 발송 |
 | 서비스 도메인 | `fondayai.com` / `www.fondayai.com` → main 브랜치 자동 배포 |
-| 개발 확인 URL | Cloudflare Pages Preview 배포 URL 사용 (`dev.<project>.pages.dev` 또는 `<hash>.<project>.pages.dev`) |
+| 개발 확인 URL | `dev.fondayai.com` → dev 브랜치 고정 개발 도메인 (`dev.fondayai.pages.dev` alias 유지) |
 
 ---
 
@@ -734,9 +734,9 @@ export const onRequest = async (context: any) => {
 
 ## 12. Git / 배포 워크플로우
 
-### 브랜치 구조 (2026-03-20 변경)
+### 브랜치 구조 (2026-03-21 기준)
 ```
-dev 브랜치   →  Cloudflare Pages Preview / branch alias URL  (개발/테스트용)
+dev 브랜치   →  dev.fondayai.com / dev.fondayai.pages.dev    (개발/테스트용)
 main 브랜치  →  fondayai.com / fondayai.pages.dev            (서비스용)
 ```
 
@@ -748,7 +748,8 @@ git add <파일들>
 git commit -m "feat/fix/chore: 설명"
 git push origin dev
 # → Cloudflare Pages preview 배포 생성 (약 1~2분)
-# → 확인 URL은 대시보드의 branch alias 또는 preview URL 사용
+# → 우선 확인 URL은 dev.fondayai.com
+# → 필요 시 dev.fondayai.pages.dev 또는 대시보드 preview URL도 사용 가능
 
 # 2. 테스트 완료 후 서비스에 반영
 git checkout main
@@ -758,16 +759,18 @@ git push origin main
 git checkout dev  # 다시 dev로
 ```
 
-- **배포 원칙**: 모든 작업은 우선 `dev` 브랜치 preview 배포에서 먼저 확인한 뒤, 이상이 없을 때만 `main` 으로 올려 `fondayai.com` 에 반영
+- **배포 원칙**: 모든 작업은 우선 `dev.fondayai.com` 에서 먼저 확인한 뒤, 이상이 없을 때만 `main` 으로 올려 `fondayai.com` 에 반영
 - 즉, 기본 작업 대상은 항상 `dev` 이고, `main` 반영은 별도 확인 후 진행
 - **커밋 컨벤션**: `feat:` / `fix:` / `chore:` / `refactor:`
 - client + server + functions 변경은 **같은 커밋**에 포함
 - Claude Code는 기본적으로 `dev` 브랜치에서 작업 후 요청 시 main에 merge
-- 참고: `fondayai.pages.dev` 는 root Pages 도메인이므로 production(main) 배포를 가리킬 수 있음. dev 확인 시에는 Cloudflare Pages 대시보드에 표시되는 preview URL을 사용.
+- 참고: `fondayai.pages.dev` 는 root Pages 도메인이므로 production(main) 배포를 가리킴
+- 참고: `dev.fondayai.com` 은 `dev.fondayai.pages.dev` 를 가리키는 고정 개발 도메인
+- 참고: 새 dev 배포 직후에는 커스텀 도메인 반영보다 `dev.fondayai.pages.dev` 가 조금 더 빨리 갱신될 수 있음
 
 ---
 
-## 13. 주요 업데이트 (2026-03-20 — 도메인/배포 세팅)
+## 13. 주요 업데이트 (2026-03-20~21 — 도메인/배포 세팅)
 
 ### A. fondayai.com 도메인 등록 및 연결
 - Cloudflare Registrar에서 `fondayai.com` 구매
@@ -778,7 +781,13 @@ git checkout dev  # 다시 dev로
 ### B. 개발/서비스 브랜치 분리
 - `dev` 브랜치 생성 및 Cloudflare Pages Preview 브랜치로 지정
 - `main` → 서비스 (`fondayai.com`, root `fondayai.pages.dev`)
-- `dev` → 개발 (Cloudflare Pages preview URL 또는 branch alias URL)
+- `dev` → 개발 (`dev.fondayai.com`, alias `dev.fondayai.pages.dev`)
+
+### B-1. 개발용 고정 도메인 연결 (2026-03-21)
+- Cloudflare Pages `fondayai` 프로젝트에 `dev.fondayai.com` 커스텀 도메인 추가
+- DNS CNAME 생성: `dev.fondayai.com` → `dev.fondayai.pages.dev`
+- 이후 개발 확인 기본 주소는 `dev.fondayai.com`
+- root `fondayai.pages.dev` 는 계속 production(main) 확인용으로 유지
 
 ### C. OG 메타태그 도메인 교체
 - `client/index.html`의 canonical, og:url, og:image, twitter:image, JSON-LD url
