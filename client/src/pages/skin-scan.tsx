@@ -390,8 +390,10 @@ export default function SkinScanPage() {
                   faceCroppedSrc={faceCroppedSrc}
                   imageBase64={imageBase64}
                   onBack={() => setScanState("idle")}
+                  onGoRoutine={() => setActiveTab("routine")}
                   onGoMagazine={() => setActiveTab("magazine")}
                   onOpenDiary={() => setActiveTab("diary")}
+                  onGoMy={() => setActiveTab("my")}
                   user={user}
                   deferredPrompt={deferredPrompt}
                   onShowInstallGuide={() => setShowInstallGuide(true)}

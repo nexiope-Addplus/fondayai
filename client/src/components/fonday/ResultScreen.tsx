@@ -6,7 +6,7 @@ import {
   Camera, ScanLine, AlertCircle, Shield, Sun, Moon,
   Sparkles, ArrowRight, Heart, Droplets, Target,
   Leaf, Star, Thermometer, Utensils, CheckCircle2, Pill,
-  Bot,
+  Bot, BookOpen, Search, User,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -40,7 +40,7 @@ import { ResultOverlayPopups } from "./ResultOverlayPopups";
 import { ResultModals } from "./ResultModals";
 
 // ─── 피부 예측 카드 ────────────────────────────────────────────────
-export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, imageBase64, onBack, onGoMagazine, onOpenDiary, user, deferredPrompt, onShowInstallGuide }: any) {
+export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, imageBase64, onBack, onGoMagazine, onOpenDiary, onGoRoutine, onGoMy, user, deferredPrompt, onShowInstallGuide }: any) {
   const { t } = useTranslation();
   const [history, setHistory] = useState<any[]>([]);
   const [isSaved, setIsSaved] = useState(false);
@@ -761,6 +761,48 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
           );
         })()}
 
+        <motion.div variants={fadeChild} className="rounded-3xl p-4"
+          style={{ background: "#FFFFFF", boxShadow: "0 8px 24px rgba(45,95,79,0.06)" }}>
+          <div className="flex items-start justify-between gap-3 mb-3">
+            <div>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>
+                {t("result.hub.eyebrow")}
+              </p>
+              <p className="text-[15px] font-bold mt-1" style={{ color: DEEP_GREEN }}>
+                {t("result.hub.title")}
+              </p>
+              <p className="text-[11px] text-stone-500 mt-1 text-kr-pretty">
+                {t("result.hub.desc")}
+              </p>
+            </div>
+            <div className="rounded-2xl px-3 py-2 text-right shrink-0" style={{ background: TINT_GREEN }}>
+              <p className="text-[10px] font-bold uppercase tracking-[0.12em]" style={{ color: DEEP_GREEN }}>
+                {t("result.hub.today")}
+              </p>
+              <p className="text-[12px] font-bold mt-1" style={{ color: DEEP_GREEN }}>{todayFocus}</p>
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-2">
+            {[
+              { key: "routine", label: t("nav.routine"), sub: t("result.hub.routineButton"), icon: <Droplets className="w-4 h-4" style={{ color: DEEP_GREEN }} />, action: onGoRoutine, bg: TINT_GREEN },
+              { key: "diary", label: t("nav.diary"), sub: t("result.hub.diaryButton"), icon: <BookOpen className="w-4 h-4" style={{ color: SCAN_TO }} />, action: onOpenDiary, bg: TINT_WARM },
+              { key: "discover", label: t("nav.magazine"), sub: t("result.hub.discoverButton"), icon: <Search className="w-4 h-4 text-[#7C3AED]" />, action: onGoMagazine, bg: "#F7F4FB" },
+              { key: "my", label: t("nav.my"), sub: t("result.hub.myButton"), icon: <User className="w-4 h-4" style={{ color: DEEP_GREEN }} />, action: onGoMy, bg: "#F8FAFD" },
+            ].map((item) => (
+              <button
+                key={item.key}
+                onClick={item.action}
+                className="rounded-2xl p-3 text-left"
+                style={{ background: item.bg }}
+              >
+                {item.icon}
+                <p className="text-[12px] font-bold mt-2 text-stone-800">{item.label}</p>
+                <p className="text-[11px] text-stone-500 mt-1 text-kr-pretty">{item.sub}</p>
+              </button>
+            ))}
+          </div>
+        </motion.div>
+
         {/* ── 3탭 네비게이션 ── */}
         <div ref={tabNavRef} className="rounded-3xl p-2 sticky top-0 z-20 backdrop-blur-md"
           style={{ background: "rgba(248,245,242,0.94)", boxShadow: "0 8px 20px rgba(45,95,79,0.05)" }}>
@@ -833,6 +875,9 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
             socialLoginButton={socialLoginButton}
             handleGoogleLogin={handleGoogleLogin}
             goTo={goTo}
+            onGoRoutineTab={onGoRoutine}
+            onGoDiaryTab={onOpenDiary}
+            onGoMyTab={onGoMy}
           />
           </motion.div>
         )}
@@ -856,6 +901,9 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
             aiCareLabels={aiCareLabels}
             setShowWaitlist={setShowWaitlist}
             goTo={goTo}
+            onGoRoutineTab={onGoRoutine}
+            onGoDiscoverTab={onGoMagazine}
+            onGoMyTab={onGoMy}
           />
           </motion.div>
         )}

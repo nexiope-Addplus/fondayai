@@ -172,6 +172,21 @@
       "dismiss": "시작하기 →"
     },
     "todayAction": "오늘의 핵심 케어",
+    "hub": {
+      "eyebrow": "NEXT STEP",
+      "title": "결과를 각 탭으로 이어서 관리하세요",
+      "desc": "스캔은 시작점입니다. 루틴, 일기, 발견, MY에서 오늘 결과를 이어서 쌓을 수 있어요.",
+      "today": "today",
+      "routineButton": "화장품과 오늘 루틴 정리",
+      "diaryButton": "저녁 기록과 메모 남기기",
+      "discoverButton": "랭킹과 영양 가이드 보기",
+      "myButton": "리포트와 히스토리 관리",
+      "routineTitle": "루틴과 기록으로 오늘 결과를 이어가세요",
+      "routineDesc": "AM/PM 루틴을 체크하고, 일기와 MY 탭에서 오늘 변화를 연결하면 흐름이 자연스러워집니다.",
+      "solutionTitle": "개선 솔루션을 실제 탭에서 이어보세요",
+      "solutionDesc": "추천 화장품, 발견 콘텐츠, 개인 리포트를 각각의 탭에서 더 길게 확인할 수 있습니다.",
+      "nutritionCta": "영양 가이드 계속 보기 →"
+    },
     "deviceTeaser": {
       "title": "Fonday 디바이스",
       "sub": "피부를 실시간으로 측정하는 전용 디바이스"

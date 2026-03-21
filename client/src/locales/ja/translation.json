@@ -172,6 +172,21 @@
       "dismiss": "始める →"
     },
     "todayAction": "今日のケア",
+    "hub": {
+      "eyebrow": "NEXT STEP",
+      "title": "この結果を各タブで続けて管理しましょう",
+      "desc": "スキャンは入口です。今日の結果をルーティン、日記、発見、MYで続けて積み上げられます。",
+      "today": "today",
+      "routineButton": "コスメと今日のルーティンを整理",
+      "diaryButton": "夜の記録とメモを残す",
+      "discoverButton": "ランキングと栄養ガイドを見る",
+      "myButton": "レポートと履歴を管理",
+      "routineTitle": "今日の結果をルーティンと記録につなげる",
+      "routineDesc": "AM/PMルーティンを確認し、日記とMYで今日の変化をつなげると流れが自然になります。",
+      "solutionTitle": "改善プランを各タブで続けて見ましょう",
+      "solutionDesc": "おすすめコスメ、発見コンテンツ、個人レポートはそれぞれのタブでさらに詳しく確認できます。",
+      "nutritionCta": "栄養ガイドを続けて見る →"
+    },
     "deviceTeaser": {
       "title": "Fondayデバイス",
       "sub": "肌をリアルタイムで計測する専用デバイス"

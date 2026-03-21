@@ -1,7 +1,7 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
-import { ScanLine, Leaf, Sparkles, Star, Bot, Thermometer, Droplets, Flame, Shield, Microscope, ArrowRight, Utensils } from "lucide-react";
+import { ScanLine, Leaf, Sparkles, Star, Bot, Thermometer, Droplets, Flame, Shield, Microscope, ArrowRight, Utensils, Search, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DEEP_GREEN, SCAN_TO, SCAN_FROM, TINT_WARM, TINT_GREEN, TINT_NEUTRAL } from "./constants";
 import { SkinPredictionCard } from "./SkinPredictionCard";
@@ -14,10 +14,48 @@ export function ResultSolutionTab(props: any) {
     pushSubscribed, pushLoading, handlePushToggle,
     aiCareSettings, updateAICareOption, aiCareLabels,
     setShowWaitlist, goTo,
+    onGoRoutineTab, onGoDiscoverTab, onGoMyTab,
   } = props;
 
   return (
           <div className="space-y-4">
+
+            <div className="rounded-3xl p-4" style={{ background: "#FAF8F5", border: "1px solid #F1E9E1" }}>
+              <div>
+                <p className="text-[10px] font-bold uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>
+                  {t("result.hub.eyebrow")}
+                </p>
+                <p className="text-[15px] font-bold mt-1" style={{ color: DEEP_GREEN }}>
+                  {t("result.hub.solutionTitle")}
+                </p>
+                <p className="text-[11px] text-stone-500 mt-1 text-kr-pretty">
+                  {t("result.hub.solutionDesc")}
+                </p>
+              </div>
+              <div className="grid grid-cols-3 gap-2 mt-3">
+                <button
+                  onClick={onGoRoutineTab}
+                  className="rounded-2xl p-3 text-left bg-white"
+                >
+                  <Droplets className="w-4 h-4 mb-2" style={{ color: DEEP_GREEN }} />
+                  <p className="text-[12px] font-bold" style={{ color: DEEP_GREEN }}>{t("nav.routine")}</p>
+                </button>
+                <button
+                  onClick={onGoDiscoverTab}
+                  className="rounded-2xl p-3 text-left bg-white"
+                >
+                  <Search className="w-4 h-4 mb-2" style={{ color: SCAN_TO }} />
+                  <p className="text-[12px] font-bold" style={{ color: SCAN_TO }}>{t("nav.magazine")}</p>
+                </button>
+                <button
+                  onClick={onGoMyTab}
+                  className="rounded-2xl p-3 text-left bg-white"
+                >
+                  <User className="w-4 h-4 mb-2 text-stone-700" />
+                  <p className="text-[12px] font-bold text-stone-800">{t("nav.my")}</p>
+                </button>
+              </div>
+            </div>
 
             {/* 화장품 스캔 배너 */}
             <div className="flex items-center gap-3 px-4 py-3.5 rounded-2xl"
@@ -203,7 +241,7 @@ export function ResultSolutionTab(props: any) {
               className="w-full flex items-center justify-center gap-2 py-3.5 rounded-2xl text-sm font-medium transition-all active:scale-95"
               style={{ background: "#FFF7ED", color: "#C2410C" }}>
               <Utensils className="w-4 h-4" />
-              <span>{t("result.tab.nutrition")} →</span>
+              <span>{t("result.hub.nutritionCta")}</span>
             </button>
           </div>
   );

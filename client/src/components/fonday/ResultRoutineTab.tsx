@@ -1,7 +1,7 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
-import { Sun, Moon, CheckCircle2 } from "lucide-react";
+import { Sun, Moon, CheckCircle2, Droplets, BookOpen, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { DEEP_GREEN, SCAN_TO, TINT_WARM, TINT_GREEN, TINT_NEUTRAL } from "./constants";
@@ -21,6 +21,7 @@ export function ResultRoutineTab(props: any) {
     user, setShowCosmeticsRegister, setShowCosmeticsGate, myCosmetics,
     overallScore, previousScore, currentStreak, onOpenDiary,
     loginPromptRef, socialLoginButton, handleGoogleLogin, goTo,
+    onGoRoutineTab, onGoDiaryTab, onGoMyTab,
   } = props;
 
   return (
@@ -211,6 +212,48 @@ export function ResultRoutineTab(props: any) {
                 onGoSolution={() => goTo("solution")}
               />
         )}
+
+        <Card className="rounded-3xl overflow-hidden shadow-[0_8px_24px_rgba(45,95,79,0.06)] bg-white">
+          <CardContent className="p-4">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.16em]" style={{ color: SCAN_TO }}>
+                {t("result.hub.eyebrow")}
+              </p>
+              <p className="text-[15px] font-bold mt-1" style={{ color: DEEP_GREEN }}>
+                {t("result.hub.routineTitle")}
+              </p>
+              <p className="text-[11px] text-stone-500 mt-1 text-kr-pretty">
+                {t("result.hub.routineDesc")}
+              </p>
+            </div>
+            <div className="grid grid-cols-3 gap-2 mt-3">
+              <button
+                onClick={onGoRoutineTab}
+                className="rounded-2xl p-3 text-left"
+                style={{ background: TINT_GREEN }}
+              >
+                <Droplets className="w-4 h-4 mb-2" style={{ color: DEEP_GREEN }} />
+                <p className="text-[12px] font-bold" style={{ color: DEEP_GREEN }}>{t("nav.routine")}</p>
+              </button>
+              <button
+                onClick={onGoDiaryTab}
+                className="rounded-2xl p-3 text-left"
+                style={{ background: TINT_WARM }}
+              >
+                <BookOpen className="w-4 h-4 mb-2" style={{ color: SCAN_TO }} />
+                <p className="text-[12px] font-bold" style={{ color: SCAN_TO }}>{t("nav.diary")}</p>
+              </button>
+              <button
+                onClick={onGoMyTab}
+                className="rounded-2xl p-3 text-left"
+                style={{ background: TINT_NEUTRAL }}
+              >
+                <User className="w-4 h-4 mb-2" style={{ color: DEEP_GREEN }} />
+                <p className="text-[12px] font-bold" style={{ color: DEEP_GREEN }}>{t("nav.my")}</p>
+              </button>
+            </div>
+          </CardContent>
+        </Card>
 
           </div>
   );

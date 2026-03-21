@@ -172,6 +172,21 @@
       "dismiss": "Let's go →"
     },
     "todayAction": "Today's Key Care",
+    "hub": {
+      "eyebrow": "NEXT STEP",
+      "title": "Carry this result into the main tabs",
+      "desc": "The scan is the entry point. Keep today's result moving through Routine, Diary, Discover, and My.",
+      "today": "today",
+      "routineButton": "Organize products and today's routine",
+      "diaryButton": "Save your note and daily record",
+      "discoverButton": "Check rankings and nutrition guides",
+      "myButton": "Manage reports and history",
+      "routineTitle": "Connect today's result to routine and logging",
+      "routineDesc": "Check your AM/PM routine, then continue the day in Diary and My for a clearer flow.",
+      "solutionTitle": "Continue the improvement plan in the main tabs",
+      "solutionDesc": "Product suggestions, discovery content, and personal reports each belong in their own tab.",
+      "nutritionCta": "Continue to nutrition guide →"
+    },
     "deviceTeaser": {
       "title": "Fonday Device",
       "sub": "A dedicated device for real-time skin measurement"
