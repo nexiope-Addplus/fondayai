@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { AnimatePresence, motion } from "framer-motion";
-import { ChevronRight, Droplets, AlertTriangle, Plus, Sparkles } from "lucide-react";
+import { ChevronRight, Droplets, AlertTriangle, Plus, Sparkles, ClipboardList, ScanLine } from "lucide-react";
 import type { CosmeticItem } from "./types";
 import {
   DEEP_GREEN,
@@ -93,6 +93,34 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
   const productSignals = buildCosmeticCorrelationSignals(list, scans, t);
   const topSignal = productSignals[0] || null;
   const selectedSignal = selectedItem ? productSignals.find((signal) => signal.itemId === selectedItem.id) || null : null;
+  const routineStats = [
+    {
+      key: "products",
+      label: t("cosmetics.dashboardProducts"),
+      value: list.length,
+      tone: "#F6FBF8",
+      color: DEEP_GREEN,
+    },
+    {
+      key: "scans",
+      label: t("cosmetics.dashboardScans"),
+      value: scans.length,
+      tone: "#FFF7F3",
+      color: SCAN_TO,
+    },
+    {
+      key: "signals",
+      label: t("cosmetics.dashboardSignals"),
+      value: productSignals.length,
+      tone: "#F7F4FB",
+      color: "#6D4CC2",
+    },
+  ];
+  const routineFlow = [
+    { Icon: ClipboardList, title: t("cosmetics.flowStep1Title"), desc: t("cosmetics.flowStep1Desc"), tone: TINT_GREEN, color: DEEP_GREEN },
+    { Icon: ScanLine, title: t("cosmetics.flowStep2Title"), desc: t("cosmetics.flowStep2Desc"), tone: TINT_WARM, color: SCAN_TO },
+    { Icon: Sparkles, title: t("cosmetics.flowStep3Title"), desc: t("cosmetics.flowStep3Desc"), tone: "#F4F0FB", color: "#6D4CC2" },
+  ];
 
   const sections = [
     {
@@ -200,18 +228,48 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
           </div>
         </div>
 
-        {topSignal && (
-          <div className="mt-4 rounded-2xl p-4" style={{ background: "#F7FAFC" }}>
-            <div className="flex items-center justify-between gap-2">
-              <p className="text-[11px] font-bold" style={{ color: DEEP_GREEN }}>{t("cosmetics.signalTopTitle")}</p>
-              <span className="rounded-full px-2 py-0.5 text-[9px] font-bold" style={{ background: `${SCAN_TO}12`, color: SCAN_TO }}>
-                {t(`cosmetics.signalConfidence.${topSignal.confidence}`)}
-              </span>
+        <div className="mt-4 rounded-3xl p-4" style={{ background: "#FAF8F5", border: "1px solid #F1E9E1" }}>
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <p className="text-[11px] font-bold tracking-[0.14em] uppercase" style={{ color: SCAN_TO }}>
+                {t("cosmetics.dashboardEyebrow")}
+              </p>
+              <p className="text-[15px] font-bold mt-1" style={{ color: DEEP_GREEN }}>
+                {t("cosmetics.dashboardTitle")}
+              </p>
+              <p className="text-[12px] text-stone-500 mt-1 text-kr-pretty">
+                {t("cosmetics.dashboardDesc")}
+              </p>
             </div>
-            <p className="text-[13px] font-semibold text-stone-800 mt-2">{topSignal.itemName}</p>
-            <p className="text-[11px] mt-1 text-kr-pretty" style={{ color: SCAN_TO }}>{topSignal.note}</p>
+            <div className="w-10 h-10 rounded-2xl flex items-center justify-center shrink-0" style={{ background: "#FFFFFF" }}>
+              <Sparkles className="w-5 h-5" style={{ color: SCAN_TO }} />
+            </div>
           </div>
-        )}
+          <div className="grid grid-cols-3 gap-2 mt-4">
+            {routineStats.map((stat) => (
+              <div key={stat.key} className="rounded-2xl p-3" style={{ background: stat.tone }}>
+                <p className="text-[10px] text-stone-400">{stat.label}</p>
+                <p className="text-xl font-bold mt-1" style={{ color: stat.color }}>{stat.value}</p>
+              </div>
+            ))}
+          </div>
+          <div className="mt-3 rounded-2xl p-3" style={{ background: "#FFFFFF" }}>
+            <p className="text-[11px] font-bold" style={{ color: DEEP_GREEN }}>{t("cosmetics.signalTopTitle")}</p>
+            {topSignal ? (
+              <>
+                <div className="flex items-center justify-between gap-2 mt-2">
+                  <p className="text-[13px] font-semibold text-stone-800">{topSignal.itemName}</p>
+                  <span className="rounded-full px-2 py-0.5 text-[9px] font-bold" style={{ background: `${SCAN_TO}12`, color: SCAN_TO }}>
+                    {t(`cosmetics.signalConfidence.${topSignal.confidence}`)}
+                  </span>
+                </div>
+                <p className="text-[11px] mt-1 text-kr-pretty" style={{ color: SCAN_TO }}>{topSignal.note}</p>
+              </>
+            ) : (
+              <p className="text-[11px] mt-2 text-stone-500 text-kr-pretty">{t("cosmetics.signalEmpty")}</p>
+            )}
+          </div>
+        </div>
       </div>
 
       <div className="space-y-3 mt-4">
@@ -229,32 +287,35 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
           </div>
         ) : (
           <>
-            {productSignals.length > 0 && (
-              <div className="rounded-[28px] border p-4 bg-white" style={{ borderColor: "#F1E9E1", boxShadow: "0 10px 24px rgba(45,95,79,0.05)" }}>
-                <div className="flex items-center justify-between gap-3 mb-3">
-                  <div>
-                    <p className="text-[15px] font-bold" style={{ color: DEEP_GREEN }}>{t("cosmetics.signalSectionTitle")}</p>
-                    <p className="text-[11px] text-stone-400">{t("cosmetics.signalSectionDesc")}</p>
-                  </div>
-                  <span className="px-2.5 py-1 rounded-full text-[10px] font-bold" style={{ background: "#EEF4FF", color: "#4A7C6E" }}>
-                    {t("cosmetics.signalWindow")}
-                  </span>
+            <div className="rounded-[28px] border p-4 bg-white" style={{ borderColor: "#E8EEE9", boxShadow: "0 10px 24px rgba(45,95,79,0.05)" }}>
+              <div className="flex items-start justify-between gap-3 mb-3">
+                <div>
+                  <p className="text-[15px] font-bold" style={{ color: DEEP_GREEN }}>{t("cosmetics.flowTitle")}</p>
+                  <p className="text-[11px] text-stone-400">{t("cosmetics.flowDesc")}</p>
                 </div>
-                <div className="space-y-2.5">
-                  {productSignals.slice(0, 3).map((signal) => (
-                    <div key={signal.itemId} className="rounded-2xl p-3" style={{ background: "#F8FAFD" }}>
-                      <div className="flex items-center justify-between gap-2">
-                        <p className="text-[12px] font-semibold text-stone-800">{signal.itemName}</p>
-                        <span className="rounded-full px-2 py-0.5 text-[9px] font-bold" style={{ background: `${DEEP_GREEN}12`, color: DEEP_GREEN }}>
-                          {t(`cosmetics.signalConfidence.${signal.confidence}`)}
-                        </span>
-                      </div>
-                      <p className="text-[11px] mt-1 text-kr-pretty" style={{ color: SCAN_TO }}>{signal.note}</p>
-                    </div>
-                  ))}
-                </div>
+                <span className="px-2.5 py-1 rounded-full text-[10px] font-bold" style={{ background: `${DEEP_GREEN}10`, color: DEEP_GREEN }}>
+                  {t("nav.scan")} → {t("nav.routine")} → {t("nav.diary")}
+                </span>
               </div>
-            )}
+              <div className="space-y-2.5">
+                {routineFlow.map(({ Icon, title, desc, tone, color }, index) => (
+                  <div key={title} className="rounded-2xl p-3 flex items-start gap-3" style={{ background: "#FAF8F5" }}>
+                    <div className="w-9 h-9 rounded-2xl flex items-center justify-center shrink-0" style={{ background: tone }}>
+                      <Icon className="w-4.5 h-4.5" style={{ color }} />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-2">
+                        <span className="text-[10px] font-bold uppercase tracking-[0.12em]" style={{ color }}>
+                          {index + 1}
+                        </span>
+                        <p className="text-[12px] font-bold text-stone-800">{title}</p>
+                      </div>
+                      <p className="text-[11px] text-stone-500 mt-1 text-kr-pretty">{desc}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
 
             <div className="grid gap-3">
               {sections.map(({ key, title, accent, bg }) => (
@@ -298,6 +359,33 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
                 </div>
               ))}
             </div>
+
+            {productSignals.length > 0 && (
+              <div className="rounded-[28px] border p-4 bg-white" style={{ borderColor: "#F1E9E1", boxShadow: "0 10px 24px rgba(45,95,79,0.05)" }}>
+                <div className="flex items-center justify-between gap-3 mb-3">
+                  <div>
+                    <p className="text-[15px] font-bold" style={{ color: DEEP_GREEN }}>{t("cosmetics.signalSectionTitle")}</p>
+                    <p className="text-[11px] text-stone-400">{t("cosmetics.signalSectionDesc")}</p>
+                  </div>
+                  <span className="px-2.5 py-1 rounded-full text-[10px] font-bold" style={{ background: "#EEF4FF", color: "#4A7C6E" }}>
+                    {t("cosmetics.signalWindow")}
+                  </span>
+                </div>
+                <div className="space-y-2.5">
+                  {productSignals.slice(0, 3).map((signal) => (
+                    <div key={signal.itemId} className="rounded-2xl p-3" style={{ background: "#F8FAFD" }}>
+                      <div className="flex items-center justify-between gap-2">
+                        <p className="text-[12px] font-semibold text-stone-800">{signal.itemName}</p>
+                        <span className="rounded-full px-2 py-0.5 text-[9px] font-bold" style={{ background: `${DEEP_GREEN}12`, color: DEEP_GREEN }}>
+                          {t(`cosmetics.signalConfidence.${signal.confidence}`)}
+                        </span>
+                      </div>
+                      <p className="text-[11px] mt-1 text-kr-pretty" style={{ color: SCAN_TO }}>{signal.note}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {routinePlan.conflicts.length > 0 && (
               <div className="rounded-[28px] border p-4" style={{ background: "#FFF8F0", borderColor: "#F7E1D1" }}>

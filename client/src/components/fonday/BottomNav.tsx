@@ -1,6 +1,6 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { House, Droplets, BookOpen, FileText, User } from "lucide-react";
+import { House, Droplets, BookOpen, Search, User } from "lucide-react";
 import { SCAN_TO } from "./constants";
 import type { TabId, ScanState } from "./types";
 
@@ -48,7 +48,7 @@ export function BottomNav({ active, onChange, scanState }: {
           {btn("scan", <House className="w-5 h-5" />, t("nav.scan"))}
           {btn("routine", <Droplets className="w-5 h-5" />, t("nav.routine"))}
           {btn("diary", <BookOpen className="w-5 h-5" />, t("nav.diary"))}
-          {btn("magazine", <FileText className="w-5 h-5" />, t("nav.magazine"))}
+          {btn("magazine", <Search className="w-5 h-5" />, t("nav.magazine"))}
           {btn("my", <User className="w-5 h-5" />, t("nav.my"))}
         </div>
       </div>

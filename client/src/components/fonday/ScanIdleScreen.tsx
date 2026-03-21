@@ -83,6 +83,11 @@ export function ScanIdleScreen({ onScan }: { onScan: () => void }) {
     { Icon: Camera, title: t("idle.step2"), sub: t("idle.step2Sub"), active: false },
     { Icon: Activity, title: t("idle.step3"), sub: t("idle.step3Sub"), active: false },
   ];
+  const FLOW_STEPS = [
+    { Icon: Activity, title: t("idle.flowStep1Title"), desc: t("idle.flowStep1Desc"), tone: TINT_GREEN, color: DEEP_GREEN },
+    { Icon: Sparkles, title: t("idle.flowStep2Title"), desc: t("idle.flowStep2Desc"), tone: TINT_WARM, color: SCAN_TO },
+    { Icon: ClipboardList, title: t("idle.flowStep3Title"), desc: t("idle.flowStep3Desc"), tone: "#F4F0FB", color: "#6D4CC2" },
+  ];
 
   return (
     <>
@@ -356,6 +361,40 @@ export function ScanIdleScreen({ onScan }: { onScan: () => void }) {
                   </div>
                 </div>
                 {i < 2 && <div className="text-stone-200 text-sm pt-2 flex-shrink-0">›</div>}
+              </div>
+            ))}
+          </div>
+        </div>
+      </motion.div>
+
+      <motion.div variants={fadeChild} className="mb-4 relative" style={{ zIndex: 1 }}>
+        <div className="rounded-2xl bg-white px-4 py-4" style={{ boxShadow: "0 8px 20px rgba(45,95,79,0.06)" }}>
+          <div className="flex items-center justify-between gap-3 mb-3">
+            <div>
+              <p className="text-[11px] font-bold tracking-[0.14em] uppercase" style={{ color: SCAN_TO }}>
+                {t("idle.flowEyebrow")}
+              </p>
+              <p className="text-[15px] font-bold text-stone-800 mt-1">{t("idle.flowTitle")}</p>
+            </div>
+            <span className="px-2.5 py-1 rounded-full text-[10px] font-bold" style={{ background: `${SCAN_FROM}12`, color: SCAN_TO }}>
+              {t("nav.scan")} → {t("nav.routine")} → {t("nav.diary")}
+            </span>
+          </div>
+          <div className="space-y-2.5">
+            {FLOW_STEPS.map(({ Icon, title, desc, tone, color }, index) => (
+              <div key={title} className="rounded-2xl px-3 py-3 flex items-start gap-3" style={{ background: "#FAF8F5" }}>
+                <div className="w-9 h-9 rounded-2xl flex items-center justify-center shrink-0" style={{ background: tone }}>
+                  <Icon className="w-4.5 h-4.5" style={{ color }} />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] font-bold uppercase tracking-[0.12em]" style={{ color }}>
+                      {index + 1}
+                    </span>
+                    <p className="text-[12px] font-bold text-stone-800">{title}</p>
+                  </div>
+                  <p className="text-[11px] text-stone-500 mt-1 text-kr-pretty">{desc}</p>
+                </div>
               </div>
             ))}
           </div>

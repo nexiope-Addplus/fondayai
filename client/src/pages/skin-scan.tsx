@@ -416,7 +416,7 @@ export default function SkinScanPage() {
           )}
           {activeTab === "my" && (
             <motion.div key="my" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-              <MyScreen user={user} onInstall={handleInstall} onBack={() => setActiveTab("scan")} onLogin={openLoginPopup} onGoMagazine={() => setActiveTab("magazine")} />
+              <MyScreen user={user} analysisResult={analysisResult} onInstall={handleInstall} onBack={() => setActiveTab("scan")} onLogin={openLoginPopup} onGoMagazine={() => setActiveTab("magazine")} />
             </motion.div>
           )}
         </AnimatePresence>

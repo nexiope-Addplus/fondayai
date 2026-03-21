@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { AnimatePresence } from "framer-motion";
 import {
@@ -9,23 +9,64 @@ import {
   CalendarDays,
   BookOpen,
   SmartphoneNfc,
+  Activity,
+  Clock3,
+  BrainCircuit,
+  ScanLine,
 } from "lucide-react";
 import {
   DEEP_GREEN,
   SCAN_TO,
   TINT_WARM,
+  TINT_GREEN,
 } from "./constants";
 import { getAttendance } from "./utils";
 import { AttendanceCalendarModal } from "./AttendanceCalendarModal";
+import type { AnalysisResult } from "./types";
 
 // Re-export for backward compatibility
 export { AttendanceCalendarModal } from "./AttendanceCalendarModal";
 export { CosmeticsRegisterModal } from "./CosmeticsRegisterModal";
 
-export function MyScreen({ user, onInstall, onBack, onLogin, onGoMagazine }: { user: any; onInstall: () => void; onBack: () => void; onLogin?: (p: "kakao"|"line"|"google", tab: string) => void; onGoMagazine?: () => void }) {
+export function MyScreen({
+  user,
+  onInstall,
+  onBack,
+  onLogin,
+  onGoMagazine,
+  analysisResult,
+}: {
+  user: any;
+  onInstall: () => void;
+  onBack: () => void;
+  onLogin?: (p: "kakao"|"line"|"google", tab: string) => void;
+  onGoMagazine?: () => void;
+  analysisResult?: AnalysisResult | null;
+}) {
   const { t, i18n } = useTranslation();
   const [showCalendar, setShowCalendar] = useState(false);
+  const [scans, setScans] = useState<any[]>([]);
+  const [loadingScans, setLoadingScans] = useState(false);
   const attendance = getAttendance();
+
+  useEffect(() => {
+    if (!user) return;
+    setLoadingScans(true);
+    fetch("/api/scans")
+      .then((res) => (res.ok ? res.json() : []))
+      .then((data) => setScans(Array.isArray(data) ? data : []))
+      .catch(() => setScans([]))
+      .finally(() => setLoadingScans(false));
+  }, [user]);
+
+  const latestScan = scans[0] ?? null;
+  const historyPreview = scans.slice(0, 4);
+  const latestScores = useMemo(() => {
+    if (!latestScan?.scores || !Array.isArray(latestScan.scores)) return [];
+    return [...latestScan.scores]
+      .sort((a: any, b: any) => Number(a.score) - Number(b.score))
+      .slice(0, 3);
+  }, [latestScan]);
 
   const handleLogout = () => {
     fetch('/api/logout', { method: 'POST' }).then(() => window.location.reload());
@@ -148,6 +189,157 @@ export function MyScreen({ user, onInstall, onBack, onLogin, onGoMagazine }: { u
           </div>
           <ChevronRight className="w-4 h-4 text-stone-300" />
         </button>
+
+        {user && (
+          <>
+            <div className="rounded-2xl bg-white p-4" style={{ boxShadow: "0 8px 24px rgba(45,95,79,0.06)" }}>
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <p className="text-[11px] font-bold tracking-[0.14em] uppercase" style={{ color: SCAN_TO }}>
+                    {t("my.reportEyebrow")}
+                  </p>
+                  <p className="text-[16px] font-bold mt-1" style={{ color: DEEP_GREEN }}>
+                    {t("my.reportTitle")}
+                  </p>
+                  <p className="text-[12px] text-stone-500 mt-1 text-kr-pretty">
+                    {latestScan
+                      ? t("my.reportDesc")
+                      : t("my.reportEmpty")}
+                  </p>
+                </div>
+                <div className="w-10 h-10 rounded-2xl flex items-center justify-center shrink-0" style={{ background: TINT_GREEN }}>
+                  <BrainCircuit className="w-5 h-5" style={{ color: DEEP_GREEN }} />
+                </div>
+              </div>
+
+              {latestScan ? (
+                <div className="mt-4 grid grid-cols-3 gap-2">
+                  <div className="rounded-2xl p-3" style={{ background: "#F6FBF8" }}>
+                    <p className="text-[10px] text-stone-400">{t("result.overall")}</p>
+                    <p className="text-xl font-bold mt-1" style={{ color: DEEP_GREEN }}>{latestScan.overallScore}</p>
+                  </div>
+                  <div className="rounded-2xl p-3" style={{ background: "#FFF7F3" }}>
+                    <p className="text-[10px] text-stone-400">{t("result.skinAge")}</p>
+                    <p className="text-xl font-bold mt-1" style={{ color: SCAN_TO }}>{latestScan.skinAge ?? "—"}</p>
+                  </div>
+                  <div className="rounded-2xl p-3" style={{ background: "#F7F4FB" }}>
+                    <p className="text-[10px] text-stone-400">{t("result.baumannLabel")}</p>
+                    <p className="text-xl font-bold mt-1 text-stone-800">{latestScan.baumannType || "—"}</p>
+                  </div>
+                </div>
+              ) : null}
+            </div>
+
+            <div className="rounded-2xl bg-white p-4" style={{ boxShadow: "0 8px 24px rgba(45,95,79,0.06)" }}>
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <p className="text-[11px] font-bold tracking-[0.14em] uppercase" style={{ color: SCAN_TO }}>
+                    {t("my.predictionEyebrow")}
+                  </p>
+                  <p className="text-[16px] font-bold mt-1" style={{ color: DEEP_GREEN }}>
+                    {t("my.predictionTitle")}
+                  </p>
+                </div>
+                <div className="w-10 h-10 rounded-2xl flex items-center justify-center shrink-0" style={{ background: "#F7F4FB" }}>
+                  <Sparkles className="w-5 h-5" style={{ color: "#7C3AED" }} />
+                </div>
+              </div>
+              {analysisResult?.prediction?.good ? (
+                <div className="mt-4 rounded-2xl p-3" style={{ background: "#F7F4FB" }}>
+                  <p className="text-[11px] font-semibold text-stone-500">
+                    {t("result.prediction.daysAfter", { days: analysisResult.prediction.good.days })}
+                  </p>
+                  <p className="text-[20px] font-bold mt-1" style={{ color: DEEP_GREEN }}>
+                    {analysisResult.prediction.good.score}{t("result.scoreSuffix")}
+                  </p>
+                  <p className="text-[12px] text-stone-600 mt-2 text-kr-pretty">
+                    {analysisResult.prediction.good.scenario}
+                  </p>
+                </div>
+              ) : (
+                <div className="mt-4 rounded-2xl p-3" style={{ background: "#F8FAFD" }}>
+                  <p className="text-[12px] text-stone-500 text-kr-pretty">{t("my.predictionEmpty")}</p>
+                </div>
+              )}
+            </div>
+
+            <div className="rounded-2xl bg-white p-4" style={{ boxShadow: "0 8px 24px rgba(45,95,79,0.06)" }}>
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <p className="text-[11px] font-bold tracking-[0.14em] uppercase" style={{ color: SCAN_TO }}>
+                    {t("my.historyEyebrow")}
+                  </p>
+                  <p className="text-[16px] font-bold mt-1" style={{ color: DEEP_GREEN }}>
+                    {t("my.historyTitle")}
+                  </p>
+                </div>
+                <div className="w-10 h-10 rounded-2xl flex items-center justify-center shrink-0" style={{ background: "#F6FBF8" }}>
+                  <Clock3 className="w-5 h-5" style={{ color: DEEP_GREEN }} />
+                </div>
+              </div>
+              {loadingScans ? (
+                <div className="flex justify-center py-6">
+                  <div className="w-5 h-5 border-2 border-stone-200 border-t-stone-400 rounded-full animate-spin" />
+                </div>
+              ) : historyPreview.length > 0 ? (
+                <div className="mt-4 space-y-2">
+                  {historyPreview.map((scan) => (
+                    <div key={scan.id} className="rounded-2xl p-3 flex items-center justify-between gap-3" style={{ background: "#F8FAFD" }}>
+                      <div className="flex items-center gap-3 min-w-0">
+                        <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0" style={{ background: TINT_WARM }}>
+                          <ScanLine className="w-4.5 h-4.5" style={{ color: SCAN_TO }} />
+                        </div>
+                        <div className="min-w-0">
+                          <p className="text-[13px] font-semibold text-stone-800 truncate">
+                            {new Date(scan.createdAt).toLocaleDateString(i18n.language === "ko" ? "ko-KR" : i18n.language === "ja" ? "ja-JP" : "en-US", {
+                              month: "short",
+                              day: "numeric",
+                            })}
+                          </p>
+                          <p className="text-[11px] text-stone-400 truncate">{scan.baumannType || "Baumann"} · {scan.skinAge ?? "—"}</p>
+                        </div>
+                      </div>
+                      <div className="text-right shrink-0">
+                        <p className="text-[10px] text-stone-400">{t("result.overall")}</p>
+                        <p className="text-[16px] font-bold" style={{ color: DEEP_GREEN }}>{scan.overallScore}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="mt-4 rounded-2xl p-3" style={{ background: "#F8FAFD" }}>
+                  <p className="text-[12px] text-stone-500">{t("my.historyEmpty")}</p>
+                </div>
+              )}
+            </div>
+
+            {latestScores.length > 0 && (
+              <div className="rounded-2xl bg-white p-4" style={{ boxShadow: "0 8px 24px rgba(45,95,79,0.06)" }}>
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <p className="text-[11px] font-bold tracking-[0.14em] uppercase" style={{ color: SCAN_TO }}>
+                      {t("my.focusEyebrow")}
+                    </p>
+                    <p className="text-[16px] font-bold mt-1" style={{ color: DEEP_GREEN }}>
+                      {t("my.focusTitle")}
+                    </p>
+                  </div>
+                  <div className="w-10 h-10 rounded-2xl flex items-center justify-center shrink-0" style={{ background: "#FFF7F3" }}>
+                    <Activity className="w-5 h-5" style={{ color: SCAN_TO }} />
+                  </div>
+                </div>
+                <div className="mt-4 space-y-2">
+                  {latestScores.map((score: any, index: number) => (
+                    <div key={`${score.label}-${index}`} className="rounded-2xl p-3 flex items-center justify-between gap-3" style={{ background: "#FFF9F7" }}>
+                      <p className="text-[12px] font-semibold text-stone-700">{score.label}</p>
+                      <p className="text-[14px] font-bold" style={{ color: SCAN_TO }}>{score.score}{t("result.scoreSuffix")}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </>
+        )}
 
         {/* 언어 설정 */}
         <div className="flex items-center justify-between p-4 rounded-2xl bg-white" style={{ boxShadow: "0 8px 24px rgba(45,95,79,0.06)" }}>

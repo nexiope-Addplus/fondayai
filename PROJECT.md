@@ -767,6 +767,8 @@ git checkout dev  # 다시 dev로
 - 참고: `fondayai.pages.dev` 는 root Pages 도메인이므로 production(main) 배포를 가리킴
 - 참고: `dev.fondayai.com` 은 `dev.fondayai.pages.dev` 를 가리키는 고정 개발 도메인
 - 참고: 새 dev 배포 직후에는 커스텀 도메인 반영보다 `dev.fondayai.pages.dev` 가 조금 더 빨리 갱신될 수 있음
+- 참고: Cloudflare Pages 환경변수는 `Preview` / `Production` 이 서로 자동 공유되지 않음
+- 참고: `Preview` 환경변수를 수정한 뒤에는 기존 dev 배포가 그 값을 자동 반영하지 않을 수 있으므로, `git push origin dev` 로 새 preview 배포를 다시 만들어야 함
 
 ---
 
@@ -788,6 +790,22 @@ git checkout dev  # 다시 dev로
 - DNS CNAME 생성: `dev.fondayai.com` → `dev.fondayai.pages.dev`
 - 이후 개발 확인 기본 주소는 `dev.fondayai.com`
 - root `fondayai.pages.dev` 는 계속 production(main) 확인용으로 유지
+
+### B-2. Preview 환경변수 적용 메모 (2026-03-21)
+- `dev` 브랜치 배포는 Cloudflare Pages `Preview` 환경변수를 사용
+- `main` 브랜치 배포는 `Production` 환경변수를 사용
+- OAuth / Gemini 테스트를 위해 `Preview` 에 아래 값들을 별도로 넣어야 함:
+  - `KAKAO_CLIENT_ID`
+  - `KAKAO_CLIENT_SECRET`
+  - `JWT_SECRET`
+  - `GOOGLE_API_KEY`
+- 실제 이슈:
+  - `Preview` 값 추가 직후 기존 `dev` 배포에서는 `client_id=undefined`, `GOOGLE_API_KEY is missing` 이 계속 보였음
+  - 원인은 새 preview 배포가 아직 생성되지 않았기 때문
+- 해결:
+  - 빈 커밋 `ed2d3ae` (`chore(deploy): refresh preview env`) 를 `dev` 에 푸시해 새 preview 배포를 강제 생성
+  - 이후 `dev.fondayai.com/auth/kakao` 정상 redirect 확인
+  - 이후 `dev.fondayai.com/api/analyze-skin` 도 더 이상 env 누락 에러 없이 Gemini 요청까지 도달함
 
 ### C. OG 메타태그 도메인 교체
 - `client/index.html`의 canonical, og:url, og:image, twitter:image, JSON-LD url
