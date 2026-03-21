@@ -785,18 +785,18 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
             {[
               { key: "routine", label: t("nav.routine"), sub: t("result.hub.routineButton"), icon: <Droplets className="w-4 h-4" style={{ color: DEEP_GREEN }} />, action: onGoRoutine, bg: TINT_GREEN },
               { key: "diary", label: t("nav.diary"), sub: t("result.hub.diaryButton"), icon: <BookOpen className="w-4 h-4" style={{ color: SCAN_TO }} />, action: onOpenDiary, bg: TINT_WARM },
-              { key: "discover", label: t("nav.magazine"), sub: t("result.hub.discoverButton"), icon: <Search className="w-4 h-4 text-[#7C3AED]" />, action: onGoMagazine, bg: "#F7F4FB" },
+              { key: "discover", label: t("nav.magazine"), sub: t("result.hub.discoverButton"), icon: <Compass className="w-4 h-4 text-[#7C3AED]" />, action: onGoMagazine, bg: "#F7F4FB" },
               { key: "my", label: t("nav.my"), sub: t("result.hub.myButton"), icon: <User className="w-4 h-4" style={{ color: DEEP_GREEN }} />, action: onGoMy, bg: "#F8FAFD" },
             ].map((item) => (
               <button
                 key={item.key}
                 onClick={item.action}
-                className="rounded-2xl p-3 text-left min-w-0"
+                className="rounded-2xl p-3 text-left min-w-0 min-h-[108px] flex flex-col"
                 style={{ background: item.bg }}
               >
                 {item.icon}
                 <p className="text-[12px] font-bold mt-2 text-stone-800">{item.label}</p>
-                <p className="text-[11px] text-stone-500 mt-1 text-kr-pretty break-keep leading-snug">{item.sub}</p>
+                <p className="text-[11px] text-stone-500 mt-1 leading-snug">{item.sub}</p>
               </button>
             ))}
           </div>

@@ -13,6 +13,7 @@ import {
   Clock3,
   BrainCircuit,
   ScanLine,
+  Compass,
 } from "lucide-react";
 import {
   DEEP_GREEN,
@@ -212,25 +213,25 @@ export function MyScreen({
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-2 mt-4">
-                <button onClick={onBack} className="rounded-2xl p-3 text-left" style={{ background: "#F6FBF8" }}>
+                <button onClick={onBack} className="rounded-2xl p-3 text-left min-h-[104px] flex flex-col" style={{ background: "#F6FBF8" }}>
                   <ScanLine className="w-4 h-4 mb-2" style={{ color: DEEP_GREEN }} />
                   <p className="text-[12px] font-bold text-stone-800">{t("nav.scan")}</p>
-                  <p className="text-[11px] text-stone-500 mt-1 text-kr-pretty">{t("my.manageScan")}</p>
+                  <p className="text-[11px] text-stone-500 mt-1 leading-snug">{t("my.manageScan")}</p>
                 </button>
-                <button onClick={onGoRoutine} className="rounded-2xl p-3 text-left" style={{ background: "#FFF7F3" }}>
+                <button onClick={onGoRoutine} className="rounded-2xl p-3 text-left min-h-[104px] flex flex-col" style={{ background: "#FFF7F3" }}>
                   <Sparkles className="w-4 h-4 mb-2" style={{ color: SCAN_TO }} />
                   <p className="text-[12px] font-bold text-stone-800">{t("nav.routine")}</p>
-                  <p className="text-[11px] text-stone-500 mt-1 text-kr-pretty">{t("my.manageRoutine")}</p>
+                  <p className="text-[11px] text-stone-500 mt-1 leading-snug">{t("my.manageRoutine")}</p>
                 </button>
-                <button onClick={onOpenDiary} className="rounded-2xl p-3 text-left" style={{ background: "#F7F4FB" }}>
+                <button onClick={onOpenDiary} className="rounded-2xl p-3 text-left min-h-[104px] flex flex-col" style={{ background: "#F7F4FB" }}>
                   <BookOpen className="w-4 h-4 mb-2 text-[#7C3AED]" />
                   <p className="text-[12px] font-bold text-stone-800">{t("nav.diary")}</p>
-                  <p className="text-[11px] text-stone-500 mt-1 text-kr-pretty">{t("my.manageDiary")}</p>
+                  <p className="text-[11px] text-stone-500 mt-1 leading-snug">{t("my.manageDiary")}</p>
                 </button>
-                <button onClick={onGoMagazine} className="rounded-2xl p-3 text-left" style={{ background: "#F8FAFD" }}>
-                  <ChevronRight className="w-4 h-4 mb-2 text-stone-500" />
+                <button onClick={onGoMagazine} className="rounded-2xl p-3 text-left min-h-[104px] flex flex-col" style={{ background: "#F8FAFD" }}>
+                  <Compass className="w-4 h-4 mb-2 text-stone-500" />
                   <p className="text-[12px] font-bold text-stone-800">{t("nav.magazine")}</p>
-                  <p className="text-[11px] text-stone-500 mt-1 text-kr-pretty">{t("my.manageDiscover")}</p>
+                  <p className="text-[11px] text-stone-500 mt-1 leading-snug">{t("my.manageDiscover")}</p>
                 </button>
               </div>
             </div>

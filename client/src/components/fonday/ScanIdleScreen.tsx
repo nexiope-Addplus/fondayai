@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Sparkles, Heart, Lock, CalendarDays, Activity,
-  ClipboardList, Camera, ChevronDown, ChevronRight, Flame, Search, User, Droplets, BookOpen,
+  ClipboardList, Camera, ChevronDown, ChevronRight, Flame, Compass, User, Droplets, BookOpen,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -506,18 +506,18 @@ export function ScanIdleScreen({
             {[
               { key: "routine", label: t("nav.routine"), sub: t("idle.shortcutRoutine"), icon: <Droplets className="w-4 h-4" style={{ color: DEEP_GREEN }} />, action: onOpenRoutine, bg: TINT_GREEN },
               { key: "diary", label: t("nav.diary"), sub: t("idle.shortcutDiary"), icon: <BookOpen className="w-4 h-4" style={{ color: SCAN_TO }} />, action: onOpenDiary, bg: TINT_WARM },
-              { key: "discover", label: t("nav.magazine"), sub: t("idle.shortcutDiscover"), icon: <Search className="w-4 h-4 text-[#7C3AED]" />, action: onOpenDiscover, bg: "#F7F4FB" },
+              { key: "discover", label: t("nav.magazine"), sub: t("idle.shortcutDiscover"), icon: <Compass className="w-4 h-4 text-[#7C3AED]" />, action: onOpenDiscover, bg: "#F7F4FB" },
               { key: "my", label: t("nav.my"), sub: t("idle.shortcutMy"), icon: <User className="w-4 h-4" style={{ color: DEEP_GREEN }} />, action: onOpenMy, bg: "#F8FAFD" },
             ].map((item) => (
               <button
                 key={item.key}
                 onClick={item.action}
-                className="rounded-2xl p-3 text-left min-w-0"
+                className="rounded-2xl p-3 text-left min-w-0 min-h-[108px] flex flex-col"
                 style={{ background: item.bg }}
               >
                 {item.icon}
                 <p className="text-[12px] font-bold mt-2 text-stone-800">{item.label}</p>
-                <p className="text-[11px] text-stone-500 mt-1 text-kr-pretty break-keep leading-snug">{item.sub}</p>
+                <p className="text-[11px] text-stone-500 mt-1 leading-snug text-left">{item.sub}</p>
               </button>
             ))}
           </div>

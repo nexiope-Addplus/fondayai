@@ -153,8 +153,8 @@ export function MagazineTab() {
 
           {/* 헤더 */}
           <motion.div variants={fadeChild} className="px-5 pt-6 pb-4">
-            <p className="text-[11px] font-bold tracking-widest uppercase mb-1" style={{ color: SCAN_TO }}>{t("discover.subtitle")}</p>
-            <h1 className="text-[26px] font-black tracking-tight leading-tight whitespace-pre-line" style={{ color: DEEP_GREEN }}>
+            <p className="text-[11px] font-bold tracking-widest uppercase mb-1" style={{ color: SCAN_TO }}>{t("nav.magazine")}</p>
+            <h1 className="text-[24px] font-black tracking-tight leading-tight whitespace-pre-line" style={{ color: DEEP_GREEN }}>
               {t("discover.title")}
             </h1>
           </motion.div>
@@ -169,7 +169,7 @@ export function MagazineTab() {
                   <p className="text-[16px] font-bold mt-1" style={{ color: DEEP_GREEN }}>
                     {t("discover.rankingTitle")}
                   </p>
-                  <p className="text-[12px] text-stone-500 mt-1 text-kr-pretty">
+                  <p className="text-[12px] text-stone-500 mt-1 leading-snug">
                     {rankingData ? t("ranking.totalData", { count: rankingData.totalScans }) : t("discover.rankingEmpty")}
                   </p>
                 </div>
@@ -219,7 +219,7 @@ export function MagazineTab() {
                         <p className="text-[12px] font-semibold text-stone-800">{item.label}</p>
                         <span className="text-[12px] font-bold" style={{ color: SCAN_TO }}>{item.score}{t("result.scoreSuffix")}</span>
                       </div>
-                      <p className="text-[11px] text-stone-500 mt-1 text-kr-pretty">
+                      <p className="text-[11px] text-stone-500 mt-1 leading-snug">
                         {t("discover.nutritionHint", { concern: item.label })}
                       </p>
                     </div>
@@ -239,7 +239,7 @@ export function MagazineTab() {
                 </div>
                 <div>
                   <p className="text-[12px] font-bold" style={{ color: DEEP_GREEN }}>{t("discover.feedTitle")}</p>
-                  <p className="text-[11px] text-stone-500 mt-1 text-kr-pretty">{t("discover.feedDesc")}</p>
+                  <p className="text-[11px] text-stone-500 mt-1 leading-snug">{t("discover.feedDesc")}</p>
                 </div>
               </div>
             </div>
