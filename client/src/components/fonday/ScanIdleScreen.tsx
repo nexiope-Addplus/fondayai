@@ -8,7 +8,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import {
   BAUMANN_COLORS, DEEP_GREEN, SCAN_FROM, SCAN_TO, TEXT_SECONDARY,
-  TINT_WARM, SCORE_COLORS, stagger, fadeChild,
+  TINT_GREEN, TINT_WARM, SCORE_COLORS, stagger, fadeChild,
 } from "./constants";
 import type { WeatherData, WeatherTipKey } from "./types";
 import { getStreak, getAttendance, getDaysSinceLastScan, getWeatherTipKey } from "./utils";
