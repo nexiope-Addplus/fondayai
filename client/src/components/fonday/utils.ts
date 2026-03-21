@@ -1198,30 +1198,43 @@ export function buildCosmeticCorrelationSignals(
       const startTs = getCosmeticStartTimestamp(item);
       if (!startTs) return null;
 
-      const baselineScans = sortedScans
-        .filter(({ ts }) => ts < startTs)
+      const preWindowScans = sortedScans
+        .filter(({ ts }) => ts < startTs && ts >= startTs - 21 * 86400000)
         .slice(-3)
         .map(({ scan }) => scan);
+      const baselineScans = preWindowScans.length > 0
+        ? preWindowScans
+        : sortedScans.filter(({ ts }) => ts < startTs).slice(-4).map(({ scan }) => scan);
 
-      const afterScans = sortedScans
-        .filter(({ ts }) => ts >= startTs && ts <= startTs + 14 * 86400000)
+      const observedAfterScans = sortedScans
+        .filter(({ ts }) => ts >= startTs && ts <= startTs + 21 * 86400000)
         .map(({ scan }) => scan);
+      const afterScans = observedAfterScans.length > 0
+        ? observedAfterScans
+        : sortedScans.filter(({ ts }) => ts >= startTs).slice(0, 4).map(({ scan }) => scan);
 
       if (afterScans.length === 0) return null;
 
+      const comparisonBaselineScans = baselineScans.length > 0
+        ? baselineScans
+        : afterScans.slice(0, Math.max(1, Math.min(2, Math.floor(afterScans.length / 2) || 1)));
+      const comparisonAfterScans = baselineScans.length > 0
+        ? afterScans
+        : afterScans.slice(-Math.max(1, Math.min(2, afterScans.length)));
+
       const baselineOverall = average(
-        baselineScans.map((scan) => Number(scan.overallScore) || 0).filter((value) => value > 0)
+        comparisonBaselineScans.map((scan) => Number(scan.overallScore) || 0).filter((value) => value > 0)
       );
       const afterOverall = average(
-        afterScans.map((scan) => Number(scan.overallScore) || 0).filter((value) => value > 0)
+        comparisonAfterScans.map((scan) => Number(scan.overallScore) || 0).filter((value) => value > 0)
       );
 
       const deltas = Array.from({ length: 10 }, (_, index) => {
         const label = Object.entries(SCORE_LABEL_MAP).find(([, mapped]) => mapped === index)?.[0] || "";
-        const beforeValues = baselineScans
+        const beforeValues = comparisonBaselineScans
           .map((scan) => Number(parseScanScores(scan)[index]?.score) || 0)
           .filter((value) => value > 0);
-        const afterValues = afterScans
+        const afterValues = comparisonAfterScans
           .map((scan) => Number(parseScanScores(scan)[index]?.score) || 0)
           .filter((value) => value > 0);
         const beforeMean = average(beforeValues);
@@ -1249,9 +1262,9 @@ export function buildCosmeticCorrelationSignals(
         .slice(0, 3);
 
       const confidence: CosmeticCorrelationSignal["confidence"] =
-        baselineScans.length >= 2 && afterScans.length >= 2
+        comparisonBaselineScans.length >= 2 && comparisonAfterScans.length >= 2 && daysSinceDate(item.opened_at || item.created_at || todayStr()) >= 10
           ? "strong"
-          : baselineScans.length >= 1 && afterScans.length >= 2
+          : comparisonBaselineScans.length >= 1 && comparisonAfterScans.length >= 2
           ? "building"
           : "early";
 

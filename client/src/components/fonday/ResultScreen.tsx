@@ -1,7 +1,7 @@
 import React, { useState, useRef, useCallback, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import i18n from "../../i18n";
-import { motion, AnimatePresence, useDragControls } from "framer-motion";
+import { motion, useDragControls } from "framer-motion";
 import {
   Camera, ScanLine, AlertCircle, Shield, Sun, Moon,
   Sparkles, ArrowRight, Heart, Droplets, Target,
@@ -13,7 +13,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import {
   DEEP_GREEN, DEEP_GREEN_LIGHT, SCAN_FROM, SCAN_TO,
   TINT_WARM, TINT_GREEN, TINT_NEUTRAL, SCORE_LABEL_MAP, NUTRIENT_COLORS,
-  SCORE_COLORS, fadeChild, stagger, tabSlideVariants, MISSION_POINTS,
+  SCORE_COLORS, fadeChild, stagger, MISSION_POINTS,
 } from "./constants";
 import type { CosmeticItem, StreakData, RankingData, MissionState, TodoItem } from "./types";
 import {
@@ -57,7 +57,6 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
   const [email, setEmail] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const resultScrollRef = useRef<HTMLDivElement>(null);
-  const tabNavRef = useRef<HTMLDivElement>(null);
   const [shareLoading, setShareLoading] = useState(false);
   const diaryDrag = useDragControls();
   const [showNutrients, setShowNutrients] = useState(false);
@@ -84,8 +83,6 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
     }
   }, []);
   const [showCheckinSheet, setShowCheckinSheet] = useState(false);
-  const [activeTab, setActiveTab] = useState<"routine" | "solution" | "nutrition">("routine");
-  const tabDirectionRef = useRef<1 | -1>(1);
   const [currentStreak, setCurrentStreak] = useState<StreakData>(() => getStreak());
   const [todayTodoProgress, setTodayTodoProgress] = useState(() => getDiaryTodoProgress(todayStr()));
   const [todayRoutineTodos, setTodayRoutineTodos] = useState<TodoItem[]>(() => getDiaryTodos(todayStr()));
@@ -101,6 +98,9 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
   const [showOnboarding, setShowOnboarding] = useState(() => !localStorage.getItem("fonday_onboarding_done"));
   const [showQuestSheet, setShowQuestSheet] = useState(false);
   const [showPwaPopup, setShowPwaPopup] = useState(false);
+  const routineSectionRef = useRef<HTMLDivElement | null>(null);
+  const solutionSectionRef = useRef<HTMLDivElement | null>(null);
+  const nutritionSectionRef = useRef<HTMLDivElement | null>(null);
 
   // PWA 설치 팝업: 결과 진입 후 4초 뒤 자동 표시
   useEffect(() => {
@@ -362,27 +362,12 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
     el.style.overflow = (showAnalysis || showImprovements) ? 'hidden' : 'auto';
   }, [showAnalysis, showImprovements]);
 
-  const TAB_SEQUENCE = ["routine", "solution", "nutrition"] as const;
-  const TAB_ORDER = { routine: 0, solution: 1, nutrition: 2 } as const;
-  const tabContentRef = useRef<HTMLDivElement | null>(null);
-  const goTo = (next: "routine" | "solution" | "nutrition") => {
-    tabDirectionRef.current = TAB_ORDER[next] >= TAB_ORDER[activeTab] ? 1 : -1;
-    setActiveTab(next);
-  };
-
-  // 탭 전환 시 탭 바 위치로 스크롤 (초기 마운트 제외)
-  const tabMountedRef = useRef(false);
-  useEffect(() => {
-    if (!tabMountedRef.current) {
-      tabMountedRef.current = true;
-      return; // 초기 로드: 스크롤 없이 최상단(10가지 점수)부터 보임
-    }
-    const content = tabContentRef.current;
+  const scrollToSection = (ref: React.RefObject<HTMLDivElement | null>) => {
     const container = resultScrollRef.current;
-    if (content && container) {
-      container.scrollTo({ top: content.offsetTop - 8, behavior: "smooth" });
-    }
-  }, [activeTab]);
+    const target = ref.current;
+    if (!container || !target) return;
+    container.scrollTo({ top: target.offsetTop - 12, behavior: "smooth" });
+  };
 
   const handlePartnershipSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -817,46 +802,50 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
           </div>
         </motion.div>
 
-        {/* ── 3탭 네비게이션 ── */}
-        <div ref={tabNavRef} className="rounded-3xl p-2 sticky top-0 z-20 backdrop-blur-md"
+        <div className="rounded-3xl p-2 sticky top-0 z-20 backdrop-blur-md"
           style={{ background: "rgba(248,245,242,0.94)", boxShadow: "0 8px 20px rgba(45,95,79,0.05)" }}>
-          <div className="flex gap-2">
-            {([
-              { id: "routine" as const,   label: t("result.tab.routine"),   icon: <CheckCircle2 className="w-4 h-4" />, activeBg: TINT_GREEN, activeText: DEEP_GREEN },
-              { id: "solution" as const,  label: t("result.tab.solution"),  icon: <Leaf className="w-4 h-4" />,         activeBg: TINT_WARM, activeText: SCAN_TO },
-              { id: "nutrition" as const, label: t("result.tab.nutrition"), icon: <Utensils className="w-4 h-4" />,     activeBg: "#FFF7ED", activeText: "#C2410C" },
-            ]).map(({ id, label, icon, activeBg, activeText }) => {
-              const isActive = activeTab === id;
-              return (
-                <button key={id} onClick={() => goTo(id)}
-                  className="flex-1 flex items-center justify-center gap-2 py-3 rounded-3xl text-xs font-medium transition-all"
-                  style={isActive
-                    ? { background: activeBg, color: activeText }
-                    : { background: "#FFFFFF", color: "#A8A29E" }}>
-                  {icon}
-                  <span>{label}</span>
-                </button>
-              );
-            })}
+          <div className="grid grid-cols-3 gap-2">
+            <button
+              onClick={() => scrollToSection(routineSectionRef)}
+              className="flex items-center justify-center gap-2 py-3 rounded-3xl text-xs font-medium"
+              style={{ background: TINT_GREEN, color: DEEP_GREEN }}
+            >
+              <CheckCircle2 className="w-4 h-4" />
+              <span>{t("result.tab.routine")}</span>
+            </button>
+            <button
+              onClick={() => scrollToSection(solutionSectionRef)}
+              className="flex items-center justify-center gap-2 py-3 rounded-3xl text-xs font-medium"
+              style={{ background: TINT_WARM, color: SCAN_TO }}
+            >
+              <Leaf className="w-4 h-4" />
+              <span>{t("result.tab.solution")}</span>
+            </button>
+            <button
+              onClick={() => scrollToSection(nutritionSectionRef)}
+              className="flex items-center justify-center gap-2 py-3 rounded-3xl text-xs font-medium"
+              style={{ background: "#FFF7ED", color: "#C2410C" }}
+            >
+              <Utensils className="w-4 h-4" />
+              <span>{t("result.tab.nutrition")}</span>
+            </button>
           </div>
         </div>
 
-        <div ref={tabContentRef} className="overflow-hidden"
-          onTouchStart={(e) => { (e.currentTarget as any)._touchX = e.touches[0].clientX; }}
-          onTouchEnd={(e) => {
-            const startX = (e.currentTarget as any)._touchX;
-            if (startX == null) return;
-            const diff = e.changedTouches[0].clientX - startX;
-            if (Math.abs(diff) < 40) return;
-            const cur = TAB_SEQUENCE.indexOf(activeTab);
-            if (diff < 0 && cur < TAB_SEQUENCE.length - 1) goTo(TAB_SEQUENCE[cur + 1]);
-            else if (diff > 0 && cur > 0) goTo(TAB_SEQUENCE[cur - 1]);
-          }}>
-        <AnimatePresence mode="wait" initial={false} custom={tabDirectionRef.current}>
-        {/* ── 루틴 탭 ── */}
-        {activeTab === "routine" && (
-          <motion.div key="routine" custom={tabDirectionRef.current} variants={tabSlideVariants}
-            initial="enter" animate="center" exit="exit" transition={{ duration: 0.2, ease: "easeInOut" }}>
+        <div ref={routineSectionRef} className="overflow-hidden mt-5">
+          <div className="flex items-center justify-between gap-3 mb-3 px-1">
+            <div>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.14em]" style={{ color: DEEP_GREEN }}>{t("result.tab.routine")}</p>
+              <p className="text-[14px] font-bold mt-1 text-stone-800">{t("result.actionCard.subtitle")}</p>
+            </div>
+            <button
+              onClick={() => scrollToSection(solutionSectionRef)}
+              className="rounded-full px-3 py-1.5 text-[10px] font-semibold"
+              style={{ background: TINT_GREEN, color: DEEP_GREEN }}
+            >
+              {t("result.tab.solution")} →
+            </button>
+          </div>
           <ResultRoutineTab
             showOnboarding={showOnboarding}
             setShowOnboarding={setShowOnboarding}
@@ -888,18 +877,27 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
             loginPromptRef={loginPromptRef}
             socialLoginButton={socialLoginButton}
             handleGoogleLogin={handleGoogleLogin}
-            goTo={goTo}
+            goTo={() => scrollToSection(solutionSectionRef)}
             onGoRoutineTab={onGoRoutine}
             onGoDiaryTab={onOpenDiary}
             onGoMyTab={onGoMy}
           />
-          </motion.div>
-        )}
+          </div>
 
-        {/* ── 솔루션 탭 ── */}
-        {activeTab === "solution" && (
-          <motion.div key="solution" custom={tabDirectionRef.current} variants={tabSlideVariants}
-            initial="enter" animate="center" exit="exit" transition={{ duration: 0.2, ease: "easeInOut" }}>
+        <div ref={solutionSectionRef} className="mt-5">
+          <div className="flex items-center justify-between gap-3 mb-3 px-1">
+            <div>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>{t("result.tab.solution")}</p>
+              <p className="text-[14px] font-bold mt-1 text-stone-800">{t("result.solutionsSub")}</p>
+            </div>
+            <button
+              onClick={() => scrollToSection(nutritionSectionRef)}
+              className="rounded-full px-3 py-1.5 text-[10px] font-semibold"
+              style={{ background: TINT_WARM, color: SCAN_TO }}
+            >
+              {t("result.hub.nutritionCta")}
+            </button>
+          </div>
           <ResultSolutionTab
             user={user}
             cosmeticCount={cosmeticCount}
@@ -914,23 +912,21 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
             updateAICareOption={updateAICareOption}
             aiCareLabels={aiCareLabels}
             setShowWaitlist={setShowWaitlist}
-            goTo={goTo}
+            goTo={() => scrollToSection(nutritionSectionRef)}
             onGoRoutineTab={onGoRoutine}
             onGoDiscoverTab={onGoMagazine}
             onGoMyTab={onGoMy}
           />
-          </motion.div>
-        )}
+        </div>
 
-        {/* ── 영양 탭 ── */}
-        {activeTab === "nutrition" && (
-          <motion.div key="nutrition" custom={tabDirectionRef.current} variants={tabSlideVariants}
-            initial="enter" animate="center" exit="exit" transition={{ duration: 0.2, ease: "easeInOut" }}>
+        <div ref={nutritionSectionRef} className="mt-5">
+          <div className="flex items-center justify-between gap-3 mb-3 px-1">
+            <div>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.14em]" style={{ color: "#7C3AED" }}>{t("result.tab.nutrition")}</p>
+              <p className="text-[14px] font-bold mt-1 text-stone-800">{t("nutrients.sectionSub")}</p>
+            </div>
+          </div>
           <ResultNutritionTab analysisResult={analysisResult} />
-          </motion.div>
-        )}
-
-        </AnimatePresence>
         </div>
 
         {/* ── 제휴 텍스트 링크 ── */}
