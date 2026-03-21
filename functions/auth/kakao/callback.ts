@@ -3,10 +3,11 @@ import { createJWT } from "../../_utils/jwt";
 export const onRequest = async (context: any) => {
   const { request, env } = context;
   const url = new URL(request.url);
+  const homeUrl = `${url.origin}/`;
   const code = url.searchParams.get("code");
 
   if (!code) {
-    return Response.redirect("/", 302);
+    return Response.redirect(homeUrl, 302);
   }
 
   try {
@@ -29,7 +30,7 @@ export const onRequest = async (context: any) => {
 
     if (!tokenRes.ok) {
       console.error("[Kakao OAuth] token exchange failed:", await tokenRes.text());
-      return Response.redirect("/", 302);
+      return Response.redirect(homeUrl, 302);
     }
 
     const tokens: any = await tokenRes.json();
@@ -41,7 +42,7 @@ export const onRequest = async (context: any) => {
 
     if (!userRes.ok) {
       console.error("[Kakao OAuth] user info failed:", await userRes.text());
-      return Response.redirect("/", 302);
+      return Response.redirect(homeUrl, 302);
     }
 
     const kakaoUser: any = await userRes.json();
@@ -68,6 +69,6 @@ export const onRequest = async (context: any) => {
     });
   } catch (e: any) {
     console.error("[Kakao OAuth] callback error:", e.message);
-    return Response.redirect("/", 302);
+    return Response.redirect(homeUrl, 302);
   }
 };
