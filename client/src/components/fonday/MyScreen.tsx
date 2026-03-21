@@ -34,6 +34,8 @@ export function MyScreen({
   onBack,
   onLogin,
   onGoMagazine,
+  onGoRoutine,
+  onOpenDiary,
   analysisResult,
 }: {
   user: any;
@@ -41,6 +43,8 @@ export function MyScreen({
   onBack: () => void;
   onLogin?: (p: "kakao"|"line"|"google", tab: string) => void;
   onGoMagazine?: () => void;
+  onGoRoutine?: () => void;
+  onOpenDiary?: () => void;
   analysisResult?: AnalysisResult | null;
 }) {
   const { t, i18n } = useTranslation();
@@ -196,6 +200,41 @@ export function MyScreen({
               <div className="flex items-start justify-between gap-3">
                 <div>
                   <p className="text-[11px] font-bold tracking-[0.14em] uppercase" style={{ color: SCAN_TO }}>
+                    {t("my.manageEyebrow")}
+                  </p>
+                  <p className="text-[16px] font-bold mt-1" style={{ color: DEEP_GREEN }}>
+                    {t("my.manageTitle")}
+                  </p>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-2 mt-4">
+                <button onClick={onBack} className="rounded-2xl p-3 text-left" style={{ background: "#F6FBF8" }}>
+                  <ScanLine className="w-4 h-4 mb-2" style={{ color: DEEP_GREEN }} />
+                  <p className="text-[12px] font-bold text-stone-800">{t("nav.scan")}</p>
+                  <p className="text-[11px] text-stone-500 mt-1 text-kr-pretty">{t("my.manageScan")}</p>
+                </button>
+                <button onClick={onGoRoutine} className="rounded-2xl p-3 text-left" style={{ background: "#FFF7F3" }}>
+                  <Sparkles className="w-4 h-4 mb-2" style={{ color: SCAN_TO }} />
+                  <p className="text-[12px] font-bold text-stone-800">{t("nav.routine")}</p>
+                  <p className="text-[11px] text-stone-500 mt-1 text-kr-pretty">{t("my.manageRoutine")}</p>
+                </button>
+                <button onClick={onOpenDiary} className="rounded-2xl p-3 text-left" style={{ background: "#F7F4FB" }}>
+                  <BookOpen className="w-4 h-4 mb-2 text-[#7C3AED]" />
+                  <p className="text-[12px] font-bold text-stone-800">{t("nav.diary")}</p>
+                  <p className="text-[11px] text-stone-500 mt-1 text-kr-pretty">{t("my.manageDiary")}</p>
+                </button>
+                <button onClick={onGoMagazine} className="rounded-2xl p-3 text-left" style={{ background: "#F8FAFD" }}>
+                  <ChevronRight className="w-4 h-4 mb-2 text-stone-500" />
+                  <p className="text-[12px] font-bold text-stone-800">{t("nav.magazine")}</p>
+                  <p className="text-[11px] text-stone-500 mt-1 text-kr-pretty">{t("my.manageDiscover")}</p>
+                </button>
+              </div>
+            </div>
+
+            <div className="rounded-2xl bg-white p-4" style={{ boxShadow: "0 8px 24px rgba(45,95,79,0.06)" }}>
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <p className="text-[11px] font-bold tracking-[0.14em] uppercase" style={{ color: SCAN_TO }}>
                     {t("my.reportEyebrow")}
                   </p>
                   <p className="text-[16px] font-bold mt-1" style={{ color: DEEP_GREEN }}>
@@ -272,6 +311,9 @@ export function MyScreen({
                   <p className="text-[16px] font-bold mt-1" style={{ color: DEEP_GREEN }}>
                     {t("my.historyTitle")}
                   </p>
+                  <p className="text-[12px] text-stone-500 mt-1 text-kr-pretty">
+                    {t("my.historyDesc")}
+                  </p>
                 </div>
                 <div className="w-10 h-10 rounded-2xl flex items-center justify-center shrink-0" style={{ background: "#F6FBF8" }}>
                   <Clock3 className="w-5 h-5" style={{ color: DEEP_GREEN }} />
@@ -309,6 +351,40 @@ export function MyScreen({
               ) : (
                 <div className="mt-4 rounded-2xl p-3" style={{ background: "#F8FAFD" }}>
                   <p className="text-[12px] text-stone-500">{t("my.historyEmpty")}</p>
+                </div>
+              )}
+            </div>
+
+            <div className="rounded-2xl bg-white p-4" style={{ boxShadow: "0 8px 24px rgba(45,95,79,0.06)" }}>
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <p className="text-[11px] font-bold tracking-[0.14em] uppercase" style={{ color: SCAN_TO }}>
+                    {t("my.archiveEyebrow")}
+                  </p>
+                  <p className="text-[16px] font-bold mt-1" style={{ color: DEEP_GREEN }}>
+                    {t("my.archiveTitle")}
+                  </p>
+                </div>
+              </div>
+              {historyPreview.length > 0 ? (
+                <div className="space-y-2 mt-4">
+                  {historyPreview.map((scan, index) => (
+                    <div key={`archive-${scan.id ?? index}`} className="rounded-2xl p-3 flex items-center justify-between gap-3" style={{ background: "#FAF8F5" }}>
+                      <div className="min-w-0">
+                        <p className="text-[12px] font-bold text-stone-800 truncate">
+                          {t("my.archiveCard", { number: historyPreview.length - index })}
+                        </p>
+                        <p className="text-[11px] text-stone-500 mt-1 truncate">
+                          {(scan.baumannType || "Baumann")} · {scan.skinAge ?? "—"} · {new Date(scan.createdAt).toLocaleDateString(i18n.language === "ko" ? "ko-KR" : i18n.language === "ja" ? "ja-JP" : "en-US")}
+                        </p>
+                      </div>
+                      <p className="text-[14px] font-bold shrink-0" style={{ color: DEEP_GREEN }}>{scan.overallScore}</p>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="mt-4 rounded-2xl p-3" style={{ background: "#F8FAFD" }}>
+                  <p className="text-[12px] text-stone-500 text-kr-pretty">{t("my.archiveEmpty")}</p>
                 </div>
               )}
             </div>

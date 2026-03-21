@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Sparkles, Heart, Lock, CalendarDays, Activity,
-  ClipboardList, Camera, ChevronDown, ChevronRight, Flame,
+  ClipboardList, Camera, ChevronDown, ChevronRight, Flame, Search, User, Droplets, BookOpen,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -17,7 +17,19 @@ import { WeatherTipCard, MiniScoreBarIdle } from "./WeatherTipCard";
 import { LangSwitcher } from "./BottomNav";
 
 // ─── 메인 스캔 화면 ───────────────────────────────────────────────
-export function ScanIdleScreen({ onScan }: { onScan: () => void }) {
+export function ScanIdleScreen({
+  onScan,
+  onOpenRoutine,
+  onOpenDiary,
+  onOpenDiscover,
+  onOpenMy,
+}: {
+  onScan: () => void;
+  onOpenRoutine?: () => void;
+  onOpenDiary?: () => void;
+  onOpenDiscover?: () => void;
+  onOpenMy?: () => void;
+}) {
   const { t } = useTranslation();
   const streak = getStreak();
   const attendance = getAttendance();
@@ -27,7 +39,17 @@ export function ScanIdleScreen({ onScan }: { onScan: () => void }) {
   const [socialCount, setSocialCount] = useState(0);
   const [pullY, setPullY] = useState(0);
   const [idleWeather, setIdleWeather] = useState<WeatherData | null>(null);
+  const [latestScan, setLatestScan] = useState<any | null>(null);
   const touchStartY = useRef(0);
+
+  useEffect(() => {
+    fetch("/api/scans")
+      .then((res) => (res.ok ? res.json() : []))
+      .then((data) => {
+        if (Array.isArray(data) && data.length > 0) setLatestScan(data[0]);
+      })
+      .catch(() => setLatestScan(null));
+  }, []);
 
   useEffect(() => {
     if (!navigator.geolocation) return;
@@ -264,6 +286,44 @@ export function ScanIdleScreen({ onScan }: { onScan: () => void }) {
       </motion.div>
 
       <motion.div variants={fadeChild} className="mb-4 relative" style={{ zIndex: 1 }}>
+        {latestScan && (
+          <div className="rounded-2xl bg-white px-4 py-4 mb-4" style={{ boxShadow: "0 8px 20px rgba(45,95,79,0.06)" }}>
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0">
+                <p className="text-[11px] font-bold tracking-[0.14em] uppercase" style={{ color: SCAN_TO }}>
+                  {t("idle.latestEyebrow")}
+                </p>
+                <p className="text-[15px] font-bold text-stone-800 mt-1">{t("idle.latestTitle")}</p>
+                <p className="text-[11px] text-stone-500 mt-1 text-kr-pretty">{t("idle.latestDesc")}</p>
+              </div>
+              <div className="rounded-2xl px-3 py-2 text-right shrink-0" style={{ background: TINT_GREEN }}>
+                <p className="text-[10px] font-bold uppercase tracking-[0.12em]" style={{ color: DEEP_GREEN }}>
+                  {t("result.overall")}
+                </p>
+                <p className="text-[18px] font-bold mt-1" style={{ color: DEEP_GREEN }}>{latestScan.overallScore ?? "—"}</p>
+              </div>
+            </div>
+            <div className="grid grid-cols-3 gap-2 mt-3">
+              <div className="rounded-2xl p-3" style={{ background: "#F6FBF8" }}>
+                <p className="text-[10px] text-stone-400">{t("result.skinAge")}</p>
+                <p className="text-[14px] font-bold mt-1" style={{ color: DEEP_GREEN }}>{latestScan.skinAge ?? "—"}</p>
+              </div>
+              <div className="rounded-2xl p-3" style={{ background: "#FFF7F3" }}>
+                <p className="text-[10px] text-stone-400">{t("result.baumannLabel")}</p>
+                <p className="text-[14px] font-bold mt-1" style={{ color: SCAN_TO }}>{latestScan.baumannType || "—"}</p>
+              </div>
+              <div className="rounded-2xl p-3" style={{ background: "#F7F4FB" }}>
+                <p className="text-[10px] text-stone-400">{t("my.focusTitle")}</p>
+                <p className="text-[12px] font-bold mt-1 text-stone-800 line-clamp-2 text-kr-pretty">
+                  {Array.isArray(latestScan.scores) && latestScan.scores.length > 1
+                    ? [...latestScan.scores].slice(1).sort((a: any, b: any) => Number(a.score) - Number(b.score))[0]?.label || "—"
+                    : "—"}
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
         <div className="grid grid-cols-[1fr_auto] gap-2">
           <button
             onClick={() => setShowCalendar(true)}
@@ -396,6 +456,41 @@ export function ScanIdleScreen({ onScan }: { onScan: () => void }) {
                   <p className="text-[11px] text-stone-500 mt-1 text-kr-pretty">{desc}</p>
                 </div>
               </div>
+            ))}
+          </div>
+        </div>
+      </motion.div>
+
+      <motion.div variants={fadeChild} className="mb-4 relative" style={{ zIndex: 1 }}>
+        <div className="rounded-2xl bg-white px-4 py-4" style={{ boxShadow: "0 8px 20px rgba(45,95,79,0.06)" }}>
+          <div className="flex items-center justify-between gap-3 mb-3">
+            <div>
+              <p className="text-[11px] font-bold tracking-[0.14em] uppercase" style={{ color: SCAN_TO }}>
+                {t("idle.shortcutEyebrow")}
+              </p>
+              <p className="text-[15px] font-bold text-stone-800 mt-1">{t("idle.shortcutTitle")}</p>
+            </div>
+            <span className="px-2.5 py-1 rounded-full text-[10px] font-bold" style={{ background: `${SCAN_FROM}12`, color: SCAN_TO }}>
+              {t("idle.shortcutBadge")}
+            </span>
+          </div>
+          <div className="grid grid-cols-2 gap-2">
+            {[
+              { key: "routine", label: t("nav.routine"), sub: t("idle.shortcutRoutine"), icon: <Droplets className="w-4 h-4" style={{ color: DEEP_GREEN }} />, action: onOpenRoutine, bg: TINT_GREEN },
+              { key: "diary", label: t("nav.diary"), sub: t("idle.shortcutDiary"), icon: <BookOpen className="w-4 h-4" style={{ color: SCAN_TO }} />, action: onOpenDiary, bg: TINT_WARM },
+              { key: "discover", label: t("nav.magazine"), sub: t("idle.shortcutDiscover"), icon: <Search className="w-4 h-4 text-[#7C3AED]" />, action: onOpenDiscover, bg: "#F7F4FB" },
+              { key: "my", label: t("nav.my"), sub: t("idle.shortcutMy"), icon: <User className="w-4 h-4" style={{ color: DEEP_GREEN }} />, action: onOpenMy, bg: "#F8FAFD" },
+            ].map((item) => (
+              <button
+                key={item.key}
+                onClick={item.action}
+                className="rounded-2xl p-3 text-left min-w-0"
+                style={{ background: item.bg }}
+              >
+                {item.icon}
+                <p className="text-[12px] font-bold mt-2 text-stone-800">{item.label}</p>
+                <p className="text-[11px] text-stone-500 mt-1 text-kr-pretty break-keep leading-snug">{item.sub}</p>
+              </button>
             ))}
           </div>
         </div>

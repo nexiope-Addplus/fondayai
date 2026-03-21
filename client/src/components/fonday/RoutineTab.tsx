@@ -191,6 +191,58 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
             </button>
           </div>
         </div>
+
+        {productSignals.length > 0 && (
+          <div className="mt-4 rounded-3xl p-4" style={{ background: "#FFFFFF", border: "1px solid #F1E9E1" }}>
+            <div className="flex items-start justify-between gap-3 mb-3">
+              <div>
+                <p className="text-[11px] font-bold tracking-[0.14em] uppercase" style={{ color: SCAN_TO }}>
+                  {t("cosmetics.effectBoardEyebrow")}
+                </p>
+                <p className="text-[15px] font-bold mt-1" style={{ color: DEEP_GREEN }}>
+                  {t("cosmetics.effectBoardTitle")}
+                </p>
+                <p className="text-[11px] text-stone-500 mt-1 text-kr-pretty">
+                  {t("cosmetics.effectBoardDesc")}
+                </p>
+              </div>
+            </div>
+            <div className="space-y-2.5">
+              {productSignals.slice(0, 3).map((signal) => {
+                const mainMetric = signal.topScoreIndex !== null ? t(`scores.${signal.topScoreIndex}`) : t("cosmetics.signalMetricFallback");
+                const deltaValue = signal.topScoreDelta ?? signal.overallDelta ?? 0;
+                const positive = deltaValue >= 0;
+                return (
+                  <div key={`effect-${signal.itemId}`} className="rounded-2xl p-3" style={{ background: "#FAF8F5" }}>
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <p className="text-[12px] font-bold text-stone-800 truncate">{signal.itemName}</p>
+                        <p className="text-[11px] text-stone-500 mt-1 text-kr-pretty">{signal.note}</p>
+                      </div>
+                      <span className="rounded-full px-2 py-0.5 text-[9px] font-bold shrink-0" style={{ background: `${positive ? DEEP_GREEN : SCAN_TO}12`, color: positive ? DEEP_GREEN : SCAN_TO }}>
+                        {positive ? "+" : ""}{deltaValue}
+                      </span>
+                    </div>
+                    <div className="grid grid-cols-3 gap-2 mt-3">
+                      <div className="rounded-2xl p-2.5 bg-white">
+                        <p className="text-[10px] text-stone-400">{t("cosmetics.effectMetricLabel")}</p>
+                        <p className="text-[11px] font-bold mt-1 text-stone-800">{mainMetric}</p>
+                      </div>
+                      <div className="rounded-2xl p-2.5 bg-white">
+                        <p className="text-[10px] text-stone-400">{t("cosmetics.effectTrackedLabel")}</p>
+                        <p className="text-[11px] font-bold mt-1 text-stone-800">{t("cosmetics.effectTrackedValue", { days: signal.daysTracked })}</p>
+                      </div>
+                      <div className="rounded-2xl p-2.5 bg-white">
+                        <p className="text-[10px] text-stone-400">{t("cosmetics.effectScanLabel")}</p>
+                        <p className="text-[11px] font-bold mt-1 text-stone-800">{t("cosmetics.effectScanValue", { count: signal.afterCount })}</p>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
       </div>
     );
   }

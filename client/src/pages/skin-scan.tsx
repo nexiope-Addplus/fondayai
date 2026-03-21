@@ -379,7 +379,15 @@ export default function SkinScanPage() {
         <AnimatePresence mode="wait">
           {activeTab === "scan" && (
             <motion.div key="scan" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-              {scanState === "idle" && <ScanIdleScreen onScan={() => setShowCamera(true)} />}
+              {scanState === "idle" && (
+                <ScanIdleScreen
+                  onScan={() => setShowCamera(true)}
+                  onOpenRoutine={() => setActiveTab("routine")}
+                  onOpenDiary={() => setActiveTab("diary")}
+                  onOpenDiscover={() => setActiveTab("magazine")}
+                  onOpenMy={() => setActiveTab("my")}
+                />
+              )}
               {scanState === "survey" && <SurveyScreen onSubmit={handleSurveySubmit} onBack={() => setScanState("idle")} />}
               {scanState === "scanning" && <ScanningScreen imageSrc={imageSrc} />}
               {scanState === "result" && (
@@ -418,7 +426,7 @@ export default function SkinScanPage() {
           )}
           {activeTab === "my" && (
             <motion.div key="my" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-              <MyScreen user={user} analysisResult={analysisResult} onInstall={handleInstall} onBack={() => setActiveTab("scan")} onLogin={openLoginPopup} onGoMagazine={() => setActiveTab("magazine")} />
+              <MyScreen user={user} analysisResult={analysisResult} onInstall={handleInstall} onBack={() => setActiveTab("scan")} onLogin={openLoginPopup} onGoMagazine={() => setActiveTab("magazine")} onGoRoutine={() => setActiveTab("routine")} onOpenDiary={() => setActiveTab("diary")} />
             </motion.div>
           )}
         </AnimatePresence>
