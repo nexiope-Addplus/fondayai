@@ -1,7 +1,7 @@
 import React, { useState, useRef, useCallback, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import i18n from "../../i18n";
-import { motion, useDragControls } from "framer-motion";
+import { motion, AnimatePresence, useDragControls } from "framer-motion";
 import {
   Camera, ScanLine, AlertCircle, Shield, Sun, Moon,
   Sparkles, ArrowRight, Heart, Droplets, Target,
@@ -31,6 +31,9 @@ import { SkinPredictionCard } from "./SkinPredictionCard";
 import { ResultDiaryCard } from "./ResultDiaryCard";
 import { ResultLoginCard } from "./ResultLoginCard";
 import { ResultActionBar } from "./ResultActionBar";
+import { ResultRoutineTab } from "./ResultRoutineTab";
+import { ResultSolutionTab } from "./ResultSolutionTab";
+import { ResultNutritionTab } from "./ResultNutritionTab";
 import { useAICareSettings } from "./useAICareSettings";
 import { ResultHeaderCard } from "./ResultHeaderCard";
 import { ResultOverlayPopups } from "./ResultOverlayPopups";
@@ -54,6 +57,7 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
   const [email, setEmail] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const resultScrollRef = useRef<HTMLDivElement>(null);
+  const tabNavRef = useRef<HTMLDivElement>(null);
   const [shareLoading, setShareLoading] = useState(false);
   const diaryDrag = useDragControls();
   const [showNutrients, setShowNutrients] = useState(false);
@@ -80,6 +84,8 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
     }
   }, []);
   const [showCheckinSheet, setShowCheckinSheet] = useState(false);
+  const [activeTab, setActiveTab] = useState<"routine" | "solution" | "nutrition">("routine");
+  const tabDirectionRef = useRef<1 | -1>(1);
   const [currentStreak, setCurrentStreak] = useState<StreakData>(() => getStreak());
   const [todayTodoProgress, setTodayTodoProgress] = useState(() => getDiaryTodoProgress(todayStr()));
   const [todayRoutineTodos, setTodayRoutineTodos] = useState<TodoItem[]>(() => getDiaryTodos(todayStr()));
@@ -355,6 +361,27 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
     if (!el) return;
     el.style.overflow = (showAnalysis || showImprovements) ? 'hidden' : 'auto';
   }, [showAnalysis, showImprovements]);
+
+  const TAB_SEQUENCE = ["routine", "solution", "nutrition"] as const;
+  const TAB_ORDER = { routine: 0, solution: 1, nutrition: 2 } as const;
+  const tabContentRef = useRef<HTMLDivElement | null>(null);
+  const goTo = (next: "routine" | "solution" | "nutrition") => {
+    tabDirectionRef.current = TAB_ORDER[next] >= TAB_ORDER[activeTab] ? 1 : -1;
+    setActiveTab(next);
+  };
+
+  const tabMountedRef = useRef(false);
+  useEffect(() => {
+    if (!tabMountedRef.current) {
+      tabMountedRef.current = true;
+      return;
+    }
+    const content = tabContentRef.current;
+    const container = resultScrollRef.current;
+    if (content && container) {
+      container.scrollTo({ top: content.offsetTop - 8, behavior: "smooth" });
+    }
+  }, [activeTab]);
 
   const handlePartnershipSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -819,6 +846,121 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
             </div>
           </div>
         </motion.div>
+
+        <div ref={tabNavRef} className="rounded-3xl p-2 sticky top-0 z-20 backdrop-blur-md"
+          style={{ background: "rgba(248,245,242,0.94)", boxShadow: "0 8px 20px rgba(45,95,79,0.05)" }}>
+          <div className="flex gap-2">
+            {([
+              { id: "routine" as const,   label: t("result.tab.routine"),   icon: <CheckCircle2 className="w-4 h-4" />, activeBg: "#F7FBF8", activeText: DEEP_GREEN },
+              { id: "solution" as const,  label: t("result.tab.solution"),  icon: <Leaf className="w-4 h-4" />,         activeBg: "#FFF8F4", activeText: SCAN_TO },
+              { id: "nutrition" as const, label: t("result.tab.nutrition"), icon: <Utensils className="w-4 h-4" />,     activeBg: "#FCF8FF", activeText: "#7C3AED" },
+            ]).map(({ id, label, icon, activeBg, activeText }) => {
+              const isActive = activeTab === id;
+              return (
+                <button key={id} onClick={() => goTo(id)}
+                  className="flex-1 flex items-center justify-center gap-2 py-3 rounded-3xl text-xs font-medium transition-all"
+                  style={isActive
+                    ? { background: activeBg, color: activeText }
+                    : { background: "#FFFFFF", color: "#A8A29E" }}>
+                  {icon}
+                  <span>{label}</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        <div ref={tabContentRef} className="overflow-hidden"
+          onTouchStart={(e) => { (e.currentTarget as any)._touchX = e.touches[0].clientX; }}
+          onTouchEnd={(e) => {
+            const startX = (e.currentTarget as any)._touchX;
+            if (startX == null) return;
+            const diff = e.changedTouches[0].clientX - startX;
+            if (Math.abs(diff) < 40) return;
+            const cur = TAB_SEQUENCE.indexOf(activeTab);
+            if (diff < 0 && cur < TAB_SEQUENCE.length - 1) goTo(TAB_SEQUENCE[cur + 1]);
+            else if (diff > 0 && cur > 0) goTo(TAB_SEQUENCE[cur - 1]);
+          }}>
+        <AnimatePresence mode="wait" initial={false} custom={tabDirectionRef.current}>
+        {activeTab === "routine" && (
+          <motion.div key="routine" custom={tabDirectionRef.current}
+            initial={{ opacity: 0, x: 12 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -12 }}
+            transition={{ duration: 0.18, ease: "easeOut" }}>
+          <ResultRoutineTab
+            showOnboarding={showOnboarding}
+            setShowOnboarding={setShowOnboarding}
+            history={history}
+            questStatusDetail={questStatusDetail}
+            nextStreakGoal={nextStreakGoal}
+            daysToGoal={daysToGoal}
+            nextStreakReward={nextStreakReward}
+            questProgressPct={questProgressPct}
+            essentialQuests={essentialQuests}
+            setShowQuestSheet={setShowQuestSheet}
+            morningRoutineItems={morningRoutineItems}
+            eveningRoutineItems={eveningRoutineItems}
+            morningRoutineComplete={morningRoutineComplete}
+            eveningRoutineComplete={eveningRoutineComplete}
+            setRoutinePeriodCompletion={setRoutinePeriodCompletion}
+            handleDiaryEntry={handleDiaryEntry}
+            routineGuide={routineGuide}
+            cosmeticsInsights={cosmeticsInsights}
+            cosmeticCount={cosmeticCount}
+            user={user}
+            setShowCosmeticsRegister={setShowCosmeticsRegister}
+            setShowCosmeticsGate={setShowCosmeticsGate}
+            myCosmetics={myCosmetics}
+            overallScore={overallScore}
+            previousScore={previousScore}
+            currentStreak={currentStreak}
+            onOpenDiary={onOpenDiary}
+            loginPromptRef={loginPromptRef}
+            socialLoginButton={socialLoginButton}
+            handleGoogleLogin={handleGoogleLogin}
+            goTo={goTo}
+            onGoRoutineTab={onGoRoutine}
+            onGoDiaryTab={onOpenDiary}
+            onGoMyTab={onGoMy}
+          />
+          </motion.div>
+        )}
+
+        {activeTab === "solution" && (
+          <motion.div key="solution" custom={tabDirectionRef.current}
+            initial={{ opacity: 0, x: 12 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -12 }}
+            transition={{ duration: 0.18, ease: "easeOut" }}>
+          <ResultSolutionTab
+            user={user}
+            cosmeticCount={cosmeticCount}
+            setShowCosmeticsRegister={setShowCosmeticsRegister}
+            setShowCosmeticsGate={setShowCosmeticsGate}
+            analysisResult={analysisResult}
+            handleDiaryEntry={handleDiaryEntry}
+            pushSubscribed={pushSubscribed}
+            pushLoading={pushLoading}
+            handlePushToggle={handlePushToggle}
+            aiCareSettings={aiCareSettings}
+            updateAICareOption={updateAICareOption}
+            aiCareLabels={aiCareLabels}
+            setShowWaitlist={setShowWaitlist}
+            goTo={goTo}
+            onGoRoutineTab={onGoRoutine}
+            onGoDiscoverTab={onGoMagazine}
+            onGoMyTab={onGoMy}
+          />
+          </motion.div>
+        )}
+
+        {activeTab === "nutrition" && (
+          <motion.div key="nutrition" custom={tabDirectionRef.current}
+            initial={{ opacity: 0, x: 12 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -12 }}
+            transition={{ duration: 0.18, ease: "easeOut" }}>
+          <ResultNutritionTab analysisResult={analysisResult} />
+          </motion.div>
+        )}
+
+        </AnimatePresence>
+        </div>
 
         {/* ── 제휴 텍스트 링크 ── */}
         <div className="pt-2 pb-1 text-center">
