@@ -713,10 +713,12 @@ export const onRequest = async (context: any) => {
 ### 즉시 필요
 - [ ] 기존에 `both` 로 저장된 화장품 데이터를 카테고리 기반 기본 시간대로 정리할지 결정
 - [ ] 결과 화면 상단 카드에서 얼굴 crop을 실기기 기준으로 한 번 더 미세조정
-- [ ] `오늘 목표`와 아침/저녁 루틴 카드의 정보 밀도를 더 줄일지 검토
+- [ ] 결과 화면 `루틴 / 솔루션 / 영양` 3탭의 실기기 정보 밀도와 스와이프 체감 재확인
+- [ ] 홈 / 루틴 / MY 카드 간격, 문구 길이, 시각 우선순위를 dev 실기기 기준으로 최종 폴리싱
 - [ ] MyScreen 화장품 상세 시트에 성분 OCR/자동 추출까지 붙일지 결정 (현재는 수동 입력)
 - [ ] Worker 실제 크론 스케줄과 `PROJECT.md` 문서 설명을 최종 기준으로 한 번 더 일치시킬 것
 - [ ] 공유 이미지 실기기 테스트 (WASM CDN 로드 확인)
+- [ ] 화장품 효과 신호가 실제 사용자 데이터에서 과장/과소 표시되지 않는지 검증
 
 ### Phase 2.5 — 아침 리포트 이메일 (다음 우선순위)
 - Resend API 연동
@@ -877,16 +879,56 @@ git checkout dev  # 다시 dev로
 - 관련 커밋:
   - `923cf4a` `feat(my): add cosmetic scan correlation signals`
 
-### J. 다음 세션에서 이어볼 우선 확인 항목
-- `dev` 배포 페이지(`fondayai.pages.dev`)에서 My 탭 실기기 확인
-  - 카드 밀도
-  - 제품-스캔 상관 신호 문구 길이
-  - 스캔 데이터가 적을 때 empty state 자연스러운지
-- 상관 신호 고도화 후보
+### J. 5탭 구조 개편 2차 정리 (2026-03-21)
+- 방향:
+  - 하단 네비를 `홈 / 루틴 / 일기 / 발견 / MY` 5탭 구조로 고정
+  - 결과 화면은 “스캔 직후 허브” 역할을 유지하되, 기존 `루틴 / 솔루션 / 영양` 내용은 삭제하지 않고 compact 3탭으로 유지
+  - 유료/무료 분기 설계는 아직 보류하고, 우선 정보 구조와 화면 역할 정리에 집중
+- 홈(`ScanIdleScreen.tsx`) 변경:
+  - 최근 스캔 API를 연결해 `최근 스캔` 요약 카드 추가
+  - 직전 스캔 대비 변화량, 마지막 스캔 시점, 집중 케어 지표 노출
+  - `루틴 / 일기 / 발견 / MY` 빠른 이동 카드를 추가해 홈을 실제 허브 역할로 강화
+- 루틴(`RoutineTab.tsx`) 변경:
+  - 대표 AM/PM 루틴 보드 외에 `효과 보드` 추가
+  - 강한 신호 수, 긍정 흐름 수, 추적 제품 수를 상단에서 요약
+  - 제품별 변화 카드에 신호 강도 바를 붙여 어떤 제품이 더 강하게 움직였는지 바로 읽히게 정리
+- MY(`MyScreen.tsx`) 변경:
+  - 관리 바로가기 카드 추가
+  - 최신 리포트 카드에 직전 대비 변화와 우선 확인 지표 추가
+  - 히스토리 설명 강화 및 리포트 보관함 성격의 섹션 추가
+- 결과(`ResultScreen.tsx`) 변경:
+  - 결과 화면을 한 페이지로 길게 늘어뜨리는 구조를 시도했다가 되돌림
+  - 현재는 상단 결과 요약 + `NEXT STEP` 허브 + compact `루틴 / 솔루션 / 영양` 3탭 구조로 재정리
+  - 목적은 기존 정보를 유지하면서도 하단 5탭과 충돌하지 않게 최소한의 허브 역할만 하도록 조정하는 것
+- 화장품 효과 신호 로직(`utils.ts`) 변경:
+  - 등록 전 baseline 스캔이 적을 때 초기 사용 구간 vs 최근 구간 비교 fallback 추가
+  - 전후 비교 윈도우를 넓혀서 데이터가 적은 사용자도 신호를 덜 거칠게 보도록 보정
+  - confidence 계산을 관찰 기간과 비교 스캔 수 기준으로 더 엄격하게 조정
+- 검증:
+  - `npm run build` 통과
+- 관련 커밋:
+  - `07020c3` `feat(result): connect scan results to tab workflow`
+  - `bbcc877` `fix(result): prevent next step overflow`
+  - `4dbec86` `feat(app): deepen home routine and my flows`
+  - `13f8dce` `feat(ui): sharpen scan summaries and routine signals`
+  - `36e25b1` `feat(result): flatten result flow and refine signal scoring`
+  - `ef40c4b` `refactor(result): simplify post-scan hub`
+  - `561aa81` `fix(result): restore compact tabbed sections`
+
+### K. 다음 세션에서 이어볼 우선 확인 항목
+- `dev.fondayai.com` 실기기 검수
+  - 홈의 최근 스캔 카드, 빠른 이동 카드, 루틴 효과 보드의 밀도 점검
+  - 결과 화면 `루틴 / 솔루션 / 영양` 3탭이 현재 톤에서 충분히 미니멀한지 확인
+  - `NEXT STEP` 허브 문구와 버튼 우선순위 재확인
+- 화장품 효과 신호 고도화 후보
   - 사용자가 카테고리 대표 제품을 직접 고정하는 기능
   - 충돌 제품에 대해 `아침으로 이동 / 저녁으로 이동 / 격일 사용` 빠른 액션 제공
   - 제품별 반응 기록과 Diary 메모 연결
   - 장기적으로는 제품별 `노출 시작/중단` 이력 저장 후 신호 정밀도 향상
+- 구조 안정화 후 후속 작업
+  - 유료/무료 분기 설계
+  - 결제/페이월 위치 구체화
+  - `main` 반영 전 dev UX 최종 점검
 
 ---
 
@@ -894,6 +936,14 @@ git checkout dev  # 다시 dev로
 
 | 커밋 | 내용 |
 |------|------|
+| 561aa81 | fix(result): 결과 화면 compact 3탭 구조 복원 |
+| ef40c4b | refactor(result): 스캔 후 결과 허브를 단순화 |
+| 36e25b1 | feat(result): 결과 흐름 단일화 실험 + 효과 신호 스코어링 보정 |
+| 13f8dce | feat(ui): 홈/루틴/MY 요약 카드와 신호 표현 강화 |
+| 4dbec86 | feat(app): 홈/루틴/MY 흐름을 5탭 구조 기준으로 심화 |
+| bbcc877 | fix(result): NEXT STEP 카드 overflow 및 좌우 흔들림 수정 |
+| 07020c3 | feat(result): 결과 화면과 하단 5탭 흐름 연결 |
+| 0cd036e | chore(deploy): preview bindings 반영용 dev 재배포 |
 | 923cf4a | feat(my): 화장품-스캔 상관 신호를 My 탭/모달/상세 시트에 추가 |
 | 2728d31 | feat(my): My 탭 화장품 루틴 보드를 대표 제품 1개 중심으로 단순화 |
 | 6ad4089 | fix(seo): robots/sitemap 도메인을 fondayai.com 기준으로 정리 |
