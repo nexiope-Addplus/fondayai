@@ -322,7 +322,7 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
           <div className="grid grid-cols-3 gap-2 mt-4">
             {routineStats.map((stat) => (
               <div key={stat.key} className="rounded-2xl p-3" style={{ background: stat.tone }}>
-                <p className="text-xs text-stone-400">{stat.label}</p>
+                <p className="text-[10px] text-stone-400 leading-tight truncate">{stat.label}</p>
                 <p className="text-xl font-bold mt-1" style={{ color: stat.color }}>{stat.value}</p>
               </div>
             ))}
@@ -332,8 +332,8 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
             {topSignal ? (
               <>
                 <div className="flex items-center justify-between gap-2 mt-2">
-                  <p className="text-[13px] font-semibold text-stone-800">{topSignal.itemName}</p>
-                  <span className="rounded-full px-2 py-0.5 text-xs font-bold" style={{ background: `${SCAN_TO}12`, color: SCAN_TO }}>
+                  <p className="text-[13px] font-semibold text-stone-800 truncate min-w-0">{topSignal.itemName}</p>
+                  <span className="rounded-full px-2 py-0.5 text-xs font-bold shrink-0" style={{ background: `${SCAN_TO}12`, color: SCAN_TO }}>
                     {t(`cosmetics.signalConfidence.${topSignal.confidence}`)}
                   </span>
                 </div>
@@ -345,15 +345,15 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
           </div>
           <div className="grid grid-cols-3 gap-2 mt-3">
             <div className="rounded-2xl p-3" style={{ background: "#FFFFFF" }}>
-              <p className="text-xs text-stone-400">{t("cosmetics.effectStrongLabel")}</p>
+              <p className="text-[10px] text-stone-400 leading-tight truncate">{t("cosmetics.effectStrongLabel")}</p>
               <p className="text-[18px] font-bold mt-1" style={{ color: DEEP_GREEN }}>{strongestSignalCount}</p>
             </div>
             <div className="rounded-2xl p-3" style={{ background: "#FFFFFF" }}>
-              <p className="text-xs text-stone-400">{t("cosmetics.effectPositiveLabel")}</p>
+              <p className="text-[10px] text-stone-400 leading-tight truncate">{t("cosmetics.effectPositiveLabel")}</p>
               <p className="text-[18px] font-bold mt-1" style={{ color: SCAN_TO }}>{positiveSignalCount}</p>
             </div>
             <div className="rounded-2xl p-3" style={{ background: "#FFFFFF" }}>
-              <p className="text-xs text-stone-400">{t("cosmetics.effectTrackedProductsLabel")}</p>
+              <p className="text-[10px] text-stone-400 leading-tight truncate">{t("cosmetics.effectTrackedProductsLabel")}</p>
               <p className="text-[18px] font-bold mt-1 text-stone-800">{productSignals.length}</p>
             </div>
           </div>
@@ -457,7 +457,7 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
                     return (
                     <div key={signal.itemId} className="rounded-2xl p-3" style={{ background: "#F8FAFD" }}>
                       <div className="flex items-center justify-between gap-2">
-                        <p className="text-[12px] font-semibold text-stone-800">{signal.itemName}</p>
+                        <p className="text-[12px] font-semibold text-stone-800 truncate min-w-0">{signal.itemName}</p>
                         <div className="flex items-center gap-1.5 shrink-0">
                           <span className="rounded-full px-2 py-0.5 text-xs font-bold" style={{ background: positive ? `${DEEP_GREEN}12` : `${SCAN_TO}12`, color: positive ? DEEP_GREEN : SCAN_TO }}>
                             {positive ? "+" : ""}{deltaValue}
@@ -495,7 +495,7 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
                 <div className="space-y-2.5">
                   {routinePlan.conflicts.map((conflict, index) => (
                     <div key={index} className="rounded-2xl bg-white p-3">
-                      <p className="text-xs font-bold text-stone-700 mb-0.5">{conflict.productNames.join(" + ")}</p>
+                      <p className="text-xs font-bold text-stone-700 mb-0.5 line-clamp-2">{conflict.productNames.join(" + ")}</p>
                       <p className="text-xs text-stone-500">{conflict.reason}</p>
                       {conflict.resolution && <p className="text-xs mt-1 font-medium" style={{ color: DEEP_GREEN }}>{conflict.resolution}</p>}
                     </div>

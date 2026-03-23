@@ -103,9 +103,9 @@ export function MyScreen({
                     <User className="w-5 h-5" style={{ color: SCAN_TO }} />
                   </div>
               }
-              <div>
-                <p className="text-[14px] font-bold text-stone-800">{user.username || user.email || "사용자"}</p>
-                <div className="flex items-center gap-1.5 mt-0.5">
+              <div className="min-w-0">
+                <p className="text-[14px] font-bold text-stone-800 truncate">{user.username || user.email || "사용자"}</p>
+                <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
                   {user.provider === "kakao" && (
                     <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-xs font-bold text-[#3C1E1E]" style={{ background: "#FEE500" }}>
                       <svg width="10" height="10" viewBox="0 0 18 18" fill="none"><path fillRule="evenodd" clipRule="evenodd" d="M9 1C4.582 1 1 3.79 1 7.222c0 2.154 1.386 4.045 3.484 5.14L3.62 15.5a.25.25 0 0 0 .368.274L7.9 13.39A9.63 9.63 0 0 0 9 13.444c4.418 0 8-2.791 8-6.222C17 3.79 13.418 1 9 1Z" fill="#3C1E1E"/></svg>
@@ -124,7 +124,7 @@ export function MyScreen({
                       Google
                     </span>
                   )}
-                  {user.email && <p className="text-xs text-stone-400">{user.email}</p>}
+                  {user.email && <p className="text-xs text-stone-400 truncate max-w-[160px]">{user.email}</p>}
                 </div>
               </div>
             </div>
@@ -167,17 +167,17 @@ export function MyScreen({
         <button onClick={() => setShowCalendar(true)}
           className="w-full flex items-center justify-between p-4 rounded-2xl bg-white active:opacity-70"
           style={{ boxShadow: "0 8px 24px rgba(45,95,79,0.06)" }}>
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl flex items-center justify-center"
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
               style={{ background: TINT_WARM }}>
               <CalendarDays className="w-5 h-5" style={{ color: SCAN_TO }} />
             </div>
-            <div className="text-left">
-              <p className="text-[14px] font-bold text-stone-800">{t("attendance.calendarTitle")}</p>
-              <p className="text-xs text-stone-400">{t("attendance.totalPoints", { n: attendance.totalPoints })}</p>
+            <div className="text-left min-w-0">
+              <p className="text-[14px] font-bold text-stone-800 truncate">{t("attendance.calendarTitle")}</p>
+              <p className="text-xs text-stone-400 truncate">{t("attendance.totalPoints", { n: attendance.totalPoints })}</p>
             </div>
           </div>
-          <ChevronRight className="w-4 h-4 text-stone-300" />
+          <ChevronRight className="w-4 h-4 text-stone-300 shrink-0" />
         </button>
 
         {user && (
@@ -234,30 +234,30 @@ export function MyScreen({
         <button onClick={onInstall}
           className="w-full flex items-center justify-between p-4 rounded-2xl bg-white active:opacity-70"
           style={{ boxShadow: "0 8px 24px rgba(45,95,79,0.06)" }}>
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: "#FFF7ED" }}>
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0" style={{ background: "#FFF7ED" }}>
               <SmartphoneNfc className="w-5 h-5" style={{ color: "#C2410C" }} />
             </div>
-            <p className="text-[14px] font-bold text-stone-800">{t("nav.install")}</p>
+            <p className="text-[14px] font-bold text-stone-800 truncate">{t("nav.install")}</p>
           </div>
-          <ChevronRight className="w-4 h-4 text-stone-300" />
+          <ChevronRight className="w-4 h-4 text-stone-300 shrink-0" />
         </button>
 
         {/* Fonday 디바이스 링크 */}
         <a href="https://fonday.replit.app/" target="_blank" rel="noopener noreferrer"
           className="flex items-center justify-between px-4 py-3.5 rounded-2xl active:opacity-70 transition-opacity"
           style={{ background: "#FFFFFF", boxShadow: "0 8px 24px rgba(45,95,79,0.06)" }}>
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl flex items-center justify-center"
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
               style={{ background: TINT_WARM }}>
               <Zap className="w-5 h-5" style={{ color: SCAN_TO }} />
             </div>
-            <div>
-              <p className="text-[14px] font-bold" style={{ color: SCAN_TO }}>{t("result.deviceTeaser.title")}</p>
-              <p className="text-xs text-stone-400">{t("result.deviceTeaser.sub")}</p>
+            <div className="min-w-0">
+              <p className="text-[14px] font-bold truncate" style={{ color: SCAN_TO }}>{t("result.deviceTeaser.title")}</p>
+              <p className="text-xs text-stone-400 truncate">{t("result.deviceTeaser.sub")}</p>
             </div>
           </div>
-          <ChevronRight className="w-4 h-4" style={{ color: SCAN_TO }} />
+          <ChevronRight className="w-4 h-4 shrink-0" style={{ color: SCAN_TO }} />
         </a>
       </div>
 

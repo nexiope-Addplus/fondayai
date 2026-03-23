@@ -70,9 +70,9 @@ function GradeCard({ cosmetic, grade }: { cosmetic: CosmeticItem; grade: Cosmeti
 
         {/* 점수 바 */}
         <div className="mt-3">
-          <div className="flex items-center justify-between mb-1">
-            <p className="text-[10px] font-semibold uppercase tracking-wider text-stone-400">{t("cosmeticsReport.compatibility")}</p>
-            <p className="text-[11px] font-bold" style={{ color: cfg.color }}>{grade.score}{t("result.scoreSuffix")}</p>
+          <div className="flex items-center justify-between gap-2 mb-1">
+            <p className="text-[10px] font-semibold uppercase tracking-wider text-stone-400 truncate min-w-0">{t("cosmeticsReport.compatibility")}</p>
+            <p className="text-[11px] font-bold shrink-0" style={{ color: cfg.color }}>{grade.score}{t("result.scoreSuffix")}</p>
           </div>
           <div className="h-1.5 rounded-full bg-stone-100 overflow-hidden">
             <motion.div

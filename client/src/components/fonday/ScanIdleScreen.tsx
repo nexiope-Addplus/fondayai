@@ -331,21 +331,21 @@ export function ScanIdleScreen({
               <div className="rounded-3xl px-2.5 py-2.5 mb-2.5 sm:rounded-3xl sm:px-3"
                 style={{ background: `${SCAN_FROM}10`, border: `1px solid ${SCAN_FROM}24` }}>
                 <div className="flex items-center justify-between gap-2">
-                  <p className="text-xs font-bold uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>{t("idle.heroBenefitsTitle")}</p>
-                  <span className="text-xs font-bold uppercase tracking-[0.14em]" style={{ color: TEXT_SECONDARY }}>{t("idle.heroTag")}</span>
+                  <p className="text-xs font-bold uppercase tracking-[0.14em] truncate min-w-0" style={{ color: SCAN_TO }}>{t("idle.heroBenefitsTitle")}</p>
+                  <span className="text-xs font-bold uppercase tracking-[0.14em] shrink-0" style={{ color: TEXT_SECONDARY }}>{t("idle.heroTag")}</span>
                 </div>
                 <div className="grid grid-cols-1 gap-2 mt-2">
                   <div className="flex items-center gap-2 text-xs font-semibold text-stone-700">
-                    <Badge className="h-5 rounded-full px-2 text-xs" style={{ background: "#F3E8E2", color: SCAN_TO }}>{t("result.baumannLabel")}</Badge>
-                    <span>{t("idle.heroBenefit1")}</span>
+                    <Badge className="h-5 rounded-full px-2 text-xs shrink-0 whitespace-nowrap" style={{ background: "#F3E8E2", color: SCAN_TO }}>{t("result.baumannLabel")}</Badge>
+                    <span className="truncate">{t("idle.heroBenefit1")}</span>
                   </div>
                   <div className="flex items-center gap-2 text-xs font-semibold text-stone-700">
-                    <Badge className="h-5 rounded-full px-2 text-xs" style={{ background: "#E7F7F0", color: DEEP_GREEN }}>{t("result.scores")}</Badge>
-                    <span>{t("idle.heroBenefit2")}</span>
+                    <Badge className="h-5 rounded-full px-2 text-xs shrink-0 whitespace-nowrap" style={{ background: "#E7F7F0", color: DEEP_GREEN }}>{t("result.scores")}</Badge>
+                    <span className="truncate">{t("idle.heroBenefit2")}</span>
                   </div>
                   <div className="flex items-center gap-2 text-xs font-semibold text-stone-700">
-                    <Badge className="h-5 rounded-full px-2 text-xs" style={{ background: "#FFF2E8", color: "#C2410C" }}>{t("result.skinAge")}</Badge>
-                    <span>{t("idle.heroBenefit3")}</span>
+                    <Badge className="h-5 rounded-full px-2 text-xs shrink-0 whitespace-nowrap" style={{ background: "#FFF2E8", color: "#C2410C" }}>{t("result.skinAge")}</Badge>
+                    <span className="truncate">{t("idle.heroBenefit3")}</span>
                   </div>
                 </div>
               </div>
@@ -379,16 +379,16 @@ export function ScanIdleScreen({
             </div>
             <div className="grid grid-cols-3 gap-2 mt-3">
               <div className="rounded-2xl p-3" style={{ background: "#F6FBF8" }}>
-                <p className="text-xs text-stone-400">{t("result.skinAge")}</p>
-                <p className="text-[14px] font-bold mt-1" style={{ color: DEEP_GREEN }}>{latestScan.skinAge ?? "—"}</p>
+                <p className="text-[10px] text-stone-400 leading-tight">{t("result.skinAge")}</p>
+                <p className="text-[14px] font-bold mt-1 truncate" style={{ color: DEEP_GREEN }}>{latestScan.skinAge ?? "—"}</p>
               </div>
               <div className="rounded-2xl p-3" style={{ background: "#FFF7F3" }}>
-                <p className="text-xs text-stone-400">{t("result.baumannLabel")}</p>
-                <p className="text-[14px] font-bold mt-1" style={{ color: SCAN_TO }}>{latestScan.baumannType || "—"}</p>
+                <p className="text-[10px] text-stone-400 leading-tight">{t("result.baumannLabel")}</p>
+                <p className="text-[14px] font-bold mt-1 truncate" style={{ color: SCAN_TO }}>{latestScan.baumannType || "—"}</p>
               </div>
               <div className="rounded-2xl p-3" style={{ background: "#F7F4FB" }}>
-                <p className="text-xs text-stone-400">{t("my.focusTitle")}</p>
-                <p className="text-[12px] font-bold mt-1 text-stone-800 line-clamp-2 text-kr-pretty">
+                <p className="text-[10px] text-stone-400 leading-tight">{t("my.focusTitle")}</p>
+                <p className="text-[11px] font-bold mt-1 text-stone-800 line-clamp-2 leading-tight text-kr-pretty">
                   {Array.isArray(latestScan.scores) && latestScan.scores.length > 1
                     ? [...latestScan.scores].slice(1).sort((a: any, b: any) => Number(a.score) - Number(b.score))[0]?.label || "—"
                     : "—"}
