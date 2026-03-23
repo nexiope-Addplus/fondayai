@@ -15,7 +15,7 @@ export function LangSwitcher() {
         <button
           key={lang}
           onClick={() => i18nHook.changeLanguage(lang.toLowerCase())}
-          className="text-xs font-bold px-3 py-1.5 rounded-full transition-all"
+          className="text-xs font-bold px-3 py-2.5 rounded-full transition-all min-h-[44px] min-w-[44px] flex items-center justify-center"
           style={current === lang ? { color: SCAN_TO } : { color: "#B0A898" }}
         >
           {lang}

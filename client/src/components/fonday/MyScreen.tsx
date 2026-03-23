@@ -220,7 +220,7 @@ export function MyScreen({
           <div className="flex gap-1">
             {(["en", "ko", "ja"] as const).map(lang => (
               <button key={lang} onClick={() => i18n.changeLanguage(lang)}
-                className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all ${
+                className={`px-3 py-2.5 rounded-lg text-xs font-bold transition-all min-h-[44px] min-w-[44px] flex items-center justify-center ${
                   i18n.language === lang ? "" : "text-stone-400 bg-stone-100"
                 }`}
                 style={i18n.language === lang ? { background: TINT_WARM, color: SCAN_TO } : {}}>
