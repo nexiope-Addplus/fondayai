@@ -109,6 +109,37 @@ import { ScanningScreen } from "../components/fonday/ScanningScreen";
 import { ResultScreen } from "../components/fonday/ResultScreen";
 import { RoutineTab } from "../components/fonday/RoutineTab";
 
+class FeedErrorBoundary extends React.Component<{ children: React.ReactNode }, { hasError: boolean; message: string }> {
+  constructor(props: { children: React.ReactNode }) {
+    super(props);
+    this.state = { hasError: false, message: "" };
+  }
+
+  static getDerivedStateFromError(error: Error) {
+    return { hasError: true, message: error?.message || "Feed render failed" };
+  }
+
+  componentDidCatch(error: Error) {
+    console.error("[FeedErrorBoundary]", error);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="min-h-[calc(100dvh-64px)] px-5 py-6" style={{ background: "#F8F5F2" }}>
+          <div className="rounded-3xl bg-white p-5" style={{ boxShadow: "0 10px 28px rgba(45,95,79,0.08)" }}>
+            <p className="text-xs font-bold tracking-widest uppercase mb-2 text-stone-400">FEED ERROR</p>
+            <p className="text-[15px] font-bold text-stone-800">피드 탭 렌더링 중 오류가 발생했습니다.</p>
+            <p className="text-[12px] text-stone-500 mt-2 break-all">{this.state.message}</p>
+          </div>
+        </div>
+      );
+    }
+
+    return this.props.children;
+  }
+}
+
 
 // ─── Google AdSense 배너 ──────────────────────────────────────────
 // 주의: AdSense 대시보드에서 각 위치별로 별도 광고 단위를 생성 후 data-ad-slot 값을 개별 교체하세요.
@@ -423,7 +454,9 @@ export default function SkinScanPage() {
           )}
           {activeTab === "magazine" && (
             <motion.div key="magazine" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-              <MagazineTab />
+              <FeedErrorBoundary>
+                <MagazineTab />
+              </FeedErrorBoundary>
             </motion.div>
           )}
           {activeTab === "my" && (
