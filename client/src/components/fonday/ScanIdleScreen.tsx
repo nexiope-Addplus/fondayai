@@ -58,22 +58,39 @@ export function ScanIdleScreen({
 
   // 운영 서버 날씨 로직 + Fallback 복구 (Care Briefing 필수)
   useEffect(() => {
+    let isMounted = true;
     const fetchWeather = (lat: number, lon: number) => {
       fetch(`/api/weather?lat=${lat}&lon=${lon}`)
         .then((r) => r.ok ? r.json() : null)
-        .then((data) => { if (data && !data.error) setIdleWeather(data as WeatherData); })
-        .catch(() => {});
+        .then((data) => { 
+          if (!isMounted) return;
+          if (data && !data.error) {
+            setIdleWeather(data as WeatherData); 
+          } else {
+             // API가 에러 페이로드를 반환한 경우 폴백
+            setIdleWeather({ temp: 20, humidity: 50, aqi: 1 } as WeatherData);
+          }
+        })
+        .catch(() => {
+          if (isMounted) {
+             // 통신 실패 시 폴백
+             setIdleWeather({ temp: 20, humidity: 50, aqi: 1 } as WeatherData);
+          }
+        });
     };
 
-    if (navigator.geolocation) {
+    if ("geolocation" in navigator) {
       navigator.geolocation.getCurrentPosition(
         (pos) => fetchWeather(pos.coords.latitude, pos.coords.longitude),
         () => fetchWeather(37.5665, 126.9780), // Fallback: Seoul
-        { timeout: 5000, enableHighAccuracy: false }
+        { timeout: 4000, enableHighAccuracy: false } // 타임아웃을 4초로 줄여 빠른 폴백 유도
       );
     } else {
       fetchWeather(37.5665, 126.9780); // Fallback: Seoul
     }
+    
+    return () => { isMounted = false; };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // 케어 브리핑 로드 (날씨 데이터 준비 시)
@@ -183,6 +200,7 @@ export function ScanIdleScreen({
           cloudy:   "idle.greetingWeatherCloudy",
         };
         const timeBased = [
+          { range: [0, 6],   emoji: "🌙", key: "idle.greetingNight" },
           { range: [6, 10],  emoji: "☀️", key: "idle.greetingMorning" },
           { range: [10, 14], emoji: "🌤️", key: "idle.greetingNoon" },
           { range: [14, 20], emoji: "💧", key: "idle.greetingAfternoon" },
