@@ -449,7 +449,7 @@ export default function SkinScanPage() {
                   weather={weatherData}
                   surveyData={surveyData}
                   analysisResult={analysisResult}
-              ...
+                  imageSrc={imageSrc}
                   faceCroppedSrc={faceCroppedSrc}
                   imageBase64={imageBase64}
                   onBack={() => setScanState("idle")}
