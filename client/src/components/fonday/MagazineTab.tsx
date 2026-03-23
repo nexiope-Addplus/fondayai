@@ -275,13 +275,13 @@ export function MagazineTab() {
                 </div>
                 <div className="grid grid-cols-2 gap-2 shrink-0 min-w-[112px]">
                   <div className="rounded-2xl p-2.5 text-center" style={{ background: "#F6FBF8" }}>
-                    <p className="text-[10px] text-stone-400">{t("ranking.avgScore")}</p>
+                    <p className="text-[11px] text-stone-400">{t("ranking.avgScore")}</p>
                     <p className="text-[17px] font-black mt-1" style={{ color: DEEP_GREEN }}>
                       {rankingData?.avgScore ?? "—"}
                     </p>
                   </div>
                   <div className="rounded-2xl p-2.5 text-center" style={{ background: "#FFF7F3" }}>
-                    <p className="text-[10px] text-stone-400">{t("ranking.topScore")}</p>
+                    <p className="text-[11px] text-stone-400">{t("ranking.topScore")}</p>
                     <p className="text-[17px] font-black mt-1" style={{ color: SCAN_TO }}>
                       {rankingData?.topScore ?? "—"}
                     </p>
@@ -330,7 +330,7 @@ export function MagazineTab() {
                             </div>
                             <span className="text-[11px] text-stone-400 w-5 text-right">{bandCount}</span>
                             {isMyBand && (
-                              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full shrink-0" style={{ background: `${SCAN_FROM}30`, color: SCAN_TO }}>
+                              <span className="text-[11px] font-bold px-1.5 py-0.5 rounded-full shrink-0" style={{ background: `${SCAN_FROM}30`, color: SCAN_TO }}>
                                 {t("ranking.me")}
                               </span>
                             )}

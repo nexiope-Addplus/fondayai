@@ -218,6 +218,17 @@ export function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: any;
     }
   }, [tab]);
 
+  // 탭 전환 시 스크롤 위치 저장/복원
+  useEffect(() => {
+    const container = diaryScrollRef.current;
+    if (!container) return;
+    const saved = sessionStorage.getItem("diary_scroll");
+    if (saved) container.scrollTop = Number(saved);
+    const onScroll = () => sessionStorage.setItem("diary_scroll", String(container.scrollTop));
+    container.addEventListener("scroll", onScroll, { passive: true });
+    return () => container.removeEventListener("scroll", onScroll);
+  }, []);
+
   if (!user) {
     return (
       <div className="flex flex-col" style={{ background: "#F8F5F2", minHeight: "calc(100dvh - 64px)" }}>
@@ -271,7 +282,7 @@ export function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: any;
                 )}
                 <Button onClick={() => onLogin ? onLogin("google", "diary") : (localStorage.setItem("fonday_return_tab", "diary"), window.location.href = "/auth/google")}
                   className="w-full h-12 rounded-xl bg-white hover:bg-stone-50 font-bold text-zinc-700 gap-2 shadow-sm">
-                  <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" className="w-4 h-4" />
+                  <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="w-4 h-4" />
                   {t("result.login.google")}
                 </Button>
               </div>

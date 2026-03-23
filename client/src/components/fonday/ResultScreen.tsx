@@ -105,17 +105,33 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
   const [showQuestSheet, setShowQuestSheet] = useState(false);
   const [showPwaPopup, setShowPwaPopup] = useState(false);
 
-  // PWA 설치 팝업: 결과 진입 후 4초 뒤 자동 표시
+  // PWA 설치 팝업: 결과 페이지 50% 스크롤 후 표시 (콘텐츠 가치 체험 후 유도)
+  const pwaTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   useEffect(() => {
     const isStandalone = window.matchMedia("(display-mode: standalone)").matches || (window.navigator as any).standalone === true;
     const isDismissed = localStorage.getItem("fonday_pwa_dismissed") === "1";
     const isIos = /iPhone|iPad|iPod/i.test(navigator.userAgent);
     if (isStandalone || isDismissed) return;
-    if (!isIos && !deferredPrompt) return; // Android인데 프롬프트 없으면 표시 안 함
-    const timer = setTimeout(() => setShowPwaPopup(true), 4000);
-    return () => clearTimeout(timer);
+    if (!isIos && !deferredPrompt) return;
+
+    const el = resultScrollRef.current;
+    if (!el) return;
+
+    const handleScroll = () => {
+      const { scrollTop, scrollHeight, clientHeight } = el;
+      const ratio = scrollTop / Math.max(1, scrollHeight - clientHeight);
+      if (ratio >= 0.5 && !pwaTimerRef.current) {
+        pwaTimerRef.current = setTimeout(() => setShowPwaPopup(true), 1000);
+        el.removeEventListener("scroll", handleScroll);
+      }
+    };
+    el.addEventListener("scroll", handleScroll, { passive: true });
+    return () => {
+      el.removeEventListener("scroll", handleScroll);
+      if (pwaTimerRef.current) clearTimeout(pwaTimerRef.current);
+    };
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [deferredPrompt]);
 
   // 챌린지 참여 후 내 결과 저장 (비로그인도 작동)
   useEffect(() => {

@@ -56,7 +56,7 @@ export function ReportTab({ user }: { user: any }) {
           )}
           <Button onClick={() => { window.location.href = "/auth/google"; }}
             className="w-full h-12 rounded-xl bg-white hover:bg-stone-50 font-bold text-zinc-700 gap-2 shadow-sm">
-            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" className="w-4 h-4" />
+            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="w-4 h-4" />
             {t("report.googleLogin")}
           </Button>
         </div>

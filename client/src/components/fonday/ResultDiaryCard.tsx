@@ -36,7 +36,7 @@ export function ResultDiaryCard({
               <p className="text-sm font-bold" style={{ color: DEEP_GREEN }}>{t("result.diary.title")}</p>
               <p className="text-xs text-stone-400">{t("result.diary.scanCount", { n: scanCount })}</p>
             </div>
-            {avatar && <img src={avatar} className="w-7 h-7 rounded-full shrink-0" />}
+            {avatar && <img src={avatar} alt="" aria-hidden="true" className="w-7 h-7 rounded-full shrink-0" />}
           </div>
 
           <div className="mt-3 rounded-2xl p-3" style={{ background: delta > 0 ? "#F0FDF4" : delta < 0 ? "#FFF5F5" : "#F8F7F5" }}>

@@ -635,7 +635,7 @@ export function DiaryFullView({ history, analysisResult, overallScore, finalType
             <span className="text-[13px] font-semibold">{t("modal.diary.title")}</span>
           </button>
           <div className="flex items-center gap-2">
-            {user?.avatar && <img src={user.avatar} className="w-7 h-7 rounded-full" />}
+            {user?.avatar && <img src={user.avatar} alt="" aria-hidden="true" className="w-7 h-7 rounded-full" />}
             <button onClick={onLogout} className="text-xs text-stone-300 underline">
               {t("modal.diary.logout")}
             </button>

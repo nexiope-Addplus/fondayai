@@ -140,7 +140,7 @@ export function CosmeticsRegisterModal({ onClose, onSuccess }: { onClose: () => 
               {/* 촬영 영역 */}
               {capturedImage ? (
                 <div className="relative rounded-3xl overflow-hidden bg-stone-100" style={{ height: 260 }}>
-                  <img src={capturedImage} className="w-full h-full object-cover" />
+                  <img src={capturedImage} alt="" aria-hidden="true" className="w-full h-full object-cover" />
                   <button onClick={() => { setCapturedImage(null); if (cameraInputRef.current) cameraInputRef.current.value = ""; if (galleryInputRef.current) galleryInputRef.current.value = ""; }}
                     className="absolute top-3 right-3 w-8 h-8 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center text-white text-sm">
                     ✕
@@ -181,7 +181,7 @@ export function CosmeticsRegisterModal({ onClose, onSuccess }: { onClose: () => 
               {/* 사진 미리보기 + 인식 결과 */}
               <div className="flex gap-3 items-start">
                 {capturedImage && (
-                  <img src={capturedImage} className="w-20 h-20 rounded-2xl object-cover bg-stone-100 shrink-0" />
+                  <img src={capturedImage} alt="" aria-hidden="true" className="w-20 h-20 rounded-2xl object-cover bg-stone-100 shrink-0" />
                 )}
                 <div className="flex-1 min-w-0 space-y-3">
                   <div>

@@ -40,6 +40,17 @@ export const TINT_WARM = "#FDF3F0";
 export const TINT_GREEN = "#F0F7F4";
 export const TINT_NEUTRAL = "#F7F5F2";
 
+// ─── z-index 스케일 ──────────────────────────────────────────────────────────
+export const Z = {
+  actionBar: 50,   // ResultActionBar / BottomNav
+  sheet: 100,      // detail sheets (RoutineTab selectedItem)
+  modal: 200,      // modals (CosmeticsRegisterModal, AttendanceCalendar)
+  camera: 200,     // CameraCapture overlay
+  pwa: 210,        // PWA install prompt
+  push: 990,       // push notification banner
+  overlay: 999,    // full-screen overlays
+} as const;
+
 // ─── 점수 라벨 매핑 (서버는 항상 한국어, 클라이언트에서 t('scores.N')로 번역) ──
 
 export const SCORE_LABEL_MAP: Record<string, number> = {

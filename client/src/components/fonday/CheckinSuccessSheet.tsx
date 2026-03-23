@@ -60,7 +60,7 @@ export function CheckinSuccessSheet({ onKakao, onLine, onGoogle, onDismiss, user
             )}
             <button onClick={onGoogle}
               className="w-full py-3.5 rounded-2xl text-sm font-bold text-stone-700 flex items-center justify-center gap-2 bg-white">
-              <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" className="w-4 h-4" />
+              <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="w-4 h-4" />
               {t("attendance.google")}
             </button>
             <button onClick={onDismiss}

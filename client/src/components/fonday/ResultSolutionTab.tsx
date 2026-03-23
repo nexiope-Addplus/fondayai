@@ -124,7 +124,7 @@ export function ResultSolutionTab(props: any) {
                   </div>
                   <div>
                     <p className="text-sm font-bold" style={{ color: SCAN_TO }}>{aiCareLabels.title}</p>
-                    <p className="text-[10px] text-stone-400 mt-0.5">{aiCareLabels.schedule}</p>
+                    <p className="text-[11px] text-stone-400 mt-0.5">{aiCareLabels.schedule}</p>
                   </div>
                 </div>
                 <button onClick={() => handlePushToggle()} disabled={pushLoading}

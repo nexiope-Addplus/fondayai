@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { Camera } from "lucide-react";
 import { SCAN_FROM, SCAN_TO } from "./constants";
 import { FaceMeshOverlay } from "./FaceMeshOverlay";
@@ -8,6 +8,7 @@ import { FaceMeshOverlay } from "./FaceMeshOverlay";
 // ─── 분석 중 화면 ─────────────────────────────────────────────────
 export function ScanningScreen({ imageSrc }: { imageSrc: string | null }) {
   const { t, i18n } = useTranslation();
+  const reducedMotion = useReducedMotion();
   const [textIdx, setTextIdx] = useState(0);
   const [progress, setProgress] = useState(0);
   const texts = t("scanning.texts", { returnObjects: true }) as string[];
@@ -21,14 +22,14 @@ export function ScanningScreen({ imageSrc }: { imageSrc: string | null }) {
     return () => clearInterval(interval);
   }, [i18n.language]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // 진행바: 0 → 95% 단방향 스무스 증가 (절대 감소 없음)
+  // 진행바: 0 → 95% 단방향 스무스 증가 (300ms 간격으로 성능 개선)
   useEffect(() => {
     let current = 0;
     const interval = setInterval(() => {
-      current += 0.35;
+      current += 1.4;
       if (current >= 95) { clearInterval(interval); current = 95; }
       setProgress(current);
-    }, 80);
+    }, 300);
     return () => clearInterval(interval);
   }, []);
 
@@ -37,7 +38,7 @@ export function ScanningScreen({ imageSrc }: { imageSrc: string | null }) {
       <div className="relative w-64 h-80 rounded-3xl overflow-hidden bg-stone-100 flex items-center justify-center shadow-inner">
         {imageSrc ? (
           <>
-            <img src={imageSrc} className="w-full h-full object-cover" />
+            <img src={imageSrc} alt="" aria-hidden="true" className="w-full h-full object-cover" />
             <FaceMeshOverlay imageSrc={imageSrc} />
           </>
         ) : (
@@ -46,8 +47,8 @@ export function ScanningScreen({ imageSrc }: { imageSrc: string | null }) {
         <motion.div
           className="absolute left-0 right-0 h-1 shadow-lg"
           style={{ background: `linear-gradient(90deg, transparent, ${SCAN_FROM}, ${SCAN_TO}, ${SCAN_FROM}, transparent)` }}
-          animate={{ top: ["5%", "95%", "5%"] }}
-          transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+          animate={reducedMotion ? { top: "50%" } : { top: ["5%", "95%", "5%"] }}
+          transition={reducedMotion ? {} : { duration: 2, repeat: Infinity, ease: "easeInOut" }}
         />
         <div className="absolute inset-0 bg-black/15" />
         <div className="absolute bottom-4 left-0 right-0 flex justify-center">

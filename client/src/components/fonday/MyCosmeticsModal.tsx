@@ -276,7 +276,7 @@ export function MyCosmeticsModal({ onClose, onAddNew, scans = [] }: { onClose: (
                       className="rounded-3xl p-3 bg-stone-50 text-left shadow-[0_4px_14px_rgba(0,0,0,0.03)]"
                     >
                       {item.image_thumbnail
-                        ? <img src={item.image_thumbnail} className="w-full h-28 rounded-2xl object-cover bg-stone-200" />
+                        ? <img src={item.image_thumbnail} alt={item.name ?? ""} className="w-full h-28 rounded-2xl object-cover bg-stone-200" />
                         : <div className="w-full h-28 rounded-2xl bg-stone-100 flex items-center justify-center">
                             <Droplets className="w-7 h-7 text-stone-400" />
                           </div>
@@ -334,7 +334,7 @@ export function MyCosmeticsModal({ onClose, onAddNew, scans = [] }: { onClose: (
               <div className="w-10 h-1 rounded-full bg-stone-200 mx-auto mb-5" />
               <div className="flex items-start gap-3">
                 {selectedItem.image_thumbnail
-                  ? <img src={selectedItem.image_thumbnail} className="w-20 h-20 rounded-3xl object-cover bg-stone-100 shrink-0" />
+                  ? <img src={selectedItem.image_thumbnail} alt={selectedItem.name ?? ""} className="w-20 h-20 rounded-3xl object-cover bg-stone-100 shrink-0" />
                   : <div className="w-20 h-20 rounded-3xl bg-stone-100 flex items-center justify-center shrink-0">
                       <Droplets className="w-8 h-8 text-stone-400" />
                     </div>

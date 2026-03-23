@@ -76,7 +76,7 @@ export function ResultHeaderCard({
         <div className="grid grid-cols-[92px_1fr] gap-2.5 items-start sm:grid-cols-[104px_1fr] sm:gap-3">
           <div>
             <div className="relative rounded-3xl overflow-hidden h-[120px] bg-stone-100 sm:rounded-3xl sm:h-[132px]">
-              <img src={faceCroppedSrc || imageSrc} className="w-full h-full object-cover" style={{ objectPosition: "center 50%" }} />
+              <img src={faceCroppedSrc || imageSrc} alt="" aria-hidden="true" className="w-full h-full object-cover" style={{ objectPosition: "center 50%" }} />
               <div className="absolute top-3 left-3 w-7 h-7 border-t-2 border-l-2 rounded-tl-lg" style={{ borderColor: SCAN_TO }} />
               <div className="absolute top-3 right-3 w-7 h-7 border-t-2 border-r-2 rounded-tr-lg" style={{ borderColor: SCAN_TO }} />
               <div className="absolute bottom-3 left-3 w-7 h-7 border-b-2 border-l-2 rounded-bl-lg" style={{ borderColor: SCAN_TO }} />

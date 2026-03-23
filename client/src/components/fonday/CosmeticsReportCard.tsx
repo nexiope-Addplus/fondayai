@@ -39,7 +39,7 @@ function GradeCard({ cosmetic, grade }: { cosmetic: CosmeticItem; grade: Cosmeti
           {/* 썸네일 or 카테고리 아이콘 */}
           <div className="w-12 h-12 rounded-2xl overflow-hidden shrink-0 bg-stone-100 flex items-center justify-center">
             {cosmetic.image_thumbnail ? (
-              <img src={cosmetic.image_thumbnail} className="w-full h-full object-cover" />
+              <img src={cosmetic.image_thumbnail} alt={cosmetic.name ?? ""} className="w-full h-full object-cover" />
             ) : (
               <span className="text-xl">🧴</span>
             )}
@@ -61,7 +61,7 @@ function GradeCard({ cosmetic, grade }: { cosmetic: CosmeticItem; grade: Cosmeti
             >
               {grade.grade}
             </div>
-            <p className="text-[10px] font-bold" style={{ color: cfg.color }}>{cfg.label}</p>
+            <p className="text-[11px] font-bold" style={{ color: cfg.color }}>{cfg.label}</p>
           </div>
 
           <div className="shrink-0 ml-1">
@@ -74,7 +74,7 @@ function GradeCard({ cosmetic, grade }: { cosmetic: CosmeticItem; grade: Cosmeti
         {/* 점수 바 */}
         <div className="mt-3">
           <div className="flex items-center justify-between gap-2 mb-1">
-            <p className="text-[10px] font-semibold uppercase tracking-wider text-stone-400 truncate min-w-0">{t("cosmeticsReport.compatibility")}</p>
+            <p className="text-[11px] font-semibold uppercase tracking-wider text-stone-400 truncate min-w-0">{t("cosmeticsReport.compatibility")}</p>
             <p className="text-[11px] font-bold shrink-0" style={{ color: cfg.color }}>{grade.score}{t("result.scoreSuffix")}</p>
           </div>
           <div className="h-1.5 rounded-full bg-stone-100 overflow-hidden">
@@ -101,7 +101,7 @@ function GradeCard({ cosmetic, grade }: { cosmetic: CosmeticItem; grade: Cosmeti
             <div className="px-4 pb-4 space-y-3 border-t border-stone-100 pt-3">
               {grade.pros.length > 0 && (
                 <div>
-                  <p className="text-[10px] font-bold uppercase tracking-wider mb-1.5" style={{ color: "#059669" }}>{t("cosmeticsReport.pros")}</p>
+                  <p className="text-[11px] font-bold uppercase tracking-wider mb-1.5" style={{ color: "#059669" }}>{t("cosmeticsReport.pros")}</p>
                   <div className="flex flex-wrap gap-1.5">
                     {grade.pros.map((p, i) => (
                       <span key={i} className="text-xs px-2.5 py-1 rounded-full font-medium" style={{ background: "#ECFDF5", color: "#059669" }}>{p}</span>
@@ -111,7 +111,7 @@ function GradeCard({ cosmetic, grade }: { cosmetic: CosmeticItem; grade: Cosmeti
               )}
               {grade.cons.length > 0 && (
                 <div>
-                  <p className="text-[10px] font-bold uppercase tracking-wider mb-1.5" style={{ color: "#EA580C" }}>{t("cosmeticsReport.cons")}</p>
+                  <p className="text-[11px] font-bold uppercase tracking-wider mb-1.5" style={{ color: "#EA580C" }}>{t("cosmeticsReport.cons")}</p>
                   <div className="flex flex-wrap gap-1.5">
                     {grade.cons.map((c, i) => (
                       <span key={i} className="text-xs px-2.5 py-1 rounded-full font-medium" style={{ background: "#FFF7ED", color: "#EA580C" }}>{c}</span>
@@ -121,7 +121,7 @@ function GradeCard({ cosmetic, grade }: { cosmetic: CosmeticItem; grade: Cosmeti
               )}
               {grade.keyIngredients.length > 0 && (
                 <div>
-                  <p className="text-[10px] font-bold uppercase tracking-wider mb-1.5 text-stone-400">{t("cosmeticsReport.keyIngredients")}</p>
+                  <p className="text-[11px] font-bold uppercase tracking-wider mb-1.5 text-stone-400">{t("cosmeticsReport.keyIngredients")}</p>
                   <div className="flex flex-wrap gap-1.5">
                     {grade.keyIngredients.map((ing, i) => (
                       <span key={i} className="text-xs px-2.5 py-1 rounded-full font-medium" style={{ background: TINT_GREEN, color: DEEP_GREEN }}>{ing}</span>
@@ -131,7 +131,7 @@ function GradeCard({ cosmetic, grade }: { cosmetic: CosmeticItem; grade: Cosmeti
               )}
               {grade.conflictIngredients.length > 0 && (
                 <div>
-                  <p className="text-[10px] font-bold uppercase tracking-wider mb-1.5" style={{ color: "#DC2626" }}>{t("cosmeticsReport.conflicts")}</p>
+                  <p className="text-[11px] font-bold uppercase tracking-wider mb-1.5" style={{ color: "#DC2626" }}>{t("cosmeticsReport.conflicts")}</p>
                   <div className="flex flex-wrap gap-1.5">
                     {grade.conflictIngredients.map((ing, i) => (
                       <span key={i} className="text-xs px-2.5 py-1 rounded-full font-medium" style={{ background: "#FEF2F2", color: "#DC2626" }}>{ing}</span>
@@ -171,7 +171,7 @@ function GradeSummaryBar({ grades }: { grades: CosmeticGrade[] }) {
                 style={{ background: GRADE_CONFIG[g].bg, color: GRADE_CONFIG[g].color, border: `1px solid ${GRADE_CONFIG[g].border}` }}>
                 {g}
               </div>
-              <span className="text-[10px] font-bold mt-0.5 text-stone-400">×{counts[g]}</span>
+              <span className="text-[11px] font-bold mt-0.5 text-stone-400">×{counts[g]}</span>
             </div>
           ) : null)}
         </div>

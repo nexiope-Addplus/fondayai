@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import {
   Sparkles, Heart, Lock, CalendarDays, Activity,
   ClipboardList, Camera, ChevronDown, ChevronRight, Flame, Bot,
@@ -31,6 +31,7 @@ export function ScanIdleScreen({
   onOpenMy?: () => void;
 }) {
   const { t } = useTranslation();
+  const reducedMotion = useReducedMotion();
   const streak = getStreak();
   const attendance = getAttendance();
   const daysSince = getDaysSinceLastScan();
@@ -41,6 +42,7 @@ export function ScanIdleScreen({
   const [idleWeather, setIdleWeather] = useState<WeatherData | null>(null);
   const [latestScan, setLatestScan] = useState<any | null>(null);
   const [recentScans, setRecentScans] = useState<any[]>([]);
+  const [scanLoading, setScanLoading] = useState(true);
   const [careBriefing, setCareBriefing] = useState<{ briefing: string; priority: string } | null>(null);
   const touchStartY = useRef(0);
 
@@ -53,7 +55,8 @@ export function ScanIdleScreen({
           if (data.length > 0) setLatestScan(data[0]);
         }
       })
-      .catch(() => setLatestScan(null));
+      .catch(() => setLatestScan(null))
+      .finally(() => setScanLoading(false));
   }, []);
 
   // 운영 서버 날씨 로직 + Fallback 복구 (Care Briefing 필수)
@@ -246,9 +249,9 @@ export function ScanIdleScreen({
                       <Bot className={`w-4 h-4 mt-0.5 shrink-0 ${careBriefing.priority === "high" ? "text-rose-500" : "text-emerald-600"}`} />
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-2 mb-0.5">
-                          <p className="text-[10px] font-black uppercase tracking-widest text-stone-400">AI Care</p>
+                          <p className="text-[11px] font-black uppercase tracking-widest text-stone-400">AI Care</p>
                           {careBriefing.priority === "high" && (
-                            <span className="text-[10px] font-bold text-rose-500 animate-pulse">!</span>
+                            <span className="text-[11px] font-bold text-rose-500 animate-pulse">!</span>
                           )}
                         </div>
                         <p className="text-[12px] font-semibold text-stone-700 leading-snug break-keep">
@@ -307,10 +310,10 @@ export function ScanIdleScreen({
             <div className="flex items-center gap-1.5 px-2 py-1 rounded-full max-w-[52%] sm:max-w-none"
               style={{ background: `${SCAN_FROM}16`, color: SCAN_TO }}>
               <Heart className="w-3 h-3 shrink-0" />
-              <span className="text-[9.5px] leading-tight font-bold text-right break-keep">{t("idle.socialCount", { n: socialCount.toLocaleString() })}</span>
+              <span className="text-[11px] leading-tight font-bold text-right break-keep">{t("idle.socialCount", { n: socialCount.toLocaleString() })}</span>
             </div>
           </div>
-          <div className="grid grid-cols-[116px_1fr] gap-2.5 items-stretch sm:grid-cols-[132px_1fr] sm:gap-3">
+          <div className="grid grid-cols-[100px_1fr] gap-2 items-stretch sm:grid-cols-[116px_1fr] sm:gap-2.5 md:grid-cols-[132px_1fr] md:gap-3">
             <div className="relative rounded-3xl overflow-hidden min-h-[168px] bg-stone-100 sm:rounded-3xl sm:min-h-[176px]">
               <img
                 src="/face-model.png"
@@ -320,8 +323,8 @@ export function ScanIdleScreen({
               />
               <motion.div className="absolute left-0 right-0 h-[2px] z-10"
                 style={{ background: `linear-gradient(90deg, transparent 0%, ${SCAN_TO}CC 40%, ${SCAN_FROM} 50%, ${SCAN_TO}CC 60%, transparent 100%)` }}
-                animate={{ top: ["5%", "88%", "5%"] }}
-                transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }} />
+                animate={reducedMotion ? { top: "50%" } : { top: ["5%", "88%", "5%"] }}
+                transition={reducedMotion ? {} : { duration: 3, repeat: Infinity, ease: "easeInOut" }} />
               <div className="absolute inset-x-0 bottom-0 h-24"
                 style={{ background: "linear-gradient(to top, rgba(20,20,20,0.55), transparent)" }} />
               <div className="absolute top-3 left-3 w-7 h-7 border-t-2 border-l-2 rounded-tl-lg" style={{ borderColor: SCAN_TO }} />
@@ -364,7 +367,27 @@ export function ScanIdleScreen({
       </motion.div>
 
       <motion.div variants={fadeChild} className="mb-4 relative" style={{ zIndex: 1 }}>
-        {latestScan && (
+        {scanLoading && (
+          <div className="rounded-2xl bg-white px-4 py-4 mb-4 animate-pulse" style={{ boxShadow: "0 8px 20px rgba(45,95,79,0.06)" }}>
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0 flex-1">
+                <div className="h-3 w-20 rounded-full bg-stone-100 mb-2" />
+                <div className="h-4 w-36 rounded-full bg-stone-100 mb-1.5" />
+                <div className="h-3 w-48 rounded-full bg-stone-100" />
+              </div>
+              <div className="rounded-2xl px-3 py-2 shrink-0 w-16 h-14 bg-stone-100" />
+            </div>
+            <div className="grid grid-cols-3 gap-2 mt-3">
+              {[1,2,3].map(i => (
+                <div key={i} className="rounded-2xl p-3 bg-stone-50">
+                  <div className="h-2.5 w-10 rounded-full bg-stone-100 mb-2" />
+                  <div className="h-4 w-8 rounded-full bg-stone-100" />
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+        {!scanLoading && latestScan && (
           <div className="rounded-2xl bg-white px-4 py-4 mb-4" style={{ boxShadow: "0 8px 20px rgba(45,95,79,0.06)" }}>
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
@@ -383,15 +406,15 @@ export function ScanIdleScreen({
             </div>
             <div className="grid grid-cols-3 gap-2 mt-3">
               <div className="rounded-2xl p-3" style={{ background: "#F6FBF8" }}>
-                <p className="text-[10px] text-stone-400 leading-tight">{t("result.skinAge")}</p>
+                <p className="text-[11px] text-stone-400 leading-tight">{t("result.skinAge")}</p>
                 <p className="text-[14px] font-bold mt-1 truncate" style={{ color: DEEP_GREEN }}>{latestScan.skinAge ?? "—"}</p>
               </div>
               <div className="rounded-2xl p-3" style={{ background: "#FFF7F3" }}>
-                <p className="text-[10px] text-stone-400 leading-tight">{t("result.baumannLabel")}</p>
+                <p className="text-[11px] text-stone-400 leading-tight">{t("result.baumannLabel")}</p>
                 <p className="text-[14px] font-bold mt-1 truncate" style={{ color: SCAN_TO }}>{latestScan.baumannType || "—"}</p>
               </div>
               <div className="rounded-2xl p-3" style={{ background: "#F7F4FB" }}>
-                <p className="text-[10px] text-stone-400 leading-tight">{t("my.focusTitle")}</p>
+                <p className="text-[11px] text-stone-400 leading-tight">{t("my.focusTitle")}</p>
                 <p className="text-[11px] font-bold mt-1 text-stone-800 line-clamp-2 leading-tight text-kr-pretty">
                   {Array.isArray(latestScan.scores) && latestScan.scores.length > 1
                     ? [...latestScan.scores].slice(1).sort((a: any, b: any) => Number(a.score) - Number(b.score))[0]?.label || "—"
@@ -537,16 +560,16 @@ export function ScanIdleScreen({
           onClick={onScan}
           className="w-full py-4 sm:py-[18px] rounded-2xl text-white text-[15px] sm:text-[16px] font-bold tracking-tight"
           style={{ background: DEEP_GREEN }}
-          whileHover={{ scale: 1.01 }}
-          whileTap={{ scale: 0.97 }}
-          animate={{
+          whileHover={{ scale: reducedMotion ? 1 : 1.01 }}
+          whileTap={{ scale: reducedMotion ? 1 : 0.97 }}
+          animate={reducedMotion ? {} : {
             boxShadow: [
               `0 8px 22px rgba(45,95,79,0.16)`,
               `0 10px 28px rgba(45,95,79,0.22)`,
               `0 8px 22px rgba(45,95,79,0.16)`,
             ],
           }}
-          transition={{ duration: 2.5, repeat: Infinity }}
+          transition={reducedMotion ? {} : { duration: 2.5, repeat: Infinity }}
         >
           {t("idle.ctaBtn")}
         </motion.button>

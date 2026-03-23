@@ -313,7 +313,7 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
           <div className="grid grid-cols-3 gap-2 mt-4">
             {routineStats.map((stat) => (
               <div key={stat.key} className="rounded-2xl p-3" style={{ background: stat.tone }}>
-                <p className="text-[10px] text-stone-400 leading-tight truncate">{stat.label}</p>
+                <p className="text-[11px] text-stone-400 leading-tight truncate">{stat.label}</p>
                 <p className="text-xl font-bold mt-1" style={{ color: stat.color }}>{stat.value}</p>
               </div>
             ))}
@@ -336,15 +336,15 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
           </div>
           <div className="grid grid-cols-3 gap-2 mt-3">
             <div className="rounded-2xl p-3" style={{ background: "#FFFFFF" }}>
-              <p className="text-[10px] text-stone-400 leading-tight truncate">{t("cosmetics.effectStrongLabel")}</p>
+              <p className="text-[11px] text-stone-400 leading-tight truncate">{t("cosmetics.effectStrongLabel")}</p>
               <p className="text-[18px] font-bold mt-1" style={{ color: DEEP_GREEN }}>{strongestSignalCount}</p>
             </div>
             <div className="rounded-2xl p-3" style={{ background: "#FFFFFF" }}>
-              <p className="text-[10px] text-stone-400 leading-tight truncate">{t("cosmetics.effectPositiveLabel")}</p>
+              <p className="text-[11px] text-stone-400 leading-tight truncate">{t("cosmetics.effectPositiveLabel")}</p>
               <p className="text-[18px] font-bold mt-1" style={{ color: SCAN_TO }}>{positiveSignalCount}</p>
             </div>
             <div className="rounded-2xl p-3" style={{ background: "#FFFFFF" }}>
-              <p className="text-[10px] text-stone-400 leading-tight truncate">{t("cosmetics.effectTrackedProductsLabel")}</p>
+              <p className="text-[11px] text-stone-400 leading-tight truncate">{t("cosmetics.effectTrackedProductsLabel")}</p>
               <p className="text-[18px] font-bold mt-1 text-stone-800">{productSignals.length}</p>
             </div>
           </div>
@@ -512,7 +512,7 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
                       className="rounded-3xl p-3 bg-stone-50 text-left shadow-[0_4px_14px_rgba(0,0,0,0.03)]"
                     >
                       {item.image_thumbnail ? (
-                        <img src={item.image_thumbnail} className="w-full h-28 rounded-2xl object-cover bg-stone-200" />
+                        <img src={item.image_thumbnail} alt={item.name ?? ""} className="w-full h-28 rounded-2xl object-cover bg-stone-200" />
                       ) : (
                         <div className="w-full h-28 rounded-2xl bg-stone-100 flex items-center justify-center">
                           <Droplets className="w-7 h-7 text-stone-400" />
@@ -601,7 +601,7 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
               </div>
               <div className="flex items-start gap-3">
                 {selectedItem.image_thumbnail ? (
-                  <img src={selectedItem.image_thumbnail} className="w-20 h-20 rounded-3xl object-cover bg-stone-100 shrink-0" />
+                  <img src={selectedItem.image_thumbnail} alt={selectedItem.name ?? ""} className="w-20 h-20 rounded-3xl object-cover bg-stone-100 shrink-0" />
                 ) : (
                   <div className="w-20 h-20 rounded-3xl bg-stone-100 flex items-center justify-center shrink-0">
                     <Droplets className="w-8 h-8 text-stone-400" />

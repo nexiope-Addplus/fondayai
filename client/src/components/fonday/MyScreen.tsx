@@ -97,7 +97,7 @@ export function MyScreen({
           <div className="flex items-center justify-between p-4 rounded-2xl bg-white" style={{ boxShadow: "0 8px 24px rgba(45,95,79,0.06)" }}>
             <div className="flex items-center gap-3">
               {user.avatar
-                ? <img src={user.avatar} className="w-10 h-10 rounded-full" />
+                ? <img src={user.avatar} alt={user.username || "프로필"} className="w-10 h-10 rounded-full" />
                 : <div className="w-10 h-10 rounded-full flex items-center justify-center"
                     style={{ background: TINT_WARM }}>
                     <User className="w-5 h-5" style={{ color: SCAN_TO }} />
@@ -120,7 +120,7 @@ export function MyScreen({
                   )}
                   {user.provider === "google" && (
                     <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-xs font-bold text-stone-600 bg-white">
-                      <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" className="w-2.5 h-2.5" />
+                      <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="w-2.5 h-2.5" />
                       Google
                     </span>
                   )}
@@ -157,7 +157,7 @@ export function MyScreen({
             )}
             <button onClick={() => onLogin ? onLogin("google", "my") : (localStorage.setItem("fonday_return_tab", "my"), window.location.href = "/auth/google")}
               className="w-full h-11 rounded-xl font-bold text-[13px] gap-2 bg-white text-stone-700 flex items-center justify-center">
-              <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" className="w-4 h-4" />
+              <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="w-4 h-4" />
               {t("attendance.google")}
             </button>
           </div>
