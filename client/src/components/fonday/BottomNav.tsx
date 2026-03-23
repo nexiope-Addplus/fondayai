@@ -56,11 +56,10 @@ export function BottomNav({ active, onChange, scanState }: {
       style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
     >
       <div className="max-w-md mx-auto px-2">
-        <div className="grid grid-cols-5 h-[64px]">
+        <div className="grid grid-cols-4 h-[64px]">
           {btn("scan", <House className="w-5 h-5" />, t("nav.scan"))}
           {btn("routine", <Droplets className="w-5 h-5" />, t("nav.routine"))}
           {btn("diary", <BookOpen className="w-5 h-5" />, t("nav.diary"))}
-          {btn("magazine", <Compass className="w-5 h-5" />, t("nav.magazine"))}
           {btn("my", <User className="w-5 h-5" />, t("nav.my"))}
         </div>
       </div>

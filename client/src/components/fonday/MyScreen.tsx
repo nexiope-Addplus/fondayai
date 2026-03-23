@@ -243,22 +243,7 @@ export function MyScreen({
           <ChevronRight className="w-4 h-4 text-stone-300 shrink-0" />
         </button>
 
-        {/* Fonday 디바이스 링크 */}
-        <a href="https://fonday.replit.app/" target="_blank" rel="noopener noreferrer"
-          className="flex items-center justify-between px-4 py-3.5 rounded-2xl active:opacity-70 transition-opacity"
-          style={{ background: "#FFFFFF", boxShadow: "0 8px 24px rgba(45,95,79,0.06)" }}>
-          <div className="flex items-center gap-3 min-w-0">
-            <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
-              style={{ background: TINT_WARM }}>
-              <Zap className="w-5 h-5" style={{ color: SCAN_TO }} />
-            </div>
-            <div className="min-w-0">
-              <p className="text-[14px] font-bold truncate" style={{ color: SCAN_TO }}>{t("result.deviceTeaser.title")}</p>
-              <p className="text-xs text-stone-400 truncate">{t("result.deviceTeaser.sub")}</p>
-            </div>
-          </div>
-          <ChevronRight className="w-4 h-4 shrink-0" style={{ color: SCAN_TO }} />
-        </a>
+        {/* Ultra-MVP: Fonday 디바이스 링크 숨김 — 리텐션 검증 후 복원 */}
       </div>
 
       {/* 출석 달력 모달 */}

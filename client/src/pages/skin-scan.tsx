@@ -19,40 +19,13 @@ import { BottomNav } from "../components/fonday/BottomNav";
 
 // 탭 컴포넌트 — 첫 방문 시 scan 탭만 로드, 나머지는 탭 전환 시 지연 로드
 const DiaryTab = lazy(() => import("../components/fonday/DiaryTab").then(m => ({ default: m.DiaryTab })));
-const MagazineTab = lazy(() => import("../components/fonday/MagazineTab").then(m => ({ default: m.MagazineTab })));
+// Ultra-MVP: MagazineTab 숨김 — 리텐션 검증 후 복원
+// const MagazineTab = lazy(() => import("../components/fonday/MagazineTab").then(m => ({ default: m.MagazineTab })));
 const MyScreen = lazy(() => import("../components/fonday/MyScreen").then(m => ({ default: m.MyScreen })));
 const RoutineTab = lazy(() => import("../components/fonday/RoutineTab").then(m => ({ default: m.RoutineTab })));
 
-class FeedErrorBoundary extends React.Component<{ children: React.ReactNode }, { hasError: boolean; message: string }> {
-  constructor(props: { children: React.ReactNode }) {
-    super(props);
-    this.state = { hasError: false, message: "" };
-  }
-
-  static getDerivedStateFromError(error: Error) {
-    return { hasError: true, message: error?.message || "Feed render failed" };
-  }
-
-  componentDidCatch(error: Error) {
-    console.error("[FeedErrorBoundary]", error);
-  }
-
-  render() {
-    if (this.state.hasError) {
-      return (
-        <div className="min-h-[calc(100dvh-64px)] px-5 py-6" style={{ background: "#F8F5F2" }}>
-          <div className="rounded-3xl bg-white p-5" style={{ boxShadow: "0 10px 28px rgba(45,95,79,0.08)" }}>
-            <p className="text-xs font-bold tracking-widest uppercase mb-2 text-stone-400">FEED ERROR</p>
-            <p className="text-[15px] font-bold text-stone-800">피드 탭 렌더링 중 오류가 발생했습니다.</p>
-            <p className="text-[12px] text-stone-500 mt-2 break-all">{this.state.message}</p>
-          </div>
-        </div>
-      );
-    }
-
-    return this.props.children;
-  }
-}
+// Ultra-MVP: FeedErrorBoundary 숨김 — 매거진 탭 복원 시 함께 복원
+// class FeedErrorBoundary extends React.Component<...> { ... }
 
 
 // ─── Google AdSense 배너 ──────────────────────────────────────────
@@ -421,15 +394,7 @@ export default function SkinScanPage() {
               </Suspense>
             </motion.div>
           )}
-          {activeTab === "magazine" && (
-            <motion.div key="magazine" custom={tabDirection} initial={{ opacity: 0, x: tabDirection * 24 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: tabDirection * -24 }} transition={{ duration: 0.18, ease: "easeOut" }}>
-              <FeedErrorBoundary>
-                <Suspense fallback={<div className="min-h-[calc(100dvh-64px)]" />}>
-                  <MagazineTab />
-                </Suspense>
-              </FeedErrorBoundary>
-            </motion.div>
-          )}
+          {/* Ultra-MVP: 매거진 탭 숨김 — 리텐션 검증 후 복원 */}
           {activeTab === "my" && (
             <motion.div key="my" custom={tabDirection} initial={{ opacity: 0, x: tabDirection * 24 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: tabDirection * -24 }} transition={{ duration: 0.18, ease: "easeOut" }}>
               <Suspense fallback={<div className="min-h-[calc(100dvh-64px)]" />}>

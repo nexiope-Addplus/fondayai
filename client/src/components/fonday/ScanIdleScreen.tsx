@@ -236,9 +236,9 @@ export function ScanIdleScreen({
               </div>
               <WeatherTipCard compact weather={idleWeather} />
 
-              {/* AI 케어 브리핑 (같은 카드 내부) */}
+              {/* Ultra-MVP: AI 케어 브리핑 숨김 — 리텐션 검증 후 복원 */}
               <AnimatePresence>
-                {careBriefing && (
+                {false && careBriefing && (
                   <motion.div
                     initial={{ opacity: 0, height: 0 }}
                     animate={{ opacity: 1, height: "auto" }}
