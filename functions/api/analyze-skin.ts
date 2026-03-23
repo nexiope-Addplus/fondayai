@@ -152,7 +152,10 @@ export const onRequest = async (context: any) => {
   if (request.method === "POST") {
     try {
       const body = await request.json();
-      const { image, surveyData, lang = "ko" } = body;
+      const { image, surveyData } = body;
+      const ALLOWED_LANGS = ["ko", "en", "ja"] as const;
+      const rawLang = body.lang ?? "ko";
+      const lang = ALLOWED_LANGS.includes(rawLang) ? rawLang : "ko";
 
       if (!env.GOOGLE_API_KEY) {
         return new Response(JSON.stringify({ error: "GOOGLE_API_KEY is missing in environment variables." }), {

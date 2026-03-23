@@ -107,11 +107,12 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
 
   // PWA 설치 팝업: 결과 페이지 50% 스크롤 후 표시 (콘텐츠 가치 체험 후 유도)
   const pwaTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const pwaTriggeredRef = useRef(false); // deferredPrompt 재실행 시 중복 방지
   useEffect(() => {
     const isStandalone = window.matchMedia("(display-mode: standalone)").matches || (window.navigator as any).standalone === true;
     const isDismissed = localStorage.getItem("fonday_pwa_dismissed") === "1";
     const isIos = /iPhone|iPad|iPod/i.test(navigator.userAgent);
-    if (isStandalone || isDismissed) return;
+    if (isStandalone || isDismissed || pwaTriggeredRef.current) return;
     if (!isIos && !deferredPrompt) return;
 
     const el = resultScrollRef.current;
@@ -120,7 +121,8 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
     const handleScroll = () => {
       const { scrollTop, scrollHeight, clientHeight } = el;
       const ratio = scrollTop / Math.max(1, scrollHeight - clientHeight);
-      if (ratio >= 0.5 && !pwaTimerRef.current) {
+      if (ratio >= 0.5 && !pwaTriggeredRef.current) {
+        pwaTriggeredRef.current = true;
         pwaTimerRef.current = setTimeout(() => setShowPwaPopup(true), 1000);
         el.removeEventListener("scroll", handleScroll);
       }
@@ -128,7 +130,7 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
     el.addEventListener("scroll", handleScroll, { passive: true });
     return () => {
       el.removeEventListener("scroll", handleScroll);
-      if (pwaTimerRef.current) clearTimeout(pwaTimerRef.current);
+      if (pwaTimerRef.current) { clearTimeout(pwaTimerRef.current); pwaTimerRef.current = null; }
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [deferredPrompt]);

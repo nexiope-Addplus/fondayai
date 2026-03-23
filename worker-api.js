@@ -95,8 +95,11 @@ export default {
       return new Response(null, { headers: corsHeaders });
     }
 
-    // 진단 엔드포인트: GET /debug-vapid
+    // 진단 엔드포인트: GET /debug-vapid (ADMIN_KEY 인증 필수)
     if (request.method === "GET" && new URL(request.url).pathname === "/debug-vapid") {
+      const adminKey = new URL(request.url).searchParams.get("key");
+      if (!env.ADMIN_KEY || adminKey !== env.ADMIN_KEY) return new Response("Unauthorized", { status: 401, headers: corsHeaders });
+
       const pub = env.VAPID_PUBLIC_KEY?.trim();
       const priv = env.VAPID_PRIVATE_KEY?.trim();
       if (!pub || !priv) return new Response("VAPID keys not set", { headers: corsHeaders });
@@ -138,8 +141,11 @@ export default {
       return new Response(JSON.stringify(info, null, 2), { headers: corsHeaders });
     }
 
-    // 테스트 엔드포인트: GET /test-push
+    // 테스트 엔드포인트: GET /test-push (ADMIN_KEY 인증 필수)
     if (request.method === "GET" && new URL(request.url).pathname === "/test-push") {
+      const adminKey = new URL(request.url).searchParams.get("key");
+      if (!env.ADMIN_KEY || adminKey !== env.ADMIN_KEY) return new Response("Unauthorized", { status: 401, headers: corsHeaders });
+
       const logs = [];
       try {
         const kv = env.PUSH_KV;

@@ -14,7 +14,7 @@ export const onRequest = async (context: any) => {
     return new Response(null, { headers: CORS });
   }
 
-  const user = await getUserFromCookie(request, env.JWT_SECRET || "fonday-secret-key");
+  const user = await getUserFromCookie(request, env.JWT_SECRET!);
   if (!user) {
     return new Response(
       JSON.stringify(request.method === "GET" ? [] : { error: "로그인이 필요합니다." }),

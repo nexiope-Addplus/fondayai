@@ -30,7 +30,7 @@ export const onRequest = async (context: any) => {
   if (request.method !== "POST") return new Response(JSON.stringify({ error: "POST only" }), { status: 405, headers: CORS });
 
   try {
-    const user = await getUserFromCookie(request, env.JWT_SECRET || "fonday-secret-key");
+    const user = await getUserFromCookie(request, env.JWT_SECRET!);
     if (!user) return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: CORS });
 
     const body: any = await request.json();

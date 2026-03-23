@@ -1,6 +1,23 @@
 // ─── Shared types for Fonday / Skin-Diary-AI ─────────────────────────────────
 
 export type TabId = "scan" | "routine" | "diary" | "magazine" | "my";
+
+export interface AppUser {
+  id: string;
+  username?: string;
+  email?: string;
+  avatar?: string;
+  provider?: "kakao" | "line" | "google";
+}
+
+export interface ScanHistory {
+  id: string;
+  overallScore: string | number;
+  baumannType?: string;
+  skinAge?: string | number;
+  scores?: Array<{ label: string; score: number }>;
+  createdAt: string;
+}
 export type ScanState = "idle" | "survey" | "scanning" | "result" | "error";
 
 export interface SurveyData {

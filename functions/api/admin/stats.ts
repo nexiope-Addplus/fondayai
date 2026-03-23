@@ -311,7 +311,8 @@ export const onRequest = async (context: any) => {
     headers: { "Content-Type": "text/html;charset=UTF-8" },
   });
   } catch (e: any) {
-    return new Response(`<pre style="font-family:monospace;padding:24px">Admin error:\n${e?.message ?? e}\n\n${e?.stack ?? ""}</pre>`, {
+    console.error("Admin stats error:", e);
+    return new Response(`<pre style="font-family:monospace;padding:24px">Internal server error</pre>`, {
       status: 500,
       headers: { "Content-Type": "text/html;charset=UTF-8" },
     });

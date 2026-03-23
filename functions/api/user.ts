@@ -3,7 +3,7 @@ import { getUserFromCookie } from "../_utils/jwt";
 export const onRequest = async (context: any) => {
   const { request, env } = context;
 
-  const user = await getUserFromCookie(request, env.JWT_SECRET || "fonday-secret-key");
+  const user = await getUserFromCookie(request, env.JWT_SECRET!);
 
   if (!user) {
     return new Response("Unauthorized", {

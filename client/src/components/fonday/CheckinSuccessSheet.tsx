@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 import { CheckCircle2, CalendarDays } from "lucide-react";
 import { SCAN_FROM, SCAN_TO } from "./constants";
+import type { AppUser } from "./types";
 import { getAttendance, todayStr } from "./utils";
 
 // ─── 체크인 성공 팝업 ─────────────────────────────────────────────
@@ -11,7 +12,7 @@ export function CheckinSuccessSheet({ onKakao, onLine, onGoogle, onDismiss, user
   onLine: () => void;
   onGoogle: () => void;
   onDismiss: () => void;
-  user: any;
+  user: AppUser | null;
 }) {
   const { t, i18n } = useTranslation();
   const data = getAttendance();

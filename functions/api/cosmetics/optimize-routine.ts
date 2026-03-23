@@ -44,7 +44,7 @@ export const onRequest = async (context: any) => {
     return new Response("Method Not Allowed", { status: 405 });
   }
 
-  const user = await getUserFromCookie(request, env.JWT_SECRET || "fonday-secret-key");
+  const user = await getUserFromCookie(request, env.JWT_SECRET!);
   if (!user) {
     return new Response(JSON.stringify({ error: "로그인 필요" }), { status: 401, headers: CORS });
   }

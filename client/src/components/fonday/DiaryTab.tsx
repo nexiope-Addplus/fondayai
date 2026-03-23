@@ -19,6 +19,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import type {
   AICareSettings,
   AnalysisResult,
+  AppUser,
   CosmeticItem,
   ReminderSettings,
 } from "./types";
@@ -50,7 +51,7 @@ import {
 import { DiaryRoutinePreviewCard, DiaryCalendarView, DiaryTimeline } from "./DiaryHelpers";
 import { DiaryReportTab } from "./DiaryReportTab";
 
-export function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: any; analysisResult: AnalysisResult | null; onBack?: () => void; onLogin?: (p: "kakao"|"line"|"google", tab: string) => void }) {
+export function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: AppUser | null; analysisResult: AnalysisResult | null; onBack?: () => void; onLogin?: (p: "kakao"|"line"|"google", tab: string) => void }) {
   const { t } = useTranslation();
   const [history, setHistory] = useState<any[]>([]);
   const [tab, setTab] = useState<"calendar" | "timeline" | "report">("calendar");
@@ -218,16 +219,17 @@ export function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: any;
     }
   }, [tab]);
 
-  // 탭 전환 시 스크롤 위치 저장/복원
+  // 탭 전환 시 스크롤 위치 저장/복원 (서브탭별 독립 키)
+  const scrollRestoreKey = `diary_scroll_${tab}`;
   useEffect(() => {
     const container = diaryScrollRef.current;
     if (!container) return;
-    const saved = sessionStorage.getItem("diary_scroll");
+    const saved = sessionStorage.getItem(scrollRestoreKey);
     if (saved) container.scrollTop = Number(saved);
-    const onScroll = () => sessionStorage.setItem("diary_scroll", String(container.scrollTop));
+    const onScroll = () => sessionStorage.setItem(scrollRestoreKey, String(container.scrollTop));
     container.addEventListener("scroll", onScroll, { passive: true });
     return () => container.removeEventListener("scroll", onScroll);
-  }, []);
+  }, [scrollRestoreKey]);
 
   if (!user) {
     return (

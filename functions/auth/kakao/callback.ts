@@ -59,7 +59,7 @@ export const onRequest = async (context: any) => {
       provider: "kakao",
     };
 
-    const jwt = await createJWT(user, env.JWT_SECRET || "fonday-secret-key");
+    const jwt = await createJWT(user, env.JWT_SECRET!);
     const maxAge = 60 * 60 * 24 * 30; // 30일
 
     return new Response(null, {
