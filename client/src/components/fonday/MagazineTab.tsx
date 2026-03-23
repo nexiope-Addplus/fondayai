@@ -166,10 +166,25 @@ export function MagazineTab() {
       .sort((a: any, b: any) => Number(a.score) - Number(b.score))
       .slice(0, 3);
   }, [latestScan]);
-  const maxDistributionCount = useMemo(
-    () => Math.max(...(rankingData?.scoreDistribution?.map((band: any) => band.count) ?? [1]), 1),
+  const rankingBands = useMemo(
+    () => Array.isArray(rankingData?.scoreDistribution) ? rankingData.scoreDistribution : [],
     [rankingData],
   );
+  const baumannTop = useMemo(
+    () => Object.entries(rankingData?.baumannDistribution ?? {})
+      .filter(([type]) => Boolean(type))
+      .sort(([, a], [, b]) => Number(b) - Number(a))
+      .slice(0, 3),
+    [rankingData],
+  );
+  const maxDistributionCount = useMemo(
+    () => Math.max(...(rankingBands.map((band: any) => Number(band?.count) || 0) ?? [1]), 1),
+    [rankingBands],
+  );
+  const latestOverall = useMemo(() => {
+    const latestScores = parseScores(latestScan?.scores);
+    return Number(latestScan?.overallScore ?? latestScores[0]?.score ?? 0);
+  }, [latestScan]);
 
   const filtered = filter === "전체"
     ? MAGAZINE_ARTICLES
@@ -284,26 +299,25 @@ export function MagazineTab() {
                   <div className="mt-4">
                     <p className="text-[11px] font-bold text-stone-400 mb-3">{t("ranking.distribution")}</p>
                     <div className="space-y-2.5">
-                      {rankingData.scoreDistribution.map((band: any, index: number) => {
-                        const barPct = Math.round((band.count / maxDistributionCount) * 100);
-                        const [bandMin, bandMax] = String(band.label).split("-").map(Number);
-                        const latestScores = parseScores(latestScan?.scores);
-                        const latestOverall = Number(latestScan?.overallScore ?? latestScores[0]?.score ?? 0);
+                      {rankingBands.map((band: any, index: number) => {
+                        const bandCount = Number(band?.count) || 0;
+                        const barPct = Math.round((bandCount / maxDistributionCount) * 100);
+                        const [bandMin, bandMax] = String(band?.label ?? "").split("-").map(Number);
                         const isMyBand = latestOverall > 0 && latestOverall >= bandMin && latestOverall <= bandMax;
 
                         return (
-                          <div key={`${band.label}-${index}`} className="flex items-center gap-2">
-                            <span className="text-[11px] text-stone-400 w-14 shrink-0">{band.label}</span>
+                          <div key={`${String(band?.label ?? "band")}-${index}`} className="flex items-center gap-2">
+                            <span className="text-[11px] text-stone-400 w-14 shrink-0">{String(band?.label ?? "-")}</span>
                             <div className="flex-1 h-5 rounded-full bg-stone-100 overflow-hidden">
                               <div
                                 className="h-full rounded-full transition-all duration-700"
                                 style={{
-                                  width: `${Math.max(barPct, band.count > 0 ? 6 : 0)}%`,
+                                  width: `${Math.max(barPct, bandCount > 0 ? 6 : 0)}%`,
                                   background: isMyBand ? `linear-gradient(90deg, ${SCAN_FROM}, ${SCAN_TO})` : "#D6D3D1",
                                 }}
                               />
                             </div>
-                            <span className="text-[11px] text-stone-400 w-5 text-right">{band.count}</span>
+                            <span className="text-[11px] text-stone-400 w-5 text-right">{bandCount}</span>
                             {isMyBand && (
                               <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full shrink-0" style={{ background: `${SCAN_FROM}30`, color: SCAN_TO }}>
                                 {t("ranking.me")}
@@ -315,20 +329,17 @@ export function MagazineTab() {
                     </div>
                   </div>
 
-                  {Object.keys(rankingData.baumannDistribution ?? {}).length > 0 && (
+                  {baumannTop.length > 0 && (
                     <div className="mt-4">
                       <p className="text-[11px] font-bold text-stone-400 mb-3">{t("ranking.topBaumann")}</p>
                       <div className="grid grid-cols-3 gap-2">
-                        {Object.entries(rankingData.baumannDistribution)
-                          .sort(([, a], [, b]) => (b as number) - (a as number))
-                          .slice(0, 3)
-                          .map(([type, count], index) => (
+                        {baumannTop.map(([type, count], index) => (
                             <div key={type} className="rounded-2xl p-3 text-center" style={{ background: index === 0 ? "#FFF7F3" : "#FAF8F5" }}>
                               <p className="text-[12px]">{["🥇", "🥈", "🥉"][index]}</p>
                               <p className="text-[16px] font-black mt-0.5" style={{ color: index === 0 ? SCAN_TO : DEEP_GREEN }}>{type}</p>
-                              <p className="text-[11px] text-stone-400 mt-1">{count as number}{t("ranking.people")}</p>
+                              <p className="text-[11px] text-stone-400 mt-1">{Number(count) || 0}{t("ranking.people")}</p>
                             </div>
-                          ))}
+                        ))}
                       </div>
                     </div>
                   )}
