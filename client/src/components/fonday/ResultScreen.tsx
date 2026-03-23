@@ -11,7 +11,9 @@ import {
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
+  BG_BASE, BG_MUTED, BORDER_COLOR, FONT_DISPLAY,
   DEEP_GREEN, DEEP_GREEN_LIGHT, SCAN_FROM, SCAN_TO,
+  TEXT_TERTIARY,
   TINT_WARM, TINT_GREEN, TINT_NEUTRAL, SCORE_LABEL_MAP, NUTRIENT_COLORS,
   SCORE_COLORS, fadeChild, stagger, MISSION_POINTS,
 } from "./constants";
@@ -786,7 +788,7 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
             style={{ borderColor: SCAN_TO, color: SCAN_TO }}>
             <Camera className="w-4 h-4" /> {t("result.back")}
           </Button>
-          <h2 className="text-xl font-black tracking-tight" style={{ color: DEEP_GREEN }}>{t("result.title")}</h2>
+          <h2 className="text-xl font-light tracking-tight" style={{ color: DEEP_GREEN, fontFamily: FONT_DISPLAY }}>{t("result.title")}</h2>
         </div>
 
         {/* 압축형 결과 헤더 */}
@@ -811,12 +813,12 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
         {(analysisResult?.improvements ?? []).length > 0 && (() => {
           const top = (analysisResult.improvements as { title: string; desc: string }[])[0];
           return (
-            <motion.div variants={fadeChild} className="rounded-3xl p-4"
-              style={{ background: "#FFFFFF", boxShadow: "0 8px 24px rgba(45,95,79,0.06)" }}>
+            <motion.div variants={fadeChild} className="rounded-3xl p-4 border"
+              style={{ background: BG_BASE, borderColor: BORDER_COLOR }}>
               <div className="flex items-center gap-2 mb-2">
-                <div className="w-7 h-7 rounded-xl flex items-center justify-center text-sm shrink-0"
-                  style={{ background: TINT_WARM }}><Target className="w-4 h-4" style={{ color: SCAN_TO }} /></div>
-                <p className="text-xs font-semibold uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>
+                <div className="w-7 h-7 rounded-xl flex items-center justify-center text-sm shrink-0 border"
+                  style={{ background: BG_MUTED, borderColor: BORDER_COLOR }}><Target className="w-4 h-4" style={{ color: SCAN_TO }} /></div>
+                <p className="text-xs font-light uppercase tracking-[0.14em]" style={{ color: TEXT_TERTIARY, fontFamily: FONT_DISPLAY }}>
                   {t("result.todayAction")}
                 </p>
               </div>
@@ -835,10 +837,10 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
           }}
         />
 
-        <motion.div variants={fadeChild} className="rounded-3xl px-4 py-3"
-          style={{ background: "#FFFFFF", boxShadow: "0 8px 24px rgba(45,95,79,0.06)" }}>
+        <motion.div variants={fadeChild} className="rounded-3xl px-4 py-3 border"
+          style={{ background: BG_BASE, borderColor: BORDER_COLOR }}>
           <div className="flex flex-wrap items-center gap-2">
-            <span className="text-xs font-semibold uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>
+            <span className="text-xs font-light uppercase tracking-[0.14em]" style={{ color: TEXT_TERTIARY, fontFamily: FONT_DISPLAY }}>
               {t("result.hub.eyebrow")}
             </span>
             <button onClick={onGoRoutine} className="rounded-full px-3 py-1.5 text-xs font-semibold" style={{ background: TINT_GREEN, color: DEEP_GREEN }}>
@@ -847,17 +849,17 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
             <button onClick={onOpenDiary} className="rounded-full px-3 py-1.5 text-xs font-semibold" style={{ background: TINT_WARM, color: SCAN_TO }}>
               {t("nav.diary")}
             </button>
-            <button onClick={onGoMagazine} className="rounded-full px-3 py-1.5 text-xs font-semibold" style={{ background: "#F7F4FB", color: "#7C3AED" }}>
+            <button onClick={onGoMagazine} className="rounded-full px-3 py-1.5 text-xs font-semibold border" style={{ background: BG_BASE, color: "#7C3AED", borderColor: BORDER_COLOR }}>
               {t("nav.magazine")}
             </button>
-            <button onClick={onGoMy} className="rounded-full px-3 py-1.5 text-xs font-semibold" style={{ background: "#F8FAFD", color: DEEP_GREEN }}>
+            <button onClick={onGoMy} className="rounded-full px-3 py-1.5 text-xs font-semibold border" style={{ background: BG_BASE, color: DEEP_GREEN, borderColor: BORDER_COLOR }}>
               {t("nav.my")}
             </button>
           </div>
         </motion.div>
 
-        <div ref={tabNavRef} className="rounded-3xl p-2 sticky top-0 z-20 backdrop-blur-md"
-          style={{ background: "rgba(248,245,242,0.94)", boxShadow: "0 8px 20px rgba(45,95,79,0.05)" }}>
+        <div ref={tabNavRef} className="rounded-3xl p-2 sticky top-0 z-20 border"
+          style={{ background: BG_MUTED, borderColor: BORDER_COLOR }}>
           <div className="flex gap-2">
             {([
               { id: "routine" as const,   label: t("result.tab.routine"),   icon: <CheckCircle2 className="w-4 h-4" />, activeBg: "#F7FBF8", activeText: DEEP_GREEN },
@@ -870,7 +872,7 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
                   className="flex-1 flex items-center justify-center gap-2 py-3 rounded-3xl text-xs font-medium transition-all"
                   style={isActive
                     ? { background: activeBg, color: activeText }
-                    : { background: "#FFFFFF", color: "#A8A29E" }}>
+                    : { background: BG_BASE, color: "#A8A29E" }}>
                   {icon}
                   <span>{label}</span>
                 </button>

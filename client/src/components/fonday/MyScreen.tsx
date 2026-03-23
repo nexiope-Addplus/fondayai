@@ -10,8 +10,12 @@ import {
   SmartphoneNfc,
 } from "lucide-react";
 import {
+  BG_BASE,
+  BORDER_COLOR,
   DEEP_GREEN,
+  FONT_DISPLAY,
   SCAN_TO,
+  TEXT_TERTIARY,
   TINT_WARM,
   TINT_GREEN,
 } from "./constants";
@@ -63,14 +67,14 @@ export function MyScreen({
   };
 
   return (
-    <div className="min-h-[calc(100dvh-64px)] pb-28" style={{ background: "#F8F5F2" }}>
+    <div className="min-h-[calc(100dvh-64px)] pb-28" style={{ background: BG_BASE }}>
       {/* 헤더 */}
       <div className="px-5 pt-5 pb-0">
-        <div className="rounded-3xl p-5" style={{ background: "#FFFFFF", boxShadow: "0 10px 28px rgba(45,95,79,0.08)" }}>
+        <div className="rounded-3xl p-5" style={{ background: "#FFFFFF", border: `1px solid ${BORDER_COLOR}` }}>
           <div className="flex items-start justify-between gap-3">
             <div>
-              <p className="text-xs font-medium tracking-widest uppercase mb-1" style={{ color: SCAN_TO, fontFamily: "'Fraunces', Georgia, serif" }}>FONDAY</p>
-              <h1 className="text-2xl font-light" style={{ color: DEEP_GREEN, fontFamily: "'Fraunces', Georgia, serif" }}>{t("nav.my")}</h1>
+              <p className="text-xs font-medium tracking-widest uppercase mb-1" style={{ color: SCAN_TO, fontFamily: FONT_DISPLAY }}>FONDAY</p>
+              <h1 className="text-2xl font-light" style={{ color: DEEP_GREEN, fontFamily: FONT_DISPLAY }}>{t("nav.my")}</h1>
               <p className="text-[12px] text-stone-500 mt-1">
                 {user ? (user.username || user.email || t("nav.my")) : t("attendance.loginDesc")}
               </p>
@@ -94,7 +98,7 @@ export function MyScreen({
       <div className="px-5 pt-5 space-y-3">
         {/* 프로필 */}
         {user ? (
-          <div className="flex items-center justify-between p-4 rounded-2xl bg-white" style={{ boxShadow: "0 8px 24px rgba(45,95,79,0.06)" }}>
+          <div className="flex items-center justify-between p-4 rounded-2xl bg-white" style={{ border: `1px solid ${BORDER_COLOR}` }}>
             <div className="flex items-center gap-3">
               {user.avatar
                 ? <img src={user.avatar} alt={user.username || "프로필"} className="w-10 h-10 rounded-full" width={40} height={40} loading="lazy" />
@@ -135,7 +139,7 @@ export function MyScreen({
             </button>
           </div>
         ) : (
-          <div className="p-4 rounded-2xl bg-white space-y-3" style={{ boxShadow: "0 8px 24px rgba(45,95,79,0.06)" }}>
+          <div className="p-4 rounded-2xl bg-white space-y-3" style={{ border: `1px solid ${BORDER_COLOR}` }}>
             <div className="text-center mb-2">
               <p className="text-[14px] font-bold text-stone-700 mb-1">{t("report.loginRequired")}</p>
               <p className="text-[12px] text-stone-400">{t("attendance.loginDesc")}</p>
@@ -166,7 +170,7 @@ export function MyScreen({
         {/* 출석 달력 */}
         <button onClick={() => setShowCalendar(true)}
           className="w-full flex items-center justify-between p-4 rounded-2xl bg-white active:opacity-70"
-          style={{ boxShadow: "0 8px 24px rgba(45,95,79,0.06)" }}>
+          style={{ border: `1px solid ${BORDER_COLOR}` }}>
           <div className="flex items-center gap-3 min-w-0">
             <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
               style={{ background: TINT_WARM }}>
@@ -181,10 +185,10 @@ export function MyScreen({
         </button>
 
         {user && (
-          <div className="rounded-2xl bg-white p-4" style={{ boxShadow: "0 8px 24px rgba(45,95,79,0.06)" }}>
+          <div className="rounded-2xl bg-white p-4" style={{ border: `1px solid ${BORDER_COLOR}` }}>
             <div className="flex items-start justify-between gap-3">
               <div>
-                <p className="text-xs font-bold tracking-[0.14em] uppercase" style={{ color: SCAN_TO }}>
+                <p className="text-xs font-bold tracking-[0.14em] uppercase" style={{ color: SCAN_TO, fontFamily: FONT_DISPLAY }}>
                   ACCOUNT
                 </p>
                 <p className="text-[16px] font-bold mt-1" style={{ color: DEEP_GREEN }}>
@@ -210,7 +214,7 @@ export function MyScreen({
         )}
 
         {/* 언어 설정 */}
-        <div className="flex items-center justify-between p-4 rounded-2xl bg-white" style={{ boxShadow: "0 8px 24px rgba(45,95,79,0.06)" }}>
+        <div className="flex items-center justify-between p-4 rounded-2xl bg-white" style={{ border: `1px solid ${BORDER_COLOR}` }}>
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: "#F6F4FB" }}>
               <Sparkles className="w-4.5 h-4.5" style={{ color: "#7C3AED" }} />
@@ -233,7 +237,7 @@ export function MyScreen({
         {/* 앱 설치 */}
         <button onClick={onInstall}
           className="w-full flex items-center justify-between p-4 rounded-2xl bg-white active:opacity-70"
-          style={{ boxShadow: "0 8px 24px rgba(45,95,79,0.06)" }}>
+          style={{ border: `1px solid ${BORDER_COLOR}` }}>
           <div className="flex items-center gap-3 min-w-0">
             <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0" style={{ background: "#FFF7ED" }}>
               <SmartphoneNfc className="w-5 h-5" style={{ color: "#C2410C" }} />

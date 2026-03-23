@@ -4,9 +4,14 @@ import { AnimatePresence, motion } from "framer-motion";
 import { ChevronRight, Droplets, AlertTriangle, Plus, Sparkles, X } from "lucide-react";
 import type { CosmeticItem } from "./types";
 import {
+  BG_BASE,
+  BG_MUTED,
+  BORDER_COLOR,
   DEEP_GREEN,
+  FONT_DISPLAY,
   SCAN_FROM,
   SCAN_TO,
+  TEXT_TERTIARY,
   TINT_GREEN,
   TINT_WARM,
   TINT_NEUTRAL,
@@ -155,13 +160,13 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
 
   if (!user) {
     return (
-      <div className="min-h-[calc(100dvh-64px)] px-5 pt-6 pb-28">
-        <div className="rounded-[28px] bg-white p-6 text-center" style={{ boxShadow: "0 10px 28px rgba(45,95,79,0.08)" }}>
+      <div className="min-h-[calc(100dvh-64px)] px-5 pt-6 pb-28" style={{ background: BG_BASE }}>
+        <div className="rounded-[28px] bg-white p-6 text-center" style={{ border: `1px solid ${BORDER_COLOR}` }}>
           <div className="w-14 h-14 rounded-3xl mx-auto mb-4 flex items-center justify-center" style={{ background: TINT_GREEN }}>
             <Droplets className="w-7 h-7" style={{ color: DEEP_GREEN }} />
           </div>
-          <p className="text-xs font-medium tracking-widest uppercase mb-2" style={{ color: SCAN_TO, fontFamily: "'Fraunces', Georgia, serif" }}>{t("nav.routine")}</p>
-          <h2 className="text-xl font-light" style={{ color: DEEP_GREEN, fontFamily: "'Fraunces', Georgia, serif" }}>{t("cosmetics.myTitle")}</h2>
+          <p className="text-xs font-medium tracking-widest uppercase mb-2" style={{ color: SCAN_TO, fontFamily: FONT_DISPLAY }}>{t("nav.routine")}</p>
+          <h2 className="text-xl font-light" style={{ color: DEEP_GREEN, fontFamily: FONT_DISPLAY }}>{t("cosmetics.myTitle")}</h2>
           <p className="text-[13px] text-stone-500 mt-2 text-kr-pretty">
             {t("cosmetics.loginDesc")}
           </p>
@@ -201,10 +206,10 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
         </div>
 
         {productSignals.length > 0 && (
-          <div className="mt-4 rounded-3xl p-4" style={{ background: "#FFFFFF", border: "1px solid #F1E9E1" }}>
+          <div className="mt-4 rounded-3xl p-4" style={{ background: "#FFFFFF", border: `1px solid ${BORDER_COLOR}` }}>
             <div className="flex items-start justify-between gap-3 mb-3">
               <div>
-                <p className="text-xs font-bold tracking-[0.14em] uppercase" style={{ color: SCAN_TO }}>
+                <p className="text-xs font-bold tracking-[0.14em] uppercase" style={{ color: SCAN_TO, fontFamily: FONT_DISPLAY }}>
                   {t("cosmetics.effectBoardEyebrow")}
                 </p>
                 <p className="text-[15px] font-bold mt-1" style={{ color: DEEP_GREEN }}>
@@ -256,11 +261,11 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
   }
 
   return (
-    <div className="min-h-[calc(100dvh-64px)] px-5 pt-5 pb-28" style={{ background: "#F8F5F2" }}>
-      <div className="rounded-3xl p-5 bg-white" style={{ boxShadow: "0 10px 28px rgba(45,95,79,0.08)" }}>
+    <div className="min-h-[calc(100dvh-64px)] px-5 pt-5 pb-28" style={{ background: BG_BASE }}>
+      <div className="rounded-3xl p-5 bg-white" style={{ border: `1px solid ${BORDER_COLOR}` }}>
         <div>
-          <p className="text-xs font-bold tracking-widest uppercase mb-1" style={{ color: SCAN_TO }}>{t("nav.routine")}</p>
-          <h1 className="text-2xl font-bold" style={{ color: DEEP_GREEN }}>{t("cosmetics.myTitle")}</h1>
+          <p className="text-xs font-bold tracking-widest uppercase mb-1" style={{ color: SCAN_TO, fontFamily: FONT_DISPLAY }}>{t("nav.routine")}</p>
+          <h1 className="text-2xl font-light" style={{ color: DEEP_GREEN, fontFamily: FONT_DISPLAY }}>{t("cosmetics.myTitle")}</h1>
           <p className="text-[12px] text-stone-500 mt-1 text-kr-pretty">
             {t("cosmetics.routineSubtitle")}
           </p>
@@ -288,10 +293,10 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
           {t("cosmetics.scanBtn")}
         </button>
 
-        <div className="mt-4 rounded-3xl p-4" style={{ background: "#FAF8F5", border: "1px solid #F1E9E1" }}>
+        <div className="mt-4 rounded-3xl p-4" style={{ background: BG_MUTED, border: `1px solid ${BORDER_COLOR}` }}>
           <div className="flex items-start justify-between gap-3">
             <div>
-              <p className="text-xs font-bold tracking-[0.14em] uppercase" style={{ color: SCAN_TO }}>
+              <p className="text-xs font-bold tracking-[0.14em] uppercase" style={{ color: SCAN_TO, fontFamily: FONT_DISPLAY }}>
                 {t("cosmetics.dashboardEyebrow")}
               </p>
               <p className="text-[15px] font-bold mt-1" style={{ color: DEEP_GREEN }}>
@@ -367,7 +372,7 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
             <div className="w-6 h-6 border-2 border-stone-200 border-t-stone-400 rounded-full animate-spin" />
           </div>
         ) : list.length === 0 ? (
-          <div className="rounded-[28px] bg-white p-8 text-center" style={{ boxShadow: "0 10px 24px rgba(45,95,79,0.05)" }}>
+          <div className="rounded-[28px] bg-white p-8 text-center" style={{ border: `1px solid ${BORDER_COLOR}` }}>
             <div className="w-14 h-14 rounded-3xl mx-auto mb-3 flex items-center justify-center" style={{ background: `${DEEP_GREEN}12`, color: DEEP_GREEN }}>
               <Droplets className="w-7 h-7" />
             </div>
@@ -378,7 +383,7 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
           <>
             <div className="grid gap-3">
               {sections.map(({ key, title, accent, bg }) => (
-                <div key={key} className="rounded-[28px] border p-4 bg-white" style={{ borderColor: key === "am" ? "#DDEBE5" : "#F2DED5", boxShadow: "0 10px 24px rgba(45,95,79,0.05)" }}>
+                <div key={key} className="rounded-[28px] border p-4 bg-white" style={{ borderColor: BORDER_COLOR }}>
                   <div className="flex items-center justify-between gap-3 mb-3">
                     <div>
                       <p className="text-[15px] font-bold" style={{ color: DEEP_GREEN }}>{title}</p>
@@ -420,7 +425,7 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
             </div>
 
             {productSignals.length > 0 && (
-              <div className="rounded-[28px] border p-4 bg-white" style={{ borderColor: "#F1E9E1", boxShadow: "0 10px 24px rgba(45,95,79,0.05)" }}>
+              <div className="rounded-[28px] border p-4 bg-white" style={{ borderColor: BORDER_COLOR }}>
                 <div className="flex items-start justify-between gap-2 mb-3">
                   <div className="min-w-0">
                     <p className="text-[15px] font-bold" style={{ color: DEEP_GREEN }}>{t("cosmetics.signalSectionTitle")}</p>
@@ -495,7 +500,7 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
               </div>
             )}
 
-            <div className="rounded-[28px] border p-4 bg-white" style={{ borderColor: "#F1E9E1", boxShadow: "0 10px 24px rgba(45,95,79,0.05)" }}>
+            <div className="rounded-[28px] border p-4 bg-white" style={{ borderColor: BORDER_COLOR }}>
               <div className="flex items-center justify-between gap-3 mb-3">
                 <div>
                   <p className="text-[15px] font-bold" style={{ color: DEEP_GREEN }}>{t("cosmetics.collectionTitle")}</p>
@@ -509,7 +514,8 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
                     <button
                       key={item.id}
                       onClick={() => setSelectedItem(item)}
-                      className="rounded-3xl p-3 bg-stone-50 text-left shadow-[0_4px_14px_rgba(0,0,0,0.03)]"
+                      className="rounded-3xl p-3 bg-stone-50 text-left"
+                      style={{ border: `1px solid ${BORDER_COLOR}` }}
                     >
                       {item.image_thumbnail ? (
                         <img src={item.image_thumbnail} alt={item.name ?? ""} className="w-full h-28 rounded-2xl object-cover bg-stone-200" loading="lazy" />

@@ -24,9 +24,13 @@ import type {
   ReminderSettings,
 } from "./types";
 import {
+  BG_BASE,
+  BORDER_COLOR,
   DEEP_GREEN,
+  FONT_DISPLAY,
   SCAN_FROM,
   SCAN_TO,
+  TEXT_TERTIARY,
   TINT_GREEN,
   TINT_NEUTRAL,
   TINT_WARM,
@@ -234,18 +238,18 @@ export function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: AppU
 
   if (!user) {
     return (
-      <div className="flex flex-col" style={{ background: "#F8F5F2", minHeight: "calc(100dvh - 64px)" }}>
-        <div className="shrink-0 px-5 pt-5 pb-0" style={{ borderBottom: "1px solid #F0EDE8" }}>
-          <div className="rounded-3xl p-5 mb-4 text-white"
-            style={{ background: "linear-gradient(135deg, #4A7C6E 0%, #C97062 100%)" }}>
-            <p className="text-xs font-medium tracking-widest uppercase mb-1 text-white/70" style={{ fontFamily: "'Fraunces', Georgia, serif" }}>FONDAY</p>
-            <h1 className="text-2xl font-light" style={{ fontFamily: "'Fraunces', Georgia, serif" }}>{t("modal.diary.title")} ✦</h1>
+      <div className="flex flex-col" style={{ background: BG_BASE, minHeight: "calc(100dvh - 64px)" }}>
+        <div className="shrink-0 px-5 pt-5 pb-0" style={{ borderBottom: `1px solid ${BORDER_COLOR}` }}>
+          <div className="rounded-3xl p-5 mb-4"
+            style={{ background: DEEP_GREEN }}>
+            <p className="text-xs font-medium tracking-widest uppercase mb-1 text-white/70" style={{ fontFamily: FONT_DISPLAY }}>FONDAY</p>
+            <h1 className="text-2xl font-light text-white" style={{ fontFamily: FONT_DISPLAY }}>{t("modal.diary.title")} ✦</h1>
             <p className="text-[12px] text-white/80 mt-2 text-kr-pretty">{t("result.login.desc")}</p>
           </div>
         </div>
         <div className="flex-1 px-5 py-6">
-          <Card className="border-none rounded-3xl shadow-md overflow-hidden"
-            style={{ background: TINT_WARM }}>
+          <Card className="rounded-3xl overflow-hidden"
+            style={{ background: TINT_WARM, border: `1px solid ${BORDER_COLOR}`, boxShadow: "none" }}>
             <CardContent className="p-6 text-center">
               <div className="w-14 h-14 rounded-3xl mx-auto flex items-center justify-center text-white"
                 style={{ background: `linear-gradient(135deg, ${DEEP_GREEN}, ${SCAN_TO})` }}>
@@ -297,13 +301,13 @@ export function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: AppU
   }
 
   return (
-    <div className="flex flex-col" style={{ background: "#F8F5F2", minHeight: "calc(100dvh - 64px)" }}>
+    <div className="flex flex-col" style={{ background: BG_BASE, minHeight: "calc(100dvh - 64px)" }}>
       {/* 헤더 */}
-      <div className="shrink-0 px-5 pt-5 pb-0" style={{ borderBottom: "1px solid #F0EDE8" }}>
+      <div className="shrink-0 px-5 pt-5 pb-0" style={{ borderBottom: `1px solid ${BORDER_COLOR}` }}>
         <div className="rounded-3xl p-5 mb-4"
-          style={{ background: "#FFFFFF", boxShadow: "0 10px 28px rgba(45,95,79,0.08)" }}>
-          <p className="text-xs font-medium tracking-widest uppercase mb-1" style={{ color: SCAN_TO, fontFamily: "'Fraunces', Georgia, serif" }}>FONDAY</p>
-          <h1 className="text-2xl font-light" style={{ color: DEEP_GREEN, fontFamily: "'Fraunces', Georgia, serif" }}>{t("modal.diary.title")}</h1>
+          style={{ background: "#FFFFFF", border: `1px solid ${BORDER_COLOR}` }}>
+          <p className="text-xs font-medium tracking-widest uppercase mb-1" style={{ color: SCAN_TO, fontFamily: FONT_DISPLAY }}>FONDAY</p>
+          <h1 className="text-2xl font-light" style={{ color: DEEP_GREEN, fontFamily: FONT_DISPLAY }}>{t("modal.diary.title")}</h1>
           <p className="text-[12px] text-stone-500 mt-2 text-kr-pretty">
             {finalType ? `${finalType} · ` : ""}{totalRecords > 0 ? `${t("modal.diary.countLabel", { count: totalRecords })}` : t("result.diary.firstRecord")}
           </p>
@@ -326,8 +330,8 @@ export function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: AppU
 
       {/* 콘텐츠 */}
       <div ref={diaryScrollRef} className="flex-1 overflow-y-auto overscroll-contain pb-24">
-        <div ref={diaryTabNavRef} className="px-5 pt-2 pb-0 sticky top-0 z-20" style={{ background: "rgba(248,245,242,0.94)" }}>
-          <div className="flex gap-2 p-2 rounded-3xl mb-3" style={{ background: "#FFFFFF", boxShadow: "0 8px 20px rgba(45,95,79,0.05)" }}>
+        <div ref={diaryTabNavRef} className="px-5 pt-2 pb-0 sticky top-0 z-20" style={{ background: `${BG_BASE}F0` }}>
+          <div className="flex gap-2 p-2 rounded-3xl mb-3" style={{ background: "#FFFFFF", border: `1px solid ${BORDER_COLOR}` }}>
             {tabs.map(({ id, label }) => (
               <button key={id} onClick={() => goToDiaryTab(id)}
                 className={`flex-1 py-2.5 text-[12px] font-medium transition-all rounded-2xl ${
@@ -372,7 +376,7 @@ export function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: AppU
             >
               <DiaryCalendarView allEntries={allEntries} />
               <div className="px-5 pt-3">
-                <Card className="border-none rounded-3xl overflow-hidden shadow-sm" style={{ background: "#FFFFFF" }}>
+                <Card className="rounded-3xl overflow-hidden" style={{ background: "#FFFFFF", border: `1px solid ${BORDER_COLOR}`, boxShadow: "none" }}>
                   <CardContent className="p-5">
                     <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0">
