@@ -11,8 +11,17 @@ export const onRequest = async (context: any) => {
   }
 
   try {
-    const body = await request.json();
-    if (!env.ADMIN_KEY || body.key !== env.ADMIN_KEY) {
+    // JSON과 form-data 둘 다 지원
+    let key: string | null = null;
+    const ct = request.headers.get("Content-Type") ?? "";
+    if (ct.includes("application/json")) {
+      const body = await request.json();
+      key = body.key ?? null;
+    } else {
+      const fd = await request.formData();
+      key = fd.get("key") as string | null;
+    }
+    if (!env.ADMIN_KEY || key !== env.ADMIN_KEY) {
       return new Response(JSON.stringify({ error: "Unauthorized" }), {
         status: 401,
         headers: { "Content-Type": "application/json" },
