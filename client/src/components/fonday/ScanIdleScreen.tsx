@@ -291,10 +291,10 @@ export function ScanIdleScreen({
         <div className="flex items-center justify-between gap-2 mb-3">
           <span className="text-xs font-medium tracking-wide" style={{ color: TEXT_TERTIARY, fontFamily: FONT_DISPLAY }}>{t("idle.heroBadge")}</span>
         </div>
-        <h1 className="text-[28px] sm:text-[30px] font-light text-stone-800 leading-[1.08] mb-1.5 px-1" style={{ fontFamily: "'Fraunces', Georgia, serif" }}>
+        <h1 className="text-[30px] font-light leading-[1.15] mb-2 px-1" style={{ color: "#1C1917", fontFamily: FONT_DISPLAY }}>
           {t("idle.subtitle1")}<br />{t("idle.subtitle3")}
         </h1>
-        <p className="text-[12px] text-stone-500 px-1 mb-3">
+        <p className="text-[14px] leading-[1.7] px-1 mb-4" style={{ color: TEXT_SECONDARY }}>
           {t("idle.subtitle4")}
         </p>
 
@@ -302,8 +302,8 @@ export function ScanIdleScreen({
           style={{ background: "#FFFFFF", boxShadow: "0 8px 24px rgba(74,124,110,0.06)", borderColor: BORDER_COLOR }}>
           <div className="flex items-center justify-between mb-3">
             <div>
-              <div className="text-xs font-bold text-stone-700">{t("idle.previewTitle")}</div>
-              <div className="text-xs text-stone-400">{t("idle.previewSub")}</div>
+              <div className="text-[13px] font-semibold text-stone-700">{t("idle.previewTitle")}</div>
+              <div className="text-[12px]" style={{ color: TEXT_TERTIARY }}>{t("idle.previewSub")}</div>
             </div>
             <div className="flex items-center gap-1.5 px-2 py-1 rounded-full max-w-[48%]"
               style={{ background: `${SCAN_FROM}16`, color: SCAN_TO }}>
@@ -366,7 +366,7 @@ export function ScanIdleScreen({
 
       <motion.div variants={fadeChild} className="mb-4 relative" style={{ zIndex: 1 }}>
         {scanLoading && (
-          <div className={`rounded-2xl bg-white px-4 py-4 mb-4${reducedMotion ? "" : " animate-pulse"}`} style={{ boxShadow: "0 8px 20px rgba(45,95,79,0.06)" }}>
+          <div className={`rounded-2xl bg-white px-4 py-4 mb-4 border${reducedMotion ? "" : " animate-pulse"}`} style={{ borderColor: BORDER_COLOR }}>
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0 flex-1">
                 <div className="h-3 w-20 rounded-full bg-stone-100 mb-2" />
@@ -386,34 +386,34 @@ export function ScanIdleScreen({
           </div>
         )}
         {!scanLoading && latestScan && (
-          <div className="rounded-2xl bg-white px-4 py-4 mb-4" style={{ boxShadow: "0 8px 20px rgba(45,95,79,0.06)" }}>
+          <div className="rounded-2xl bg-white px-4 py-4 mb-4 border" style={{ borderColor: BORDER_COLOR }}>
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
-                <p className="text-xs font-bold tracking-[0.14em] uppercase" style={{ color: SCAN_TO }}>
+                <p className="text-[11px] font-medium tracking-[0.14em] uppercase" style={{ color: TEXT_TERTIARY, fontFamily: FONT_DISPLAY }}>
                   {t("idle.latestEyebrow")}
                 </p>
-                <p className="text-[15px] font-bold text-stone-800 mt-1">{t("idle.latestTitle")}</p>
-                <p className="text-xs text-stone-500 mt-1 text-kr-pretty">{t("idle.latestDesc")}</p>
+                <p className="text-[16px] font-semibold mt-1" style={{ color: "#1C1917" }}>{t("idle.latestTitle")}</p>
+                <p className="text-[13px] mt-1 text-kr-pretty" style={{ color: TEXT_SECONDARY }}>{t("idle.latestDesc")}</p>
               </div>
-              <div className="rounded-2xl px-3 py-2 text-right shrink-0" style={{ background: TINT_GREEN }}>
-                <p className="text-xs font-bold uppercase tracking-[0.12em]" style={{ color: DEEP_GREEN }}>
+              <div className="rounded-2xl px-3 py-2 text-right shrink-0 border" style={{ borderColor: BORDER_COLOR }}>
+                <p className="text-[11px] font-medium uppercase tracking-[0.12em]" style={{ color: TEXT_TERTIARY }}>
                   {t("result.overall")}
                 </p>
-                <p className="text-[18px] font-light mt-1" style={{ color: DEEP_GREEN, fontFamily: "'Fraunces', Georgia, serif" }}>{latestScan.overallScore ?? "—"}</p>
+                <p className="text-[24px] font-light mt-1" style={{ color: DEEP_GREEN, fontFamily: FONT_DISPLAY }}>{latestScan.overallScore ?? "—"}</p>
               </div>
             </div>
             <div className="grid grid-cols-3 gap-2 mt-3">
-              <div className="rounded-2xl p-3" style={{ background: "#F6FBF8" }}>
-                <p className="text-[11px] text-stone-400 leading-tight">{t("result.skinAge")}</p>
-                <p className="text-[14px] font-bold mt-1 truncate" style={{ color: DEEP_GREEN }}>{latestScan.skinAge ?? "—"}</p>
+              <div className="rounded-2xl p-3 border" style={{ borderColor: BORDER_COLOR }}>
+                <p className="text-[11px] leading-tight" style={{ color: TEXT_TERTIARY }}>{t("result.skinAge")}</p>
+                <p className="text-[16px] font-light mt-1 truncate" style={{ color: DEEP_GREEN, fontFamily: FONT_DISPLAY }}>{latestScan.skinAge ?? "—"}</p>
               </div>
-              <div className="rounded-2xl p-3" style={{ background: "#FFF7F3" }}>
-                <p className="text-[11px] text-stone-400 leading-tight">{t("result.baumannLabel")}</p>
-                <p className="text-[14px] font-bold mt-1 truncate" style={{ color: SCAN_TO }}>{latestScan.baumannType || "—"}</p>
+              <div className="rounded-2xl p-3 border" style={{ borderColor: BORDER_COLOR }}>
+                <p className="text-[11px] leading-tight" style={{ color: TEXT_TERTIARY }}>{t("result.baumannLabel")}</p>
+                <p className="text-[16px] font-light mt-1 truncate" style={{ color: SCAN_TO, fontFamily: FONT_DISPLAY }}>{latestScan.baumannType || "—"}</p>
               </div>
-              <div className="rounded-2xl p-3" style={{ background: "#F7F4FB" }}>
-                <p className="text-[11px] text-stone-400 leading-tight">{t("my.focusTitle")}</p>
-                <p className="text-[11px] font-bold mt-1 text-stone-800 line-clamp-2 leading-tight text-kr-pretty">
+              <div className="rounded-2xl p-3 border" style={{ borderColor: BORDER_COLOR }}>
+                <p className="text-[11px] leading-tight" style={{ color: TEXT_TERTIARY }}>{t("my.focusTitle")}</p>
+                <p className="text-[12px] font-semibold mt-1 line-clamp-2 leading-tight text-kr-pretty" style={{ color: "#1C1917" }}>
                   {Array.isArray(latestScan.scores) && latestScan.scores.length > 1
                     ? [...latestScan.scores].slice(1).sort((a: any, b: any) => Number(a.score) - Number(b.score))[0]?.label || "—"
                     : "—"}
@@ -443,24 +443,24 @@ export function ScanIdleScreen({
         <div className="grid grid-cols-[1fr_auto] gap-2">
           <button
             onClick={() => setShowCalendar(true)}
-            className="flex items-center justify-between gap-3 rounded-2xl px-3.5 py-3 text-left active:opacity-70"
-            style={{ background: "#FFFFFF", boxShadow: "0 8px 20px rgba(45,95,79,0.06)" }}
+            className="flex items-center justify-between gap-3 rounded-2xl px-3.5 py-3 text-left active:opacity-70 border"
+            style={{ background: "#FFFFFF", borderColor: BORDER_COLOR }}
           >
             <div className="flex items-center gap-3 min-w-0">
               <div className="w-9 h-9 rounded-2xl flex items-center justify-center shrink-0" style={{ background: TINT_WARM }}>
                 <CalendarDays className="w-4.5 h-4.5" style={{ color: SCAN_TO }} />
               </div>
               <div className="min-w-0">
-                <p className="text-[12px] font-bold text-stone-800 truncate">{t("attendance.calendarTitle")}</p>
-                <p className="text-xs text-stone-500 truncate">{t("attendance.totalPoints", { n: attendance.totalPoints })}</p>
+                <p className="text-[13px] font-semibold text-stone-800 truncate">{t("attendance.calendarTitle")}</p>
+                <p className="text-[12px] truncate" style={{ color: TEXT_TERTIARY }}>{t("attendance.totalPoints", { n: attendance.totalPoints })}</p>
               </div>
             </div>
             <ChevronRight className="w-4 h-4 text-stone-300 shrink-0" />
           </button>
           {streak.count >= 2 && (
             <div
-              className="rounded-2xl px-3 py-2.5 flex flex-col justify-center min-w-[92px]"
-              style={{ background: "#FFF7ED", boxShadow: "0 8px 20px rgba(217,119,6,0.08)" }}
+              className="rounded-2xl px-3 py-2.5 flex flex-col justify-center min-w-[92px] border"
+              style={{ background: "#FFF7ED", borderColor: BORDER_COLOR }}
             >
               <div className="flex items-center gap-1 text-xs font-bold uppercase tracking-[0.12em]" style={{ color: "#C2410C" }}>
                 <Flame className="w-3 h-3" />
