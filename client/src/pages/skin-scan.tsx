@@ -414,7 +414,6 @@ export default function SkinScanPage() {
             <motion.div key="scan" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
               {scanState === "idle" && (
                 <ScanIdleScreen
-                  weather={weatherData}
                   onScan={() => setShowCamera(true)}
                   onOpenRoutine={() => setActiveTab("routine")}
                   onOpenDiary={() => setActiveTab("diary")}
@@ -426,7 +425,6 @@ export default function SkinScanPage() {
               {scanState === "scanning" && <ScanningScreen imageSrc={imageSrc} />}
               {scanState === "result" && (
                 <ResultScreen
-                  weather={weatherData}
                   surveyData={surveyData}
                   analysisResult={analysisResult}
                   imageSrc={imageSrc}
