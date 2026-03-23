@@ -1083,6 +1083,8 @@
     "registering": "등록 중...",
     "registerSuccess": "등록 완료!",
     "myTitle": "내 화장품 루틴",
+    "loginDesc": "화장품 등록, AM/PM 루틴, 제품별 피부 변화 신호를 한 곳에서 확인하세요.",
+    "routineSubtitle": "등록한 제품과 오늘 루틴을 정리합니다.",
     "myEmpty": "등록된 제품이 없어요",
     "myEmptyDesc": "제품 전면을 촬영하면 자동으로 등록돼요",
     "boardHeadline": "내 루틴 보드를 정리했어요",
@@ -1228,5 +1230,9 @@
     "addBtn": "화장품 등록하기",
     "addMore": "화장품 추가 등록",
     "error": "분석 중 오류가 발생했어요. 다시 시도해 주세요."
+  },
+  "common": {
+    "viewAll": "전체보기 {{count}}개",
+    "collapse": "접기"
   }
 }

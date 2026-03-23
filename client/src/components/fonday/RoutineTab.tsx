@@ -17,6 +17,7 @@ import {
   buildCosmeticCorrelationSignals,
 } from "./utils";
 import { CosmeticsRegisterModal } from "./CosmeticsRegisterModal";
+import { CosmeticsReportCard } from "./CosmeticsReportCard";
 
 interface OptimizedRoutine {
   am: { id: string; order: number }[];
@@ -34,6 +35,8 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
   const [showRegister, setShowRegister] = useState(false);
   const [selectedItem, setSelectedItem] = useState<CosmeticItem | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [showReportCard, setShowReportCard] = useState(false);
+  const [showAllSignals, setShowAllSignals] = useState(false);
 
   const loadData = async () => {
     if (!user) {
@@ -91,6 +94,15 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
       : undefined,
   );
   const productSignals = buildCosmeticCorrelationSignals(list, scans, t);
+  const latestScan = scans.length > 0 ? scans[0] : null;
+  const latestBaumannType = latestScan?.baumannType ?? "";
+  const latestScores = (() => {
+    try {
+      if (!latestScan?.scores) return [];
+      return Array.isArray(latestScan.scores) ? latestScan.scores : JSON.parse(latestScan.scores as string);
+    } catch { return []; }
+  })();
+  const latestAnalysisResult = latestScores.length > 0 ? { scores: latestScores } as any : null;
   const topSignal = productSignals[0] || null;
   const selectedSignal = selectedItem ? productSignals.find((signal) => signal.itemId === selectedItem.id) || null : null;
   const strongestSignalCount = productSignals.filter((signal) => signal.confidence === "strong").length;
@@ -151,7 +163,7 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
           <p className="text-xs font-bold tracking-widest uppercase mb-2" style={{ color: SCAN_TO }}>{t("nav.routine")}</p>
           <h2 className="text-xl font-bold" style={{ color: DEEP_GREEN }}>{t("cosmetics.myTitle")}</h2>
           <p className="text-[13px] text-stone-500 mt-2 text-kr-pretty">
-            화장품 등록, AM/PM 루틴, 제품별 피부 변화 신호를 한 곳에서 확인하세요.
+            {t("cosmetics.loginDesc")}
           </p>
           <div className="space-y-2 mt-5 text-left">
             <div className="rounded-2xl px-4 py-3" style={{ background: "#F8FAFD" }}>
@@ -251,7 +263,7 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
             <p className="text-xs font-bold tracking-widest uppercase mb-1" style={{ color: SCAN_TO }}>{t("nav.routine")}</p>
             <h1 className="text-2xl font-bold" style={{ color: DEEP_GREEN }}>{t("cosmetics.myTitle")}</h1>
             <p className="text-[12px] text-stone-500 mt-1 text-kr-pretty">
-              등록한 제품과 오늘 루틴을 정리합니다.
+              {t("cosmetics.routineSubtitle")}
             </p>
           </div>
           <button
@@ -298,9 +310,14 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
                 {t("cosmetics.dashboardDesc")}
               </p>
             </div>
-            <div className="w-10 h-10 rounded-2xl flex items-center justify-center shrink-0" style={{ background: "#FFFFFF" }}>
-              <Sparkles className="w-5 h-5" style={{ color: SCAN_TO }} />
-            </div>
+            <button
+              onClick={() => list.length > 0 && latestAnalysisResult ? setShowReportCard(true) : setShowRegister(true)}
+              className="w-10 h-10 rounded-2xl flex items-center justify-center shrink-0 cursor-pointer"
+              style={{ background: list.length > 0 && latestAnalysisResult ? `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})` : "#FFFFFF" }}
+              aria-label={t("cosmeticsReport.title")}
+            >
+              <Sparkles className="w-5 h-5" style={{ color: list.length > 0 && latestAnalysisResult ? "#FFFFFF" : SCAN_TO }} />
+            </button>
           </div>
           <div className="grid grid-cols-3 gap-2 mt-4">
             {routineStats.map((stat) => (
@@ -340,6 +357,16 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
               <p className="text-[18px] font-bold mt-1 text-stone-800">{productSignals.length}</p>
             </div>
           </div>
+          {list.length > 0 && latestAnalysisResult && (
+            <button
+              onClick={() => setShowReportCard(true)}
+              className="w-full mt-3 rounded-2xl px-4 py-3 flex items-center justify-center gap-2 text-[13px] font-bold cursor-pointer"
+              style={{ background: `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})`, color: "#FFFFFF" }}
+            >
+              <Sparkles className="w-4 h-4" />
+              {t("cosmeticsReport.title")}
+            </button>
+          )}
         </div>
       </div>
 
@@ -408,26 +435,42 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
                     <p className="text-[15px] font-bold" style={{ color: DEEP_GREEN }}>{t("cosmetics.signalSectionTitle")}</p>
                     <p className="text-xs text-stone-400">{t("cosmetics.signalSectionDesc")}</p>
                   </div>
-                  <span className="px-2.5 py-1 rounded-full text-xs font-bold" style={{ background: "#EEF4FF", color: "#4A7C6E" }}>
-                    {t("cosmetics.signalWindow")}
-                  </span>
+                  <div className="flex items-center gap-2">
+                    <span className="px-2.5 py-1 rounded-full text-xs font-bold" style={{ background: "#EEF4FF", color: "#4A7C6E" }}>
+                      {t("cosmetics.signalWindow")}
+                    </span>
+                    {productSignals.length > 3 && (
+                      <button
+                        onClick={() => setShowAllSignals((v) => !v)}
+                        className="px-2.5 py-1 rounded-full text-xs font-bold cursor-pointer"
+                        style={{ background: TINT_WARM, color: SCAN_TO }}
+                      >
+                        {showAllSignals ? t("common.collapse") : t("common.viewAll", { count: productSignals.length })}
+                      </button>
+                    )}
+                  </div>
                 </div>
                 <div className="space-y-2.5">
-                  {productSignals.slice(0, 3).map((signal) => {
+                  {(showAllSignals ? productSignals : productSignals.slice(0, 3)).map((signal) => {
                     const deltaValue = signal.topScoreDelta ?? signal.overallDelta ?? 0;
                     const positive = deltaValue >= 0;
                     return (
                     <div key={signal.itemId} className="rounded-2xl p-3" style={{ background: "#F8FAFD" }}>
                       <div className="flex items-center justify-between gap-2">
                         <p className="text-[12px] font-semibold text-stone-800">{signal.itemName}</p>
-                        <span className="rounded-full px-2 py-0.5 text-xs font-bold" style={{ background: `${DEEP_GREEN}12`, color: DEEP_GREEN }}>
-                          {t(`cosmetics.signalConfidence.${signal.confidence}`)}
-                        </span>
+                        <div className="flex items-center gap-1.5 shrink-0">
+                          <span className="rounded-full px-2 py-0.5 text-xs font-bold" style={{ background: positive ? `${DEEP_GREEN}12` : `${SCAN_TO}12`, color: positive ? DEEP_GREEN : SCAN_TO }}>
+                            {positive ? "+" : ""}{deltaValue}
+                          </span>
+                          <span className="rounded-full px-2 py-0.5 text-xs font-bold" style={{ background: `${DEEP_GREEN}12`, color: DEEP_GREEN }}>
+                            {t(`cosmetics.signalConfidence.${signal.confidence}`)}
+                          </span>
+                        </div>
                       </div>
                       <p className="text-xs mt-1 text-kr-pretty" style={{ color: SCAN_TO }}>{signal.note}</p>
                       <div className="mt-3 h-2 rounded-full bg-white overflow-hidden">
                         <div
-                          className="h-full rounded-full"
+                          className="h-full rounded-full transition-all duration-700"
                           style={{
                             width: `${Math.min(100, Math.max(14, Math.abs(deltaValue) * 6))}%`,
                             background: positive ? DEEP_GREEN : SCAN_TO,
@@ -519,6 +562,18 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
       >
         <Plus className="w-6 h-6 text-white" />
       </button>
+
+      <AnimatePresence>
+        {showReportCard && latestAnalysisResult && (
+          <CosmeticsReportCard
+            myCosmetics={list}
+            analysisResult={latestAnalysisResult}
+            finalType={latestBaumannType}
+            onClose={() => setShowReportCard(false)}
+            onAddCosmetic={() => { setShowReportCard(false); setShowRegister(true); }}
+          />
+        )}
+      </AnimatePresence>
 
       <AnimatePresence>
         {showRegister && (

@@ -1083,6 +1083,8 @@
     "registering": "Registering...",
     "registerSuccess": "Registered!",
     "myTitle": "My Skincare Routine",
+    "loginDesc": "Manage cosmetics, AM/PM routines, and skin change signals all in one place.",
+    "routineSubtitle": "Your registered products and today's routine.",
     "myEmpty": "No products registered yet",
     "myEmptyDesc": "Scan the front of a product to add it automatically",
     "boardHeadline": "Your routine board is organized",
@@ -1228,5 +1230,9 @@
     "addBtn": "Register Products",
     "addMore": "Add More Products",
     "error": "Analysis failed. Please try again."
+  },
+  "common": {
+    "viewAll": "View all {{count}}",
+    "collapse": "Collapse"
   }
 }
