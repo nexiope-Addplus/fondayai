@@ -137,6 +137,11 @@
     ],
     "startBtn": "Start AI Analysis"
   },
+  "scan": {
+    "errorTitle": "Analysis failed",
+    "errorDesc": "Please try again in a moment. If the issue persists, try refreshing the app.",
+    "errorRetry": "Try again"
+  },
   "scanning": {
     "texts": [
       "Optimizing photo data...",

@@ -137,6 +137,11 @@
     ],
     "startBtn": "AI 분석 시작"
   },
+  "scan": {
+    "errorTitle": "분석에 실패했어요",
+    "errorDesc": "잠시 후 다시 시도해 주세요. 문제가 계속되면 앱을 새로고침해 보세요.",
+    "errorRetry": "다시 시도하기"
+  },
   "scanning": {
     "texts": [
       "사진 데이터 최적화 중...",

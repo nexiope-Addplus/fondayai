@@ -185,10 +185,20 @@ export default function SkinScanPage() {
   const [imageSrc, setImageSrc] = useState<string | null>(null);
   const [faceCroppedSrc, setFaceCroppedSrc] = useState<string | null>(null);
   const [imageBase64, setImageBase64] = useState<string | null>(null);
+  const [scanError, setScanError] = useState<string | null>(null);
   const [user, setUser] = useState<any>(undefined);
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
   const [showInstallGuide, setShowInstallGuide] = useState(false);
+  const prevTabRef = useRef<TabId>("scan");
   const justLoggedInRef = useRef(false);
+
+  const TAB_ORDER: TabId[] = ["scan", "routine", "diary", "magazine", "my"];
+  const tabDirection = TAB_ORDER.indexOf(activeTab) >= TAB_ORDER.indexOf(prevTabRef.current) ? 1 : -1;
+
+  const handleTabChange = (tab: TabId) => {
+    prevTabRef.current = activeTab;
+    setActiveTab(tab);
+  };
 
   useEffect(() => {
     const handler = (e: any) => { e.preventDefault(); setDeferredPrompt(e); };
@@ -384,16 +394,16 @@ export default function SkinScanPage() {
           const errJson = JSON.parse(rawText);
           msg = errJson.detail || errJson.message || errJson.error || JSON.stringify(errJson);
         } catch { msg += ": " + rawText.slice(0, 100); }
-        alert(`분석 실패: ${msg}`);
-        setScanState("idle");
+        setScanError(msg);
+        setScanState("error");
         return;
       }
       const result = JSON.parse(rawText);
       setAnalysisResult(result);
       setScanState("result");
     } catch (err: any) {
-      alert(`분석 실패: ${err.message || "네트워크 오류"}`);
-      setScanState("idle");
+      setScanError(err.message || "네트워크 오류");
+      setScanState("error");
     }
   }, [imageFile, imageBase64]);
 
@@ -409,20 +419,46 @@ export default function SkinScanPage() {
           />
         )}
 
-        <AnimatePresence mode="wait">
+        <AnimatePresence mode="wait" custom={tabDirection}>
           {activeTab === "scan" && (
-            <motion.div key="scan" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+            <motion.div
+              key="scan"
+              custom={tabDirection}
+              initial={{ opacity: 0, x: tabDirection * 24 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: tabDirection * -24 }}
+              transition={{ duration: 0.18, ease: "easeOut" }}
+            >
               {scanState === "idle" && (
                 <ScanIdleScreen
                   onScan={() => setShowCamera(true)}
-                  onOpenRoutine={() => setActiveTab("routine")}
-                  onOpenDiary={() => setActiveTab("diary")}
-                  onOpenDiscover={() => setActiveTab("magazine")}
-                  onOpenMy={() => setActiveTab("my")}
+                  onOpenRoutine={() => handleTabChange("routine")}
+                  onOpenDiary={() => handleTabChange("diary")}
+                  onOpenDiscover={() => handleTabChange("magazine")}
+                  onOpenMy={() => handleTabChange("my")}
                 />
               )}
               {scanState === "survey" && <SurveyScreen onSubmit={handleSurveySubmit} onBack={() => setScanState("idle")} />}
               {scanState === "scanning" && <ScanningScreen imageSrc={imageSrc} />}
+              {scanState === "error" && (
+                <div className="min-h-[calc(100dvh-64px)] flex flex-col items-center justify-center px-6 text-center" style={{ background: "#FDFAF8" }}>
+                  <div className="w-16 h-16 rounded-3xl flex items-center justify-center mb-5" style={{ background: "#FEF2F2" }}>
+                    <AlertCircle className="w-8 h-8 text-rose-500" />
+                  </div>
+                  <h2 className="text-xl font-bold text-stone-800 mb-2">{t("scan.errorTitle")}</h2>
+                  <p className="text-sm text-stone-500 mb-2 text-kr-pretty">{t("scan.errorDesc")}</p>
+                  {scanError && (
+                    <p className="text-xs text-stone-400 bg-stone-100 rounded-xl px-4 py-2 mb-6 max-w-xs break-all">{scanError}</p>
+                  )}
+                  <button
+                    onClick={() => { setScanError(null); setScanState("idle"); }}
+                    className="w-full max-w-xs py-3.5 rounded-2xl font-bold text-white"
+                    style={{ background: "#2D5F4F" }}
+                  >
+                    {t("scan.errorRetry")}
+                  </button>
+                </div>
+              )}
               {scanState === "result" && (
                 <ResultScreen
                   surveyData={surveyData}
@@ -431,10 +467,10 @@ export default function SkinScanPage() {
                   faceCroppedSrc={faceCroppedSrc}
                   imageBase64={imageBase64}
                   onBack={() => setScanState("idle")}
-                  onGoRoutine={() => setActiveTab("routine")}
-                  onGoMagazine={() => setActiveTab("magazine")}
-                  onOpenDiary={() => setActiveTab("diary")}
-                  onGoMy={() => setActiveTab("my")}
+                  onGoRoutine={() => handleTabChange("routine")}
+                  onGoMagazine={() => handleTabChange("magazine")}
+                  onOpenDiary={() => handleTabChange("diary")}
+                  onGoMy={() => handleTabChange("my")}
                   user={user}
                   deferredPrompt={deferredPrompt}
                   onShowInstallGuide={() => setShowInstallGuide(true)}
@@ -443,25 +479,25 @@ export default function SkinScanPage() {
             </motion.div>
           )}
           {activeTab === "diary" && (
-            <motion.div key="diary" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-              <ExtractedDiaryTab user={user} analysisResult={analysisResult} onBack={() => setActiveTab("scan")} onLogin={openLoginPopup} />
+            <motion.div key="diary" custom={tabDirection} initial={{ opacity: 0, x: tabDirection * 24 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: tabDirection * -24 }} transition={{ duration: 0.18, ease: "easeOut" }}>
+              <ExtractedDiaryTab user={user} analysisResult={analysisResult} onBack={() => handleTabChange("scan")} onLogin={openLoginPopup} />
             </motion.div>
           )}
           {activeTab === "routine" && (
-            <motion.div key="routine" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+            <motion.div key="routine" custom={tabDirection} initial={{ opacity: 0, x: tabDirection * 24 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: tabDirection * -24 }} transition={{ duration: 0.18, ease: "easeOut" }}>
               <RoutineTab user={user} onLogin={openLoginPopup} />
             </motion.div>
           )}
           {activeTab === "magazine" && (
-            <motion.div key="magazine" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+            <motion.div key="magazine" custom={tabDirection} initial={{ opacity: 0, x: tabDirection * 24 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: tabDirection * -24 }} transition={{ duration: 0.18, ease: "easeOut" }}>
               <FeedErrorBoundary>
                 <MagazineTab />
               </FeedErrorBoundary>
             </motion.div>
           )}
           {activeTab === "my" && (
-            <motion.div key="my" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-              <MyScreen user={user} analysisResult={analysisResult} onInstall={handleInstall} onBack={() => setActiveTab("scan")} onLogin={openLoginPopup} onGoMagazine={() => setActiveTab("magazine")} onGoRoutine={() => setActiveTab("routine")} onOpenDiary={() => setActiveTab("diary")} />
+            <motion.div key="my" custom={tabDirection} initial={{ opacity: 0, x: tabDirection * 24 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: tabDirection * -24 }} transition={{ duration: 0.18, ease: "easeOut" }}>
+              <MyScreen user={user} analysisResult={analysisResult} onInstall={handleInstall} onBack={() => handleTabChange("scan")} onLogin={openLoginPopup} onGoMagazine={() => handleTabChange("magazine")} onGoRoutine={() => handleTabChange("routine")} onOpenDiary={() => handleTabChange("diary")} />
             </motion.div>
           )}
         </AnimatePresence>
@@ -507,7 +543,7 @@ export default function SkinScanPage() {
           )}
         </AnimatePresence>
       </div>
-      <BottomNav active={activeTab} onChange={setActiveTab} scanState={scanState} />
+      <BottomNav active={activeTab} onChange={handleTabChange} scanState={scanState} />
     </div>
   );
 }

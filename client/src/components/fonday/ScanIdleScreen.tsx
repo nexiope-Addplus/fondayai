@@ -59,22 +59,23 @@ export function ScanIdleScreen({
   // 운영 서버 날씨 로직 + Fallback 복구 (Care Briefing 필수)
   useEffect(() => {
     let isMounted = true;
-    const fetchWeather = (lat: number, lon: number) => {
+    const SEOUL = { lat: 37.5665, lon: 126.9780 };
+
+    const fetchWeather = (lat: number, lon: number, isRetry = false) => {
       fetch(`/api/weather?lat=${lat}&lon=${lon}`)
         .then((r) => r.ok ? r.json() : null)
-        .then((data) => { 
+        .then((data) => {
           if (!isMounted) return;
           if (data && !data.error) {
-            setIdleWeather(data as WeatherData); 
-          } else {
-             // API가 에러 페이로드를 반환한 경우 폴백
-            setIdleWeather({ temp: 20, humidity: 50, aqi: 1 } as WeatherData);
+            setIdleWeather(data as WeatherData);
+          } else if (!isRetry) {
+            // 현재 위치 API 실패 시 서울로 재시도
+            fetchWeather(SEOUL.lat, SEOUL.lon, true);
           }
         })
         .catch(() => {
-          if (isMounted) {
-             // 통신 실패 시 폴백
-             setIdleWeather({ temp: 20, humidity: 50, aqi: 1 } as WeatherData);
+          if (isMounted && !isRetry) {
+            fetchWeather(SEOUL.lat, SEOUL.lon, true);
           }
         });
     };
@@ -82,13 +83,13 @@ export function ScanIdleScreen({
     if ("geolocation" in navigator) {
       navigator.geolocation.getCurrentPosition(
         (pos) => fetchWeather(pos.coords.latitude, pos.coords.longitude),
-        () => fetchWeather(37.5665, 126.9780), // Fallback: Seoul
-        { timeout: 4000, enableHighAccuracy: false } // 타임아웃을 4초로 줄여 빠른 폴백 유도
+        () => fetchWeather(SEOUL.lat, SEOUL.lon), // 위치 권한 거부 시 서울
+        { timeout: 5000, enableHighAccuracy: false }
       );
     } else {
-      fetchWeather(37.5665, 126.9780); // Fallback: Seoul
+      fetchWeather(SEOUL.lat, SEOUL.lon);
     }
-    
+
     return () => { isMounted = false; };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

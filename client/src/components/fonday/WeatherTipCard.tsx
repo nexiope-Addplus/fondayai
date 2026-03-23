@@ -50,6 +50,9 @@ export function WeatherTipCard({ compact, weather }: {
           <div className="flex flex-col items-end gap-1 shrink-0">
             <span className="text-xs font-semibold px-1.5 py-0.5 rounded-full text-white"
               style={{ background: DEEP_GREEN }}>{weather.temp}°C</span>
+            {weather.cityName && (
+              <span className="text-[10px] text-stone-400 font-medium">📍 {weather.cityName}</span>
+            )}
             {aqiLabel && <span className="text-xs font-semibold px-1.5 py-0.5 rounded-full bg-white/70 text-stone-500">{aqiLabel}</span>}
           </div>
         </div>
