@@ -9,6 +9,7 @@ import {
   DEEP_GREEN,
   DEEP_GREEN_LIGHT,
   SCAN_TO,
+  SCAN_FROM,
   TINT_GREEN,
   TINT_WARM,
   CATEGORY_FILTERS,
@@ -29,11 +30,11 @@ const CATEGORY_I18N_KEYS: Record<CategoryFilter, string> = {
 };
 
 function parseScores(scores: unknown) {
-  if (Array.isArray(scores)) return scores;
+  if (Array.isArray(scores)) return scores.filter(s => s && typeof s === "object");
   if (typeof scores === "string") {
     try {
       const parsed = JSON.parse(scores);
-      return Array.isArray(parsed) ? parsed : [];
+      return Array.isArray(parsed) ? parsed.filter(s => s && typeof s === "object") : [];
     } catch {
       return [];
     }
@@ -47,9 +48,9 @@ function normalizeRankingData(data: any) {
     totalScans: Number(data.totalScans) || 0,
     avgScore: Number(data.avgScore) || 0,
     topScore: Number(data.topScore) || 0,
-    myPercentile: data.myPercentile !== undefined ? Number(data.myPercentile) : undefined,
+    myPercentile: (data.myPercentile !== undefined && data.myPercentile !== null) ? Number(data.myPercentile) : undefined,
     scoreDistribution: Array.isArray(data.scoreDistribution) ? data.scoreDistribution : [],
-    baumannDistribution: data.baumannDistribution && typeof data.baumannDistribution === "object"
+    baumannDistribution: (data.baumannDistribution && typeof data.baumannDistribution === "object")
       ? data.baumannDistribution
       : {},
   };
@@ -114,7 +115,7 @@ function ArticleModal({ article, onClose }: { article: MagazineArticle; onClose:
             <div className="flex items-center gap-2.5 py-3 border-y border-stone-100">
               <div className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-semibold shrink-0"
                 style={{ background: `linear-gradient(135deg, ${article.bgFrom}, ${article.bgTo})` }}>
-                {article.author[0]}
+                {article.author ? article.author[0] : "?"}
               </div>
               <div>
                 <p className="text-[12px] font-bold text-stone-800">{article.author}</p>
@@ -124,7 +125,7 @@ function ArticleModal({ article, onClose }: { article: MagazineArticle; onClose:
 
             <p className="text-[13px] text-stone-500 leading-relaxed">{article.summary}</p>
 
-            {article.body.map((section, i) => (
+            {Array.isArray(article.body) && article.body.map((section, i) => (
               <div key={i} className="space-y-1.5">
                 {section.heading && (
                   <h3 className="text-sm font-bold" style={{ color: DEEP_GREEN_LIGHT }}>{section.heading}</h3>
@@ -163,27 +164,34 @@ export function MagazineTab() {
     const scores = parseScores(latestScan?.scores);
     if (scores.length === 0) return [];
     return [...scores]
-      .sort((a: any, b: any) => Number(a.score) - Number(b.score))
+      .filter((s: any) => s && typeof s.score !== "undefined")
+      .sort((a: any, b: any) => (Number(a.score) || 0) - (Number(b.score) || 0))
       .slice(0, 3);
   }, [latestScan]);
+
   const rankingBands = useMemo(
     () => Array.isArray(rankingData?.scoreDistribution) ? rankingData.scoreDistribution : [],
     [rankingData],
   );
+
   const baumannTop = useMemo(
     () => Object.entries(rankingData?.baumannDistribution ?? {})
       .filter(([type]) => Boolean(type))
-      .sort(([, a], [, b]) => Number(b) - Number(a))
+      .sort(([, a], [, b]) => (Number(b) || 0) - (Number(a) || 0))
       .slice(0, 3),
     [rankingData],
   );
-  const maxDistributionCount = useMemo(
-    () => Math.max(...(rankingBands.map((band: any) => Number(band?.count) || 0) ?? [1]), 1),
-    [rankingBands],
-  );
+
+  const maxDistributionCount = useMemo(() => {
+    const counts = rankingBands.map((band: any) => Number(band?.count) || 0);
+    return counts.length > 0 ? Math.max(...counts, 1) : 1;
+  }, [rankingBands]);
+
   const latestOverall = useMemo(() => {
     const latestScores = parseScores(latestScan?.scores);
-    return Number(latestScan?.overallScore ?? latestScores[0]?.score ?? 0);
+    const val = latestScan?.overallScore ?? latestScores[0]?.score ?? 0;
+    const num = Number(val);
+    return isNaN(num) ? 0 : num;
   }, [latestScan]);
 
   const filtered = filter === "전체"
@@ -211,7 +219,7 @@ export function MagazineTab() {
               <div className="rounded-3xl bg-white p-4" style={{ boxShadow: "0 10px 24px rgba(45,95,79,0.06)" }}>
                 <div className="flex items-center gap-2 mb-3">
                   <div className="w-9 h-9 rounded-2xl flex items-center justify-center shrink-0" style={{ background: TINT_GREEN }}>
-                    <BarChart3 className="w-4.5 h-4.5" style={{ color: DEEP_GREEN }} />
+                    <BarChart3 className="w-5 h-5" style={{ color: DEEP_GREEN }} />
                   </div>
                   <div className="min-w-0">
                     <p className="text-xs font-bold text-stone-800">{t("discover.rankingTitle")}</p>
@@ -229,7 +237,7 @@ export function MagazineTab() {
               <div className="rounded-3xl bg-white p-4" style={{ boxShadow: "0 10px 24px rgba(45,95,79,0.06)" }}>
                 <div className="flex items-center gap-2 mb-3">
                   <div className="w-9 h-9 rounded-2xl flex items-center justify-center shrink-0" style={{ background: TINT_WARM }}>
-                    <Salad className="w-4.5 h-4.5" style={{ color: SCAN_TO }} />
+                    <Salad className="w-5 h-5" style={{ color: SCAN_TO }} />
                   </div>
                   <div className="min-w-0">
                     <p className="text-xs font-bold text-stone-800">{t("discover.nutritionTitle")}</p>
@@ -248,6 +256,7 @@ export function MagazineTab() {
             </div>
           </motion.div>
 
+          {/* 랭킹 상세 섹션 */}
           <motion.div variants={fadeChild} className="px-5 mb-5">
             <div className="rounded-3xl bg-white p-4" style={{ boxShadow: "0 10px 24px rgba(45,95,79,0.06)" }}>
               <div className="flex items-start justify-between gap-3">
@@ -303,7 +312,7 @@ export function MagazineTab() {
                         const bandCount = Number(band?.count) || 0;
                         const barPct = Math.round((bandCount / maxDistributionCount) * 100);
                         const [bandMin, bandMax] = String(band?.label ?? "").split("-").map(Number);
-                        const isMyBand = latestOverall > 0 && latestOverall >= bandMin && latestOverall <= bandMax;
+                        const isMyBand = latestOverall > 0 && latestOverall >= bandMin && latestOverall <= (bandMax || 100);
 
                         return (
                           <div key={`${String(band?.label ?? "band")}-${index}`} className="flex items-center gap-2">
@@ -335,7 +344,7 @@ export function MagazineTab() {
                       <div className="grid grid-cols-3 gap-2">
                         {baumannTop.map(([type, count], index) => (
                             <div key={type} className="rounded-2xl p-3 text-center" style={{ background: index === 0 ? "#FFF7F3" : "#FAF8F5" }}>
-                              <p className="text-[12px]">{["🥇", "🥈", "🥉"][index]}</p>
+                              <p className="text-[12px]">{["🥇", "🥈", "🥉"][index] || ""}</p>
                               <p className="text-[16px] font-black mt-0.5" style={{ color: index === 0 ? SCAN_TO : DEEP_GREEN }}>{type}</p>
                               <p className="text-[11px] text-stone-400 mt-1">{Number(count) || 0}{t("ranking.people")}</p>
                             </div>
@@ -348,6 +357,7 @@ export function MagazineTab() {
             </div>
           </motion.div>
 
+          {/* 영양 상세 섹션 */}
           <motion.div variants={fadeChild} className="px-5 mb-5">
             <div className="rounded-3xl p-4" style={{ background: "linear-gradient(135deg, #FFF8F4, #F7FBF8)", border: "1px solid #F1E9E1" }}>
               <div className="flex items-start justify-between gap-3">
@@ -457,7 +467,7 @@ export function MagazineTab() {
                     <div className="flex items-center gap-1.5">
                       <div className="w-5 h-5 rounded-full flex items-center justify-center text-white text-xs font-black"
                         style={{ background: `linear-gradient(135deg, ${featured.bgFrom}, ${featured.bgTo})` }}>
-                        {featured.author[0]}
+                        {featured.author ? featured.author[0] : "?"}
                       </div>
                       <span className="text-xs font-bold text-stone-500">{featured.author}</span>
                       <span className="text-xs text-stone-300">{featured.authorRole}</span>

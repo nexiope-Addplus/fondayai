@@ -32,26 +32,39 @@ export const onRequest = async (context: any) => {
       for (const key of listed.keys) {
         const raw = await env.SCANS_KV.get(key.name);
         if (!raw) continue;
-        const scans: any[] = JSON.parse(raw);
-        for (const scan of scans) {
-          const s = parseInt(scan.overallScore);
-          if (s > 0) allScores.push(s);
-          if (scan.baumannType) {
-            baumannDistribution[scan.baumannType] =
-              (baumannDistribution[scan.baumannType] || 0) + 1;
+        try {
+          const scans: any[] = JSON.parse(raw);
+          if (Array.isArray(scans)) {
+            for (const scan of scans) {
+              const s = parseInt(scan.overallScore);
+              if (!isNaN(s) && s > 0) allScores.push(s);
+              if (scan.baumannType) {
+                baumannDistribution[scan.baumannType] =
+                  (baumannDistribution[scan.baumannType] || 0) + 1;
+              }
+            }
           }
+        } catch (e) {
+          console.error(`Failed to parse scan data for ${key.name}:`, e);
+          continue;
         }
       }
     }
 
     // 현재 유저 점수를 풀에 포함 (미저장 스캔 포함)
-    const scorePool = myScore && myScore > 0 ? [...allScores, myScore] : allScores;
+    const scorePool = (myScore && myScore > 0) ? allScores.concat([myScore]) : allScores;
 
     const totalScans = scorePool.length;
-    const avgScore = scorePool.length
-      ? Math.round(scorePool.reduce((a, b) => a + b, 0) / scorePool.length)
+    const avgScore = totalScans > 0
+      ? Math.round(scorePool.reduce((a, b) => a + b, 0) / totalScans)
       : 0;
-    const topScore = scorePool.length ? Math.max(...scorePool) : 0;
+    
+    let topScore = 0;
+    if (totalScans > 0) {
+      for (const s of scorePool) {
+        if (s > topScore) topScore = s;
+      }
+    }
 
     const scoreDistribution = [
       { label: "0-20", count: 0 },
