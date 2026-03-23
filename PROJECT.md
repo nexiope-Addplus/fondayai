@@ -39,8 +39,8 @@
 ### AI
 | 항목 | 기술 |
 |------|------|
-| 모델 | Google Gemini 2.5 Flash (`gemini-2.5-flash`) |
-| 용도 | 피부 분석, 화장품 사진 분류 |
+| 모델 | Google Gemini 2.0 Flash (`gemini-2.0-flash`) |
+| 용도 | 피부 분석, 화장품 사진 분류, 지능형 케어 브리핑 생성 |
 | 패키지 | `@google/generative-ai` (서버), Fetch API (Cloudflare Functions) |
 
 ### 배포 (프로덕션)
@@ -63,10 +63,10 @@
 ├── client/
 │   ├── src/
 │   │   ├── pages/
-│   │   │   ├── skin-scan.tsx        ★ 메인 UI 진입점 (478줄)
+│   │   │   ├── skin-scan.tsx        ★ 메인 UI 진입점 (날씨 상태 중앙 관리 추가)
 │   │   │   └── battle.tsx           피부 챌린지 페이지
 │   │   ├── components/fonday/       ★ 분리된 컴포넌트 모음
-│   │   │   ├── ResultScreen.tsx     결과 화면 진입점 (1011줄)
+│   │   │   ├── ResultScreen.tsx     결과 화면 진입점 (저장 시 기상 정보 포함)
 │   │   │   ├── ResultHeaderCard.tsx 결과 상단 요약 카드
 │   │   │   ├── ResultOverlayPopups.tsx 플로팅 팝업 (스트릭/미션/PWA/체크인/푸시)
 │   │   │   ├── ResultModals.tsx     모든 바텀시트·모달 모음
@@ -78,21 +78,17 @@
 │   │   │   ├── PwaInstallPopup.tsx  PWA 설치 팝업
 │   │   │   ├── RoutineUpdateSheet.tsx 루틴 업데이트 시트
 │   │   │   ├── WaitlistModal.tsx    얼리버드 웨이트리스트 모달
-│   │   │   ├── DiaryTab.tsx         피부 일기 탭 (495줄, calendar/timeline/report)
-│   │   │   ├── DiaryReportTab.tsx   일기 리포트 탭 콘텐츠 (619줄)
+│   │   │   ├── DiaryTab.tsx         피부 일기 탭 (calendar/timeline/report)
+│   │   │   ├── DiaryReportTab.tsx   일기 리포트 탭 콘텐츠
 │   │   │   ├── DiaryHelpers.tsx     일기 탭 내부 헬퍼 컴포넌트들
-│   │   │   │                        (InlineTodos, InlineMemo,
-│   │   │   │                         DiaryRoutinePreviewCard,
-│   │   │   │                         DiaryCalendarView,
-│   │   │   │                         DiaryTimeline, DiaryFullView)
-│   │   │   ├── MyScreen.tsx         마이 화면 (270줄)
+│   │   │   ├── MyScreen.tsx         마이 화면
 │   │   │   ├── AttendanceCalendarModal.tsx 출석 달력 모달
 │   │   │   ├── MyCosmeticsModal.tsx 내 화장품 목록 모달
 │   │   │   ├── CosmeticsRegisterModal.tsx 화장품 등록 모달
-│   │   │   ├── ScanIdleScreen.tsx   스캔 대기 화면
+│   │   │   ├── ScanIdleScreen.tsx   스캔 대기 화면 (AI 케어 브리핑 카드 추가)
 │   │   │   ├── ScanningScreen.tsx   분석 중 화면
 │   │   │   ├── SurveyScreen.tsx     설문 화면
-│   │   │   ├── MagazineTab.tsx      발견 탭 (랭킹 + 영양 + 매거진 허브)
+│   │   │   ├── MagazineTab.tsx      발견 탭 (안정성 강화 및 스타일 수정)
 │   │   │   ├── ReportTab.tsx        리포트 탭
 │   │   │   ├── BottomNav.tsx        하단 네비게이션
 │   │   │   ├── CameraCapture.tsx    카메라 캡처
@@ -112,7 +108,7 @@
 │   │   │   ├── PushPromptSheet.tsx  푸시 알림 유도 시트
 │   │   │   ├── MissionCard.tsx      미션 카드
 │   │   │   ├── types.ts             공용 타입 정의
-│   │   │   ├── constants.ts         색상/상수
+│   │   │   ├── constants.ts         색상/상수 (임포트 이슈 방지용 로컬 상수화 병행)
 │   │   │   └── utils.ts             공용 유틸 함수
 │   │   ├── locales/
 │   │   │   ├── ko/translation.json  ★ 한국어 번역
@@ -130,12 +126,13 @@
 ├── functions/
 │   ├── api/
 │   │   ├── analyze-skin.ts          ★ POST /api/analyze-skin (Gemini 피부 분석)
+│   │   ├── care-briefing.ts         ★ GET /api/care-briefing (지능형 케어 매니저)
 │   │   ├── cosmetics/
 │   │   │   ├── classify.ts          ★ POST /api/cosmetics/classify (Gemini Vision)
 │   │   │   ├── index.ts             ★ GET/POST /api/cosmetics
 │   │   │   └── [id].ts              ★ DELETE /api/cosmetics/:id
-│   │   ├── scans.ts                 GET/POST /api/scans
-│   │   ├── ranking.ts               GET /api/ranking
+│   │   ├── scans.ts                 GET/POST /api/scans (기상 정보 저장 추가)
+│   │   ├── ranking.ts               GET /api/ranking (대량 데이터 성능 최적화)
 │   │   ├── challenge-token.ts       POST /api/challenge-token (비로그인 지원)
 │   │   ├── diary.ts                 GET/POST /api/diary (피부 일기 서버 동기화)
 │   │   ├── push-subscribe.ts        POST /api/push-subscribe
@@ -156,18 +153,11 @@
 │   └── battle/
 │       └── [[route]].ts             동적 OG 태그 (카카오톡 미리보기)
 ├── shared/
-│   └── schema.ts                    DB 스키마 타입 정의
-├── worker-api.js                    Cloudflare Worker (크론 푸시)
-├── wrangler.toml                    Worker 설정
+│   └── schema.ts                    DB 스키마 타입 정의 (weather_info 필드 추가)
+├── worker-api.js                    Cloudflare Worker (크론 푸시, 지능형 브리핑 통합)
+├── wrangler.toml                    Worker 설정 (D1 바인딩 추가)
 └── PROJECT.md                       ★ 이 파일
 ```
-
-### 현재 화면 역할 요약
-- `scan`: 스캔 대기 → 설문 → 분석 → 결과
-- `routine`: 등록 화장품 기반 루틴/충돌/추천 관리
-- `diary`: `calendar / timeline / report` 3탭 구조의 기록 화면
-- `magazine`: 단순 매거진이 아니라 `Discover` 허브. 랭킹, 영양 보완 포인트, 매거진 콘텐츠를 한 곳에 모음
-- `my`: 계정, 출석, 언어, 설치, 디바이스 링크 중심의 관리 화면
 
 ---
 
@@ -230,7 +220,7 @@ SCANS_KV    → KV Namespace: FONDAY_SCANS
 ### D1 데이터베이스 스키마 (fonday-db)
 
 ```sql
--- 스캔 기록
+-- 스캔 기록 (2026-03-23 weather_info 추가)
 CREATE TABLE IF NOT EXISTS scans (
   id TEXT PRIMARY KEY,
   overall_score INTEGER DEFAULT 0,
@@ -238,6 +228,7 @@ CREATE TABLE IF NOT EXISTS scans (
   skin_age INTEGER,
   ai_comment TEXT DEFAULT '',
   scores TEXT DEFAULT '[]',
+  weather_info TEXT, -- 기상 정보 JSON (기온, 습도, AQI 등)
   share_token TEXT DEFAULT '',
   lang TEXT DEFAULT 'ko',
   is_guest INTEGER DEFAULT 1,
@@ -274,797 +265,96 @@ CREATE TABLE IF NOT EXISTS cosmetics (
 );
 ```
 
-> ⚠️ **D1 테이블은 자동 생성되지 않습니다.** Cloudflare 대시보드 → D1 → fonday-db → Console에서 위 SQL을 직접 실행해야 합니다.
-
 ### Worker (worker-api.js)
 - **이름**: fonday-push-worker (wrangler.toml 참조)
-- **바인딩**: PUSH_KV
-- **배포 방식**: GitHub 자동배포 아님. `git push`로는 반영되지 않음. `npx wrangler deploy` 또는 Cloudflare 대시보드 수동 배포 필요
-- **주의**: 현재 Codex 실행 환경에서는 `CLOUDFLARE_API_TOKEN` 미설정으로 `wrangler deploy` 실패함. 실제 배포 시 토큰 환경변수 필요
+- **바인딩**: PUSH_KV, FONDAY_DB (fonday-db)
+- **배포 방식**: `npx wrangler deploy` (수동 배포)
 - **크론**:
-  - `30 22 * * *` — KST 07:30 스캔 리마인더
-  - `0 3 * * *` — KST 12:00 점심 식단 알림
-  - `0 6 * * *` — KST 15:00 수분 리마인더
-  - `0 9 * * *` — KST 18:00 저녁 식단 알림
-  - `0 11-13 * * *` — KST 20:00/21:00/22:00 루틴 리마인더
+  - `0 22 * * *` — KST 07:00 스캔 리마인더 + **지능형 케어 브리핑 (New)**
+  - `0 1 * * *` — KST 10:00 UV 자외선 케어
+  - `0 3 * * *` — KST 12:00 점심 식단 가이드
+  - `0 6,9 * * *` — KST 15:00/18:00 수분 리마인더 + 저녁 식단 가이드
+  - `0 11-14 * * *` — KST 20~23:00 루틴 체크 및 취침 전 케어
 
 ---
 
 ## 5-1. 최근 주요 업데이트 (2026-03-23 기준)
 
-### A. Discover 탭 재구성 (2026-03-23)
-- `client/src/components/fonday/MagazineTab.tsx`
-  - 기존 “매거진 탭”을 `발견 허브` 역할로 재구성
-  - 상단에 `내 피부 위치` 랭킹 요약 카드와 `보완 포인트` 영양 요약 카드를 배치
-  - 랭킹 상세:
-    - 내 백분위
-    - 전체 분포 바
-    - 상위 Baumann 타입
-    - 평균 점수 / 최고 점수
-  - 영양 상세:
-    - 최근 스캔의 낮은 점수 3개
-    - 각 취약 항목별 생활/영양 힌트
-- 현재 `magazine` 탭은 읽을거리만 모아둔 탭이 아니라, 비교 데이터와 가이드를 포함한 탐색 탭임
+### A. Discover 탭 재구성 및 안정화
+- `MagazineTab.tsx`
+  - 랭킹 요약 및 영양 요약 카드 통합
+  - 데이터 파싱 방어 로직 강화 (NaN 체크, 비객체 데이터 필터링)
+  - 비표준 Tailwind 클래스 수정 및 레이아웃 최적화
+- `api/ranking.ts`
+  - 대량 데이터 처리 시 스택 초과 방지를 위해 전개 연산자 제거 및 루프 방식 전환
+  - KV 데이터 파싱 예외 처리 추가
 
-### B. Diary 랭킹 이동 (2026-03-23)
-- `client/src/components/fonday/DiaryTab.tsx`
-  - `ranking` 탭 제거
-  - 현재 구조는 `calendar / timeline / report`
-  - 랭킹은 더 이상 Diary의 하위 탭이 아니라 Discover의 핵심 섹션으로 이동
-- 주의:
-  - `DiaryHelpers.tsx` 내부의 `DiaryFullView`에는 과거 랭킹 탭 구조 일부가 남아 있음
-  - 현재 메인 라우트/실사용 화면 기준 핵심 Diary UX는 `DiaryTab.tsx`가 기준
+### B. 능능적 케어 매니저 (Care Manager) 도입
+- **환경-피부 상관관계 인프라**:
+  - `shared/schema.ts`: `scans` 테이블에 `weather_info` 필드 추가
+  - `api/scans.ts`: 스캔 시점의 기온, 습도, AQI를 영구 저장하도록 수정
+- **지능형 분석 엔진 (`api/care-briefing.ts`)**:
+  - 실시간 날씨와 유저의 최근 취약 지표를 결합하여 Gemini 기반 맞춤 조언 생성
+  - 게스트 유저에게는 일반적인 기상 피부 팁 제공
+- **Home 화면 UX 개선**:
+  - `ScanIdleScreen.tsx`: 최상단에 **AI Care Briefing** 카드 배치
+  - 위치 정보 권한 거부 시 서울 날씨로 자동 폴백(Fallback) 처리
 
-### C. 화장품 성적표 추가 (2026-03-22)
-- `client/src/components/fonday/CosmeticsReportCard.tsx`
-  - 등록한 화장품을 바우만 타입/현재 점수 기준으로 `A/B/C/D/F` 등급화
-  - 제품별 장점/주의점/핵심 성분/충돌 성분 표시
-  - 전체 평균 점수와 등급 분포 요약 제공
-- `server/routes.ts`
-  - `POST /api/cosmetics/grade` 추가
-  - 로그인 사용자의 등록 화장품을 읽고 Gemini 기반 등급 리포트 생성
-- `client/src/components/fonday/ResultRoutineTab.tsx`, `ResultScreen.tsx`
-  - 결과 화면 루틴 흐름 안에서 성적표 진입 동선 연결
-
-### D. UI 폴리싱 일괄 반영 (2026-03-22)
-- `5ea436d feat(ui): text size floor, BottomNav polish, score countup, radius unify, result entrance motion`
-- 영향 범위:
-  - `BottomNav`: 5탭 구조 유지하면서 아이콘/타이포 밀도 재정리
-  - `ResultHeaderCard`: 점수 카운트업, 카드 위계, 반경/패딩 통일
-  - `Diary`, `Routine`, `Magazine`, `My`, 각종 시트/모달:
-    - 텍스트 최소 크기 상향
-    - 과한 반경/패딩 편차 축소
-    - `white + tint + soft shadow` 시스템 재적용
-  - 결과 진입 모션과 각 카드 반경을 더 일관된 톤으로 맞춤
-
-### E. 결과/탭 역할 재정렬 (2026-03-21 ~ 2026-03-22)
-- `8f25443 refactor(ux): realign tab roles and reduce clutter`
-- `7344155 fix(ui): restore result screen and trim idle extras`
-- `6630156 fix(result): restore solution tab rendering`
-- 반영 내용:
-  - 결과 화면은 `routine / solution / nutrition` 3탭 구조 유지
-  - 상단 허브 카드와 보조 CTA를 줄여 읽기 흐름을 단순화
-  - `solution` 탭 blank 이슈는 누락 import 수정으로 복구 완료
-  - Idle 화면은 다시 “지금 스캔” CTA 중심으로 정리
-
-### F. 식단 추천 알림 다양화
-- `worker-api.js`
-  - 기존 바우만 타입 고정 메뉴 1개 구조를 변경
-  - 최근 측정 결과의 낮은 점수(`scoreSummary`)를 기반으로 식단 보완 메뉴/팁을 조합
-  - 같은 사용자에게 같은 메뉴 조합이 연속으로 가지 않도록 `mealHistory` 저장
-- `functions/api/push-subscribe.ts`
-  - 구독 데이터에 `scoreSummary` 병합 저장
-- `client/src/pages/skin-scan.tsx`
-  - 푸시 구독 시 최근 취약 점수 3개를 서버에 전송
-  - 이미 구독 중이어도 새 스캔 결과가 나오면 서버 구독 메타데이터 재동기화
-
-### G. 루틴 리마인더 동기화 보강
-- 푸시 구독이 갱신될 때 `/api/diary-reminder` 도 다시 동기화하도록 수정
-- 구독 재발급 후 루틴 리마인더가 서버 KV에서 끊기는 문제를 줄임
-
-### H. 일기 리포트 탭 고도화
-- `client/src/pages/skin-scan.tsx`
-  - 리포트 탭을 단순 주간 잠금 카드에서 누적 분석형 화면으로 확장
-  - 추가된 내용:
-    - 전문가 코멘트형 누적 리포트
-    - 우선 케어 과제 3개
-    - 성분 중심 추천
-    - 시술 방향 제안
-    - 루틴/메모/원인 태그 시그널
-    - 스파이더 그래프(현재 vs 누적 평균)
-    - 성분 반응 추적
-    - 시술 후 회복 가이드
-    - 계절/환경 영향 해석
-    - 트리거 상관관계
-    - 향후 2주 회복 예측
-- 아직 전용 `/report` 페이지로 분리하지는 않았고, 현재는 `DiaryTab` 내부 리포트 탭에서 확장된 상태
-
-### I. AI 밀착케어 알림 체계 통합
-- 목표: 흩어져 있던 스캔/식단/수분/루틴 알림을 `AI 밀착케어` 1개 설정으로 통합
-- `client/src/pages/skin-scan.tsx`
-  - 결과 페이지 기존 식단 푸시 버튼을 `AI 밀착케어` 카드로 교체
-  - 설정 모델 `AICareSettings` 추가
-  - 하위 옵션:
-    - `scan`
-    - `meal`
-    - `hydration`
-    - `routine`
-  - 루틴 시간은 기존 다이어리 리마인더 UI에서 계속 조정하되, 내부적으로 AI 밀착케어 설정과 연동
-- `functions/api/push-subscribe.ts`
-  - 구독 데이터에 `careSettings` 저장
-- `worker-api.js`
-  - 스캔/식단/루틴 알림 전송 전에 `careSettings.enabled` 및 각 하위 옵션 확인
-  - 새 `sendHydrationPushToAll()` 추가
-- `wrangler.toml`
-  - 수분 리마인더용 `0 6 * * *` (KST 15:00) 크론 추가
-
-### J. 배포/운영 관련 현재 상태
-- GitHub `main`에는 반영 완료
-- 그러나 Cloudflare Worker `fonday-push-worker` 는 **자동 Git 배포가 아님**
-- Cloudflare 대시보드에서 확인한 결과:
-  - `Build > Git repository` 비어 있음
-  - 즉 Worker는 수동 배포 필요
-- `npx wrangler deploy` 시도했으나 현재 환경에서 실패
-  - 이유: 비대화형 환경이라 `CLOUDFLARE_API_TOKEN` 필요
-- 따라서 다음 AI/작업자는 아래 중 하나를 해야 함:
-  - `export CLOUDFLARE_API_TOKEN=... && npx wrangler deploy`
-  - 또는 Cloudflare 대시보드에서 수동 배포
-- 배포 후 Cloudflare Worker의 `Trigger Events`에서 반드시 아래 크론 반영 여부 확인 필요:
-  - `30 22 * * *`
-  - `0 3 * * *`
-  - `0 6 * * *`
-  - `0 9 * * *`
-  - `0 11-13 * * *`
-
-### K. 디자인 시스템/결과 UX 2차 정리 (2026-03-19 이후 누적)
-- 대상 파일: `client/src/pages/skin-scan.tsx`, `client/src/index.css`
-- 최근 일련의 커밋으로 스캔/결과/일기/My 화면 전반의 시각 톤을 재정리함
-- 큰 방향:
-  - gradient/강한 배지/과한 그림자 남발을 줄이고 `white + tint + soft shadow` 문법으로 통일
-  - 정보량을 줄이는 대신 `첫 화면에 필요한 정보`와 `펼쳐볼 정보`의 위계를 분리
-  - 결과 화면 탭 전환을 슬라이드 기반으로 유지하면서 탭별 읽기 흐름을 더 명확히 정리
-
-### L. Idle 화면 재배치
-- `ScanIdleScreen`
-  - 상단 최우선 정보가 다시 스캔 CTA/히어로가 되도록 재배치
-  - `오늘 출석 완료`, `연속 출석`은 최상단 주인공 자리에서 빼고 히어로 아래 보조 정보 스트립으로 이동
-  - 헤더 카피는 유지하되, 길어진 설명 때문에 CTA가 아래로 밀리는 문제를 완화
-- 현재 의도:
-  - 첫 인상은 “지금 스캔하라”
-  - 출석/포인트는 보조 동기부여 요소
-
-### M. 결과 화면 재정리
-- `ResultScreen`
-  - 상단 결과부는 너무 밋밋해졌던 정리 버전에서 일부 임팩트를 복원
-  - 점수 3카드/요약 구조는 유지하되, `나의 피부 MBTI` 카드를 새 톤에 맞게 다시 정리
-  - MBTI 카드는 화이트 카드 + tint 아이콘 + 낮은 강조 버튼 문법으로 통일
-  - 종합점수 / 피부나이 / 순위 상단 카드는 여러 차례 미세조정함
-    - 모바일에서 깨지던 레이아웃 수정
-    - `종합점수 : ??점` 구조로 정리
-    - 종합점수는 메인 카드, 피부나이/순위는 서브 카드 위계로 재정렬
-    - 최종적으로 종합점수는 가운데 정렬, 라벨 타이포도 키워서 숫자와 밸런스를 맞춤
-- 결과 하단 3탭:
-  - `routine / solution / nutrition` 탭 이동은 슬라이드 유지
-  - 탭 변경 시 해당 탭 콘텐츠 시작점으로 스크롤되도록 로직 반영
-  - `solution`, `nutrition` 카드도 flat tint/white 기반으로 추가 정리
-  - 마지막 폴리싱에서 두 탭의 섹션 헤더, 카드 패딩, 아이콘 박스, shadow 강도를 더 같은 시스템으로 맞춤
-- `AI 피부 예측` 카드:
-  - 기존 이모지 아이콘을 제거하고 Lucide 아이콘(`Bot`)으로 통일
-  - CTA도 강한 gradient 대신 현재 결과 화면 톤에 맞는 화이트/보더 스타일로 조정
-- 결과 하단 고정 CTA:
-   - 초기의 강한 강조 버튼 문법에서 벗어나, 화면 본문 카드 시스템과 어울리는 bordered button 톤으로 정리
-
-### N. Diary 탭 / My 탭 구조 정리
-- `DiaryTab`
-  - 현재 기준 `calendar / timeline / report` 내부 슬라이드 탭 구조
-  - 루트 탭 관점에서 중복되는 상단 백버튼은 제거
-  - 상단 히어로/탭 바를 결과 탭과 비슷한 밀도의 카드 문법으로 통일
-  - `report` 탭은 단순 분석 리포트에서 `피부과 상담실장 컨설팅` 흐름으로 확장
-    - 상단 요약 카드: `이번 주 피부 컨설팅` + 핵심 한 줄 + 상태 배지
-    - `핵심 관찰` / `원인 추정` / `컨설턴트 해석` / `이번 주 우선 과제` 구조 추가
-    - `피해야 할 실수`, `유지 / 줄이기 / 추가`, `생활/영양 보완`, `마무리 코멘트` 추가
-    - 스파이더 그래프는 유지하되, 메인 콘텐츠가 아니라 해석을 받쳐주는 보조 시각화로 배치
-    - 추천 성분 처방 / 권장 시술 방향 / 시술 후 회복 가이드까지 같은 상담 문맥 안에서 읽히도록 정리
-- `MyScreen`
-  - 헤더, 프로필, 출석, 계정, 언어, 설치, 디바이스 링크 중심 구조로 단순화
-  - 루트 탭 구조라 상단 `홈/뒤로` 버튼은 제거
-  - `rounded-2xl + p-4 + soft shadow` 기준으로 카드 반경/패딩 통일
-
-### O. UX 판단 기준 메모
-- `idle` 최상단에 출석 상태를 강하게 두는 것은 메인 행동(스캔)을 흐릴 가능성이 큼
-- `Diary`, `My`는 하단 탭이 이미 1차 내비게이션이므로 상단 백버튼은 대체로 불필요
-- 다크모드는 장기적으로 고려 가능하지만, 현재 우선순위는 아님
-  - 피부 사진/분석 결과 신뢰감은 기본적으로 라이트 모드에서 더 잘 살아남
-  - 먼저 라이트 경험 완성도를 올리는 쪽이 우선
-
-### P. 현재 남아 있는 기술 이슈
-- 2026-03-20 기준 `npm run check` (tsc) 통과
-- 이번 세션에서 정리된 항목:
-  - `server/auth.ts`: `passport-google-oauth20`, `passport-kakao`, `passport-line-auth` 선언 누락 보강
-  - `server/auth.ts`: Google/Kakao OAuth callback 파라미터 타입 보강
-  - `server/routes.ts`: `Set` spread를 `Array.from(new Set(...))`로 변경해 TS2802 해소
-- 현재 기준으로 별도 타입 오류는 재현되지 않음
-
-### Q. skin-scan 리팩토링 중간 복구 상태 (2026-03-19)
-- 목적:
-  - 거대한 `client/src/pages/skin-scan.tsx`를 `client/src/components/fonday/` 하위 모듈로 분리
-- 생성된 리팩토링 파일:
-  - `client/src/components/fonday/DiaryTab.tsx`
-  - `client/src/components/fonday/MagazineTab.tsx`
-  - `client/src/components/fonday/MyScreen.tsx`
-  - `client/src/components/fonday/types.ts`
-  - `client/src/components/fonday/constants.ts`
-  - `client/src/components/fonday/utils.ts`
-- 중간에 멈췄을 때 문제:
-  - `DiaryTab.tsx`가 사실상 원본 내용을 복사만 한 상태라 import/공용 헬퍼 연결이 거의 없었음
-  - `skin-scan.tsx`에서도 `ReportConcernKey`, `syncReminderToServer`가 빠진 채 참조되고 있었음
-  - 그 결과 `npm run check`에서 `DiaryTab.tsx` 중심의 대량 `Cannot find name ...` 오류가 발생했음
-- 이번 세션에서 복구한 내용:
-  - `client/src/components/fonday/types.ts`
-    - `ReportConcernKey` 추가
-  - `client/src/components/fonday/utils.ts`
-    - `buildDiaryReportModel` 공용화
-    - `syncReminderToServer` 공용화
-  - `client/src/components/fonday/DiaryTab.tsx`
-    - React / i18n / framer-motion / recharts / shadcn / shared utils import 복구
-    - `export function DiaryTab` 형태로 정리
-    - 랭킹 배지 문구 렌더링 오류 수정
-  - `client/src/pages/skin-scan.tsx`
-    - 공용 `ReportConcernKey`, `syncReminderToServer` 다시 연결
-- 현재 결과:
-  - 리팩토링 때문에 새로 생겼던 `DiaryTab` 관련 타입 오류는 해소됨
-  - 실제 다이어리 화면 렌더링도 이제 `client/src/components/fonday/DiaryTab.tsx`를 사용하도록 전환됨
-  - 이후 baseline 타입 오류도 정리되어 `npm run check`가 통과하는 상태가 됨
-- 이번 추가 진행:
-  - `skin-scan.tsx` 안의 죽은 로컬 diary 구현은 1차 중복 제거 완료
-  - 제거된 로컬 함수:
-    - `InlineTodos`
-    - `InlineMemo`
-    - `DiaryRoutinePreviewCard`
-    - `DiaryCalendarView`
-    - `DiaryTimeline`
-    - `DiaryFullView`
-    - 로컬 `DiaryTab`
-  - 현재 `skin-scan.tsx`는 실제로 추출된 `client/src/components/fonday/DiaryTab.tsx`만 사용함
-  - `npm run check` 통과
-  - `MagazineTab`, `MyScreen`, `AttendanceCalendarModal`, `CosmeticsRegisterModal`은 이미 추출 컴포넌트 기준으로 실제 사용 중이었고, `skin-scan.tsx` 안에 별도 로컬 중복 구현은 남아 있지 않음을 확인
-  - diary 분리 이후 `skin-scan.tsx`에 남아 있던 미사용 diary helper import도 정리함
-  - baseline 타입 오류 정리:
-    - `client/src/pages/skin-scan.tsx`의 `Set` spread를 `Array.from(new Set(...))`로 변경
-    - `server/routes.ts`의 `Set` spread를 `Array.from(new Set(...))`로 변경
-    - `server/auth.ts`의 OAuth callback 파라미터 타입 보강
-    - `server/passport-auth.d.ts` 추가로 passport 관련 외부 모듈 선언 보강
-- 아직 남은 구조 작업:
-  - 다음 단계는 `skin-scan.tsx` 자체를 더 작은 결과/스캔/공유/모달 단위로 나눌지 판단하는 것
-  - 즉, 현재는 “Diary 분리 + 중복 제거 + My/Magazine 사용 전환 확인 + baseline 타입 정리”까지 끝났고, 다음 단계는 더 큰 화면 단위 분리 여부를 정하는 것
-  - 결과 화면 분리 1차:
-    - `client/src/components/fonday/SkinPredictionCard.tsx` 추출 완료
-    - `skin-scan.tsx`는 해당 예측 카드를 import 해서 사용하도록 전환
-    - 이어서 `client/src/components/fonday/ResultDiaryCard.tsx` 추출 완료
-    - 결과 화면의 로그인된 `피부일기 요약 카드`는 이제 추출 컴포넌트로 사용
-    - 이어서 `client/src/components/fonday/ResultLoginCard.tsx` 추출 완료
-    - 결과 화면의 비로그인 유도 카드도 추출 컴포넌트로 사용
-    - 이어서 `client/src/components/fonday/ResultNutrientsSheet.tsx` 추출 완료
-    - 결과 화면의 `showNutrients` 바텀시트는 추출 컴포넌트로 사용
-    - 이 시점 `skin-scan.tsx`는 약 4125줄 수준까지 축소
+### C. 지능형 푸시 알림 통합
+- `worker-api.js` 고도화
+  - 매일 아침 7시, 유저의 피부 약점과 기상을 결합한 Gemini 맞춤 푸시 발송
+  - 8종의 알림 시나리오(스캔, UV, 식단, 수분, 루틴, 취침 등)를 `scheduled` 트리거로 통합 활성화
+  - `wrangler.toml`에 D1 바인딩을 추가하여 Worker에서 직접 스캔 데이터 참조 가능하게 개선
 
 ---
 
 ## 6. 인증 시스템
 
-- **방식**: OAuth (Kakao, Google) → JWT 쿠키
+- **방식**: OAuth (Kakao, Google, LINE) → JWT 쿠키
 - **JWT**: `functions/_utils/jwt.ts`의 `getUserFromCookie(request, env.JWT_SECRET)` 로 검증
-- **로컬 개발**: Passport.js 세션 기반 (server/auth.ts)
-- **프로덕션**: Cloudflare Functions에서 JWT 쿠키 직접 검증
-
-```typescript
-// Cloudflare Functions에서 인증 체크 패턴
-const user = await getUserFromCookie(request, env.JWT_SECRET || "fonday-secret-key");
-if (!user) return new Response(JSON.stringify([]), { status: 401 });
-// user.id, user.email, user.name 사용 가능
-```
+- **LINE LIFF**: LINE 브라우저 내 자동 로그인 통합 완료
 
 ---
 
 ## 7. 구현된 주요 기능
 
-### 핵심 플로우
-1. **Idle 화면** → 카메라 촬영 → 설문 (30초) → AI 분석 → 결과 화면
-2. 결과 화면: 상단 요약 + MBTI/랭킹/피부나이 + 3탭 (`routine | solution | nutrition`) + 하단 액션바
-3. 하단 탭 구조:
-   - `Routine`: 등록 화장품 루틴, 충돌 관리, 성적표 진입
-   - `Diary`: 달력/타임라인/주간 리포트
-   - `Discover`: 랭킹 + 영양 + 매거진
-   - `My`: 출석/계정/설치/언어
+### 피부 분석 & Care Manager
+- Gemini 2.0 Flash 기반 10개 점수 항목 분석
+- **Care Briefing**: 날씨 위협 요소와 피부 약점을 연결한 능동적 조언 (홈 화면 + 푸시)
+- 기상 정보 동시 저장: 분석 기록과 당시 환경 데이터(온도/습도 등) 연동 저장
 
-### 피부 분석
-- Gemini 2.5 Flash Vision → 10개 점수 항목 (0~100)
-- **바우만 타입** 4축 계산: O/D(수분), S/R(민감도), P/N(색소), W/T(탄력)
-- 핫스팟(red dot) overlay는 한때 실험했지만, 설명 부족으로 현재 제거됨
-- 피부 나이 추정
-- 14일 후 피부 예측 (good/bad 시나리오)
+### 화장품 관리 (Cosmetics)
+- 사진 촬영을 통한 자동 분류 (Gemini Vision)
+- **화장품 성적표**: 바우만 타입별 제품 등급(A~F) 및 성분 궁합 분석
+- AI 루틴 최적화: 성분 충돌 감지 및 바르는 순서 가이드
 
-### 화장품 카메라 스캔
-- 제품 전면 촬영 → Gemini Vision → 이름/브랜드/카테고리 자동 추출
-- 썸네일(300px JPEG) D1 저장
-- 전성분 텍스트를 수동 입력해서 제품 상세 시트에서 확인 가능
-- 등록 시 `am/pm/both`를 직접 받지 않고 카테고리 기준 기본 시간대로 자동 추천
-- 결과 화면 사진 바로 아래 배너로 접근
-- MyScreen에서 `내 루틴 요약 + 아침/저녁 루틴 보드 + 제품 컬렉션` 형태로 확인
-- 제품 카드를 누르면 상세 시트에서 카테고리/사용 시간/개봉일/성분 확인 및 삭제 가능
-- `화장품 성적표`:
-  - 결과/루틴 흐름에서 진입 가능
-  - 바우만 타입 + 현재 점수 기준으로 제품별 `A/B/C/D/F` 등급 제공
-  - 장점/주의점/핵심 성분/충돌 성분을 카드 단위로 표시
-
-### 피부 일기 (DiaryTab)
-- 로컬스토리지 + D1 서버 동기화 (write-through + server-wins)
-- 현재 메인 구조는 `calendar / timeline / report`
-- 달력 히트맵, 타임라인, 메모, 루틴 체크리스트, 원인 태그
-- 주간 리포트/컨설팅형 해석 카드 제공
-
-### 스트릭/미션/출석
-- localStorage 기반 (`fonday_streak`, `fonday_missions`, `fonday_attendance`)
-- 연속 스캔 스트릭, 9개 미션, 출석 포인트 (하루 3pt)
-- 결과 진입 시 자동 체크인
-
-### 결과 화면 UX (2026-03-23 최신)
-- 상단 요약은 `작은 얼굴 프레임 + 핵심 점수 4개 + 상세 분석 모달 버튼` 구조
-- 종합 점수 / 피부 MBTI / 피부나이 / 백분위는 아래 카드형 요약 블록에서 유지
-- `오늘 목표`는 진행판 역할만 맡고, 루틴 상세 내용은 반복 노출하지 않도록 축소
-- 아침/저녁 루틴은 제품명 나열 대신 카테고리 순서(`토너 → 세럼 → 선크림`) 중심으로 표기
-- 루틴 체크는 제품별 여러 개가 아니라 `아침 완료`, `저녁 완료` 1회 체크로 diary todo에 일괄 반영
-- 하단 탭은 현재 `routine / solution / nutrition` 3개
-- `routine`: 실행 루틴, 화장품 인사이트, 성적표 진입
-- `solution`: 개선안, 추천 화장품, AI 밀착케어, 디바이스 티저
-- `nutrition`: 영양제/피해야 할 음식/수분 가이드
-- 전체 10개 점수는 `주요 분석결과` 모달에서 확인
-- 핫스팟(red dot) 오버레이는 설명 부족 문제로 제거됨
-
-### Discover 탭
-- 상단 랭킹 요약 카드 + 영양 요약 카드
-- 랭킹 상세 섹션:
-  - 내 백분위
-  - 점수 구간 분포
-  - 상위 Baumann 타입
-  - 평균/최고 점수
-- 영양 상세 섹션:
-  - 최근 스캔의 낮은 점수 3개
-  - 각 취약 지표별 생활/영양 힌트
-- 하단에 매거진 아티클 목록 유지
-
-### AI 응답 파싱 안정화
-- `functions/api/analyze-skin.ts` 와 `server/routes.ts` 에 Gemini JSON 복구 파서 추가
-- 코드블록, 스마트 따옴표, trailing comma, quote 없는 key 일부를 방어
-- `functions/api/cosmetics/classify.ts` 에도 동일한 복구 파서 반영
-
-### 랭킹/피부 챌린지
-- D1 전체 스캔 데이터 기반 백분위 계산
-- 챌린지 링크 공유 → `/battle/:token` 페이지에서 비교
-
-### 공유 이미지
-- Satori + Resvg WASM 서버사이드 생성 (5장 슬라이드)
-- `functions/api/generate-share.ts`
-
-### 푸시 알림
-- Web Push API, VAPID 암호화, KV에 구독 저장
-- iOS PWA / Android 지원
-
----
-
-## 8. i18n 아키텍처
-
-- **지원 언어**: KO (기본), EN, JA
-- **언어 저장**: localStorage `fonday_lang`
-- **번역 파일**: `client/src/locales/{ko,en,ja}/translation.json`
-- **서버 프롬프트**: `buildPrompt(surveyData, lang)` — 언어별 AI 응답 언어 지정
-- **점수 레이블**: 서버는 항상 한국어로 반환 → 클라이언트에서 `t('scores.0')` 등으로 표시
-
----
-
-## 9. 색상/디자인 상수
-
-```typescript
-const DEEP_GREEN = "#2D5F4F";
-const DEEP_GREEN_LIGHT = "#3D7A66";
-const SCAN_FROM = "#E09882";
-const SCAN_TO = "#C97062";
-```
-
-- 배경: `#FAF9F6` (크림), `#FBF9F7`
-- 카드 보더: `#F0EDE8`
-
----
-
-## 10. 주요 패턴 & 주의사항
-
-### ⚠️ 프로덕션 vs 로컬 API
-- `server/routes.ts` — **로컬 개발 전용** (Express 서버)
-- `functions/api/*.ts` — **프로덕션 실제 동작** (Cloudflare Pages Functions)
-- 새 API 엔드포인트를 만들 때 **반드시 두 곳 모두** 구현해야 합니다
-- 특히 Gemini JSON 파싱 보강처럼 분석/분류 로직을 수정할 때 `functions/api/*.ts` 와 `server/routes.ts` 를 같이 맞춰야 합니다
-
-### Cloudflare Functions 패턴
-```typescript
-import { getUserFromCookie } from "../../_utils/jwt";
-
-const CORS = {
-  "Content-Type": "application/json",
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-  "Access-Control-Allow-Headers": "Content-Type",
-};
-
-export const onRequest = async (context: any) => {
-  const { request, env } = context;
-  if (request.method === "OPTIONS") return new Response(null, { headers: CORS });
-
-  // D1 접근: env.FONDAY_DB.prepare(sql).bind(...).run() / .all() / .first()
-  // KV 접근: env.SCANS_KV.get(key) / env.PUSH_KV.put(key, value)
-  // 인증: const user = await getUserFromCookie(request, env.JWT_SECRET)
-};
-```
-
-### skin-scan.tsx 규모 (리팩토링 완료)
-- **463줄** — `client/src/components/fonday/` 하위로 전체 분리 완료
-- `skin-scan.tsx`는 이제 진입점 역할만 하며, 실제 화면 컴포넌트는 모두 `components/fonday/`에 있음
-- 주요 화면별 파일:
-  - **ResultScreen.tsx** (961줄): 결과 화면 상태 관리 + 레이아웃
-  - **DiaryTab.tsx** (593줄): 피부 일기 탭 (달력/타임라인/리포트/랭킹)
-  - **DiaryReportTab.tsx** (619줄): 일기 리포트 탭 콘텐츠
-  - **DiaryHelpers.tsx** (754줄): 일기 탭 내부 서브 컴포넌트들
-  - **MyScreen.tsx** (289줄): 마이 화면
-- 수정 시 해당 컴포넌트 파일을 직접 편집할 것
-
-### D1 테이블 마이그레이션
-- 코드로 자동 마이그레이션 없음 — Cloudflare D1 콘솔에서 수동 실행 필요
-- `ALTER TABLE ... ADD COLUMN` 실패해도 무시 (이미 있는 경우)
+### 푸시 알림 (Intelligent Notifications)
+- 하루 8회 밀착 케어: 스캔/날씨브리핑/UV/점심/수분/저녁/루틴/취침
+- 유저별 취약 지표 기반의 개인화된 알림 메시지 생성
 
 ---
 
 ## 11. TODO / 다음 작업
 
-### Refactor 진행 상태 (2026-03-20 완료)
+### 우선순위 작업
+- [ ] **사용자 경험 고도화**: 화장품 효과 신호(Correlation Signal)가 실제 기상 데이터와 연동되어 "추운 날 효과가 좋은 제품" 등의 통계 제공
+- [ ] **성분 분석 강화**: 화장품 상세 시트에 OCR을 통한 전성분 자동 추출 및 유해 성분 체크 고도화
+- [ ] **PWA 최적화**: 오프라인 모드에서의 기본적인 데이터 조회 및 스캔 큐잉 기능 점검
+- [ ] **결제 시스템**: 로드맵 Phase 3에 따른 포트원/Stripe 연동 기초 설계
 
-#### 완료된 리팩토링 전체 요약
-
-| 파일 | 리팩토링 전 | 리팩토링 후 |
-|------|------------|------------|
-| `skin-scan.tsx` | 6000+ 줄 | **463줄** |
-| `ResultScreen.tsx` | (skin-scan 내부) | **961줄** |
-| `DiaryTab.tsx` | (skin-scan 내부 → 1883줄) | **593줄** |
-| `MyScreen.tsx` | (skin-scan 내부 → 924줄) | **289줄** |
-
-#### Stage 1~2: skin-scan.tsx 1차 분리 (3766줄까지)
-- `types.ts`, `constants.ts`, `utils.ts` 공통 모듈 생성
-- `ScanIdleScreen`, `ScanningScreen`, `SurveyScreen`, `CameraCapture`, `BottomNav` 추출
-- `MagazineTab`, `ReportTab` 추출
-- `MyScreen`, `AttendanceCalendarModal`, `CosmeticsRegisterModal` 추출
-- `SkinPredictionCard`, `ResultDiaryCard`, `ResultLoginCard` 추출
-- `ResultNutrientsSheet`, `ResultImprovementsSheet`, `ResultAnalysisSheet` 추출
-- `ResultCosmeticsGateSheet`, `ResultActionBar`, `ResultQuestSheet` 추출
-- `PartnershipModal`, `CheckinSuccessSheet`, `PushPromptSheet`, `MissionCard` 추출
-
-#### Stage 3: ResultScreen 추출 (skin-scan.tsx → 463줄)
-- `ResultScreen.tsx` (1939줄)로 결과 화면 전체 분리
-
-#### Stage 4: ResultScreen 내부 분리 (1939 → 1406줄)
-- `ResultRoutineTab.tsx` — 루틴 탭 콘텐츠
-- `ResultSolutionTab.tsx` — 솔루션 탭 콘텐츠
-- `ResultNutritionTab.tsx` — 영양 탭 콘텐츠
-- `PwaInstallPopup.tsx` — PWA 설치 팝업
-- `RoutineUpdateSheet.tsx` — 루틴 업데이트 시트
-- `WaitlistModal.tsx` — 얼리버드 모달
-
-#### Stage 5: DiaryTab 내부 분리 (1883 → 1176줄)
-- `DiaryHelpers.tsx` — InlineTodos, InlineMemo, DiaryRoutinePreviewCard, DiaryCalendarView, DiaryTimeline, DiaryFullView (6개 헬퍼)
-
-#### Stage 6: MyScreen 분리 (924 → 289줄)
-- `AttendanceCalendarModal.tsx` — 출석 달력 모달
-- `MyCosmeticsModal.tsx` — 내 화장품 목록 모달
-- `CosmeticsRegisterModal.tsx` — 화장품 등록 모달
-- MyScreen.tsx에서 backward-compat re-export 유지
-
-#### Stage 7: DiaryTab 2차 분리 (1176 → 593줄)
-- `DiaryReportTab.tsx` (619줄) — 리포트 탭 전체 콘텐츠 + computed vars 추출
-
-#### Stage 8: ResultScreen 2차 분리 (1406 → 961줄)
-- `useAICareSettings.ts` (222줄) — AI 밀착케어 푸시 알림 상태 훅
-- `ResultHeaderCard.tsx` (197줄) — 결과 상단 요약 카드 컴포넌트
-- `ResultOverlayPopups.tsx` (112줄) — 플로팅 팝업들 (스트릭/미션/PWA/체크인/푸시)
-- `ResultModals.tsx` (164줄) — 모든 바텀시트·모달 컴포넌트 집합
-- `utils.ts` — `parseFoodOptions`, `pickFoodOption`, `dedupeFoods` 이동
-
-#### 현재 상태 (2026-03-20)
-- `npm run check` (tsc) **통과**
-- 전체 `components/fonday/` 파일 수: 40개
-- 주요 파일 줄수: `ResultScreen.tsx` 961줄, `DiaryTab.tsx` 593줄
-
-#### 추가 진행 예정 (다음 세션)
-아래 작업은 현 세션 사용량 부족으로 중단. 다음 세션에서 이어서 진행 가능.
-
-1. **`useShareHandler` 훅 추출** (약 100줄 절감)
-   - `handleShare` 함수 전체 (ResultScreen.tsx 내 lines ~605-706)
-   - 의존: `analysisResult`, `rankingData`, `finalType`, `overallScore`, `avoidLunch`, `avoidDinner`, `t`, `i18n`
-   - 반환: `{ handleShare, shareLoading }`
-
-2. **`useQuestBoard` 훅 추출** (약 60줄 절감)
-   - `questBoard`, `essentialQuests`, `questDoneCount`, `questProgressPct` 등 computed values
-   - 의존: `missionState`, `routineComplete`, `todayHasMemo`, `overallScore`, `currentStreak`, `t`
-
-3. **`useRoutineTodos` 훅 추출** (약 40줄 절감)
-   - `getRoutineTodoState`, `isRoutinePeriodComplete`, `setRoutinePeriodCompletion`
-   - 의존: `todayRoutineTodos`, `setTodayRoutineTodos`, `saveDiaryTodos`, `todayStr`
-
-위 3개 모두 완료 시 ResultScreen.tsx 약 760줄 수준까지 감소 예상.
-
-### 즉시 필요
-- [ ] 기존에 `both` 로 저장된 화장품 데이터를 카테고리 기반 기본 시간대로 정리할지 결정
-- [ ] 결과 화면 상단 카드에서 얼굴 crop을 실기기 기준으로 한 번 더 미세조정
-- [ ] 결과 화면 `루틴 / 솔루션 / 영양` 3탭의 실기기 정보 밀도와 스와이프 체감 재확인
-- [ ] 홈 / 루틴 / MY 카드 간격, 문구 길이, 시각 우선순위를 dev 실기기 기준으로 최종 폴리싱
-- [ ] MyScreen 화장품 상세 시트에 성분 OCR/자동 추출까지 붙일지 결정 (현재는 수동 입력)
-- [ ] Worker 실제 크론 스케줄과 `PROJECT.md` 문서 설명을 최종 기준으로 한 번 더 일치시킬 것
-- [ ] 공유 이미지 실기기 테스트 (WASM CDN 로드 확인)
-- [ ] 화장품 효과 신호가 실제 사용자 데이터에서 과장/과소 표시되지 않는지 검증
-
-### Phase 2.5 — 아침 리포트 이메일 (다음 우선순위)
-- Resend API 연동
-- Worker 크론 KST 07:00
-- 어제 스캔 결과 + 오늘 루틴 + 식단 팁 포함
-
-### Phase 2 — 스마트 푸시 고도화
-- 하루 5회: 아침스캔 / 정오자차 / 점심메뉴 / 저녁루틴 / 취침케어
-
-### Phase 4 — 주간 리포트 개인화
-- 스캔 히스토리 기반 트렌드 분석
-- 화장품 사용 + 점수 변화 상관관계
+### 리팩토링 예정
+- [ ] `ResultScreen.tsx` 내 `useShareHandler`, `useQuestBoard`, `useRoutineTodos` 훅 추출 (코드 다이어트)
+- [ ] `api/ranking.ts` 결과의 KV 캐싱 처리 (성능 최적화)
 
 ---
 
-## 12. Git / 배포 워크플로우
-
-### 브랜치 구조 (2026-03-21 기준)
-```
-dev 브랜치   →  dev.fondayai.com / dev.fondayai.pages.dev    (개발/테스트용)
-main 브랜치  →  fondayai.com / fondayai.pages.dev            (서비스용)
-```
-
-### 개발 플로우
-```bash
-# 1. 평소 작업은 dev 브랜치에서
-git checkout dev
-git add <파일들>
-git commit -m "feat/fix/chore: 설명"
-git push origin dev
-# → Cloudflare Pages preview 배포 생성 (약 1~2분)
-# → 우선 확인 URL은 dev.fondayai.com
-# → 필요 시 dev.fondayai.pages.dev 또는 대시보드 preview URL도 사용 가능
-
-# 2. 테스트 완료 후 서비스에 반영
-git checkout main
-git merge dev
-git push origin main
-# → fondayai.com / fondayai.pages.dev 에 자동 배포 (약 1~2분)
-git checkout dev  # 다시 dev로
-```
-
-- **배포 원칙**: 모든 작업은 우선 `dev.fondayai.com` 에서 먼저 확인한 뒤, 이상이 없을 때만 `main` 으로 올려 `fondayai.com` 에 반영
-- 즉, 기본 작업 대상은 항상 `dev` 이고, `main` 반영은 별도 확인 후 진행
-- **커밋 컨벤션**: `feat:` / `fix:` / `chore:` / `refactor:`
-- client + server + functions 변경은 **같은 커밋**에 포함
-- Claude Code는 기본적으로 `dev` 브랜치에서 작업 후 요청 시 main에 merge
-- 참고: `fondayai.pages.dev` 는 root Pages 도메인이므로 production(main) 배포를 가리킴
-- 참고: `dev.fondayai.com` 은 `dev.fondayai.pages.dev` 를 가리키는 고정 개발 도메인
-- 참고: 새 dev 배포 직후에는 커스텀 도메인 반영보다 `dev.fondayai.pages.dev` 가 조금 더 빨리 갱신될 수 있음
-- 참고: Cloudflare Pages 환경변수는 `Preview` / `Production` 이 서로 자동 공유되지 않음
-- 참고: `Preview` 환경변수를 수정한 뒤에는 기존 dev 배포가 그 값을 자동 반영하지 않을 수 있으므로, `git push origin dev` 로 새 preview 배포를 다시 만들어야 함
-
----
-
-## 13. 주요 업데이트 (2026-03-20~21 — 도메인/배포 세팅)
-
-### A. fondayai.com 도메인 등록 및 연결
-- Cloudflare Registrar에서 `fondayai.com` 구매
-- Cloudflare Pages `fondayai` 프로젝트에 `fondayai.com` / `www.fondayai.com` 커스텀 도메인 연결
-- DNS CNAME 레코드 추가 (fondayai.pages.dev → fondayai.com)
-- SSL 인증서 자동 발급 완료
-
-### B. 개발/서비스 브랜치 분리
-- `dev` 브랜치 생성 및 Cloudflare Pages Preview 브랜치로 지정
-- `main` → 서비스 (`fondayai.com`, root `fondayai.pages.dev`)
-- `dev` → 개발 (`dev.fondayai.com`, alias `dev.fondayai.pages.dev`)
-
-### B-1. 개발용 고정 도메인 연결 (2026-03-21)
-- Cloudflare Pages `fondayai` 프로젝트에 `dev.fondayai.com` 커스텀 도메인 추가
-- DNS CNAME 생성: `dev.fondayai.com` → `dev.fondayai.pages.dev`
-- 이후 개발 확인 기본 주소는 `dev.fondayai.com`
-- root `fondayai.pages.dev` 는 계속 production(main) 확인용으로 유지
-
-### B-2. Preview 환경변수 적용 메모 (2026-03-21)
-- `dev` 브랜치 배포는 Cloudflare Pages `Preview` 환경변수를 사용
-- `main` 브랜치 배포는 `Production` 환경변수를 사용
-- OAuth / Gemini 테스트를 위해 `Preview` 에 아래 값들을 별도로 넣어야 함:
-  - `KAKAO_CLIENT_ID`
-  - `KAKAO_CLIENT_SECRET`
-  - `JWT_SECRET`
-  - `GOOGLE_API_KEY`
-- 실제 이슈:
-  - `Preview` 값 추가 직후 기존 `dev` 배포에서는 `client_id=undefined`, `GOOGLE_API_KEY is missing` 이 계속 보였음
-  - 원인은 새 preview 배포가 아직 생성되지 않았기 때문
-- 해결:
-  - 빈 커밋 `ed2d3ae` (`chore(deploy): refresh preview env`) 를 `dev` 에 푸시해 새 preview 배포를 강제 생성
-  - 이후 `dev.fondayai.com/auth/kakao` 정상 redirect 확인
-  - 이후 `dev.fondayai.com/api/analyze-skin` 도 더 이상 env 누락 에러 없이 Gemini 요청까지 도달함
-
-### C. OG 메타태그 도메인 교체
-- `client/index.html`의 canonical, og:url, og:image, twitter:image, JSON-LD url
-- `fondayai.pages.dev` → `fondayai.com` 으로 전부 교체
-
-### D. 화장품 루틴 AI 최적화 (2026-03-20)
-- `POST /api/cosmetics/optimize-routine` 엔드포인트 추가 (서버)
-- Gemini 2.5 Flash로 성분 충돌 분석 (레티놀+AHA/BHA, 비타민C+레티놀 등)
-- AM/PM 루틴을 바르는 순서(1번~)로 정렬 표시
-- 충돌 성분 조합은 하단 경고 카드로 이유/해결방법 표시
-- AI 분석 실패 또는 대기 중에는 카테고리 기반 정렬로 fallback
-
-### E. Cloudflare Functions optimize-routine 추가
-- `functions/api/cosmetics/optimize-routine.ts` 생성
-- `server/routes.ts`와 동일한 Gemini 성분 충돌 분석 로직
-- 프로덕션(`fondayai.com`)에서 AI 루틴 최적화 정상 동작
-
-### F. 미완료 — OAuth 콘솔 업데이트 필요
-아직 각 OAuth 콘솔에 `fondayai.com` 콜백 URL이 추가되지 않음. 로그인 기능 테스트 전 반드시 필요:
-- Google Cloud Console → 승인된 리디렉션 URI에 `https://fondayai.com/auth/google/callback` 추가
-- 카카오 디벨로퍼스 → 리디렉션 URI `https://fondayai.com/auth/kakao/callback` 추가
-- (LINE 사용 시) LINE Developers → `https://fondayai.com/auth/line/callback` 추가
-
-### G. JWT_SECRET / SESSION_SECRET 보안 강화 완료
-- Cloudflare Pages Production 환경변수에 `JWT_SECRET`, `SESSION_SECRET` 랜덤값(64자) 설정 완료 (API로 자동 설정)
-
-### H. My 탭 화장품 루틴 보드 단순화 (2026-03-20)
-- `client/src/components/fonday/MyScreen.tsx`
-  - My 탭의 `내 화장품 루틴` 진입 카드를 단순 목록형에서 보드형 요약 카드로 변경
-  - 아침/저녁 대표 루틴 단계 수와 충돌 주의 1건을 바로 미리 볼 수 있게 수정
-- `client/src/components/fonday/MyCosmeticsModal.tsx`
-  - 화장품 루틴 보드를 기존 “등록 제품 전부 나열” 방식에서 `카테고리당 대표 제품 1개` 중심으로 재구성
-  - 성분 충돌 가능성이 큰 조합은 메인 루틴에서 제외하고 별도 주의 카드에서 설명
-- `client/src/components/fonday/utils.ts`
-  - 대표 제품 선별 + 충돌 제외용 `buildRepresentativeRoutine` 로직 추가
-  - 레티노이드/각질케어, 레티노이드/비타민C, 비타민C/각질케어, 복수 각질 케어 등을 필터링
-- `server/routes.ts`, `functions/api/cosmetics/optimize-routine.ts`
-  - Gemini 프롬프트를 `대표 제품 1개씩 + 과한 단계 제외` 방향으로 수정
-- 관련 커밋:
-  - `2728d31` `feat(my): simplify cosmetics routine board`
-
-### I. 화장품-스캔 상관 신호 1차 구현 (2026-03-20)
-- 문제의식:
-  - 화장품 등록 데이터와 스캔 데이터는 쌓이지만, “이 제품 등록 후 어떤 점수가 어떻게 움직였는지” 연결 화면이 없어서 구독 가치가 약함
-- 구현 방향:
-  - 강한 인과 표현 대신 `개인 상관 신호`로 우선 구현
-  - 제품의 `opened_at` 또는 `created_at` 시점을 기준으로 전후 14일 스캔 흐름 비교
-  - 표현 예시는 “최근 14일 안에서 수분 밸런스가 평균 n점 더 좋게 나타남” 수준으로 유지
-  - 같이 사용한 제품 수를 함께 보여 단독 효과로 과장되지 않도록 함
-- 적용 위치:
-  - `client/src/components/fonday/MyScreen.tsx`
-    - My 탭 카드 안에 `스캔과 가장 강하게 함께 움직인 제품` 요약 신호 추가
-  - `client/src/components/fonday/MyCosmeticsModal.tsx`
-    - 상단에 `제품-스캔 상관 신호` 섹션 추가
-    - 제품 카드/상세 시트 안에 개별 제품 신호, 관찰 스캔 수, 같이 사용한 제품 표시
-  - `client/src/components/fonday/utils.ts`
-    - `buildCosmeticCorrelationSignals` 계산 로직 추가
-    - 신호 등급: `early` / `building` / `strong`
-  - `client/src/components/fonday/types.ts`
-    - `CosmeticItem.created_at` 추가
-  - `client/src/locales/{ko,en,ja}/translation.json`
-    - 상관 신호용 문구 추가
-- 현재 제약:
-  - 아직은 `상관 신호`이며 엄격한 인과 추정은 아님
-  - 제품을 동시에 여러 개 쓰는 경우 `같이 쓰던 제품`만 노출하고 정교한 보정은 하지 않음
-  - 화장품 삭제/중단 이력 기반의 정밀 노출 모델은 아직 없음
-- 검증:
-  - `npm run check` 통과
-- 관련 커밋:
-  - `923cf4a` `feat(my): add cosmetic scan correlation signals`
-
-### J. 5탭 구조 개편 2차 정리 (2026-03-21)
-- 방향:
-  - 하단 네비를 `홈 / 루틴 / 일기 / 발견 / MY` 5탭 구조로 고정
-  - 결과 화면은 “스캔 직후 허브” 역할을 유지하되, 기존 `루틴 / 솔루션 / 영양` 내용은 삭제하지 않고 compact 3탭으로 유지
-  - 유료/무료 분기 설계는 아직 보류하고, 우선 정보 구조와 화면 역할 정리에 집중
-- 홈(`ScanIdleScreen.tsx`) 변경:
-  - 최근 스캔 API를 연결해 `최근 스캔` 요약 카드 추가
-  - 직전 스캔 대비 변화량, 마지막 스캔 시점, 집중 케어 지표 노출
-  - `루틴 / 일기 / 발견 / MY` 빠른 이동 카드를 추가해 홈을 실제 허브 역할로 강화
-- 루틴(`RoutineTab.tsx`) 변경:
-  - 대표 AM/PM 루틴 보드 외에 `효과 보드` 추가
-  - 강한 신호 수, 긍정 흐름 수, 추적 제품 수를 상단에서 요약
-  - 제품별 변화 카드에 신호 강도 바를 붙여 어떤 제품이 더 강하게 움직였는지 바로 읽히게 정리
-- MY(`MyScreen.tsx`) 변경:
-  - 관리 바로가기 카드 추가
-  - 최신 리포트 카드에 직전 대비 변화와 우선 확인 지표 추가
-  - 히스토리 설명 강화 및 리포트 보관함 성격의 섹션 추가
-- 결과(`ResultScreen.tsx`) 변경:
-  - 결과 화면을 한 페이지로 길게 늘어뜨리는 구조를 시도했다가 되돌림
-  - 현재는 상단 결과 요약 + `NEXT STEP` 허브 + compact `루틴 / 솔루션 / 영양` 3탭 구조로 재정리
-  - 목적은 기존 정보를 유지하면서도 하단 5탭과 충돌하지 않게 최소한의 허브 역할만 하도록 조정하는 것
-- 화장품 효과 신호 로직(`utils.ts`) 변경:
-  - 등록 전 baseline 스캔이 적을 때 초기 사용 구간 vs 최근 구간 비교 fallback 추가
-  - 전후 비교 윈도우를 넓혀서 데이터가 적은 사용자도 신호를 덜 거칠게 보도록 보정
-  - confidence 계산을 관찰 기간과 비교 스캔 수 기준으로 더 엄격하게 조정
-- 검증:
-  - `npm run build` 통과
-- 관련 커밋:
-  - `07020c3` `feat(result): connect scan results to tab workflow`
-  - `bbcc877` `fix(result): prevent next step overflow`
-  - `4dbec86` `feat(app): deepen home routine and my flows`
-  - `13f8dce` `feat(ui): sharpen scan summaries and routine signals`
-  - `36e25b1` `feat(result): flatten result flow and refine signal scoring`
-  - `ef40c4b` `refactor(result): simplify post-scan hub`
-  - `561aa81` `fix(result): restore compact tabbed sections`
-
-### K. 다음 세션에서 이어볼 우선 확인 항목
-- `dev.fondayai.com` 실기기 검수
-  - 홈의 최근 스캔 카드, 빠른 이동 카드, 루틴 효과 보드의 밀도 점검
-  - 결과 화면 `루틴 / 솔루션 / 영양` 3탭이 현재 톤에서 충분히 미니멀한지 확인
-  - `NEXT STEP` 허브 문구와 버튼 우선순위 재확인
-- 화장품 효과 신호 고도화 후보
-  - 사용자가 카테고리 대표 제품을 직접 고정하는 기능
-  - 충돌 제품에 대해 `아침으로 이동 / 저녁으로 이동 / 격일 사용` 빠른 액션 제공
-  - 제품별 반응 기록과 Diary 메모 연결
-  - 장기적으로는 제품별 `노출 시작/중단` 이력 저장 후 신호 정밀도 향상
-- 구조 안정화 후 후속 작업
-  - 유료/무료 분기 설계
-  - 결제/페이월 위치 구체화
-  - `main` 반영 전 dev UX 최종 점검
-
----
-
-## 14. 최근 커밋 히스토리 (주요)
+## 14. 최근 커밋 히스토리 (2026-03-23)
 
 | 커밋 | 내용 |
 |------|------|
+| 2752ba6 | fix(care): 게스트 브리핑 노출 및 위치 권한 폴백(서울) 추가 |
+| 8c42943 | feat(care): 능동적 AI 케어 매니저 브리핑 및 통합 푸시 시스템 구축 |
+| 6d69b3f | fix(feed): constants 임포트 오류 방지를 위해 SCAN_FROM 로컬 선언 |
+| 77f707c | fix(feed): 랭킹 데이터 파싱 및 렌더링 안정성 강화 (NaN 체크 및 성능 최적화) |
+| 7f5c567 | debug(feed): 런타임 에러 바운더리 추가 |
 | 561aa81 | fix(result): 결과 화면 compact 3탭 구조 복원 |
-| ef40c4b | refactor(result): 스캔 후 결과 허브를 단순화 |
-| 36e25b1 | feat(result): 결과 흐름 단일화 실험 + 효과 신호 스코어링 보정 |
-| 13f8dce | feat(ui): 홈/루틴/MY 요약 카드와 신호 표현 강화 |
-| 4dbec86 | feat(app): 홈/루틴/MY 흐름을 5탭 구조 기준으로 심화 |
-| bbcc877 | fix(result): NEXT STEP 카드 overflow 및 좌우 흔들림 수정 |
-| 07020c3 | feat(result): 결과 화면과 하단 5탭 흐름 연결 |
-| 0cd036e | chore(deploy): preview bindings 반영용 dev 재배포 |
-| 923cf4a | feat(my): 화장품-스캔 상관 신호를 My 탭/모달/상세 시트에 추가 |
-| 2728d31 | feat(my): My 탭 화장품 루틴 보드를 대표 제품 1개 중심으로 단순화 |
-| 6ad4089 | fix(seo): robots/sitemap 도메인을 fondayai.com 기준으로 정리 |
-| 5770ea0 | feat(report): Diary 리포트에 상담실장형 섹션(우선과제/원인추정/피해야할실수/루틴조정 등) 확장 |
-| 7bc8f02 | refactor(report): Diary 리포트 탭을 상담 브리핑 흐름으로 재설계 |
-| 704ad4c | docs: 3월 UI 최종 폴리싱 내용 PROJECT.md 반영 |
-| c338636 | refactor(result): 결과 상단 종합점수/라벨 타이포 미세 조정 |
-| d8cada7 | refactor(ui): 결과/솔루션/영양/My 화면 카드 시스템 최종 폴리싱 |
-| 47c9ebb | refactor(result): 결과 상단 카드 정렬/간격 마감 조정 |
-| a22c23c | refactor(result): 결과 상단 3카드 여백 축소 |
-| 7d2550d | fix(result): 모바일에서 깨지던 상단 지표 카드 레이아웃 복원 |
-| 61f1a7c | refactor(result): 종합점수 메인 카드, 피부나이/순위 서브 카드 구조로 재정렬 |
-| cf2e4bf | docs: PROJECT.md에 3월 UI 리파인먼트 내역 정리 |
-| 55d4af9 | refactor(ui): idle/My/MBTI 재정리 + 루트 탭 백버튼 제거 + AI 예측 아이콘 통일 |
-| f0d18a6 | refactor(ui): 결과 3탭 톤/스크롤 동작 정렬 |
-| 80c023e | refactor(ui): idle/결과 상단 임팩트 복원 + Diary 내부 슬라이드 탭 추가 |
-| 1e6a897 | refactor(ui): scan/result 경험의 시각적 강도 정리 |
-| 0c07009 | feat(cosmetics): 내 화장품 루틴 보드형 개편 + 성분 상세 시트/저장 추가 |
-| b26991f | feat(diary): 피부일기 탭을 달력 중심 독립 페이지형으로 정리 |
-| afa0913 | fix(diary): 달력 우선 배치 + 오늘 루틴 완료형 UI 정리 |
-| 249a0e7 | fix(result): 결과 요약 카드 정렬 및 총포인트 통합 |
-| dec3a48 | fix(result): 주요 분석결과 시트 상단에 피부 총평 먼저 노출 |
-| 2296c26 | fix(result): MBTI 요약/루틴 액션 문구 정리 |
-| 576701d | feat(result): 결과 화면 시각 위계 재정리 |
-| b49879b | feat(result): 결과 화면 중복 축소 + 화장품 자동 시간대 추천 |
-| fed963f | feat(result): 루틴 완료 체크를 아침/저녁 단위로 단순화 |
-| 2767a8d | fix(result): 결과 사진 축소 + 중복 점수 패널 제거 |
-| 9257c93 | fix(ai): Gemini JSON 파싱 복구 로직 추가 |
-| a35a1bf | feat(result): compact summary and sync routine actions |
-| 5577807 | feat(result): 오늘 목표 허브 + 루틴 코치 통합 |
-| 8070560 | feat(cosmetics): routine coach / good combo / caution 추가 |
-| cfe287c | feat(flow): diary API 프로덕션 동기화 + cosmetics insight 추가 |
-| 44d3b0c | feat(idle): hero copy / mobile layout 정리 |
-| ee03355 | docs: add PROJECT.md for cross-session AI context |
-| 94ee36f | fix(ux): 사진 object-top, 용어 한국어화 |
-| d520a73 | feat(functions): 화장품 Cloudflare Functions 3개 추가 |
