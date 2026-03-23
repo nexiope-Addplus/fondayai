@@ -38,7 +38,7 @@ export const onRequest = async (context: any) => {
     }
 
     const genAI = new GoogleGenerativeAI(env.GOOGLE_API_KEY);
-    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
     let prompt = "";
     if (latest && weakest) {
@@ -76,6 +76,6 @@ export const onRequest = async (context: any) => {
     }), { headers: CORS });
 
   } catch (err: any) {
-    return new Response(JSON.stringify({ briefing: "오늘도 당신의 피부를 응원합니다! 규칙적인 관리를 잊지 마세요." }), { headers: CORS });
+    return new Response(JSON.stringify({ briefing: "오류 발생: " + err.message }), { headers: CORS });
   }
 };

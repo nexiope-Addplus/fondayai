@@ -61,7 +61,7 @@ export default {
         const body = await request.json();
         const { image, surveyData, lang = "ko" } = body;
         const genAI = new GoogleGenerativeAI(env.GOOGLE_API_KEY);
-        const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
         const prompt = buildPrompt(surveyData, lang);
         const base64Data = image.split(",")[1] || image;
         const result = await model.generateContent([prompt, { inlineData: { data: base64Data, mimeType: "image/jpeg" } }]);
