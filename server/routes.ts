@@ -580,6 +580,78 @@ ${JSON.stringify(cosmeticList, null, 2)}
     }
   });
 
+  // 화장품 성적표 — 등록된 화장품을 바우만 타입 기준으로 채점 (로그인 필수)
+  app.post("/api/cosmetics/grade", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).json({ error: "로그인 필요" });
+    const userId = (req.user as any).id;
+    const { baumannType, scores, lang } = req.body;
+    const apiKey = process.env.GOOGLE_API_KEY;
+    if (!apiKey) return res.status(500).json({ error: "API key 없음" });
+    if (!isConfigured()) return res.json([]);
+    try {
+      const cosmeticsResult = await d1Query(
+        "SELECT * FROM cosmetics WHERE user_id = ? AND status = 'active' ORDER BY created_at DESC",
+        [userId]
+      );
+      const cosmetics = cosmeticsResult?.results || [];
+      if (cosmetics.length === 0) return res.json([]);
+
+      const langLabel = lang === "ja" ? "日本語" : lang === "en" ? "영어" : "한국어";
+      const scoresStr = Array.isArray(scores)
+        ? scores.map((s: any) => `${s.label}: ${s.score}`).join(", ")
+        : "";
+
+      const cosmeticList = cosmetics.map((c: any) => ({
+        id: c.id,
+        name: c.name,
+        brand: c.brand || "",
+        category: c.category,
+        ingredients: c.ingredients || "",
+      }));
+
+      const prompt = `당신은 피부과 전문의입니다. 아래 사용자의 바우만 피부 타입과 점수를 기반으로 각 화장품이 해당 피부에 얼마나 적합한지 성적표를 작성하세요.
+
+바우만 타입: ${baumannType || "알 수 없음"}
+피부 점수: ${scoresStr || "없음"}
+
+화장품 목록:
+${JSON.stringify(cosmeticList, null, 2)}
+
+채점 기준:
+- A (90-100점): 이 피부 타입에 매우 적합한 성분, 큰 장점이 있음
+- B (75-89점): 대체로 좋음, 소소한 주의 사항이 있을 수 있음
+- C (60-74점): 보통, 효과적이지만 더 좋은 대안이 있음
+- D (40-59점): 일부 성분이 이 피부 타입과 맞지 않음
+- F (0-39점): 이 피부 타입에 맞지 않는 성분 포함, 자극 가능성 높음
+
+응답은 반드시 ${langLabel}로 작성하고, 아래 JSON 형식으로만 응답 (다른 텍스트 절대 금지):
+[
+  {
+    "id": "제품id",
+    "grade": "A",
+    "score": 92,
+    "summary": "한 문장 요약",
+    "pros": ["장점1", "장점2"],
+    "cons": ["단점1"],
+    "keyIngredients": ["핵심성분1", "핵심성분2"],
+    "conflictIngredients": ["충돌성분1"]
+  }
+]
+
+성분 정보가 없으면 카테고리와 바우만 타입 일반 지식으로 채점하세요. pros/cons/keyIngredients/conflictIngredients는 각각 1-3개로 제한하세요.`;
+
+      const genAI = new GoogleGenerativeAI(apiKey);
+      const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+      const result = await model.generateContent(prompt);
+      const text = result.response.text();
+      const parsed = parseGeminiJson(text);
+      const grades = Array.isArray(parsed) ? parsed : [];
+      res.json(grades);
+    } catch (e: any) {
+      res.status(500).json({ error: e.message });
+    }
+  });
+
   // 화장품 삭제 (로그인 필수)
   app.delete("/api/cosmetics/:id", async (req, res) => {
     if (!req.isAuthenticated()) return res.status(401).json({ error: "로그인 필요" });

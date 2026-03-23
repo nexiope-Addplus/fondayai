@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import { Sun, Moon, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { DEEP_GREEN, SCAN_TO, TINT_WARM, TINT_GREEN, TINT_NEUTRAL } from "./constants";
+import { DEEP_GREEN, SCAN_FROM, SCAN_TO, TINT_WARM, TINT_GREEN, TINT_NEUTRAL } from "./constants";
 import { ResultDiaryCard } from "./ResultDiaryCard";
 import { ResultLoginCard } from "./ResultLoginCard";
 
@@ -21,6 +21,7 @@ export function ResultRoutineTab(props: any) {
     user, setShowCosmeticsRegister, setShowCosmeticsGate, myCosmetics,
     overallScore, previousScore, currentStreak, onOpenDiary,
     loginPromptRef, socialLoginButton, handleGoogleLogin, goTo,
+    setShowCosmeticsReport,
   } = props;
 
   return (
@@ -148,13 +149,24 @@ export function ResultRoutineTab(props: any) {
                     <p className="text-xs font-semibold uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>{t("cosmetics.insightTitle")}</p>
                     <p className="text-xs text-stone-400">{t("cosmetics.ctaCount", { count: cosmeticCount })}</p>
                   </div>
-                  <button
-                    onClick={() => user ? setShowCosmeticsRegister(true) : setShowCosmeticsGate(true)}
-                    className="rounded-full px-3 py-1.5 text-xs font-medium whitespace-nowrap"
-                    style={{ background: "#FFFFFF", color: DEEP_GREEN }}
-                  >
-                    + {t("cosmetics.scanBtn")}
-                  </button>
+                  <div className="flex items-center gap-2">
+                    {myCosmetics.length > 0 && setShowCosmeticsReport && (
+                      <button
+                        onClick={() => setShowCosmeticsReport(true)}
+                        className="rounded-full px-3 py-1.5 text-xs font-bold whitespace-nowrap"
+                        style={{ background: `${SCAN_FROM}18`, color: SCAN_TO }}
+                      >
+                        {t("cosmeticsReport.btnLabel")}
+                      </button>
+                    )}
+                    <button
+                      onClick={() => user ? setShowCosmeticsRegister(true) : setShowCosmeticsGate(true)}
+                      className="rounded-full px-3 py-1.5 text-xs font-medium whitespace-nowrap"
+                      style={{ background: "#FFFFFF", color: DEEP_GREEN }}
+                    >
+                      + {t("cosmetics.scanBtn")}
+                    </button>
+                  </div>
                 </div>
                 {myCosmetics.length > 0 && (
                   <div className="grid gap-3 md:grid-cols-2">

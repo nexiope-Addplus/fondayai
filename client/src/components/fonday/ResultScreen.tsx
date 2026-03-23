@@ -38,6 +38,7 @@ import { useAICareSettings } from "./useAICareSettings";
 import { ResultHeaderCard } from "./ResultHeaderCard";
 import { ResultOverlayPopups } from "./ResultOverlayPopups";
 import { ResultModals } from "./ResultModals";
+import { CosmeticsReportCard } from "./CosmeticsReportCard";
 
 // ─── 피부 예측 카드 ────────────────────────────────────────────────
 export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, imageBase64, onBack, onGoMagazine, onOpenDiary, onGoRoutine, onGoMy, user, deferredPrompt, onShowInstallGuide }: any) {
@@ -97,6 +98,7 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
   const [myCosmetics, setMyCosmetics] = useState<CosmeticItem[]>([]);
   const [showCosmeticsGate, setShowCosmeticsGate] = useState(false);
   const [showCosmeticsRegister, setShowCosmeticsRegister] = useState(false);
+  const [showCosmeticsReport, setShowCosmeticsReport] = useState(false);
   const [showRoutineUpdateSheet, setShowRoutineUpdateSheet] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(() => !localStorage.getItem("fonday_onboarding_done"));
   const [showQuestSheet, setShowQuestSheet] = useState(false);
@@ -861,6 +863,7 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
             onGoRoutineTab={onGoRoutine}
             onGoDiaryTab={onOpenDiary}
             onGoMyTab={onGoMy}
+            setShowCosmeticsReport={setShowCosmeticsReport}
           />
           </motion.div>
         )}
@@ -986,6 +989,22 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
         isSuccess={isSuccess}
         handleWaitlistSubmit={handleWaitlistSubmit}
       />
+
+      <AnimatePresence>
+        {showCosmeticsReport && (
+          <CosmeticsReportCard
+            myCosmetics={myCosmetics}
+            analysisResult={analysisResult}
+            finalType={finalType}
+            onClose={() => setShowCosmeticsReport(false)}
+            onAddCosmetic={() => {
+              setShowCosmeticsReport(false);
+              if (user) setShowCosmeticsRegister(true);
+              else setShowCosmeticsGate(true);
+            }}
+          />
+        )}
+      </AnimatePresence>
     </motion.div>
     </>
   );

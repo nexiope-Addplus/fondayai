@@ -155,6 +155,19 @@ export interface TodoItem {
   done: boolean;
 }
 
+// ─── 화장품 성적표 ─────────────────────────────────────────────────────────────
+
+export interface CosmeticGrade {
+  id: string;
+  grade: "A" | "B" | "C" | "D" | "F";
+  score: number;
+  summary: string;
+  pros: string[];
+  cons: string[];
+  keyIngredients: string[];
+  conflictIngredients: string[];
+}
+
 // ─── 리포트 언어 ──────────────────────────────────────────────────────────────
 
 export type ReportLang = "ko" | "en" | "ja";

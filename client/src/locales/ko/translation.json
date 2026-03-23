@@ -1212,5 +1212,21 @@
       "기타스킨케어": "기타 스킨케어",
       "스킨케어아님": "스킨케어 아님"
     }
+  },
+  "cosmeticsReport": {
+    "eyebrow": "AI 분석",
+    "title": "화장품 성적표",
+    "btnLabel": "성적표 보기",
+    "compatibility": "피부 궁합",
+    "avgScore": "평균 궁합 점수",
+    "pros": "장점",
+    "cons": "주의",
+    "keyIngredients": "핵심 성분",
+    "conflicts": "주의 성분",
+    "emptyTitle": "등록된 화장품이 없어요",
+    "emptySub": "사용 중인 화장품을 등록하면 내 피부와의 궁합을 분석해 드려요",
+    "addBtn": "화장품 등록하기",
+    "addMore": "화장품 추가 등록",
+    "error": "분석 중 오류가 발생했어요. 다시 시도해 주세요."
   }
 }

@@ -1212,5 +1212,21 @@
       "기타스킨케어": "Other Skincare",
       "스킨케어아님": "Not Skincare"
     }
+  },
+  "cosmeticsReport": {
+    "eyebrow": "AI Analysis",
+    "title": "Skincare Report Card",
+    "btnLabel": "View Report Card",
+    "compatibility": "Skin Compatibility",
+    "avgScore": "Avg. Compatibility Score",
+    "pros": "Benefits",
+    "cons": "Cautions",
+    "keyIngredients": "Key Ingredients",
+    "conflicts": "Conflicting Ingredients",
+    "emptyTitle": "No products registered yet",
+    "emptySub": "Register your skincare products to see how well they match your skin type",
+    "addBtn": "Register Products",
+    "addMore": "Add More Products",
+    "error": "Analysis failed. Please try again."
   }
 }

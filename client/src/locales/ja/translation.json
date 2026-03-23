@@ -1212,5 +1212,21 @@
       "기타스킨케어": "その他スキンケア",
       "스킨케어아님": "スキンケア以外"
     }
+  },
+  "cosmeticsReport": {
+    "eyebrow": "AI分析",
+    "title": "コスメ成績表",
+    "btnLabel": "成績表を見る",
+    "compatibility": "肌との相性",
+    "avgScore": "平均相性スコア",
+    "pros": "メリット",
+    "cons": "注意点",
+    "keyIngredients": "主要成分",
+    "conflicts": "注意成分",
+    "emptyTitle": "登録済み化粧品がありません",
+    "emptySub": "使用中の化粧品を登録すると、肌タイプとの相性を分析します",
+    "addBtn": "化粧品を登録する",
+    "addMore": "化粧品を追加登録",
+    "error": "分析中にエラーが発生しました。再度お試しください。"
   }
 }
