@@ -576,8 +576,29 @@ export const onRequest = async (context: any) => {
     </table>
   </div>
 
-  <p style="margin-top:40px;font-size:11px;color:#d4d4d4;text-align:center">
-    Fonday Admin · 이벤트 수집: events 테이블 필요 (POST /api/admin/d1-migrate4 with ADMIN_KEY)
+  <!-- ═══ 데이터 초기화 ══════════════════════════════════════════════ -->
+  <div style="margin-top:48px;padding:20px;background:#fff5f5;border-radius:14px;border:1.5px solid #fecaca">
+    <h2 style="margin:0 0 6px;color:#b91c1c;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em">⚠️ 위험 구역 — 전체 데이터 초기화</h2>
+    <p style="font-size:12px;color:#78716c;margin:0 0 14px">스캔, 일기, 화장품, 이벤트, 푸시 구독이 <strong>모두 삭제</strong>됩니다. 복구 불가합니다.</p>
+    <form method="POST" action="/api/admin/reset-data"
+      onsubmit="return confirm('정말로 모든 데이터를 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.')">
+      <input type="hidden" name="key" value="${key}" />
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+        <input
+          type="text" name="confirm" placeholder="전체초기화 입력 후 버튼 클릭"
+          style="flex:1;min-width:200px;padding:10px 14px;border:1.5px solid #fca5a5;border-radius:10px;font-size:13px;outline:none;background:white"
+        />
+        <button type="submit"
+          style="padding:10px 20px;background:#ef4444;color:white;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap">
+          전체 초기화
+        </button>
+      </div>
+      <p style="font-size:11px;color:#a8a29e;margin:8px 0 0">입력란에 <code style="background:#f5f5f4;padding:1px 5px;border-radius:4px">전체초기화</code> 를 정확히 입력해야 실행됩니다</p>
+    </form>
+  </div>
+
+  <p style="margin-top:24px;font-size:11px;color:#d4d4d4;text-align:center">
+    Fonday Admin · events 테이블 미생성 시: POST /api/admin/d1-migrate4
   </p>
 </body>
 </html>`;
