@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 import { Droplets, Plus, X } from "lucide-react";
-import { SCAN_TO, TINT_WARM, fadeChild } from "./constants";
+import { SCAN_TO, TINT_WARM, BORDER_COLOR, FONT_DISPLAY, fadeChild } from "./constants";
 
 type RoutineLogInputProps = {
   onSave: (products: string[]) => void;
@@ -38,13 +38,13 @@ export function RoutineLogInput({ onSave, initialProducts = [] }: RoutineLogInpu
 
   return (
     <motion.div variants={fadeChild} className="rounded-3xl p-4"
-      style={{ background: "#FFFFFF", boxShadow: "0 8px 24px rgba(45,95,79,0.06)" }}>
+      style={{ background: "#FFFFFF", border: `1px solid ${BORDER_COLOR}` }}>
       <div className="flex items-center gap-2 mb-3">
         <div className="w-7 h-7 rounded-xl flex items-center justify-center shrink-0"
           style={{ background: TINT_WARM }}>
           <Droplets className="w-4 h-4" style={{ color: SCAN_TO }} />
         </div>
-        <p className="text-xs font-semibold uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>
+        <p className="text-xs font-semibold uppercase tracking-[0.14em]" style={{ color: SCAN_TO, fontFamily: FONT_DISPLAY }}>
           {t("routineLog.title", "오늘 사용한 화장품")}
         </p>
       </div>

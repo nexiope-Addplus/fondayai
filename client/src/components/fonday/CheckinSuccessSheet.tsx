@@ -2,7 +2,7 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 import { CheckCircle2, CalendarDays } from "lucide-react";
-import { SCAN_FROM, SCAN_TO } from "./constants";
+import { BORDER_COLOR, SCAN_FROM, SCAN_TO, TEXT_TERTIARY } from "./constants";
 import type { AppUser } from "./types";
 import { getAttendance, todayStr } from "./utils";
 
@@ -23,7 +23,8 @@ export function CheckinSuccessSheet({ onKakao, onLine, onGoogle, onDismiss, user
         className="fixed inset-0 z-[980] bg-black/40" onClick={onDismiss} />
       <motion.div key="ci-sheet" initial={{ y: "100%" }} animate={{ y: 0 }} exit={{ y: "100%" }}
         transition={{ type: "spring", damping: 30, stiffness: 300 }}
-        className="fixed bottom-0 left-0 right-0 z-[990] bg-white rounded-t-3xl shadow-2xl max-w-md mx-auto px-5 pb-10 pt-6">
+        className="fixed bottom-0 left-0 right-0 z-[990] bg-white rounded-t-3xl max-w-md mx-auto px-5 pb-10 pt-6"
+        style={{ borderTop: `1px solid ${BORDER_COLOR}` }}>
         <div className="w-10 h-1 rounded-full bg-stone-200 mx-auto mb-5" />
 
         {/* 타이틀 */}
@@ -32,7 +33,7 @@ export function CheckinSuccessSheet({ onKakao, onLine, onGoogle, onDismiss, user
             style={{ background: "linear-gradient(135deg, #E09882, #C97062)" }}>
             <CheckCircle2 className="w-7 h-7 text-white" />
           </div>
-          <h2 className="text-lg font-bold text-stone-800 mb-1">{t("attendance.title")}</h2>
+          <h2 className="text-lg font-semibold text-stone-800 mb-1">{t("attendance.title")}</h2>
         </div>
 
         {!user && (
@@ -71,7 +72,7 @@ export function CheckinSuccessSheet({ onKakao, onLine, onGoogle, onDismiss, user
           </div>
         ) : (
           <button onClick={onDismiss}
-            className="w-full py-3.5 rounded-2xl text-[14px] font-bold text-white"
+            className="w-full py-3.5 rounded-2xl text-[14px] font-semibold text-white"
             style={{ background: `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})` }}>
             {t("attendance.close")}
           </button>
@@ -89,9 +90,10 @@ export function AttendanceBadge({ onClick }: { onClick: () => void }) {
   const checkedToday = data.dates.includes(today);
   return (
     <button onClick={onClick}
-      className="flex items-center gap-1 bg-white/80 backdrop-blur-sm rounded-full px-2.5 py-1.5 shadow-sm transition-all active:scale-95">
+      className="flex items-center gap-1 bg-white/80 rounded-full px-2.5 py-1.5 border transition-all active:scale-95"
+      style={{ borderColor: BORDER_COLOR }}>
       <CalendarDays className="w-3.5 h-3.5" style={{ color: checkedToday ? SCAN_TO : "#B0A898" }} />
-      <span className="text-xs font-bold" style={{ color: checkedToday ? SCAN_TO : "#B0A898" }}>
+      <span className="text-xs font-semibold" style={{ color: checkedToday ? SCAN_TO : TEXT_TERTIARY }}>
         {checkedToday ? t("attendance.alreadyChecked") : t("attendance.checkIn")}
       </span>
     </button>

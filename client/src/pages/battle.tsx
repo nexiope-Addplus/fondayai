@@ -7,6 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer, Legend } from "recharts";
 import { Shield, Sparkles, ChevronLeft, Zap, ArrowRight, Activity, FileText } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { BG_BASE, BG_MUTED, BORDER_COLOR, FONT_DISPLAY, TEXT_TERTIARY } from "@/components/fonday/constants";
 
 const SCAN_FROM = "#E5B9A8";
 const SCAN_TO = "#C97062";
@@ -101,8 +102,8 @@ export default function BattlePage() {
 
   if (error || !friendScan) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[100dvh] px-6 text-center gap-4 bg-stone-50/50">
-        <div className="w-16 h-16 rounded-full bg-stone-100 flex items-center justify-center mb-2">
+      <div className="flex flex-col items-center justify-center min-h-[100dvh] px-6 text-center gap-4" style={{ background: BG_BASE }}>
+        <div className="w-16 h-16 rounded-full flex items-center justify-center mb-2" style={{ background: BG_MUTED }}>
           <Shield className="w-8 h-8 text-stone-300" />
         </div>
         <h2 className="text-xl font-black text-stone-800">{t("battle.errorTitle")}</h2>
@@ -145,9 +146,9 @@ export default function BattlePage() {
   const isWinner = myScan && (myScoreVal >= friendScoreVal);
 
   return (
-    <div className="min-h-[100dvh] bg-stone-50/30 flex flex-col">
+    <div className="min-h-[100dvh] flex flex-col" style={{ background: BG_BASE }}>
       {/* Header */}
-      <div className="h-14 flex items-center justify-between px-4 shrink-0 bg-white/80 backdrop-blur-md sticky top-0 z-50 border-b border-stone-100">
+      <div className="h-14 flex items-center justify-between px-4 shrink-0 bg-white/80 backdrop-blur-md sticky top-0 z-50" style={{ borderBottom: `1px solid ${BORDER_COLOR}` }}>
         <button onClick={() => setLocation("/")} className="w-10 h-10 flex items-center justify-center -ml-2 rounded-full hover:bg-stone-100 active:bg-stone-200 transition-colors">
           <ChevronLeft className="w-6 h-6 text-stone-600" />
         </button>
@@ -171,11 +172,11 @@ export default function BattlePage() {
           {/* Versus Cards */}
           <motion.div variants={fadeChild} className="grid grid-cols-[1fr_auto_1fr] gap-3 items-center">
             {/* Friend Card */}
-            <div className="relative p-4 rounded-3xl bg-white shadow-lg border border-stone-100/50 flex flex-col items-center justify-center text-center overflow-hidden h-[160px]">
+            <div className="relative p-4 rounded-3xl bg-white flex flex-col items-center justify-center text-center overflow-hidden h-[160px]" style={{ border: `1px solid ${BORDER_COLOR}` }}>
               <div className="absolute top-0 right-0 w-16 h-16 bg-gradient-to-bl from-stone-100 to-transparent rounded-bl-full opacity-50" />
-              <p className="text-xs font-bold text-stone-400 mb-2">{t("battle.friend")}</p>
-              <span className="text-4xl font-black leading-none mb-1" style={{ color: SCAN_TO }}>{friendScan.overallScore}</span>
-              <p className="text-xs font-bold text-stone-400 mb-2">{t("battle.totalScore")}</p>
+              <p className="text-xs font-bold mb-2" style={{ color: TEXT_TERTIARY, fontFamily: FONT_DISPLAY }}>{t("battle.friend")}</p>
+              <span className="text-4xl font-light leading-none mb-1" style={{ color: SCAN_TO, fontFamily: FONT_DISPLAY }}>{friendScan.overallScore}</span>
+              <p className="text-xs font-bold mb-2" style={{ color: TEXT_TERTIARY, fontFamily: FONT_DISPLAY }}>{t("battle.totalScore")}</p>
               
               {friendScan.baumannType && (
                 <div className="flex items-center justify-center gap-[2px]">
@@ -194,18 +195,18 @@ export default function BattlePage() {
             </div>
 
             {/* My Card */}
-            <div className="relative p-4 rounded-3xl shadow-lg flex flex-col items-center justify-center text-center overflow-hidden h-[160px]"
-                 style={{ 
+            <div className="relative p-4 rounded-3xl flex flex-col items-center justify-center text-center overflow-hidden h-[160px]"
+                 style={{
                    background: myScan ? "white" : `linear-gradient(135deg, ${DEEP_GREEN_LIGHT}, ${DEEP_GREEN})`,
-                   border: myScan ? "1px solid rgba(0,0,0,0.05)" : "none"
+                   border: myScan ? `1px solid ${BORDER_COLOR}` : "none"
                  }}>
               <div className="absolute top-0 right-0 w-16 h-16 bg-gradient-to-bl from-white/10 to-transparent rounded-bl-full" />
               
               {myScan ? (
                 <>
-                  <p className="text-xs font-bold text-stone-400 mb-2">{t("battle.me")}</p>
-                  <span className="text-4xl font-black leading-none mb-1" style={{ color: DEEP_GREEN }}>{myScan.overallScore}</span>
-                  <p className="text-xs font-bold text-stone-400 mb-2">{t("battle.totalScore")}</p>
+                  <p className="text-xs font-bold mb-2" style={{ color: TEXT_TERTIARY, fontFamily: FONT_DISPLAY }}>{t("battle.me")}</p>
+                  <span className="text-4xl font-light leading-none mb-1" style={{ color: DEEP_GREEN, fontFamily: FONT_DISPLAY }}>{myScan.overallScore}</span>
+                  <p className="text-xs font-bold mb-2" style={{ color: TEXT_TERTIARY, fontFamily: FONT_DISPLAY }}>{t("battle.totalScore")}</p>
                   
                   {myScan.baumannType && (
                     <div className="flex items-center justify-center gap-[2px]">
@@ -231,9 +232,9 @@ export default function BattlePage() {
           {/* Comparison Radar Chart */}
           {myScan && (
             <motion.div variants={fadeChild}>
-              <Card className="border-none shadow-md rounded-3xl overflow-hidden box-border">
+              <Card className="rounded-3xl overflow-hidden box-border" style={{ border: `1px solid ${BORDER_COLOR}`, boxShadow: "none" }}>
                 <div className="p-5 pb-0">
-                  <h3 className="text-[14px] font-black" style={{ color: DEEP_GREEN }}>{t("battle.compareTitle")}</h3>
+                  <h3 className="text-[14px] font-black" style={{ color: DEEP_GREEN, fontFamily: FONT_DISPLAY }}>{t("battle.compareTitle")}</h3>
                   <p className="text-xs text-stone-400 mt-1">{t("battle.compareChartSub")}</p>
                 </div>
                 <div className="w-full h-72 pt-4 box-border">
@@ -260,16 +261,16 @@ export default function BattlePage() {
           {/* Detailed Scores List (Only if user has scanned) */}
           {myScan && chartData.length > 0 && (
             <motion.div variants={fadeChild} className="space-y-3 pt-2">
-              <h3 className="text-[14px] font-black px-1" style={{ color: DEEP_GREEN }}>{t("battle.detailTitle")}</h3>
+              <h3 className="text-[14px] font-black px-1" style={{ color: DEEP_GREEN, fontFamily: FONT_DISPLAY }}>{t("battle.detailTitle")}</h3>
               {chartData.map((item, i) => {
                 const diff = item.me - item.friend;
                 const iWon = diff > 0;
                 const isTie = diff === 0;
 
                 return (
-                  <div key={i} className="bg-white p-4 rounded-2xl shadow-sm border border-stone-100 flex items-center justify-between">
+                  <div key={i} className="bg-white p-4 rounded-2xl flex items-center justify-between" style={{ border: `1px solid ${BORDER_COLOR}` }}>
                     <div className="flex items-center gap-3 w-[80px] shrink-0">
-                      <div className="w-8 h-8 rounded-full bg-stone-50 flex items-center justify-center">
+                      <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ background: BG_MUTED }}>
                         <Zap className="w-4 h-4 text-stone-400" />
                       </div>
                       <span className="text-[12px] font-bold text-stone-700">{item.subject}</span>
@@ -288,11 +289,11 @@ export default function BattlePage() {
                     <div className="flex flex-col items-end w-[60px] shrink-0 text-xs">
                       <div className="flex items-center gap-1.5 mb-1 text-stone-500">
                         <span>{t("battle.friend")}</span>
-                        <span className="font-black text-[12px] text-stone-800">{item.friend}</span>
+                        <span className="font-light text-[12px] text-stone-800" style={{ fontFamily: FONT_DISPLAY }}>{item.friend}</span>
                       </div>
                       <div className="flex items-center gap-1.5" style={{ color: DEEP_GREEN }}>
                         <span>{t("battle.me")}</span>
-                        <span className="font-black text-[12px]">{item.me}</span>
+                        <span className="font-light text-[12px]" style={{ fontFamily: FONT_DISPLAY }}>{item.me}</span>
                       </div>
                     </div>
                   </div>

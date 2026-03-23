@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence, useDragControls } from "framer-motion";
 import { ChevronDown, ChevronUp, Plus, RotateCcw, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { DEEP_GREEN, SCAN_TO, TINT_GREEN, TINT_WARM } from "./constants";
+import { DEEP_GREEN, SCAN_TO, TINT_GREEN, TINT_WARM, BG_MUTED, BORDER_COLOR, FONT_DISPLAY, TEXT_TERTIARY } from "./constants";
 import type { AnalysisResult, CosmeticItem, CosmeticGrade } from "./types";
 
 // ─── 세션 레벨 캐시 (컴포넌트 재마운트 시에도 유지) ─────────────────
@@ -29,7 +29,7 @@ function GradeCard({ cosmetic, grade }: { cosmetic: CosmeticItem; grade: Cosmeti
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       className="rounded-3xl overflow-hidden"
-      style={{ background: "#FFFFFF", boxShadow: "0 4px 16px rgba(45,95,79,0.06)", border: `1px solid ${cfg.border}` }}
+      style={{ background: "#FFFFFF", border: `1px solid ${cfg.border}` }}
     >
       <button
         className="w-full p-4 text-left"
@@ -74,8 +74,8 @@ function GradeCard({ cosmetic, grade }: { cosmetic: CosmeticItem; grade: Cosmeti
         {/* 점수 바 */}
         <div className="mt-3">
           <div className="flex items-center justify-between gap-2 mb-1">
-            <p className="text-[11px] font-semibold uppercase tracking-wider text-stone-400 truncate min-w-0">{t("cosmeticsReport.compatibility")}</p>
-            <p className="text-[11px] font-bold shrink-0" style={{ color: cfg.color }}>{grade.score}{t("result.scoreSuffix")}</p>
+            <p className="text-[11px] font-semibold uppercase tracking-wider truncate min-w-0" style={{ color: TEXT_TERTIARY, fontFamily: FONT_DISPLAY }}>{t("cosmeticsReport.compatibility")}</p>
+            <p className="text-[11px] font-light shrink-0" style={{ color: cfg.color, fontFamily: FONT_DISPLAY }}>{grade.score}{t("result.scoreSuffix")}</p>
           </div>
           <div className="h-1.5 rounded-full bg-stone-100 overflow-hidden">
             <motion.div
@@ -101,7 +101,7 @@ function GradeCard({ cosmetic, grade }: { cosmetic: CosmeticItem; grade: Cosmeti
             <div className="px-4 pb-4 space-y-3 border-t border-stone-100 pt-3">
               {grade.pros.length > 0 && (
                 <div>
-                  <p className="text-[11px] font-bold uppercase tracking-wider mb-1.5" style={{ color: "#059669" }}>{t("cosmeticsReport.pros")}</p>
+                  <p className="text-[11px] font-bold uppercase tracking-wider mb-1.5" style={{ color: "#059669", fontFamily: FONT_DISPLAY }}>{t("cosmeticsReport.pros")}</p>
                   <div className="flex flex-wrap gap-1.5">
                     {grade.pros.map((p, i) => (
                       <span key={i} className="text-xs px-2.5 py-1 rounded-full font-medium" style={{ background: "#ECFDF5", color: "#059669" }}>{p}</span>
@@ -111,7 +111,7 @@ function GradeCard({ cosmetic, grade }: { cosmetic: CosmeticItem; grade: Cosmeti
               )}
               {grade.cons.length > 0 && (
                 <div>
-                  <p className="text-[11px] font-bold uppercase tracking-wider mb-1.5" style={{ color: "#EA580C" }}>{t("cosmeticsReport.cons")}</p>
+                  <p className="text-[11px] font-bold uppercase tracking-wider mb-1.5" style={{ color: "#EA580C", fontFamily: FONT_DISPLAY }}>{t("cosmeticsReport.cons")}</p>
                   <div className="flex flex-wrap gap-1.5">
                     {grade.cons.map((c, i) => (
                       <span key={i} className="text-xs px-2.5 py-1 rounded-full font-medium" style={{ background: "#FFF7ED", color: "#EA580C" }}>{c}</span>
@@ -121,7 +121,7 @@ function GradeCard({ cosmetic, grade }: { cosmetic: CosmeticItem; grade: Cosmeti
               )}
               {grade.keyIngredients.length > 0 && (
                 <div>
-                  <p className="text-[11px] font-bold uppercase tracking-wider mb-1.5 text-stone-400">{t("cosmeticsReport.keyIngredients")}</p>
+                  <p className="text-[11px] font-bold uppercase tracking-wider mb-1.5" style={{ color: TEXT_TERTIARY, fontFamily: FONT_DISPLAY }}>{t("cosmeticsReport.keyIngredients")}</p>
                   <div className="flex flex-wrap gap-1.5">
                     {grade.keyIngredients.map((ing, i) => (
                       <span key={i} className="text-xs px-2.5 py-1 rounded-full font-medium" style={{ background: TINT_GREEN, color: DEEP_GREEN }}>{ing}</span>
@@ -131,7 +131,7 @@ function GradeCard({ cosmetic, grade }: { cosmetic: CosmeticItem; grade: Cosmeti
               )}
               {grade.conflictIngredients.length > 0 && (
                 <div>
-                  <p className="text-[11px] font-bold uppercase tracking-wider mb-1.5" style={{ color: "#DC2626" }}>{t("cosmeticsReport.conflicts")}</p>
+                  <p className="text-[11px] font-bold uppercase tracking-wider mb-1.5" style={{ color: "#DC2626", fontFamily: FONT_DISPLAY }}>{t("cosmeticsReport.conflicts")}</p>
                   <div className="flex flex-wrap gap-1.5">
                     {grade.conflictIngredients.map((ing, i) => (
                       <span key={i} className="text-xs px-2.5 py-1 rounded-full font-medium" style={{ background: "#FEF2F2", color: "#DC2626" }}>{ing}</span>
@@ -161,8 +161,8 @@ function GradeSummaryBar({ grades }: { grades: CosmeticGrade[] }) {
     <div className="rounded-3xl p-4 mb-4" style={{ background: cfg.bg, border: `1px solid ${cfg.border}` }}>
       <div className="flex items-center justify-between">
         <div>
-          <p className="text-xs font-bold uppercase tracking-wider text-stone-400">{t("cosmeticsReport.avgScore")}</p>
-          <p className="text-3xl font-black mt-0.5" style={{ color: cfg.color }}>{avg}{t("result.scoreSuffix")}</p>
+          <p className="text-xs font-bold uppercase tracking-wider" style={{ color: TEXT_TERTIARY, fontFamily: FONT_DISPLAY }}>{t("cosmeticsReport.avgScore")}</p>
+          <p className="text-3xl font-light mt-0.5" style={{ color: cfg.color, fontFamily: FONT_DISPLAY }}>{avg}{t("result.scoreSuffix")}</p>
         </div>
         <div className="flex gap-1.5">
           {(["A", "B", "C", "D", "F"] as const).map((g) => counts[g] ? (
@@ -288,7 +288,7 @@ export function CosmeticsReportCard({
         {/* 헤더 */}
         <div className="flex items-center justify-between px-5 py-3 shrink-0">
           <div>
-            <p className="text-xs font-bold uppercase tracking-widest" style={{ color: SCAN_TO }}>{t("cosmeticsReport.eyebrow")}</p>
+            <p className="text-xs font-bold uppercase tracking-widest" style={{ color: SCAN_TO, fontFamily: FONT_DISPLAY }}>{t("cosmeticsReport.eyebrow")}</p>
             <h2 className="text-lg font-bold mt-0.5" style={{ color: DEEP_GREEN }}>{t("cosmeticsReport.title")}</h2>
           </div>
           <div className="flex items-center gap-2">
@@ -335,7 +335,7 @@ export function CosmeticsReportCard({
           {loading && myCosmetics.length > 0 && (
             <div className="space-y-3">
               {/* 분석 진행 바 */}
-              <div className="rounded-3xl p-4" style={{ background: "#F0F9F4", border: "1px solid #D1FAE5" }}>
+              <div className="rounded-3xl p-4" style={{ background: BG_MUTED, border: `1px solid ${BORDER_COLOR}` }}>
                 <div className="flex items-center justify-between mb-2">
                   <p className="text-xs font-bold" style={{ color: DEEP_GREEN }}>{t("cosmeticsReport.analyzing")}</p>
                   <p className="text-xs font-bold tabular-nums" style={{ color: DEEP_GREEN }}>{Math.round(progress)}%</p>
@@ -351,7 +351,7 @@ export function CosmeticsReportCard({
                 <p className="text-[11px] text-stone-400 mt-2">{t("cosmeticsReport.analyzingDesc")}</p>
               </div>
               {myCosmetics.map((_, i) => (
-                <div key={i} className="rounded-3xl bg-stone-100 animate-pulse" style={{ height: 80 }} />
+                <div key={i} className="rounded-3xl animate-pulse" style={{ height: 80, background: BG_MUTED }} />
               ))}
             </div>
           )}

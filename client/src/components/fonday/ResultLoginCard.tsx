@@ -2,7 +2,7 @@ import type { ReactNode, Ref } from "react";
 import { useTranslation } from "react-i18next";
 import { Leaf } from "lucide-react";
 
-import { DEEP_GREEN, SCAN_TO, TINT_WARM } from "./constants";
+import { DEEP_GREEN, SCAN_TO, TINT_WARM, BORDER_COLOR } from "./constants";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
@@ -21,14 +21,14 @@ export function ResultLoginCard({
 
   return (
     <div ref={loginPromptRef}>
-      <Card className="rounded-3xl p-6 text-center" style={{ background: "#FFFFFF", boxShadow: "0 8px 24px rgba(45,95,79,0.06)" }}>
+      <Card className="rounded-3xl p-6 text-center" style={{ background: "#FFFFFF", border: `1px solid ${BORDER_COLOR}` }}>
         <CardHeader className="p-0 mb-4">
-          <CardTitle className="text-lg font-bold" style={{ color: DEEP_GREEN }}>{t("result.login.title")}</CardTitle>
+          <CardTitle className="text-lg font-semibold" style={{ color: DEEP_GREEN }}>{t("result.login.title")}</CardTitle>
           <CardDescription className="text-xs">{t("result.login.desc")}</CardDescription>
         </CardHeader>
         <CardContent className="p-0 space-y-3">
           {socialLoginButton}
-          <Button onClick={onGoogleLogin} className="w-full h-12 rounded-xl bg-white hover:bg-stone-50 font-bold text-zinc-700 gap-2 shadow-sm">
+          <Button onClick={onGoogleLogin} className="w-full h-12 rounded-xl bg-white hover:bg-stone-50 font-semibold text-zinc-700 gap-2 shadow-sm">
             <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="w-4 h-4" />
             {t("result.login.google")}
           </Button>

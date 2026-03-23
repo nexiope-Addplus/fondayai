@@ -31,6 +31,10 @@ import {
   TINT_GREEN,
   TINT_NEUTRAL,
   TINT_WARM,
+  BG_MUTED,
+  BORDER_COLOR,
+  FONT_DISPLAY,
+  TEXT_TERTIARY,
 } from "./constants";
 import {
   buildRoutineGuide,
@@ -244,9 +248,9 @@ export function DiaryRoutinePreviewCard({ routineGuide, dateStr }: { routineGuid
 
   return (
     <div className="px-5 pt-4">
-      <div className="rounded-3xl border bg-white shadow-sm" style={{  }}>
+      <div className="rounded-3xl bg-white" style={{ border: `1px solid ${BORDER_COLOR}` }}>
         <div className="p-5">
-          <p className="text-xs font-bold tracking-[0.16em] uppercase" style={{ color: SCAN_TO }}>{t("diary.routineTitle")}</p>
+          <p className="text-xs font-bold tracking-[0.16em] uppercase" style={{ color: SCAN_TO, fontFamily: FONT_DISPLAY }}>{t("diary.routineTitle")}</p>
           <p className="text-base font-bold mt-1 text-kr-pretty" style={{ color: DEEP_GREEN }}>{t("modal.diary.todayRoutineTitle")}</p>
           <p className="text-xs text-stone-500 mt-1">{t("modal.diary.todayRoutineDesc")}</p>
           <div className="grid gap-3 mt-4 md:grid-cols-2">

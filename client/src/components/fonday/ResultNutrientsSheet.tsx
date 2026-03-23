@@ -2,7 +2,7 @@ import { AnimatePresence, motion, useDragControls } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import { AlertCircle, Moon, Sun, Utensils, X } from "lucide-react";
 
-import { NUTRIENT_COLORS, NUTRIENT_ICONS } from "./constants";
+import { BG_MUTED, BORDER_COLOR, FONT_DISPLAY, NUTRIENT_COLORS, NUTRIENT_ICONS, TEXT_TERTIARY } from "./constants";
 
 export function ResultNutrientsSheet({
   open,
@@ -24,9 +24,10 @@ export function ResultNutrientsSheet({
     <AnimatePresence>
       {open && (
         <motion.div className="fixed inset-0 z-[100] flex items-end justify-center" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-          <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" onClick={onClose} />
+          <div className="absolute inset-0 bg-black/30" onClick={onClose} />
           <motion.div
-            className="relative bg-white rounded-t-3xl w-full max-w-sm shadow-xl max-h-[90dvh] flex flex-col"
+            className="relative bg-white rounded-t-3xl w-full max-w-sm max-h-[90dvh] flex flex-col"
+            style={{ borderTop: `1px solid ${BORDER_COLOR}` }}
             initial={{ y: "100%" }}
             animate={{ y: 0 }}
             exit={{ y: "100%" }}
@@ -48,8 +49,8 @@ export function ResultNutrientsSheet({
                     <Utensils className="w-4 h-4 text-white" />
                   </div>
                   <div>
-                    <h3 className="font-bold text-base" style={{ color: "#D97706" }}>{t("nutrients.sectionTitle")}</h3>
-                    <p className="text-xs text-stone-400">{t("nutrients.sectionSub")}</p>
+                    <h3 className="font-semibold text-base" style={{ color: "#D97706" }}>{t("nutrients.sectionTitle")}</h3>
+                    <p className="text-xs" style={{ fontFamily: FONT_DISPLAY, color: TEXT_TERTIARY }}>{t("nutrients.sectionSub")}</p>
                   </div>
                 </div>
                 <button onClick={onClose} className="w-7 h-7 rounded-full bg-stone-100 flex items-center justify-center">
@@ -71,20 +72,20 @@ export function ResultNutrientsSheet({
                       initial={{ opacity: 0, y: 12 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: index * 0.08 }}
-                      className="flex gap-3 p-4 rounded-2xl"
-                      style={{ background: `${color}0D` }}
+                      className="flex gap-3 p-4 rounded-2xl border"
+                      style={{ background: BG_MUTED, borderColor: BORDER_COLOR }}
                     >
                       <div className="shrink-0">
-                        <div className="w-8 h-8 rounded-full flex items-center justify-center text-base" style={{ background: "#FFFFFF" }}>
+                        <div className="w-8 h-8 rounded-full flex items-center justify-center text-base border" style={{ background: "#FFFFFF", borderColor: BORDER_COLOR }}>
                           {NUTRIENT_ICONS[letter]}
                         </div>
-                        <p className="text-xs font-semibold text-center mt-0.5" style={{ color }}>{letter}</p>
+                        <p className="text-xs font-light text-center mt-0.5" style={{ fontFamily: FONT_DISPLAY, color }}>{letter}</p>
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-[13px] font-bold mb-0.5" style={{ color }}>{nutrient.name}</p>
+                        <p className="text-[13px] font-semibold mb-0.5" style={{ color }}>{nutrient.name}</p>
                         <p className="text-[12px] text-stone-500 leading-relaxed mb-1.5">{nutrient.why}</p>
                         <p className="text-xs text-stone-400">
-                          <span className="font-bold" style={{ color }}>{t("nutrients.foodLabel")} </span>
+                          <span className="font-semibold" style={{ color }}>{t("nutrients.foodLabel")} </span>
                           {nutrient.foods}
                         </p>
                       </div>
@@ -95,10 +96,10 @@ export function ResultNutrientsSheet({
                 <div className="pt-1">
                   <div className="flex items-center gap-2 mb-3 pt-2 border-t border-stone-100">
                     <AlertCircle className="w-4 h-4 text-amber-500 shrink-0" />
-                    <p className="text-sm font-bold" style={{ color: "#D97706" }}>{t("nutrients.avoidTitle")}</p>
+                    <p className="text-sm font-semibold" style={{ color: "#D97706" }}>{t("nutrients.avoidTitle")}</p>
                   </div>
 
-                  <div className="rounded-2xl p-4 mb-2.5" style={{ background: "#FFF7ED" }}>
+                  <div className="rounded-2xl p-4 mb-2.5 border" style={{ background: BG_MUTED, borderColor: BORDER_COLOR }}>
                     <div className="flex items-center gap-1.5 mb-2.5">
                       <Sun className="w-4 h-4 text-orange-500 shrink-0" />
                       <span className="text-xs font-semibold text-orange-700">{t("nutrients.avoidLunch")}</span>
@@ -108,7 +109,7 @@ export function ResultNutrientsSheet({
                         <div key={index} className="flex gap-2 items-start">
                           <span className="text-xs font-semibold text-orange-400 shrink-0 mt-0.5">✕</span>
                           <div>
-                            <p className="text-[12px] font-bold text-stone-700">{food}</p>
+                            <p className="text-[12px] font-semibold text-stone-700">{food}</p>
                             <p className="text-xs text-stone-400">{why}</p>
                           </div>
                         </div>
@@ -116,7 +117,7 @@ export function ResultNutrientsSheet({
                     </div>
                   </div>
 
-                  <div className="rounded-2xl p-4" style={{ background: "#F6F4FB" }}>
+                  <div className="rounded-2xl p-4 border" style={{ background: BG_MUTED, borderColor: BORDER_COLOR }}>
                     <div className="flex items-center gap-1.5 mb-2.5">
                       <Moon className="w-4 h-4 text-violet-500 shrink-0" />
                       <span className="text-xs font-semibold text-violet-700">{t("nutrients.avoidDinner")}</span>
@@ -126,7 +127,7 @@ export function ResultNutrientsSheet({
                         <div key={index} className="flex gap-2 items-start">
                           <span className="text-xs font-semibold text-violet-400 shrink-0 mt-0.5">✕</span>
                           <div>
-                            <p className="text-[12px] font-bold text-stone-700">{food}</p>
+                            <p className="text-[12px] font-semibold text-stone-700">{food}</p>
                             <p className="text-xs text-stone-400">{why}</p>
                           </div>
                         </div>

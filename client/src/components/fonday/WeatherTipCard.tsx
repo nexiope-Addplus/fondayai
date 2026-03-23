@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 import { Sun } from "lucide-react";
-import { DEEP_GREEN, TINT_GREEN, TEXT_SECONDARY, fadeChild } from "./constants";
+import { DEEP_GREEN, TINT_GREEN, TEXT_SECONDARY, fadeChild, BORDER_COLOR, FONT_DISPLAY, TEXT_TERTIARY } from "./constants";
 import type { WeatherData } from "./types";
 import { getWeatherTipKey } from "./utils";
 
@@ -64,7 +64,7 @@ export function WeatherTipCard({ compact, weather }: {
     <motion.div variants={fadeChild} className="mb-4">
       <div
         className="rounded-2xl p-4 overflow-hidden relative"
-        style={{ background: TINT_GREEN, boxShadow: "0 2px 12px rgba(45,95,79,0.08)" }}
+        style={{ background: TINT_GREEN, border: `1px solid ${BORDER_COLOR}` }}
       >
         <div className="absolute top-0 right-0 w-20 h-20 rounded-bl-full opacity-20"
           style={{ background: DEEP_GREEN }} />
@@ -73,7 +73,7 @@ export function WeatherTipCard({ compact, weather }: {
             style={{ background: DEEP_GREEN }}>
             <Sun className="w-2.5 h-2.5 text-white" />
           </div>
-          <span className="text-xs font-bold tracking-widest uppercase" style={{ color: DEEP_GREEN }}>
+          <span className="text-xs font-semibold tracking-widest uppercase" style={{ fontFamily: FONT_DISPLAY, color: TEXT_TERTIARY }}>
             {t("weather.cardTitle")}
           </span>
         </div>
@@ -81,7 +81,7 @@ export function WeatherTipCard({ compact, weather }: {
         <div className="flex items-start gap-3">
           <span className="text-3xl leading-none flex-shrink-0">{tip.emoji}</span>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-bold text-stone-800 mb-1 leading-tight">{tip.title}</p>
+            <p className="text-sm font-semibold text-stone-800 mb-1 leading-tight">{tip.title}</p>
             <p className="text-[11.5px] text-stone-500 leading-relaxed">{tip.body}</p>
           </div>
         </div>
@@ -131,7 +131,7 @@ export function MiniScoreBarIdle({ label, score, color, delay, delta }: {
           }}
         />
       </div>
-      <span className="text-[10px] font-bold flex-shrink-0 w-6 text-right mt-0.5" style={{ color }}>{score}</span>
+      <span className="text-[10px] font-light flex-shrink-0 w-6 text-right mt-0.5" style={{ fontFamily: FONT_DISPLAY, color }}>{score}</span>
       {delta != null && delta !== 0 && (
         <span className={`text-[10px] font-bold flex-shrink-0 w-8 text-right mt-0.5 ${delta > 0 ? "text-emerald-500" : "text-rose-500"}`}>
           {delta > 0 ? `+${delta}` : `${delta}`}

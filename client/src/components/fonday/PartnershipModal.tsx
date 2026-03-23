@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 
 import { Button } from "@/components/ui/button";
 
-import { DEEP_GREEN } from "./constants";
+import { DEEP_GREEN, BG_MUTED, BORDER_COLOR, FONT_DISPLAY } from "./constants";
 
 type PartnerForm = {
   name: string;
@@ -44,7 +44,8 @@ export function PartnershipModal({
         >
           <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" />
           <motion.div
-            className="relative bg-white rounded-t-3xl sm:rounded-3xl p-8 w-full max-w-sm shadow-xl"
+            className="relative bg-white rounded-t-3xl sm:rounded-3xl p-8 w-full max-w-sm"
+            style={{ border: `1px solid ${BORDER_COLOR}` }}
             initial={{ y: 100, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: 100, opacity: 0 }}
@@ -80,7 +81,8 @@ export function PartnershipModal({
                     placeholder={t("modal.partnership.name")}
                     value={form.name}
                     onChange={(event) => onFormChange({ ...form, name: event.target.value })}
-                    className="w-full px-4 py-3.5 rounded-xl focus:outline-none focus:ring-2 text-sm"
+                    className="w-full px-4 py-3.5 rounded-xl focus:outline-none text-sm"
+                    style={{ background: BG_MUTED, border: `1px solid ${BORDER_COLOR}` }}
                   />
                   <input
                     type="text"
@@ -88,7 +90,8 @@ export function PartnershipModal({
                     placeholder={t("modal.partnership.company")}
                     value={form.company}
                     onChange={(event) => onFormChange({ ...form, company: event.target.value })}
-                    className="w-full px-4 py-3.5 rounded-xl focus:outline-none focus:ring-2 text-sm"
+                    className="w-full px-4 py-3.5 rounded-xl focus:outline-none text-sm"
+                    style={{ background: BG_MUTED, border: `1px solid ${BORDER_COLOR}` }}
                   />
                   <input
                     type="email"
@@ -96,7 +99,8 @@ export function PartnershipModal({
                     placeholder={t("modal.partnership.email")}
                     value={form.email}
                     onChange={(event) => onFormChange({ ...form, email: event.target.value })}
-                    className="w-full px-4 py-3.5 rounded-xl focus:outline-none focus:ring-2 text-sm"
+                    className="w-full px-4 py-3.5 rounded-xl focus:outline-none text-sm"
+                    style={{ background: BG_MUTED, border: `1px solid ${BORDER_COLOR}` }}
                   />
                   <textarea
                     required
@@ -104,7 +108,8 @@ export function PartnershipModal({
                     value={form.message}
                     onChange={(event) => onFormChange({ ...form, message: event.target.value })}
                     rows={3}
-                    className="w-full px-4 py-3.5 rounded-xl focus:outline-none focus:ring-2 text-sm resize-none"
+                    className="w-full px-4 py-3.5 rounded-xl focus:outline-none text-sm resize-none"
+                    style={{ background: BG_MUTED, border: `1px solid ${BORDER_COLOR}` }}
                   />
                   <Button
                     disabled={submitting}

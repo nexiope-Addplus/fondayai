@@ -2,7 +2,7 @@ import { AnimatePresence, motion, useDragControls } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import { Leaf, Sparkles, Star, X } from "lucide-react";
 
-import { DEEP_GREEN, SCAN_TO, TINT_GREEN, TINT_WARM } from "./constants";
+import { BG_MUTED, BORDER_COLOR, DEEP_GREEN, FONT_DISPLAY, SCAN_TO, TEXT_TERTIARY } from "./constants";
 
 export function ResultImprovementsSheet({
   open,
@@ -22,9 +22,10 @@ export function ResultImprovementsSheet({
     <AnimatePresence>
       {open && (
         <motion.div className="fixed inset-0 z-[100] flex items-end justify-center" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-          <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" onClick={onClose} />
+          <div className="absolute inset-0 bg-black/30" onClick={onClose} />
           <motion.div
-            className="relative bg-white rounded-t-3xl w-full max-w-sm shadow-xl max-h-[90dvh] flex flex-col"
+            className="relative bg-white rounded-t-3xl w-full max-w-sm max-h-[90dvh] flex flex-col"
+            style={{ borderTop: `1px solid ${BORDER_COLOR}` }}
             initial={{ y: "100%" }}
             animate={{ y: 0 }}
             exit={{ y: "100%" }}
@@ -46,8 +47,8 @@ export function ResultImprovementsSheet({
                     <Leaf className="w-4 h-4 text-white" />
                   </div>
                   <div>
-                    <h3 className="font-bold text-base" style={{ color: DEEP_GREEN }}>{t("modal.improvements.title")}</h3>
-                    <p className="text-xs text-stone-400">{t("modal.improvements.sub")}</p>
+                    <h3 className="font-semibold text-base" style={{ color: DEEP_GREEN }}>{t("modal.improvements.title")}</h3>
+                    <p className="text-xs" style={{ fontFamily: FONT_DISPLAY, color: TEXT_TERTIARY }}>{t("modal.improvements.sub")}</p>
                   </div>
                 </div>
                 <button onClick={onClose} className="w-7 h-7 rounded-full bg-stone-100 flex items-center justify-center">
@@ -63,22 +64,22 @@ export function ResultImprovementsSheet({
                     initial={{ opacity: 0, y: 12 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: index * 0.08 }}
-                    className="flex gap-3 p-4 rounded-2xl"
-                    style={{ background: index === 0 ? TINT_WARM : index === 1 ? TINT_GREEN : "#F6F4FB" }}
+                    className="flex gap-3 p-4 rounded-2xl border"
+                    style={{ background: BG_MUTED, borderColor: BORDER_COLOR }}
                   >
                     <div className="shrink-0">
                       <div
-                        className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-semibold"
-                        style={{ background: "#FFFFFF", color: index === 0 ? SCAN_TO : index === 1 ? DEEP_GREEN : "#7C3AED" }}
+                        className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-light border"
+                        style={{ fontFamily: FONT_DISPLAY, background: "#FFFFFF", borderColor: BORDER_COLOR, color: index === 0 ? SCAN_TO : index === 1 ? DEEP_GREEN : "#7C3AED" }}
                       >
                         {index + 1}
                       </div>
-                      <p className="text-xs font-semibold text-center mt-0.5" style={{ color: index === 0 ? SCAN_TO : index === 1 ? DEEP_GREEN : "#7C3AED" }}>
+                      <p className="text-xs text-center mt-0.5" style={{ fontFamily: FONT_DISPLAY, color: TEXT_TERTIARY }}>
                         STEP
                       </p>
                     </div>
                     <div>
-                      <p className="text-[13px] font-bold text-stone-800 mb-0.5">{item.title}</p>
+                      <p className="text-[13px] font-semibold text-stone-800 mb-0.5">{item.title}</p>
                       <p className="text-[12px] text-stone-500 leading-relaxed">{item.desc}</p>
                     </div>
                   </motion.div>
@@ -91,7 +92,7 @@ export function ResultImprovementsSheet({
                   <>
                     <div className="flex items-center gap-2 pt-2 pb-1">
                       <Sparkles className="w-4 h-4" style={{ color: SCAN_TO }} />
-                      <p className="text-sm font-bold" style={{ color: DEEP_GREEN }}>{t("modal.improvements.cosmetics")}</p>
+                      <p className="text-sm font-semibold" style={{ color: DEEP_GREEN }}>{t("modal.improvements.cosmetics")}</p>
                     </div>
                     {cosmetics.map((item, index) => (
                       <motion.div
@@ -99,15 +100,15 @@ export function ResultImprovementsSheet({
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.3 + index * 0.07 }}
-                        className="flex items-start gap-3 p-4 rounded-2xl"
-                        style={{ background: "#FFF7ED" }}
+                        className="flex items-start gap-3 p-4 rounded-2xl border"
+                        style={{ background: BG_MUTED, borderColor: BORDER_COLOR }}
                       >
-                        <div className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0" style={{ background: "#FFFFFF" }}>
+                        <div className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0 border" style={{ background: "#FFFFFF", borderColor: BORDER_COLOR }}>
                           <Star className="w-4 h-4" style={{ color: "#D97706" }} />
                         </div>
                         <div>
                           <div className="flex items-center gap-1.5 mb-0.5">
-                            <span className="text-sm font-bold text-stone-800">{item.type}</span>
+                            <span className="text-sm font-semibold text-stone-800">{item.type}</span>
                             <span className="text-xs px-1.5 py-0.5 rounded-full font-medium" style={{ background: "#FFFFFF", color: "#D97706" }}>
                               {item.key}
                             </span>

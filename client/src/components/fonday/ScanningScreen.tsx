@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { Camera } from "lucide-react";
-import { SCAN_FROM, SCAN_TO } from "./constants";
+import { SCAN_FROM, SCAN_TO, BG_BASE, FONT_DISPLAY } from "./constants";
 import { FaceMeshOverlay } from "./FaceMeshOverlay";
 
 // ─── 분석 중 화면 ─────────────────────────────────────────────────
@@ -34,7 +34,7 @@ export function ScanningScreen({ imageSrc }: { imageSrc: string | null }) {
   }, []);
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-[calc(100dvh-60px)] bg-[#FAF9F6] px-6">
+    <div className="flex flex-col items-center justify-center min-h-[calc(100dvh-60px)] px-6" style={{ background: BG_BASE }}>
       <div className="relative w-64 h-80 rounded-3xl overflow-hidden bg-stone-100 flex items-center justify-center shadow-inner">
         {imageSrc ? (
           <>
@@ -54,13 +54,13 @@ export function ScanningScreen({ imageSrc }: { imageSrc: string | null }) {
         <div className="absolute bottom-4 left-0 right-0 flex justify-center">
           <div className="bg-black/50 backdrop-blur-md px-3 py-1.5 rounded-full flex items-center gap-2">
             <div className="w-2 h-2 rounded-full animate-pulse" style={{ background: SCAN_FROM }} />
-            <span className="text-xs font-bold text-white uppercase tracking-wider">AI Scanning</span>
+            <span className="text-xs font-semibold text-white uppercase tracking-wider" style={{ fontFamily: FONT_DISPLAY }}>AI Scanning</span>
           </div>
         </div>
       </div>
       <div className="mt-8 text-center space-y-3">
         <AnimatePresence mode="wait">
-          <motion.p key={textIdx} className="font-bold text-xl text-stone-800"
+          <motion.p key={textIdx} className="font-semibold text-xl text-stone-800"
             initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.3 }}>
             {texts[textIdx]}
           </motion.p>

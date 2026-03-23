@@ -1,7 +1,7 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
 
-import { DEEP_GREEN } from "./constants";
+import { BG_MUTED, BORDER_COLOR, DEEP_GREEN, FONT_DISPLAY, TEXT_TERTIARY } from "./constants";
 
 type LoginProvider = "kakao" | "line" | "google";
 
@@ -28,9 +28,10 @@ export function ResultCosmeticsGateSheet({
           exit={{ opacity: 0 }}
           onClick={onClose}
         >
-          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
+          <div className="absolute inset-0 bg-black/40" />
           <motion.div
-            className="relative bg-white rounded-t-[32px] w-full max-w-md p-6 pb-10 shadow-2xl"
+            className="relative bg-white rounded-t-[32px] w-full max-w-md p-6 pb-10"
+            style={{ borderTop: `1px solid ${BORDER_COLOR}` }}
             initial={{ y: 120, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: 120, opacity: 0 }}
@@ -46,15 +47,15 @@ export function ResultCosmeticsGateSheet({
                 🧴
               </div>
               <div>
-                <p className="text-base font-bold" style={{ color: DEEP_GREEN }}>
+                <p className="text-base font-semibold" style={{ color: DEEP_GREEN }}>
                   {t("cosmetics.loginGateTitle")}
                 </p>
-                <p className="text-[12px] text-stone-400 font-semibold">{t("cosmetics.loginGateSubtitle")}</p>
+                <p className="text-[12px]" style={{ fontFamily: FONT_DISPLAY, color: TEXT_TERTIARY }}>{t("cosmetics.loginGateSubtitle")}</p>
               </div>
             </div>
             <p className="text-[13px] text-stone-600 mb-3 leading-relaxed">{t("cosmetics.loginGateDesc")}</p>
 
-            <div className="rounded-2xl p-4 mb-5 space-y-3.5" style={{ background: "#F0F7F5" }}>
+            <div className="rounded-2xl p-4 mb-5 space-y-3.5 border" style={{ background: BG_MUTED, borderColor: BORDER_COLOR }}>
               {[
                 t("cosmetics.loginGateBullet1"),
                 t("cosmetics.loginGateBullet2"),
@@ -78,7 +79,7 @@ export function ResultCosmeticsGateSheet({
               {language === "ko" ? (
                 <button
                   onClick={() => onLogin("kakao")}
-                  className="w-full py-3.5 rounded-2xl text-sm font-bold flex items-center justify-center gap-2"
+                  className="w-full py-3.5 rounded-2xl text-sm font-semibold flex items-center justify-center gap-2"
                   style={{ background: "#FEE500", color: "#3C1E1E" }}
                 >
                   <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
@@ -94,7 +95,7 @@ export function ResultCosmeticsGateSheet({
               ) : (
                 <button
                   onClick={() => onLogin("line")}
-                  className="w-full py-3.5 rounded-2xl text-sm font-bold flex items-center justify-center gap-2 text-white"
+                  className="w-full py-3.5 rounded-2xl text-sm font-semibold flex items-center justify-center gap-2 text-white"
                   style={{ background: "#06C755" }}
                 >
                   <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
@@ -109,7 +110,7 @@ export function ResultCosmeticsGateSheet({
 
               <button
                 onClick={() => onLogin("google")}
-                className="w-full py-3.5 rounded-2xl text-sm font-bold flex items-center justify-center gap-2 bg-white text-stone-700"
+                className="w-full py-3.5 rounded-2xl text-sm font-semibold flex items-center justify-center gap-2 bg-white text-stone-700"
               >
                 <img
                   src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"

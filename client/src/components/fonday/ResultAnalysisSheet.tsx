@@ -4,14 +4,17 @@ import { Activity, LayoutGrid, Shield, Sparkles, X, Zap } from "lucide-react";
 
 import {
   BAUMANN_COLORS,
+  BG_MUTED,
+  BORDER_COLOR,
   DEEP_GREEN,
   DEEP_GREEN_LIGHT,
+  FONT_DISPLAY,
   SCAN_FROM,
   SCAN_TO,
   SCORE_COLORS,
   SCORE_ICONS,
+  TEXT_TERTIARY,
   TINT_NEUTRAL,
-  TINT_WARM,
 } from "./constants";
 
 type ScoreItem = {
@@ -51,9 +54,10 @@ export function ResultAnalysisSheet({
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
         >
-          <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" onClick={onClose} />
+          <div className="absolute inset-0 bg-black/30" onClick={onClose} />
           <motion.div
-            className="relative bg-white rounded-t-3xl w-full max-w-sm shadow-xl max-h-[90dvh] flex flex-col"
+            className="relative bg-white rounded-t-3xl w-full max-w-sm max-h-[90dvh] flex flex-col"
+            style={{ borderTop: `1px solid ${BORDER_COLOR}` }}
             initial={{ y: "100%" }}
             animate={{ y: 0 }}
             exit={{ y: "100%" }}
@@ -81,10 +85,10 @@ export function ResultAnalysisSheet({
                     <LayoutGrid className="w-4 h-4 text-white" />
                   </div>
                   <div>
-                    <h3 className="font-bold text-base" style={{ color: DEEP_GREEN }}>
+                    <h3 className="font-semibold text-base" style={{ color: DEEP_GREEN }}>
                       {t("modal.analysis.title")}
                     </h3>
-                    <p className="text-xs text-stone-400">{t("modal.analysis.sub")}</p>
+                    <p className="text-xs" style={{ fontFamily: FONT_DISPLAY, color: TEXT_TERTIARY }}>{t("modal.analysis.sub")}</p>
                   </div>
                 </div>
                 <button
@@ -98,12 +102,12 @@ export function ResultAnalysisSheet({
             <div className="flex-1 overflow-y-auto overscroll-contain">
               <div className="px-6 pb-8 space-y-3">
                 {aiComment && (
-                  <div className="p-4 rounded-2xl" style={{ background: TINT_WARM }}>
+                  <div className="p-4 rounded-2xl border" style={{ background: BG_MUTED, borderColor: BORDER_COLOR }}>
                     <div className="flex items-center gap-2 mb-2">
                       <div className="w-7 h-7 rounded-xl flex items-center justify-center" style={{ background: "#FFFFFF" }}>
                         <Sparkles className="w-3.5 h-3.5" style={{ color: SCAN_TO }} />
                       </div>
-                      <p className="text-sm font-bold" style={{ color: DEEP_GREEN }}>
+                      <p className="text-sm font-semibold" style={{ color: DEEP_GREEN }}>
                         {t("result.aiComment")}
                       </p>
                     </div>
@@ -121,16 +125,17 @@ export function ResultAnalysisSheet({
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: index * 0.05 }}
-                      className="p-4 rounded-2xl bg-stone-50"
+                      className="p-4 rounded-2xl border"
+                      style={{ background: BG_MUTED, borderColor: BORDER_COLOR }}
                     >
                       <div className="flex items-center gap-2 mb-1.5">
-                        <div className="w-6 h-6 rounded-full flex items-center justify-center bg-white shadow-sm shrink-0">
+                        <div className="w-6 h-6 rounded-full flex items-center justify-center bg-white border shrink-0" style={{ borderColor: BORDER_COLOR }}>
                           <Icon className="w-3 h-3" style={{ color }} />
                         </div>
                         <span className="text-xs font-semibold" style={{ color }}>
                           {t(`scores.${index}`)}
                         </span>
-                        <span className="ml-auto text-xs font-semibold" style={{ color }}>
+                        <span className="ml-auto text-xs font-light" style={{ fontFamily: FONT_DISPLAY, color }}>
                           {item.score}
                           {t("result.scoreSuffix")}
                         </span>
@@ -144,13 +149,13 @@ export function ResultAnalysisSheet({
                   <div className="pt-1">
                     <div className="flex items-center gap-2 mb-3">
                       <Activity className="w-4 h-4" style={{ color: DEEP_GREEN }} />
-                      <p className="text-sm font-bold" style={{ color: DEEP_GREEN }}>
+                      <p className="text-sm font-semibold" style={{ color: DEEP_GREEN }}>
                         {t("modal.analysis.skinReport")}
                       </p>
                     </div>
                     <div className="grid grid-cols-2 gap-2">
                       {skinReport.map((item, index) => (
-                        <div key={index} className="p-3 rounded-2xl" style={{ background: TINT_NEUTRAL }}>
+                        <div key={index} className="p-3 rounded-2xl border" style={{ background: BG_MUTED, borderColor: BORDER_COLOR }}>
                           <p className="text-xs font-semibold mb-1" style={{ color: DEEP_GREEN_LIGHT }}>
                             {item.area}
                           </p>
@@ -164,7 +169,7 @@ export function ResultAnalysisSheet({
                 <div className="pt-1">
                   <div className="flex items-center gap-2 mb-3">
                     <Shield className="w-4 h-4" style={{ color: DEEP_GREEN }} />
-                    <p className="text-sm font-bold" style={{ color: DEEP_GREEN }}>
+                    <p className="text-sm font-semibold" style={{ color: DEEP_GREEN }}>
                       {t("modal.analysis.baumannDetail", { type: finalType })}
                     </p>
                   </div>
@@ -177,13 +182,13 @@ export function ResultAnalysisSheet({
                         <div
                           key={index}
                           className="p-3 rounded-2xl border"
-                          style={{ background: `${color}10`, borderColor: `${color}30` }}
+                          style={{ background: BG_MUTED, borderColor: BORDER_COLOR }}
                         >
                           <div className="flex items-center gap-1.5 mb-1">
-                            <span className="text-[17px] font-black" style={{ color }}>
+                            <span className="text-[17px] font-light" style={{ fontFamily: FONT_DISPLAY, color }}>
                               {letter}
                             </span>
-                            <span className="text-[12px] font-bold text-stone-700">
+                            <span className="text-[12px] font-semibold text-stone-700">
                               {t(`baumann.${letter}.name`)}
                             </span>
                           </div>

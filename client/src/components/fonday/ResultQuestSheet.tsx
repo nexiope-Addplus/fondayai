@@ -2,7 +2,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { CheckCircle2, Star, X } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
-import { DEEP_GREEN, SCAN_TO } from "./constants";
+import { BORDER_COLOR, DEEP_GREEN, FONT_DISPLAY, SCAN_TO, TEXT_TERTIARY } from "./constants";
 
 type QuestItem = {
   id: string;
@@ -40,9 +40,10 @@ export function ResultQuestSheet({
           exit={{ opacity: 0 }}
           onClick={onClose}
         >
-          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
+          <div className="absolute inset-0 bg-black/40" />
           <motion.div
-            className="relative bg-white rounded-t-[32px] w-full max-w-md px-5 pt-5 pb-8 shadow-2xl max-h-[82vh] overflow-y-auto"
+            className="relative bg-white rounded-t-[32px] w-full max-w-md px-5 pt-5 pb-8 max-h-[82vh] overflow-y-auto"
+            style={{ borderTop: `1px solid ${BORDER_COLOR}` }}
             initial={{ y: 120 }}
             animate={{ y: 0 }}
             exit={{ y: 120 }}
@@ -52,17 +53,17 @@ export function ResultQuestSheet({
             <div className="w-10 h-1 rounded-full bg-stone-200 mx-auto mb-4" />
             <div className="flex items-center justify-between gap-3 mb-4">
               <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.16em]" style={{ color: SCAN_TO }}>
+                <p className="text-xs uppercase tracking-[0.16em]" style={{ fontFamily: FONT_DISPLAY, color: TEXT_TERTIARY }}>
                   {t("result.actionCard.questEyebrow")}
                 </p>
-                <p className="text-base font-bold mt-1" style={{ color: DEEP_GREEN }}>
+                <p className="text-base font-semibold mt-1" style={{ color: DEEP_GREEN }}>
                   {t("result.actionCard.questTitle", { done: doneCount, total: totalCount })}
                 </p>
               </div>
               <div className="flex items-center gap-2">
                 <span
-                  className="rounded-full px-3 py-1 text-xs font-bold"
-                  style={{ background: "#FFF7ED", color: "#D97706" }}
+                  className="rounded-full px-3 py-1 text-xs font-light"
+                  style={{ fontFamily: FONT_DISPLAY, background: "#FFF7ED", color: "#D97706" }}
                 >
                   {totalPoints}pt
                 </span>
@@ -82,7 +83,7 @@ export function ResultQuestSheet({
                   className="flex items-center gap-3 rounded-2xl px-3 py-3"
                   style={{
                     background: quest.done ? "#F8FFFB" : "#FFFFFF",
-                    border: `1px solid ${quest.done ? "#DDF5E8" : "#F3E7E3"}`,
+                    border: `1px solid ${BORDER_COLOR}`,
                   }}
                 >
                   <div
@@ -101,8 +102,8 @@ export function ResultQuestSheet({
                         {quest.label}
                       </p>
                       <span
-                        className="text-xs font-bold"
-                        style={{ color: quest.done ? "#059669" : quest.accent }}
+                        className="text-xs font-light"
+                        style={{ fontFamily: FONT_DISPLAY, color: quest.done ? "#059669" : quest.accent }}
                       >
                         {quest.reward}
                       </span>

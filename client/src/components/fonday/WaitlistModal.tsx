@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence } from "framer-motion";
 import { Heart, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { SCAN_FROM, SCAN_TO, DEEP_GREEN } from "./constants";
+import { SCAN_FROM, SCAN_TO, DEEP_GREEN, BG_MUTED, BORDER_COLOR } from "./constants";
 
 export function WaitlistModal({ open, onClose, email, onEmailChange, isSubmitting, isSuccess, onSubmit }: any) {
   const { t } = useTranslation();
@@ -14,7 +14,8 @@ export function WaitlistModal({ open, onClose, email, onEmailChange, isSubmittin
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             onClick={() => onClose()}>
             <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" />
-            <motion.div className="relative bg-white rounded-t-3xl sm:rounded-3xl p-8 w-full max-w-sm shadow-xl"
+            <motion.div className="relative bg-white rounded-t-3xl sm:rounded-3xl p-8 w-full max-w-sm"
+              style={{ border: `1px solid ${BORDER_COLOR}` }}
               initial={{ y: 100, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 100, opacity: 0 }}
               onClick={e => e.stopPropagation()}>
               <div className="w-10 h-1 rounded-full bg-stone-200 mx-auto mb-6" />
@@ -34,7 +35,8 @@ export function WaitlistModal({ open, onClose, email, onEmailChange, isSubmittin
                   <form onSubmit={onSubmit} className="space-y-4">
                     <input type="email" required placeholder={t("modal.waitlist.email")} value={email}
                       onChange={e => onEmailChange(e.target.value)}
-                      className="w-full px-4 py-3.5 rounded-xl focus:outline-none focus:ring-2 focus:ring-rose-200" />
+                      className="w-full px-4 py-3.5 rounded-xl focus:outline-none text-sm"
+                      style={{ background: BG_MUTED, border: `1px solid ${BORDER_COLOR}` }} />
                     <Button disabled={isSubmitting} type="submit"
                       className="w-full h-14 rounded-2xl font-bold text-[15px] text-white"
                       style={{ background: `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})` }}>

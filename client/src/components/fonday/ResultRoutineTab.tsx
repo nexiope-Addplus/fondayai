@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import { Sun, Moon, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { DEEP_GREEN, SCAN_FROM, SCAN_TO, TINT_WARM, TINT_GREEN, TINT_NEUTRAL } from "./constants";
+import { DEEP_GREEN, SCAN_FROM, SCAN_TO, TINT_WARM, TINT_GREEN, TINT_NEUTRAL, BORDER_COLOR, FONT_DISPLAY, TEXT_TERTIARY } from "./constants";
 import { ResultDiaryCard } from "./ResultDiaryCard";
 import { ResultLoginCard } from "./ResultLoginCard";
 
@@ -32,11 +32,11 @@ export function ResultRoutineTab(props: any) {
           <motion.div
             initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }}
             className="rounded-3xl p-4 flex items-start gap-3"
-            style={{ background: "#FFFFFF", boxShadow: "0 8px 24px rgba(45,95,79,0.06)" }}
+            style={{ background: "#FFFFFF", border: `1px solid ${BORDER_COLOR}` }}
           >
             <span className="text-xl shrink-0 mt-0.5">✨</span>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-bold text-stone-800 mb-0.5">{t("result.onboarding.title")}</p>
+              <p className="text-sm font-semibold text-stone-800 mb-0.5">{t("result.onboarding.title")}</p>
               <p className="text-xs text-stone-500 leading-relaxed text-kr-pretty">{t("result.onboarding.sub")}</p>
               <button
                 onClick={() => { localStorage.setItem("fonday_onboarding_done", "1"); setShowOnboarding(false); }}
@@ -50,11 +50,11 @@ export function ResultRoutineTab(props: any) {
         )}
 
         {/* 퀘스트 / 미션 카드 */}
-        <Card className="rounded-3xl overflow-hidden shadow-[0_8px_24px_rgba(45,95,79,0.06)] bg-white">
+        <Card className="rounded-3xl overflow-hidden bg-white" style={{ border: `1px solid ${BORDER_COLOR}` }}>
           <CardContent className="p-3.5">
             <div className="min-w-0">
-              <p className="text-xs font-semibold tracking-[0.16em] uppercase" style={{ color: SCAN_TO }}>{t("result.actionCard.missionEyebrow")}</p>
-              <p className="text-base font-bold mt-1 text-kr-pretty" style={{ color: DEEP_GREEN }}>{t("result.actionCard.title")}</p>
+              <p className="text-xs font-semibold tracking-[0.16em] uppercase" style={{ fontFamily: FONT_DISPLAY, color: TEXT_TERTIARY }}>{t("result.actionCard.missionEyebrow")}</p>
+              <p className="text-base font-semibold mt-1 text-kr-pretty" style={{ color: DEEP_GREEN }}>{t("result.actionCard.title")}</p>
               <p className="text-xs text-stone-500 mt-1.5 leading-relaxed text-kr-pretty">{questStatusDetail}</p>
             </div>
             <div className="h-2 rounded-full bg-stone-100 overflow-hidden mt-3">
@@ -84,16 +84,16 @@ export function ResultRoutineTab(props: any) {
         </Card>
 
         {/* 루틴 체크 카드 */}
-        <Card className="shadow-[0_8px_24px_rgba(45,95,79,0.06)] rounded-3xl overflow-hidden bg-white">
+        <Card className="rounded-3xl overflow-hidden bg-white" style={{ border: `1px solid ${BORDER_COLOR}` }}>
           <CardContent className="p-4">
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
-                <p className="text-xs font-semibold uppercase tracking-[0.16em]" style={{ color: DEEP_GREEN }}>{t("diary.routineTitle")}</p>
+                <p className="text-xs font-semibold uppercase tracking-[0.16em]" style={{ fontFamily: FONT_DISPLAY, color: TEXT_TERTIARY }}>{t("diary.routineTitle")}</p>
                 <div className="mt-1 space-y-0.5">
-                  <p className="text-[13px] font-bold leading-snug flex items-center gap-1" style={{ color: DEEP_GREEN }}>
+                  <p className="text-[13px] font-semibold leading-snug flex items-center gap-1" style={{ color: DEEP_GREEN }}>
                     <Sun className="w-3.5 h-3.5 shrink-0" />{t("cosmetics.amBtn")}: {morningRoutineItems.join(" + ")}
                   </p>
-                  <p className="text-[13px] font-bold leading-snug flex items-center gap-1" style={{ color: SCAN_TO }}>
+                  <p className="text-[13px] font-semibold leading-snug flex items-center gap-1" style={{ color: SCAN_TO }}>
                     <Moon className="w-3.5 h-3.5 shrink-0" />{t("cosmetics.pmBtn")}: {eveningRoutineItems.join(" + ")}
                   </p>
                 </div>
@@ -116,7 +116,7 @@ export function ResultRoutineTab(props: any) {
               >
                 <div className="flex items-center gap-2 min-w-0">
                   <Sun className="w-4 h-4 shrink-0" style={{ color: DEEP_GREEN }} />
-                  <p className="text-xs font-bold truncate" style={{ color: DEEP_GREEN }}>{morningRoutineItems.join(" → ")}</p>
+                  <p className="text-xs font-semibold truncate" style={{ color: DEEP_GREEN }}>{morningRoutineItems.join(" → ")}</p>
                 </div>
                 <div className={`w-5 h-5 rounded-[6px] border-2 flex items-center justify-center shrink-0 ${
                   morningRoutineComplete ? "border-emerald-400 bg-emerald-400" : "border-stone-200 bg-white"
@@ -132,7 +132,7 @@ export function ResultRoutineTab(props: any) {
               >
                 <div className="flex items-center gap-2 min-w-0">
                   <Moon className="w-4 h-4 shrink-0" style={{ color: SCAN_TO }} />
-                  <p className="text-xs font-bold truncate" style={{ color: SCAN_TO }}>{eveningRoutineItems.join(" → ")}</p>
+                  <p className="text-xs font-semibold truncate" style={{ color: SCAN_TO }}>{eveningRoutineItems.join(" → ")}</p>
                 </div>
                 <div className={`w-5 h-5 rounded-[6px] border-2 flex items-center justify-center shrink-0 ${
                   eveningRoutineComplete ? "border-emerald-400 bg-emerald-400" : "border-stone-200 bg-white"
@@ -146,14 +146,14 @@ export function ResultRoutineTab(props: any) {
               <div className="mt-4 rounded-3xl p-4" style={{ background: TINT_NEUTRAL }}>
                 <div className="flex items-center justify-between gap-3 mb-3">
                   <div>
-                    <p className="text-xs font-semibold uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>{t("cosmetics.insightTitle")}</p>
+                    <p className="text-xs font-semibold uppercase tracking-[0.14em]" style={{ fontFamily: FONT_DISPLAY, color: TEXT_TERTIARY }}>{t("cosmetics.insightTitle")}</p>
                     <p className="text-xs text-stone-400">{t("cosmetics.ctaCount", { count: cosmeticCount })}</p>
                   </div>
                   <div className="flex items-center gap-2">
                     {myCosmetics.length > 0 && setShowCosmeticsReport && (
                       <button
                         onClick={() => setShowCosmeticsReport(true)}
-                        className="rounded-full px-3 py-1.5 text-xs font-bold whitespace-nowrap"
+                        className="rounded-full px-3 py-1.5 text-xs font-semibold whitespace-nowrap"
                         style={{ background: `${SCAN_FROM}18`, color: SCAN_TO }}
                       >
                         {t("cosmeticsReport.btnLabel")}

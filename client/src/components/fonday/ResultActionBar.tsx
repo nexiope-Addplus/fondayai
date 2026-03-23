@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 
 import { Button } from "@/components/ui/button";
 
-import { DEEP_GREEN, SCAN_TO } from "./constants";
+import { DEEP_GREEN, SCAN_TO, BORDER_COLOR } from "./constants";
 
 export function ResultActionBar({
   shareLoading,
@@ -27,7 +27,7 @@ export function ResultActionBar({
   return (
     <div
       className="fixed left-0 right-0 z-[50] flex items-center gap-2 px-4 py-3 bg-white/95 backdrop-blur-md border-t border-stone-100"
-      style={{ bottom: 60, boxShadow: "0 -4px 16px rgba(0,0,0,0.06)" }}
+      style={{ bottom: 60, borderTopColor: BORDER_COLOR }}
     >
       <Button
         onClick={onShare}

@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 import { CheckCircle2, Lock } from "lucide-react";
-import { DEEP_GREEN, TINT_NEUTRAL, MISSION_POINTS, fadeChild } from "./constants";
+import { DEEP_GREEN, TINT_NEUTRAL, MISSION_POINTS, fadeChild, BORDER_COLOR, FONT_DISPLAY } from "./constants";
 import type { MissionState } from "./types";
 import { getMissions, todayStr } from "./utils";
 
@@ -37,7 +37,7 @@ export function MissionCard() {
   return (
     <motion.div variants={fadeChild} className="mb-4">
       <div className="rounded-2xl px-4 py-3.5"
-        style={{ background: "#FFFFFF", boxShadow: "0 2px 10px rgba(45,95,79,0.06)" }}>
+        style={{ background: "#FFFFFF", border: `1px solid ${BORDER_COLOR}` }}>
         <div className="flex items-start justify-between gap-3 mb-3">
           <div className="min-w-0">
             <p className="text-sm font-semibold" style={{ color: DEEP_GREEN }}>{t("mission.title")}</p>

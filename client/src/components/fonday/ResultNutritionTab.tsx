@@ -2,7 +2,7 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 import { Utensils, Pill, AlertCircle } from "lucide-react";
-import { SCORE_LABEL_MAP } from "./constants";
+import { SCORE_LABEL_MAP, BORDER_COLOR, FONT_DISPLAY, TEXT_TERTIARY } from "./constants";
 
 export function ResultNutritionTab({ analysisResult }: any) {
   const { t } = useTranslation();
@@ -14,7 +14,7 @@ export function ResultNutritionTab({ analysisResult }: any) {
                 <Utensils className="w-4 h-4" style={{ color: "#7C3AED" }} />
               </div>
               <div>
-                <p className="text-xs font-bold uppercase tracking-[0.14em]" style={{ color: "#7C3AED" }}>{t("nutrients.supplementsTitle")}</p>
+                <p className="text-xs font-semibold uppercase tracking-[0.14em]" style={{ fontFamily: FONT_DISPLAY, color: TEXT_TERTIARY }}>{t("nutrients.supplementsTitle")}</p>
                 <p className="text-xs text-stone-400">{t("nutrients.supplementsSub")}</p>
               </div>
             </div>
@@ -32,13 +32,13 @@ export function ResultNutritionTab({ analysisResult }: any) {
                     <motion.div key={i} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: i * 0.07 }}
                       className="flex items-start gap-3 p-3.5 rounded-2xl"
-                      style={{ background: "#FFFFFF", boxShadow: "0 8px 24px rgba(45,95,79,0.06)" }}>
+                      style={{ background: "#FFFFFF", border: `1px solid ${BORDER_COLOR}` }}>
                       <div className="w-10 h-10 rounded-2xl flex items-center justify-center shrink-0 mt-0.5" style={{ background: "#F6F4FB" }}>
                         <span className="text-xl">{item.emoji}</span>
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-0.5 flex-wrap">
-                          <p className="text-sm font-bold text-stone-800">{item.name}</p>
+                          <p className="text-sm font-semibold text-stone-800">{item.name}</p>
                           <span className="text-xs font-medium rounded-full px-2 py-0.5 shrink-0"
                             style={{ background: "#FFFFFF", color: "#7C3AED" }}>
                             {SCORE_LABEL_MAP[item.targetScore] !== undefined ? t(`scores.${SCORE_LABEL_MAP[item.targetScore]}`) : item.targetScore}
@@ -54,7 +54,7 @@ export function ResultNutritionTab({ analysisResult }: any) {
                 {/* 수분 목표 */}
                 {analysisResult.nutritionTips.hydrationGoal && (
                   <div className="flex items-center gap-3 rounded-2xl px-4 py-3.5"
-                    style={{ background: "#FFFFFF", boxShadow: "0 8px 24px rgba(45,95,79,0.06)" }}>
+                    style={{ background: "#FFFFFF", border: `1px solid ${BORDER_COLOR}` }}>
                     <div className="w-10 h-10 rounded-2xl flex items-center justify-center shrink-0" style={{ background: "#F5F9FF" }}>
                       <span className="text-xl">💧</span>
                     </div>
@@ -71,17 +71,17 @@ export function ResultNutritionTab({ analysisResult }: any) {
                     <div className="w-9 h-9 rounded-2xl flex items-center justify-center" style={{ background: "#FFF7ED" }}>
                       <AlertCircle className="w-4 h-4 text-amber-500 shrink-0" />
                     </div>
-                    <p className="text-xs font-bold uppercase tracking-[0.14em]" style={{ color: "#D97706" }}>{t("nutrients.avoidTitle")}</p>
+                    <p className="text-xs font-semibold uppercase tracking-[0.14em]" style={{ fontFamily: FONT_DISPLAY, color: TEXT_TERTIARY }}>{t("nutrients.avoidTitle")}</p>
                   </div>
                   <div className="space-y-3">
                     {analysisResult.nutritionTips.avoidFoods.map((item: { emoji: string; food: string; reason: string }, idx: number) => (
                       <div key={idx} className="flex items-start gap-3 p-3 rounded-2xl"
-                        style={{ background: "#FFFFFF", boxShadow: "0 8px 24px rgba(45,95,79,0.06)" }}>
+                        style={{ background: "#FFFFFF", border: `1px solid ${BORDER_COLOR}` }}>
                         <div className="w-10 h-10 rounded-2xl flex items-center justify-center shrink-0" style={{ background: "#FFF7ED" }}>
                           <span className="text-xl">{item.emoji}</span>
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="text-[12px] font-bold text-stone-700 mb-0.5">{item.food}</p>
+                          <p className="text-[12px] font-semibold text-stone-700 mb-0.5">{item.food}</p>
                           <p className="text-xs text-stone-400">{item.reason}</p>
                         </div>
                       </div>
