@@ -9,7 +9,7 @@ import {
   DEEP_GREEN,
   DEEP_GREEN_LIGHT,
   CATEGORY_FILTERS,
-  MAGAZINE_ARTICLES,
+  getMagazineArticles,
   fadeChild,
   stagger,
 } from "./constants";
@@ -143,7 +143,7 @@ function ArticleModal({ article, onClose }: { article: MagazineArticle; onClose:
 }
 
 export function MagazineTab() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [filter, setFilter] = useState<CategoryFilter>("전체");
   const [selectedArticle, setSelectedArticle] = useState<MagazineArticle | null>(null);
   const [rankingData, setRankingData] = useState<any | null>(null);
@@ -198,10 +198,11 @@ export function MagazineTab() {
   }, [latestScan]);
 
   const { filtered, featured, rest } = useMemo(() => {
-    const f = filter === "전체" ? MAGAZINE_ARTICLES : MAGAZINE_ARTICLES.filter(a => a.category === filter);
+    const articles = getMagazineArticles(i18n.language);
+    const f = filter === "전체" ? articles : articles.filter(a => a.category === filter);
     const feat = f.find(a => a.featured) ?? f[0] ?? null;
     return { filtered: f, featured: feat, rest: feat ? f.filter(a => a.id !== feat.id) : f };
-  }, [filter]);
+  }, [filter, i18n.language]);
 
   return (
     <>
