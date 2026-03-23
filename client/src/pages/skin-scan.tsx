@@ -81,7 +81,7 @@ export default function SkinScanPage() {
 
   const { trackEvent } = useAnalytics(i18n.language, !user);
 
-  const TAB_ORDER: TabId[] = ["scan", "routine", "diary", "magazine", "my"];
+  const TAB_ORDER: TabId[] = ["scan", "routine", "diary", "my"];
   const tabDirection = TAB_ORDER.indexOf(activeTab) >= TAB_ORDER.indexOf(prevTabRef.current) ? 1 : -1;
 
   const handleTabChange = (tab: TabId) => {
@@ -336,7 +336,7 @@ export default function SkinScanPage() {
                   onScan={() => setShowCamera(true)}
                   onOpenRoutine={() => handleTabChange("routine")}
                   onOpenDiary={() => handleTabChange("diary")}
-                  onOpenDiscover={() => handleTabChange("magazine")}
+                  onOpenDiscover={() => handleTabChange("scan")}
                   onOpenMy={() => handleTabChange("my")}
                 />
               )}
@@ -370,7 +370,7 @@ export default function SkinScanPage() {
                   imageBase64={imageBase64}
                   onBack={() => setScanState("idle")}
                   onGoRoutine={() => handleTabChange("routine")}
-                  onGoMagazine={() => handleTabChange("magazine")}
+                  onGoMagazine={() => handleTabChange("scan")}
                   onOpenDiary={() => handleTabChange("diary")}
                   onGoMy={() => handleTabChange("my")}
                   user={user}
@@ -398,7 +398,7 @@ export default function SkinScanPage() {
           {activeTab === "my" && (
             <motion.div key="my" custom={tabDirection} initial={{ opacity: 0, x: tabDirection * 24 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: tabDirection * -24 }} transition={{ duration: 0.18, ease: "easeOut" }}>
               <Suspense fallback={<div className="min-h-[calc(100dvh-64px)]" />}>
-                <MyScreen user={user} analysisResult={analysisResult} onInstall={handleInstall} onBack={() => handleTabChange("scan")} onLogin={openLoginPopup} onGoMagazine={() => handleTabChange("magazine")} onGoRoutine={() => handleTabChange("routine")} onOpenDiary={() => handleTabChange("diary")} />
+                <MyScreen user={user} analysisResult={analysisResult} onInstall={handleInstall} onBack={() => handleTabChange("scan")} onLogin={openLoginPopup} onGoMagazine={() => handleTabChange("scan")} onGoRoutine={() => handleTabChange("routine")} onOpenDiary={() => handleTabChange("diary")} />
               </Suspense>
             </motion.div>
           )}
