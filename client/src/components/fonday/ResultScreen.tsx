@@ -41,7 +41,7 @@ import { ResultModals } from "./ResultModals";
 import { CosmeticsReportCard } from "./CosmeticsReportCard";
 
 // ─── 피부 예측 카드 ────────────────────────────────────────────────
-export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, imageBase64, onBack, onGoMagazine, onOpenDiary, onGoRoutine, onGoMy, user, deferredPrompt, onShowInstallGuide }: any) {
+export function ResultScreen({ weather, surveyData, analysisResult, imageSrc, faceCroppedSrc, imageBase64, onBack, onGoMagazine, onOpenDiary, onGoRoutine, onGoMy, user, deferredPrompt, onShowInstallGuide }: any) {
   const { t } = useTranslation();
   const [history, setHistory] = useState<any[]>([]);
   const [isSaved, setIsSaved] = useState(false);
@@ -329,6 +329,7 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
         aiComment: analysisResult.aiComment,
         improvements: analysisResult.improvements ?? [],
         cosmetics: analysisResult.cosmetics ?? [],
+        weatherInfo: weather,
         lang: i18n.language || "ko",
         gender: (surveyData?.genderIdx ?? 0) === 0 ? "female" : "male",
         ageGroup: ["10대","20대 초반","20대 후반","30대 초반","30대 후반","40대 초반","40대 후반","50대+"][surveyData?.ageIdx ?? 2] ?? "",
@@ -348,6 +349,7 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
           scores: analysisResult.scores,
           skinAge: analysisResult.skinAge,
           aiComment: analysisResult.aiComment,
+          weatherInfo: weather,
           lang: i18n.language || "ko",
           isGuest: false,
           gender: (surveyData?.genderIdx ?? 0) === 0 ? "female" : "male",
@@ -355,7 +357,7 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
         }),
       }).catch(() => {});
     }).catch(() => {}); // Bug 4 fix: .catch() 추가
-  }, [user, analysisResult]);
+  }, [user, analysisResult, weather, isSaved, finalType, surveyData]);
 
   // 모달 열릴 때 배경 스크롤 잠금
   useEffect(() => {

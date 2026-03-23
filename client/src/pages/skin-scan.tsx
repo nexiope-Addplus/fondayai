@@ -188,7 +188,20 @@ export default function SkinScanPage() {
   const [user, setUser] = useState<any>(undefined);
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
   const [showInstallGuide, setShowInstallGuide] = useState(false);
+  const [weatherData, setWeatherData] = useState<WeatherData | null>(null);
   const justLoggedInRef = useRef(false);
+
+  // 날씨 정보 중앙 관리 (Care Manager 기초 데이터)
+  useEffect(() => {
+    if (!navigator.geolocation) return;
+    navigator.geolocation.getCurrentPosition((pos) => {
+      const { latitude: lat, longitude: lon } = pos.coords;
+      fetch(`/api/weather?lat=${lat}&lon=${lon}`)
+        .then(res => res.ok ? res.json() : null)
+        .then(data => { if (data && !data.error) setWeatherData(data); })
+        .catch(() => {});
+    });
+  }, []);
 
   useEffect(() => {
     const handler = (e: any) => { e.preventDefault(); setDeferredPrompt(e); };
@@ -414,6 +427,7 @@ export default function SkinScanPage() {
             <motion.div key="scan" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
               {scanState === "idle" && (
                 <ScanIdleScreen
+                  weather={weatherData}
                   onScan={() => setShowCamera(true)}
                   onOpenRoutine={() => setActiveTab("routine")}
                   onOpenDiary={() => setActiveTab("diary")}
@@ -425,9 +439,10 @@ export default function SkinScanPage() {
               {scanState === "scanning" && <ScanningScreen imageSrc={imageSrc} />}
               {scanState === "result" && (
                 <ResultScreen
+                  weather={weatherData}
                   surveyData={surveyData}
                   analysisResult={analysisResult}
-                  imageSrc={imageSrc}
+              ...
                   faceCroppedSrc={faceCroppedSrc}
                   imageBase64={imageBase64}
                   onBack={() => setScanState("idle")}

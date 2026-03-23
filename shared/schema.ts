@@ -24,6 +24,7 @@ export const scans = pgTable("scans", {
   imageSrc: text("image_src"),
   baumannType: text("baumann_type"),
   skinAge: text("skin_age"),
+  weatherInfo: text("weather_info"), // JSON string: { temp, humidity, aqi, ... }
   shareToken: varchar("share_token").unique(),
   createdAt: text("created_at").default(sql`CURRENT_TIMESTAMP`),
 });

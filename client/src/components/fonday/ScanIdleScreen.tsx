@@ -18,12 +18,14 @@ import { LangSwitcher } from "./BottomNav";
 
 // ─── 메인 스캔 화면 ───────────────────────────────────────────────
 export function ScanIdleScreen({
+  weather,
   onScan,
   onOpenRoutine,
   onOpenDiary,
   onOpenDiscover,
   onOpenMy,
 }: {
+  weather: WeatherData | null;
   onScan: () => void;
   onOpenRoutine?: () => void;
   onOpenDiary?: () => void;
@@ -38,9 +40,9 @@ export function ScanIdleScreen({
   const [showBaumannExp, setShowBaumannExp] = useState(false);
   const [socialCount, setSocialCount] = useState(0);
   const [pullY, setPullY] = useState(0);
-  const [idleWeather, setIdleWeather] = useState<WeatherData | null>(null);
   const [latestScan, setLatestScan] = useState<any | null>(null);
   const [recentScans, setRecentScans] = useState<any[]>([]);
+  const [careBriefing, setCareBriefing] = useState<{ briefing: string; priority: string } | null>(null);
   const touchStartY = useRef(0);
 
   useEffect(() => {
@@ -55,20 +57,14 @@ export function ScanIdleScreen({
       .catch(() => setLatestScan(null));
   }, []);
 
+  // 케어 브리핑 로드
   useEffect(() => {
-    if (!navigator.geolocation) return;
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        const { latitude: lat, longitude: lon } = pos.coords;
-        fetch(`/api/weather?lat=${lat}&lon=${lon}`)
-          .then((r) => r.ok ? r.json() : null)
-          .then((data) => { if (data && !data.error) setIdleWeather(data as WeatherData); })
-          .catch(() => {});
-      },
-      () => {},
-      { timeout: 8000 }
-    );
-  }, []);
+    if (!weather) return;
+    fetch(`/api/care-briefing?temp=${weather.temp}&humidity=${weather.humidity}&aqi=${weather.aqi || ""}`)
+      .then(res => res.ok ? res.json() : null)
+      .then(data => { if (data && data.briefing) setCareBriefing(data); })
+      .catch(() => {});
+  }, [weather]);
 
   const handleTouchStart = (e: React.TouchEvent) => {
     touchStartY.current = e.touches[0].clientY;
@@ -173,8 +169,8 @@ export function ScanIdleScreen({
         if (!fallback) return null;
 
         // 낮 시간대(6~20)에 날씨 데이터가 있으면 날씨 기반 그리팅 사용
-        const useWeatherGreeting = idleWeather && hour >= 6 && hour < 20;
-        const wKey = useWeatherGreeting ? getWeatherTipKey(idleWeather!) : null;
+        const useWeatherGreeting = weather && hour >= 6 && hour < 20;
+        const wKey = useWeatherGreeting ? getWeatherTipKey(weather!) : null;
         const emoji = wKey ? weatherEmojiMap[wKey] : fallback.emoji;
         const greetingKey = wKey ? weatherKeyMap[wKey] : fallback.key;
 
@@ -186,8 +182,38 @@ export function ScanIdleScreen({
                 <span className="text-base">{emoji}</span>
                 <p className="text-[12px] font-semibold text-stone-600">{t(greetingKey)}</p>
               </div>
-              <WeatherTipCard compact weather={idleWeather} />
+              <WeatherTipCard compact weather={weather} />
             </div>
+
+            {/* AI 케어 매니저 브리핑 카드 */}
+            <AnimatePresence>
+              {careBriefing && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="mt-2 rounded-2xl p-3.5 flex items-start gap-3 shadow-sm border"
+                  style={{
+                    background: careBriefing.priority === "high" ? "#FFF1F0" : "#F0F7F4",
+                    borderColor: careBriefing.priority === "high" ? "#FECACA" : "#D1FAE5"
+                  }}
+                >
+                  <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center shrink-0 shadow-sm">
+                    <Bot className={`w-4.5 h-4.5 ${careBriefing.priority === "high" ? "text-rose-500" : "text-emerald-600"}`} />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center justify-between mb-0.5">
+                      <p className="text-[10px] font-black uppercase tracking-widest text-stone-400">AI Care Briefing</p>
+                      {careBriefing.priority === "high" && (
+                        <span className="text-[10px] font-bold text-rose-500 animate-pulse">URGENT</span>
+                      )}
+                    </div>
+                    <p className="text-[13px] font-bold text-stone-800 leading-snug break-keep">
+                      {careBriefing.briefing}
+                    </p>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </motion.div>
         );
       })()}

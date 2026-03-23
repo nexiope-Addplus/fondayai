@@ -52,6 +52,7 @@ export const onRequest = async (context: any) => {
       hotspots: body.hotspots ?? [],
       improvements: body.improvements ?? [],
       cosmetics: body.cosmetics ?? [],
+      weatherInfo: body.weatherInfo ?? null,
       shareToken,
     };
 
@@ -68,8 +69,8 @@ export const onRequest = async (context: any) => {
       env.FONDAY_DB.prepare(
         `INSERT OR IGNORE INTO scans
            (id, user_id, overall_score, baumann_type, skin_age, ai_comment, scores,
-            share_token, lang, is_guest, gender, age_group, created_at)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?, ?)`
+            weather_info, share_token, lang, is_guest, gender, age_group, created_at)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?, ?)`
       ).bind(
         crypto.randomUUID(),
         user.id,
@@ -78,6 +79,7 @@ export const onRequest = async (context: any) => {
         body.skinAge ?? null,
         body.aiComment ?? "",
         JSON.stringify(body.scores ?? []),
+        JSON.stringify(body.weatherInfo ?? null),
         shareToken,
         body.lang ?? "ko",
         body.gender ?? "",
