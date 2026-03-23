@@ -1,7 +1,7 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
-import { ScanLine, Leaf, Sparkles, Star, Bot, Thermometer, Flame, Shield, Microscope, ArrowRight, Utensils } from "lucide-react";
+import { ScanLine, Leaf, Sparkles, Star, Bot, Thermometer, Droplets, Flame, Shield, Microscope, ArrowRight, Utensils } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DEEP_GREEN, SCAN_TO, SCAN_FROM, TINT_WARM, TINT_GREEN, TINT_NEUTRAL } from "./constants";
 import { SkinPredictionCard } from "./SkinPredictionCard";
