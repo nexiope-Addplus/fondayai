@@ -18,6 +18,12 @@ crons = ["0 22 * * *", "0 1 * * *", "0 3 * * *", "0 6,9 * * *", "0 11-14 * * *"]
 binding = "PUSH_KV"
 id = "9ef421f3bbbc4ba7a97f3a7cfb73fc8e"
 
+# ── D1 Databases ──────────────────────────────────────────────────
+[[d1_databases]]
+binding = "FONDAY_DB"
+database_name = "fonday-db"
+database_id = "125366b1-198e-4cef-a3d7-167befda2c77"
+
 # ── Secrets (wrangler secret put 명령으로 등록) ───────────────────
 # wrangler secret put VAPID_PUBLIC_KEY
 # wrangler secret put VAPID_PRIVATE_KEY

@@ -193,14 +193,21 @@ export default function SkinScanPage() {
 
   // 날씨 정보 중앙 관리 (Care Manager 기초 데이터)
   useEffect(() => {
-    if (!navigator.geolocation) return;
-    navigator.geolocation.getCurrentPosition((pos) => {
-      const { latitude: lat, longitude: lon } = pos.coords;
+    const fetchWeather = (lat: number, lon: number) => {
       fetch(`/api/weather?lat=${lat}&lon=${lon}`)
         .then(res => res.ok ? res.json() : null)
         .then(data => { if (data && !data.error) setWeatherData(data); })
         .catch(() => {});
-    });
+    };
+
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => fetchWeather(pos.coords.latitude, pos.coords.longitude),
+        () => fetchWeather(37.5665, 126.9780) // Fallback: Seoul
+      );
+    } else {
+      fetchWeather(37.5665, 126.9780); // Fallback: Seoul
+    }
   }, []);
 
   useEffect(() => {
