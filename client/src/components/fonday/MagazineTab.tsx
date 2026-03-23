@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence, useDragControls } from "framer-motion";
-import { Clock, User, ChevronRight, BarChart3, Salad } from "lucide-react";
+import { Clock, User, ChevronRight } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Card, CardContent } from "@/components/ui/card";
 import type { MagazineArticle } from "./types";
@@ -172,27 +172,8 @@ export function MagazineTab() {
       .slice(0, 3);
   }, [latestScan]);
 
-  const rankingBands = useMemo(
-    () => Array.isArray(rankingData?.scoreDistribution) ? rankingData.scoreDistribution : [],
-    [rankingData],
-  );
-
-  const baumannTop = useMemo(
-    () => Object.entries(rankingData?.baumannDistribution ?? {})
-      .filter(([type]) => Boolean(type))
-      .sort(([, a], [, b]) => (Number(b) || 0) - (Number(a) || 0))
-      .slice(0, 3),
-    [rankingData],
-  );
-
-  const maxDistributionCount = useMemo(() => {
-    const counts = rankingBands.map((band: any) => Number(band?.count) || 0);
-    return counts.length > 0 ? Math.max(...counts, 1) : 1;
-  }, [rankingBands]);
-
   const latestOverall = useMemo(() => {
-    const latestScores = parseScores(latestScan?.scores);
-    const val = latestScan?.overallScore ?? latestScores[0]?.score ?? 0;
+    const val = latestScan?.overallScore ?? 0;
     const num = Number(val);
     return isNaN(num) ? 0 : num;
   }, [latestScan]);
@@ -204,216 +185,74 @@ export function MagazineTab() {
     return { filtered: f, featured: feat, rest: feat ? f.filter(a => a.id !== feat.id) : f };
   }, [filter, i18n.language]);
 
+  // 모든 아티클 (featured 포함) 하나의 리스트로
+  const allArticles = useMemo(() => {
+    if (!featured) return rest;
+    return [featured, ...rest];
+  }, [featured, rest]);
+
   return (
     <>
       <ScrollArea className="h-[calc(100dvh-60px)]">
         <motion.div className="pb-28" variants={stagger} initial="initial" animate="animate">
 
-          {/* 헤더 */}
-          <motion.div variants={fadeChild} className="px-5 pt-6 pb-4">
-            <p className="text-xs font-bold tracking-widest uppercase mb-1" style={{ color: SCAN_TO }}>{t("nav.magazine")}</p>
-            <h1 className="text-[24px] font-black tracking-tight leading-tight whitespace-pre-line" style={{ color: DEEP_GREEN }}>
-              {t("discover.title")}
-            </h1>
-          </motion.div>
-
-          <motion.div variants={fadeChild} className="px-5 mb-5">
-            <div className="grid grid-cols-2 gap-3">
-              <div className="rounded-3xl bg-white p-4" style={{ boxShadow: "0 10px 24px rgba(45,95,79,0.06)" }}>
-                <div className="flex items-center gap-2 mb-3">
-                  <div className="w-9 h-9 rounded-2xl flex items-center justify-center shrink-0" style={{ background: TINT_GREEN }}>
-                    <BarChart3 className="w-5 h-5" style={{ color: DEEP_GREEN }} />
-                  </div>
-                  <div className="min-w-0">
-                    <p className="text-xs font-bold text-stone-800">{t("discover.rankingTitle")}</p>
-                    <p className="text-xs text-stone-400">
-                      {rankingData ? t("ranking.totalData", { count: rankingData.totalScans }) : t("discover.rankingEmpty")}
-                    </p>
-                  </div>
-                </div>
-                <p className="text-[22px] font-bold" style={{ color: DEEP_GREEN }}>
-                  {rankingData?.myPercentile !== undefined ? `${rankingData.myPercentile}%` : "—"}
-                </p>
-                <p className="text-xs text-stone-400 mt-1">{t("ranking.topLabel")}</p>
-              </div>
-
-              <div className="rounded-3xl bg-white p-4" style={{ boxShadow: "0 10px 24px rgba(45,95,79,0.06)" }}>
-                <div className="flex items-center gap-2 mb-3">
-                  <div className="w-9 h-9 rounded-2xl flex items-center justify-center shrink-0" style={{ background: TINT_WARM }}>
-                    <Salad className="w-5 h-5" style={{ color: SCAN_TO }} />
-                  </div>
-                  <div className="min-w-0">
-                    <p className="text-xs font-bold text-stone-800">{t("discover.nutritionTitle")}</p>
-                    <p className="text-xs text-stone-400">{t("discover.feedTitle")}</p>
-                  </div>
-                </div>
-                {weakestScores[0] ? (
-                  <>
-                    <p className="text-[14px] font-bold text-stone-800">{weakestScores[0].label}</p>
-                    <p className="text-xs mt-1" style={{ color: SCAN_TO }}>{weakestScores[0].score}{t("result.scoreSuffix")}</p>
-                  </>
-                ) : (
-                  <p className="text-xs text-stone-400">{t("discover.nutritionEmpty")}</p>
-                )}
-              </div>
+          {/* 컴팩트 헤더 */}
+          <motion.div variants={fadeChild} className="px-5 pt-5 pb-3 flex items-center justify-between">
+            <div>
+              <p className="text-[11px] font-bold tracking-widest uppercase mb-0.5" style={{ color: SCAN_TO }}>{t("nav.magazine")}</p>
+              <h1 className="text-[20px] font-black tracking-tight leading-tight" style={{ color: DEEP_GREEN }}>
+                {t("magazine.subtitle")}
+              </h1>
             </div>
+            {/* 인라인 순위 뱃지 */}
+            {rankingData?.myPercentile !== undefined && (
+              <div className="px-3 py-1.5 rounded-2xl shrink-0" style={{ background: `${SCAN_FROM}18` }}>
+                <p className="text-[10px] text-stone-400 text-center">{t("ranking.topLabel")}</p>
+                <p className="text-[15px] font-black leading-none text-center" style={{ color: SCAN_TO }}>
+                  {t("ranking.myPercentile", { percent: rankingData.myPercentile })}
+                </p>
+              </div>
+            )}
           </motion.div>
 
-          {/* 랭킹 상세 섹션 */}
-          <motion.div variants={fadeChild} className="px-5 mb-5">
-            <div className="rounded-3xl bg-white p-4" style={{ boxShadow: "0 10px 24px rgba(45,95,79,0.06)" }}>
-              <div className="flex items-start justify-between gap-3">
-                <div className="min-w-0">
-                  <p className="text-[11px] font-bold tracking-[0.14em] uppercase" style={{ color: SCAN_TO }}>
-                    {t("discover.rankingEyebrow")}
-                  </p>
-                  <p className="text-[16px] font-bold mt-1" style={{ color: DEEP_GREEN }}>
-                    {t("discover.rankingTitle")}
-                  </p>
-                  <p className="text-[12px] text-stone-500 mt-1 leading-snug">
-                    {rankingData ? t("ranking.totalData", { count: rankingData.totalScans }) : t("discover.rankingEmpty")}
-                  </p>
-                </div>
-                <div className="grid grid-cols-2 gap-2 shrink-0 min-w-[112px]">
-                  <div className="rounded-2xl p-2.5 text-center" style={{ background: "#F6FBF8" }}>
-                    <p className="text-[11px] text-stone-400">{t("ranking.avgScore")}</p>
-                    <p className="text-[17px] font-black mt-1" style={{ color: DEEP_GREEN }}>
-                      {rankingData?.avgScore ?? "—"}
-                    </p>
-                  </div>
-                  <div className="rounded-2xl p-2.5 text-center" style={{ background: "#FFF7F3" }}>
-                    <p className="text-[11px] text-stone-400">{t("ranking.topScore")}</p>
-                    <p className="text-[17px] font-black mt-1" style={{ color: SCAN_TO }}>
-                      {rankingData?.topScore ?? "—"}
-                    </p>
-                  </div>
-                </div>
+          {/* 통계 한줄 바 */}
+          {rankingData && (
+            <motion.div variants={fadeChild} className="mx-5 mb-4 px-4 py-2.5 rounded-2xl flex items-center gap-0 bg-white"
+              style={{ boxShadow: "0 2px 8px rgba(45,95,79,0.06)" }}>
+              <div className="flex-1 text-center">
+                <p className="text-[10px] text-stone-400">{t("ranking.avgScore")}</p>
+                <p className="text-[16px] font-black" style={{ color: DEEP_GREEN }}>{rankingData.avgScore || "—"}</p>
               </div>
-
-              {rankingData && (
+              <div className="w-px h-7 bg-stone-100" />
+              <div className="flex-1 text-center">
+                <p className="text-[10px] text-stone-400">{t("ranking.topScore")}</p>
+                <p className="text-[16px] font-black" style={{ color: SCAN_TO }}>{rankingData.topScore || "—"}</p>
+              </div>
+              <div className="w-px h-7 bg-stone-100" />
+              <div className="flex-1 text-center">
+                <p className="text-[10px] text-stone-400">{t("ranking.totalData", { count: "" }).trim()}</p>
+                <p className="text-[16px] font-black text-stone-700">{rankingData.totalScans || "—"}</p>
+              </div>
+              {latestOverall > 0 && (
                 <>
-                  <div className="mt-4 rounded-2xl p-4" style={{ background: "linear-gradient(135deg, rgba(201,112,98,0.10), rgba(45,95,79,0.08))" }}>
-                    {rankingData.myPercentile !== undefined ? (
-                      <>
-                        <p className="text-[11px] text-stone-500">{t("ranking.myRankLabel")}</p>
-                        <p className="text-[28px] font-black mt-1" style={{ color: SCAN_TO }}>
-                          {t("ranking.myPercentile", { percent: rankingData.myPercentile })}
-                        </p>
-                      </>
-                    ) : (
-                      <>
-                        <p className="text-[13px] font-bold" style={{ color: DEEP_GREEN }}>{t("discover.rankingTitle")}</p>
-                        <p className="text-[11px] text-stone-500 mt-1">{t("ranking.loginForRank")}</p>
-                      </>
-                    )}
+                  <div className="w-px h-7 bg-stone-100" />
+                  <div className="flex-1 text-center">
+                    <p className="text-[10px] text-stone-400">{t("idle.latestEyebrow")}</p>
+                    <p className="text-[16px] font-black" style={{ color: DEEP_GREEN }}>{latestOverall}</p>
                   </div>
-
-                  <div className="mt-4">
-                    <p className="text-[11px] font-bold text-stone-400 mb-3">{t("ranking.distribution")}</p>
-                    <div className="space-y-2.5">
-                      {rankingBands.map((band: any, index: number) => {
-                        const bandCount = Number(band?.count) || 0;
-                        const barPct = Math.round((bandCount / maxDistributionCount) * 100);
-                        const [bandMin, bandMax] = String(band?.label ?? "").split("-").map(Number);
-                        const isMyBand = latestOverall > 0 && latestOverall >= bandMin && latestOverall <= (bandMax || 100);
-
-                        return (
-                          <div key={`${String(band?.label ?? "band")}-${index}`} className="flex items-center gap-2">
-                            <span className="text-[11px] text-stone-400 w-14 shrink-0">{String(band?.label ?? "-")}</span>
-                            <div className="flex-1 h-5 rounded-full bg-stone-100 overflow-hidden">
-                              <div
-                                className="h-full rounded-full transition-all duration-700"
-                                style={{
-                                  width: `${Math.max(barPct, bandCount > 0 ? 6 : 0)}%`,
-                                  background: isMyBand ? `linear-gradient(90deg, ${SCAN_FROM}, ${SCAN_TO})` : "#D6D3D1",
-                                }}
-                              />
-                            </div>
-                            <span className="text-[11px] text-stone-400 w-5 text-right">{bandCount}</span>
-                            {isMyBand && (
-                              <span className="text-[11px] font-bold px-1.5 py-0.5 rounded-full shrink-0" style={{ background: `${SCAN_FROM}30`, color: SCAN_TO }}>
-                                {t("ranking.me")}
-                              </span>
-                            )}
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-
-                  {baumannTop.length > 0 && (
-                    <div className="mt-4">
-                      <p className="text-[11px] font-bold text-stone-400 mb-3">{t("ranking.topBaumann")}</p>
-                      <div className="grid grid-cols-3 gap-2">
-                        {baumannTop.map(([type, count], index) => (
-                            <div key={type} className="rounded-2xl p-3 text-center" style={{ background: index === 0 ? "#FFF7F3" : "#FAF8F5" }}>
-                              <p className="text-[12px]">{["🥇", "🥈", "🥉"][index] || ""}</p>
-                              <p className="text-[16px] font-black mt-0.5" style={{ color: index === 0 ? SCAN_TO : DEEP_GREEN }}>{type}</p>
-                              <p className="text-[11px] text-stone-400 mt-1">{Number(count) || 0}{t("ranking.people")}</p>
-                            </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
                 </>
               )}
-            </div>
-          </motion.div>
-
-          {/* 영양 상세 섹션 */}
-          <motion.div variants={fadeChild} className="px-5 mb-5">
-            <div className="rounded-3xl p-4" style={{ background: "linear-gradient(135deg, #FFF8F4, #F7FBF8)", border: "1px solid #F1E9E1" }}>
-              <div className="flex items-start justify-between gap-3">
-                <div className="min-w-0">
-                  <p className="text-[11px] font-bold tracking-[0.14em] uppercase" style={{ color: SCAN_TO }}>
-                    {t("discover.nutritionEyebrow")}
-                  </p>
-                  <p className="text-[16px] font-bold mt-1" style={{ color: DEEP_GREEN }}>
-                    {t("discover.nutritionTitle")}
-                  </p>
-                  <p className="text-[12px] text-stone-500 mt-1 leading-snug">
-                    {weakestScores[0]
-                      ? t("discover.nutritionHint", { concern: weakestScores[0].label })
-                      : t("discover.nutritionEmpty")}
-                  </p>
-                </div>
-                <div className="w-11 h-11 rounded-2xl flex items-center justify-center shrink-0" style={{ background: "#FFFFFF" }}>
-                  <Salad className="w-5 h-5" style={{ color: SCAN_TO }} />
-                </div>
-              </div>
-
-              <div className="grid gap-2 mt-4">
-                {weakestScores.length > 0 ? (
-                  weakestScores.map((item: any, index: number) => (
-                    <div key={`${item.label}-${index}`} className="rounded-2xl bg-white p-3.5">
-                      <div className="flex items-center justify-between gap-3">
-                        <p className="text-[13px] font-bold text-stone-800">{item.label}</p>
-                        <span className="text-[12px] font-bold" style={{ color: SCAN_TO }}>
-                          {item.score}{t("result.scoreSuffix")}
-                        </span>
-                      </div>
-                      <p className="text-[11px] text-stone-500 mt-1 leading-snug">
-                        {t("discover.nutritionHint", { concern: item.label })}
-                      </p>
-                    </div>
-                  ))
-                ) : (
-                  <div className="rounded-2xl bg-white p-4">
-                    <p className="text-[12px] text-stone-500">{t("discover.nutritionEmpty")}</p>
-                  </div>
-                )}
-              </div>
-            </div>
-          </motion.div>
+            </motion.div>
+          )}
 
           {/* 카테고리 필터 */}
-          <motion.div variants={fadeChild} className="px-5 pb-4">
+          <motion.div variants={fadeChild} className="px-5 pb-3">
             <div className="flex gap-2 overflow-x-auto pb-1 no-scrollbar">
               {CATEGORY_FILTERS.map(cat => (
                 <button
                   key={cat}
                   onClick={() => setFilter(cat)}
-                  className="shrink-0 px-3.5 py-1.5 rounded-full text-[12px] font-bold transition-all"
+                  className="shrink-0 px-3 py-1.5 rounded-full text-[12px] font-bold transition-all"
                   style={filter === cat
                     ? { background: DEEP_GREEN, color: "white" }
                     : { background: "#F3F1EE", color: "#8C8070" }
@@ -425,118 +264,82 @@ export function MagazineTab() {
             </div>
           </motion.div>
 
-          {/* 피처드 히어로 카드 */}
-          {featured && (
-            <motion.div variants={fadeChild} className="px-5 mb-5">
-              <motion.div
-                onClick={() => setSelectedArticle(featured)}
-                whileTap={{ scale: 0.98 }}
-                className="rounded-3xl overflow-hidden shadow-lg cursor-pointer"
-                style={{ background: `linear-gradient(145deg, ${featured.bgFrom}, ${featured.bgTo})` }}
-              >
-                {/* 이미지 영역 */}
-                <div className="relative" style={{ height: 140 }}>
-                  <div className="absolute inset-0 opacity-10"
-                    style={{ backgroundImage: "radial-gradient(circle at 20% 80%, white 1.5px, transparent 1.5px), radial-gradient(circle at 80% 20%, white 1.5px, transparent 1.5px)", backgroundSize: "28px 28px" }} />
-                  {/* 장식 원 */}
-                  <div className="absolute right-6 top-6 w-28 h-28 rounded-full bg-white/10 flex items-center justify-center">
-                    <div className="w-20 h-20 rounded-full bg-white/10 flex items-center justify-center">
-                      <span style={{ fontSize: 44 }}>{featured.emoji}</span>
-                    </div>
-                  </div>
-                  <div className="absolute bottom-0 left-0 right-0 h-24"
-                    style={{ background: "linear-gradient(to top, rgba(0,0,0,0.25), transparent)" }} />
-                  <div className="absolute top-4 left-4">
-                    <span className="text-xs font-bold text-white bg-white/20 backdrop-blur-sm px-2.5 py-1 rounded-full">
-                      ★ FEATURED
-                    </span>
-                  </div>
-                </div>
-                {/* 텍스트 영역 */}
-                <div className="px-5 pb-5 pt-3 bg-white/95">
-                  <div className="flex items-center gap-1.5 mb-2">
-                    <span className="text-xs font-bold px-2 py-0.5 rounded-full"
-                      style={{ background: `${featured.bgFrom}22`, color: featured.bgTo }}>
-                      {featured.tag}
-                    </span>
-                    <span className="text-xs text-stone-400">·</span>
-                    <span className="text-xs text-stone-400">{t("magazine.readTime", { time: featured.readTime })}</span>
-                  </div>
-                  <h2 className="text-base font-bold leading-snug mb-2" style={{ color: DEEP_GREEN }}>
-                    {featured.title}
-                  </h2>
-                  <p className="text-xs text-stone-500 leading-relaxed line-clamp-2">{featured.summary}</p>
-                  <div className="flex items-center justify-between mt-3">
-                    <div className="flex items-center gap-1.5">
-                      <div className="w-5 h-5 rounded-full flex items-center justify-center text-white text-xs font-black"
-                        style={{ background: `linear-gradient(135deg, ${featured.bgFrom}, ${featured.bgTo})` }}>
-                        {featured.author ? featured.author[0] : "?"}
-                      </div>
-                      <span className="text-xs font-bold text-stone-500">{featured.author}</span>
-                      <span className="text-xs text-stone-300">{featured.authorRole}</span>
-                    </div>
-                    <div className="flex items-center gap-1" style={{ color: featured.bgTo }}>
-                      <span className="text-xs font-bold">{t("magazine.read")}</span>
-                      <ChevronRight className="w-3.5 h-3.5" />
-                    </div>
-                  </div>
-                </div>
-              </motion.div>
-            </motion.div>
-          )}
-
-          {/* 나머지 아티클 목록 */}
-          <div className="px-5 space-y-3">
-            {rest.map((article, idx) => (
-              <div key={article.id}>
+          {/* 아티클 목록 (featured 포함 통합) */}
+          <div className="px-5 space-y-2.5">
+            {allArticles.map((article) => {
+              const isFeatured = article.featured;
+              return (
                 <motion.div
+                  key={article.id}
                   variants={fadeChild}
                   onClick={() => setSelectedArticle(article)}
                   whileTap={{ scale: 0.98 }}
                   className="cursor-pointer"
                 >
-                  <Card className="border-none shadow-sm rounded-2xl overflow-hidden">
+                  <Card className="border-none overflow-hidden"
+                    style={{ boxShadow: isFeatured ? "0 4px 16px rgba(45,95,79,0.10)" : "0 1px 4px rgba(0,0,0,0.06)" }}>
                     <CardContent className="p-0 flex items-stretch">
                       {/* 썸네일 */}
                       <div
-                        className="w-24 shrink-0 flex flex-col items-center justify-center relative"
-                        style={{ background: `linear-gradient(145deg, ${article.bgFrom}, ${article.bgTo})`, minHeight: 96 }}
+                        className="shrink-0 flex flex-col items-center justify-center relative"
+                        style={{
+                          background: `linear-gradient(145deg, ${article.bgFrom}, ${article.bgTo})`,
+                          width: isFeatured ? 88 : 72,
+                          minHeight: isFeatured ? 100 : 84,
+                        }}
                       >
                         <div className="absolute inset-0 opacity-10"
-                          style={{ backgroundImage: "radial-gradient(circle at 50% 50%, white 1px, transparent 1px)", backgroundSize: "14px 14px" }} />
-                        <span style={{ fontSize: 32 }}>{article.emoji}</span>
+                          style={{ backgroundImage: "radial-gradient(circle at 50% 50%, white 1px, transparent 1px)", backgroundSize: "12px 12px" }} />
+                        <span style={{ fontSize: isFeatured ? 34 : 26 }}>{article.emoji}</span>
+                        {isFeatured && (
+                          <span className="absolute top-2 left-2 text-[9px] font-black text-white/90 bg-black/20 px-1.5 py-0.5 rounded-full leading-none">
+                            ★
+                          </span>
+                        )}
                       </div>
                       {/* 텍스트 */}
-                      <div className="flex-1 p-3.5 flex flex-col justify-between">
+                      <div className="flex-1 px-3 py-2.5 flex flex-col justify-between min-w-0">
                         <div>
                           <div className="flex items-center gap-1.5 mb-1">
-                            <span className="text-xs font-bold px-1.5 py-0.5 rounded-full"
+                            <span className="text-[11px] font-bold px-1.5 py-0.5 rounded-full shrink-0"
                               style={{ background: `${article.bgFrom}22`, color: article.bgTo }}>
                               {article.tag}
                             </span>
+                            {isFeatured && (
+                              <span className="text-[11px] font-bold" style={{ color: DEEP_GREEN }}>PICK</span>
+                            )}
                           </div>
-                          <h3 className="text-sm font-bold leading-snug line-clamp-2 mb-1" style={{ color: DEEP_GREEN }}>
+                          <h3
+                            className="font-bold leading-snug line-clamp-2"
+                            style={{ fontSize: isFeatured ? 13 : 12, color: DEEP_GREEN }}
+                          >
                             {article.title}
                           </h3>
-                          <p className="text-xs text-stone-400 line-clamp-2 leading-relaxed">{article.summary}</p>
+                          {isFeatured && (
+                            <p className="text-[11px] text-stone-400 line-clamp-1 leading-relaxed mt-0.5">{article.summary}</p>
+                          )}
                         </div>
-                        <div className="flex items-center justify-between mt-2">
+                        <div className="flex items-center justify-between mt-1.5">
                           <div className="flex items-center gap-1">
-                            <User className="w-2.5 h-2.5 text-stone-300" />
-                            <span className="text-xs text-stone-400">{article.author}</span>
+                            <User className="w-2.5 h-2.5 text-stone-300 shrink-0" />
+                            <span className="text-[11px] text-stone-400">{article.authorRole}</span>
                           </div>
-                          <div className="flex items-center gap-0.5 text-stone-300">
+                          <div className="flex items-center gap-0.5 text-stone-300 shrink-0">
                             <Clock className="w-2.5 h-2.5" />
-                            <span className="text-xs">{article.readTime}</span>
+                            <span className="text-[11px]">{article.readTime}</span>
                           </div>
                         </div>
+                      </div>
+                      <div className="flex items-center pr-3 shrink-0">
+                        <ChevronRight className="w-3.5 h-3.5 text-stone-300" />
                       </div>
                     </CardContent>
                   </Card>
                 </motion.div>
-              </div>
-            ))}
+              );
+            })}
           </div>
+
         </motion.div>
       </ScrollArea>
 
