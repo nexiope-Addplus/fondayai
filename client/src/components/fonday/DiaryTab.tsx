@@ -308,21 +308,21 @@ export function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: AppU
           style={{ background: "#FFFFFF", border: `1px solid ${BORDER_COLOR}` }}>
           <p className="text-xs font-medium tracking-widest uppercase mb-1" style={{ color: SCAN_TO, fontFamily: FONT_DISPLAY }}>FONDAY</p>
           <h1 className="text-2xl font-light" style={{ color: DEEP_GREEN, fontFamily: FONT_DISPLAY }}>{t("modal.diary.title")}</h1>
-          <p className="text-[12px] text-stone-500 mt-2 text-kr-pretty">
+          <p className="text-[13px] mt-2 text-kr-pretty" style={{ color: TEXT_TERTIARY }}>
             {finalType ? `${finalType} · ` : ""}{totalRecords > 0 ? `${t("modal.diary.countLabel", { count: totalRecords })}` : t("result.diary.firstRecord")}
           </p>
-          <div className="grid grid-cols-3 gap-2.5 mt-4">
-            <div className="rounded-2xl p-3 text-center" style={{ background: TINT_WARM }}>
-              <p className="text-xs font-bold text-stone-400 whitespace-nowrap">{t("result.overall")}</p>
-              <p className="text-2xl font-bold mt-1" style={{ color: SCAN_TO }}>{overallScore || "—"}</p>
+          <div className="grid grid-cols-3 gap-2 mt-4">
+            <div className="rounded-2xl p-3 text-center border" style={{ borderColor: BORDER_COLOR }}>
+              <p className="text-[11px] font-medium whitespace-nowrap" style={{ color: TEXT_TERTIARY }}>{t("result.overall")}</p>
+              <p className="text-[24px] font-light mt-1" style={{ color: SCAN_TO, fontFamily: FONT_DISPLAY }}>{overallScore || "—"}</p>
             </div>
-            <div className="rounded-2xl p-3 text-center" style={{ background: "#F6F4FB" }}>
-              <p className="text-xs font-bold text-stone-400 whitespace-nowrap">{t("result.diary.avg7d")}</p>
-              <p className="text-2xl font-bold mt-1" style={{ color: "#7C3AED" }}>{avgScore || "—"}</p>
+            <div className="rounded-2xl p-3 text-center border" style={{ borderColor: BORDER_COLOR }}>
+              <p className="text-[11px] font-medium whitespace-nowrap" style={{ color: TEXT_TERTIARY }}>{t("result.diary.avg7d")}</p>
+              <p className="text-[24px] font-light mt-1" style={{ color: "#7C3AED", fontFamily: FONT_DISPLAY }}>{avgScore || "—"}</p>
             </div>
-            <div className="rounded-2xl p-3 text-center" style={{ background: TINT_GREEN }}>
-              <p className="text-xs font-bold text-stone-400 whitespace-nowrap">{t("diary.routineTitle")}</p>
-              <p className="text-2xl font-bold mt-1" style={{ color: DEEP_GREEN }}>{diaryTodoProgress.total > 0 ? `${diaryTodoProgress.done}/${diaryTodoProgress.total}` : (diaryMemoReady ? "1/1" : "0/1")}</p>
+            <div className="rounded-2xl p-3 text-center border" style={{ borderColor: BORDER_COLOR }}>
+              <p className="text-[11px] font-medium whitespace-nowrap" style={{ color: TEXT_TERTIARY }}>{t("diary.routineTitle")}</p>
+              <p className="text-[24px] font-light mt-1" style={{ color: DEEP_GREEN, fontFamily: FONT_DISPLAY }}>{diaryTodoProgress.total > 0 ? `${diaryTodoProgress.done}/${diaryTodoProgress.total}` : (diaryMemoReady ? "1/1" : "0/1")}</p>
             </div>
           </div>
         </div>
