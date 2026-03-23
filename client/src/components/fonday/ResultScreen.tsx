@@ -40,6 +40,7 @@ import { ResultHeaderCard } from "./ResultHeaderCard";
 import { ResultOverlayPopups } from "./ResultOverlayPopups";
 import { ResultModals } from "./ResultModals";
 import { CosmeticsReportCard } from "./CosmeticsReportCard";
+import { RoutineLogInput } from "./RoutineLogInput";
 
 // ─── 피부 예측 카드 ────────────────────────────────────────────────
 export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, imageBase64, onBack, onGoMagazine, onOpenDiary, onGoRoutine, onGoMy, user, deferredPrompt, onShowInstallGuide }: any) {
@@ -105,6 +106,7 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
   const [showOnboarding, setShowOnboarding] = useState(() => !localStorage.getItem("fonday_onboarding_done"));
   const [showQuestSheet, setShowQuestSheet] = useState(false);
   const [showPwaPopup, setShowPwaPopup] = useState(false);
+  const [routineProducts, setRoutineProducts] = useState<string[]>([]);
 
   // PWA 설치 팝업: 결과 페이지 50% 스크롤 후 표시 (콘텐츠 가치 체험 후 유도)
   const pwaTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -802,6 +804,7 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
           setShowBaumannInfo={setShowBaumannInfo}
           setShowAnalysis={setShowAnalysis}
           previewScoreItems={previewScoreItems}
+          previousScores={history.length > 0 ? history[0]?.scores : null}
         />
 
         {/* ── 오늘의 핵심 액션 카드 ── */}
@@ -822,6 +825,15 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
             </motion.div>
           );
         })()}
+
+        {/* 루틴 로그 — 오늘 사용한 화장품 기록 */}
+        <RoutineLogInput
+          initialProducts={routineProducts}
+          onSave={(products) => {
+            setRoutineProducts(products);
+            localStorage.setItem("fonday_routine_" + todayStr(), JSON.stringify(products));
+          }}
+        />
 
         <motion.div variants={fadeChild} className="rounded-3xl px-4 py-3"
           style={{ background: "#FFFFFF", boxShadow: "0 8px 24px rgba(45,95,79,0.06)" }}>
@@ -975,6 +987,7 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
         pendingChallengeToken={pendingChallengeToken}
         currentShareToken={currentShareToken}
         onShare={handleShare}
+        baumannType={finalType}
         onOpenChallenge={() => {
           sessionStorage.removeItem("battleChallengeToken");
           window.location.href = `/battle/${pendingChallengeToken}`;

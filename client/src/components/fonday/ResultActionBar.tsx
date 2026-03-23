@@ -12,6 +12,7 @@ export function ResultActionBar({
   onShare,
   onOpenChallenge,
   onCreateChallenge,
+  baumannType,
 }: {
   shareLoading: boolean;
   pendingChallengeToken: string | null;
@@ -19,6 +20,7 @@ export function ResultActionBar({
   onShare: () => void;
   onOpenChallenge: () => void;
   onCreateChallenge: () => void;
+  baumannType?: string;
 }) {
   const { t } = useTranslation();
 
@@ -43,7 +45,7 @@ export function ResultActionBar({
         ) : (
           <>
             <Share2 className="w-4 h-4" aria-hidden="true" />
-            <span className="text-[12px]">{t("result.share")}</span>
+            <span className="text-[12px]">{baumannType ? `${baumannType}형 공유하기` : t("result.share")}</span>
           </>
         )}
       </Button>

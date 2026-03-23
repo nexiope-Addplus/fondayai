@@ -106,11 +106,12 @@ export function WeatherTipCard({ compact, weather }: {
 }
 
 // ─── idle 미리보기 점수 바 ────────────────────────────────────────
-export function MiniScoreBarIdle({ label, score, color, delay }: {
+export function MiniScoreBarIdle({ label, score, color, delay, delta }: {
   label: string;
   score: number;
   color: string;
   delay: number;
+  delta?: number | null;
 }) {
   const [animated, setAnimated] = useState(false);
   useEffect(() => {
@@ -131,6 +132,11 @@ export function MiniScoreBarIdle({ label, score, color, delay }: {
         />
       </div>
       <span className="text-[10px] font-bold flex-shrink-0 w-6 text-right mt-0.5" style={{ color }}>{score}</span>
+      {delta != null && delta !== 0 && (
+        <span className={`text-[10px] font-bold flex-shrink-0 w-8 text-right mt-0.5 ${delta > 0 ? "text-emerald-500" : "text-rose-500"}`}>
+          {delta > 0 ? `+${delta}` : `${delta}`}
+        </span>
+      )}
     </div>
   );
 }

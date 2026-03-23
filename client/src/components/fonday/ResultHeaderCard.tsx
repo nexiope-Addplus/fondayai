@@ -50,6 +50,7 @@ type ResultHeaderCardProps = {
   setShowBaumannInfo: (fn: (v: boolean) => boolean) => void;
   setShowAnalysis: (v: boolean) => void;
   previewScoreItems: { idx: number; score: number; color: string }[];
+  previousScores?: { score: number }[] | null;
 };
 
 export function ResultHeaderCard({
@@ -66,6 +67,7 @@ export function ResultHeaderCard({
   setShowBaumannInfo,
   setShowAnalysis,
   previewScoreItems,
+  previousScores,
 }: ResultHeaderCardProps) {
   const { t } = useTranslation();
 
@@ -113,9 +115,11 @@ export function ResultHeaderCard({
               </p>
             </div>
             <div className="flex flex-col gap-1.5">
-              {previewScoreItems.map(({ idx, score, color }: { idx: number; score: number; color: string }, i: number) => (
-                <MiniScoreBarIdle key={idx} label={t(`scores.${idx}`)} score={score} color={color} delay={i * 80} />
-              ))}
+              {previewScoreItems.map(({ idx, score, color }: { idx: number; score: number; color: string }, i: number) => {
+                const prevScore = previousScores?.[idx]?.score;
+                const delta = prevScore != null ? score - prevScore : null;
+                return <MiniScoreBarIdle key={idx} label={t(`scores.${idx}`)} score={score} color={color} delay={i * 80} delta={delta} />;
+              })}
             </div>
           </div>
         </div>
