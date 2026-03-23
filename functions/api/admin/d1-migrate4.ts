@@ -29,8 +29,9 @@ export const onRequest = async (context: any) => {
     const results: string[] = [];
 
     // events 테이블 생성
-    const tableInfo = await env.FONDAY_DB.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name='events'").first();
-    if (tableInfo) {
+    // 테이블 존재 여부: PRAGMA로 확인 (sqlite_master는 D1에서 미지원)
+    const pragmaInfo = await env.FONDAY_DB.prepare("PRAGMA table_info(events)").all().catch(() => ({ results: [] }));
+    if ((pragmaInfo as any).results?.length > 0) {
       results.push("events table already exists — skipped");
     } else {
       await env.FONDAY_DB.prepare(`
@@ -47,7 +48,7 @@ export const onRequest = async (context: any) => {
       `).run();
       await env.FONDAY_DB.prepare("CREATE INDEX idx_events_type ON events(event_type)").run();
       await env.FONDAY_DB.prepare("CREATE INDEX idx_events_created ON events(created_at)").run();
-      await env.FONDAY_DB.prepare("CREATE INDEX idx_events_user ON events(user_id) WHERE user_id != ''").run();
+      await env.FONDAY_DB.prepare("CREATE INDEX idx_events_user ON events(user_id)").run();
       results.push("events table created with indexes");
     }
 
