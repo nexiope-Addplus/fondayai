@@ -72,6 +72,7 @@ export class MemStorage implements IStorage {
       imageSrc: insertScan.imageSrc || null,
       baumannType: insertScan.baumannType || null,
       skinAge: insertScan.skinAge || null,
+      weatherInfo: insertScan.weatherInfo || null,
       shareToken: insertScan.shareToken || null,
       createdAt: new Date().toISOString(),
     };

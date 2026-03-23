@@ -47,6 +47,7 @@ function mapD1Scan(row: any): Scan {
     imageSrc: null,
     baumannType: row.baumann_type || null,
     skinAge: row.skin_age != null ? String(row.skin_age) : null,
+    weatherInfo: row.weather_info || null,
     shareToken: row.share_token || null,
     createdAt: row.created_at || null,
   };

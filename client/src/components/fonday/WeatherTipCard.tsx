@@ -31,8 +31,10 @@ export function WeatherTipCard({ compact, weather }: {
   const tipKey = getWeatherTipKey(weather);
   const tipRaw = t(`weather.tips.${tipKey}`, { returnObjects: true });
   const tipArr = Array.isArray(tipRaw) ? tipRaw : [tipRaw];
-  const dayIdx = Math.floor(Date.now() / 86400000) % tipArr.length;
-  const tip = tipArr[dayIdx] as { emoji: string; title: string; body: string };
+  const dayIdx = Math.floor(Date.now() / 86400000) % Math.max(1, tipArr.length);
+  const rawTip = tipArr[dayIdx];
+  const fallbackTip = { emoji: "🌤️", title: "오늘의 피부 케어", body: "날씨에 맞춘 스킨케어로 하루를 시작하세요." };
+  const tip = (rawTip && typeof rawTip === 'object' && 'emoji' in rawTip) ? rawTip as { emoji: string; title: string; body: string } : fallbackTip;
   const aqiLabel = weather.aqi ? t(`weather.aqi${weather.aqi}`) : null;
 
   if (compact) {

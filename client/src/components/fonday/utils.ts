@@ -1262,7 +1262,7 @@ export function buildCosmeticCorrelationSignals(
         .slice(0, 3);
 
       const confidence: CosmeticCorrelationSignal["confidence"] =
-        comparisonBaselineScans.length >= 2 && comparisonAfterScans.length >= 2 && daysSinceDate(item.opened_at || item.created_at || todayStr()) >= 10
+        comparisonBaselineScans.length >= 2 && comparisonAfterScans.length >= 2 && (daysSinceDate(item.opened_at || item.created_at || todayStr()) ?? 0) >= 10
           ? "strong"
           : comparisonBaselineScans.length >= 1 && comparisonAfterScans.length >= 2
           ? "building"

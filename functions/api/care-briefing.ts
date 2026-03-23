@@ -38,7 +38,7 @@ export const onRequest = async (context: any) => {
     }
 
     const genAI = new GoogleGenerativeAI(env.GOOGLE_API_KEY);
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
     let prompt = "";
     if (latest && weakest) {
