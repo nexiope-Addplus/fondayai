@@ -160,8 +160,8 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
           <div className="w-14 h-14 rounded-3xl mx-auto mb-4 flex items-center justify-center" style={{ background: TINT_GREEN }}>
             <Droplets className="w-7 h-7" style={{ color: DEEP_GREEN }} />
           </div>
-          <p className="text-xs font-bold tracking-widest uppercase mb-2" style={{ color: SCAN_TO }}>{t("nav.routine")}</p>
-          <h2 className="text-xl font-bold" style={{ color: DEEP_GREEN }}>{t("cosmetics.myTitle")}</h2>
+          <p className="text-xs font-medium tracking-widest uppercase mb-2" style={{ color: SCAN_TO, fontFamily: "'Fraunces', Georgia, serif" }}>{t("nav.routine")}</p>
+          <h2 className="text-xl font-light" style={{ color: DEEP_GREEN, fontFamily: "'Fraunces', Georgia, serif" }}>{t("cosmetics.myTitle")}</h2>
           <p className="text-[13px] text-stone-500 mt-2 text-kr-pretty">
             {t("cosmetics.loginDesc")}
           </p>

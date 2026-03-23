@@ -41,7 +41,7 @@ export function ResultCosmeticsGateSheet({
             <div className="flex items-center gap-3 mb-4">
               <div
                 className="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl shrink-0"
-                style={{ background: "linear-gradient(135deg, #1A3B2E, #2D5F4F)" }}
+                style={{ background: "linear-gradient(135deg, #1A3B2E, #4A7C6E)" }}
               >
                 🧴
               </div>

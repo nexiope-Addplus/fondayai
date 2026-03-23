@@ -31,8 +31,8 @@ export const BAUMANN_COLORS: Record<string, string> = {
   T: "#14B8A6",
 };
 
-export const DEEP_GREEN = "#2D5F4F";
-export const DEEP_GREEN_LIGHT = "#3D7A66";
+export const DEEP_GREEN = "#4A7C6E";
+export const DEEP_GREEN_LIGHT = "#5E9688";
 export const TEXT_SECONDARY = "#8C8070";
 export const SCAN_FROM = "#E09882";
 export const SCAN_TO = "#C97062";

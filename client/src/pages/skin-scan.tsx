@@ -355,7 +355,7 @@ export default function SkinScanPage() {
                   <button
                     onClick={() => { setScanError(null); setScanState("idle"); }}
                     className="w-full max-w-xs py-3.5 rounded-2xl font-bold text-white"
-                    style={{ background: "#2D5F4F" }}
+                    style={{ background: "#4A7C6E" }}
                   >
                     {t("scan.errorRetry")}
                   </button>
@@ -418,7 +418,7 @@ export default function SkinScanPage() {
                   style={{ background: "linear-gradient(135deg, #E09882, #C97062)" }}>
                   <SmartphoneNfc className="w-7 h-7 text-white" />
                 </div>
-                <h3 className="text-center text-lg font-black mb-2" style={{ color: "#2D5F4F" }}>{t("install.title")}</h3>
+                <h3 className="text-center text-lg font-black mb-2" style={{ color: "#4A7C6E" }}>{t("install.title")}</h3>
                 <p className="text-center text-sm text-stone-400 mb-6">{t("install.desc")}</p>
                 <div className="space-y-3 mb-6">
                   <div className="flex items-start gap-3 p-3 rounded-2xl bg-stone-50">

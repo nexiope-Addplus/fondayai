@@ -385,7 +385,7 @@ export function DiaryCalendarView({ allEntries }: { allEntries: { dateStr: strin
                 {score !== undefined && <span className="w-1.5 h-1.5 rounded-full" style={{ background: getScoreColor(score) }} />}
                 {todoProgress.total > 0 && <span className="w-1.5 h-1.5 rounded-full" style={{ background: todoProgress.done === todoProgress.total ? "#10B981" : "#D97706" }} />}
                 {memo && <span className="w-1.5 h-1.5 rounded-full" style={{ background: "#7C3AED" }} />}
-                {tags.length > 0 && <span className="w-1.5 h-1.5 rounded-full" style={{ background: "#2D5F4F" }} />}
+                {tags.length > 0 && <span className="w-1.5 h-1.5 rounded-full" style={{ background: "#4A7C6E" }} />}
               </div>
             </button>
           );
@@ -420,7 +420,7 @@ export function DiaryCalendarView({ allEntries }: { allEntries: { dateStr: strin
           { label: t("modal.diary.legendRoutine"), color: "#10B981" },
           { label: t("modal.diary.legendIncomplete"), color: "#D97706" },
           { label: t("modal.diary.legendMemo"), color: "#7C3AED" },
-          { label: t("modal.diary.legendTag"), color: "#2D5F4F" },
+          { label: t("modal.diary.legendTag"), color: "#4A7C6E" },
         ].map(({ label, color }) => (
           <div key={label} className="flex items-center gap-1">
             <div className="w-3 h-3 rounded-full" style={{ background: color }} />

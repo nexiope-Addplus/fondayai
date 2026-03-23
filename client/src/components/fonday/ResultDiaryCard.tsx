@@ -80,7 +80,7 @@ export function ResultDiaryCard({
                 onOpenDiary?.();
               }}
               className="flex-1 rounded-2xl py-2 px-2 flex flex-col items-center justify-center gap-0.5 text-white active:scale-95 transition-all"
-              style={{ background: `linear-gradient(135deg, ${DEEP_GREEN}, #2D5F4F)` }}
+              style={{ background: `linear-gradient(135deg, ${DEEP_GREEN}, #4A7C6E)` }}
             >
               <BookOpen className="w-3.5 h-3.5" />
               <p className="text-xs font-bold">{t("result.diaryView")}</p>

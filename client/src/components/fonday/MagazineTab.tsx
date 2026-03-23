@@ -239,7 +239,7 @@ export function MagazineTab() {
           {/* ── 내 순위 카드 (PRIMARY) ── */}
           {latestOverall > 0 && rankingData && (
             <motion.div variants={fadeChild} className="mx-5 mb-4">
-              <div className="rounded-3xl p-4" style={{ background: `linear-gradient(135deg, ${DEEP_GREEN}, #2D5F4F)`, boxShadow: "0 8px 24px rgba(45,95,79,0.22)" }}>
+              <div className="rounded-3xl p-4" style={{ background: `linear-gradient(135deg, ${DEEP_GREEN}, #4A7C6E)`, boxShadow: "0 8px 24px rgba(45,95,79,0.22)" }}>
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
                     <p className="text-[10px] font-bold text-white/60 uppercase tracking-widest mb-1">{t("idle.latestEyebrow")}</p>

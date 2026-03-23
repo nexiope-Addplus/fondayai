@@ -25,7 +25,7 @@ export function PwaInstallPopup({ open, onDismiss, deferredPrompt, onShowInstall
                 <img src="/icon-192.png" alt="Fonday" className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
               </div>
               <div>
-                <p className="font-bold text-base" style={{ color: "#2D5F4F" }}>{t("install.popupTitle")}</p>
+                <p className="font-bold text-base" style={{ color: "#4A7C6E" }}>{t("install.popupTitle")}</p>
                 <p className="text-[13px] text-stone-500 mt-0.5">{t("install.popupDesc")}</p>
               </div>
             </div>

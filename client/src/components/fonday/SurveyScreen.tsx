@@ -38,7 +38,7 @@ export function SurveyScreen({ onSubmit, onBack }: {
             <div className="flex gap-2">
               {[t("survey.female"), t("survey.male")].map((item, idx) => (
                 <Button key={idx} onClick={() => setGenderIdx(idx)} variant={genderIdx === idx ? "default" : "outline"}
-                  className={`flex-1 h-14 rounded-2xl text-[14px] font-bold ${genderIdx === idx ? "bg-[#2D5F4F] hover:bg-[#2D5F4F]" : ""}`}>
+                  className={`flex-1 h-14 rounded-2xl text-[14px] font-bold ${genderIdx === idx ? "bg-[#4A7C6E] hover:bg-[#4A7C6E]" : ""}`}>
                   {item}
                 </Button>
               ))}
@@ -50,7 +50,7 @@ export function SurveyScreen({ onSubmit, onBack }: {
             <div className="grid grid-cols-2 gap-2">
               {ageGroups.map((item, idx) => (
                 <Button key={idx} onClick={() => setAgeIdx(idx)} variant={ageIdx === idx ? "default" : "outline"}
-                  className={`h-12 rounded-2xl text-[13px] font-bold ${ageIdx === idx ? "bg-[#2D5F4F] hover:bg-[#2D5F4F]" : ""}`}>
+                  className={`h-12 rounded-2xl text-[13px] font-bold ${ageIdx === idx ? "bg-[#4A7C6E] hover:bg-[#4A7C6E]" : ""}`}>
                   {item}
                 </Button>
               ))}
@@ -81,7 +81,7 @@ export function SurveyScreen({ onSubmit, onBack }: {
           concerns: concernIdxs.map(i => skinConcerns[i]),
           condition: "맨얼굴"
         })}
-          className="w-full h-14 rounded-2xl font-bold text-white shadow-xl bg-[#2D5F4F] hover:bg-[#3D7A66] text-lg">
+          className="w-full h-14 rounded-2xl font-bold text-white shadow-xl bg-[#4A7C6E] hover:bg-[#3D7A66] text-lg">
           {t("survey.startBtn")}
         </Button>
       </motion.div>

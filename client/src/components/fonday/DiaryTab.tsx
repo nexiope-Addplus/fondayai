@@ -237,9 +237,9 @@ export function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: AppU
       <div className="flex flex-col" style={{ background: "#F8F5F2", minHeight: "calc(100dvh - 64px)" }}>
         <div className="shrink-0 px-5 pt-5 pb-0" style={{ borderBottom: "1px solid #F0EDE8" }}>
           <div className="rounded-3xl p-5 mb-4 text-white"
-            style={{ background: "linear-gradient(135deg, #2D5F4F 0%, #C97062 100%)" }}>
-            <p className="text-xs font-bold tracking-widest uppercase mb-1 text-white/70">FONDAY</p>
-            <h1 className="text-2xl font-bold">{t("modal.diary.title")} ✦</h1>
+            style={{ background: "linear-gradient(135deg, #4A7C6E 0%, #C97062 100%)" }}>
+            <p className="text-xs font-medium tracking-widest uppercase mb-1 text-white/70" style={{ fontFamily: "'Fraunces', Georgia, serif" }}>FONDAY</p>
+            <h1 className="text-2xl font-light" style={{ fontFamily: "'Fraunces', Georgia, serif" }}>{t("modal.diary.title")} ✦</h1>
             <p className="text-[12px] text-white/80 mt-2 text-kr-pretty">{t("result.login.desc")}</p>
           </div>
         </div>
@@ -302,8 +302,8 @@ export function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: AppU
       <div className="shrink-0 px-5 pt-5 pb-0" style={{ borderBottom: "1px solid #F0EDE8" }}>
         <div className="rounded-3xl p-5 mb-4"
           style={{ background: "#FFFFFF", boxShadow: "0 10px 28px rgba(45,95,79,0.08)" }}>
-          <p className="text-xs font-bold tracking-widest uppercase mb-1" style={{ color: SCAN_TO }}>FONDAY</p>
-          <h1 className="text-2xl font-bold" style={{ color: DEEP_GREEN }}>{t("modal.diary.title")}</h1>
+          <p className="text-xs font-medium tracking-widest uppercase mb-1" style={{ color: SCAN_TO, fontFamily: "'Fraunces', Georgia, serif" }}>FONDAY</p>
+          <h1 className="text-2xl font-light" style={{ color: DEEP_GREEN, fontFamily: "'Fraunces', Georgia, serif" }}>{t("modal.diary.title")}</h1>
           <p className="text-[12px] text-stone-500 mt-2 text-kr-pretty">
             {finalType ? `${finalType} · ` : ""}{totalRecords > 0 ? `${t("modal.diary.countLabel", { count: totalRecords })}` : t("result.diary.firstRecord")}
           </p>

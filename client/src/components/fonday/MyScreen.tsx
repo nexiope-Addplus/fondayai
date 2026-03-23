@@ -69,8 +69,8 @@ export function MyScreen({
         <div className="rounded-3xl p-5" style={{ background: "#FFFFFF", boxShadow: "0 10px 28px rgba(45,95,79,0.08)" }}>
           <div className="flex items-start justify-between gap-3">
             <div>
-              <p className="text-xs font-bold tracking-widest uppercase mb-1" style={{ color: SCAN_TO }}>FONDAY</p>
-              <h1 className="text-2xl font-bold" style={{ color: DEEP_GREEN }}>{t("nav.my")}</h1>
+              <p className="text-xs font-medium tracking-widest uppercase mb-1" style={{ color: SCAN_TO, fontFamily: "'Fraunces', Georgia, serif" }}>FONDAY</p>
+              <h1 className="text-2xl font-light" style={{ color: DEEP_GREEN, fontFamily: "'Fraunces', Georgia, serif" }}>{t("nav.my")}</h1>
               <p className="text-[12px] text-stone-500 mt-1">
                 {user ? (user.username || user.email || t("nav.my")) : t("attendance.loginDesc")}
               </p>

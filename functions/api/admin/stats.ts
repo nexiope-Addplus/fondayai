@@ -12,13 +12,13 @@ function nowKST(): string { return toKST(new Date().toISOString()); }
 const CSS = `
 * { box-sizing: border-box; }
 body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; max-width: 960px; margin: 0 auto; padding: 24px 20px 80px; background: #faf9f6; color: #1c1917; }
-h1 { font-size: 22px; font-weight: 900; color: #2D5F4F; margin: 0 0 4px; }
+h1 { font-size: 22px; font-weight: 900; color: #4A7C6E; margin: 0 0 4px; }
 h2 { font-size: 11px; font-weight: 700; color: #a8a29e; margin: 28px 0 10px; text-transform: uppercase; letter-spacing: .08em; }
 .cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 16px 0; }
 .card { background: white; border-radius: 14px; padding: 16px 14px; box-shadow: 0 1px 6px rgba(0,0,0,0.05); }
-.card .num { font-size: 28px; font-weight: 900; color: #2D5F4F; line-height: 1; }
+.card .num { font-size: 28px; font-weight: 900; color: #4A7C6E; line-height: 1; }
 .card .label { font-size: 11px; color: #a8a29e; margin-top: 4px; }
-.card .sub { font-size: 11px; color: #2D5F4F; font-weight: 600; margin-top: 2px; }
+.card .sub { font-size: 11px; color: #4A7C6E; font-weight: 600; margin-top: 2px; }
 .grid4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; }
 .grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
 .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
@@ -27,7 +27,7 @@ h2 { font-size: 11px; font-weight: 700; color: #a8a29e; margin: 28px 0 10px; tex
 table { width: 100%; border-collapse: collapse; background: white; border-radius: 14px; overflow: hidden; box-shadow: 0 1px 6px rgba(0,0,0,0.05); }
 th { background: #f5f5f4; padding: 8px 12px; text-align: left; font-size: 10px; color: #78716c; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; }
 td { padding: 8px 12px; font-size: 12px; border-top: 1px solid #f5f5f4; }
-.badge { display: inline-block; padding: 2px 7px; border-radius: 20px; font-size: 10px; font-weight: 700; background: #ecfdf5; color: #2D5F4F; }
+.badge { display: inline-block; padding: 2px 7px; border-radius: 20px; font-size: 10px; font-weight: 700; background: #ecfdf5; color: #4A7C6E; }
 .badge-guest { background: #fef3c7; color: #92400e; }
 .badge-f { background: #fce7f3; color: #9d174d; }
 .badge-m { background: #ede9fe; color: #5b21b6; }
@@ -38,12 +38,12 @@ td { padding: 8px 12px; font-size: 12px; border-top: 1px solid #f5f5f4; }
 .bar-label { width: 72px; text-align: right; color: #78716c; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex-shrink: 0; }
 .bar-label-wide { width: 96px; text-align: right; color: #78716c; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex-shrink: 0; }
 .bar-bg { flex: 1; background: #f5f5f4; border-radius: 99px; height: 9px; }
-.bar-fill { height: 9px; border-radius: 99px; background: #2D5F4F; }
-.bar-val { width: 28px; font-weight: 700; color: #2D5F4F; font-size: 11px; text-align: right; flex-shrink: 0; }
+.bar-fill { height: 9px; border-radius: 99px; background: #4A7C6E; }
+.bar-val { width: 28px; font-weight: 700; color: #4A7C6E; font-size: 11px; text-align: right; flex-shrink: 0; }
 .bar-pct { width: 34px; font-size: 10px; color: #a8a29e; flex-shrink: 0; }
 .chart { display: flex; align-items: flex-end; gap: 3px; height: 72px; margin-top: 8px; }
 .chart-col { display: flex; flex-direction: column; align-items: center; flex: 1; gap: 3px; }
-.chart-bar { width: 100%; background: #2D5F4F; border-radius: 3px 3px 0 0; min-height: 2px; }
+.chart-bar { width: 100%; background: #4A7C6E; border-radius: 3px 3px 0 0; min-height: 2px; }
 .chart-label { font-size: 8px; color: #a8a29e; white-space: nowrap; }
 .pie-row { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
 .pie-item { display: flex; align-items: center; gap: 5px; font-size: 11px; }
@@ -52,13 +52,13 @@ td { padding: 8px 12px; font-size: 12px; border-top: 1px solid #f5f5f4; }
 .funnel-step { flex: 1; text-align: center; padding: 12px 8px; background: #f5f5f4; border-right: 2px solid white; }
 .funnel-step:first-child { border-radius: 10px 0 0 10px; }
 .funnel-step:last-child { border-right: none; border-radius: 0 10px 10px 0; }
-.funnel-num { font-size: 22px; font-weight: 900; color: #2D5F4F; }
+.funnel-num { font-size: 22px; font-weight: 900; color: #4A7C6E; }
 .funnel-label { font-size: 10px; color: #78716c; margin-top: 3px; }
 .funnel-rate { font-size: 11px; font-weight: 700; color: #f59e0b; margin-top: 2px; }
 .metric-row { display: flex; justify-content: space-between; align-items: center; padding: 7px 0; border-bottom: 1px solid #f5f5f4; font-size: 12px; }
 .metric-row:last-child { border-bottom: none; }
 .nav { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
-.nav a { text-decoration: none; font-size: 12px; font-weight: 700; color: #2D5F4F; background: white; padding: 6px 14px; border-radius: 20px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+.nav a { text-decoration: none; font-size: 12px; font-weight: 700; color: #4A7C6E; background: white; padding: 6px 14px; border-radius: 20px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
 .nav a:hover { background: #ecfdf5; }
 .section { margin-top: 24px; }
 .score-dist { display: flex; align-items: flex-end; gap: 2px; height: 56px; margin-top: 8px; }
@@ -77,11 +77,11 @@ const LOGIN_FORM = `<!DOCTYPE html>
   <style>
     body { font-family: -apple-system, sans-serif; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; background: #faf9f6; }
     .box { background: white; border-radius: 20px; padding: 40px; box-shadow: 0 4px 24px rgba(0,0,0,0.08); width: 320px; text-align: center; }
-    h1 { font-size: 22px; font-weight: 900; color: #2D5F4F; margin: 0 0 8px; }
+    h1 { font-size: 22px; font-weight: 900; color: #4A7C6E; margin: 0 0 8px; }
     p { color: #a8a29e; font-size: 13px; margin: 0 0 24px; }
     input { width: 100%; padding: 12px 16px; border: 1.5px solid #e7e5e4; border-radius: 12px; font-size: 15px; box-sizing: border-box; outline: none; }
-    input:focus { border-color: #2D5F4F; }
-    button { width: 100%; margin-top: 12px; padding: 13px; background: #2D5F4F; color: white; border: none; border-radius: 12px; font-size: 15px; font-weight: 700; cursor: pointer; }
+    input:focus { border-color: #4A7C6E; }
+    button { width: 100%; margin-top: 12px; padding: 13px; background: #4A7C6E; color: white; border: none; border-radius: 12px; font-size: 15px; font-weight: 700; cursor: pointer; }
   </style>
 </head>
 <body>
@@ -231,7 +231,7 @@ export const onRequest = async (context: any) => {
       (AGE_ORDER.indexOf(a.age_group) + 99) % 99 - (AGE_ORDER.indexOf(b.age_group) + 99) % 99
     );
 
-    const scoreColors = ["#ef4444","#f97316","#f59e0b","#eab308","#84cc16","#22c55e","#10b981","#14b8a6","#06b6d4","#2D5F4F"];
+    const scoreColors = ["#ef4444","#f97316","#f59e0b","#eab308","#84cc16","#22c55e","#10b981","#14b8a6","#06b6d4","#4A7C6E"];
 
     const TAB_LABEL: Record<string, string> = {
       scan: "스캔", routine: "루틴", diary: "일기", magazine: "매거진", my: "MY",
@@ -248,7 +248,7 @@ export const onRequest = async (context: any) => {
 </head>
 <body>
   <h1>🌿 Fonday Admin Dashboard</h1>
-  <p style="color:#a8a29e;font-size:12px;margin:4px 0 16px">${nowKST()} KST &nbsp;·&nbsp; <a href="" style="color:#2D5F4F;font-weight:700">새로고침</a></p>
+  <p style="color:#a8a29e;font-size:12px;margin:4px 0 16px">${nowKST()} KST &nbsp;·&nbsp; <a href="" style="color:#4A7C6E;font-weight:700">새로고침</a></p>
 
   <nav class="nav">
     <a href="#overview">개요</a>
@@ -370,7 +370,7 @@ export const onRequest = async (context: any) => {
         <div class="bar-wrap">
           ${genderArr.map((r: any) => {
             const pct = Math.round(r.cnt / genderTotal * 100);
-            const color = r.gender === "female" ? "#ec4899" : r.gender === "male" ? "#6366f1" : "#2D5F4F";
+            const color = r.gender === "female" ? "#ec4899" : r.gender === "male" ? "#6366f1" : "#4A7C6E";
             const label = r.gender === "female" ? "여성" : r.gender === "male" ? "남성" : r.gender;
             return `<div class="bar-row">
               <div class="bar-label">${label}</div>
@@ -410,7 +410,7 @@ export const onRequest = async (context: any) => {
         <h3>언어 분포</h3>
         <div class="pie-row">
           ${((langRows as any)?.results ?? []).map((r: any, i: number) => {
-            const colors = ["#2D5F4F","#f59e0b","#6366f1","#ef4444","#10b981"];
+            const colors = ["#4A7C6E","#f59e0b","#6366f1","#ef4444","#10b981"];
             const langTotal = ((langRows as any)?.results ?? []).reduce((s: number, x: any) => s + x.cnt, 0) || 1;
             const pct = Math.round(r.cnt / langTotal * 100);
             return `<div class="pie-item"><div class="dot" style="background:${colors[i % colors.length]}"></div>${(r.lang ?? "ko").toUpperCase()} ${r.cnt} (${pct}%)</div>`;
@@ -420,8 +420,8 @@ export const onRequest = async (context: any) => {
           ${((langRows as any)?.results ?? []).map((r: any) => {
             const langTotal = ((langRows as any)?.results ?? []).reduce((s: number, x: any) => s + x.cnt, 0) || 1;
             const pct = Math.round(r.cnt / langTotal * 100);
-            const colors: Record<string,string> = { ko: "#2D5F4F", en: "#f59e0b", ja: "#6366f1" };
-            const color = colors[r.lang ?? "ko"] ?? "#2D5F4F";
+            const colors: Record<string,string> = { ko: "#4A7C6E", en: "#f59e0b", ja: "#6366f1" };
+            const color = colors[r.lang ?? "ko"] ?? "#4A7C6E";
             return `<div class="bar-row">
               <div class="bar-label">${(r.lang ?? "ko").toUpperCase()}</div>
               <div class="bar-bg"><div class="bar-fill" style="width:${pct}%;background:${color}"></div></div>
@@ -435,7 +435,7 @@ export const onRequest = async (context: any) => {
         <div style="margin-top:8px">
           <div class="metric-row">
             <span>로그인 스캔</span>
-            <span style="font-weight:700;color:#2D5F4F">${loggedin} (${loginRate}%)</span>
+            <span style="font-weight:700;color:#4A7C6E">${loggedin} (${loginRate}%)</span>
           </div>
           <div class="metric-row">
             <span>게스트 스캔</span>
@@ -485,11 +485,11 @@ export const onRequest = async (context: any) => {
           ? '<p style="font-size:11px;color:#a8a29e;margin:0">데이터 없음</p>'
           : (() => {
               const tabTotal = tabRows.reduce((s: number, r: any) => s + r.cnt, 0) || 1;
-              const tabColors: Record<string,string> = { scan: "#2D5F4F", routine: "#f59e0b", diary: "#6366f1", magazine: "#ec4899", my: "#10b981" };
+              const tabColors: Record<string,string> = { scan: "#4A7C6E", routine: "#f59e0b", diary: "#6366f1", magazine: "#ec4899", my: "#10b981" };
               return `<div class="bar-wrap">
                 ${tabRows.map((r: any) => {
                   const pct = Math.round(r.cnt / tabTotal * 100);
-                  const color = tabColors[r.tab] ?? "#2D5F4F";
+                  const color = tabColors[r.tab] ?? "#4A7C6E";
                   return `<div class="bar-row">
                     <div class="bar-label">${TAB_LABEL[r.tab] ?? r.tab}</div>
                     <div class="bar-bg"><div class="bar-fill" style="width:${pct}%;background:${color}"></div></div>

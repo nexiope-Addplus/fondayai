@@ -128,7 +128,7 @@ export function ResultHeaderCard({
           <div className="col-span-2 rounded-2xl px-4 py-3.5" style={{ background: TINT_WARM }}>
             <div className="min-w-0 flex items-end justify-center gap-2">
               <p className="text-[15px] font-bold tracking-[-0.01em] text-stone-600">{t("result.overall")} :</p>
-              <p className="text-[36px] font-black leading-none" style={{ color: SCAN_TO }}>
+              <p className="text-[36px] font-light leading-none" style={{ color: SCAN_TO, fontFamily: "'Fraunces', Georgia, serif" }}>
                 <CountUp value={overallScore} />{t("result.scoreSuffix")}
               </p>
             </div>

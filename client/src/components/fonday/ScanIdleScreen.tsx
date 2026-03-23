@@ -178,7 +178,7 @@ export function ScanIdleScreen({
         <div className="flex items-center gap-1.5 px-3 py-1 rounded-full"
           style={{ background: `${SCAN_FROM}22`, border: `1px solid ${SCAN_FROM}50` }}>
           <Sparkles className="w-3 h-3" style={{ color: SCAN_TO }} />
-          <span className="text-xs font-bold tracking-widest uppercase" style={{ color: SCAN_TO }}>FONDAY AI</span>
+          <span className="text-xs font-medium tracking-widest uppercase" style={{ color: SCAN_TO, fontFamily: "'Fraunces', Georgia, serif" }}>FONDAY AI</span>
         </div>
         <LangSwitcher />
       </div>
@@ -293,13 +293,13 @@ export function ScanIdleScreen({
           <div className="flex items-center gap-1.5 px-3 py-1 rounded-full"
             style={{ background: `${SCAN_FROM}22`, border: `1px solid ${SCAN_FROM}50` }}>
             <Sparkles className="w-3 h-3" style={{ color: SCAN_TO }} />
-            <span className="text-xs font-bold tracking-widest uppercase" style={{ color: SCAN_TO }}>FONDAY AI</span>
+            <span className="text-xs font-medium tracking-widest uppercase" style={{ color: SCAN_TO, fontFamily: "'Fraunces', Georgia, serif" }}>FONDAY AI</span>
           </div>
           <div className="px-3 py-1 rounded-full bg-white/80 border border-white/70 shadow-[0_8px_24px_rgba(189,133,111,0.12)]">
             <span className="text-xs font-bold" style={{ color: DEEP_GREEN }}>{t("idle.heroBadge")}</span>
           </div>
         </div>
-        <h1 className="text-[28px] sm:text-[30px] font-bold text-stone-800 leading-[1.08] mb-1.5 px-1">
+        <h1 className="text-[28px] sm:text-[30px] font-light text-stone-800 leading-[1.08] mb-1.5 px-1" style={{ fontFamily: "'Fraunces', Georgia, serif" }}>
           {t("idle.subtitle1")}<br />{t("idle.subtitle3")}
         </h1>
         <p className="text-[12px] text-stone-500 px-1 mb-3">
@@ -407,7 +407,7 @@ export function ScanIdleScreen({
                 <p className="text-xs font-bold uppercase tracking-[0.12em]" style={{ color: DEEP_GREEN }}>
                   {t("result.overall")}
                 </p>
-                <p className="text-[18px] font-bold mt-1" style={{ color: DEEP_GREEN }}>{latestScan.overallScore ?? "—"}</p>
+                <p className="text-[18px] font-light mt-1" style={{ color: DEEP_GREEN, fontFamily: "'Fraunces', Georgia, serif" }}>{latestScan.overallScore ?? "—"}</p>
               </div>
             </div>
             <div className="grid grid-cols-3 gap-2 mt-3">

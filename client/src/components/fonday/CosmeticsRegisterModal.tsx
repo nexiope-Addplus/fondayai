@@ -187,12 +187,12 @@ export function CosmeticsRegisterModal({ onClose, onSuccess }: { onClose: () => 
                   <div>
                     <label className="text-xs font-bold text-stone-400 uppercase tracking-wider mb-1 block">제품명</label>
                     <input value={name} onChange={e => setName(e.target.value)}
-                      className="w-full px-3 py-2.5 rounded-xl text-[13px] font-medium text-stone-800 outline-none focus:border-[#2D5F4F] bg-stone-50" />
+                      className="w-full px-3 py-2.5 rounded-xl text-[13px] font-medium text-stone-800 outline-none focus:border-[#4A7C6E] bg-stone-50" />
                   </div>
                   <div>
                     <label className="text-xs font-bold text-stone-400 uppercase tracking-wider mb-1 block">브랜드</label>
                     <input value={brand} onChange={e => setBrand(e.target.value)}
-                      className="w-full px-3 py-2.5 rounded-xl text-[13px] font-medium text-stone-800 outline-none focus:border-[#2D5F4F] bg-stone-50" />
+                      className="w-full px-3 py-2.5 rounded-xl text-[13px] font-medium text-stone-800 outline-none focus:border-[#4A7C6E] bg-stone-50" />
                   </div>
                 </div>
               </div>
@@ -225,7 +225,7 @@ export function CosmeticsRegisterModal({ onClose, onSuccess }: { onClose: () => 
               <div>
                 <label className="text-xs font-bold text-stone-400 uppercase tracking-wider mb-2 block">{t("cosmetics.openedLabel")}</label>
                 <input type="date" value={openedAt} onChange={e => setOpenedAt(e.target.value)}
-                  className="w-full px-4 py-3.5 rounded-2xl text-[14px] font-medium text-stone-800 outline-none focus:border-[#2D5F4F] bg-stone-50" />
+                  className="w-full px-4 py-3.5 rounded-2xl text-[14px] font-medium text-stone-800 outline-none focus:border-[#4A7C6E] bg-stone-50" />
               </div>
 
               <div>
@@ -235,7 +235,7 @@ export function CosmeticsRegisterModal({ onClose, onSuccess }: { onClose: () => 
                   onChange={e => setIngredients(e.target.value)}
                   rows={3}
                   placeholder={t("cosmetics.ingredientsPlaceholder")}
-                  className="w-full px-4 py-3 rounded-2xl text-[13px] font-medium text-stone-800 outline-none focus:border-[#2D5F4F] bg-stone-50 resize-none"
+                  className="w-full px-4 py-3 rounded-2xl text-[13px] font-medium text-stone-800 outline-none focus:border-[#4A7C6E] bg-stone-50 resize-none"
                 />
               </div>
 
