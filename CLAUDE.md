@@ -92,6 +92,15 @@ const onScroll = () => {
 
 ---
 
+## 디자인 시스템
+
+DESIGN.md를 반드시 읽고 모든 시각/UI 결정에 참고할 것.
+폰트, 색상, 간격, 미학 방향이 정의되어 있음.
+명시적 사용자 승인 없이 DESIGN.md에서 벗어나지 말 것.
+QA 모드에서는 DESIGN.md와 맞지 않는 코드를 플래그할 것.
+
+---
+
 ## 보안 규칙 (절대 위반 금지)
 
 1. **JWT_SECRET fallback 금지**: `env.JWT_SECRET || "fallback"` 패턴 사용 금지. 반드시 `env.JWT_SECRET!`
