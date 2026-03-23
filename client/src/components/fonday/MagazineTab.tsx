@@ -8,15 +8,17 @@ import type { MagazineArticle } from "./types";
 import {
   DEEP_GREEN,
   DEEP_GREEN_LIGHT,
-  SCAN_TO,
-  SCAN_FROM,
-  TINT_GREEN,
-  TINT_WARM,
   CATEGORY_FILTERS,
   MAGAZINE_ARTICLES,
   fadeChild,
   stagger,
 } from "./constants";
+
+// 로컬 색상 상수 (임포트 이슈 방지)
+const SCAN_FROM = "#E09882";
+const SCAN_TO = "#C97062";
+const TINT_GREEN = "#F0F7F4";
+const TINT_WARM = "#FDF3F0";
 
 // ─── 매거진 탭 ────────────────────────────────────────────────────
 type CategoryFilter = typeof CATEGORY_FILTERS[number];
