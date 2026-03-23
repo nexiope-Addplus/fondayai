@@ -88,7 +88,7 @@ export function MyScreen({
             <span className="rounded-full px-3 py-1 text-xs font-bold" style={{ background: `${DEEP_GREEN}10`, color: DEEP_GREEN }}>
               {t("attendance.calendarTitle")}
             </span>
-            <span className="rounded-full px-3 py-1 text-xs font-bold" style={{ background: TINT_WARM, color: SCAN_TO }}>
+            <span className="rounded-full px-3 py-1 text-xs font-bold whitespace-nowrap" style={{ background: TINT_WARM, color: SCAN_TO }}>
               {t("attendance.totalPoints", { n: attendance.totalPoints })}
             </span>
           </div>
