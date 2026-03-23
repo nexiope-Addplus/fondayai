@@ -586,11 +586,11 @@ export function ScanIdleScreen({
       </motion.div>
 
       <div className="text-center pt-4 pb-4 relative" style={{ zIndex: 1 }}>
-        <a href="/privacy.html" className="text-xs underline" style={{ color: TEXT_SECONDARY }}>
+        <a href="/privacy.html" className="text-xs underline inline-flex items-center min-h-[44px] px-2" style={{ color: TEXT_SECONDARY }}>
           {t("idle.privacyLink")}
         </a>
-        <span className="text-xs text-stone-200 mx-2">·</span>
-        <a href="/terms.html" className="text-xs underline" style={{ color: TEXT_SECONDARY }}>
+        <span className="text-xs text-stone-200 mx-1">·</span>
+        <a href="/terms.html" className="text-xs underline inline-flex items-center min-h-[44px] px-2" style={{ color: TEXT_SECONDARY }}>
           {t("idle.termsLink")}
         </a>
       </div>
