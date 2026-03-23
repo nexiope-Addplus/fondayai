@@ -280,31 +280,50 @@ CREATE TABLE IF NOT EXISTS cosmetics (
 
 ## 5-1. 최근 주요 업데이트 (2026-03-23 기준)
 
-### A. Discover 탭 재구성 및 안정화
-- `MagazineTab.tsx`
-  - 랭킹 요약 및 영양 요약 카드 통합
-  - 데이터 파싱 방어 로직 강화 (NaN 체크, 비객체 데이터 필터링)
-  - 비표준 Tailwind 클래스 수정 및 레이아웃 최적화
-- `api/ranking.ts`
-  - 대량 데이터 처리 시 스택 초과 방지를 위해 전개 연산자 제거 및 루프 방식 전환
-  - KV 데이터 파싱 예외 처리 추가
+### A. 피드 탭 전면 리디자인 (순위 PRIMARY)
+- `MagazineTab.tsx` 구조 변경: **피부 점수 순위 데이터가 최상단 PRIMARY**, 매거진 아티클은 하단 secondary
+  - **내 순위 카드**: 내 점수(44px 대형) + 상위 X% 뱃지를 다크 그린 카드로 강조 표시
+  - **커뮤니티 통계 바**: 평균 점수 / 최고 점수 / 총 스캔 수 3열 표시 (라벨 truncate 처리)
+  - **점수 분포 바 차트**: `scoreDistribution` 기반 시각화, 내 점수 구간을 주황색으로 강조 (◀ 마커)
+  - **내 개선 포인트**: 최근 스캔의 하위 3개 점수 카드 표시
+  - **Baumann 타입 분포**: 상위 4개 타입 수평 바 차트
+  - 매거진 섹션은 구분선 이후 compact 리스트 (썸네일 64px, 텍스트 12px)
+- `overflow-x-hidden` 추가 → 영어 전환 시 피드탭 오른쪽 밀림 현상 해결
 
-### B. 능능적 케어 매니저 (Care Manager) 도입
+### B. 영어 레이아웃 버그 수정
+- `WeatherTipCard.tsx` — `MiniScoreBarIdle` 컴포넌트:
+  - 라벨 `w-[74px] whitespace-nowrap text-xs` → `w-[80px] text-[10px] leading-snug break-words`
+  - `items-center` → `items-start`로 2줄 라벨 정렬 맞춤
+  - Idle 화면과 결과 화면 10개 점수 그래프에서 영어 라벨 겹침 해결
+- `ScanIdleScreen.tsx` — 스캔 카운터 필:
+  - `max-w-[52%]` → `max-w-[48%]`, `text-[11px]` → `text-[10px]`으로 영어 텍스트 overflow 해결
+- `ScanIdleScreen.tsx` — heroBenefitsTitle 행:
+  - `tracking-[0.14em]` → `tracking-[0.08em]`, `text-[10px]` + `truncate`로 영어 정렬 수정
+
+### C. 매거진 다국어 번역 추가
+- `constants.ts`: `MAGAZINE_ARTICLES_EN` (10개), `MAGAZINE_ARTICLES_JA` (10개) 추가
+- `getMagazineArticles(lang: string)` 함수: 언어별 아티클 자동 선택
+
+### D. 관리자 대시보드 (fondayai.com/admin)
+- `functions/api/admin/stats.ts`: POST /api/admin/stats (ADMIN_KEY 인증)
+  - 총 유저/스캔/게스트/다이어리/화장품 통계, 일별 스캔 트렌드, 바우만 분포
+  - D1 초기화 마이그레이션 API 포함 (`d1-migrate`, `d1-migrate4`)
+- ADMIN_KEY는 Cloudflare Pages Secrets에 저장
+
+### E. AI 케어 설정 및 기타 버그 수정
+- AI 밀착케어 ON/OFF 토글 → VAPID 키를 서버 `/api/vapid-key` 엔드포인트에서 fetch하도록 수정 (hardcode 제거)
+- `ResultDiaryCard.tsx`: 총 스캔 횟수 `fonday_total_scans` localStorage 기반으로 정확히 업데이트
+- `ResultScreen.tsx`: 스캔 저장 시 `fonday_total_scans` increment
+- Preview 환경(dev.fondayai.com)에 VAPID 키 설정 완료
+
+### F. 능동적 케어 매니저 (Care Manager) 도입 (이전 세션)
 - **환경-피부 상관관계 인프라**:
   - `shared/schema.ts`: `scans` 테이블에 `weather_info` 필드 추가
-  - `api/scans.ts`: 스캔 시점의 기온, 습도, AQI를 영구 저장하도록 수정
+  - `api/scans.ts`: 스캔 시점의 기온, 습도, AQI를 영구 저장
 - **지능형 분석 엔진 (`api/care-briefing.ts`)**:
   - 실시간 날씨와 유저의 최근 취약 지표를 결합하여 Gemini 기반 맞춤 조언 생성
-  - 게스트 유저에게는 일반적인 기상 피부 팁 제공
-- **Home 화면 UX 개선**:
-  - `ScanIdleScreen.tsx`: 최상단에 **AI Care Briefing** 카드 배치
-  - 위치 정보 권한 거부 시 서울 날씨로 자동 폴백(Fallback) 처리
-
-### C. 지능형 푸시 알림 통합
-- `worker-api.js` 고도화
-  - 매일 아침 7시, 유저의 피부 약점과 기상을 결합한 Gemini 맞춤 푸시 발송
-  - 8종의 알림 시나리오(스캔, UV, 식단, 수분, 루틴, 취침 등)를 `scheduled` 트리거로 통합 활성화
-  - `wrangler.toml`에 D1 바인딩을 추가하여 Worker에서 직접 스캔 데이터 참조 가능하게 개선
+- **Home 화면**: `ScanIdleScreen.tsx` 최상단에 AI Care Briefing 카드 배치
+- `worker-api.js`: 매일 아침 7시 Gemini 맞춤 푸시 + 8종 알림 시나리오 통합
 
 ---
 
@@ -352,9 +371,13 @@ CREATE TABLE IF NOT EXISTS cosmetics (
 
 | 커밋 | 내용 |
 |------|------|
+| fd4dbf4 | fix(ui): 피드탭 리디자인 및 영어 레이아웃 버그 수정 (MagazineTab 순위 PRIMARY, MiniScoreBarIdle, socialCount, heroBenefitsTitle) |
+| 1ba8bb6 | redesign(magazine): 매거진 탭 컴팩트 리디자인 (통계 한줄 바 + unified 아티클 리스트) |
+| 39be8fa | feat(magazine): 영어/일본어 매거진 아티클 번역 추가 (constants.ts getMagazineArticles) |
+| 3a8b717 | fix(ui): 매거진 순위/스캔횟수/idle헤더/말줄임 버그 수정 |
+| bef2531 | feat(admin): 전체 데이터 초기화 기능 추가 (확인 텍스트 + 이중 확인) |
+| ec7aeca | fix(admin): d1-migrate4 accept form-data and JSON |
+| a349fb9 | fix(push): AI 케어 토글 수정 (VAPID 키 서버 엔드포인트 fetch) |
+| 2c95054 | feat(admin): full analytics dashboard + event tracking |
 | 2752ba6 | fix(care): 게스트 브리핑 노출 및 위치 권한 폴백(서울) 추가 |
 | 8c42943 | feat(care): 능동적 AI 케어 매니저 브리핑 및 통합 푸시 시스템 구축 |
-| 6d69b3f | fix(feed): constants 임포트 오류 방지를 위해 SCAN_FROM 로컬 선언 |
-| 77f707c | fix(feed): 랭킹 데이터 파싱 및 렌더링 안정성 강화 (NaN 체크 및 성능 최적화) |
-| 7f5c567 | debug(feed): 런타임 에러 바운더리 추가 |
-| 561aa81 | fix(result): 결과 화면 compact 3탭 구조 복원 |
