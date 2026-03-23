@@ -313,10 +313,10 @@ export function ScanIdleScreen({
               <div className="text-xs font-bold text-stone-700">{t("idle.previewTitle")}</div>
               <div className="text-xs text-stone-400">{t("idle.previewSub")}</div>
             </div>
-            <div className="flex items-center gap-1.5 px-2 py-1 rounded-full max-w-[52%] sm:max-w-none"
+            <div className="flex items-center gap-1.5 px-2 py-1 rounded-full max-w-[48%]"
               style={{ background: `${SCAN_FROM}16`, color: SCAN_TO }}>
               <Heart className="w-3 h-3 shrink-0" />
-              <span className="text-[11px] leading-tight font-bold text-right break-keep">{t("idle.socialCount", { n: socialCount.toLocaleString() })}</span>
+              <span className="text-[10px] leading-tight font-bold">{t("idle.socialCount", { n: socialCount.toLocaleString() })}</span>
             </div>
           </div>
           <div className="grid grid-cols-[100px_1fr] gap-2 items-stretch sm:grid-cols-[116px_1fr] sm:gap-2.5 md:grid-cols-[132px_1fr] md:gap-3">
@@ -343,9 +343,9 @@ export function ScanIdleScreen({
             <div className="flex flex-col">
               <div className="rounded-3xl px-2.5 py-2.5 mb-2.5 sm:rounded-3xl sm:px-3"
                 style={{ background: `${SCAN_FROM}10`, border: `1px solid ${SCAN_FROM}24` }}>
-                <div className="flex items-center justify-between gap-2">
-                  <p className="text-xs font-bold uppercase tracking-[0.14em] min-w-0" style={{ color: SCAN_TO }}>{t("idle.heroBenefitsTitle")}</p>
-                  <span className="text-xs font-bold uppercase tracking-[0.14em] shrink-0" style={{ color: TEXT_SECONDARY }}>{t("idle.heroTag")}</span>
+                <div className="flex items-center justify-between gap-1">
+                  <p className="text-[10px] font-bold uppercase tracking-[0.08em] truncate min-w-0" style={{ color: SCAN_TO }}>{t("idle.heroBenefitsTitle")}</p>
+                  <span className="text-[10px] font-bold uppercase tracking-[0.08em] shrink-0 ml-1" style={{ color: TEXT_SECONDARY }}>{t("idle.heroTag")}</span>
                 </div>
                 <div className="grid grid-cols-1 gap-2 mt-2">
                   <div className="flex items-center gap-2 text-xs font-semibold text-stone-700">

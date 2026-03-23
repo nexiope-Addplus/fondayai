@@ -118,9 +118,9 @@ export function MiniScoreBarIdle({ label, score, color, delay }: {
     return () => clearTimeout(timer);
   }, [delay]);
   return (
-    <div className="flex items-center gap-2">
-      <span className="text-xs flex-shrink-0 w-[74px] whitespace-nowrap" style={{ color: TEXT_SECONDARY }}>{label}</span>
-      <div className="flex-1 h-[5px] rounded-full overflow-hidden" style={{ background: "#E8E0D8" }}>
+    <div className="flex items-start gap-2">
+      <span className="text-[10px] flex-shrink-0 w-[80px] leading-snug break-words" style={{ color: TEXT_SECONDARY }}>{label}</span>
+      <div className="flex-1 h-[5px] rounded-full overflow-hidden mt-1" style={{ background: "#E8E0D8" }}>
         <div
           className="h-full rounded-full"
           style={{
@@ -130,7 +130,7 @@ export function MiniScoreBarIdle({ label, score, color, delay }: {
           }}
         />
       </div>
-      <span className="text-xs font-bold flex-shrink-0 w-6 text-right" style={{ color }}>{score}</span>
+      <span className="text-[10px] font-bold flex-shrink-0 w-6 text-right mt-0.5" style={{ color }}>{score}</span>
     </div>
   );
 }
