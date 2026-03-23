@@ -7,8 +7,9 @@ import {
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import {
-  BAUMANN_COLORS, DEEP_GREEN, SCAN_FROM, SCAN_TO, TEXT_SECONDARY,
+  BAUMANN_COLORS, DEEP_GREEN, SCAN_FROM, SCAN_TO, TEXT_SECONDARY, TEXT_TERTIARY,
   TINT_GREEN, TINT_WARM, SCORE_COLORS, stagger, fadeChild,
+  BG_BASE, BG_MUTED, BORDER_COLOR, FONT_DISPLAY,
 } from "./constants";
 import type { WeatherData, WeatherTipKey } from "./types";
 import { getStreak, getAttendance, getDaysSinceLastScan, getWeatherTipKey } from "./utils";
@@ -167,7 +168,7 @@ export function ScanIdleScreen({
 
     <motion.div
       className="flex flex-col px-3 pb-8 relative overflow-hidden"
-      style={{ minHeight: "calc(100dvh - 60px)", background: "#FDFAF8", paddingTop: 20 }}
+      style={{ minHeight: "calc(100dvh - 60px)", background: BG_BASE, paddingTop: 20 }}
       variants={stagger} initial="initial" animate="animate"
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
@@ -175,10 +176,8 @@ export function ScanIdleScreen({
     >
       {/* 상단 헤더 row */}
       <div className="flex justify-between items-center mb-3 relative" style={{ zIndex: 1 }}>
-        <div className="flex items-center gap-1.5 px-3 py-1 rounded-full"
-          style={{ background: `${SCAN_FROM}22`, border: `1px solid ${SCAN_FROM}50` }}>
-          <Sparkles className="w-3 h-3" style={{ color: SCAN_TO }} />
-          <span className="text-xs font-medium tracking-widest uppercase" style={{ color: SCAN_TO, fontFamily: "'Fraunces', Georgia, serif" }}>FONDAY AI</span>
+        <div className="flex items-center gap-1.5">
+          <span className="text-sm font-medium tracking-wide" style={{ color: TEXT_SECONDARY, fontFamily: FONT_DISPLAY }}>Fonday AI</span>
         </div>
         <LangSwitcher />
       </div>
@@ -228,7 +227,7 @@ export function ScanIdleScreen({
         return (
           <motion.div variants={fadeChild} className="mb-3 relative" style={{ zIndex: 1 }}>
             <div className="rounded-2xl overflow-hidden border"
-              style={{ background: "rgba(255,255,255,0.85)", borderColor: "rgba(201,112,98,0.12)", backdropFilter: "blur(8px)" }}>
+              style={{ background: "rgba(255,255,255,0.9)", borderColor: BORDER_COLOR }}>
               {/* 인사 + 날씨 헤더 */}
               <div className="flex items-center gap-2 px-3.5 py-2.5">
                 <span className="text-base">{emoji}</span>
@@ -290,14 +289,7 @@ export function ScanIdleScreen({
       {/* ── 헤더 + 히어로 미리보기 ── */}
       <motion.div variants={fadeChild} className="mb-4 relative" style={{ zIndex: 1 }}>
         <div className="flex items-center justify-between gap-2 mb-3">
-          <div className="flex items-center gap-1.5 px-3 py-1 rounded-full"
-            style={{ background: `${SCAN_FROM}22`, border: `1px solid ${SCAN_FROM}50` }}>
-            <Sparkles className="w-3 h-3" style={{ color: SCAN_TO }} />
-            <span className="text-xs font-medium tracking-widest uppercase" style={{ color: SCAN_TO, fontFamily: "'Fraunces', Georgia, serif" }}>FONDAY AI</span>
-          </div>
-          <div className="px-3 py-1 rounded-full bg-white/80 border border-white/70 shadow-[0_8px_24px_rgba(189,133,111,0.12)]">
-            <span className="text-xs font-bold" style={{ color: DEEP_GREEN }}>{t("idle.heroBadge")}</span>
-          </div>
+          <span className="text-xs font-medium tracking-wide" style={{ color: TEXT_TERTIARY, fontFamily: FONT_DISPLAY }}>{t("idle.heroBadge")}</span>
         </div>
         <h1 className="text-[28px] sm:text-[30px] font-light text-stone-800 leading-[1.08] mb-1.5 px-1" style={{ fontFamily: "'Fraunces', Georgia, serif" }}>
           {t("idle.subtitle1")}<br />{t("idle.subtitle3")}
@@ -306,8 +298,8 @@ export function ScanIdleScreen({
           {t("idle.subtitle4")}
         </p>
 
-        <div className="rounded-3xl p-3 border border-white/70 sm:rounded-3xl sm:p-3.5"
-          style={{ background: "rgba(255,255,255,0.84)", boxShadow: "0 18px 44px rgba(160,120,100,0.15)", backdropFilter: "blur(14px)" }}>
+        <div className="rounded-3xl p-3 border sm:rounded-3xl sm:p-3.5"
+          style={{ background: "#FFFFFF", boxShadow: "0 8px 24px rgba(74,124,110,0.06)", borderColor: BORDER_COLOR }}>
           <div className="flex items-center justify-between mb-3">
             <div>
               <div className="text-xs font-bold text-stone-700">{t("idle.previewTitle")}</div>
@@ -482,7 +474,7 @@ export function ScanIdleScreen({
 
       {/* 바우만 설명 더보기 accordion */}
       <motion.div variants={fadeChild} className="mb-4 relative" style={{ zIndex: 1 }}>
-        <div className="rounded-2xl bg-white/90" style={{ backdropFilter: "blur(8px)" }}>
+        <div className="rounded-2xl bg-white border" style={{ borderColor: BORDER_COLOR }}>
           <button onClick={() => setShowBaumannExp(v => !v)}
             className="w-full flex items-center justify-between px-4 py-3">
             <div className="flex items-center gap-2">
@@ -524,8 +516,8 @@ export function ScanIdleScreen({
 
       {/* 단계 표시 */}
       <motion.div variants={fadeChild} className="mb-4 relative" style={{ zIndex: 1 }}>
-        <div className="bg-white rounded-2xl px-3 py-2.5"
-          style={{ boxShadow: "0 2px 10px rgba(45,95,79,0.06)" }}>
+        <div className="bg-white rounded-2xl px-3 py-2.5 border"
+          style={{ borderColor: BORDER_COLOR }}>
           <h2 className="text-xs font-semibold text-stone-400 text-center mb-2 tracking-widest uppercase">
             {t("idle.stepsTitle")}
           </h2>
@@ -553,10 +545,9 @@ export function ScanIdleScreen({
 
       {/* 개인정보 보호 배지 */}
       <motion.div variants={fadeChild} className="mb-4 relative" style={{ zIndex: 1 }}>
-        <div className="flex items-center justify-center gap-1.5 px-3.5 py-2.5 rounded-2xl"
-          style={{ background: "#EEF7F3" }}>
-          <Lock className="w-3.5 h-3.5 flex-shrink-0" style={{ color: DEEP_GREEN }} />
-          <span className="text-xs font-medium" style={{ color: DEEP_GREEN }}>{t("idle.privacy")}</span>
+        <div className="flex items-center justify-center gap-1.5 px-3.5 py-2.5">
+          <Lock className="w-3.5 h-3.5 flex-shrink-0" style={{ color: TEXT_TERTIARY }} />
+          <span className="text-xs font-medium" style={{ color: TEXT_TERTIARY }}>{t("idle.privacy")}</span>
         </div>
       </motion.div>
 
@@ -564,18 +555,10 @@ export function ScanIdleScreen({
       <motion.div variants={fadeChild} className="mt-auto relative" style={{ zIndex: 1 }}>
         <motion.button
           onClick={onScan}
-          className="w-full py-4 sm:py-[18px] rounded-2xl text-white text-[15px] sm:text-[16px] font-bold tracking-tight"
+          className="w-full py-4 sm:py-[18px] rounded-xl text-white text-[15px] sm:text-[16px] font-semibold tracking-tight"
           style={{ background: DEEP_GREEN }}
           whileHover={{ scale: reducedMotion ? 1 : 1.01 }}
           whileTap={{ scale: reducedMotion ? 1 : 0.97 }}
-          animate={reducedMotion ? {} : {
-            boxShadow: [
-              `0 8px 22px rgba(45,95,79,0.16)`,
-              `0 10px 28px rgba(45,95,79,0.22)`,
-              `0 8px 22px rgba(45,95,79,0.16)`,
-            ],
-          }}
-          transition={reducedMotion ? {} : { duration: 2.5, repeat: Infinity }}
         >
           {t("idle.ctaBtn")}
         </motion.button>

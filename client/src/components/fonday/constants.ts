@@ -33,12 +33,19 @@ export const BAUMANN_COLORS: Record<string, string> = {
 
 export const DEEP_GREEN = "#4A7C6E";
 export const DEEP_GREEN_LIGHT = "#5E9688";
-export const TEXT_SECONDARY = "#8C8070";
+export const TEXT_SECONDARY = "#8C8078";
+export const TEXT_TERTIARY = "#B0A898";
 export const SCAN_FROM = "#E09882";
 export const SCAN_TO = "#C97062";
 export const TINT_WARM = "#FDF3F0";
 export const TINT_GREEN = "#F0F7F4";
 export const TINT_NEUTRAL = "#F7F5F2";
+
+// ─── DESIGN.md 디자인 토큰 ────────────────────────────────────────────────────
+export const BG_BASE = "#FDFCFA";
+export const BG_MUTED = "#F8F7F5";
+export const BORDER_COLOR = "#EBE8E4";
+export const FONT_DISPLAY = "'Fraunces', Georgia, serif";
 
 // ─── z-index 스케일 ──────────────────────────────────────────────────────────
 export const Z = {
