@@ -278,7 +278,39 @@ CREATE TABLE IF NOT EXISTS cosmetics (
 
 ---
 
-## 5-1. 최근 주요 업데이트 (2026-03-23 기준)
+## 5-0. 최근 주요 업데이트 (2026-03-24 기준)
+
+### 디자인 시스템 수립 및 전체 적용
+
+**DESIGN.md 생성** — 뷰티테크/스킨케어 리서치 기반 디자인 시스템 확립:
+- **Aesthetic**: Minimal / Organic — 여백과 타이포그래피가 주역
+- **Primary Color**: Sage Green `#4A7C6E` (기존 Forest Green `#2D5F4F`에서 변경)
+- **Accent**: Salmon `#C97062` (유지)
+- **Display Font**: Fraunces Light (300) — Google Fonts CDN
+- **Body Font**: Pretendard (유지)
+- **Spacing**: 8px base, spacious density
+- **차별화**: 스킨케어 카테고리의 쿨톤(민트/티아) 대신 따뜻한 earth-tone + 세리프 디스플레이 폰트
+
+**전체 코드베이스 적용 (33+ 파일):**
+- `constants.ts`: `DEEP_GREEN` → `#4A7C6E`, 디자인 토큰 추가 (`BG_BASE`, `BG_MUTED`, `BORDER_COLOR`, `FONT_DISPLAY`, `TEXT_TERTIARY`)
+- `index.html`: Fraunces 폰트 CDN 추가, `theme-color` 업데이트
+- 모든 화면: box-shadow 기반 카드 → border 기반 전환 (미니멀)
+- 점수/숫자: `font-bold/black` → Fraunces Light 300 (우아함)
+- 배경색: 제각각 → `BG_BASE #FDFCFA` / `BG_MUTED #F8F7F5` 통일
+- eyebrow 라벨: `FONT_DISPLAY` + `TEXT_TERTIARY` 통일
+- 장식 제거: 그라디언트 헤더→단색, backdrop-blur 제거, CTA 그림자 애니메이션 제거
+- 타이포 스케일: 메트릭 점수 24px Fraunces Light, 라벨 11px, Body 14px 통일
+- 터치 영역: 언어 버튼/푸터 링크 44px 확대 (WCAG)
+- 시맨틱 HTML: 스텝 섹션 `<p>` → `<h2>` 변경
+
+### Ultra-MVP 기능 업데이트
+- 루틴 로그 + 점수 delta + MBTI 공유 강화
+- magazine 탭 참조 제거로 빈 화면 수정
+- idle 화면 카피 포지셔닝 변경 (MBTI 진단 → 화장품 추천 → 효과 추적)
+
+---
+
+## 5-1. 이전 주요 업데이트 (2026-03-23 기준)
 
 ### A. 피드 탭 전면 리디자인 (순위 PRIMARY)
 - `MagazineTab.tsx` 구조 변경: **피부 점수 순위 데이터가 최상단 PRIMARY**, 매거진 아티클은 하단 secondary
@@ -367,10 +399,21 @@ CREATE TABLE IF NOT EXISTS cosmetics (
 
 ---
 
-## 14. 최근 커밋 히스토리 (2026-03-23)
+## 14. 최근 커밋 히스토리 (2026-03-24)
 
 | 커밋 | 내용 |
 |------|------|
+| 930b2c4 | style: DiaryTab/MyScreen 타이포 스케일 통일 |
+| 4c0af84 | style: ScanIdleScreen 타이포/정렬/여백 세밀 조정 |
+| 1815de5 | style: 전체 화면 미니멀 리디자인 (5개 화면 shadow→border, FONT_DISPLAY) |
+| f0d0f59 | style: ScanIdleScreen 미니멀 리디자인 + 디자인 토큰 추가 |
+| 59c2061 | style: DESIGN.md 디자인 시스템 전체 적용 (Sage Green + Fraunces) |
+| a960d56 | docs: DESIGN.md 생성 + CLAUDE.md 디자인 시스템 참조 추가 |
+| 60f0d98 | style(design): 홈 스텝 섹션 시맨틱 h2 헤딩 추가 |
+| 75e8665 | style(design): 푸터 링크 터치 영역 44px 확대 |
+| 0b4a13e | style(design): 언어 전환 버튼 터치 영역 44px 확대 |
+| 8cdbec4 | feat: 루틴 로그 + 점수 delta + MBTI 공유 강화 |
+| 0f70d6d | fix: magazine 탭 참조 제거로 빈 화면 수정 |
 | fd4dbf4 | fix(ui): 피드탭 리디자인 및 영어 레이아웃 버그 수정 (MagazineTab 순위 PRIMARY, MiniScoreBarIdle, socialCount, heroBenefitsTitle) |
 | 1ba8bb6 | redesign(magazine): 매거진 탭 컴팩트 리디자인 (통계 한줄 바 + unified 아티클 리스트) |
 | 39be8fa | feat(magazine): 영어/일본어 매거진 아티클 번역 추가 (constants.ts getMagazineArticles) |
