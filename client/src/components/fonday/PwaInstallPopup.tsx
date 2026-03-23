@@ -1,6 +1,7 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence } from "framer-motion";
+import { isIOS } from "./utils";
 
 export function PwaInstallPopup({ open, onDismiss, deferredPrompt, onShowInstallGuide }: any) {
   const { t } = useTranslation();
@@ -31,8 +32,7 @@ export function PwaInstallPopup({ open, onDismiss, deferredPrompt, onShowInstall
             <button
               onClick={() => {
                 onDismiss();
-                const isIos = /iPhone|iPad|iPod/i.test(navigator.userAgent);
-                if (isIos || !deferredPrompt) {
+                if (isIOS() || !deferredPrompt) {
                   onShowInstallGuide?.();
                 } else {
                   deferredPrompt.prompt();
@@ -42,7 +42,7 @@ export function PwaInstallPopup({ open, onDismiss, deferredPrompt, onShowInstall
               className="w-full h-12 rounded-2xl font-bold text-white mb-3"
               style={{ background: "linear-gradient(135deg, #E09882, #C97062)" }}
             >
-              {/iPhone|iPad|iPod/i.test(navigator.userAgent) || !deferredPrompt ? t("install.popupIosBtn") : t("install.popupBtn")}
+              {isIOS() || !deferredPrompt ? t("install.popupIosBtn") : t("install.popupBtn")}
             </button>
             <button
               onClick={() => { onDismiss(); }}

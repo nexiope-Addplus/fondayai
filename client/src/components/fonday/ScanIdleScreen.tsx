@@ -368,7 +368,7 @@ export function ScanIdleScreen({
 
       <motion.div variants={fadeChild} className="mb-4 relative" style={{ zIndex: 1 }}>
         {scanLoading && (
-          <div className={`rounded-2xl bg-white px-4 py-4 mb-4 ${reducedMotion ? "" : "animate-pulse"}`} style={{ boxShadow: "0 8px 20px rgba(45,95,79,0.06)" }}>
+          <div className={`rounded-2xl bg-white px-4 py-4 mb-4${reducedMotion ? "" : " animate-pulse"}`} style={{ boxShadow: "0 8px 20px rgba(45,95,79,0.06)" }}>
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0 flex-1">
                 <div className="h-3 w-20 rounded-full bg-stone-100 mb-2" />

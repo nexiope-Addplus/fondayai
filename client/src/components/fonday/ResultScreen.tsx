@@ -26,6 +26,7 @@ import {
   getDiaryTodos, saveDiaryTodos, getDiaryTodoProgress, initDiaryTodosFromRoutine,
   buildCosmeticsInsights, buildRoutineGuide,
   pickFoodOption, dedupeFoods,
+  isIOS, isPWA,
 } from "./utils";
 import { SkinPredictionCard } from "./SkinPredictionCard";
 import { ResultDiaryCard } from "./ResultDiaryCard";
@@ -109,11 +110,9 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
   const pwaTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const pwaTriggeredRef = useRef(false); // deferredPrompt 재실행 시 중복 방지
   useEffect(() => {
-    const isStandalone = window.matchMedia("(display-mode: standalone)").matches || (window.navigator as any).standalone === true;
     const isDismissed = localStorage.getItem("fonday_pwa_dismissed") === "1";
-    const isIos = /iPhone|iPad|iPod/i.test(navigator.userAgent);
-    if (isStandalone || isDismissed || pwaTriggeredRef.current) return;
-    if (!isIos && !deferredPrompt) return;
+    if (isPWA() || isDismissed || pwaTriggeredRef.current) return;
+    if (!isIOS() && !deferredPrompt) return;
 
     const el = resultScrollRef.current;
     if (!el) return;
@@ -130,7 +129,10 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
     el.addEventListener("scroll", handleScroll, { passive: true });
     return () => {
       el.removeEventListener("scroll", handleScroll);
-      if (pwaTimerRef.current) { clearTimeout(pwaTimerRef.current); pwaTimerRef.current = null; }
+      if (pwaTimerRef.current) {
+        clearTimeout(pwaTimerRef.current);
+        pwaTimerRef.current = null;
+      }
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [deferredPrompt]);

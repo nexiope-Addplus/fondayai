@@ -226,7 +226,15 @@ export function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: AppU
     if (!container) return;
     const saved = sessionStorage.getItem(scrollRestoreKey);
     if (saved) container.scrollTop = Number(saved);
-    const onScroll = () => sessionStorage.setItem(scrollRestoreKey, String(container.scrollTop));
+    let ticking = false;
+    const onScroll = () => {
+      if (ticking) return;
+      ticking = true;
+      setTimeout(() => {
+        sessionStorage.setItem(scrollRestoreKey, String(container.scrollTop));
+        ticking = false;
+      }, 300);
+    };
     container.addEventListener("scroll", onScroll, { passive: true });
     return () => container.removeEventListener("scroll", onScroll);
   }, [scrollRestoreKey]);
