@@ -101,23 +101,6 @@ export function SkinPredictionCard({
           </div>
         </div>
 
-        <div className="mt-3 rounded-2xl px-3 py-3 flex items-center justify-between gap-3" style={{ background: "#FAF5FF", border: "1px solid #E9D5FF" }}>
-          <p className="text-xs text-stone-500 leading-snug text-kr-pretty">{t("result.prediction.diaryHint")}</p>
-          <div className="flex items-center gap-2 shrink-0">
-            <span className="rounded-full bg-violet-100 px-2.5 py-1 text-xs font-bold text-violet-600">
-              {t("result.prediction.questHint")}
-            </span>
-            {onOpenDiary && (
-              <Button
-                onClick={onOpenDiary}
-                className="rounded-full h-8 px-3 text-xs font-semibold shadow-none"
-                style={{ background: "#FFFFFF", color: SCAN_TO, border: "1px solid #E9D5FF" }}
-              >
-                {t("result.prediction.diaryButton")}
-              </Button>
-            )}
-          </div>
-        </div>
       </CardContent>
     </Card>
   );

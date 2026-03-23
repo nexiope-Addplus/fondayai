@@ -158,7 +158,15 @@ export function useAICareSettings(analysisResult: AnalysisResult | null) {
       } else {
         const perm = await Notification.requestPermission();
         if (perm !== "granted") { setPushLoading(false); return; }
-        const VAPID_PUBLIC = import.meta.env.VITE_VAPID_PUBLIC_KEY || "";
+        // 빌드 타임 env가 없으면 서버에서 공개키 가져오기
+        let VAPID_PUBLIC = import.meta.env.VITE_VAPID_PUBLIC_KEY || "";
+        if (!VAPID_PUBLIC) {
+          try {
+            const res = await fetch("/api/vapid-public-key");
+            if (res.ok) { const d = await res.json(); VAPID_PUBLIC = d.key || ""; }
+          } catch {}
+        }
+        if (!VAPID_PUBLIC) { setPushLoading(false); return; }
         const sub = existing || await reg.pushManager.subscribe({
           userVisibleOnly: true,
           applicationServerKey: VAPID_PUBLIC,
