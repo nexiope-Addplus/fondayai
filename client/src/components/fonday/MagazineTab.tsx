@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence, useDragControls } from "framer-motion";
-import { Clock, User, ChevronRight, BarChart3, Salad, Sparkles } from "lucide-react";
+import { Clock, User, ChevronRight, BarChart3, Salad } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Card, CardContent } from "@/components/ui/card";
 import type { MagazineArticle } from "./types";
@@ -138,6 +138,10 @@ export function MagazineTab() {
       .sort((a: any, b: any) => Number(a.score) - Number(b.score))
       .slice(0, 3);
   }, [latestScan]);
+  const maxDistributionCount = useMemo(
+    () => Math.max(...(rankingData?.scoreDistribution?.map((band: any) => band.count) ?? [1]), 1),
+    [rankingData],
+  );
 
   const filtered = filter === "전체"
     ? MAGAZINE_ARTICLES
@@ -196,6 +200,154 @@ export function MagazineTab() {
                   </>
                 ) : (
                   <p className="text-xs text-stone-400">{t("discover.nutritionEmpty")}</p>
+                )}
+              </div>
+            </div>
+          </motion.div>
+
+          <motion.div variants={fadeChild} className="px-5 mb-5">
+            <div className="rounded-3xl bg-white p-4" style={{ boxShadow: "0 10px 24px rgba(45,95,79,0.06)" }}>
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <p className="text-[11px] font-bold tracking-[0.14em] uppercase" style={{ color: SCAN_TO }}>
+                    {t("discover.rankingEyebrow")}
+                  </p>
+                  <p className="text-[16px] font-bold mt-1" style={{ color: DEEP_GREEN }}>
+                    {t("discover.rankingTitle")}
+                  </p>
+                  <p className="text-[12px] text-stone-500 mt-1 leading-snug">
+                    {rankingData ? t("ranking.totalData", { count: rankingData.totalScans }) : t("discover.rankingEmpty")}
+                  </p>
+                </div>
+                <div className="grid grid-cols-2 gap-2 shrink-0 min-w-[112px]">
+                  <div className="rounded-2xl p-2.5 text-center" style={{ background: "#F6FBF8" }}>
+                    <p className="text-[10px] text-stone-400">{t("ranking.avgScore")}</p>
+                    <p className="text-[17px] font-black mt-1" style={{ color: DEEP_GREEN }}>
+                      {rankingData?.avgScore ?? "—"}
+                    </p>
+                  </div>
+                  <div className="rounded-2xl p-2.5 text-center" style={{ background: "#FFF7F3" }}>
+                    <p className="text-[10px] text-stone-400">{t("ranking.topScore")}</p>
+                    <p className="text-[17px] font-black mt-1" style={{ color: SCAN_TO }}>
+                      {rankingData?.topScore ?? "—"}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {rankingData && (
+                <>
+                  <div className="mt-4 rounded-2xl p-4" style={{ background: "linear-gradient(135deg, rgba(201,112,98,0.10), rgba(45,95,79,0.08))" }}>
+                    {rankingData.myPercentile !== undefined ? (
+                      <>
+                        <p className="text-[11px] text-stone-500">{t("ranking.myRankLabel")}</p>
+                        <p className="text-[28px] font-black mt-1" style={{ color: SCAN_TO }}>
+                          {t("ranking.myPercentile", { percent: rankingData.myPercentile })}
+                        </p>
+                      </>
+                    ) : (
+                      <>
+                        <p className="text-[13px] font-bold" style={{ color: DEEP_GREEN }}>{t("discover.rankingTitle")}</p>
+                        <p className="text-[11px] text-stone-500 mt-1">{t("ranking.loginForRank")}</p>
+                      </>
+                    )}
+                  </div>
+
+                  <div className="mt-4">
+                    <p className="text-[11px] font-bold text-stone-400 mb-3">{t("ranking.distribution")}</p>
+                    <div className="space-y-2.5">
+                      {rankingData.scoreDistribution.map((band: any, index: number) => {
+                        const barPct = Math.round((band.count / maxDistributionCount) * 100);
+                        const [bandMin, bandMax] = String(band.label).split("-").map(Number);
+                        const latestOverall = Number(latestScan?.overallScore ?? latestScan?.scores?.[0]?.score ?? 0);
+                        const isMyBand = latestOverall > 0 && latestOverall >= bandMin && latestOverall <= bandMax;
+
+                        return (
+                          <div key={`${band.label}-${index}`} className="flex items-center gap-2">
+                            <span className="text-[11px] text-stone-400 w-14 shrink-0">{band.label}</span>
+                            <div className="flex-1 h-5 rounded-full bg-stone-100 overflow-hidden">
+                              <div
+                                className="h-full rounded-full transition-all duration-700"
+                                style={{
+                                  width: `${Math.max(barPct, band.count > 0 ? 6 : 0)}%`,
+                                  background: isMyBand ? `linear-gradient(90deg, ${SCAN_FROM}, ${SCAN_TO})` : "#D6D3D1",
+                                }}
+                              />
+                            </div>
+                            <span className="text-[11px] text-stone-400 w-5 text-right">{band.count}</span>
+                            {isMyBand && (
+                              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full shrink-0" style={{ background: `${SCAN_FROM}30`, color: SCAN_TO }}>
+                                {t("ranking.me")}
+                              </span>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {Object.keys(rankingData.baumannDistribution ?? {}).length > 0 && (
+                    <div className="mt-4">
+                      <p className="text-[11px] font-bold text-stone-400 mb-3">{t("ranking.topBaumann")}</p>
+                      <div className="grid grid-cols-3 gap-2">
+                        {Object.entries(rankingData.baumannDistribution)
+                          .sort(([, a], [, b]) => (b as number) - (a as number))
+                          .slice(0, 3)
+                          .map(([type, count], index) => (
+                            <div key={type} className="rounded-2xl p-3 text-center" style={{ background: index === 0 ? "#FFF7F3" : "#FAF8F5" }}>
+                              <p className="text-[12px]">{["🥇", "🥈", "🥉"][index]}</p>
+                              <p className="text-[16px] font-black mt-0.5" style={{ color: index === 0 ? SCAN_TO : DEEP_GREEN }}>{type}</p>
+                              <p className="text-[11px] text-stone-400 mt-1">{count as number}{t("ranking.people")}</p>
+                            </div>
+                          ))}
+                      </div>
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
+          </motion.div>
+
+          <motion.div variants={fadeChild} className="px-5 mb-5">
+            <div className="rounded-3xl p-4" style={{ background: "linear-gradient(135deg, #FFF8F4, #F7FBF8)", border: "1px solid #F1E9E1" }}>
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <p className="text-[11px] font-bold tracking-[0.14em] uppercase" style={{ color: SCAN_TO }}>
+                    {t("discover.nutritionEyebrow")}
+                  </p>
+                  <p className="text-[16px] font-bold mt-1" style={{ color: DEEP_GREEN }}>
+                    {t("discover.nutritionTitle")}
+                  </p>
+                  <p className="text-[12px] text-stone-500 mt-1 leading-snug">
+                    {weakestScores[0]
+                      ? t("discover.nutritionHint", { concern: weakestScores[0].label })
+                      : t("discover.nutritionEmpty")}
+                  </p>
+                </div>
+                <div className="w-11 h-11 rounded-2xl flex items-center justify-center shrink-0" style={{ background: "#FFFFFF" }}>
+                  <Salad className="w-5 h-5" style={{ color: SCAN_TO }} />
+                </div>
+              </div>
+
+              <div className="grid gap-2 mt-4">
+                {weakestScores.length > 0 ? (
+                  weakestScores.map((item: any, index: number) => (
+                    <div key={`${item.label}-${index}`} className="rounded-2xl bg-white p-3.5">
+                      <div className="flex items-center justify-between gap-3">
+                        <p className="text-[13px] font-bold text-stone-800">{item.label}</p>
+                        <span className="text-[12px] font-bold" style={{ color: SCAN_TO }}>
+                          {item.score}{t("result.scoreSuffix")}
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-stone-500 mt-1 leading-snug">
+                        {t("discover.nutritionHint", { concern: item.label })}
+                      </p>
+                    </div>
+                  ))
+                ) : (
+                  <div className="rounded-2xl bg-white p-4">
+                    <p className="text-[12px] text-stone-500">{t("discover.nutritionEmpty")}</p>
+                  </div>
                 )}
               </div>
             </div>

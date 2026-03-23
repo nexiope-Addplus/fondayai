@@ -3,12 +3,8 @@ import { useTranslation } from "react-i18next";
 import i18n from "../../i18n";
 import { AnimatePresence, motion } from "framer-motion";
 import {
-  ChevronLeft,
-  ChevronRight,
   ClipboardList,
   Lock,
-  Moon,
-  Sun,
 } from "lucide-react";
 import {
   Line,
@@ -24,10 +20,7 @@ import type {
   AICareSettings,
   AnalysisResult,
   CosmeticItem,
-  DiaryCauseTag,
-  RankingData,
   ReminderSettings,
-  TodoItem,
 } from "./types";
 import {
   DEEP_GREEN,
@@ -42,33 +35,25 @@ import {
   buildDiaryReportModel,
   buildRoutineGuide,
   getAICareSettings,
-  getCauseTagLabel,
-  getDiaryCauseTags,
   getDiaryMemo,
   getDiaryTodoProgress,
-  getDiaryTodos,
   getReminderSettings,
   getReportLang,
   getStreak,
   getWeeklyReport,
   saveAICareSettings,
-  saveDiaryCauseTags,
-  saveDiaryMemo,
-  saveDiaryTodos,
   saveReminderSettings,
-  suggestCauseTags,
   syncReminderToServer,
   todayStr,
 } from "./utils";
 
-import { InlineTodos, InlineMemo, DiaryRoutinePreviewCard, DiaryCalendarView, DiaryTimeline, DiaryFullView } from "./DiaryHelpers";
+import { DiaryRoutinePreviewCard, DiaryCalendarView, DiaryTimeline } from "./DiaryHelpers";
 import { DiaryReportTab } from "./DiaryReportTab";
 
 export function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: any; analysisResult: AnalysisResult | null; onBack?: () => void; onLogin?: (p: "kakao"|"line"|"google", tab: string) => void }) {
   const { t } = useTranslation();
   const [history, setHistory] = useState<any[]>([]);
-  const [rankingData, setRankingData] = useState<RankingData | null>(null);
-  const [tab, setTab] = useState<"calendar" | "timeline" | "report" | "ranking">("calendar");
+  const [tab, setTab] = useState<"calendar" | "timeline" | "report">("calendar");
   const [loading, setLoading] = useState(true);
   const [reminderSettings, setReminderSettings] = useState<ReminderSettings>(() => getReminderSettings());
   const [aiCareSettings, setAICareSettings] = useState<AICareSettings>(() => getAICareSettings());
@@ -124,11 +109,6 @@ export function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: any;
           }
         } catch {}
       }
-      try {
-        const qs = overallScore > 0 ? `?myScore=${overallScore}` : "";
-        const r = await fetch(`/api/ranking${qs}`);
-        if (r.ok) setRankingData(await r.json());
-      } catch {}
       setLoading(false);
     };
     load();
@@ -136,7 +116,7 @@ export function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: any;
 
   useEffect(() => {
     const targetTab = sessionStorage.getItem("fonday_diary_target_tab");
-    if (targetTab === "calendar" || targetTab === "timeline" || targetTab === "report" || targetTab === "ranking") {
+    if (targetTab === "calendar" || targetTab === "timeline" || targetTab === "report") {
       setTab(targetTab);
       sessionStorage.removeItem("fonday_diary_target_tab");
     }
@@ -206,14 +186,13 @@ export function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: any;
     return () => window.clearInterval(timer);
   }, [reminderSettings.enabled]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const tabs: { id: "calendar" | "timeline" | "report" | "ranking"; label: string }[] = [
+  const tabs: { id: "calendar" | "timeline" | "report"; label: string }[] = [
     { id: "calendar", label: t("modal.diary.calendarTab") },
     { id: "timeline", label: t("modal.diary.timelineTab") },
     { id: "report", label: t("modal.diary.reportTab") },
-    { id: "ranking", label: t("modal.diary.rankingTab") },
   ];
-  const diaryTabSequence = ["calendar", "timeline", "report", "ranking"] as const;
-  const diaryTabOrder = { calendar: 0, timeline: 1, report: 2, ranking: 3 } as const;
+  const diaryTabSequence = ["calendar", "timeline", "report"] as const;
+  const diaryTabOrder = { calendar: 0, timeline: 1, report: 2 } as const;
   const diaryTabDirectionRef = useRef(1);
   const diaryTabNavRef = useRef<HTMLDivElement | null>(null);
   const diaryScrollRef = useRef<HTMLDivElement | null>(null);
@@ -222,7 +201,7 @@ export function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: any;
     center: { x: 0, opacity: 1 },
     exit: (dir: number) => ({ x: dir * -28, opacity: 0 }),
   };
-  const goToDiaryTab = (next: "calendar" | "timeline" | "report" | "ranking") => {
+  const goToDiaryTab = (next: "calendar" | "timeline" | "report") => {
     diaryTabDirectionRef.current = diaryTabOrder[next] >= diaryTabOrder[tab] ? 1 : -1;
     setTab(next);
   };
@@ -508,83 +487,6 @@ export function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: any;
               />
             </motion.div>
           )}
-          {tab === "ranking" && (
-            <motion.div
-              key="rank"
-              custom={diaryTabDirectionRef.current}
-              variants={diaryTabSlideVariants}
-              initial="enter"
-              animate="center"
-              exit="exit"
-              transition={{ duration: 0.22, ease: "easeOut" }}
-              className="min-h-full"
-            >
-              <div className="px-5 pb-8 space-y-4 pt-4">
-                {!rankingData ? (
-                  <div className="py-12 text-center"><p className="text-[12px] text-stone-400">...</p></div>
-                ) : (
-                  <>
-                    {rankingData.myPercentile !== undefined ? (
-                      <div className="p-5 rounded-2xl text-center"
-                        style={{ background: `linear-gradient(135deg, ${SCAN_FROM}20, ${SCAN_TO}10)` }}>
-                        <p className="text-xs text-stone-500 mb-1">{t("ranking.myRankLabel")}</p>
-                        <p className="text-4xl font-black" style={{ color: SCAN_TO }}>
-                          {t("ranking.myPercentile", { percent: rankingData.myPercentile })}
-                        </p>
-                        <p className="text-xs text-stone-400 mt-1">{t("ranking.totalData", { count: rankingData.totalScans })}</p>
-                      </div>
-                    ) : (
-                      <div className="p-4 rounded-2xl text-center bg-stone-50">
-                        <p className="text-[12px] text-stone-500">{t("ranking.loginForRank")}</p>
-                        <p className="text-xs text-stone-300 mt-1">{t("ranking.totalData", { count: rankingData.totalScans })}</p>
-                      </div>
-                    )}
-                    <div>
-                      <p className="text-xs font-bold text-stone-400 mb-3">{t("ranking.distribution")}</p>
-                      <div className="space-y-3">
-                        {rankingData.scoreDistribution.map((band, bi) => {
-                          const maxCount = Math.max(...rankingData.scoreDistribution.map(d => d.count), 1);
-                          const barPct = Math.round((band.count / maxCount) * 100);
-                          const [bMin, bMax] = band.label.split("-").map(Number);
-                          const isMyBand = overallScore >= bMin && overallScore <= bMax;
-                          return (
-                            <div key={bi} className="flex items-center gap-2">
-                              <span className="text-xs text-stone-400 w-14 shrink-0">{band.label}</span>
-                              <div className="flex-1 h-5 rounded-full bg-stone-100 overflow-hidden">
-                                <div className="h-full rounded-full transition-all duration-700"
-                                  style={{ width: `${Math.max(barPct, band.count > 0 ? 6 : 0)}%`,
-                                    background: isMyBand ? `linear-gradient(90deg, ${SCAN_FROM}, ${SCAN_TO})` : "#D1D5DB" }} />
-                              </div>
-                              <span className="text-xs text-stone-400 w-5 text-right">{band.count}</span>
-                              {isMyBand && (
-                                <span className="text-xs font-bold px-1.5 py-0.5 rounded-full shrink-0"
-                                  style={{ background: `${SCAN_FROM}30`, color: SCAN_TO }}>{t("ranking.me")}</span>
-                              )}
-                            </div>
-                          );
-                        })}
-                      </div>
-                    </div>
-                    {Object.keys(rankingData.baumannDistribution).length > 0 && (
-                      <div>
-                        <p className="text-xs font-bold text-stone-400 mb-3">{t("ranking.topBaumann")}</p>
-                        <div className="flex gap-2 flex-wrap">
-                          {Object.entries(rankingData.baumannDistribution)
-                            .sort(([,a],[,b]) => b - a).slice(0, 3)
-                            .map(([type, count]) => (
-                              <div key={type} className="flex items-center gap-2 px-3 py-2 rounded-xl bg-white">
-                                <span className="text-sm font-bold" style={{ color: SCAN_TO }}>{type}</span>
-                                <span className="text-xs text-stone-400">{count}{t("ranking.people")}</span>
-                              </div>
-                            ))}
-                        </div>
-                      </div>
-                    )}
-                  </>
-                )}
-              </div>
-            </motion.div>
-        )}
         </AnimatePresence>
         </div>
       </div>
