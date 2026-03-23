@@ -157,6 +157,7 @@ export default function SkinScanPage() {
   const [user, setUser] = useState<any>(undefined);
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
   const [showInstallGuide, setShowInstallGuide] = useState(false);
+  const justLoggedInRef = useRef(false);
 
   useEffect(() => {
     const handler = (e: any) => { e.preventDefault(); setDeferredPrompt(e); };
@@ -182,6 +183,7 @@ export default function SkinScanPage() {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const justLoggedIn = params.get("login") === "success";
+    justLoggedInRef.current = justLoggedIn;
     if (justLoggedIn) window.history.replaceState({}, "", "/");
 
     fetch("/api/user")
@@ -301,10 +303,10 @@ export default function SkinScanPage() {
       localStorage.removeItem("pendingResult");
     }
     const returnTab = localStorage.getItem("fonday_return_tab");
-    if (returnTab) {
+    if (justLoggedInRef.current && returnTab) {
       setActiveTab(returnTab as TabId);
-      localStorage.removeItem("fonday_return_tab");
     }
+    localStorage.removeItem("fonday_return_tab");
   }, [user]);
 
   const handleCapture = useCallback((file: File) => {
