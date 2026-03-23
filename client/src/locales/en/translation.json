@@ -1234,7 +1234,9 @@
     "emptySub": "Register your skincare products to see how well they match your skin type",
     "addBtn": "Register Products",
     "addMore": "Add More Products",
-    "error": "Analysis failed. Please try again."
+    "error": "Analysis failed. Please try again.",
+    "analyzing": "Analyzing ingredients with AI...",
+    "analyzingDesc": "Matching your skin type with product ingredients"
   },
   "common": {
     "viewAll": "View all {{count}}",

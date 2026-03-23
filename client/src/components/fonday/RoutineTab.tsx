@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { AnimatePresence, motion } from "framer-motion";
-import { ChevronRight, Droplets, AlertTriangle, Plus, Sparkles } from "lucide-react";
+import { ChevronRight, Droplets, AlertTriangle, Plus, Sparkles, X } from "lucide-react";
 import type { CosmeticItem } from "./types";
 import {
   DEEP_GREEN,
@@ -598,7 +598,16 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
               exit={{ y: 120 }}
               transition={{ type: "spring", damping: 28, stiffness: 280 }}
             >
-              <div className="w-10 h-1 rounded-full bg-stone-200 mx-auto mb-5" />
+              <div className="flex items-center justify-between px-1 mb-4">
+                <div className="w-10 h-1 rounded-full bg-stone-200 mx-auto" />
+                <button
+                  onClick={() => setSelectedItem(null)}
+                  className="absolute right-5 top-5 w-8 h-8 rounded-full flex items-center justify-center"
+                  style={{ background: "#F5F5F4" }}
+                >
+                  <X className="w-4 h-4 text-stone-400" />
+                </button>
+              </div>
               <div className="flex items-start gap-3">
                 {selectedItem.image_thumbnail ? (
                   <img src={selectedItem.image_thumbnail} className="w-20 h-20 rounded-3xl object-cover bg-stone-100 shrink-0" />

@@ -6,6 +6,9 @@ import { Button } from "@/components/ui/button";
 import { DEEP_GREEN, SCAN_TO, TINT_GREEN, TINT_WARM } from "./constants";
 import type { AnalysisResult, CosmeticItem, CosmeticGrade } from "./types";
 
+// ─── 세션 레벨 캐시 (컴포넌트 재마운트 시에도 유지) ─────────────────
+const _gradeCache: Record<string, CosmeticGrade[]> = {};
+
 // ─── 등급별 색상 ──────────────────────────────────────────────────
 const GRADE_CONFIG: Record<string, { color: string; bg: string; border: string; label: string }> = {
   A: { color: "#059669", bg: "#ECFDF5", border: "#A7F3D0", label: "최적" },
@@ -195,15 +198,32 @@ export function CosmeticsReportCard({
   const dragControls = useDragControls();
   const [grades, setGrades] = useState<CosmeticGrade[]>([]);
   const [loading, setLoading] = useState(false);
+  const [progress, setProgress] = useState(0);
   const [error, setError] = useState(false);
   const hasFetched = useRef(false);
+  const progressTimer = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  useEffect(() => {
-    if (hasFetched.current) return;
-    hasFetched.current = true;
-    if (myCosmetics.length === 0) return;
+  const cacheKey = `${finalType}_${i18n.language}`;
+
+  const startProgress = () => {
+    setProgress(0);
+    progressTimer.current = setInterval(() => {
+      setProgress((p) => {
+        if (p >= 88) { clearInterval(progressTimer.current!); return 88; }
+        return p + (88 - p) * 0.06;
+      });
+    }, 120);
+  };
+  const finishProgress = () => {
+    if (progressTimer.current) clearInterval(progressTimer.current);
+    setProgress(100);
+    setTimeout(() => setProgress(0), 400);
+  };
+
+  const doFetch = () => {
     setLoading(true);
     setError(false);
+    startProgress();
     fetch("/api/cosmetics/grade", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -214,9 +234,26 @@ export function CosmeticsReportCard({
       }),
     })
       .then((r) => r.ok ? r.json() : Promise.reject())
-      .then((data) => setGrades(Array.isArray(data) ? data : []))
+      .then((data) => {
+        const result = Array.isArray(data) ? data : [];
+        _gradeCache[cacheKey] = result;
+        setGrades(result);
+      })
       .catch(() => setError(true))
-      .finally(() => setLoading(false));
+      .finally(() => { finishProgress(); setLoading(false); });
+  };
+
+  useEffect(() => {
+    if (hasFetched.current) return;
+    hasFetched.current = true;
+    if (myCosmetics.length === 0) return;
+    // 캐시 확인
+    if (_gradeCache[cacheKey]) {
+      setGrades(_gradeCache[cacheKey]);
+      return;
+    }
+    doFetch();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // 등록된 화장품과 grade 결과를 id로 매칭
@@ -257,16 +294,11 @@ export function CosmeticsReportCard({
           <div className="flex items-center gap-2">
             {!loading && grades.length > 0 && (
               <button
-                onClick={() => { hasFetched.current = false; setGrades([]); setError(false); setLoading(true);
-                  fetch("/api/cosmetics/grade", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ baumannType: finalType, scores: analysisResult?.scores ?? [], lang: i18n.language }),
-                  })
-                    .then((r) => r.ok ? r.json() : Promise.reject())
-                    .then((data) => setGrades(Array.isArray(data) ? data : []))
-                    .catch(() => setError(true))
-                    .finally(() => setLoading(false));
+                onClick={() => {
+                  hasFetched.current = false;
+                  delete _gradeCache[cacheKey];
+                  setGrades([]);
+                  doFetch();
                 }}
                 className="w-8 h-8 rounded-full flex items-center justify-center"
                 style={{ background: TINT_WARM }}
@@ -301,7 +333,22 @@ export function CosmeticsReportCard({
           {/* 로딩 */}
           {loading && myCosmetics.length > 0 && (
             <div className="space-y-3">
-              <div className="rounded-3xl h-20 bg-stone-100 animate-pulse" />
+              {/* 분석 진행 바 */}
+              <div className="rounded-3xl p-4" style={{ background: "#F0F9F4", border: "1px solid #D1FAE5" }}>
+                <div className="flex items-center justify-between mb-2">
+                  <p className="text-xs font-bold" style={{ color: DEEP_GREEN }}>{t("cosmeticsReport.analyzing")}</p>
+                  <p className="text-xs font-bold tabular-nums" style={{ color: DEEP_GREEN }}>{Math.round(progress)}%</p>
+                </div>
+                <div className="h-2 rounded-full bg-emerald-100 overflow-hidden">
+                  <motion.div
+                    className="h-full rounded-full"
+                    animate={{ width: `${progress}%` }}
+                    transition={{ duration: 0.3, ease: "easeOut" }}
+                    style={{ background: "linear-gradient(90deg, #059669, #34d399)" }}
+                  />
+                </div>
+                <p className="text-[11px] text-stone-400 mt-2">{t("cosmeticsReport.analyzingDesc")}</p>
+              </div>
               {myCosmetics.map((_, i) => (
                 <div key={i} className="rounded-3xl bg-stone-100 animate-pulse" style={{ height: 80 }} />
               ))}

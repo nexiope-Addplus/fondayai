@@ -220,42 +220,46 @@ export function ScanIdleScreen({
           <motion.div variants={fadeChild} className="mb-3 relative" style={{ zIndex: 1 }}>
             <div className="rounded-2xl overflow-hidden border"
               style={{ background: "rgba(255,255,255,0.85)", borderColor: "rgba(201,112,98,0.12)", backdropFilter: "blur(8px)" }}>
+              {/* 인사 + 날씨 헤더 */}
               <div className="flex items-center gap-2 px-3.5 py-2.5">
                 <span className="text-base">{emoji}</span>
                 <p className="text-[12px] font-semibold text-stone-600">{t(greetingKey)}</p>
               </div>
               <WeatherTipCard compact weather={idleWeather} />
-            </div>
 
-            {/* AI 케어 매니저 브리핑 카드 */}
-            <AnimatePresence>
-              {careBriefing && (
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="mt-2 rounded-2xl p-3.5 flex items-start gap-3 shadow-sm border"
-                  style={{
-                    background: careBriefing.priority === "high" ? "#FFF1F0" : "#F0F7F4",
-                    borderColor: careBriefing.priority === "high" ? "#FECACA" : "#D1FAE5"
-                  }}
-                >
-                  <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center shrink-0 shadow-sm">
-                    <Bot className={`w-5 h-5 ${careBriefing.priority === "high" ? "text-rose-500" : "text-emerald-600"}`} />
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center justify-between mb-0.5">
-                      <p className="text-[10px] font-black uppercase tracking-widest text-stone-400">AI Care Briefing</p>
-                      {careBriefing.priority === "high" && (
-                        <span className="text-[10px] font-bold text-rose-500 animate-pulse">URGENT</span>
-                      )}
+              {/* AI 케어 브리핑 (같은 카드 내부) */}
+              <AnimatePresence>
+                {careBriefing && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: "auto" }}
+                    exit={{ opacity: 0, height: 0 }}
+                    className="overflow-hidden"
+                  >
+                    <div
+                      className="flex items-start gap-2.5 px-3.5 py-2.5 border-t"
+                      style={{
+                        background: careBriefing.priority === "high" ? "#FFF8F8" : "#F4FBF7",
+                        borderColor: careBriefing.priority === "high" ? "#FECACA" : "#D1FAE5",
+                      }}
+                    >
+                      <Bot className={`w-4 h-4 mt-0.5 shrink-0 ${careBriefing.priority === "high" ? "text-rose-500" : "text-emerald-600"}`} />
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-2 mb-0.5">
+                          <p className="text-[10px] font-black uppercase tracking-widest text-stone-400">AI Care</p>
+                          {careBriefing.priority === "high" && (
+                            <span className="text-[10px] font-bold text-rose-500 animate-pulse">!</span>
+                          )}
+                        </div>
+                        <p className="text-[12px] font-semibold text-stone-700 leading-snug break-keep">
+                          {careBriefing.briefing}
+                        </p>
+                      </div>
                     </div>
-                    <p className="text-[13px] font-bold text-stone-800 leading-snug break-keep">
-                      {careBriefing.briefing}
-                    </p>
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
           </motion.div>
         );
       })()}
