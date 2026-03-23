@@ -79,36 +79,29 @@ export function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: AppU
     const load = async () => {
       setLoading(true);
       if (user) {
-        try {
-          const r = await fetch("/api/scans");
-          if (r.ok) { const d = await r.json(); if (Array.isArray(d)) setHistory(d); }
-        } catch {}
+        const [scansRes, diaryRes, cosmeticsRes] = await Promise.allSettled([
+          fetch("/api/scans"),
+          fetch("/api/diary"),
+          fetch("/api/cosmetics"),
+        ]);
+        if (scansRes.status === "fulfilled" && scansRes.value.ok) {
+          try { const d = await scansRes.value.json(); if (Array.isArray(d)) setHistory(d); } catch {}
+        }
         // 서버 → localStorage 동기화 (기기 변경/캐시 삭제 복원)
-        try {
-          const r = await fetch("/api/diary");
-          if (r.ok) {
-            const entries: any[] = await r.json();
+        if (diaryRes.status === "fulfilled" && diaryRes.value.ok) {
+          try {
+            const entries: any[] = await diaryRes.value.json();
             entries.forEach((entry: any) => {
               const { date_str, memo, todos, cause_tags } = entry;
               if (memo) localStorage.setItem(`fonday_memo_${date_str}`, memo);
-              try {
-                const t = JSON.parse(todos || "[]");
-                if (t.length > 0) localStorage.setItem(`fonday_todos_${date_str}`, todos);
-              } catch {}
-              try {
-                const c = JSON.parse(cause_tags || "[]");
-                if (c.length > 0) localStorage.setItem(`fonday_cause_tags_${date_str}`, cause_tags);
-              } catch {}
+              try { const t = JSON.parse(todos || "[]"); if (t.length > 0) localStorage.setItem(`fonday_todos_${date_str}`, todos); } catch {}
+              try { const c = JSON.parse(cause_tags || "[]"); if (c.length > 0) localStorage.setItem(`fonday_cause_tags_${date_str}`, cause_tags); } catch {}
             });
-          }
-        } catch {}
-        try {
-          const cosmeticsRes = await fetch("/api/cosmetics");
-          if (cosmeticsRes.ok) {
-            const cosmetics = await cosmeticsRes.json();
-            setMyCosmetics(Array.isArray(cosmetics) ? cosmetics : []);
-          }
-        } catch {}
+          } catch {}
+        }
+        if (cosmeticsRes.status === "fulfilled" && cosmeticsRes.value.ok) {
+          try { const d = await cosmeticsRes.value.json(); setMyCosmetics(Array.isArray(d) ? d : []); } catch {}
+        }
       }
       setLoading(false);
     };

@@ -97,7 +97,7 @@ export function MyScreen({
           <div className="flex items-center justify-between p-4 rounded-2xl bg-white" style={{ boxShadow: "0 8px 24px rgba(45,95,79,0.06)" }}>
             <div className="flex items-center gap-3">
               {user.avatar
-                ? <img src={user.avatar} alt={user.username || "프로필"} className="w-10 h-10 rounded-full" />
+                ? <img src={user.avatar} alt={user.username || "프로필"} className="w-10 h-10 rounded-full" width={40} height={40} loading="lazy" />
                 : <div className="w-10 h-10 rounded-full flex items-center justify-center"
                     style={{ background: TINT_WARM }}>
                     <User className="w-5 h-5" style={{ color: SCAN_TO }} />

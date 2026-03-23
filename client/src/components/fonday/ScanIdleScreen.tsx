@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import {
@@ -61,23 +61,23 @@ export function ScanIdleScreen({
 
   // 운영 서버 날씨 로직 + Fallback 복구 (Care Briefing 필수)
   useEffect(() => {
-    let isMounted = true;
+    const controller = new AbortController();
+    const { signal } = controller;
     const SEOUL = { lat: 37.5665, lon: 126.9780 };
 
     const fetchWeather = (lat: number, lon: number, isRetry = false) => {
-      fetch(`/api/weather?lat=${lat}&lon=${lon}`)
+      fetch(`/api/weather?lat=${lat}&lon=${lon}`, { signal })
         .then((r) => r.ok ? r.json() : null)
         .then((data) => {
-          if (!isMounted) return;
+          if (signal.aborted) return;
           if (data && !data.error) {
             setIdleWeather(data as WeatherData);
           } else if (!isRetry) {
-            // 현재 위치 API 실패 시 서울로 재시도
             fetchWeather(SEOUL.lat, SEOUL.lon, true);
           }
         })
         .catch(() => {
-          if (isMounted && !isRetry) {
+          if (!signal.aborted && !isRetry) {
             fetchWeather(SEOUL.lat, SEOUL.lon, true);
           }
         });
@@ -86,14 +86,14 @@ export function ScanIdleScreen({
     if ("geolocation" in navigator) {
       navigator.geolocation.getCurrentPosition(
         (pos) => fetchWeather(pos.coords.latitude, pos.coords.longitude),
-        () => fetchWeather(SEOUL.lat, SEOUL.lon), // 위치 권한 거부 시 서울
+        () => fetchWeather(SEOUL.lat, SEOUL.lon),
         { timeout: 5000, enableHighAccuracy: false }
       );
     } else {
       fetchWeather(SEOUL.lat, SEOUL.lon);
     }
 
-    return () => { isMounted = false; };
+    return () => controller.abort();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -153,9 +153,10 @@ export function ScanIdleScreen({
   const latestScoreDelta = latestScan && previousScan
     ? Number(latestScan.overallScore || 0) - Number(previousScan.overallScore || 0)
     : null;
-  const latestWeakMetric = Array.isArray(latestScan?.scores) && latestScan.scores.length > 1
-    ? [...latestScan.scores].slice(1).sort((a: any, b: any) => Number(a.score) - Number(b.score))[0]
-    : null;
+  const latestWeakMetric = useMemo(() => {
+    if (!Array.isArray(latestScan?.scores) || latestScan.scores.length <= 1) return null;
+    return [...latestScan.scores].slice(1).sort((a: any, b: any) => Number(a.score) - Number(b.score))[0];
+  }, [latestScan?.scores]);
 
   return (
     <>

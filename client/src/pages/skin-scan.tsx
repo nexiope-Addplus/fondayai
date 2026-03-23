@@ -1,113 +1,26 @@
-import React, { useState, useRef, useCallback, useEffect } from "react";
+import React, { useState, useRef, useCallback, useEffect, Suspense, lazy } from "react";
 import { useTranslation } from "react-i18next";
 import i18n from "../i18n";
-import { motion, AnimatePresence, useDragControls } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
+import { AlertCircle, SmartphoneNfc } from "lucide-react";
+import type { TabId, ScanState, SurveyData, AnalysisResult } from "../components/fonday/types";
 import {
-  Camera,
-  BookOpen,
-  ScanLine,
-  AlertCircle,
-  Shield,
-  Sun,
-  Moon,
-  Share2,
-  ChevronLeft,
-  Sparkles,
-  ArrowRight,
-  Heart,
-  Droplets,
-  LayoutGrid,
-  Activity,
-  Target,
-  Flame,
-  Eye,
-  Zap,
-  Leaf,
-  Star,
-  Waves,
-  X,
-  Lock,
-  Thermometer,
-  FileText,
-  PlusSquare,
-  SmartphoneNfc,
-  Clock,
-  User,
-  ChevronRight,
-  ChevronDown,
-  Utensils,
-  Trophy,
-  CalendarDays,
-  CheckCircle2,
-  Bell,
-  Smartphone,
-  ClipboardList,
-  Pill,
-  Crown,
-  Ban,
-  Droplet,
-  Microscope,
-  Bot,
-} from "lucide-react";
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Legend } from 'recharts';
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ScrollArea } from "@/components/ui/scroll-area";
-
-// ─── Extracted shared modules ──────────────────────────────────────────────
-export type { TabId, ScanState, SurveyData, Hotspot, PredictionScenario, AnalysisResult, RankingData, CosmeticItem, StreakData, MissionState, AttendanceData, MagazineArticle, ReminderSettings, AICareSettings, DiaryCauseTag, WeatherData, WeatherTipKey, TodoItem, ReportLang, ReportConcernKey } from "../components/fonday/types";
-import type { TabId, ScanState, SurveyData, Hotspot, PredictionScenario, AnalysisResult, RankingData, CosmeticItem, StreakData, MissionState, AttendanceData, MagazineArticle, ReminderSettings, AICareSettings, DiaryCauseTag, WeatherData, WeatherTipKey, TodoItem, ReportLang, ReportConcernKey } from "../components/fonday/types";
-import {
-  BAUMANN_COLORS, DEEP_GREEN, DEEP_GREEN_LIGHT, TEXT_SECONDARY, SCAN_FROM, SCAN_TO,
-  TINT_WARM, TINT_GREEN, TINT_NEUTRAL, SCORE_LABEL_MAP, NUTRIENT_COLORS, NUTRIENT_ICONS,
-  SCORE_ICONS, SCORE_COLORS, fadeChild, stagger, tabSlideVariants, MISSION_POINTS,
-  DIARY_CAUSE_TAGS, LEGACY_DIARY_CAUSE_TAG_MAP, CAUSE_TAG_KEYWORDS,
-  CATEGORY_ORDER, COSMETIC_CATEGORIES, CATEGORY_FILTERS, MAGAZINE_ARTICLES,
-} from "../components/fonday/constants";
-import {
-  buildPushScoreSummary, buildBaumannTypeFromResult, todayStr,
-  getStreak, updateStreak, getDaysSinceLastScan,
-  getMissions, checkAndCompleteMissions,
-  getAttendance, checkinToday,
-  isIOS, isAndroid, isPWA, shouldShowPushPrompt, dismissPushPrompt,
-  markChallengeUsed, markShareUsed,
-  getDiaryMemo,
-  getAICareSettings, saveAICareSettings,
-  getDiaryCauseTags,
-  getReminderSettings, saveReminderSettings,
-  getDiaryTodos, saveDiaryTodos, getDiaryTodoProgress, initDiaryTodosFromRoutine,
-  syncReminderToServer,
-  daysSinceDate, buildCosmeticsInsights,
-  sortCosmeticsForRoutine, inferCosmeticTimeOfDay, buildRoutineGuide,
-  getWeatherTipKey, cropFaceFromImage, compressThumbnail,
+  todayStr, getStreak, getAttendance,
+  getDiaryMemo, getDiaryTodos, getDiaryCauseTags,
+  cropFaceFromImage,
 } from "../components/fonday/utils";
-import { DiaryTab as ExtractedDiaryTab } from "../components/fonday/DiaryTab";
-import { MagazineTab } from "../components/fonday/MagazineTab";
-import { MyScreen } from "../components/fonday/MyScreen";
-import { SkinPredictionCard } from "../components/fonday/SkinPredictionCard";
-import { ResultDiaryCard } from "../components/fonday/ResultDiaryCard";
-import { ResultLoginCard } from "../components/fonday/ResultLoginCard";
-import { ResultNutrientsSheet } from "../components/fonday/ResultNutrientsSheet";
-import { ResultImprovementsSheet } from "../components/fonday/ResultImprovementsSheet";
-import { ResultAnalysisSheet } from "../components/fonday/ResultAnalysisSheet";
-import { ResultCosmeticsGateSheet } from "../components/fonday/ResultCosmeticsGateSheet";
-import { ResultActionBar } from "../components/fonday/ResultActionBar";
-import { ResultQuestSheet } from "../components/fonday/ResultQuestSheet";
-import { PartnershipModal } from "../components/fonday/PartnershipModal";
-import { CheckinSuccessSheet, AttendanceBadge } from "../components/fonday/CheckinSuccessSheet";
-import { PushPromptSheet } from "../components/fonday/PushPromptSheet";
 import { CameraCapture } from "../components/fonday/CameraCapture";
-import { WeatherTipCard, MiniScoreBarIdle } from "../components/fonday/WeatherTipCard";
-import { MissionCard } from "../components/fonday/MissionCard";
-import { BottomNav, LangSwitcher } from "../components/fonday/BottomNav";
-import { FaceMeshOverlay } from "../components/fonday/FaceMeshOverlay";
 import { ScanIdleScreen } from "../components/fonday/ScanIdleScreen";
 import { SurveyScreen } from "../components/fonday/SurveyScreen";
 import { ScanningScreen } from "../components/fonday/ScanningScreen";
 import { ResultScreen } from "../components/fonday/ResultScreen";
-import { RoutineTab } from "../components/fonday/RoutineTab";
+import { BottomNav } from "../components/fonday/BottomNav";
+
+// 탭 컴포넌트 — 첫 방문 시 scan 탭만 로드, 나머지는 탭 전환 시 지연 로드
+const DiaryTab = lazy(() => import("../components/fonday/DiaryTab").then(m => ({ default: m.DiaryTab })));
+const MagazineTab = lazy(() => import("../components/fonday/MagazineTab").then(m => ({ default: m.MagazineTab })));
+const MyScreen = lazy(() => import("../components/fonday/MyScreen").then(m => ({ default: m.MyScreen })));
+const RoutineTab = lazy(() => import("../components/fonday/RoutineTab").then(m => ({ default: m.RoutineTab })));
 
 class FeedErrorBoundary extends React.Component<{ children: React.ReactNode }, { hasError: boolean; message: string }> {
   constructor(props: { children: React.ReactNode }) {
@@ -480,24 +393,32 @@ export default function SkinScanPage() {
           )}
           {activeTab === "diary" && (
             <motion.div key="diary" custom={tabDirection} initial={{ opacity: 0, x: tabDirection * 24 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: tabDirection * -24 }} transition={{ duration: 0.18, ease: "easeOut" }}>
-              <ExtractedDiaryTab user={user} analysisResult={analysisResult} onBack={() => handleTabChange("scan")} onLogin={openLoginPopup} />
+              <Suspense fallback={<div className="min-h-[calc(100dvh-64px)]" />}>
+                <DiaryTab user={user} analysisResult={analysisResult} onBack={() => handleTabChange("scan")} onLogin={openLoginPopup} />
+              </Suspense>
             </motion.div>
           )}
           {activeTab === "routine" && (
             <motion.div key="routine" custom={tabDirection} initial={{ opacity: 0, x: tabDirection * 24 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: tabDirection * -24 }} transition={{ duration: 0.18, ease: "easeOut" }}>
-              <RoutineTab user={user} onLogin={openLoginPopup} />
+              <Suspense fallback={<div className="min-h-[calc(100dvh-64px)]" />}>
+                <RoutineTab user={user} onLogin={openLoginPopup} />
+              </Suspense>
             </motion.div>
           )}
           {activeTab === "magazine" && (
             <motion.div key="magazine" custom={tabDirection} initial={{ opacity: 0, x: tabDirection * 24 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: tabDirection * -24 }} transition={{ duration: 0.18, ease: "easeOut" }}>
               <FeedErrorBoundary>
-                <MagazineTab />
+                <Suspense fallback={<div className="min-h-[calc(100dvh-64px)]" />}>
+                  <MagazineTab />
+                </Suspense>
               </FeedErrorBoundary>
             </motion.div>
           )}
           {activeTab === "my" && (
             <motion.div key="my" custom={tabDirection} initial={{ opacity: 0, x: tabDirection * 24 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: tabDirection * -24 }} transition={{ duration: 0.18, ease: "easeOut" }}>
-              <MyScreen user={user} analysisResult={analysisResult} onInstall={handleInstall} onBack={() => handleTabChange("scan")} onLogin={openLoginPopup} onGoMagazine={() => handleTabChange("magazine")} onGoRoutine={() => handleTabChange("routine")} onOpenDiary={() => handleTabChange("diary")} />
+              <Suspense fallback={<div className="min-h-[calc(100dvh-64px)]" />}>
+                <MyScreen user={user} analysisResult={analysisResult} onInstall={handleInstall} onBack={() => handleTabChange("scan")} onLogin={openLoginPopup} onGoMagazine={() => handleTabChange("magazine")} onGoRoutine={() => handleTabChange("routine")} onOpenDiary={() => handleTabChange("diary")} />
+              </Suspense>
             </motion.div>
           )}
         </AnimatePresence>

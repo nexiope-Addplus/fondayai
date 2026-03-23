@@ -512,7 +512,7 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
                       className="rounded-3xl p-3 bg-stone-50 text-left shadow-[0_4px_14px_rgba(0,0,0,0.03)]"
                     >
                       {item.image_thumbnail ? (
-                        <img src={item.image_thumbnail} alt={item.name ?? ""} className="w-full h-28 rounded-2xl object-cover bg-stone-200" />
+                        <img src={item.image_thumbnail} alt={item.name ?? ""} className="w-full h-28 rounded-2xl object-cover bg-stone-200" loading="lazy" />
                       ) : (
                         <div className="w-full h-28 rounded-2xl bg-stone-100 flex items-center justify-center">
                           <Droplets className="w-7 h-7 text-stone-400" />
@@ -601,7 +601,7 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
               </div>
               <div className="flex items-start gap-3">
                 {selectedItem.image_thumbnail ? (
-                  <img src={selectedItem.image_thumbnail} alt={selectedItem.name ?? ""} className="w-20 h-20 rounded-3xl object-cover bg-stone-100 shrink-0" />
+                  <img src={selectedItem.image_thumbnail} alt={selectedItem.name ?? ""} className="w-20 h-20 rounded-3xl object-cover bg-stone-100 shrink-0" loading="lazy" />
                 ) : (
                   <div className="w-20 h-20 rounded-3xl bg-stone-100 flex items-center justify-center shrink-0">
                     <Droplets className="w-8 h-8 text-stone-400" />

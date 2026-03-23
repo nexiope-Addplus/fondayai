@@ -39,7 +39,7 @@ function GradeCard({ cosmetic, grade }: { cosmetic: CosmeticItem; grade: Cosmeti
           {/* 썸네일 or 카테고리 아이콘 */}
           <div className="w-12 h-12 rounded-2xl overflow-hidden shrink-0 bg-stone-100 flex items-center justify-center">
             {cosmetic.image_thumbnail ? (
-              <img src={cosmetic.image_thumbnail} alt={cosmetic.name ?? ""} className="w-full h-full object-cover" />
+              <img src={cosmetic.image_thumbnail} alt={cosmetic.name ?? ""} className="w-full h-full object-cover" loading="lazy" />
             ) : (
               <span className="text-xl">🧴</span>
             )}

@@ -196,12 +196,11 @@ export function MagazineTab() {
     return isNaN(num) ? 0 : num;
   }, [latestScan]);
 
-  const filtered = filter === "전체"
-    ? MAGAZINE_ARTICLES
-    : MAGAZINE_ARTICLES.filter(a => a.category === filter);
-
-  const featured = filtered.find(a => a.featured) ?? filtered[0] ?? null;
-  const rest = featured ? filtered.filter(a => a.id !== featured.id) : filtered;
+  const { filtered, featured, rest } = useMemo(() => {
+    const f = filter === "전체" ? MAGAZINE_ARTICLES : MAGAZINE_ARTICLES.filter(a => a.category === filter);
+    const feat = f.find(a => a.featured) ?? f[0] ?? null;
+    return { filtered: f, featured: feat, rest: feat ? f.filter(a => a.id !== feat.id) : f };
+  }, [filter]);
 
   return (
     <>

@@ -336,13 +336,19 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
   // 날씨 정보 가져오기 (Care Manager 저장용)
   useEffect(() => {
     if (!navigator.geolocation) return;
-    navigator.geolocation.getCurrentPosition((pos) => {
-      const { latitude: lat, longitude: lon } = pos.coords;
-      fetch(`/api/weather?lat=${lat}&lon=${lon}`)
-        .then(res => res.ok ? res.json() : null)
-        .then(data => { if (data && !data.error) setInternalWeather(data); })
-        .catch(() => {});
-    });
+    const controller = new AbortController();
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const { latitude: lat, longitude: lon } = pos.coords;
+        fetch(`/api/weather?lat=${lat}&lon=${lon}`, { signal: controller.signal })
+          .then(res => res.ok ? res.json() : null)
+          .then(data => { if (data && !data.error) setInternalWeather(data); })
+          .catch(() => {});
+      },
+      () => {},
+      { timeout: 5000, enableHighAccuracy: false }
+    );
+    return () => controller.abort();
   }, []);
 
   // 스캔 저장 (운영 버전 안정성 복구 + weatherInfo 추가)
