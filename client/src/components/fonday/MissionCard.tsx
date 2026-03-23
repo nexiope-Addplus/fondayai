@@ -41,11 +41,11 @@ export function MissionCard() {
         <div className="flex items-start justify-between gap-3 mb-3">
           <div className="min-w-0">
             <p className="text-sm font-semibold" style={{ color: DEEP_GREEN }}>{t("mission.title")}</p>
-            <p className="text-[11px] text-stone-500 mt-1 leading-relaxed">
+            <p className="text-xs text-stone-500 mt-1 leading-relaxed">
               {focusedItems.slice(0, 2).map(({ id }) => t(`mission.${id}`)).join(" · ")}
             </p>
           </div>
-          <span className="text-[11px] font-semibold px-2.5 py-1 rounded-full shrink-0"
+          <span className="text-xs font-semibold px-2.5 py-1 rounded-full shrink-0"
             style={{ background: "#FFF7ED", color: "#B45309" }}>
             {t("mission.points", { n: missions.totalPoints })}
           </span>
@@ -60,14 +60,14 @@ export function MissionCard() {
                   {t(`mission.${id}`)}
                 </span>
               </div>
-              <span className="text-[11px] font-semibold shrink-0 text-amber-600">+{points}pt</span>
+              <span className="text-xs font-semibold shrink-0 text-amber-600">+{points}pt</span>
             </div>
           ))}
         </div>
         {missionItems.length > 4 && (
           <button
             onClick={() => setExpanded(e => !e)}
-            className="mt-2 w-full text-[11px] font-medium text-stone-400 text-center py-1"
+            className="mt-2 w-full text-xs font-medium text-stone-400 text-center py-1"
           >
             {expanded ? t("mission.hide") : t("mission.showAll")}
           </button>

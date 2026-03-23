@@ -68,13 +68,13 @@ function ArticleModal({ article, onClose }: { article: MagazineArticle; onClose:
             <span style={{ fontSize: 52 }}>{article.emoji}</span>
           </div>
           <div className="absolute top-3 left-3">
-            <span className="text-[10px] font-bold text-white/90 bg-black/20 backdrop-blur-sm px-2 py-1 rounded-full">
+            <span className="text-xs font-bold text-white/90 bg-black/20 backdrop-blur-sm px-2 py-1 rounded-full">
               {article.tag}
             </span>
           </div>
           <div className="absolute bottom-3 right-3 flex items-center gap-1">
             <Clock className="w-3 h-3 text-white/80" />
-            <span className="text-[10px] text-white/80 font-medium">{t("magazine.readTime", { time: article.readTime })}</span>
+            <span className="text-xs text-white/80 font-medium">{t("magazine.readTime", { time: article.readTime })}</span>
           </div>
         </div>
 
@@ -91,7 +91,7 @@ function ArticleModal({ article, onClose }: { article: MagazineArticle; onClose:
               </div>
               <div>
                 <p className="text-[12px] font-bold text-stone-800">{article.author}</p>
-                <p className="text-[10px] text-stone-400">{article.authorRole} · {article.date}</p>
+                <p className="text-xs text-stone-400">{article.authorRole} · {article.date}</p>
               </div>
             </div>
 
@@ -153,7 +153,7 @@ export function MagazineTab() {
 
           {/* 헤더 */}
           <motion.div variants={fadeChild} className="px-5 pt-6 pb-4">
-            <p className="text-[11px] font-bold tracking-widest uppercase mb-1" style={{ color: SCAN_TO }}>{t("nav.magazine")}</p>
+            <p className="text-xs font-bold tracking-widest uppercase mb-1" style={{ color: SCAN_TO }}>{t("nav.magazine")}</p>
             <h1 className="text-[24px] font-black tracking-tight leading-tight whitespace-pre-line" style={{ color: DEEP_GREEN }}>
               {t("discover.title")}
             </h1>
@@ -167,8 +167,8 @@ export function MagazineTab() {
                     <BarChart3 className="w-4.5 h-4.5" style={{ color: DEEP_GREEN }} />
                   </div>
                   <div className="min-w-0">
-                    <p className="text-[11px] font-bold text-stone-800">{t("discover.rankingTitle")}</p>
-                    <p className="text-[10px] text-stone-400">
+                    <p className="text-xs font-bold text-stone-800">{t("discover.rankingTitle")}</p>
+                    <p className="text-xs text-stone-400">
                       {rankingData ? t("ranking.totalData", { count: rankingData.totalScans }) : t("discover.rankingEmpty")}
                     </p>
                   </div>
@@ -176,7 +176,7 @@ export function MagazineTab() {
                 <p className="text-[22px] font-bold" style={{ color: DEEP_GREEN }}>
                   {rankingData?.myPercentile !== undefined ? `${rankingData.myPercentile}%` : "—"}
                 </p>
-                <p className="text-[11px] text-stone-400 mt-1">{t("ranking.topLabel")}</p>
+                <p className="text-xs text-stone-400 mt-1">{t("ranking.topLabel")}</p>
               </div>
 
               <div className="rounded-3xl bg-white p-4" style={{ boxShadow: "0 10px 24px rgba(45,95,79,0.06)" }}>
@@ -185,17 +185,17 @@ export function MagazineTab() {
                     <Salad className="w-4.5 h-4.5" style={{ color: SCAN_TO }} />
                   </div>
                   <div className="min-w-0">
-                    <p className="text-[11px] font-bold text-stone-800">{t("discover.nutritionTitle")}</p>
-                    <p className="text-[10px] text-stone-400">{t("discover.feedTitle")}</p>
+                    <p className="text-xs font-bold text-stone-800">{t("discover.nutritionTitle")}</p>
+                    <p className="text-xs text-stone-400">{t("discover.feedTitle")}</p>
                   </div>
                 </div>
                 {weakestScores[0] ? (
                   <>
                     <p className="text-[14px] font-bold text-stone-800">{weakestScores[0].label}</p>
-                    <p className="text-[11px] mt-1" style={{ color: SCAN_TO }}>{weakestScores[0].score}{t("result.scoreSuffix")}</p>
+                    <p className="text-xs mt-1" style={{ color: SCAN_TO }}>{weakestScores[0].score}{t("result.scoreSuffix")}</p>
                   </>
                 ) : (
-                  <p className="text-[11px] text-stone-400">{t("discover.nutritionEmpty")}</p>
+                  <p className="text-xs text-stone-400">{t("discover.nutritionEmpty")}</p>
                 )}
               </div>
             </div>
@@ -242,7 +242,7 @@ export function MagazineTab() {
                   <div className="absolute bottom-0 left-0 right-0 h-24"
                     style={{ background: "linear-gradient(to top, rgba(0,0,0,0.25), transparent)" }} />
                   <div className="absolute top-4 left-4">
-                    <span className="text-[10px] font-bold text-white bg-white/20 backdrop-blur-sm px-2.5 py-1 rounded-full">
+                    <span className="text-xs font-bold text-white bg-white/20 backdrop-blur-sm px-2.5 py-1 rounded-full">
                       ★ FEATURED
                     </span>
                   </div>
@@ -250,28 +250,28 @@ export function MagazineTab() {
                 {/* 텍스트 영역 */}
                 <div className="px-5 pb-5 pt-3 bg-white/95">
                   <div className="flex items-center gap-1.5 mb-2">
-                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full"
+                    <span className="text-xs font-bold px-2 py-0.5 rounded-full"
                       style={{ background: `${featured.bgFrom}22`, color: featured.bgTo }}>
                       {featured.tag}
                     </span>
-                    <span className="text-[10px] text-stone-400">·</span>
-                    <span className="text-[10px] text-stone-400">{t("magazine.readTime", { time: featured.readTime })}</span>
+                    <span className="text-xs text-stone-400">·</span>
+                    <span className="text-xs text-stone-400">{t("magazine.readTime", { time: featured.readTime })}</span>
                   </div>
                   <h2 className="text-base font-bold leading-snug mb-2" style={{ color: DEEP_GREEN }}>
                     {featured.title}
                   </h2>
-                  <p className="text-[11px] text-stone-500 leading-relaxed line-clamp-2">{featured.summary}</p>
+                  <p className="text-xs text-stone-500 leading-relaxed line-clamp-2">{featured.summary}</p>
                   <div className="flex items-center justify-between mt-3">
                     <div className="flex items-center gap-1.5">
-                      <div className="w-5 h-5 rounded-full flex items-center justify-center text-white text-[8px] font-black"
+                      <div className="w-5 h-5 rounded-full flex items-center justify-center text-white text-xs font-black"
                         style={{ background: `linear-gradient(135deg, ${featured.bgFrom}, ${featured.bgTo})` }}>
                         {featured.author[0]}
                       </div>
-                      <span className="text-[11px] font-bold text-stone-500">{featured.author}</span>
-                      <span className="text-[10px] text-stone-300">{featured.authorRole}</span>
+                      <span className="text-xs font-bold text-stone-500">{featured.author}</span>
+                      <span className="text-xs text-stone-300">{featured.authorRole}</span>
                     </div>
                     <div className="flex items-center gap-1" style={{ color: featured.bgTo }}>
-                      <span className="text-[11px] font-bold">{t("magazine.read")}</span>
+                      <span className="text-xs font-bold">{t("magazine.read")}</span>
                       <ChevronRight className="w-3.5 h-3.5" />
                     </div>
                   </div>
@@ -305,7 +305,7 @@ export function MagazineTab() {
                       <div className="flex-1 p-3.5 flex flex-col justify-between">
                         <div>
                           <div className="flex items-center gap-1.5 mb-1">
-                            <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full"
+                            <span className="text-xs font-bold px-1.5 py-0.5 rounded-full"
                               style={{ background: `${article.bgFrom}22`, color: article.bgTo }}>
                               {article.tag}
                             </span>
@@ -313,16 +313,16 @@ export function MagazineTab() {
                           <h3 className="text-sm font-bold leading-snug line-clamp-2 mb-1" style={{ color: DEEP_GREEN }}>
                             {article.title}
                           </h3>
-                          <p className="text-[10px] text-stone-400 line-clamp-2 leading-relaxed">{article.summary}</p>
+                          <p className="text-xs text-stone-400 line-clamp-2 leading-relaxed">{article.summary}</p>
                         </div>
                         <div className="flex items-center justify-between mt-2">
                           <div className="flex items-center gap-1">
                             <User className="w-2.5 h-2.5 text-stone-300" />
-                            <span className="text-[9px] text-stone-400">{article.author}</span>
+                            <span className="text-xs text-stone-400">{article.author}</span>
                           </div>
                           <div className="flex items-center gap-0.5 text-stone-300">
                             <Clock className="w-2.5 h-2.5" />
-                            <span className="text-[9px]">{article.readTime}</span>
+                            <span className="text-xs">{article.readTime}</span>
                           </div>
                         </div>
                       </div>

@@ -49,7 +49,7 @@ export function ResultNutrientsSheet({
                   </div>
                   <div>
                     <h3 className="font-bold text-base" style={{ color: "#D97706" }}>{t("nutrients.sectionTitle")}</h3>
-                    <p className="text-[11px] text-stone-400">{t("nutrients.sectionSub")}</p>
+                    <p className="text-xs text-stone-400">{t("nutrients.sectionSub")}</p>
                   </div>
                 </div>
                 <button onClick={onClose} className="w-7 h-7 rounded-full bg-stone-100 flex items-center justify-center">
@@ -78,12 +78,12 @@ export function ResultNutrientsSheet({
                         <div className="w-8 h-8 rounded-full flex items-center justify-center text-base" style={{ background: "#FFFFFF" }}>
                           {NUTRIENT_ICONS[letter]}
                         </div>
-                        <p className="text-[9px] font-semibold text-center mt-0.5" style={{ color }}>{letter}</p>
+                        <p className="text-xs font-semibold text-center mt-0.5" style={{ color }}>{letter}</p>
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-[13px] font-bold mb-0.5" style={{ color }}>{nutrient.name}</p>
                         <p className="text-[12px] text-stone-500 leading-relaxed mb-1.5">{nutrient.why}</p>
-                        <p className="text-[11px] text-stone-400">
+                        <p className="text-xs text-stone-400">
                           <span className="font-bold" style={{ color }}>{t("nutrients.foodLabel")} </span>
                           {nutrient.foods}
                         </p>
@@ -109,7 +109,7 @@ export function ResultNutrientsSheet({
                           <span className="text-xs font-semibold text-orange-400 shrink-0 mt-0.5">✕</span>
                           <div>
                             <p className="text-[12px] font-bold text-stone-700">{food}</p>
-                            <p className="text-[11px] text-stone-400">{why}</p>
+                            <p className="text-xs text-stone-400">{why}</p>
                           </div>
                         </div>
                       ))}
@@ -127,7 +127,7 @@ export function ResultNutrientsSheet({
                           <span className="text-xs font-semibold text-violet-400 shrink-0 mt-0.5">✕</span>
                           <div>
                             <p className="text-[12px] font-bold text-stone-700">{food}</p>
-                            <p className="text-[11px] text-stone-400">{why}</p>
+                            <p className="text-xs text-stone-400">{why}</p>
                           </div>
                         </div>
                       ))}

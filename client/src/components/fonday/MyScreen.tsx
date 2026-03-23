@@ -69,22 +69,22 @@ export function MyScreen({
         <div className="rounded-3xl p-5" style={{ background: "#FFFFFF", boxShadow: "0 10px 28px rgba(45,95,79,0.08)" }}>
           <div className="flex items-start justify-between gap-3">
             <div>
-              <p className="text-[11px] font-bold tracking-widest uppercase mb-1" style={{ color: SCAN_TO }}>FONDAY</p>
+              <p className="text-xs font-bold tracking-widest uppercase mb-1" style={{ color: SCAN_TO }}>FONDAY</p>
               <h1 className="text-2xl font-bold" style={{ color: DEEP_GREEN }}>{t("nav.my")}</h1>
               <p className="text-[12px] text-stone-500 mt-1">
                 {user ? (user.username || user.email || t("nav.my")) : t("attendance.loginDesc")}
               </p>
             </div>
             <div className="rounded-2xl px-3 py-2 text-right shrink-0" style={{ background: TINT_WARM }}>
-              <p className="text-[10px] font-bold uppercase tracking-[0.12em]" style={{ color: SCAN_TO }}>points</p>
+              <p className="text-xs font-bold uppercase tracking-[0.12em]" style={{ color: SCAN_TO }}>points</p>
               <p className="text-xl font-bold leading-none mt-1" style={{ color: DEEP_GREEN }}>{attendance.totalPoints}</p>
             </div>
           </div>
           <div className="flex flex-wrap gap-2 mt-4">
-            <span className="rounded-full px-3 py-1 text-[10px] font-bold" style={{ background: `${DEEP_GREEN}10`, color: DEEP_GREEN }}>
+            <span className="rounded-full px-3 py-1 text-xs font-bold" style={{ background: `${DEEP_GREEN}10`, color: DEEP_GREEN }}>
               {t("attendance.calendarTitle")}
             </span>
-            <span className="rounded-full px-3 py-1 text-[10px] font-bold" style={{ background: TINT_WARM, color: SCAN_TO }}>
+            <span className="rounded-full px-3 py-1 text-xs font-bold" style={{ background: TINT_WARM, color: SCAN_TO }}>
               {t("attendance.totalPoints", { n: attendance.totalPoints })}
             </span>
           </div>
@@ -107,24 +107,24 @@ export function MyScreen({
                 <p className="text-[14px] font-bold text-stone-800">{user.username || user.email || "사용자"}</p>
                 <div className="flex items-center gap-1.5 mt-0.5">
                   {user.provider === "kakao" && (
-                    <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[10px] font-bold text-[#3C1E1E]" style={{ background: "#FEE500" }}>
+                    <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-xs font-bold text-[#3C1E1E]" style={{ background: "#FEE500" }}>
                       <svg width="10" height="10" viewBox="0 0 18 18" fill="none"><path fillRule="evenodd" clipRule="evenodd" d="M9 1C4.582 1 1 3.79 1 7.222c0 2.154 1.386 4.045 3.484 5.14L3.62 15.5a.25.25 0 0 0 .368.274L7.9 13.39A9.63 9.63 0 0 0 9 13.444c4.418 0 8-2.791 8-6.222C17 3.79 13.418 1 9 1Z" fill="#3C1E1E"/></svg>
                       카카오
                     </span>
                   )}
                   {user.provider === "line" && (
-                    <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[10px] font-bold text-white" style={{ background: "#06C755" }}>
+                    <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-xs font-bold text-white" style={{ background: "#06C755" }}>
                       <svg width="10" height="10" viewBox="0 0 18 18" fill="none"><path d="M9 1C4.582 1 1 3.79 1 7.222c0 2.03 1.09 3.84 2.8 5.04-.12.44-.77 2.96-.8 3.15a.2.2 0 0 0 .3.22l3.72-2.46c.6.09 1.3.14 1.98.14 4.418 0 8-2.791 8-6.222C17 3.79 13.418 1 9 1Z" fill="white"/></svg>
                       LINE
                     </span>
                   )}
                   {user.provider === "google" && (
-                    <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[10px] font-bold text-stone-600 bg-white">
+                    <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-xs font-bold text-stone-600 bg-white">
                       <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" className="w-2.5 h-2.5" />
                       Google
                     </span>
                   )}
-                  {user.email && <p className="text-[11px] text-stone-400">{user.email}</p>}
+                  {user.email && <p className="text-xs text-stone-400">{user.email}</p>}
                 </div>
               </div>
             </div>
@@ -174,7 +174,7 @@ export function MyScreen({
             </div>
             <div className="text-left">
               <p className="text-[14px] font-bold text-stone-800">{t("attendance.calendarTitle")}</p>
-              <p className="text-[11px] text-stone-400">{t("attendance.totalPoints", { n: attendance.totalPoints })}</p>
+              <p className="text-xs text-stone-400">{t("attendance.totalPoints", { n: attendance.totalPoints })}</p>
             </div>
           </div>
           <ChevronRight className="w-4 h-4 text-stone-300" />
@@ -184,7 +184,7 @@ export function MyScreen({
           <div className="rounded-2xl bg-white p-4" style={{ boxShadow: "0 8px 24px rgba(45,95,79,0.06)" }}>
             <div className="flex items-start justify-between gap-3">
               <div>
-                <p className="text-[11px] font-bold tracking-[0.14em] uppercase" style={{ color: SCAN_TO }}>
+                <p className="text-xs font-bold tracking-[0.14em] uppercase" style={{ color: SCAN_TO }}>
                   ACCOUNT
                 </p>
                 <p className="text-[16px] font-bold mt-1" style={{ color: DEEP_GREEN }}>
@@ -220,7 +220,7 @@ export function MyScreen({
           <div className="flex gap-1">
             {(["en", "ko", "ja"] as const).map(lang => (
               <button key={lang} onClick={() => i18n.changeLanguage(lang)}
-                className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all ${
+                className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all ${
                   i18n.language === lang ? "" : "text-stone-400 bg-stone-100"
                 }`}
                 style={i18n.language === lang ? { background: TINT_WARM, color: SCAN_TO } : {}}>
@@ -254,7 +254,7 @@ export function MyScreen({
             </div>
             <div>
               <p className="text-[14px] font-bold" style={{ color: SCAN_TO }}>{t("result.deviceTeaser.title")}</p>
-              <p className="text-[11px] text-stone-400">{t("result.deviceTeaser.sub")}</p>
+              <p className="text-xs text-stone-400">{t("result.deviceTeaser.sub")}</p>
             </div>
           </div>
           <ChevronRight className="w-4 h-4" style={{ color: SCAN_TO }} />

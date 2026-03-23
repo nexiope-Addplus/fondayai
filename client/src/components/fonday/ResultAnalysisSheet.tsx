@@ -84,7 +84,7 @@ export function ResultAnalysisSheet({
                     <h3 className="font-bold text-base" style={{ color: DEEP_GREEN }}>
                       {t("modal.analysis.title")}
                     </h3>
-                    <p className="text-[11px] text-stone-400">{t("modal.analysis.sub")}</p>
+                    <p className="text-xs text-stone-400">{t("modal.analysis.sub")}</p>
                   </div>
                 </div>
                 <button
@@ -154,7 +154,7 @@ export function ResultAnalysisSheet({
                           <p className="text-xs font-semibold mb-1" style={{ color: DEEP_GREEN_LIGHT }}>
                             {item.area}
                           </p>
-                          <p className="text-[11px] text-stone-500 leading-snug">{item.finding}</p>
+                          <p className="text-xs text-stone-500 leading-snug">{item.finding}</p>
                         </div>
                       ))}
                     </div>
@@ -187,7 +187,7 @@ export function ResultAnalysisSheet({
                               {t(`baumann.${letter}.name`)}
                             </span>
                           </div>
-                          <p className="text-[11px] text-stone-500 leading-snug">
+                          <p className="text-xs text-stone-500 leading-snug">
                             {t(`baumann.${letter}.desc`)}
                           </p>
                         </div>

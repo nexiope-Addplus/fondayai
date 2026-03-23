@@ -713,7 +713,13 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
     />
 
     {/* ── 공유 슬라이드는 서버사이드(generate-share.ts)에서 생성됨 ── */}
-    <div ref={resultScrollRef} className="h-[calc(100dvh-60px)] overflow-y-auto">
+    <motion.div
+      ref={resultScrollRef}
+      className="h-[calc(100dvh-60px)] overflow-y-auto"
+      initial={{ opacity: 0, y: 28 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+    >
       <motion.div className="px-5 pt-6 pb-40 space-y-6" variants={stagger} initial="initial" animate="animate">
         {/* 헤더 */}
         <div className="flex justify-between items-center">
@@ -750,12 +756,12 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
               <div className="flex items-center gap-2 mb-2">
                 <div className="w-7 h-7 rounded-xl flex items-center justify-center text-sm shrink-0"
                   style={{ background: TINT_WARM }}><Target className="w-4 h-4" style={{ color: SCAN_TO }} /></div>
-                <p className="text-[10px] font-semibold uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>
+                <p className="text-xs font-semibold uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>
                   {t("result.todayAction")}
                 </p>
               </div>
               <p className="text-sm font-bold text-stone-800 leading-tight mb-1">{top.title}</p>
-              <p className="text-[11px] text-stone-500 leading-relaxed">{top.desc}</p>
+              <p className="text-xs text-stone-500 leading-relaxed">{top.desc}</p>
             </motion.div>
           );
         })()}
@@ -763,19 +769,19 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
         <motion.div variants={fadeChild} className="rounded-3xl px-4 py-3"
           style={{ background: "#FFFFFF", boxShadow: "0 8px 24px rgba(45,95,79,0.06)" }}>
           <div className="flex flex-wrap items-center gap-2">
-            <span className="text-[10px] font-semibold uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>
+            <span className="text-xs font-semibold uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>
               {t("result.hub.eyebrow")}
             </span>
-            <button onClick={onGoRoutine} className="rounded-full px-3 py-1.5 text-[11px] font-semibold" style={{ background: TINT_GREEN, color: DEEP_GREEN }}>
+            <button onClick={onGoRoutine} className="rounded-full px-3 py-1.5 text-xs font-semibold" style={{ background: TINT_GREEN, color: DEEP_GREEN }}>
               {t("nav.routine")}
             </button>
-            <button onClick={onOpenDiary} className="rounded-full px-3 py-1.5 text-[11px] font-semibold" style={{ background: TINT_WARM, color: SCAN_TO }}>
+            <button onClick={onOpenDiary} className="rounded-full px-3 py-1.5 text-xs font-semibold" style={{ background: TINT_WARM, color: SCAN_TO }}>
               {t("nav.diary")}
             </button>
-            <button onClick={onGoMagazine} className="rounded-full px-3 py-1.5 text-[11px] font-semibold" style={{ background: "#F7F4FB", color: "#7C3AED" }}>
+            <button onClick={onGoMagazine} className="rounded-full px-3 py-1.5 text-xs font-semibold" style={{ background: "#F7F4FB", color: "#7C3AED" }}>
               {t("nav.magazine")}
             </button>
-            <button onClick={onGoMy} className="rounded-full px-3 py-1.5 text-[11px] font-semibold" style={{ background: "#F8FAFD", color: DEEP_GREEN }}>
+            <button onClick={onGoMy} className="rounded-full px-3 py-1.5 text-xs font-semibold" style={{ background: "#F8FAFD", color: DEEP_GREEN }}>
               {t("nav.my")}
             </button>
           </div>
@@ -899,7 +905,7 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
         {/* ── 제휴 텍스트 링크 ── */}
         <div className="pt-2 pb-1 text-center">
           <button onClick={() => setShowPartnership(true)}
-            className="text-[11px] text-stone-400 underline underline-offset-2 hover:text-stone-600 transition-colors">
+            className="text-xs text-stone-400 underline underline-offset-2 hover:text-stone-600 transition-colors">
             {t("result.partnershipLink")}
           </button>
         </div>
@@ -980,7 +986,7 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
         isSuccess={isSuccess}
         handleWaitlistSubmit={handleWaitlistSubmit}
       />
-    </div>
+    </motion.div>
     </>
   );
 }

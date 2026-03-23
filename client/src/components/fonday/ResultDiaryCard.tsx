@@ -34,7 +34,7 @@ export function ResultDiaryCard({
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-sm font-bold" style={{ color: DEEP_GREEN }}>{t("result.diary.title")}</p>
-              <p className="text-[11px] text-stone-400">{t("result.diary.scanCount", { n: scanCount })}</p>
+              <p className="text-xs text-stone-400">{t("result.diary.scanCount", { n: scanCount })}</p>
             </div>
             {avatar && <img src={avatar} className="w-7 h-7 rounded-full shrink-0" />}
           </div>
@@ -45,7 +45,7 @@ export function ResultDiaryCard({
                 <span className="text-[28px] font-black leading-none" style={{ color: delta > 0 ? "#059669" : delta < 0 ? "#DC2626" : "#A8A29E" }}>
                   {delta > 0 ? "▲" : delta < 0 ? "▼" : "―"} {t("result.diary.deltaPoint", { n: Math.abs(delta) })}
                 </span>
-                <p className="text-[11px] text-stone-500 leading-snug whitespace-pre-line">
+                <p className="text-xs text-stone-500 leading-snug whitespace-pre-line">
                   {delta > 0 ? t("result.diary.improved") : delta < 0 ? t("result.diary.worse") : t("result.diary.noChange")}
                 </p>
               </div>
@@ -56,14 +56,14 @@ export function ResultDiaryCard({
 
           <div className="flex gap-2 mt-2">
             <div className="flex-1 rounded-2xl py-2 px-2 text-center" style={{ background: TINT_WARM }}>
-              <p className="text-[9px] font-bold text-stone-400 mb-0.5">{t("result.diary.streak")}</p>
+              <p className="text-xs font-bold text-stone-400 mb-0.5">{t("result.diary.streak")}</p>
               <p className="text-sm font-bold flex items-center justify-center gap-0.5" style={{ color: SCAN_TO }}>
                 {streakCount || 1}
                 <Flame className="w-3.5 h-3.5 inline ml-0.5" style={{ color: SCAN_TO }} />
               </p>
             </div>
             <div className="flex-1 rounded-2xl py-2 px-2 text-center" style={{ background: "#F0FDF4" }}>
-              <p className="text-[9px] font-bold text-stone-400 mb-0.5">{t("result.totalScans")}</p>
+              <p className="text-xs font-bold text-stone-400 mb-0.5">{t("result.totalScans")}</p>
               <p className="text-sm font-bold" style={{ color: "#059669" }}>{history.length + 1}</p>
             </div>
             <button
@@ -75,13 +75,13 @@ export function ResultDiaryCard({
               style={{ background: `linear-gradient(135deg, ${DEEP_GREEN}, #2D5F4F)` }}
             >
               <BookOpen className="w-3.5 h-3.5" />
-              <p className="text-[9px] font-bold">{t("result.diaryView")}</p>
+              <p className="text-xs font-bold">{t("result.diaryView")}</p>
             </button>
           </div>
 
           {history.length > 0 && (
             <div className="mt-2.5 pt-2.5 border-t border-stone-100">
-              <p className="text-[9px] font-bold text-stone-400 mb-1.5">{t("result.prevRecords")}</p>
+              <p className="text-xs font-bold text-stone-400 mb-1.5">{t("result.prevRecords")}</p>
               <div className="flex gap-1.5 overflow-x-auto pb-0.5">
                 {[...history].slice(0, 5).map((entry, index) => {
                   const score = parseInt(String(entry.overallScore || "0"), 10);
@@ -90,7 +90,7 @@ export function ResultDiaryCard({
                   return (
                     <div key={index} className="flex flex-col items-center shrink-0 px-2.5 py-1.5 rounded-xl" style={{ background: TINT_NEUTRAL, minWidth: 36 }}>
                       <p className="text-xs font-semibold" style={{ color: SCAN_TO }}>{score}</p>
-                      <p className="text-[8px] text-stone-400 mt-0.5">{label}</p>
+                      <p className="text-xs text-stone-400 mt-0.5">{label}</p>
                     </div>
                   );
                 })}

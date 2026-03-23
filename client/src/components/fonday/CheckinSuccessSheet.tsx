@@ -90,7 +90,7 @@ export function AttendanceBadge({ onClick }: { onClick: () => void }) {
     <button onClick={onClick}
       className="flex items-center gap-1 bg-white/80 backdrop-blur-sm rounded-full px-2.5 py-1.5 shadow-sm transition-all active:scale-95">
       <CalendarDays className="w-3.5 h-3.5" style={{ color: checkedToday ? SCAN_TO : "#B0A898" }} />
-      <span className="text-[11px] font-bold" style={{ color: checkedToday ? SCAN_TO : "#B0A898" }}>
+      <span className="text-xs font-bold" style={{ color: checkedToday ? SCAN_TO : "#B0A898" }}>
         {checkedToday ? t("attendance.alreadyChecked") : t("attendance.checkIn")}
       </span>
     </button>

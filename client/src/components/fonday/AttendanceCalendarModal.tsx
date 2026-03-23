@@ -32,7 +32,7 @@ export function AttendanceCalendarModal({ onClose }: { onClose: () => void }) {
         <div className="flex items-center justify-between mb-1">
           <h2 className="text-base font-bold" style={{ color: DEEP_GREEN }}>{t("attendance.calendarTitle")}</h2>
           <div className="flex items-center gap-1.5">
-            <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full text-white"
+            <span className="text-xs font-bold px-2.5 py-0.5 rounded-full text-white"
               style={{ background: "#F59E0B" }}>
               {t("attendance.totalPoints", { n: data.totalPoints })}
             </span>
@@ -43,7 +43,7 @@ export function AttendanceCalendarModal({ onClose }: { onClose: () => void }) {
         {/* 요일 헤더 */}
         <div className="grid grid-cols-7 mb-1">
           {["일","월","화","수","목","금","토"].map(d => (
-            <div key={d} className="text-center text-[10px] font-bold text-stone-400 py-1">{d}</div>
+            <div key={d} className="text-center text-xs font-bold text-stone-400 py-1">{d}</div>
           ))}
         </div>
 

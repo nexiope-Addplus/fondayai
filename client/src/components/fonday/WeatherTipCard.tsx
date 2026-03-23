@@ -52,9 +52,9 @@ export function WeatherTipCard({ compact, weather: weatherProp }: {
             <p className="text-[10.5px] text-stone-500 leading-relaxed mt-0.5">{tip.body}</p>
           </div>
           <div className="flex flex-col items-end gap-1 shrink-0">
-            <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full text-white"
+            <span className="text-xs font-semibold px-1.5 py-0.5 rounded-full text-white"
               style={{ background: DEEP_GREEN }}>{weather.temp}°C</span>
-            {aqiLabel && <span className="text-[9px] font-semibold px-1.5 py-0.5 rounded-full bg-white/70 text-stone-500">{aqiLabel}</span>}
+            {aqiLabel && <span className="text-xs font-semibold px-1.5 py-0.5 rounded-full bg-white/70 text-stone-500">{aqiLabel}</span>}
           </div>
         </div>
       </div>
@@ -74,7 +74,7 @@ export function WeatherTipCard({ compact, weather: weatherProp }: {
             style={{ background: DEEP_GREEN }}>
             <Sun className="w-2.5 h-2.5 text-white" />
           </div>
-          <span className="text-[10px] font-bold tracking-widest uppercase" style={{ color: DEEP_GREEN }}>
+          <span className="text-xs font-bold tracking-widest uppercase" style={{ color: DEEP_GREEN }}>
             {t("weather.cardTitle")}
           </span>
         </div>
@@ -88,15 +88,15 @@ export function WeatherTipCard({ compact, weather: weatherProp }: {
         </div>
 
         <div className="flex items-center gap-2 mt-3 flex-wrap">
-          <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full text-white"
+          <span className="text-xs font-semibold px-2 py-0.5 rounded-full text-white"
             style={{ background: DEEP_GREEN }}>
             {weather.temp}°C
           </span>
-          <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-white/70 text-stone-600">
+          <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-white/70 text-stone-600">
             {t("weather.humidity", { val: weather.humidity })}
           </span>
           {aqiLabel && (
-            <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-white/70 text-stone-600">
+            <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-white/70 text-stone-600">
               {aqiLabel}
             </span>
           )}
@@ -120,7 +120,7 @@ export function MiniScoreBarIdle({ label, score, color, delay }: {
   }, [delay]);
   return (
     <div className="flex items-center gap-2">
-      <span className="text-[10px] flex-shrink-0 w-[74px] whitespace-nowrap" style={{ color: TEXT_SECONDARY }}>{label}</span>
+      <span className="text-xs flex-shrink-0 w-[74px] whitespace-nowrap" style={{ color: TEXT_SECONDARY }}>{label}</span>
       <div className="flex-1 h-[5px] rounded-full overflow-hidden" style={{ background: "#E8E0D8" }}>
         <div
           className="h-full rounded-full"
@@ -131,7 +131,7 @@ export function MiniScoreBarIdle({ label, score, color, delay }: {
           }}
         />
       </div>
-      <span className="text-[11px] font-bold flex-shrink-0 w-6 text-right" style={{ color }}>{score}</span>
+      <span className="text-xs font-bold flex-shrink-0 w-6 text-right" style={{ color }}>{score}</span>
     </div>
   );
 }

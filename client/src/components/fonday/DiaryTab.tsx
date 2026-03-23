@@ -245,7 +245,7 @@ export function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: any;
         <div className="shrink-0 px-5 pt-5 pb-0" style={{ borderBottom: "1px solid #F0EDE8" }}>
           <div className="rounded-3xl p-5 mb-4 text-white"
             style={{ background: "linear-gradient(135deg, #2D5F4F 0%, #C97062 100%)" }}>
-            <p className="text-[11px] font-bold tracking-widest uppercase mb-1 text-white/70">FONDAY</p>
+            <p className="text-xs font-bold tracking-widest uppercase mb-1 text-white/70">FONDAY</p>
             <h1 className="text-2xl font-bold">{t("modal.diary.title")} ✦</h1>
             <p className="text-[12px] text-white/80 mt-2 text-kr-pretty">{t("result.login.desc")}</p>
           </div>
@@ -262,15 +262,15 @@ export function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: any;
               <p className="text-[12px] text-stone-500 mt-2 leading-relaxed text-kr-pretty">{t("result.login.desc")}</p>
               <div className="grid grid-cols-3 gap-2.5 mt-5 text-left">
                 <div className="rounded-2xl p-3" style={{ background: TINT_WARM }}>
-                  <p className="text-[10px] font-bold text-stone-500">{t("result.diary.avg7d")}</p>
+                  <p className="text-xs font-bold text-stone-500">{t("result.diary.avg7d")}</p>
                   <p className="text-lg font-bold mt-1" style={{ color: SCAN_TO }}>--</p>
                 </div>
                 <div className="rounded-2xl p-3" style={{ background: "#F5F3FF" }}>
-                  <p className="text-[10px] font-bold text-stone-500">{t("modal.diary.timelineTab")}</p>
+                  <p className="text-xs font-bold text-stone-500">{t("modal.diary.timelineTab")}</p>
                   <p className="text-lg font-bold mt-1" style={{ color: "#7C3AED" }}>--</p>
                 </div>
                 <div className="rounded-2xl p-3" style={{ background: TINT_GREEN }}>
-                  <p className="text-[10px] font-bold text-stone-500">{t("modal.diary.calendarTab")}</p>
+                  <p className="text-xs font-bold text-stone-500">{t("modal.diary.calendarTab")}</p>
                   <p className="text-lg font-bold mt-1" style={{ color: "#059669" }}>--</p>
                 </div>
               </div>
@@ -309,22 +309,22 @@ export function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: any;
       <div className="shrink-0 px-5 pt-5 pb-0" style={{ borderBottom: "1px solid #F0EDE8" }}>
         <div className="rounded-3xl p-5 mb-4"
           style={{ background: "#FFFFFF", boxShadow: "0 10px 28px rgba(45,95,79,0.08)" }}>
-          <p className="text-[11px] font-bold tracking-widest uppercase mb-1" style={{ color: SCAN_TO }}>FONDAY</p>
+          <p className="text-xs font-bold tracking-widest uppercase mb-1" style={{ color: SCAN_TO }}>FONDAY</p>
           <h1 className="text-2xl font-bold" style={{ color: DEEP_GREEN }}>{t("modal.diary.title")}</h1>
           <p className="text-[12px] text-stone-500 mt-2 text-kr-pretty">
             {finalType ? `${finalType} · ` : ""}{totalRecords > 0 ? `${t("modal.diary.countLabel", { count: totalRecords })}` : t("result.diary.firstRecord")}
           </p>
           <div className="grid grid-cols-3 gap-2.5 mt-4">
             <div className="rounded-2xl p-3 text-center" style={{ background: TINT_WARM }}>
-              <p className="text-[10px] font-bold text-stone-400 whitespace-nowrap">{t("result.overall")}</p>
+              <p className="text-xs font-bold text-stone-400 whitespace-nowrap">{t("result.overall")}</p>
               <p className="text-2xl font-bold mt-1" style={{ color: SCAN_TO }}>{overallScore || "—"}</p>
             </div>
             <div className="rounded-2xl p-3 text-center" style={{ background: "#F6F4FB" }}>
-              <p className="text-[10px] font-bold text-stone-400 whitespace-nowrap">{t("result.diary.avg7d")}</p>
+              <p className="text-xs font-bold text-stone-400 whitespace-nowrap">{t("result.diary.avg7d")}</p>
               <p className="text-2xl font-bold mt-1" style={{ color: "#7C3AED" }}>{avgScore || "—"}</p>
             </div>
             <div className="rounded-2xl p-3 text-center" style={{ background: TINT_GREEN }}>
-              <p className="text-[10px] font-bold text-stone-400 whitespace-nowrap">{t("diary.routineTitle")}</p>
+              <p className="text-xs font-bold text-stone-400 whitespace-nowrap">{t("diary.routineTitle")}</p>
               <p className="text-2xl font-bold mt-1" style={{ color: DEEP_GREEN }}>{diaryTodoProgress.total > 0 ? `${diaryTodoProgress.done}/${diaryTodoProgress.total}` : (diaryMemoReady ? "1/1" : "0/1")}</p>
             </div>
           </div>
@@ -383,9 +383,9 @@ export function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: any;
                   <CardContent className="p-5">
                     <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0">
-                        <p className="text-[10px] font-bold tracking-[0.16em] uppercase" style={{ color: SCAN_TO }}>{t("modal.diary.reminderTitle")}</p>
+                        <p className="text-xs font-bold tracking-[0.16em] uppercase" style={{ color: SCAN_TO }}>{t("modal.diary.reminderTitle")}</p>
                         <p className="text-base font-bold mt-1 text-kr-pretty" style={{ color: DEEP_GREEN }}>{t("modal.diary.reminderHeadline")}</p>
-                        <p className="text-[11px] text-stone-500 mt-1 leading-relaxed text-kr-pretty">
+                        <p className="text-xs text-stone-500 mt-1 leading-relaxed text-kr-pretty">
                           {t("modal.diary.reminderDesc")} {aiCareSettings.enabled ? "" : t("modal.diary.aiCareWarn")}
                         </p>
                       </div>
@@ -430,7 +430,7 @@ export function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: any;
                       </button>
                     </div>
                     {reminderPushWarn && (
-                      <p className="text-[11px] text-amber-600 mt-1.5">
+                      <p className="text-xs text-amber-600 mt-1.5">
                         {t("modal.diary.pushWarn")}
                       </p>
                     )}
@@ -453,7 +453,7 @@ export function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: any;
                               saveAICareSettings(nextCare);
                               if (next.enabled) syncReminderToServer(next);
                             }}
-                            className="px-3 py-1.5 rounded-full text-[11px] font-bold"
+                            className="px-3 py-1.5 rounded-full text-xs font-bold"
                             style={selected
                               ? { background: `${SCAN_FROM}20`, color: SCAN_TO }
                               : { background: TINT_NEUTRAL, color: "#9A8F80" }}
@@ -527,20 +527,20 @@ export function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: any;
                     {rankingData.myPercentile !== undefined ? (
                       <div className="p-5 rounded-2xl text-center"
                         style={{ background: `linear-gradient(135deg, ${SCAN_FROM}20, ${SCAN_TO}10)` }}>
-                        <p className="text-[11px] text-stone-500 mb-1">{t("ranking.myRankLabel")}</p>
+                        <p className="text-xs text-stone-500 mb-1">{t("ranking.myRankLabel")}</p>
                         <p className="text-4xl font-black" style={{ color: SCAN_TO }}>
                           {t("ranking.myPercentile", { percent: rankingData.myPercentile })}
                         </p>
-                        <p className="text-[11px] text-stone-400 mt-1">{t("ranking.totalData", { count: rankingData.totalScans })}</p>
+                        <p className="text-xs text-stone-400 mt-1">{t("ranking.totalData", { count: rankingData.totalScans })}</p>
                       </div>
                     ) : (
                       <div className="p-4 rounded-2xl text-center bg-stone-50">
                         <p className="text-[12px] text-stone-500">{t("ranking.loginForRank")}</p>
-                        <p className="text-[11px] text-stone-300 mt-1">{t("ranking.totalData", { count: rankingData.totalScans })}</p>
+                        <p className="text-xs text-stone-300 mt-1">{t("ranking.totalData", { count: rankingData.totalScans })}</p>
                       </div>
                     )}
                     <div>
-                      <p className="text-[11px] font-bold text-stone-400 mb-3">{t("ranking.distribution")}</p>
+                      <p className="text-xs font-bold text-stone-400 mb-3">{t("ranking.distribution")}</p>
                       <div className="space-y-3">
                         {rankingData.scoreDistribution.map((band, bi) => {
                           const maxCount = Math.max(...rankingData.scoreDistribution.map(d => d.count), 1);
@@ -549,15 +549,15 @@ export function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: any;
                           const isMyBand = overallScore >= bMin && overallScore <= bMax;
                           return (
                             <div key={bi} className="flex items-center gap-2">
-                              <span className="text-[10px] text-stone-400 w-14 shrink-0">{band.label}</span>
+                              <span className="text-xs text-stone-400 w-14 shrink-0">{band.label}</span>
                               <div className="flex-1 h-5 rounded-full bg-stone-100 overflow-hidden">
                                 <div className="h-full rounded-full transition-all duration-700"
                                   style={{ width: `${Math.max(barPct, band.count > 0 ? 6 : 0)}%`,
                                     background: isMyBand ? `linear-gradient(90deg, ${SCAN_FROM}, ${SCAN_TO})` : "#D1D5DB" }} />
                               </div>
-                              <span className="text-[10px] text-stone-400 w-5 text-right">{band.count}</span>
+                              <span className="text-xs text-stone-400 w-5 text-right">{band.count}</span>
                               {isMyBand && (
-                                <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full shrink-0"
+                                <span className="text-xs font-bold px-1.5 py-0.5 rounded-full shrink-0"
                                   style={{ background: `${SCAN_FROM}30`, color: SCAN_TO }}>{t("ranking.me")}</span>
                               )}
                             </div>
@@ -567,14 +567,14 @@ export function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: any;
                     </div>
                     {Object.keys(rankingData.baumannDistribution).length > 0 && (
                       <div>
-                        <p className="text-[11px] font-bold text-stone-400 mb-3">{t("ranking.topBaumann")}</p>
+                        <p className="text-xs font-bold text-stone-400 mb-3">{t("ranking.topBaumann")}</p>
                         <div className="flex gap-2 flex-wrap">
                           {Object.entries(rankingData.baumannDistribution)
                             .sort(([,a],[,b]) => b - a).slice(0, 3)
                             .map(([type, count]) => (
                               <div key={type} className="flex items-center gap-2 px-3 py-2 rounded-xl bg-white">
                                 <span className="text-sm font-bold" style={{ color: SCAN_TO }}>{type}</span>
-                                <span className="text-[11px] text-stone-400">{count}{t("ranking.people")}</span>
+                                <span className="text-xs text-stone-400">{count}{t("ranking.people")}</span>
                               </div>
                             ))}
                         </div>

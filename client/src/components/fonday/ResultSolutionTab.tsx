@@ -28,10 +28,10 @@ export function ResultSolutionTab(props: any) {
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-bold leading-tight text-kr-pretty" style={{ color: DEEP_GREEN }}>{t("cosmetics.ctaTitle")}</p>
-                <p className="text-[11px] text-stone-400 leading-tight text-kr-pretty">{t("cosmetics.ctaBannerSub")}</p>
+                <p className="text-xs text-stone-400 leading-tight text-kr-pretty">{t("cosmetics.ctaBannerSub")}</p>
               </div>
               {user && cosmeticCount > 0 && (
-                <span className="text-[11px] font-medium px-2 py-1 rounded-full"
+                <span className="text-xs font-medium px-2 py-1 rounded-full"
                   style={{ background: "#FFFFFF", color: DEEP_GREEN }}>
                   {t("cosmetics.ctaCount", { count: cosmeticCount })}
                 </span>
@@ -50,8 +50,8 @@ export function ResultSolutionTab(props: any) {
                 <Leaf className="w-4 h-4" style={{ color: DEEP_GREEN }} />
               </div>
               <div>
-                <p className="text-[10px] font-bold uppercase tracking-[0.14em]" style={{ color: DEEP_GREEN }}>{t("modal.improvements.title")}</p>
-                <p className="text-[11px] text-stone-400">{t("modal.improvements.sub")}</p>
+                <p className="text-xs font-bold uppercase tracking-[0.14em]" style={{ color: DEEP_GREEN }}>{t("modal.improvements.title")}</p>
+                <p className="text-xs text-stone-400">{t("modal.improvements.sub")}</p>
               </div>
             </div>
             {(analysisResult?.improvements ?? []).slice(0, 3).map((item: { title: string; desc: string }, i: number) => (
@@ -63,7 +63,7 @@ export function ResultSolutionTab(props: any) {
                     style={{ background: i === 0 ? TINT_WARM : i === 1 ? TINT_GREEN : "#F6F4FB", color: i === 0 ? SCAN_TO : i === 1 ? DEEP_GREEN : "#7C3AED" }}>
                     {i + 1}
                   </div>
-                  <p className="text-[9px] font-semibold text-center mt-1"
+                  <p className="text-xs font-semibold text-center mt-1"
                     style={{ color: i === 0 ? SCAN_TO : i === 1 ? DEEP_GREEN : "#7C3AED" }}>STEP</p>
                 </div>
                 <div>
@@ -81,7 +81,7 @@ export function ResultSolutionTab(props: any) {
                   <div className="w-9 h-9 rounded-2xl flex items-center justify-center" style={{ background: TINT_WARM }}>
                     <Sparkles className="w-4 h-4" style={{ color: SCAN_TO }} />
                   </div>
-                  <p className="text-[10px] font-bold uppercase tracking-[0.14em]" style={{ color: DEEP_GREEN }}>{t("modal.improvements.cosmetics")}</p>
+                  <p className="text-xs font-bold uppercase tracking-[0.14em]" style={{ color: DEEP_GREEN }}>{t("modal.improvements.cosmetics")}</p>
                 </div>
                 {(analysisResult.cosmetics as { type: string; key: string; reason: string }[]).map((item, i) => (
                   <motion.div key={`c-${i}`} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
@@ -95,7 +95,7 @@ export function ResultSolutionTab(props: any) {
                     <div>
                       <div className="flex items-center gap-1.5 mb-0.5">
                         <span className="text-sm font-bold text-stone-800">{item.type}</span>
-                        <span className="text-[10px] px-1.5 py-0.5 rounded-full font-medium" style={{ background: "#FFFFFF", color: "#D97706" }}>{item.key}</span>
+                        <span className="text-xs px-1.5 py-0.5 rounded-full font-medium" style={{ background: "#FFFFFF", color: "#D97706" }}>{item.key}</span>
                       </div>
                       <p className="text-[12px] text-stone-500 leading-relaxed">{item.reason}</p>
                     </div>
@@ -124,7 +124,7 @@ export function ResultSolutionTab(props: any) {
                   </div>
                   <div>
                     <p className="text-sm font-bold" style={{ color: SCAN_TO }}>{aiCareLabels.title}</p>
-                    <p className="text-[10px] text-stone-400 mt-0.5">{aiCareLabels.schedule}</p>
+                    <p className="text-xs text-stone-400 mt-0.5">{aiCareLabels.schedule}</p>
                   </div>
                 </div>
                 <button onClick={() => handlePushToggle()} disabled={pushLoading}
@@ -165,9 +165,9 @@ export function ResultSolutionTab(props: any) {
               <div className="p-5">
                 <div className="flex items-start justify-between gap-3 mb-4">
                   <div>
-                    <p className="text-[10px] font-bold uppercase tracking-[0.18em]" style={{ color: SCAN_TO }}>COMING SOON</p>
+                    <p className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: SCAN_TO }}>COMING SOON</p>
                     <p className="text-[17px] font-black mt-1" style={{ color: DEEP_GREEN }}>{t("result.deviceTeaser.title")}</p>
-                    <p className="text-[11px] text-stone-400 mt-1">{t("result.deviceTeaser.sub")}</p>
+                    <p className="text-xs text-stone-400 mt-1">{t("result.deviceTeaser.sub")}</p>
                   </div>
                   <div className="w-12 h-12 rounded-2xl flex items-center justify-center shrink-0"
                     style={{ background: TINT_WARM }}>
@@ -185,13 +185,13 @@ export function ResultSolutionTab(props: any) {
                     return (
                       <div key={i} className="flex items-center gap-2 p-2.5 rounded-xl bg-white/70">
                         <Icon className="w-4 h-4 shrink-0" style={{ color: item.color }} />
-                        <p className="text-[11px] font-semibold text-stone-600">{item.label}</p>
+                        <p className="text-xs font-semibold text-stone-600">{item.label}</p>
                       </div>
                     );
                   })}
                 </div>
                 <Button onClick={() => setShowWaitlist(true)}
-                  className="w-full h-11 rounded-xl text-[12px] font-semibold"
+                  className="w-full h-11 rounded-2xl text-[12px] font-semibold"
                   style={{ background: TINT_WARM, color: SCAN_TO }}>
                   <span className="flex items-center gap-1.5">{t("result.earlybird")} <ArrowRight className="w-4 h-4" /></span>
                 </Button>

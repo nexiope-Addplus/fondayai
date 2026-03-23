@@ -67,7 +67,7 @@ export function ResultCosmeticsGateSheet({
                     className="w-5 h-5 rounded-full flex items-center justify-center shrink-0"
                     style={{ background: DEEP_GREEN }}
                   >
-                    <span className="text-white text-[10px] font-bold">✓</span>
+                    <span className="text-white text-xs font-bold">✓</span>
                   </div>
                   <span className="text-[12px] text-stone-700 font-medium">{bullet}</span>
                 </div>

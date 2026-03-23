@@ -89,7 +89,7 @@ export function ReportTab({ user }: { user: any }) {
       <motion.div className="px-5 pt-6 pb-24 space-y-4" variants={stagger} initial="initial" animate="animate">
         <motion.div variants={fadeChild} className="flex items-center justify-between">
           <h2 className="text-xl font-black" style={{ color: DEEP_GREEN }}>{t("report.title")}</h2>
-          <span className="text-[11px] text-stone-400">
+          <span className="text-xs text-stone-400">
             {date.toLocaleDateString(i18n.language === "ko" ? "ko-KR" : i18n.language === "ja" ? "ja-JP" : "en-US", { month: "long", day: "numeric", hour: "2-digit", minute: "2-digit" })}
           </span>
         </motion.div>
@@ -102,13 +102,13 @@ export function ReportTab({ user }: { user: any }) {
                 <div className="w-[72px] h-[72px] rounded-2xl flex flex-col items-center justify-center text-white shadow-lg shrink-0"
                   style={{ background: `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})` }}>
                   <span className="text-3xl font-black leading-none">{lastScan.overallScore}</span>
-                  <span className="text-[9px] font-bold opacity-80 mt-1">{t("report.overall")}</span>
+                  <span className="text-xs font-bold opacity-80 mt-1">{t("report.overall")}</span>
                 </div>
                 {lastScan.skinAge && (
                   <div className="w-[72px] h-[72px] rounded-2xl flex flex-col items-center justify-center text-white shadow-lg shrink-0"
                     style={{ background: "#8B5CF6" }}>
                     <span className="text-3xl font-black leading-none">{lastScan.skinAge}</span>
-                    <span className="text-[9px] font-bold opacity-80 mt-1">{t("report.skinAge")}</span>
+                    <span className="text-xs font-bold opacity-80 mt-1">{t("report.skinAge")}</span>
                   </div>
                 )}
                 <div className="flex-1 min-w-0">
@@ -121,7 +121,7 @@ export function ReportTab({ user }: { user: any }) {
                     {baumannLetters.map((letter: string, i: number) => {
                       const color = BAUMANN_COLORS[letter];
                       if (!color) return null;
-                      return <span key={i} className="text-[10px] font-bold px-2 py-0.5 rounded-full"
+                      return <span key={i} className="text-xs font-bold px-2 py-0.5 rounded-full"
                         style={{ background: `${color}18`, color }}>{t(`baumann.${letter}.name`)}</span>;
                     })}
                   </div>

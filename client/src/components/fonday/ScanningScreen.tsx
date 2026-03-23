@@ -53,7 +53,7 @@ export function ScanningScreen({ imageSrc }: { imageSrc: string | null }) {
         <div className="absolute bottom-4 left-0 right-0 flex justify-center">
           <div className="bg-black/50 backdrop-blur-md px-3 py-1.5 rounded-full flex items-center gap-2">
             <div className="w-2 h-2 rounded-full animate-pulse" style={{ background: SCAN_FROM }} />
-            <span className="text-[10px] font-bold text-white uppercase tracking-wider">AI Scanning</span>
+            <span className="text-xs font-bold text-white uppercase tracking-wider">AI Scanning</span>
           </div>
         </div>
       </div>
@@ -68,7 +68,7 @@ export function ScanningScreen({ imageSrc }: { imageSrc: string | null }) {
       </div>
       {/* 진행 바 */}
       <div className="mt-8 w-full max-w-xs">
-        <div className="flex justify-between text-[10px] text-stone-400 mb-1.5">
+        <div className="flex justify-between text-xs text-stone-400 mb-1.5">
           <span>{t("scanning.progress")}</span>
           <span>{Math.round(progress)}%</span>
         </div>

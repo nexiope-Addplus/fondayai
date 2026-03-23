@@ -199,39 +199,39 @@ export function DiaryReportTab({ diaryReport, reportLang, routineGuide, weeklyRe
         <CardContent className="p-5">
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0">
-              <p className="text-[10px] font-bold tracking-[0.16em] uppercase" style={{ color: SCAN_TO }}>
+              <p className="text-xs font-bold tracking-[0.16em] uppercase" style={{ color: SCAN_TO }}>
                 {reportConsultText.brief}
               </p>
               <p className="text-[20px] font-black mt-1 text-kr-pretty" style={{ color: DEEP_GREEN }}>
                 {reportLang === "ko" ? "이번 주 피부 컨설팅" : reportLang === "ja" ? "今週の肌コンサルティング" : "This Week's Skin Consult"}
               </p>
-              <p className="text-[11px] text-stone-500 mt-1 leading-relaxed text-kr-pretty">
+              <p className="text-xs text-stone-500 mt-1 leading-relaxed text-kr-pretty">
                 {consultantHeadline}
               </p>
             </div>
             <div className="rounded-3xl px-3 py-2 text-right shrink-0"
               style={{ background: "#FFFFFFAA" }}>
-              <p className="text-[10px] font-bold text-stone-500 whitespace-nowrap">{diaryReport.copy.period}</p>
+              <p className="text-xs font-bold text-stone-500 whitespace-nowrap">{diaryReport.copy.period}</p>
               <p className="text-sm font-bold mt-1" style={{ color: DEEP_GREEN }}>{diaryReport.periodLabel}</p>
             </div>
           </div>
           <div className="mt-3 flex justify-start">
-            <span className="rounded-full px-3 py-1 text-[10px] font-bold" style={{ background: "#FFFFFF", color: SCAN_TO }}>
+            <span className="rounded-full px-3 py-1 text-xs font-bold" style={{ background: "#FFFFFF", color: SCAN_TO }}>
               {reportStatusLabel}
             </span>
           </div>
 
           <div className="grid grid-cols-3 gap-2 mt-4">
             <div className="rounded-2xl p-3 text-center" style={{ background: "#FFFFFF" }}>
-              <p className="text-[10px] font-bold text-stone-400">{diaryReport.copy.scans}</p>
+              <p className="text-xs font-bold text-stone-400">{diaryReport.copy.scans}</p>
               <p className="text-[20px] font-black mt-1" style={{ color: DEEP_GREEN }}>{diaryReport.scanCount}</p>
             </div>
             <div className="rounded-2xl p-3 text-center" style={{ background: "#FFFFFF" }}>
-              <p className="text-[10px] font-bold text-stone-400">{diaryReport.copy.diary}</p>
+              <p className="text-xs font-bold text-stone-400">{diaryReport.copy.diary}</p>
               <p className="text-[20px] font-black mt-1" style={{ color: SCAN_TO }}>{diaryReport.memoCount}</p>
             </div>
             <div className="rounded-2xl p-3 text-center" style={{ background: "#FFFFFF" }}>
-              <p className="text-[10px] font-bold text-stone-400">{diaryReport.copy.adherence}</p>
+              <p className="text-xs font-bold text-stone-400">{diaryReport.copy.adherence}</p>
               <p className="text-[20px] font-black mt-1" style={{ color: "#0F766E" }}>{diaryReport.adherence}</p>
             </div>
           </div>
@@ -245,21 +245,21 @@ export function DiaryReportTab({ diaryReport, reportLang, routineGuide, weeklyRe
               <Sparkles className="w-4 h-4" style={{ color: SCAN_TO }} />
             </div>
             <div className="min-w-0">
-              <p className="text-[10px] font-bold uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>
+              <p className="text-xs font-bold uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>
                 {reportConsultText.insight}
               </p>
               <div className="flex items-center gap-2 mt-1 flex-wrap">
                 <p className="text-base font-bold text-kr-pretty" style={{ color: DEEP_GREEN }}>
                   {diaryReport.copy[diaryReport.trendKey]}
                 </p>
-                <span className="px-2.5 py-1 rounded-full text-[10px] font-bold" style={{ background: `${SCAN_FROM}18`, color: SCAN_TO }}>
+                <span className="px-2.5 py-1 rounded-full text-xs font-bold" style={{ background: `${SCAN_FROM}18`, color: SCAN_TO }}>
                   {diaryReport.trendDesc}
                 </span>
               </div>
               <p className="text-[13px] text-stone-600 mt-3 leading-relaxed text-kr-pretty">
                 {diaryReport.executiveSummary}
               </p>
-              <p className="text-[11px] text-stone-500 mt-2 leading-relaxed text-kr-pretty">
+              <p className="text-xs text-stone-500 mt-2 leading-relaxed text-kr-pretty">
                 {diaryReport.routineDesc}
               </p>
             </div>
@@ -275,7 +275,7 @@ export function DiaryReportTab({ diaryReport, reportLang, routineGuide, weeklyRe
           <div className="space-y-2.5 mt-3">
             {causeEstimateItems.map((item, index) => (
               <div key={`${item}-${index}`} className="rounded-2xl p-3 flex items-start gap-3" style={{ background: "#F8F5F2" }}>
-                <div className="w-7 h-7 rounded-xl flex items-center justify-center shrink-0 text-[11px] font-bold" style={{ background: "#FFFFFF", color: SCAN_TO }}>
+                <div className="w-7 h-7 rounded-xl flex items-center justify-center shrink-0 text-xs font-bold" style={{ background: "#FFFFFF", color: SCAN_TO }}>
                   {index + 1}
                 </div>
                 <p className="text-[12px] text-stone-700 leading-relaxed text-kr-pretty">{item}</p>
@@ -293,7 +293,7 @@ export function DiaryReportTab({ diaryReport, reportLang, routineGuide, weeklyRe
           <div className="space-y-2.5 mt-3">
             {consultantActionItems.map((item, index) => (
               <div key={`${item}-${index}`} className="rounded-2xl p-3 flex items-start gap-3" style={{ background: index === 0 ? TINT_WARM : index === 1 ? TINT_GREEN : "#F6F4FB" }}>
-                <div className="w-7 h-7 rounded-xl flex items-center justify-center shrink-0 text-[11px] font-bold" style={{ background: "#FFFFFF", color: index === 0 ? SCAN_TO : index === 1 ? DEEP_GREEN : "#7C3AED" }}>
+                <div className="w-7 h-7 rounded-xl flex items-center justify-center shrink-0 text-xs font-bold" style={{ background: "#FFFFFF", color: index === 0 ? SCAN_TO : index === 1 ? DEEP_GREEN : "#7C3AED" }}>
                   {index + 1}
                 </div>
                 <p className="text-[12px] text-stone-700 leading-relaxed text-kr-pretty">{item}</p>
@@ -308,7 +308,7 @@ export function DiaryReportTab({ diaryReport, reportLang, routineGuide, weeklyRe
           <p className="text-xs font-semibold uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>
             {reportDetailText.radarTitle}
           </p>
-          <p className="text-[11px] text-stone-500 mt-1">{reportDetailText.radarSub}</p>
+          <p className="text-xs text-stone-500 mt-1">{reportDetailText.radarSub}</p>
           <div className="w-full h-72 pt-2">
             <ResponsiveContainer width="100%" height="100%">
               <RadarChart cx="50%" cy="50%" outerRadius="68%" data={diaryReport.radarData}>
@@ -338,7 +338,7 @@ export function DiaryReportTab({ diaryReport, reportLang, routineGuide, weeklyRe
                 </div>
                 <div className="rounded-2xl px-3 py-2 shrink-0 text-right"
                   style={{ background: `${concern.accent}12`, border: `1px solid ${concern.accent}20` }}>
-                  <p className="text-[10px] font-bold" style={{ color: concern.accent }}>{diaryReport.copy.avgRisk}</p>
+                  <p className="text-xs font-bold" style={{ color: concern.accent }}>{diaryReport.copy.avgRisk}</p>
                   <p className="text-[20px] font-black leading-none mt-1" style={{ color: concern.accent }}>{concern.avgRisk}</p>
                 </div>
               </div>
@@ -356,15 +356,15 @@ export function DiaryReportTab({ diaryReport, reportLang, routineGuide, weeklyRe
             <p className="text-xs font-semibold uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>
               {diaryReport.copy.ingredients}
             </p>
-            <p className="text-[11px] text-stone-500 mt-1 text-kr-pretty">{reportLang === "ko" ? "상담실장이 우선 추천하는 성분 처방입니다." : reportLang === "ja" ? "優先して勧めたい成分処方です。" : "Top ingredient prescriptions a consultant would prioritize."}</p>
+            <p className="text-xs text-stone-500 mt-1 text-kr-pretty">{reportLang === "ko" ? "상담실장이 우선 추천하는 성분 처방입니다." : reportLang === "ja" ? "優先して勧めたい成分処方です。" : "Top ingredient prescriptions a consultant would prioritize."}</p>
             <div className="space-y-3 mt-3">
               {diaryReport.ingredientPlan.map((item: any) => (
                 <div key={item.name} className="rounded-2xl p-3" style={{ background: `${item.accent}10` }}>
                   <div className="flex items-center justify-between gap-2">
                     <p className="text-sm font-bold" style={{ color: item.accent }}>{item.name}</p>
-                    <span className="text-[10px] font-bold px-2 py-1 rounded-full bg-white/80 text-stone-500">{item.concern}</span>
+                    <span className="text-xs font-bold px-2 py-1 rounded-full bg-white/80 text-stone-500">{item.concern}</span>
                   </div>
-                  <p className="text-[11px] text-stone-600 mt-2 leading-relaxed">{item.reason}</p>
+                  <p className="text-xs text-stone-600 mt-2 leading-relaxed">{item.reason}</p>
                 </div>
               ))}
             </div>
@@ -376,21 +376,21 @@ export function DiaryReportTab({ diaryReport, reportLang, routineGuide, weeklyRe
             <p className="text-xs font-semibold uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>
               {diaryReport.copy.procedures}
             </p>
-            <p className="text-[11px] text-stone-500 mt-1 text-kr-pretty">{reportLang === "ko" ? "시술이 필요하다면 상담실에서 먼저 검토할 만한 방향입니다." : reportLang === "ja" ? "施術を考えるなら先に相談しやすい方向です。" : "If procedures are on the table, these are the first directions worth discussing."}</p>
+            <p className="text-xs text-stone-500 mt-1 text-kr-pretty">{reportLang === "ko" ? "시술이 필요하다면 상담실에서 먼저 검토할 만한 방향입니다." : reportLang === "ja" ? "施術を考えるなら先に相談しやすい方向です。" : "If procedures are on the table, these are the first directions worth discussing."}</p>
             <div className="space-y-3 mt-3">
               {diaryReport.procedurePlan.map((item: any) => (
                 <div key={item.name} className="rounded-2xl p-3 border" style={{ borderColor: `${item.accent}20`, background: "#FFFFFF" }}>
                   <div className="flex items-center justify-between gap-2">
                     <p className="text-sm font-bold" style={{ color: DEEP_GREEN }}>{item.name}</p>
-                    <span className="text-[10px] font-bold px-2 py-1 rounded-full" style={{ background: `${item.accent}12`, color: item.accent }}>
+                    <span className="text-xs font-bold px-2 py-1 rounded-full" style={{ background: `${item.accent}12`, color: item.accent }}>
                       {diaryReport.copy.recommended}
                     </span>
                   </div>
-                  <p className="text-[11px] text-stone-600 mt-2 leading-relaxed">{item.reason}</p>
+                  <p className="text-xs text-stone-600 mt-2 leading-relaxed">{item.reason}</p>
                 </div>
               ))}
             </div>
-            <p className="text-[11px] text-stone-500 mt-3 leading-relaxed">{diaryReport.copy.procedureNote}</p>
+            <p className="text-xs text-stone-500 mt-3 leading-relaxed">{diaryReport.copy.procedureNote}</p>
           </CardContent>
         </Card>
       </div>
@@ -401,31 +401,31 @@ export function DiaryReportTab({ diaryReport, reportLang, routineGuide, weeklyRe
             <p className="text-xs font-semibold uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>
               {reportLang === "ko" ? "성분 반응 추적" : reportDetailText.ingredientTrack}
             </p>
-            <p className="text-[11px] text-stone-500 mt-1">{reportDetailText.ingredientTrackSub}</p>
+            <p className="text-xs text-stone-500 mt-1">{reportDetailText.ingredientTrackSub}</p>
             <div className="space-y-3 mt-3">
               {diaryReport.ingredientSignals.length > 0 ? (
                 <>
                   <div>
-                    <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-emerald-600">{reportDetailText.positiveFlow}</p>
+                    <p className="text-xs font-bold uppercase tracking-[0.12em] text-emerald-600">{reportDetailText.positiveFlow}</p>
                     <div className="space-y-3 mt-2">
                       {diaryReport.ingredientSignals.filter((item: any) => item.delta >= 0).slice(0, 3).map((item: any) => (
                         <div key={`good-${item.ingredient}`} className="rounded-[16px] p-3" style={{ background: TINT_GREEN }}>
                           <div className="flex items-center justify-between gap-2">
                             <p className="text-sm font-bold text-emerald-700">{item.ingredient}</p>
-                            <span className="text-[10px] font-bold text-emerald-600">+{item.delta}</span>
+                            <span className="text-xs font-bold text-emerald-600">+{item.delta}</span>
                           </div>
                         </div>
                       ))}
                     </div>
                   </div>
                   <div>
-                    <p className="text-[10px] font-bold uppercase tracking-[0.12em]" style={{ color: SCAN_TO }}>{reportDetailText.cautionFlow}</p>
+                    <p className="text-xs font-bold uppercase tracking-[0.12em]" style={{ color: SCAN_TO }}>{reportDetailText.cautionFlow}</p>
                     <div className="space-y-3 mt-2">
                       {diaryReport.ingredientSignals.filter((item: any) => item.delta < 0).slice(0, 3).map((item: any) => (
                         <div key={`bad-${item.ingredient}`} className="rounded-[16px] p-3" style={{ background: TINT_WARM }}>
                           <div className="flex items-center justify-between gap-2">
                             <p className="text-sm font-bold" style={{ color: SCAN_TO }}>{item.ingredient}</p>
-                            <span className="text-[10px] font-bold" style={{ color: SCAN_TO }}>{item.delta}</span>
+                            <span className="text-xs font-bold" style={{ color: SCAN_TO }}>{item.delta}</span>
                           </div>
                         </div>
                       ))}
@@ -462,28 +462,28 @@ export function DiaryReportTab({ diaryReport, reportLang, routineGuide, weeklyRe
           </p>
           <div className="grid gap-3 mt-3 md:grid-cols-2">
             <div className="rounded-3xl p-4" style={{ background: TINT_WARM }}>
-              <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-stone-400">{diaryReport.copy.routineGood}</p>
+              <p className="text-xs font-bold uppercase tracking-[0.12em] text-stone-400">{diaryReport.copy.routineGood}</p>
               <p className="text-sm font-bold mt-2 text-kr-pretty" style={{ color: DEEP_GREEN }}>{diaryReport.routineHighlights.strong}</p>
             </div>
             <div className="rounded-3xl p-4" style={{ background: TINT_NEUTRAL }}>
-              <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-stone-400">{diaryReport.copy.routineWatch}</p>
+              <p className="text-xs font-bold uppercase tracking-[0.12em] text-stone-400">{diaryReport.copy.routineWatch}</p>
               <p className="text-sm font-bold mt-2 text-kr-pretty" style={{ color: "#8C8070" }}>{diaryReport.routineHighlights.watch}</p>
             </div>
             <div className="rounded-3xl p-4" style={{ background: TINT_WARM }}>
-              <p className="text-[10px] font-bold uppercase tracking-[0.12em]" style={{ color: SCAN_TO }}>{diaryReport.copy.memoSignals}</p>
+              <p className="text-xs font-bold uppercase tracking-[0.12em]" style={{ color: SCAN_TO }}>{diaryReport.copy.memoSignals}</p>
               <div className="flex flex-wrap gap-1.5 mt-3">
                 {(diaryReport.keywordSummary.length > 0 ? diaryReport.keywordSummary : [diaryReport.copy.notEnough]).map((item: string) => (
-                  <span key={item} className="px-2.5 py-1 rounded-full text-[10px] font-bold" style={{ background: "#FFFFFF", color: SCAN_TO }}>
+                  <span key={item} className="px-2.5 py-1 rounded-full text-xs font-bold" style={{ background: "#FFFFFF", color: SCAN_TO }}>
                     {item}
                   </span>
                 ))}
               </div>
             </div>
             <div className="rounded-3xl p-4" style={{ background: "#F5F3FF" }}>
-              <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-[#7C3AED]">{diaryReport.copy.causeSignals}</p>
+              <p className="text-xs font-bold uppercase tracking-[0.12em] text-[#7C3AED]">{diaryReport.copy.causeSignals}</p>
               <div className="flex flex-wrap gap-1.5 mt-3">
                 {(diaryReport.topCauseTags.length > 0 ? diaryReport.topCauseTags : [diaryReport.copy.notEnough]).map((item: string) => (
-                  <span key={item} className="px-2.5 py-1 rounded-full text-[10px] font-bold" style={{ background: "#FFFFFF", color: "#7C3AED" }}>
+                  <span key={item} className="px-2.5 py-1 rounded-full text-xs font-bold" style={{ background: "#FFFFFF", color: "#7C3AED" }}>
                     {item}
                   </span>
                 ))}
@@ -491,14 +491,14 @@ export function DiaryReportTab({ diaryReport, reportLang, routineGuide, weeklyRe
             </div>
           </div>
           <div className="rounded-3xl p-4 mt-3" style={{ background: TINT_NEUTRAL }}>
-            <p className="text-[10px] font-bold uppercase tracking-[0.12em]" style={{ color: DEEP_GREEN }}>
+            <p className="text-xs font-bold uppercase tracking-[0.12em]" style={{ color: DEEP_GREEN }}>
               {diaryReport.copy.cosmeticsSignal}
             </p>
             <p className="text-[12px] text-stone-600 mt-2 leading-relaxed">{diaryReport.cosmeticsSignal}</p>
             {routineGuide.cautions.length > 0 && (
               <div className="flex flex-wrap gap-1.5 mt-3">
                 {routineGuide.cautions.slice(0, 2).map((item: string) => (
-                  <span key={item} className="px-2.5 py-1 rounded-full text-[10px] font-bold" style={{ background: TINT_WARM, color: SCAN_TO }}>
+                  <span key={item} className="px-2.5 py-1 rounded-full text-xs font-bold" style={{ background: TINT_WARM, color: SCAN_TO }}>
                     {item}
                   </span>
                 ))}
@@ -507,15 +507,15 @@ export function DiaryReportTab({ diaryReport, reportLang, routineGuide, weeklyRe
           </div>
           <div className="grid gap-3 mt-3 md:grid-cols-3">
             <div className="rounded-2xl p-3" style={{ background: TINT_GREEN }}>
-              <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-emerald-700">{reportLang === "ko" ? "유지" : reportLang === "ja" ? "維持" : "Keep"}</p>
+              <p className="text-xs font-bold uppercase tracking-[0.12em] text-emerald-700">{reportLang === "ko" ? "유지" : reportLang === "ja" ? "維持" : "Keep"}</p>
               <p className="text-[12px] font-semibold mt-2 text-stone-700 text-kr-pretty">{routineAdjustPlan.keep}</p>
             </div>
             <div className="rounded-2xl p-3" style={{ background: TINT_WARM }}>
-              <p className="text-[10px] font-bold uppercase tracking-[0.12em]" style={{ color: SCAN_TO }}>{reportLang === "ko" ? "줄이기" : reportLang === "ja" ? "減らす" : "Reduce"}</p>
+              <p className="text-xs font-bold uppercase tracking-[0.12em]" style={{ color: SCAN_TO }}>{reportLang === "ko" ? "줄이기" : reportLang === "ja" ? "減らす" : "Reduce"}</p>
               <p className="text-[12px] font-semibold mt-2 text-stone-700 text-kr-pretty">{routineAdjustPlan.reduce}</p>
             </div>
             <div className="rounded-2xl p-3" style={{ background: "#F6F4FB" }}>
-              <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-[#7C3AED]">{reportLang === "ko" ? "추가" : reportLang === "ja" ? "追加" : "Add"}</p>
+              <p className="text-xs font-bold uppercase tracking-[0.12em] text-[#7C3AED]">{reportLang === "ko" ? "추가" : reportLang === "ja" ? "追加" : "Add"}</p>
               <p className="text-[12px] font-semibold mt-2 text-stone-700 text-kr-pretty">{routineAdjustPlan.add}</p>
             </div>
           </div>
@@ -530,7 +530,7 @@ export function DiaryReportTab({ diaryReport, reportLang, routineGuide, weeklyRe
           <div className="space-y-2.5 mt-3">
             {avoidMistakes.map((item, index) => (
               <div key={`${item}-${index}`} className="rounded-2xl p-3 flex items-start gap-3" style={{ background: "#FFF7ED" }}>
-                <div className="w-7 h-7 rounded-xl flex items-center justify-center shrink-0 text-[11px] font-bold" style={{ background: "#FFFFFF", color: "#C2410C" }}>
+                <div className="w-7 h-7 rounded-xl flex items-center justify-center shrink-0 text-xs font-bold" style={{ background: "#FFFFFF", color: "#C2410C" }}>
                   !
                 </div>
                 <p className="text-[12px] text-stone-700 leading-relaxed text-kr-pretty">{item}</p>
@@ -566,7 +566,7 @@ export function DiaryReportTab({ diaryReport, reportLang, routineGuide, weeklyRe
                 <div key={item.tag} className="rounded-2xl p-3" style={{ background: item.diff <= 0 ? TINT_WARM : TINT_GREEN }}>
                   <div className="flex items-center justify-between gap-2">
                     <p className="text-sm font-bold" style={{ color: item.diff <= 0 ? SCAN_TO : "#059669" }}>{item.label}</p>
-                    <span className="text-[10px] font-bold" style={{ color: item.diff <= 0 ? SCAN_TO : "#059669" }}>
+                    <span className="text-xs font-bold" style={{ color: item.diff <= 0 ? SCAN_TO : "#059669" }}>
                       {item.diff > 0 ? `+${item.diff}` : item.diff}
                     </span>
                   </div>
@@ -589,17 +589,17 @@ export function DiaryReportTab({ diaryReport, reportLang, routineGuide, weeklyRe
               <p className="text-[13px] text-stone-600 mt-2 leading-relaxed text-kr-pretty">{diaryReport.forecast.note}</p>
             </div>
             <div className="rounded-3xl px-3 py-2 shrink-0 text-right" style={{ background: "#FFFFFF" }}>
-              <p className="text-[10px] font-bold text-stone-400">WEEK 2</p>
+              <p className="text-xs font-bold text-stone-400">WEEK 2</p>
               <p className="text-[20px] font-black mt-1" style={{ color: DEEP_GREEN }}>{diaryReport.forecast.week2}</p>
             </div>
           </div>
           <div className="grid grid-cols-2 gap-3 mt-4">
             <div className="rounded-2xl p-3" style={{ background: "#FFFFFF" }}>
-              <p className="text-[10px] font-bold text-stone-400">WEEK 1</p>
+              <p className="text-xs font-bold text-stone-400">WEEK 1</p>
               <p className="text-2xl font-bold mt-1" style={{ color: SCAN_TO }}>{diaryReport.forecast.week1}</p>
             </div>
             <div className="rounded-2xl p-3" style={{ background: "#FFFFFF" }}>
-              <p className="text-[10px] font-bold text-stone-400">WEEK 2</p>
+              <p className="text-xs font-bold text-stone-400">WEEK 2</p>
               <p className="text-2xl font-bold mt-1" style={{ color: DEEP_GREEN }}>{diaryReport.forecast.week2}</p>
             </div>
           </div>

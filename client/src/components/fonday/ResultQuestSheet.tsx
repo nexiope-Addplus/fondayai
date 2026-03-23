@@ -61,7 +61,7 @@ export function ResultQuestSheet({
               </div>
               <div className="flex items-center gap-2">
                 <span
-                  className="rounded-full px-3 py-1 text-[10px] font-bold"
+                  className="rounded-full px-3 py-1 text-xs font-bold"
                   style={{ background: "#FFF7ED", color: "#D97706" }}
                 >
                   {totalPoints}pt
@@ -101,13 +101,13 @@ export function ResultQuestSheet({
                         {quest.label}
                       </p>
                       <span
-                        className="text-[10px] font-bold"
+                        className="text-xs font-bold"
                         style={{ color: quest.done ? "#059669" : quest.accent }}
                       >
                         {quest.reward}
                       </span>
                     </div>
-                    <p className="text-[10px] text-stone-500 mt-0.5 leading-[1.45] text-kr-pretty">
+                    <p className="text-xs text-stone-500 mt-0.5 leading-[1.45] text-kr-pretty">
                       {quest.detail}
                     </p>
                   </div>

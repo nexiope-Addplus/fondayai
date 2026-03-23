@@ -173,14 +173,14 @@ export default function BattlePage() {
             {/* Friend Card */}
             <div className="relative p-4 rounded-3xl bg-white shadow-lg border border-stone-100/50 flex flex-col items-center justify-center text-center overflow-hidden h-[160px]">
               <div className="absolute top-0 right-0 w-16 h-16 bg-gradient-to-bl from-stone-100 to-transparent rounded-bl-full opacity-50" />
-              <p className="text-[11px] font-bold text-stone-400 mb-2">{t("battle.friend")}</p>
+              <p className="text-xs font-bold text-stone-400 mb-2">{t("battle.friend")}</p>
               <span className="text-4xl font-black leading-none mb-1" style={{ color: SCAN_TO }}>{friendScan.overallScore}</span>
-              <p className="text-[10px] font-bold text-stone-400 mb-2">{t("battle.totalScore")}</p>
+              <p className="text-xs font-bold text-stone-400 mb-2">{t("battle.totalScore")}</p>
               
               {friendScan.baumannType && (
                 <div className="flex items-center justify-center gap-[2px]">
                   {friendScan.baumannType.split('').map((letter, i) => (
-                    <span key={i} className="text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center text-white" style={{ background: BAUMANN_COLORS[letter] || "#ccc" }}>
+                    <span key={i} className="text-xs font-bold w-4 h-4 rounded-full flex items-center justify-center text-white" style={{ background: BAUMANN_COLORS[letter] || "#ccc" }}>
                       {letter}
                     </span>
                   ))}
@@ -203,14 +203,14 @@ export default function BattlePage() {
               
               {myScan ? (
                 <>
-                  <p className="text-[11px] font-bold text-stone-400 mb-2">{t("battle.me")}</p>
+                  <p className="text-xs font-bold text-stone-400 mb-2">{t("battle.me")}</p>
                   <span className="text-4xl font-black leading-none mb-1" style={{ color: DEEP_GREEN }}>{myScan.overallScore}</span>
-                  <p className="text-[10px] font-bold text-stone-400 mb-2">{t("battle.totalScore")}</p>
+                  <p className="text-xs font-bold text-stone-400 mb-2">{t("battle.totalScore")}</p>
                   
                   {myScan.baumannType && (
                     <div className="flex items-center justify-center gap-[2px]">
                       {myScan.baumannType.split('').map((letter, i) => (
-                        <span key={i} className="text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center text-white" style={{ background: BAUMANN_COLORS[letter] || "#ccc" }}>
+                        <span key={i} className="text-xs font-bold w-4 h-4 rounded-full flex items-center justify-center text-white" style={{ background: BAUMANN_COLORS[letter] || "#ccc" }}>
                           {letter}
                         </span>
                       ))}
@@ -285,7 +285,7 @@ export default function BattlePage() {
                       )}
                     </div>
 
-                    <div className="flex flex-col items-end w-[60px] shrink-0 text-[10px]">
+                    <div className="flex flex-col items-end w-[60px] shrink-0 text-xs">
                       <div className="flex items-center gap-1.5 mb-1 text-stone-500">
                         <span>{t("battle.friend")}</span>
                         <span className="font-black text-[12px] text-stone-800">{item.friend}</span>

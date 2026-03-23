@@ -151,7 +151,7 @@ export function CosmeticsRegisterModal({ onClose, onSuccess }: { onClose: () => 
                   style={{ height: 220 }}>
                   <span className="text-5xl">🧴</span>
                   <p className="text-[13px] font-bold text-stone-400">{t("cosmetics.scanPhoto")}</p>
-                  <p className="text-[11px] text-stone-300">제품 전면이 잘 보이게 찍어주세요</p>
+                  <p className="text-xs text-stone-300">제품 전면이 잘 보이게 찍어주세요</p>
                 </div>
               )}
 
@@ -185,12 +185,12 @@ export function CosmeticsRegisterModal({ onClose, onSuccess }: { onClose: () => 
                 )}
                 <div className="flex-1 min-w-0 space-y-3">
                   <div>
-                    <label className="text-[10px] font-bold text-stone-400 uppercase tracking-wider mb-1 block">제품명</label>
+                    <label className="text-xs font-bold text-stone-400 uppercase tracking-wider mb-1 block">제품명</label>
                     <input value={name} onChange={e => setName(e.target.value)}
                       className="w-full px-3 py-2.5 rounded-xl text-[13px] font-medium text-stone-800 outline-none focus:border-[#2D5F4F] bg-stone-50" />
                   </div>
                   <div>
-                    <label className="text-[10px] font-bold text-stone-400 uppercase tracking-wider mb-1 block">브랜드</label>
+                    <label className="text-xs font-bold text-stone-400 uppercase tracking-wider mb-1 block">브랜드</label>
                     <input value={brand} onChange={e => setBrand(e.target.value)}
                       className="w-full px-3 py-2.5 rounded-xl text-[13px] font-medium text-stone-800 outline-none focus:border-[#2D5F4F] bg-stone-50" />
                   </div>
@@ -199,7 +199,7 @@ export function CosmeticsRegisterModal({ onClose, onSuccess }: { onClose: () => 
 
               {/* 카테고리 */}
               <div className="rounded-2xl px-4 py-3" style={{ background: analysisConfidence === "high" ? "#F0F7F4" : "#FFF7ED" }}>
-                <p className="text-[11px] font-semibold text-kr-pretty" style={{ color: analysisConfidence === "high" ? DEEP_GREEN : SCAN_TO }}>
+                <p className="text-xs font-semibold text-kr-pretty" style={{ color: analysisConfidence === "high" ? DEEP_GREEN : SCAN_TO }}>
                   {analysisConfidence === "high"
                     ? "사진에서 읽힌 정보를 기준으로 자동 분류했어요. 틀리면 아래에서 수정해 주세요."
                     : "자동 인식 정확도가 높지 않아요. 제품명, 카테고리, 전성분을 꼭 한 번 확인해 주세요."}
@@ -207,7 +207,7 @@ export function CosmeticsRegisterModal({ onClose, onSuccess }: { onClose: () => 
               </div>
 
               <div>
-                <label className="text-[11px] font-bold text-stone-400 uppercase tracking-wider mb-2 block">{t("cosmetics.categoryLabel")}</label>
+                <label className="text-xs font-bold text-stone-400 uppercase tracking-wider mb-2 block">{t("cosmetics.categoryLabel")}</label>
                 <div className="grid grid-cols-3 gap-2">
                   {COSMETIC_CATEGORIES.map(cat => (
                     <button key={cat} onClick={() => setCategory(cat)}
@@ -223,13 +223,13 @@ export function CosmeticsRegisterModal({ onClose, onSuccess }: { onClose: () => 
 
               {/* 개봉일 */}
               <div>
-                <label className="text-[11px] font-bold text-stone-400 uppercase tracking-wider mb-2 block">{t("cosmetics.openedLabel")}</label>
+                <label className="text-xs font-bold text-stone-400 uppercase tracking-wider mb-2 block">{t("cosmetics.openedLabel")}</label>
                 <input type="date" value={openedAt} onChange={e => setOpenedAt(e.target.value)}
                   className="w-full px-4 py-3.5 rounded-2xl text-[14px] font-medium text-stone-800 outline-none focus:border-[#2D5F4F] bg-stone-50" />
               </div>
 
               <div>
-                <label className="text-[11px] font-bold text-stone-400 uppercase tracking-wider mb-2 block">{t("cosmetics.ingredientsLabel")}</label>
+                <label className="text-xs font-bold text-stone-400 uppercase tracking-wider mb-2 block">{t("cosmetics.ingredientsLabel")}</label>
                 <textarea
                   value={ingredients}
                   onChange={e => setIngredients(e.target.value)}

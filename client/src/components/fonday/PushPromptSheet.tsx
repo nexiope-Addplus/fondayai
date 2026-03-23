@@ -58,7 +58,7 @@ export function PushPromptSheet({ onAllow, onDismiss, isLoading }: {
               <h3 className="font-bold text-stone-800 text-lg mt-2">{t("pushPrompt.title")}</h3>
               <p className="text-stone-500 text-[13px] mt-1.5 leading-relaxed">{t("pushPrompt.desc")}</p>
               {isAndroid() && (
-                <span className="inline-block mt-2 text-[11px] bg-emerald-50 text-emerald-600 px-2 py-0.5 rounded-full font-medium">Android</span>
+                <span className="inline-block mt-2 text-xs bg-emerald-50 text-emerald-600 px-2 py-0.5 rounded-full font-medium">Android</span>
               )}
             </div>
             <button

@@ -126,11 +126,11 @@ export function MyCosmeticsModal({ onClose, onAddNew, scans = [] }: { onClose: (
               <div className="rounded-[28px] border p-5" style={{ background: "#FFFFFF", borderColor: "#F1E9E1", boxShadow: "0 10px 26px rgba(45,95,79,0.05)" }}>
                 <div className="flex items-start justify-between gap-3">
                   <div>
-                    <p className="text-[10px] font-bold tracking-[0.16em] uppercase" style={{ color: SCAN_TO }}>{t("cosmetics.myTitle")}</p>
+                    <p className="text-xs font-bold tracking-[0.16em] uppercase" style={{ color: SCAN_TO }}>{t("cosmetics.myTitle")}</p>
                     <p className="text-lg font-bold mt-1" style={{ color: DEEP_GREEN }}>{t("cosmetics.boardHeadline")}</p>
-                    <p className="text-[11px] text-stone-400 mt-1">{t("cosmetics.boardSub")}</p>
+                    <p className="text-xs text-stone-400 mt-1">{t("cosmetics.boardSub")}</p>
                   </div>
-                  <span className="px-2.5 py-1 rounded-full text-[10px] font-bold"
+                  <span className="px-2.5 py-1 rounded-full text-xs font-bold"
                     style={{ background: `${SCAN_FROM}16`, color: SCAN_TO }}>
                     {t("cosmetics.ctaCount", { count: list.length })}
                   </span>
@@ -138,7 +138,7 @@ export function MyCosmeticsModal({ onClose, onAddNew, scans = [] }: { onClose: (
 
                 <div className="flex flex-wrap gap-1.5 mt-4">
                   {quickInsights.slice(0, 3).map((item) => (
-                    <span key={item} className="px-2.5 py-1 rounded-full text-[10px] font-bold"
+                    <span key={item} className="px-2.5 py-1 rounded-full text-xs font-bold"
                       style={{ background: TINT_WARM, color: SCAN_TO }}>
                       {item}
                     </span>
@@ -149,9 +149,9 @@ export function MyCosmeticsModal({ onClose, onAddNew, scans = [] }: { onClose: (
                   <div className="flex items-center justify-between gap-3">
                     <div>
                       <p className="text-[13px] font-bold" style={{ color: DEEP_GREEN }}>{t("cosmetics.routineRepresentativeTitle")}</p>
-                      <p className="text-[11px] text-stone-400 mt-1">{t("cosmetics.routineRepresentativeDesc")}</p>
+                      <p className="text-xs text-stone-400 mt-1">{t("cosmetics.routineRepresentativeDesc")}</p>
                     </div>
-                    <span className="px-2.5 py-1 rounded-full text-[10px] font-bold" style={{ background: `${DEEP_GREEN}12`, color: DEEP_GREEN }}>
+                    <span className="px-2.5 py-1 rounded-full text-xs font-bold" style={{ background: `${DEEP_GREEN}12`, color: DEEP_GREEN }}>
                       {t("cosmetics.routineRepresentativeBadge")}
                     </span>
                   </div>
@@ -162,9 +162,9 @@ export function MyCosmeticsModal({ onClose, onAddNew, scans = [] }: { onClose: (
                     <div className="flex items-center justify-between gap-3">
                       <div>
                         <p className="text-[13px] font-bold" style={{ color: DEEP_GREEN }}>{t("cosmetics.signalSectionTitle")}</p>
-                        <p className="text-[11px] text-stone-400 mt-1">{t("cosmetics.signalSectionDesc")}</p>
+                        <p className="text-xs text-stone-400 mt-1">{t("cosmetics.signalSectionDesc")}</p>
                       </div>
-                      <span className="px-2.5 py-1 rounded-full text-[10px] font-bold" style={{ background: "#EEF4FF", color: "#4A7C6E" }}>
+                      <span className="px-2.5 py-1 rounded-full text-xs font-bold" style={{ background: "#EEF4FF", color: "#4A7C6E" }}>
                         {t("cosmetics.signalWindow")}
                       </span>
                     </div>
@@ -173,11 +173,11 @@ export function MyCosmeticsModal({ onClose, onAddNew, scans = [] }: { onClose: (
                         <div key={signal.itemId} className="rounded-2xl bg-white px-3 py-3">
                           <div className="flex items-center justify-between gap-2">
                             <p className="text-[12px] font-semibold text-stone-800 truncate">{signal.itemName}</p>
-                            <span className="rounded-full px-2 py-0.5 text-[9px] font-bold shrink-0" style={{ background: `${DEEP_GREEN}10`, color: DEEP_GREEN }}>
+                            <span className="rounded-full px-2 py-0.5 text-xs font-bold shrink-0" style={{ background: `${DEEP_GREEN}10`, color: DEEP_GREEN }}>
                               {t(`cosmetics.signalConfidence.${signal.confidence}`)}
                             </span>
                           </div>
-                          <p className="text-[11px] mt-1 text-kr-pretty" style={{ color: SCAN_TO }}>{signal.note}</p>
+                          <p className="text-xs mt-1 text-kr-pretty" style={{ color: SCAN_TO }}>{signal.note}</p>
                         </div>
                       ))}
                     </div>
@@ -193,7 +193,7 @@ export function MyCosmeticsModal({ onClose, onAddNew, scans = [] }: { onClose: (
                       <div className="flex items-center justify-between gap-3 mb-3">
                         <div>
                           <p className="text-[15px] font-bold" style={{ color: DEEP_GREEN }}>{title}</p>
-                          <p className="text-[11px] text-stone-400">
+                          <p className="text-xs text-stone-400">
                             {optimizing
                               ? t("cosmetics.routineOptimizing")
                               : items.length > 0
@@ -202,7 +202,7 @@ export function MyCosmeticsModal({ onClose, onAddNew, scans = [] }: { onClose: (
                           </p>
                         </div>
                         {!optimizing && items.length > 0 && (
-                          <span className="px-2.5 py-1 rounded-full text-[10px] font-bold" style={{ background: bg, color: accent }}>
+                          <span className="px-2.5 py-1 rounded-full text-xs font-bold" style={{ background: bg, color: accent }}>
                             {t("cosmetics.routineRepresentativeBadge")}
                           </span>
                         )}
@@ -218,13 +218,13 @@ export function MyCosmeticsModal({ onClose, onAddNew, scans = [] }: { onClose: (
                             className="w-full rounded-2xl bg-white border px-3.5 py-3 flex items-center gap-3 text-left"
                             style={{ borderColor: `${accent}20` }}
                           >
-                            <span className="w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-bold text-white shrink-0"
+                            <span className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold text-white shrink-0"
                               style={{ background: accent }}>
                               {index + 1}
                             </span>
                             <div className="min-w-0 flex-1">
                               <p className="text-xs font-semibold truncate" style={{ color: DEEP_GREEN }}>{t(`cosmetics.categories.${item.category}`)}</p>
-                              <p className="text-[11px] text-stone-400 truncate">{item.name}</p>
+                              <p className="text-xs text-stone-400 truncate">{item.name}</p>
                             </div>
                             <ChevronRight className="w-4 h-4 text-stone-300 shrink-0" />
                           </button>
@@ -240,15 +240,15 @@ export function MyCosmeticsModal({ onClose, onAddNew, scans = [] }: { onClose: (
                       <AlertTriangle className="w-4 h-4 shrink-0" style={{ color: SCAN_TO }} />
                       <div>
                         <p className="text-[13px] font-bold" style={{ color: SCAN_TO }}>{t("cosmetics.routineConflictTitle")}</p>
-                        <p className="text-[11px] text-stone-400 mt-0.5">{t("cosmetics.routineConflictDesc")}</p>
+                        <p className="text-xs text-stone-400 mt-0.5">{t("cosmetics.routineConflictDesc")}</p>
                       </div>
                     </div>
                     <div className="space-y-2.5">
                       {routinePlan.conflicts.map((c, i) => (
                         <div key={i} className="rounded-2xl bg-white p-3">
-                          <p className="text-[11px] font-bold text-stone-700 mb-0.5">{c.productNames.join(" + ")}</p>
-                          <p className="text-[11px] text-stone-500">{c.reason}</p>
-                          {c.resolution && <p className="text-[11px] mt-1 font-medium" style={{ color: DEEP_GREEN }}>{c.resolution}</p>}
+                          <p className="text-xs font-bold text-stone-700 mb-0.5">{c.productNames.join(" + ")}</p>
+                          <p className="text-xs text-stone-500">{c.reason}</p>
+                          {c.resolution && <p className="text-xs mt-1 font-medium" style={{ color: DEEP_GREEN }}>{c.resolution}</p>}
                         </div>
                       ))}
                     </div>
@@ -260,10 +260,10 @@ export function MyCosmeticsModal({ onClose, onAddNew, scans = [] }: { onClose: (
                 <div className="flex items-center justify-between gap-3 mb-3">
                   <div>
                     <p className="text-[15px] font-bold" style={{ color: DEEP_GREEN }}>{t("cosmetics.collectionTitle")}</p>
-                    <p className="text-[11px] text-stone-400">{t("cosmetics.collectionSub")}</p>
+                    <p className="text-xs text-stone-400">{t("cosmetics.collectionSub")}</p>
                   </div>
                   <button onClick={onAddNew}
-                    className="px-3 py-1.5 rounded-full text-[10px] font-bold text-white"
+                    className="px-3 py-1.5 rounded-full text-xs font-bold text-white"
                     style={{ background: DEEP_GREEN }}>
                     + {t("cosmetics.ctaBtn")}
                   </button>
@@ -283,18 +283,18 @@ export function MyCosmeticsModal({ onClose, onAddNew, scans = [] }: { onClose: (
                       }
                       <div className="mt-3">
                         <p className="text-xs font-semibold text-stone-800 truncate">{item.name}</p>
-                        <p className="text-[11px] text-stone-400 truncate">{item.brand || t("cosmetics.noBrand")}</p>
+                        <p className="text-xs text-stone-400 truncate">{item.brand || t("cosmetics.noBrand")}</p>
                         {productSignals.find((signal) => signal.itemId === item.id) && (
-                          <p className="text-[10px] mt-2 line-clamp-2 text-kr-pretty" style={{ color: SCAN_TO }}>
+                          <p className="text-xs mt-2 line-clamp-2 text-kr-pretty" style={{ color: SCAN_TO }}>
                             {productSignals.find((signal) => signal.itemId === item.id)?.note}
                           </p>
                         )}
                         <div className="flex flex-wrap gap-1.5 mt-2">
-                          <span className="px-2 py-1 rounded-full text-[9px] font-bold"
+                          <span className="px-2 py-1 rounded-full text-xs font-bold"
                             style={{ background: `${DEEP_GREEN}12`, color: DEEP_GREEN }}>
                             {t(`cosmetics.categories.${item.category}`)}
                           </span>
-                          <span className="px-2 py-1 rounded-full text-[9px] font-bold"
+                          <span className="px-2 py-1 rounded-full text-xs font-bold"
                             style={{ background: `${SCAN_FROM}14`, color: SCAN_TO }}>
                             {item.time_of_day === "am"
                               ? t("cosmetics.amBtn")
@@ -343,11 +343,11 @@ export function MyCosmeticsModal({ onClose, onAddNew, scans = [] }: { onClose: (
                   <p className="text-lg font-bold text-stone-800 text-kr-pretty">{selectedItem.name}</p>
                   <p className="text-[12px] text-stone-400 mt-1">{selectedItem.brand || t("cosmetics.noBrand")}</p>
                   <div className="flex flex-wrap gap-1.5 mt-2">
-                    <span className="px-2.5 py-1 rounded-full text-[10px] font-bold"
+                    <span className="px-2.5 py-1 rounded-full text-xs font-bold"
                       style={{ background: `${DEEP_GREEN}12`, color: DEEP_GREEN }}>
                       {t(`cosmetics.categories.${selectedItem.category}`)}
                     </span>
-                    <span className="px-2.5 py-1 rounded-full text-[10px] font-bold"
+                    <span className="px-2.5 py-1 rounded-full text-xs font-bold"
                       style={{ background: `${SCAN_FROM}14`, color: SCAN_TO }}>
                       {selectedItem.time_of_day === "am"
                         ? t("cosmetics.amBtn")
@@ -363,11 +363,11 @@ export function MyCosmeticsModal({ onClose, onAddNew, scans = [] }: { onClose: (
 
               <div className="grid grid-cols-2 gap-2.5 mt-5">
                 <div className="rounded-2xl p-3" style={{ background: TINT_NEUTRAL }}>
-                  <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-stone-400">{t("cosmetics.openedLabel")}</p>
+                  <p className="text-xs font-bold uppercase tracking-[0.14em] text-stone-400">{t("cosmetics.openedLabel")}</p>
                   <p className="text-xs font-semibold mt-1" style={{ color: DEEP_GREEN }}>{selectedItem.opened_at || t("cosmetics.detailUnknown")}</p>
                 </div>
                 <div className="rounded-2xl p-3" style={{ background: TINT_WARM }}>
-                  <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-stone-400">{t("cosmetics.detailStatusLabel")}</p>
+                  <p className="text-xs font-bold uppercase tracking-[0.14em] text-stone-400">{t("cosmetics.detailStatusLabel")}</p>
                   <p className="text-xs font-semibold mt-1" style={{ color: SCAN_TO }}>{t("cosmetics.detailStatusActive")}</p>
                 </div>
               </div>
@@ -383,7 +383,7 @@ export function MyCosmeticsModal({ onClose, onAddNew, scans = [] }: { onClose: (
                 <div className="flex items-center justify-between gap-3">
                   <p className="text-xs font-semibold uppercase tracking-[0.14em]" style={{ color: DEEP_GREEN }}>{t("cosmetics.signalCardTitle")}</p>
                   {selectedSignal && (
-                    <span className="px-2 py-0.5 rounded-full text-[9px] font-bold" style={{ background: `${DEEP_GREEN}12`, color: DEEP_GREEN }}>
+                    <span className="px-2 py-0.5 rounded-full text-xs font-bold" style={{ background: `${DEEP_GREEN}12`, color: DEEP_GREEN }}>
                       {t(`cosmetics.signalConfidence.${selectedSignal.confidence}`)}
                     </span>
                   )}
@@ -393,30 +393,30 @@ export function MyCosmeticsModal({ onClose, onAddNew, scans = [] }: { onClose: (
                     <p className="text-[13px] font-semibold mt-2 text-kr-pretty" style={{ color: SCAN_TO }}>{selectedSignal.note}</p>
                     <div className="grid grid-cols-2 gap-2.5 mt-4">
                       <div className="rounded-2xl bg-white p-3">
-                        <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-stone-400">{t("cosmetics.signalMetricLabel")}</p>
+                        <p className="text-xs font-bold uppercase tracking-[0.12em] text-stone-400">{t("cosmetics.signalMetricLabel")}</p>
                         <p className="text-xs font-semibold mt-1" style={{ color: DEEP_GREEN }}>
                           {selectedSignal.topScoreIndex !== null ? t(`scores.${selectedSignal.topScoreIndex}`) : t("cosmetics.signalMetricFallback")}
                         </p>
-                        <p className="text-[11px] mt-1" style={{ color: SCAN_TO }}>
+                        <p className="text-xs mt-1" style={{ color: SCAN_TO }}>
                           {selectedSignal.topScoreDelta !== null
                             ? `${selectedSignal.topScoreDelta > 0 ? "+" : ""}${Math.round(selectedSignal.topScoreDelta)}`
                             : "—"}
                         </p>
                       </div>
                       <div className="rounded-2xl bg-white p-3">
-                        <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-stone-400">{t("cosmetics.signalObservedLabel")}</p>
+                        <p className="text-xs font-bold uppercase tracking-[0.12em] text-stone-400">{t("cosmetics.signalObservedLabel")}</p>
                         <p className="text-xs font-semibold mt-1" style={{ color: DEEP_GREEN }}>
                           {t("cosmetics.signalObservedValue", { count: selectedSignal.afterCount, days: Math.min(selectedSignal.daysTracked, 14) })}
                         </p>
-                        <p className="text-[11px] mt-1 text-stone-400">
+                        <p className="text-xs mt-1 text-stone-400">
                           {t("cosmetics.signalBaselineValue", { count: selectedSignal.beforeCount })}
                         </p>
                       </div>
                     </div>
                     {selectedSignal.coUsedProducts.length > 0 && (
                       <div className="mt-3 rounded-2xl bg-white p-3">
-                        <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-stone-400">{t("cosmetics.signalCoUsedLabel")}</p>
-                        <p className="text-[11px] text-stone-600 mt-1 text-kr-pretty">
+                        <p className="text-xs font-bold uppercase tracking-[0.12em] text-stone-400">{t("cosmetics.signalCoUsedLabel")}</p>
+                        <p className="text-xs text-stone-600 mt-1 text-kr-pretty">
                           {selectedSignal.coUsedProducts.join(", ")}
                         </p>
                       </div>

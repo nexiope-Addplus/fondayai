@@ -212,10 +212,10 @@ export function ScanIdleScreen({
           <div className="flex items-center gap-1.5 px-3 py-1 rounded-full"
             style={{ background: `${SCAN_FROM}22`, border: `1px solid ${SCAN_FROM}50` }}>
             <Sparkles className="w-3 h-3" style={{ color: SCAN_TO }} />
-            <span className="text-[11px] font-bold tracking-widest uppercase" style={{ color: SCAN_TO }}>FONDAY AI</span>
+            <span className="text-xs font-bold tracking-widest uppercase" style={{ color: SCAN_TO }}>FONDAY AI</span>
           </div>
           <div className="px-3 py-1 rounded-full bg-white/80 border border-white/70 shadow-[0_8px_24px_rgba(189,133,111,0.12)]">
-            <span className="text-[10px] font-bold" style={{ color: DEEP_GREEN }}>{t("idle.heroBadge")}</span>
+            <span className="text-xs font-bold" style={{ color: DEEP_GREEN }}>{t("idle.heroBadge")}</span>
           </div>
         </div>
         <h1 className="text-[28px] sm:text-[30px] font-bold text-stone-800 leading-[1.08] mb-1.5 px-1">
@@ -229,8 +229,8 @@ export function ScanIdleScreen({
           style={{ background: "rgba(255,255,255,0.84)", boxShadow: "0 18px 44px rgba(160,120,100,0.15)", backdropFilter: "blur(14px)" }}>
           <div className="flex items-center justify-between mb-3">
             <div>
-              <div className="text-[11px] font-bold text-stone-700">{t("idle.previewTitle")}</div>
-              <div className="text-[9px] text-stone-400">{t("idle.previewSub")}</div>
+              <div className="text-xs font-bold text-stone-700">{t("idle.previewTitle")}</div>
+              <div className="text-xs text-stone-400">{t("idle.previewSub")}</div>
             </div>
             <div className="flex items-center gap-1.5 px-2 py-1 rounded-full max-w-[52%] sm:max-w-none"
               style={{ background: `${SCAN_FROM}16`, color: SCAN_TO }}>
@@ -255,7 +255,7 @@ export function ScanIdleScreen({
               <div className="absolute top-3 left-3 w-7 h-7 border-t-2 border-l-2 rounded-tl-lg" style={{ borderColor: SCAN_TO }} />
               <div className="absolute top-3 right-3 w-7 h-7 border-t-2 border-r-2 rounded-tr-lg" style={{ borderColor: SCAN_TO }} />
               <div className="absolute bottom-3 left-3 text-white">
-                <p className="text-[8px] sm:text-[9px] font-bold uppercase tracking-[0.16em] text-white/75">{t("idle.heroMbtiLabel")}</p>
+                <p className="text-xs sm:text-xs font-bold uppercase tracking-[0.16em] text-white/75">{t("idle.heroMbtiLabel")}</p>
                 <p className="text-[22px] sm:text-2xl font-bold leading-none">OSNT</p>
               </div>
             </div>
@@ -263,20 +263,20 @@ export function ScanIdleScreen({
               <div className="rounded-3xl px-2.5 py-2.5 mb-2.5 sm:rounded-3xl sm:px-3"
                 style={{ background: `${SCAN_FROM}10`, border: `1px solid ${SCAN_FROM}24` }}>
                 <div className="flex items-center justify-between gap-2">
-                  <p className="text-[10px] font-bold uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>{t("idle.heroBenefitsTitle")}</p>
-                  <span className="text-[9px] font-bold uppercase tracking-[0.14em]" style={{ color: TEXT_SECONDARY }}>{t("idle.heroTag")}</span>
+                  <p className="text-xs font-bold uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>{t("idle.heroBenefitsTitle")}</p>
+                  <span className="text-xs font-bold uppercase tracking-[0.14em]" style={{ color: TEXT_SECONDARY }}>{t("idle.heroTag")}</span>
                 </div>
                 <div className="grid grid-cols-1 gap-2 mt-2">
-                  <div className="flex items-center gap-2 text-[11px] font-semibold text-stone-700">
-                    <Badge className="h-5 rounded-full px-2 text-[9px]" style={{ background: "#F3E8E2", color: SCAN_TO }}>{t("result.baumannLabel")}</Badge>
+                  <div className="flex items-center gap-2 text-xs font-semibold text-stone-700">
+                    <Badge className="h-5 rounded-full px-2 text-xs" style={{ background: "#F3E8E2", color: SCAN_TO }}>{t("result.baumannLabel")}</Badge>
                     <span>{t("idle.heroBenefit1")}</span>
                   </div>
-                  <div className="flex items-center gap-2 text-[11px] font-semibold text-stone-700">
-                    <Badge className="h-5 rounded-full px-2 text-[9px]" style={{ background: "#E7F7F0", color: DEEP_GREEN }}>{t("result.scores")}</Badge>
+                  <div className="flex items-center gap-2 text-xs font-semibold text-stone-700">
+                    <Badge className="h-5 rounded-full px-2 text-xs" style={{ background: "#E7F7F0", color: DEEP_GREEN }}>{t("result.scores")}</Badge>
                     <span>{t("idle.heroBenefit2")}</span>
                   </div>
-                  <div className="flex items-center gap-2 text-[11px] font-semibold text-stone-700">
-                    <Badge className="h-5 rounded-full px-2 text-[9px]" style={{ background: "#FFF2E8", color: "#C2410C" }}>{t("result.skinAge")}</Badge>
+                  <div className="flex items-center gap-2 text-xs font-semibold text-stone-700">
+                    <Badge className="h-5 rounded-full px-2 text-xs" style={{ background: "#FFF2E8", color: "#C2410C" }}>{t("result.skinAge")}</Badge>
                     <span>{t("idle.heroBenefit3")}</span>
                   </div>
                 </div>
@@ -296,14 +296,14 @@ export function ScanIdleScreen({
           <div className="rounded-2xl bg-white px-4 py-4 mb-4" style={{ boxShadow: "0 8px 20px rgba(45,95,79,0.06)" }}>
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
-                <p className="text-[11px] font-bold tracking-[0.14em] uppercase" style={{ color: SCAN_TO }}>
+                <p className="text-xs font-bold tracking-[0.14em] uppercase" style={{ color: SCAN_TO }}>
                   {t("idle.latestEyebrow")}
                 </p>
                 <p className="text-[15px] font-bold text-stone-800 mt-1">{t("idle.latestTitle")}</p>
-                <p className="text-[11px] text-stone-500 mt-1 text-kr-pretty">{t("idle.latestDesc")}</p>
+                <p className="text-xs text-stone-500 mt-1 text-kr-pretty">{t("idle.latestDesc")}</p>
               </div>
               <div className="rounded-2xl px-3 py-2 text-right shrink-0" style={{ background: TINT_GREEN }}>
-                <p className="text-[10px] font-bold uppercase tracking-[0.12em]" style={{ color: DEEP_GREEN }}>
+                <p className="text-xs font-bold uppercase tracking-[0.12em]" style={{ color: DEEP_GREEN }}>
                   {t("result.overall")}
                 </p>
                 <p className="text-[18px] font-bold mt-1" style={{ color: DEEP_GREEN }}>{latestScan.overallScore ?? "—"}</p>
@@ -311,15 +311,15 @@ export function ScanIdleScreen({
             </div>
             <div className="grid grid-cols-3 gap-2 mt-3">
               <div className="rounded-2xl p-3" style={{ background: "#F6FBF8" }}>
-                <p className="text-[10px] text-stone-400">{t("result.skinAge")}</p>
+                <p className="text-xs text-stone-400">{t("result.skinAge")}</p>
                 <p className="text-[14px] font-bold mt-1" style={{ color: DEEP_GREEN }}>{latestScan.skinAge ?? "—"}</p>
               </div>
               <div className="rounded-2xl p-3" style={{ background: "#FFF7F3" }}>
-                <p className="text-[10px] text-stone-400">{t("result.baumannLabel")}</p>
+                <p className="text-xs text-stone-400">{t("result.baumannLabel")}</p>
                 <p className="text-[14px] font-bold mt-1" style={{ color: SCAN_TO }}>{latestScan.baumannType || "—"}</p>
               </div>
               <div className="rounded-2xl p-3" style={{ background: "#F7F4FB" }}>
-                <p className="text-[10px] text-stone-400">{t("my.focusTitle")}</p>
+                <p className="text-xs text-stone-400">{t("my.focusTitle")}</p>
                 <p className="text-[12px] font-bold mt-1 text-stone-800 line-clamp-2 text-kr-pretty">
                   {Array.isArray(latestScan.scores) && latestScan.scores.length > 1
                     ? [...latestScan.scores].slice(1).sort((a: any, b: any) => Number(a.score) - Number(b.score))[0]?.label || "—"
@@ -329,17 +329,17 @@ export function ScanIdleScreen({
             </div>
             <div className="flex flex-wrap gap-2 mt-3">
               {latestScoreDelta !== null && (
-                <span className="rounded-full px-2.5 py-1 text-[10px] font-bold" style={{ background: latestScoreDelta >= 0 ? "#E8F5EC" : "#FFF7ED", color: latestScoreDelta >= 0 ? "#2D7D46" : "#C2410C" }}>
+                <span className="rounded-full px-2.5 py-1 text-xs font-bold" style={{ background: latestScoreDelta >= 0 ? "#E8F5EC" : "#FFF7ED", color: latestScoreDelta >= 0 ? "#2D7D46" : "#C2410C" }}>
                   {latestScoreDelta >= 0 ? "+" : ""}{latestScoreDelta}{t("result.scoreSuffix")}
                 </span>
               )}
               {latestWeakMetric?.label && (
-                <span className="rounded-full px-2.5 py-1 text-[10px] font-bold" style={{ background: "#F7F4FB", color: "#6D4CC2" }}>
+                <span className="rounded-full px-2.5 py-1 text-xs font-bold" style={{ background: "#F7F4FB", color: "#6D4CC2" }}>
                   {t("idle.latestFocus", { concern: latestWeakMetric.label })}
                 </span>
               )}
               {daysSince !== null && (
-                <span className="rounded-full px-2.5 py-1 text-[10px] font-bold" style={{ background: "#F8FAFD", color: DEEP_GREEN }}>
+                <span className="rounded-full px-2.5 py-1 text-xs font-bold" style={{ background: "#F8FAFD", color: DEEP_GREEN }}>
                   {t("idle.latestRecency", { days: daysSince })}
                 </span>
               )}
@@ -359,7 +359,7 @@ export function ScanIdleScreen({
               </div>
               <div className="min-w-0">
                 <p className="text-[12px] font-bold text-stone-800 truncate">{t("attendance.calendarTitle")}</p>
-                <p className="text-[11px] text-stone-500 truncate">{t("attendance.totalPoints", { n: attendance.totalPoints })}</p>
+                <p className="text-xs text-stone-500 truncate">{t("attendance.totalPoints", { n: attendance.totalPoints })}</p>
               </div>
             </div>
             <ChevronRight className="w-4 h-4 text-stone-300 shrink-0" />
@@ -369,7 +369,7 @@ export function ScanIdleScreen({
               className="rounded-2xl px-3 py-2.5 flex flex-col justify-center min-w-[92px]"
               style={{ background: "#FFF7ED", boxShadow: "0 8px 20px rgba(217,119,6,0.08)" }}
             >
-              <div className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-[0.12em]" style={{ color: "#C2410C" }}>
+              <div className="flex items-center gap-1 text-xs font-bold uppercase tracking-[0.12em]" style={{ color: "#C2410C" }}>
                 <Flame className="w-3 h-3" />
                 streak
               </div>
@@ -389,7 +389,7 @@ export function ScanIdleScreen({
               <p className="text-sm font-bold text-stone-800">{t("idle.baumannSectionTitle")}</p>
             </div>
             <div className="flex items-center gap-1.5">
-              {!showBaumannExp && <span className="text-[10px] font-bold text-stone-400">O/D · S/R · P/N · W/T</span>}
+              {!showBaumannExp && <span className="text-xs font-bold text-stone-400">O/D · S/R · P/N · W/T</span>}
               <ChevronDown className={`w-4 h-4 text-stone-400 transition-transform duration-200 ${showBaumannExp ? "rotate-180" : ""}`} />
             </div>
           </button>
@@ -398,18 +398,18 @@ export function ScanIdleScreen({
               <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }}
                 exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.22 }}
                 className="overflow-hidden px-4 pb-4">
-                <p className="text-[11px] text-stone-500 mb-3 leading-relaxed">{t("idle.baumannSectionDesc")}</p>
+                <p className="text-xs text-stone-500 mb-3 leading-relaxed">{t("idle.baumannSectionDesc")}</p>
                 <div className="space-y-1.5 mb-3">
                   {(t("idle.baumannAxes", { returnObjects: true }) as any[]).map((ax: any, i: number) => (
                     <div key={i} className="flex items-center gap-3 p-2.5 rounded-xl bg-stone-50">
                       <p className="text-xs font-semibold text-stone-600 w-16 shrink-0">{ax.label}</p>
-                      <p className="text-[11px] text-stone-400">{ax.desc}</p>
+                      <p className="text-xs text-stone-400">{ax.desc}</p>
                     </div>
                   ))}
                 </div>
                 <div className="flex flex-wrap gap-1.5">
                   {(Object.entries(BAUMANN_COLORS) as [string, string][]).map(([letter, color]) => (
-                    <span key={letter} className="text-[10px] font-bold px-2.5 py-1 rounded-full border"
+                    <span key={letter} className="text-xs font-bold px-2.5 py-1 rounded-full border"
                       style={{ color, background: `${color}12`, borderColor: `${color}25` }}>
                       {letter} {t(`baumann.${letter}.name`)}
                     </span>
@@ -425,7 +425,7 @@ export function ScanIdleScreen({
       <motion.div variants={fadeChild} className="mb-4 relative" style={{ zIndex: 1 }}>
         <div className="bg-white rounded-2xl px-3 py-2.5"
           style={{ boxShadow: "0 2px 10px rgba(45,95,79,0.06)" }}>
-          <p className="text-[9px] font-semibold text-stone-400 text-center mb-2 tracking-widest uppercase">
+          <p className="text-xs font-semibold text-stone-400 text-center mb-2 tracking-widest uppercase">
             {t("idle.stepsTitle")}
           </p>
           <div className="flex items-start justify-between">
@@ -439,8 +439,8 @@ export function ScanIdleScreen({
                     <step.Icon className="w-4 h-4" style={{ color: step.active ? SCAN_TO : "#A9998E" }} />
                   </div>
                   <div className="text-center">
-                    <div className="text-[10px] font-semibold text-stone-700">{step.title}</div>
-                    <div className="text-[9px] text-stone-400 mt-0.5 leading-tight">{step.sub}</div>
+                    <div className="text-xs font-semibold text-stone-700">{step.title}</div>
+                    <div className="text-xs text-stone-400 mt-0.5 leading-tight">{step.sub}</div>
                   </div>
                 </div>
                 {i < 2 && <div className="text-stone-200 text-sm pt-2 flex-shrink-0">›</div>}
@@ -455,7 +455,7 @@ export function ScanIdleScreen({
         <div className="flex items-center justify-center gap-1.5 px-3.5 py-2.5 rounded-2xl"
           style={{ background: "#EEF7F3" }}>
           <Lock className="w-3.5 h-3.5 flex-shrink-0" style={{ color: DEEP_GREEN }} />
-          <span className="text-[11px] font-medium" style={{ color: DEEP_GREEN }}>{t("idle.privacy")}</span>
+          <span className="text-xs font-medium" style={{ color: DEEP_GREEN }}>{t("idle.privacy")}</span>
         </div>
       </motion.div>
 
@@ -478,18 +478,18 @@ export function ScanIdleScreen({
         >
           {t("idle.ctaBtn")}
         </motion.button>
-        <p className="text-center text-[11px] mt-2.5" style={{ color: TEXT_SECONDARY }}>
+        <p className="text-center text-xs mt-2.5" style={{ color: TEXT_SECONDARY }}>
           <Sparkles className="w-3 h-3 inline mr-1" style={{ color: SCAN_FROM }} />
           {t("idle.ctaHint")}
         </p>
       </motion.div>
 
       <div className="text-center pt-4 pb-4 relative" style={{ zIndex: 1 }}>
-        <a href="/privacy.html" className="text-[10px] underline" style={{ color: TEXT_SECONDARY }}>
+        <a href="/privacy.html" className="text-xs underline" style={{ color: TEXT_SECONDARY }}>
           {t("idle.privacyLink")}
         </a>
-        <span className="text-[10px] text-stone-200 mx-2">·</span>
-        <a href="/terms.html" className="text-[10px] underline" style={{ color: TEXT_SECONDARY }}>
+        <span className="text-xs text-stone-200 mx-2">·</span>
+        <a href="/terms.html" className="text-xs underline" style={{ color: TEXT_SECONDARY }}>
           {t("idle.termsLink")}
         </a>
       </div>

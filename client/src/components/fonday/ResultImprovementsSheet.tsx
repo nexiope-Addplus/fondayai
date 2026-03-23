@@ -47,7 +47,7 @@ export function ResultImprovementsSheet({
                   </div>
                   <div>
                     <h3 className="font-bold text-base" style={{ color: DEEP_GREEN }}>{t("modal.improvements.title")}</h3>
-                    <p className="text-[11px] text-stone-400">{t("modal.improvements.sub")}</p>
+                    <p className="text-xs text-stone-400">{t("modal.improvements.sub")}</p>
                   </div>
                 </div>
                 <button onClick={onClose} className="w-7 h-7 rounded-full bg-stone-100 flex items-center justify-center">
@@ -73,7 +73,7 @@ export function ResultImprovementsSheet({
                       >
                         {index + 1}
                       </div>
-                      <p className="text-[9px] font-semibold text-center mt-0.5" style={{ color: index === 0 ? SCAN_TO : index === 1 ? DEEP_GREEN : "#7C3AED" }}>
+                      <p className="text-xs font-semibold text-center mt-0.5" style={{ color: index === 0 ? SCAN_TO : index === 1 ? DEEP_GREEN : "#7C3AED" }}>
                         STEP
                       </p>
                     </div>
@@ -108,7 +108,7 @@ export function ResultImprovementsSheet({
                         <div>
                           <div className="flex items-center gap-1.5 mb-0.5">
                             <span className="text-sm font-bold text-stone-800">{item.type}</span>
-                            <span className="text-[10px] px-1.5 py-0.5 rounded-full font-medium" style={{ background: "#FFFFFF", color: "#D97706" }}>
+                            <span className="text-xs px-1.5 py-0.5 rounded-full font-medium" style={{ background: "#FFFFFF", color: "#D97706" }}>
                               {item.key}
                             </span>
                           </div>

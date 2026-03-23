@@ -128,7 +128,7 @@ function AdBanner({ slot }: { slot: string }) {
   return (
     <div className="w-full overflow-hidden my-2">
       {/* 광고 레이블 - AdSense 정책 준수 (광고임을 명시) */}
-      <p className="text-[10px] text-center text-stone-300 mb-1 tracking-widest uppercase font-medium">광고</p>
+      <p className="text-xs text-center text-stone-300 mb-1 tracking-widest uppercase font-medium">광고</p>
       <ins
         className="adsbygoogle"
         style={{ display: "block" }}

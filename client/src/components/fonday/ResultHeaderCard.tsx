@@ -1,6 +1,28 @@
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from "framer-motion";
+
+// ─── 카운트업 숫자 컴포넌트 ───────────────────────────────────────
+function CountUp({ value, className, style }: { value: number; className?: string; style?: React.CSSProperties }) {
+  const motionVal = useMotionValue(0);
+  const spring = useSpring(motionVal, { stiffness: 60, damping: 18, mass: 0.8 });
+  const display = useTransform(spring, (v) => Math.round(v));
+  const [displayed, setDisplayed] = useState(0);
+  const started = useRef(false);
+
+  useEffect(() => {
+    if (!started.current) {
+      started.current = true;
+      motionVal.set(value);
+    }
+  }, [value, motionVal]);
+
+  useEffect(() => {
+    return display.on("change", (v) => setDisplayed(v));
+  }, [display]);
+
+  return <span className={className} style={style}>{displayed}</span>;
+}
 import { Flame, Microscope } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import type { AnalysisResult, RankingData, StreakData } from "./types";
@@ -62,7 +84,7 @@ export function ResultHeaderCard({
             </div>
             <div className="mt-2 rounded-2xl px-2.5 py-2 text-center"
               style={{ background: TINT_WARM }}>
-              <p className="text-[8px] font-black uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>{t("result.baumannLabel")}</p>
+              <p className="text-xs font-black uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>{t("result.baumannLabel")}</p>
               <p className="text-lg font-bold leading-none mt-1" style={{ color: SCAN_TO }}>{finalType}</p>
             </div>
           </div>
@@ -71,16 +93,16 @@ export function ResultHeaderCard({
             <div className="rounded-3xl px-2.5 py-2.5 mb-2.5 sm:rounded-3xl sm:px-3"
               style={{ background: `${SCAN_FROM}10`, border: `1px solid ${SCAN_FROM}24` }}>
               <div className="flex items-center justify-between gap-2">
-                <p className="text-[10px] font-bold uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>{t("result.scores")}</p>
+                <p className="text-xs font-bold uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>{t("result.scores")}</p>
                 <button
                   onClick={() => setShowAnalysis(true)}
-                  className="rounded-full px-2.5 py-1 text-[9px] font-bold whitespace-nowrap"
+                  className="rounded-full px-2.5 py-1 text-xs font-bold whitespace-nowrap"
                   style={{ background: TINT_WARM, color: SCAN_TO }}
                 >
                   {t("modal.analysis.title")} {t("result.viewBtn")}
                 </button>
               </div>
-              <p className="text-[11px] text-stone-500 mt-2 leading-relaxed text-kr-pretty">
+              <p className="text-xs text-stone-500 mt-2 leading-relaxed text-kr-pretty">
                 {scoreDelta !== null
                   ? scoreDelta > 0
                     ? `${t("result.overall")} +${scoreDelta}`
@@ -102,20 +124,24 @@ export function ResultHeaderCard({
           <div className="col-span-2 rounded-2xl px-4 py-3.5" style={{ background: TINT_WARM }}>
             <div className="min-w-0 flex items-end justify-center gap-2">
               <p className="text-[15px] font-bold tracking-[-0.01em] text-stone-600">{t("result.overall")} :</p>
-              <p className="text-[36px] font-black leading-none" style={{ color: SCAN_TO }}>{overallScore}{t("result.scoreSuffix")}</p>
+              <p className="text-[36px] font-black leading-none" style={{ color: SCAN_TO }}>
+                <CountUp value={overallScore} />{t("result.scoreSuffix")}
+              </p>
             </div>
-            <p className="text-[11px] text-stone-600 mt-1.5 leading-snug text-kr-pretty text-center">
+            <p className="text-xs text-stone-600 mt-1.5 leading-snug text-kr-pretty text-center">
               {weakestSummary || t("result.actionCard.phaseRecord")}
             </p>
           </div>
           <div className="rounded-2xl px-3 py-3 flex flex-col items-center justify-center text-center min-w-0" style={{ background: "#F7F3FF", border: "1px solid #E9DDFF" }}>
-            <p className="text-[10px] font-bold uppercase tracking-[0.08em] text-stone-400 text-center">{t("result.skinAge")}</p>
+            <p className="text-xs font-bold uppercase tracking-[0.08em] text-stone-400 text-center">{t("result.skinAge")}</p>
             <p className="text-[27px] font-bold leading-none mt-1.5" style={{ color: "#7C3AED" }}>
-              {analysisResult?.skinAge && analysisResult.skinAge > 0 ? analysisResult.skinAge : "—"}
+              {analysisResult?.skinAge && analysisResult.skinAge > 0
+                ? <CountUp value={analysisResult.skinAge} />
+                : "—"}
             </p>
           </div>
           <div className="rounded-2xl px-3 py-3 flex flex-col items-center justify-center text-center min-w-0" style={{ background: "#FFF8EE", border: "1px solid #F4E2C4" }}>
-            <p className="text-[10px] font-bold uppercase tracking-[0.08em] text-stone-400 text-center">{t("ranking.topLabel")}</p>
+            <p className="text-xs font-bold uppercase tracking-[0.08em] text-stone-400 text-center">{t("ranking.topLabel")}</p>
             <p className="text-[21px] font-bold leading-none mt-1.5 break-keep text-center" style={{ color: "#D97706" }}>
               {rankingData && rankingData.myPercentile !== undefined ? t("ranking.myPercentile", { percent: rankingData.myPercentile }) : "—"}
             </p>
@@ -130,19 +156,19 @@ export function ResultHeaderCard({
                 <Microscope className="w-5 h-5" style={{ color: SCAN_TO }} />
               </div>
               <div className="min-w-0">
-                <p className="text-[10px] font-bold uppercase tracking-[0.16em]" style={{ color: SCAN_TO }}>{t("result.baumannLabel")}</p>
+                <p className="text-xs font-bold uppercase tracking-[0.16em]" style={{ color: SCAN_TO }}>{t("result.baumannLabel")}</p>
                 <div className="flex items-center gap-2 mt-1 flex-wrap">
                   <p className="text-lg font-bold leading-none" style={{ color: DEEP_GREEN }}>{finalType}</p>
                   <button onClick={() => setShowBaumannInfo(v => !v)}
-                    className="text-[10px] font-bold px-2.5 py-1 rounded-full transition-all"
+                    className="text-xs font-bold px-2.5 py-1 rounded-full transition-all"
                     style={{ background: TINT_WARM, color: SCAN_TO }}>
                     {showBaumannInfo ? t("result.baumannFold") : t("result.baumannExpand")}
                   </button>
                 </div>
-                <p className="text-[11px] font-medium mt-1 text-stone-500 text-kr-pretty">{t("result.mbtiSub")}</p>
+                <p className="text-xs font-medium mt-1 text-stone-500 text-kr-pretty">{t("result.mbtiSub")}</p>
               </div>
             </div>
-            <div className="rounded-full px-3 py-1 text-[10px] font-bold shrink-0 flex items-center gap-0.5"
+            <div className="rounded-full px-3 py-1 text-xs font-bold shrink-0 flex items-center gap-0.5"
               style={{ background: TINT_GREEN, color: DEEP_GREEN }}>
               <Flame className="w-3 h-3" style={{ color: SCAN_TO }} />{t("streak.badge", { count: currentStreak.count || 1 })}
             </div>
@@ -152,7 +178,7 @@ export function ResultHeaderCard({
               const color = BAUMANN_COLORS[letter];
               if (!color) return null;
               return (
-                <span key={i} className="text-[10px] font-bold px-2.5 py-1 rounded-full border"
+                <span key={i} className="text-xs font-bold px-2.5 py-1 rounded-full border"
                   style={{ color, background: `${color}12`, borderColor: `${color}22` }}>
                   {t(`baumann.${letter}.name`)}
                 </span>
@@ -170,7 +196,7 @@ export function ResultHeaderCard({
                     <div key={letter} className="rounded-2xl p-2.5"
                       style={{ background: `${color}10`, border: `1px solid ${color}20` }}>
                       <p className="text-xs font-semibold" style={{ color }}>{letter} — {t(`baumann.${letter}.name`)}</p>
-                      <p className="text-[10px] text-stone-500 mt-0.5 leading-relaxed">{t(`baumann.${letter}.desc`)}</p>
+                      <p className="text-xs text-stone-500 mt-0.5 leading-relaxed">{t(`baumann.${letter}.desc`)}</p>
                     </div>
                   );
                 })}
@@ -183,11 +209,11 @@ export function ResultHeaderCard({
               className="mt-3 block w-full rounded-2xl px-3 py-2.5 text-left"
               style={{ background: "#FFFFFF", border: "1px solid #F0E2DA" }}
             >
-              <p className="text-[10px] font-bold uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>{t("result.aiComment")}</p>
-              <p className="text-[11px] text-stone-600 mt-1 leading-relaxed text-kr-pretty line-clamp-2">
+              <p className="text-xs font-bold uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>{t("result.aiComment")}</p>
+              <p className="text-xs text-stone-600 mt-1 leading-relaxed text-kr-pretty line-clamp-2">
                 {analysisResult.aiComment}
               </p>
-              <p className="text-[10px] font-bold mt-2" style={{ color: SCAN_TO }}>{t("modal.analysis.title")} {t("result.viewBtn")}</p>
+              <p className="text-xs font-bold mt-2" style={{ color: SCAN_TO }}>{t("modal.analysis.title")} {t("result.viewBtn")}</p>
             </button>
           )}
         </div>

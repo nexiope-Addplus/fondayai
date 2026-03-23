@@ -15,7 +15,7 @@ export function LangSwitcher() {
         <button
           key={lang}
           onClick={() => i18nHook.changeLanguage(lang.toLowerCase())}
-          className="text-[11px] font-bold px-1.5 py-0.5 rounded-full transition-all"
+          className="text-xs font-bold px-3 py-1.5 rounded-full transition-all"
           style={current === lang ? { color: SCAN_TO } : { color: "#B0A898" }}
         >
           {lang}
@@ -33,16 +33,28 @@ export function BottomNav({ active, onChange, scanState }: {
 }) {
   const { t } = useTranslation();
   if (scanState === "survey" || scanState === "scanning") return null;
-  const btn = (tab: TabId, icon: React.ReactNode, label: string) => (
-    <button
-      onClick={() => onChange(tab)}
-      className={`flex flex-col items-center justify-center gap-0.5 transition-colors ${active === tab ? "text-[#C97062]" : "text-stone-400"}`}>
-      {icon}
-      <span className="text-[10px] font-semibold">{label}</span>
-    </button>
-  );
+  const btn = (tab: TabId, icon: React.ReactNode, label: string) => {
+    const isActive = active === tab;
+    return (
+      <button
+        key={tab}
+        onClick={() => onChange(tab)}
+        aria-current={isActive ? "page" : undefined}
+        className={`relative flex flex-col items-center justify-center gap-0.5 transition-colors ${isActive ? "text-[#C97062]" : "text-stone-400"}`}
+      >
+        {icon}
+        <span className="text-[10px] font-semibold leading-none">{label}</span>
+        {isActive && (
+          <span className="absolute bottom-1.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-[#C97062]" />
+        )}
+      </button>
+    );
+  };
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-2xl border-t border-stone-100">
+    <nav
+      className="fixed bottom-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-2xl border-t border-stone-100"
+      style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
+    >
       <div className="max-w-md mx-auto px-2">
         <div className="grid grid-cols-5 h-[64px]">
           {btn("scan", <House className="w-5 h-5" />, t("nav.scan"))}

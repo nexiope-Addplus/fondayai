@@ -14,8 +14,8 @@ export function ResultNutritionTab({ analysisResult }: any) {
                 <Utensils className="w-4 h-4" style={{ color: "#7C3AED" }} />
               </div>
               <div>
-                <p className="text-[10px] font-bold uppercase tracking-[0.14em]" style={{ color: "#7C3AED" }}>{t("nutrients.supplementsTitle")}</p>
-                <p className="text-[11px] text-stone-400">{t("nutrients.supplementsSub")}</p>
+                <p className="text-xs font-bold uppercase tracking-[0.14em]" style={{ color: "#7C3AED" }}>{t("nutrients.supplementsTitle")}</p>
+                <p className="text-xs text-stone-400">{t("nutrients.supplementsSub")}</p>
               </div>
             </div>
 
@@ -39,13 +39,13 @@ export function ResultNutritionTab({ analysisResult }: any) {
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-0.5 flex-wrap">
                           <p className="text-sm font-bold text-stone-800">{item.name}</p>
-                          <span className="text-[9px] font-medium rounded-full px-2 py-0.5 shrink-0"
+                          <span className="text-xs font-medium rounded-full px-2 py-0.5 shrink-0"
                             style={{ background: "#FFFFFF", color: "#7C3AED" }}>
                             {SCORE_LABEL_MAP[item.targetScore] !== undefined ? t(`scores.${SCORE_LABEL_MAP[item.targetScore]}`) : item.targetScore}
                           </span>
                         </div>
-                        <p className="text-[10px] font-semibold mb-0.5 flex items-center gap-0.5" style={{ color: "#7C3AED" }}><Pill className="w-3 h-3 inline mr-0.5" /> {item.dose}</p>
-                        <p className="text-[11px] text-stone-500 leading-relaxed">{item.reason}</p>
+                        <p className="text-xs font-semibold mb-0.5 flex items-center gap-0.5" style={{ color: "#7C3AED" }}><Pill className="w-3 h-3 inline mr-0.5" /> {item.dose}</p>
+                        <p className="text-xs text-stone-500 leading-relaxed">{item.reason}</p>
                       </div>
                     </motion.div>
                   ))}
@@ -59,7 +59,7 @@ export function ResultNutritionTab({ analysisResult }: any) {
                       <span className="text-xl">💧</span>
                     </div>
                     <div>
-                      <p className="text-[10px] font-semibold text-blue-600 mb-0.5">{t("nutrients.hydrationLabel")}</p>
+                      <p className="text-xs font-semibold text-blue-600 mb-0.5">{t("nutrients.hydrationLabel")}</p>
                       <p className="text-[12px] text-stone-600 leading-relaxed">{analysisResult.nutritionTips.hydrationGoal}</p>
                     </div>
                   </div>
@@ -71,7 +71,7 @@ export function ResultNutritionTab({ analysisResult }: any) {
                     <div className="w-9 h-9 rounded-2xl flex items-center justify-center" style={{ background: "#FFF7ED" }}>
                       <AlertCircle className="w-4 h-4 text-amber-500 shrink-0" />
                     </div>
-                    <p className="text-[10px] font-bold uppercase tracking-[0.14em]" style={{ color: "#D97706" }}>{t("nutrients.avoidTitle")}</p>
+                    <p className="text-xs font-bold uppercase tracking-[0.14em]" style={{ color: "#D97706" }}>{t("nutrients.avoidTitle")}</p>
                   </div>
                   <div className="space-y-3">
                     {analysisResult.nutritionTips.avoidFoods.map((item: { emoji: string; food: string; reason: string }, idx: number) => (
@@ -82,7 +82,7 @@ export function ResultNutritionTab({ analysisResult }: any) {
                         </div>
                         <div className="flex-1 min-w-0">
                           <p className="text-[12px] font-bold text-stone-700 mb-0.5">{item.food}</p>
-                          <p className="text-[11px] text-stone-400">{item.reason}</p>
+                          <p className="text-xs text-stone-400">{item.reason}</p>
                         </div>
                       </div>
                     ))}

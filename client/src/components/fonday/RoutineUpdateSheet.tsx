@@ -24,25 +24,25 @@ export function RoutineUpdateSheet({ open, onClose, morningRoutineItems, evening
               <div className="mt-5 rounded-3xl p-4" style={{ background: TINT_NEUTRAL }}>
                 <div className="grid grid-cols-2 gap-2.5">
                   <div className="rounded-2xl p-3" style={{ background: "#FFFFFF", border: "1px solid #DCE9E4" }}>
-                    <p className="text-[10px] font-bold uppercase tracking-[0.14em]" style={{ color: DEEP_GREEN }}>{t("cosmetics.amBtn")}</p>
+                    <p className="text-xs font-bold uppercase tracking-[0.14em]" style={{ color: DEEP_GREEN }}>{t("cosmetics.amBtn")}</p>
                     <div className="mt-2 space-y-1.5">
                       {morningRoutineItems.map((item: any, index: number) => (
                         <div key={`suggest-am-${index}`} className="flex items-center gap-2">
-                          <span className="w-5 h-5 rounded-full flex items-center justify-center text-[9px] font-bold text-white shrink-0"
+                          <span className="w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold text-white shrink-0"
                             style={{ background: DEEP_GREEN }}>{index + 1}</span>
-                          <p className="text-[11px] font-semibold text-stone-700 leading-tight text-kr-pretty">{item}</p>
+                          <p className="text-xs font-semibold text-stone-700 leading-tight text-kr-pretty">{item}</p>
                         </div>
                       ))}
                     </div>
                   </div>
                   <div className="rounded-2xl p-3" style={{ background: "#FFFFFF", border: "1px solid #F2DED6" }}>
-                    <p className="text-[10px] font-bold uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>{t("cosmetics.pmBtn")}</p>
+                    <p className="text-xs font-bold uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>{t("cosmetics.pmBtn")}</p>
                     <div className="mt-2 space-y-1.5">
                       {eveningRoutineItems.map((item: any, index: number) => (
                         <div key={`suggest-pm-${index}`} className="flex items-center gap-2">
-                          <span className="w-5 h-5 rounded-full flex items-center justify-center text-[9px] font-bold text-white shrink-0"
+                          <span className="w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold text-white shrink-0"
                             style={{ background: SCAN_TO }}>{index + 1}</span>
-                          <p className="text-[11px] font-semibold text-stone-700 leading-tight text-kr-pretty">{item}</p>
+                          <p className="text-xs font-semibold text-stone-700 leading-tight text-kr-pretty">{item}</p>
                         </div>
                       ))}
                     </div>
