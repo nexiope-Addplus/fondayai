@@ -20,7 +20,7 @@ export function SurveyScreen({ onSubmit, onBack }: {
   const toggleConcern = (i: number) => setConcernIdxs(prev => prev.includes(i) ? prev.filter(x => x !== i) : [...prev, i]);
 
   return (
-    <motion.div className="flex flex-col h-[calc(100dvh-60px)]" variants={stagger} initial="initial" animate="animate">
+    <motion.div className="flex flex-col h-[calc(100dvh-64px)]" variants={stagger} initial="initial" animate="animate">
       <motion.div variants={fadeChild} className="px-6 pt-8 pb-2 shrink-0">
         <div className="flex items-center gap-2 mb-1">
           <Button variant="ghost" size="icon" onClick={onBack} className="-ml-2">
@@ -31,7 +31,7 @@ export function SurveyScreen({ onSubmit, onBack }: {
         <p className="text-[13px] text-muted-foreground ml-10">{t("survey.subtitle")}</p>
       </motion.div>
 
-      <div className="flex-1 overflow-y-auto overscroll-contain px-6">
+      <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain px-6">
         <div className="space-y-8 pb-4">
           <div className="space-y-3">
             <label className="text-[12px] font-bold ml-1 uppercase tracking-wider" style={{ color: DEEP_GREEN_LIGHT }}>{t("survey.gender")}</label>
@@ -71,7 +71,7 @@ export function SurveyScreen({ onSubmit, onBack }: {
         </div>
       </div>
 
-      <motion.div variants={fadeChild} className="px-6 py-4 shrink-0 bg-white border-t border-stone-100">
+      <motion.div variants={fadeChild} className="px-6 py-4 shrink-0 bg-white border-t border-stone-100" style={{ zIndex: 10 }}>
         <Button onClick={() => onSubmit({
           gender: genderIdx === 0 ? t("survey.female") : t("survey.male"),
           age: ageGroups[ageIdx],

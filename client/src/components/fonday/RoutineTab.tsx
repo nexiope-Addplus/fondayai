@@ -258,21 +258,12 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
   return (
     <div className="min-h-[calc(100dvh-64px)] px-5 pt-5 pb-28" style={{ background: "#F8F5F2" }}>
       <div className="rounded-3xl p-5 bg-white" style={{ boxShadow: "0 10px 28px rgba(45,95,79,0.08)" }}>
-        <div className="flex items-start justify-between gap-3">
-          <div>
-            <p className="text-xs font-bold tracking-widest uppercase mb-1" style={{ color: SCAN_TO }}>{t("nav.routine")}</p>
-            <h1 className="text-2xl font-bold" style={{ color: DEEP_GREEN }}>{t("cosmetics.myTitle")}</h1>
-            <p className="text-[12px] text-stone-500 mt-1 text-kr-pretty">
-              {t("cosmetics.routineSubtitle")}
-            </p>
-          </div>
-          <button
-            onClick={() => setShowRegister(true)}
-            className="w-11 h-11 rounded-2xl flex items-center justify-center shrink-0"
-            style={{ background: `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})` }}
-          >
-            <Plus className="w-5 h-5 text-white" />
-          </button>
+        <div>
+          <p className="text-xs font-bold tracking-widest uppercase mb-1" style={{ color: SCAN_TO }}>{t("nav.routine")}</p>
+          <h1 className="text-2xl font-bold" style={{ color: DEEP_GREEN }}>{t("cosmetics.myTitle")}</h1>
+          <p className="text-[12px] text-stone-500 mt-1 text-kr-pretty">
+            {t("cosmetics.routineSubtitle")}
+          </p>
         </div>
 
         <div className="grid grid-cols-2 gap-3 mt-4">
@@ -430,19 +421,19 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
 
             {productSignals.length > 0 && (
               <div className="rounded-[28px] border p-4 bg-white" style={{ borderColor: "#F1E9E1", boxShadow: "0 10px 24px rgba(45,95,79,0.05)" }}>
-                <div className="flex items-center justify-between gap-3 mb-3">
-                  <div>
+                <div className="flex items-start justify-between gap-2 mb-3">
+                  <div className="min-w-0">
                     <p className="text-[15px] font-bold" style={{ color: DEEP_GREEN }}>{t("cosmetics.signalSectionTitle")}</p>
-                    <p className="text-xs text-stone-400">{t("cosmetics.signalSectionDesc")}</p>
+                    <p className="text-xs text-stone-400 mt-0.5">{t("cosmetics.signalSectionDesc")}</p>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <span className="px-2.5 py-1 rounded-full text-xs font-bold" style={{ background: "#EEF4FF", color: "#4A7C6E" }}>
+                  <div className="flex flex-col items-end gap-1.5 shrink-0">
+                    <span className="px-2.5 py-1 rounded-full text-xs font-bold whitespace-nowrap" style={{ background: "#EEF4FF", color: "#4A7C6E" }}>
                       {t("cosmetics.signalWindow")}
                     </span>
                     {productSignals.length > 3 && (
                       <button
                         onClick={() => setShowAllSignals((v) => !v)}
-                        className="px-2.5 py-1 rounded-full text-xs font-bold cursor-pointer"
+                        className="px-2.5 py-1 rounded-full text-xs font-bold cursor-pointer whitespace-nowrap"
                         style={{ background: TINT_WARM, color: SCAN_TO }}
                       >
                         {showAllSignals ? t("common.collapse") : t("common.viewAll", { count: productSignals.length })}
