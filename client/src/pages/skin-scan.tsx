@@ -193,30 +193,31 @@ export default function SkinScanPage() {
 
   // 날씨 정보 중앙 관리 (Care Manager 기초 데이터)
   useEffect(() => {
-    const fetchWeather = (lat: number, lon: number) => {
-      fetch(`/api/weather?lat=${lat}&lon=${lon}`)
-        .then(res => res.ok ? res.json() : null)
-        .then(data => {
-          if (data && !data.error) {
-            setWeatherData(data);
-          } else {
-            console.warn("[Weather] API error, using default data");
-          }
-        })
-        .catch(err => console.error("[Weather] Fetch failed:", err));
+    const fetchWeather = async (lat: number, lon: number) => {
+      try {
+        const res = await fetch(`/api/weather?lat=${lat}&lon=${lon}`);
+        if (!res.ok) throw new Error("Weather API failed");
+        const data = await res.json();
+        if (data && !data.error) setWeatherData(data);
+      } catch (err) {
+        console.error("[Weather] Fetch error:", err);
+      }
     };
 
-    if (navigator.geolocation) {
+    // 위치 정보 요청 (브라우저 팝업 트리거)
+    if ("geolocation" in navigator) {
       navigator.geolocation.getCurrentPosition(
-        (pos) => fetchWeather(pos.coords.latitude, pos.coords.longitude),
-        (err) => {
-          console.warn("[Weather] Geolocation denied/failed:", err.message);
-          fetchWeather(37.5665, 126.9780); // Fallback: Seoul
+        (pos) => {
+          fetchWeather(pos.coords.latitude, pos.coords.longitude);
         },
-        { timeout: 5000 }
+        (err) => {
+          console.warn("[Weather] Geolocation error, using fallback:", err.message);
+          fetchWeather(37.5665, 126.9780); // 서울
+        },
+        { timeout: 7000, enableHighAccuracy: false }
       );
     } else {
-      fetchWeather(37.5665, 126.9780); // Fallback: Seoul
+      fetchWeather(37.5665, 126.9780); // 서울
     }
   }, []);
 

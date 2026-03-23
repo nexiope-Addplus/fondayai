@@ -315,10 +315,10 @@ export function ResultScreen({ weather, surveyData, analysisResult, imageSrc, fa
   // 스캔 저장 (로그인 + 분석결과 둘 다 준비됐을 때)
   useEffect(() => {
     if (!user || !analysisResult || !analysisResult.scores || isSaved) return;
-    const overallScore = analysisResult.scores[0]?.score || 0;
     
-    // weatherInfo는 있어도 되고 없어도 되지만, 객체 구조는 유지하도록 방어
-    const safeWeather = weather && typeof weather === 'object' ? weather : null;
+    // weather 데이터가 객체인지, 필요한 속성이 있는지 2중 체크
+    const hasWeatherData = weather && typeof weather === 'object' && 'temp' in weather;
+    const overallScore = analysisResult.scores[0]?.score || 0;
 
     fetch("/api/scans", {
       method: "POST",
@@ -332,7 +332,7 @@ export function ResultScreen({ weather, surveyData, analysisResult, imageSrc, fa
         aiComment: analysisResult.aiComment,
         improvements: analysisResult.improvements ?? [],
         cosmetics: analysisResult.cosmetics ?? [],
-        weatherInfo: safeWeather,
+        weatherInfo: hasWeatherData ? weather : null,
         lang: i18n.language || "ko",
         gender: (surveyData?.genderIdx ?? 0) === 0 ? "female" : "male",
         ageGroup: ["10대","20대 초반","20대 후반","30대 초반","30대 후반","40대 초반","40대 후반","50대+"][surveyData?.ageIdx ?? 2] ?? "",
@@ -352,14 +352,14 @@ export function ResultScreen({ weather, surveyData, analysisResult, imageSrc, fa
           scores: analysisResult.scores,
           skinAge: analysisResult.skinAge,
           aiComment: analysisResult.aiComment,
-          weatherInfo: safeWeather,
+          weatherInfo: hasWeatherData ? weather : null,
           lang: i18n.language || "ko",
           isGuest: false,
           gender: (surveyData?.genderIdx ?? 0) === 0 ? "female" : "male",
           ageGroup: KO_AGE_GROUPS2[surveyData?.ageIdx ?? 2] ?? "",
         }),
       }).catch(() => {});
-    }).catch(() => {}); 
+    }).catch(err => console.error("[Scan Save] Error:", err)); 
   }, [user, analysisResult, weather, isSaved, finalType, surveyData]);
 
   // 모달 열릴 때 배경 스크롤 잠금

@@ -59,12 +59,15 @@ export function ScanIdleScreen({
 
   // 케어 브리핑 로드
   useEffect(() => {
-    if (!weather || typeof weather.temp === 'undefined') return;
-    const { temp, humidity, aqi = "" } = weather;
+    if (!weather || typeof weather.temp === 'undefined' || weather.temp === null) return;
+    const temp = weather.temp;
+    const humidity = weather.humidity ?? "";
+    const aqi = weather.aqi ?? "";
+    
     fetch(`/api/care-briefing?temp=${temp}&humidity=${humidity}&aqi=${aqi}`)
       .then(res => res.ok ? res.json() : null)
       .then(data => { if (data && data.briefing) setCareBriefing(data); })
-      .catch(() => {});
+      .catch(err => console.error("[Care Briefing] Fetch error:", err));
   }, [weather]);
 
   const handleTouchStart = (e: React.TouchEvent) => {
