@@ -30,14 +30,19 @@ export function ResultActionBar({
       <Button
         onClick={onShare}
         disabled={shareLoading}
+        aria-label={shareLoading ? t("common.loading") : t("result.share")}
+        aria-busy={shareLoading}
         className="flex-1 h-12 rounded-2xl font-semibold flex items-center justify-center gap-1.5 border"
         style={{ background: "#FFFFFF", color: DEEP_GREEN, borderColor: "#D6E7DF" }}
       >
         {shareLoading ? (
-          <div className="w-4 h-4 border-2 border-stone-300 border-t-stone-600 rounded-full animate-spin" />
+          <>
+            <div className="w-4 h-4 border-2 border-stone-300 border-t-stone-600 rounded-full animate-spin" aria-hidden="true" />
+            <span className="sr-only">{t("common.loading")}</span>
+          </>
         ) : (
           <>
-            <Share2 className="w-4 h-4" />
+            <Share2 className="w-4 h-4" aria-hidden="true" />
             <span className="text-[12px]">{t("result.share")}</span>
           </>
         )}
@@ -49,7 +54,7 @@ export function ResultActionBar({
           className="flex-1 h-12 rounded-2xl font-semibold flex items-center justify-center gap-1.5 border"
           style={{ background: "#FFFFFF", color: "#7C3AED", borderColor: "#E9DDFF" }}
         >
-          <Trophy className="w-4 h-4" />
+          <Trophy className="w-4 h-4" aria-hidden="true" />
           <span className="text-[12px]">{t("result.challengeResult")}</span>
         </Button>
       ) : (
@@ -63,7 +68,7 @@ export function ResultActionBar({
           disabled={!currentShareToken}
           onClick={onCreateChallenge}
         >
-          <Crown className="w-4 h-4" />
+          <Crown className="w-4 h-4" aria-hidden="true" />
           <span className="text-[12px]">{t("result.challengeShort")}</span>
         </Button>
       )}

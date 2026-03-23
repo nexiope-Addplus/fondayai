@@ -107,7 +107,9 @@
     "selectPhoto": "사진 선택하기",
     "cancel": "취소",
     "guide1": "얼굴을 타원 안에 맞춰주세요",
-    "guide2": "정면을 바라보고 자연광에서 촬영하면 좋아요"
+    "guide2": "정면을 바라보고 자연광에서 촬영하면 좋아요",
+    "preview": "카메라 미리보기",
+    "capture": "사진 촬영"
   },
   "survey": {
     "title": "피부 분석 기초 정보",
@@ -1240,6 +1242,9 @@
   },
   "common": {
     "viewAll": "전체보기 {{count}}개",
-    "collapse": "접기"
+    "collapse": "접기",
+    "close": "닫기",
+    "refresh": "새로고침",
+    "loading": "불러오는 중"
   }
 }

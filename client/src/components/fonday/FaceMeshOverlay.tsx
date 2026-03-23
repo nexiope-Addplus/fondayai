@@ -107,6 +107,8 @@ export function FaceMeshOverlay({ imageSrc }: { imageSrc: string }) {
   return (
     <canvas
       ref={canvasRef}
+      role="img"
+      aria-label="Face mesh analysis overlay"
       className="absolute inset-0 w-full h-full pointer-events-none"
       style={{ opacity: visible ? 1 : 0, transition: 'opacity 0.6s ease' }}
     />

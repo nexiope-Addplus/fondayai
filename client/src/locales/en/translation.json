@@ -107,7 +107,9 @@
     "selectPhoto": "Select Photo",
     "cancel": "Cancel",
     "guide1": "Align your face inside the oval",
-    "guide2": "Face forward in natural light for best results"
+    "guide2": "Face forward in natural light for best results",
+    "preview": "Camera preview",
+    "capture": "Take photo"
   },
   "survey": {
     "title": "Skin Profile",
@@ -1240,6 +1242,9 @@
   },
   "common": {
     "viewAll": "View all {{count}}",
+    "close": "Close",
+    "refresh": "Refresh",
+    "loading": "Loading",
     "collapse": "Collapse"
   }
 }

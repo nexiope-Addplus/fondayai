@@ -96,6 +96,7 @@ export function CameraCapture({ onCapture, onClose }: {
           autoPlay
           playsInline
           muted
+          aria-label={t("camera.preview")}
           className="absolute inset-0 w-full h-full object-cover"
           style={{ transform: "scaleX(-1)" }}
         />
@@ -130,7 +131,7 @@ export function CameraCapture({ onCapture, onClose }: {
         </div>
 
         {/* 닫기 버튼 */}
-        <button onClick={onClose} className="absolute top-4 right-4 w-10 h-10 rounded-full bg-black/40 backdrop-blur flex items-center justify-center">
+        <button onClick={onClose} aria-label={t("common.close")} className="absolute top-4 right-4 w-10 h-10 rounded-full bg-black/40 backdrop-blur flex items-center justify-center">
           <X className="w-5 h-5 text-white" />
         </button>
       </div>
@@ -140,6 +141,7 @@ export function CameraCapture({ onCapture, onClose }: {
         <motion.button
           onClick={capture}
           disabled={!ready}
+          aria-label={t("camera.capture")}
           className="w-20 h-20 rounded-full bg-white flex items-center justify-center shadow-2xl disabled:opacity-30"
           whileTap={{ scale: 0.88 }}
         >

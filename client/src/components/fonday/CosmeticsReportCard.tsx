@@ -300,13 +300,14 @@ export function CosmeticsReportCard({
                   setGrades([]);
                   doFetch();
                 }}
+                aria-label={t("common.refresh")}
                 className="w-8 h-8 rounded-full flex items-center justify-center"
                 style={{ background: TINT_WARM }}
               >
                 <RotateCcw className="w-4 h-4" style={{ color: SCAN_TO }} />
               </button>
             )}
-            <button onClick={onClose} className="w-8 h-8 rounded-full flex items-center justify-center" style={{ background: "#F5F5F4" }}>
+            <button onClick={onClose} aria-label={t("common.close")} className="w-8 h-8 rounded-full flex items-center justify-center" style={{ background: "#F5F5F4" }}>
               <X className="w-4 h-4 text-stone-400" />
             </button>
           </div>
