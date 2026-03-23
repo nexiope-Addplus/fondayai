@@ -54,8 +54,9 @@ function normalizeRankingData(data: any) {
 }
 
 function isInRange(score: number, band: any): boolean {
-  if (band.range) {
-    const parts = String(band.range).split("-").map(Number);
+  const rangeStr = band.range ?? band.label;
+  if (rangeStr) {
+    const parts = String(rangeStr).split("-").map(Number);
     return score >= (parts[0] ?? 0) && score <= (parts[1] ?? 100);
   }
   return score >= (Number(band.min) || 0) && score <= (Number(band.max) || 100);
@@ -197,7 +198,7 @@ export function MagazineTab() {
     if (!rankingData?.scoreDistribution?.length) return [];
     const maxCount = Math.max(...rankingData.scoreDistribution.map((b: any) => Number(b.count) || 0));
     return rankingData.scoreDistribution.map((b: any) => ({
-      label: String(b.range ?? `${b.min ?? "?"}-${b.max ?? "?"}`),
+      label: String(b.range ?? b.label ?? `${b.min ?? "?"}-${b.max ?? "?"}`),
       count: Number(b.count) || 0,
       pct: maxCount > 0 ? Math.round(((Number(b.count) || 0) / maxCount) * 100) : 0,
       isMyRange: latestOverall > 0 && isInRange(latestOverall, b),
