@@ -16,7 +16,9 @@ export function WeatherTipCard({ compact, weather: weatherProp }: {
   const [denied, setDenied] = useState(false);
 
   useEffect(() => {
-    if (weatherProp !== undefined) return; // 외부에서 prop으로 전달된 경우 내부 fetch 스킵
+    // weatherProp이 있으면 fetch 건너뜀
+    if (weatherProp) return;
+    
     if (!navigator.geolocation) return;
     navigator.geolocation.getCurrentPosition(
       (pos) => {
@@ -31,11 +33,11 @@ export function WeatherTipCard({ compact, weather: weatherProp }: {
     );
   }, [weatherProp]);
 
-  const weather = weatherProp ?? internalWeather;
+  const weather = weatherProp || internalWeather;
   
   if (denied) return null;
   
-  // 로딩 상태 처리 (데이터가 아직 없을 때)
+  // 로딩 상태 처리
   if (!weather) {
     return (
       <div className="px-3.5 py-2.5 border-t border-stone-100/80 animate-pulse" style={{ background: TINT_GREEN }}>

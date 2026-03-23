@@ -188,38 +188,7 @@ export default function SkinScanPage() {
   const [user, setUser] = useState<any>(undefined);
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
   const [showInstallGuide, setShowInstallGuide] = useState(false);
-  const [weatherData, setWeatherData] = useState<WeatherData | null>(null);
   const justLoggedInRef = useRef(false);
-
-  // 날씨 정보 중앙 관리 (Care Manager 기초 데이터)
-  useEffect(() => {
-    const fetchWeather = async (lat: number, lon: number) => {
-      try {
-        const res = await fetch(`/api/weather?lat=${lat}&lon=${lon}`);
-        if (!res.ok) throw new Error("Weather API failed");
-        const data = await res.json();
-        if (data && !data.error) setWeatherData(data);
-      } catch (err) {
-        console.error("[Weather] Fetch error:", err);
-      }
-    };
-
-    // 위치 정보 요청 (브라우저 팝업 트리거)
-    if ("geolocation" in navigator) {
-      navigator.geolocation.getCurrentPosition(
-        (pos) => {
-          fetchWeather(pos.coords.latitude, pos.coords.longitude);
-        },
-        (err) => {
-          console.warn("[Weather] Geolocation error, using fallback:", err.message);
-          fetchWeather(37.5665, 126.9780); // 서울
-        },
-        { timeout: 7000, enableHighAccuracy: false }
-      );
-    } else {
-      fetchWeather(37.5665, 126.9780); // 서울
-    }
-  }, []);
 
   useEffect(() => {
     const handler = (e: any) => { e.preventDefault(); setDeferredPrompt(e); };

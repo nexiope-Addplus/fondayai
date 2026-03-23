@@ -41,12 +41,13 @@ import { ResultModals } from "./ResultModals";
 import { CosmeticsReportCard } from "./CosmeticsReportCard";
 
 // ─── 피부 예측 카드 ────────────────────────────────────────────────
-export function ResultScreen({ weather, surveyData, analysisResult, imageSrc, faceCroppedSrc, imageBase64, onBack, onGoMagazine, onOpenDiary, onGoRoutine, onGoMy, user, deferredPrompt, onShowInstallGuide }: any) {
+export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, imageBase64, onBack, onGoMagazine, onOpenDiary, onGoRoutine, onGoMy, user, deferredPrompt, onShowInstallGuide }: any) {
   const { t } = useTranslation();
   const [history, setHistory] = useState<any[]>([]);
   const [isSaved, setIsSaved] = useState(false);
   const [currentScanId, setCurrentScanId] = useState<string | null>(null);
   const [currentShareToken, setCurrentShareToken] = useState<string | null>(null);
+  const [internalWeather, setInternalWeather] = useState<any>(null);
   const [showWaitlist, setShowWaitlist] = useState(false);
   const [showImprovements, setShowImprovements] = useState(false);
   const [showAnalysis, setShowAnalysis] = useState(false);
@@ -312,14 +313,23 @@ export function ResultScreen({ weather, surveyData, analysisResult, imageSrc, fa
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, analysisResult]);
 
-  // 스캔 저장 (로그인 + 분석결과 둘 다 준비됐을 때)
+  // 날씨 정보 가져오기 (Care Manager 저장용)
   useEffect(() => {
-    if (!user || !analysisResult || !analysisResult.scores || isSaved) return;
-    
-    // weather 데이터가 객체인지, 필요한 속성이 있는지 2중 체크
-    const hasWeatherData = weather && typeof weather === 'object' && 'temp' in weather;
-    const overallScore = analysisResult.scores[0]?.score || 0;
+    if (!navigator.geolocation) return;
+    navigator.geolocation.getCurrentPosition((pos) => {
+      const { latitude: lat, longitude: lon } = pos.coords;
+      fetch(`/api/weather?lat=${lat}&lon=${lon}`)
+        .then(res => res.ok ? res.json() : null)
+        .then(data => { if (data && !data.error) setInternalWeather(data); })
+        .catch(() => {});
+    });
+  }, []);
 
+  // 스캔 저장 (운영 버전 안정성 복구 + weatherInfo 추가)
+  useEffect(() => {
+    if (!user || !analysisResult || isSaved) return;
+    const overallScore = analysisResult.scores?.[0]?.score || 0;
+    
     fetch("/api/scans", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -332,7 +342,7 @@ export function ResultScreen({ weather, surveyData, analysisResult, imageSrc, fa
         aiComment: analysisResult.aiComment,
         improvements: analysisResult.improvements ?? [],
         cosmetics: analysisResult.cosmetics ?? [],
-        weatherInfo: hasWeatherData ? weather : null,
+        weatherInfo: internalWeather,
         lang: i18n.language || "ko",
         gender: (surveyData?.genderIdx ?? 0) === 0 ? "female" : "male",
         ageGroup: ["10대","20대 초반","20대 후반","30대 초반","30대 후반","40대 초반","40대 후반","50대+"][surveyData?.ageIdx ?? 2] ?? "",
@@ -341,7 +351,8 @@ export function ResultScreen({ weather, surveyData, analysisResult, imageSrc, fa
       setIsSaved(true);
       if (data?.id) setCurrentScanId(data.id);
       if (data?.shareToken) setCurrentShareToken(data.shareToken);
-      // D1에도 저장 (관리자 통계용)
+      
+      // D1 챌린지 데이터 동기화
       const KO_AGE_GROUPS2 = ["10대","20대 초반","20대 후반","30대 초반","30대 후반","40대 초반","40대 후반","50대+"];
       fetch("/api/challenge-token", {
         method: "POST",
@@ -352,15 +363,15 @@ export function ResultScreen({ weather, surveyData, analysisResult, imageSrc, fa
           scores: analysisResult.scores,
           skinAge: analysisResult.skinAge,
           aiComment: analysisResult.aiComment,
-          weatherInfo: hasWeatherData ? weather : null,
+          weatherInfo: internalWeather,
           lang: i18n.language || "ko",
           isGuest: false,
           gender: (surveyData?.genderIdx ?? 0) === 0 ? "female" : "male",
           ageGroup: KO_AGE_GROUPS2[surveyData?.ageIdx ?? 2] ?? "",
         }),
       }).catch(() => {});
-    }).catch(err => console.error("[Scan Save] Error:", err)); 
-  }, [user, analysisResult, weather, isSaved, finalType, surveyData]);
+    }).catch(err => console.error("[Scan Save Error]", err));
+  }, [user, analysisResult, internalWeather]);
 
   // 모달 열릴 때 배경 스크롤 잠금
   useEffect(() => {

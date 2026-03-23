@@ -18,14 +18,12 @@ import { LangSwitcher } from "./BottomNav";
 
 // ─── 메인 스캔 화면 ───────────────────────────────────────────────
 export function ScanIdleScreen({
-  weather,
   onScan,
   onOpenRoutine,
   onOpenDiary,
   onOpenDiscover,
   onOpenMy,
 }: {
-  weather: WeatherData | null;
   onScan: () => void;
   onOpenRoutine?: () => void;
   onOpenDiary?: () => void;
@@ -40,6 +38,7 @@ export function ScanIdleScreen({
   const [showBaumannExp, setShowBaumannExp] = useState(false);
   const [socialCount, setSocialCount] = useState(0);
   const [pullY, setPullY] = useState(0);
+  const [idleWeather, setIdleWeather] = useState<WeatherData | null>(null);
   const [latestScan, setLatestScan] = useState<any | null>(null);
   const [recentScans, setRecentScans] = useState<any[]>([]);
   const [careBriefing, setCareBriefing] = useState<{ briefing: string; priority: string } | null>(null);
@@ -57,18 +56,30 @@ export function ScanIdleScreen({
       .catch(() => setLatestScan(null));
   }, []);
 
-  // 케어 브리핑 로드
+  // 운영 서버 날씨 로직 복구
   useEffect(() => {
-    if (!weather || typeof weather.temp === 'undefined' || weather.temp === null) return;
-    const temp = weather.temp;
-    const humidity = weather.humidity ?? "";
-    const aqi = weather.aqi ?? "";
-    
-    fetch(`/api/care-briefing?temp=${temp}&humidity=${humidity}&aqi=${aqi}`)
+    if (!navigator.geolocation) return;
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const { latitude: lat, longitude: lon } = pos.coords;
+        fetch(`/api/weather?lat=${lat}&lon=${lon}`)
+          .then((r) => r.ok ? r.json() : null)
+          .then((data) => { if (data && !data.error) setIdleWeather(data as WeatherData); })
+          .catch(() => {});
+      },
+      () => {},
+      { timeout: 8000 }
+    );
+  }, []);
+
+  // 케어 브리핑 로드 (날씨 데이터 준비 시)
+  useEffect(() => {
+    if (!idleWeather || !idleWeather.temp) return;
+    fetch(`/api/care-briefing?temp=${idleWeather.temp}&humidity=${idleWeather.humidity || ""}&aqi=${idleWeather.aqi || ""}`)
       .then(res => res.ok ? res.json() : null)
       .then(data => { if (data && data.briefing) setCareBriefing(data); })
-      .catch(err => console.error("[Care Briefing] Fetch error:", err));
-  }, [weather]);
+      .catch(() => {});
+  }, [idleWeather]);
 
   const handleTouchStart = (e: React.TouchEvent) => {
     touchStartY.current = e.touches[0].clientY;
@@ -173,8 +184,8 @@ export function ScanIdleScreen({
         if (!fallback) return null;
 
         // 낮 시간대(6~20)에 날씨 데이터가 있으면 날씨 기반 그리팅 사용
-        const useWeatherGreeting = weather && hour >= 6 && hour < 20;
-        const wKey = useWeatherGreeting ? getWeatherTipKey(weather!) : null;
+        const useWeatherGreeting = idleWeather && hour >= 6 && hour < 20;
+        const wKey = useWeatherGreeting ? getWeatherTipKey(idleWeather!) : null;
         const emoji = wKey ? weatherEmojiMap[wKey] : fallback.emoji;
         const greetingKey = wKey ? weatherKeyMap[wKey] : fallback.key;
 
@@ -186,7 +197,7 @@ export function ScanIdleScreen({
                 <span className="text-base">{emoji}</span>
                 <p className="text-[12px] font-semibold text-stone-600">{t(greetingKey)}</p>
               </div>
-              <WeatherTipCard compact weather={weather} />
+              <WeatherTipCard compact weather={idleWeather} />
             </div>
 
             {/* AI 케어 매니저 브리핑 카드 */}
