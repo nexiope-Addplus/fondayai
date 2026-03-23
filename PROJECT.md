@@ -63,35 +63,36 @@
 ├── client/
 │   ├── src/
 │   │   ├── pages/
-│   │   │   ├── skin-scan.tsx        ★ 메인 UI 진입점 (463줄 — 리팩토링 완료)
+│   │   │   ├── skin-scan.tsx        ★ 메인 UI 진입점 (478줄)
 │   │   │   └── battle.tsx           피부 챌린지 페이지
 │   │   ├── components/fonday/       ★ 분리된 컴포넌트 모음
-│   │   │   ├── ResultScreen.tsx     결과 화면 진입점 (961줄)
+│   │   │   ├── ResultScreen.tsx     결과 화면 진입점 (1011줄)
 │   │   │   ├── ResultHeaderCard.tsx 결과 상단 요약 카드
 │   │   │   ├── ResultOverlayPopups.tsx 플로팅 팝업 (스트릭/미션/PWA/체크인/푸시)
 │   │   │   ├── ResultModals.tsx     모든 바텀시트·모달 모음
 │   │   │   ├── ResultRoutineTab.tsx 결과 루틴 탭 콘텐츠
 │   │   │   ├── ResultSolutionTab.tsx 결과 솔루션 탭 콘텐츠
 │   │   │   ├── ResultNutritionTab.tsx 결과 영양 탭 콘텐츠
+│   │   │   ├── CosmeticsReportCard.tsx 화장품 성적표 모달
 │   │   │   ├── useAICareSettings.ts AI 밀착케어 푸시 설정 훅
 │   │   │   ├── PwaInstallPopup.tsx  PWA 설치 팝업
 │   │   │   ├── RoutineUpdateSheet.tsx 루틴 업데이트 시트
 │   │   │   ├── WaitlistModal.tsx    얼리버드 웨이트리스트 모달
-│   │   │   ├── DiaryTab.tsx         피부 일기 탭 (593줄)
+│   │   │   ├── DiaryTab.tsx         피부 일기 탭 (495줄, calendar/timeline/report)
 │   │   │   ├── DiaryReportTab.tsx   일기 리포트 탭 콘텐츠 (619줄)
 │   │   │   ├── DiaryHelpers.tsx     일기 탭 내부 헬퍼 컴포넌트들
 │   │   │   │                        (InlineTodos, InlineMemo,
 │   │   │   │                         DiaryRoutinePreviewCard,
 │   │   │   │                         DiaryCalendarView,
 │   │   │   │                         DiaryTimeline, DiaryFullView)
-│   │   │   ├── MyScreen.tsx         마이 화면 (289줄)
+│   │   │   ├── MyScreen.tsx         마이 화면 (270줄)
 │   │   │   ├── AttendanceCalendarModal.tsx 출석 달력 모달
 │   │   │   ├── MyCosmeticsModal.tsx 내 화장품 목록 모달
 │   │   │   ├── CosmeticsRegisterModal.tsx 화장품 등록 모달
 │   │   │   ├── ScanIdleScreen.tsx   스캔 대기 화면
 │   │   │   ├── ScanningScreen.tsx   분석 중 화면
 │   │   │   ├── SurveyScreen.tsx     설문 화면
-│   │   │   ├── MagazineTab.tsx      매거진 탭
+│   │   │   ├── MagazineTab.tsx      발견 탭 (랭킹 + 영양 + 매거진 허브)
 │   │   │   ├── ReportTab.tsx        리포트 탭
 │   │   │   ├── BottomNav.tsx        하단 네비게이션
 │   │   │   ├── CameraCapture.tsx    카메라 캡처
@@ -161,6 +162,13 @@
 └── PROJECT.md                       ★ 이 파일
 ```
 
+### 현재 화면 역할 요약
+- `scan`: 스캔 대기 → 설문 → 분석 → 결과
+- `routine`: 등록 화장품 기반 루틴/충돌/추천 관리
+- `diary`: `calendar / timeline / report` 3탭 구조의 기록 화면
+- `magazine`: 단순 매거진이 아니라 `Discover` 허브. 랭킹, 영양 보완 포인트, 매거진 콘텐츠를 한 곳에 모음
+- `my`: 계정, 출석, 언어, 설치, 디바이스 링크 중심의 관리 화면
+
 ---
 
 ## 4. 개발 환경 설정
@@ -193,7 +201,7 @@ CF_D1_TOKEN=...             # D1 로컬 테스트용
 ### Pages 프로젝트
 - **이름**: fonday (또는 유사)
 - **빌드 명령어**: `npm run build`
-- **출력 디렉토리**: `client/dist`
+- **출력 디렉토리**: `dist/public`
 - **배포 브랜치**: `main` (GitHub push 시 자동 배포)
 
 ### Pages 환경변수 (Secrets)
@@ -282,9 +290,64 @@ CREATE TABLE IF NOT EXISTS cosmetics (
 
 ---
 
-## 5-1. 최근 주요 업데이트 (2026-03-16)
+## 5-1. 최근 주요 업데이트 (2026-03-23 기준)
 
-### A. 식단 추천 알림 다양화
+### A. Discover 탭 재구성 (2026-03-23)
+- `client/src/components/fonday/MagazineTab.tsx`
+  - 기존 “매거진 탭”을 `발견 허브` 역할로 재구성
+  - 상단에 `내 피부 위치` 랭킹 요약 카드와 `보완 포인트` 영양 요약 카드를 배치
+  - 랭킹 상세:
+    - 내 백분위
+    - 전체 분포 바
+    - 상위 Baumann 타입
+    - 평균 점수 / 최고 점수
+  - 영양 상세:
+    - 최근 스캔의 낮은 점수 3개
+    - 각 취약 항목별 생활/영양 힌트
+- 현재 `magazine` 탭은 읽을거리만 모아둔 탭이 아니라, 비교 데이터와 가이드를 포함한 탐색 탭임
+
+### B. Diary 랭킹 이동 (2026-03-23)
+- `client/src/components/fonday/DiaryTab.tsx`
+  - `ranking` 탭 제거
+  - 현재 구조는 `calendar / timeline / report`
+  - 랭킹은 더 이상 Diary의 하위 탭이 아니라 Discover의 핵심 섹션으로 이동
+- 주의:
+  - `DiaryHelpers.tsx` 내부의 `DiaryFullView`에는 과거 랭킹 탭 구조 일부가 남아 있음
+  - 현재 메인 라우트/실사용 화면 기준 핵심 Diary UX는 `DiaryTab.tsx`가 기준
+
+### C. 화장품 성적표 추가 (2026-03-22)
+- `client/src/components/fonday/CosmeticsReportCard.tsx`
+  - 등록한 화장품을 바우만 타입/현재 점수 기준으로 `A/B/C/D/F` 등급화
+  - 제품별 장점/주의점/핵심 성분/충돌 성분 표시
+  - 전체 평균 점수와 등급 분포 요약 제공
+- `server/routes.ts`
+  - `POST /api/cosmetics/grade` 추가
+  - 로그인 사용자의 등록 화장품을 읽고 Gemini 기반 등급 리포트 생성
+- `client/src/components/fonday/ResultRoutineTab.tsx`, `ResultScreen.tsx`
+  - 결과 화면 루틴 흐름 안에서 성적표 진입 동선 연결
+
+### D. UI 폴리싱 일괄 반영 (2026-03-22)
+- `5ea436d feat(ui): text size floor, BottomNav polish, score countup, radius unify, result entrance motion`
+- 영향 범위:
+  - `BottomNav`: 5탭 구조 유지하면서 아이콘/타이포 밀도 재정리
+  - `ResultHeaderCard`: 점수 카운트업, 카드 위계, 반경/패딩 통일
+  - `Diary`, `Routine`, `Magazine`, `My`, 각종 시트/모달:
+    - 텍스트 최소 크기 상향
+    - 과한 반경/패딩 편차 축소
+    - `white + tint + soft shadow` 시스템 재적용
+  - 결과 진입 모션과 각 카드 반경을 더 일관된 톤으로 맞춤
+
+### E. 결과/탭 역할 재정렬 (2026-03-21 ~ 2026-03-22)
+- `8f25443 refactor(ux): realign tab roles and reduce clutter`
+- `7344155 fix(ui): restore result screen and trim idle extras`
+- `6630156 fix(result): restore solution tab rendering`
+- 반영 내용:
+  - 결과 화면은 `routine / solution / nutrition` 3탭 구조 유지
+  - 상단 허브 카드와 보조 CTA를 줄여 읽기 흐름을 단순화
+  - `solution` 탭 blank 이슈는 누락 import 수정으로 복구 완료
+  - Idle 화면은 다시 “지금 스캔” CTA 중심으로 정리
+
+### F. 식단 추천 알림 다양화
 - `worker-api.js`
   - 기존 바우만 타입 고정 메뉴 1개 구조를 변경
   - 최근 측정 결과의 낮은 점수(`scoreSummary`)를 기반으로 식단 보완 메뉴/팁을 조합
@@ -295,11 +358,11 @@ CREATE TABLE IF NOT EXISTS cosmetics (
   - 푸시 구독 시 최근 취약 점수 3개를 서버에 전송
   - 이미 구독 중이어도 새 스캔 결과가 나오면 서버 구독 메타데이터 재동기화
 
-### B. 루틴 리마인더 동기화 보강
+### G. 루틴 리마인더 동기화 보강
 - 푸시 구독이 갱신될 때 `/api/diary-reminder` 도 다시 동기화하도록 수정
 - 구독 재발급 후 루틴 리마인더가 서버 KV에서 끊기는 문제를 줄임
 
-### C. 일기 리포트 탭 고도화
+### H. 일기 리포트 탭 고도화
 - `client/src/pages/skin-scan.tsx`
   - 리포트 탭을 단순 주간 잠금 카드에서 누적 분석형 화면으로 확장
   - 추가된 내용:
@@ -316,7 +379,7 @@ CREATE TABLE IF NOT EXISTS cosmetics (
     - 향후 2주 회복 예측
 - 아직 전용 `/report` 페이지로 분리하지는 않았고, 현재는 `DiaryTab` 내부 리포트 탭에서 확장된 상태
 
-### D. AI 밀착케어 알림 체계 통합
+### I. AI 밀착케어 알림 체계 통합
 - 목표: 흩어져 있던 스캔/식단/수분/루틴 알림을 `AI 밀착케어` 1개 설정으로 통합
 - `client/src/pages/skin-scan.tsx`
   - 결과 페이지 기존 식단 푸시 버튼을 `AI 밀착케어` 카드로 교체
@@ -335,7 +398,7 @@ CREATE TABLE IF NOT EXISTS cosmetics (
 - `wrangler.toml`
   - 수분 리마인더용 `0 6 * * *` (KST 15:00) 크론 추가
 
-### E. 배포/운영 관련 현재 상태
+### J. 배포/운영 관련 현재 상태
 - GitHub `main`에는 반영 완료
 - 그러나 Cloudflare Worker `fonday-push-worker` 는 **자동 Git 배포가 아님**
 - Cloudflare 대시보드에서 확인한 결과:
@@ -353,7 +416,7 @@ CREATE TABLE IF NOT EXISTS cosmetics (
   - `0 9 * * *`
   - `0 11-13 * * *`
 
-### F. 디자인 시스템/결과 UX 2차 정리 (2026-03-19)
+### K. 디자인 시스템/결과 UX 2차 정리 (2026-03-19 이후 누적)
 - 대상 파일: `client/src/pages/skin-scan.tsx`, `client/src/index.css`
 - 최근 일련의 커밋으로 스캔/결과/일기/My 화면 전반의 시각 톤을 재정리함
 - 큰 방향:
@@ -361,7 +424,7 @@ CREATE TABLE IF NOT EXISTS cosmetics (
   - 정보량을 줄이는 대신 `첫 화면에 필요한 정보`와 `펼쳐볼 정보`의 위계를 분리
   - 결과 화면 탭 전환을 슬라이드 기반으로 유지하면서 탭별 읽기 흐름을 더 명확히 정리
 
-### G. Idle 화면 재배치
+### L. Idle 화면 재배치
 - `ScanIdleScreen`
   - 상단 최우선 정보가 다시 스캔 CTA/히어로가 되도록 재배치
   - `오늘 출석 완료`, `연속 출석`은 최상단 주인공 자리에서 빼고 히어로 아래 보조 정보 스트립으로 이동
@@ -370,7 +433,7 @@ CREATE TABLE IF NOT EXISTS cosmetics (
   - 첫 인상은 “지금 스캔하라”
   - 출석/포인트는 보조 동기부여 요소
 
-### H. 결과 화면 재정리
+### M. 결과 화면 재정리
 - `ResultScreen`
   - 상단 결과부는 너무 밋밋해졌던 정리 버전에서 일부 임팩트를 복원
   - 점수 3카드/요약 구조는 유지하되, `나의 피부 MBTI` 카드를 새 톤에 맞게 다시 정리
@@ -388,12 +451,12 @@ CREATE TABLE IF NOT EXISTS cosmetics (
 - `AI 피부 예측` 카드:
   - 기존 이모지 아이콘을 제거하고 Lucide 아이콘(`Bot`)으로 통일
   - CTA도 강한 gradient 대신 현재 결과 화면 톤에 맞는 화이트/보더 스타일로 조정
- - 결과 하단 고정 CTA:
+- 결과 하단 고정 CTA:
    - 초기의 강한 강조 버튼 문법에서 벗어나, 화면 본문 카드 시스템과 어울리는 bordered button 톤으로 정리
 
-### I. Diary 탭 / My 탭 구조 정리
+### N. Diary 탭 / My 탭 구조 정리
 - `DiaryTab`
-  - `calendar / timeline / report / ranking` 내부 슬라이드 탭 구조 적용
+  - 현재 기준 `calendar / timeline / report` 내부 슬라이드 탭 구조
   - 루트 탭 관점에서 중복되는 상단 백버튼은 제거
   - 상단 히어로/탭 바를 결과 탭과 비슷한 밀도의 카드 문법으로 통일
   - `report` 탭은 단순 분석 리포트에서 `피부과 상담실장 컨설팅` 흐름으로 확장
@@ -403,19 +466,18 @@ CREATE TABLE IF NOT EXISTS cosmetics (
     - 스파이더 그래프는 유지하되, 메인 콘텐츠가 아니라 해석을 받쳐주는 보조 시각화로 배치
     - 추천 성분 처방 / 권장 시술 방향 / 시술 후 회복 가이드까지 같은 상담 문맥 안에서 읽히도록 정리
 - `MyScreen`
-  - 기존에는 새 디자인 톤이 거의 반영되지 않았음
-  - 현재는 헤더, 프로필, 출석/설정/설치/매거진/디바이스 카드까지 `white + tint + soft shadow` 계열로 재정리
+  - 헤더, 프로필, 출석, 계정, 언어, 설치, 디바이스 링크 중심 구조로 단순화
   - 루트 탭 구조라 상단 `홈/뒤로` 버튼은 제거
-  - 마지막 폴리싱에서 `rounded-2xl + p-4 + soft shadow` 기준으로 카드 반경/패딩까지 통일
+  - `rounded-2xl + p-4 + soft shadow` 기준으로 카드 반경/패딩 통일
 
-### J. UX 판단 기준 메모
+### O. UX 판단 기준 메모
 - `idle` 최상단에 출석 상태를 강하게 두는 것은 메인 행동(스캔)을 흐릴 가능성이 큼
 - `Diary`, `My`는 하단 탭이 이미 1차 내비게이션이므로 상단 백버튼은 대체로 불필요
 - 다크모드는 장기적으로 고려 가능하지만, 현재 우선순위는 아님
   - 피부 사진/분석 결과 신뢰감은 기본적으로 라이트 모드에서 더 잘 살아남
   - 먼저 라이트 경험 완성도를 올리는 쪽이 우선
 
-### K. 현재 남아 있는 기술 이슈
+### P. 현재 남아 있는 기술 이슈
 - 2026-03-20 기준 `npm run check` (tsc) 통과
 - 이번 세션에서 정리된 항목:
   - `server/auth.ts`: `passport-google-oauth20`, `passport-kakao`, `passport-line-auth` 선언 누락 보강
@@ -423,7 +485,7 @@ CREATE TABLE IF NOT EXISTS cosmetics (
   - `server/routes.ts`: `Set` spread를 `Array.from(new Set(...))`로 변경해 TS2802 해소
 - 현재 기준으로 별도 타입 오류는 재현되지 않음
 
-### L. skin-scan 리팩토링 중간 복구 상태 (2026-03-19)
+### Q. skin-scan 리팩토링 중간 복구 상태 (2026-03-19)
 - 목적:
   - 거대한 `client/src/pages/skin-scan.tsx`를 `client/src/components/fonday/` 하위 모듈로 분리
 - 생성된 리팩토링 파일:
@@ -508,7 +570,12 @@ if (!user) return new Response(JSON.stringify([]), { status: 401 });
 
 ### 핵심 플로우
 1. **Idle 화면** → 카메라 촬영 → 설문 (30초) → AI 분석 → 결과 화면
-2. 결과 화면: 상단 요약 + 오늘 목표 + 루틴 카드 + 2탭 (솔루션 | 영양) + 하단 고정 액션바
+2. 결과 화면: 상단 요약 + MBTI/랭킹/피부나이 + 3탭 (`routine | solution | nutrition`) + 하단 액션바
+3. 하단 탭 구조:
+   - `Routine`: 등록 화장품 루틴, 충돌 관리, 성적표 진입
+   - `Diary`: 달력/타임라인/주간 리포트
+   - `Discover`: 랭킹 + 영양 + 매거진
+   - `My`: 출석/계정/설치/언어
 
 ### 피부 분석
 - Gemini 2.5 Flash Vision → 10개 점수 항목 (0~100)
@@ -525,25 +592,46 @@ if (!user) return new Response(JSON.stringify([]), { status: 401 });
 - 결과 화면 사진 바로 아래 배너로 접근
 - MyScreen에서 `내 루틴 요약 + 아침/저녁 루틴 보드 + 제품 컬렉션` 형태로 확인
 - 제품 카드를 누르면 상세 시트에서 카테고리/사용 시간/개봉일/성분 확인 및 삭제 가능
+- `화장품 성적표`:
+  - 결과/루틴 흐름에서 진입 가능
+  - 바우만 타입 + 현재 점수 기준으로 제품별 `A/B/C/D/F` 등급 제공
+  - 장점/주의점/핵심 성분/충돌 성분을 카드 단위로 표시
 
 ### 피부 일기 (DiaryTab)
 - 로컬스토리지 + D1 서버 동기화 (write-through + server-wins)
+- 현재 메인 구조는 `calendar / timeline / report`
 - 달력 히트맵, 타임라인, 메모, 루틴 체크리스트, 원인 태그
-- 주간 리포트 (7일 연속 스캔 시 잠금 해제)
+- 주간 리포트/컨설팅형 해석 카드 제공
 
 ### 스트릭/미션/출석
 - localStorage 기반 (`fonday_streak`, `fonday_missions`, `fonday_attendance`)
 - 연속 스캔 스트릭, 9개 미션, 출석 포인트 (하루 3pt)
 - 결과 진입 시 자동 체크인
 
-### 결과 화면 UX (2026-03-13 최신)
+### 결과 화면 UX (2026-03-23 최신)
 - 상단 요약은 `작은 얼굴 프레임 + 핵심 점수 4개 + 상세 분석 모달 버튼` 구조
 - 종합 점수 / 피부 MBTI / 피부나이 / 백분위는 아래 카드형 요약 블록에서 유지
 - `오늘 목표`는 진행판 역할만 맡고, 루틴 상세 내용은 반복 노출하지 않도록 축소
 - 아침/저녁 루틴은 제품명 나열 대신 카테고리 순서(`토너 → 세럼 → 선크림`) 중심으로 표기
 - 루틴 체크는 제품별 여러 개가 아니라 `아침 완료`, `저녁 완료` 1회 체크로 diary todo에 일괄 반영
-- 하단 탭은 현재 `솔루션 / 영양` 2개만 사용하고, 전체 10개 점수는 `주요 분석결과` 모달에서 확인
+- 하단 탭은 현재 `routine / solution / nutrition` 3개
+- `routine`: 실행 루틴, 화장품 인사이트, 성적표 진입
+- `solution`: 개선안, 추천 화장품, AI 밀착케어, 디바이스 티저
+- `nutrition`: 영양제/피해야 할 음식/수분 가이드
+- 전체 10개 점수는 `주요 분석결과` 모달에서 확인
 - 핫스팟(red dot) 오버레이는 설명 부족 문제로 제거됨
+
+### Discover 탭
+- 상단 랭킹 요약 카드 + 영양 요약 카드
+- 랭킹 상세 섹션:
+  - 내 백분위
+  - 점수 구간 분포
+  - 상위 Baumann 타입
+  - 평균/최고 점수
+- 영양 상세 섹션:
+  - 최근 스캔의 낮은 점수 3개
+  - 각 취약 지표별 생활/영양 힌트
+- 하단에 매거진 아티클 목록 유지
 
 ### AI 응답 파싱 안정화
 - `functions/api/analyze-skin.ts` 와 `server/routes.ts` 에 Gemini JSON 복구 파서 추가

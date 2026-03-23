@@ -28,6 +28,33 @@ const CATEGORY_I18N_KEYS: Record<CategoryFilter, string> = {
   "전문가": "magazine.categories.expert",
 };
 
+function parseScores(scores: unknown) {
+  if (Array.isArray(scores)) return scores;
+  if (typeof scores === "string") {
+    try {
+      const parsed = JSON.parse(scores);
+      return Array.isArray(parsed) ? parsed : [];
+    } catch {
+      return [];
+    }
+  }
+  return [];
+}
+
+function normalizeRankingData(data: any) {
+  if (!data || typeof data !== "object") return null;
+  return {
+    totalScans: Number(data.totalScans) || 0,
+    avgScore: Number(data.avgScore) || 0,
+    topScore: Number(data.topScore) || 0,
+    myPercentile: data.myPercentile !== undefined ? Number(data.myPercentile) : undefined,
+    scoreDistribution: Array.isArray(data.scoreDistribution) ? data.scoreDistribution : [],
+    baumannDistribution: data.baumannDistribution && typeof data.baumannDistribution === "object"
+      ? data.baumannDistribution
+      : {},
+  };
+}
+
 function ArticleModal({ article, onClose }: { article: MagazineArticle; onClose: () => void }) {
   const { t } = useTranslation();
   const dragControls = useDragControls();
@@ -122,7 +149,7 @@ export function MagazineTab() {
   useEffect(() => {
     fetch("/api/ranking")
       .then((res) => (res.ok ? res.json() : null))
-      .then((data) => setRankingData(data))
+      .then((data) => setRankingData(normalizeRankingData(data)))
       .catch(() => setRankingData(null));
     fetch("/api/scans")
       .then((res) => (res.ok ? res.json() : []))
@@ -133,8 +160,9 @@ export function MagazineTab() {
   }, []);
 
   const weakestScores = useMemo(() => {
-    if (!latestScan?.scores || !Array.isArray(latestScan.scores)) return [];
-    return [...latestScan.scores]
+    const scores = parseScores(latestScan?.scores);
+    if (scores.length === 0) return [];
+    return [...scores]
       .sort((a: any, b: any) => Number(a.score) - Number(b.score))
       .slice(0, 3);
   }, [latestScan]);
@@ -147,8 +175,8 @@ export function MagazineTab() {
     ? MAGAZINE_ARTICLES
     : MAGAZINE_ARTICLES.filter(a => a.category === filter);
 
-  const featured = filtered.find(a => a.featured) ?? filtered[0];
-  const rest = filtered.filter(a => a.id !== featured.id);
+  const featured = filtered.find(a => a.featured) ?? filtered[0] ?? null;
+  const rest = featured ? filtered.filter(a => a.id !== featured.id) : filtered;
 
   return (
     <>
@@ -259,7 +287,8 @@ export function MagazineTab() {
                       {rankingData.scoreDistribution.map((band: any, index: number) => {
                         const barPct = Math.round((band.count / maxDistributionCount) * 100);
                         const [bandMin, bandMax] = String(band.label).split("-").map(Number);
-                        const latestOverall = Number(latestScan?.overallScore ?? latestScan?.scores?.[0]?.score ?? 0);
+                        const latestScores = parseScores(latestScan?.scores);
+                        const latestOverall = Number(latestScan?.overallScore ?? latestScores[0]?.score ?? 0);
                         const isMyBand = latestOverall > 0 && latestOverall >= bandMin && latestOverall <= bandMax;
 
                         return (
