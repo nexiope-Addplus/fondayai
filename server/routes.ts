@@ -758,5 +758,62 @@ ${JSON.stringify(cosmeticList, null, 2)}
     res.json({ ok: true });
   });
 
+  // ─── Weather (Open-Meteo, no API key needed) ───────────────────────────
+  app.get("/api/weather", async (req, res) => {
+    const { lat, lon } = req.query as Record<string, string>;
+    if (!lat || !lon) return res.status(400).json({ error: "lat/lon required" });
+
+    function wmoToWeatherId(code: number): number {
+      if (code === 0) return 800;
+      if (code <= 3) return 801 + (code - 1);
+      if (code <= 48) return 741;
+      if (code <= 55) return 300;
+      if (code <= 57) return 301;
+      if (code <= 65) return 500 + (code - 61);
+      if (code <= 67) return 511;
+      if (code <= 75) return 600 + (code - 71);
+      if (code === 77) return 611;
+      if (code <= 82) return 521;
+      if (code <= 86) return 621;
+      if (code === 95) return 200;
+      return 202;
+    }
+    function wmoToMain(code: number): string {
+      if (code === 0) return "Clear";
+      if (code <= 3) return "Clouds";
+      if (code <= 48) return "Fog";
+      if (code <= 67) return "Drizzle";
+      if (code <= 77) return "Snow";
+      if (code <= 82) return "Rain";
+      if (code <= 86) return "Snow";
+      return "Thunderstorm";
+    }
+
+    try {
+      const [meteoRes, geoRes] = await Promise.all([
+        fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,weather_code`),
+        fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`, { headers: { "User-Agent": "FondayAI/1.0" } }),
+      ]);
+      if (!meteoRes.ok) throw new Error(`Open-Meteo error: ${meteoRes.status}`);
+      const meteo = await meteoRes.json() as any;
+      const geo = geoRes.ok ? (await geoRes.json() as any) : null;
+      const current = meteo.current ?? {};
+      const wmoCode = current.weather_code ?? 0;
+      const addr = geo?.address ?? {};
+      const cityName = addr.city || addr.town || addr.village || addr.county || addr.state || "";
+      res.json({
+        temp: Math.round(current.temperature_2m ?? 0),
+        humidity: current.relative_humidity_2m ?? 0,
+        weatherId: wmoToWeatherId(wmoCode),
+        weatherMain: wmoToMain(wmoCode),
+        cityName,
+        aqi: null,
+        uvIndex: null,
+      });
+    } catch (err: any) {
+      res.status(500).json({ error: err.message });
+    }
+  });
+
   return httpServer;
 }

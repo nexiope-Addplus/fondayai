@@ -1,8 +1,32 @@
-interface Env {
-  OPENWEATHER_API_KEY: string;
+// WMO weather code → OWM-compatible weatherId mapping
+function wmoToWeatherId(code: number): number {
+  if (code === 0) return 800;           // Clear sky
+  if (code <= 3) return 801 + (code - 1); // Partly/mostly cloudy, overcast
+  if (code <= 48) return 741;           // Fog / rime fog
+  if (code <= 55) return 300;           // Drizzle
+  if (code <= 57) return 301;           // Freezing drizzle
+  if (code <= 65) return 500 + (code - 61); // Rain
+  if (code <= 67) return 511;           // Freezing rain
+  if (code <= 75) return 600 + (code - 71); // Snow
+  if (code === 77) return 611;          // Snow grains
+  if (code <= 82) return 521;           // Rain showers
+  if (code <= 86) return 621;           // Snow showers
+  if (code === 95) return 200;          // Thunderstorm
+  return 202;                           // Thunderstorm with hail
 }
 
-export const onRequestGet: PagesFunction<Env> = async (ctx) => {
+function wmoToMain(code: number): string {
+  if (code === 0) return "Clear";
+  if (code <= 3) return "Clouds";
+  if (code <= 48) return "Fog";
+  if (code <= 67) return "Drizzle";
+  if (code <= 77) return "Snow";
+  if (code <= 82) return "Rain";
+  if (code <= 86) return "Snow";
+  return "Thunderstorm";
+}
+
+export const onRequestGet: PagesFunction = async (ctx) => {
   const url = new URL(ctx.request.url);
   const lat = url.searchParams.get("lat");
   const lon = url.searchParams.get("lon");
@@ -14,45 +38,41 @@ export const onRequestGet: PagesFunction<Env> = async (ctx) => {
     });
   }
 
-  const apiKey = ctx.env.OPENWEATHER_API_KEY;
-  if (!apiKey) {
-    return new Response(JSON.stringify({ error: "API key not configured" }), {
-      status: 500,
-      headers: { "Content-Type": "application/json" },
-    });
-  }
-
   try {
-    const [weatherRes, aqiRes] = await Promise.all([
+    const [meteoRes, geoRes] = await Promise.all([
       fetch(
-        `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric`
+        `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,weather_code`
       ),
       fetch(
-        `https://api.openweathermap.org/data/2.5/air_pollution?lat=${lat}&lon=${lon}&appid=${apiKey}`
+        `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`,
+        { headers: { "User-Agent": "FondayAI/1.0" } }
       ),
     ]);
 
-    if (!weatherRes.ok) {
-      throw new Error(`Weather API error: ${weatherRes.status}`);
-    }
+    if (!meteoRes.ok) throw new Error(`Open-Meteo error: ${meteoRes.status}`);
 
-    const weather = await weatherRes.json() as any;
-    const aqi = aqiRes.ok ? (await aqiRes.json() as any) : null;
+    const meteo = await meteoRes.json() as any;
+    const geo = geoRes.ok ? (await geoRes.json() as any) : null;
+
+    const current = meteo.current ?? {};
+    const wmoCode = current.weather_code ?? 0;
+    const addr = geo?.address ?? {};
+    const cityName = addr.city || addr.town || addr.village || addr.county || addr.state || "";
 
     const result = {
-      temp: Math.round(weather.main?.temp ?? 0),
-      humidity: weather.main?.humidity ?? 0,
-      weatherId: weather.weather?.[0]?.id ?? 800,
-      weatherMain: weather.weather?.[0]?.main ?? "Clear",
-      cityName: weather.name ?? "",
-      aqi: aqi?.list?.[0]?.main?.aqi ?? null, // 1=Good, 2=Fair, 3=Moderate, 4=Poor, 5=Very Poor
-      uvIndex: null as number | null, // free tier doesn't include UVI in current weather
+      temp: Math.round(current.temperature_2m ?? 0),
+      humidity: current.relative_humidity_2m ?? 0,
+      weatherId: wmoToWeatherId(wmoCode),
+      weatherMain: wmoToMain(wmoCode),
+      cityName,
+      aqi: null as number | null,
+      uvIndex: null as number | null,
     };
 
     return new Response(JSON.stringify(result), {
       headers: {
         "Content-Type": "application/json",
-        "Cache-Control": "public, max-age=1800", // 30min cache
+        "Cache-Control": "public, max-age=1800",
         "Access-Control-Allow-Origin": "*",
       },
     });
