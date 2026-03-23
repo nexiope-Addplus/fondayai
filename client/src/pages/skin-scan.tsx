@@ -9,6 +9,7 @@ import {
   getDiaryMemo, getDiaryTodos, getDiaryCauseTags,
   cropFaceFromImage,
 } from "../components/fonday/utils";
+import { useAnalytics } from "../components/fonday/useAnalytics";
 import { CameraCapture } from "../components/fonday/CameraCapture";
 import { ScanIdleScreen } from "../components/fonday/ScanIdleScreen";
 import { SurveyScreen } from "../components/fonday/SurveyScreen";
@@ -105,12 +106,15 @@ export default function SkinScanPage() {
   const prevTabRef = useRef<TabId>("scan");
   const justLoggedInRef = useRef(false);
 
+  const { trackEvent } = useAnalytics(i18n.language, !user);
+
   const TAB_ORDER: TabId[] = ["scan", "routine", "diary", "magazine", "my"];
   const tabDirection = TAB_ORDER.indexOf(activeTab) >= TAB_ORDER.indexOf(prevTabRef.current) ? 1 : -1;
 
   const handleTabChange = (tab: TabId) => {
     prevTabRef.current = activeTab;
     setActiveTab(tab);
+    trackEvent("tab_view", { tab });
   };
 
   useEffect(() => {
@@ -121,8 +125,10 @@ export default function SkinScanPage() {
 
   const handleInstall = async () => {
     if (deferredPrompt) {
+      trackEvent("pwa_prompt_shown");
       deferredPrompt.prompt();
-      await deferredPrompt.userChoice;
+      const choice = await deferredPrompt.userChoice;
+      trackEvent(choice.outcome === "accepted" ? "pwa_prompt_accepted" : "pwa_prompt_dismissed");
       setDeferredPrompt(null);
     } else {
       setShowInstallGuide(true);
@@ -263,6 +269,12 @@ export default function SkinScanPage() {
     localStorage.removeItem("fonday_return_tab");
   }, [user]);
 
+  // app_open — 최초 마운트 시 1회
+  useEffect(() => {
+    trackEvent("app_open", { lang: i18n.language });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const handleCapture = useCallback((file: File) => {
     setImageFile(file);
     const objUrl = URL.createObjectURL(file);
@@ -280,6 +292,7 @@ export default function SkinScanPage() {
   const handleSurveySubmit = useCallback(async (data: SurveyData) => {
     setSurveyData(data);
     setScanState("scanning");
+    trackEvent("scan_start", { gender: data.gender, age: data.age });
     if (!imageFile) return;
 
     // base64가 아직 준비되지 않았으면 대기
@@ -309,16 +322,19 @@ export default function SkinScanPage() {
         } catch { msg += ": " + rawText.slice(0, 100); }
         setScanError(msg);
         setScanState("error");
+        trackEvent("scan_fail", { status: response.status });
         return;
       }
       const result = JSON.parse(rawText);
       setAnalysisResult(result);
       setScanState("result");
+      trackEvent("scan_complete", { score: result.overallScore, baumannType: result.baumannType });
     } catch (err: any) {
       setScanError(err.message || "네트워크 오류");
       setScanState("error");
+      trackEvent("scan_fail", { error: "network" });
     }
-  }, [imageFile, imageBase64]);
+  }, [imageFile, imageBase64, trackEvent]);
 
   return (
     <div className="min-h-[100dvh] bg-[#FAF9F6] text-stone-900">

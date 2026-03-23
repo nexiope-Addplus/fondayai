@@ -1,3 +1,73 @@
+/** UTC ISO → KST 표시 문자열 (yyyy-MM-dd HH:mm) */
+function toKST(isoStr: string): string {
+  if (!isoStr) return "";
+  try {
+    const d = new Date(isoStr);
+    const kst = new Date(d.getTime() + 9 * 60 * 60 * 1000);
+    return kst.toISOString().slice(0, 16).replace("T", " ");
+  } catch { return isoStr.slice(0, 16); }
+}
+function nowKST(): string { return toKST(new Date().toISOString()); }
+
+const CSS = `
+* { box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; max-width: 960px; margin: 0 auto; padding: 24px 20px 80px; background: #faf9f6; color: #1c1917; }
+h1 { font-size: 22px; font-weight: 900; color: #2D5F4F; margin: 0 0 4px; }
+h2 { font-size: 11px; font-weight: 700; color: #a8a29e; margin: 28px 0 10px; text-transform: uppercase; letter-spacing: .08em; }
+.cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 16px 0; }
+.card { background: white; border-radius: 14px; padding: 16px 14px; box-shadow: 0 1px 6px rgba(0,0,0,0.05); }
+.card .num { font-size: 28px; font-weight: 900; color: #2D5F4F; line-height: 1; }
+.card .label { font-size: 11px; color: #a8a29e; margin-top: 4px; }
+.card .sub { font-size: 11px; color: #2D5F4F; font-weight: 600; margin-top: 2px; }
+.grid4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; }
+.grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.panel { background: white; border-radius: 14px; padding: 16px; box-shadow: 0 1px 6px rgba(0,0,0,0.05); }
+.panel h3 { font-size: 12px; font-weight: 700; color: #78716c; margin: 0 0 12px; text-transform: uppercase; letter-spacing: .05em; }
+table { width: 100%; border-collapse: collapse; background: white; border-radius: 14px; overflow: hidden; box-shadow: 0 1px 6px rgba(0,0,0,0.05); }
+th { background: #f5f5f4; padding: 8px 12px; text-align: left; font-size: 10px; color: #78716c; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; }
+td { padding: 8px 12px; font-size: 12px; border-top: 1px solid #f5f5f4; }
+.badge { display: inline-block; padding: 2px 7px; border-radius: 20px; font-size: 10px; font-weight: 700; background: #ecfdf5; color: #2D5F4F; }
+.badge-guest { background: #fef3c7; color: #92400e; }
+.badge-f { background: #fce7f3; color: #9d174d; }
+.badge-m { background: #ede9fe; color: #5b21b6; }
+.badge-red { background: #fef2f2; color: #b91c1c; }
+.badge-blue { background: #eff6ff; color: #1d4ed8; }
+.bar-wrap { display: flex; flex-direction: column; gap: 5px; }
+.bar-row { display: flex; align-items: center; gap: 8px; font-size: 11px; }
+.bar-label { width: 72px; text-align: right; color: #78716c; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex-shrink: 0; }
+.bar-label-wide { width: 96px; text-align: right; color: #78716c; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex-shrink: 0; }
+.bar-bg { flex: 1; background: #f5f5f4; border-radius: 99px; height: 9px; }
+.bar-fill { height: 9px; border-radius: 99px; background: #2D5F4F; }
+.bar-val { width: 28px; font-weight: 700; color: #2D5F4F; font-size: 11px; text-align: right; flex-shrink: 0; }
+.bar-pct { width: 34px; font-size: 10px; color: #a8a29e; flex-shrink: 0; }
+.chart { display: flex; align-items: flex-end; gap: 3px; height: 72px; margin-top: 8px; }
+.chart-col { display: flex; flex-direction: column; align-items: center; flex: 1; gap: 3px; }
+.chart-bar { width: 100%; background: #2D5F4F; border-radius: 3px 3px 0 0; min-height: 2px; }
+.chart-label { font-size: 8px; color: #a8a29e; white-space: nowrap; }
+.pie-row { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+.pie-item { display: flex; align-items: center; gap: 5px; font-size: 11px; }
+.dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+.funnel { display: flex; gap: 0; }
+.funnel-step { flex: 1; text-align: center; padding: 12px 8px; background: #f5f5f4; border-right: 2px solid white; }
+.funnel-step:first-child { border-radius: 10px 0 0 10px; }
+.funnel-step:last-child { border-right: none; border-radius: 0 10px 10px 0; }
+.funnel-num { font-size: 22px; font-weight: 900; color: #2D5F4F; }
+.funnel-label { font-size: 10px; color: #78716c; margin-top: 3px; }
+.funnel-rate { font-size: 11px; font-weight: 700; color: #f59e0b; margin-top: 2px; }
+.metric-row { display: flex; justify-content: space-between; align-items: center; padding: 7px 0; border-bottom: 1px solid #f5f5f4; font-size: 12px; }
+.metric-row:last-child { border-bottom: none; }
+.nav { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+.nav a { text-decoration: none; font-size: 12px; font-weight: 700; color: #2D5F4F; background: white; padding: 6px 14px; border-radius: 20px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+.nav a:hover { background: #ecfdf5; }
+.section { margin-top: 24px; }
+.score-dist { display: flex; align-items: flex-end; gap: 2px; height: 56px; margin-top: 8px; }
+.score-col { display: flex; flex-direction: column; align-items: center; flex: 1; }
+.score-bar { width: 100%; border-radius: 2px 2px 0 0; min-height: 2px; }
+.score-label { font-size: 7px; color: #a8a29e; margin-top: 2px; }
+@media(max-width:640px) { .cards { grid-template-columns: repeat(2,1fr); } .grid4,.grid3,.grid2 { grid-template-columns: 1fr; } .funnel { flex-direction: column; } .funnel-step { border-right: none; border-bottom: 2px solid white; } .funnel-step:first-child { border-radius: 10px 10px 0 0; } .funnel-step:last-child { border-radius: 0 0 10px 10px; } }
+`;
+
 const LOGIN_FORM = `<!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -26,295 +96,498 @@ const LOGIN_FORM = `<!DOCTYPE html>
 </body>
 </html>`;
 
-/** UTC ISO → KST 표시 문자열 (yyyy-MM-dd HH:mm) */
-function toKST(isoStr: string): string {
-  if (!isoStr) return "";
-  try {
-    const d = new Date(isoStr);
-    const kst = new Date(d.getTime() + 9 * 60 * 60 * 1000);
-    return kst.toISOString().slice(0, 16).replace("T", " ");
-  } catch { return isoStr.slice(0, 16); }
-}
-
-/** 현재 KST 시각 */
-function nowKST(): string {
-  return toKST(new Date().toISOString());
-}
-
-// 간단한 어드민 통계 엔드포인트 (POST 폼 인증)
 export const onRequest = async (context: any) => {
   const { request, env } = context;
 
-  // GET → 로그인 폼
   if (request.method === "GET") {
     return new Response(LOGIN_FORM, { headers: { "Content-Type": "text/html;charset=UTF-8" } });
   }
-
-  // POST → 비밀번호 확인
   if (request.method !== "POST") return new Response("Method Not Allowed", { status: 405 });
 
   const formData = await request.formData();
   const key = formData.get("key");
   if (!env.ADMIN_KEY || key !== env.ADMIN_KEY) {
     return new Response(LOGIN_FORM.replace("</form>", '<p style="color:#ef4444;font-size:13px">비밀번호가 틀렸습니다</p></form>'), {
-      status: 401,
-      headers: { "Content-Type": "text/html;charset=UTF-8" },
+      status: 401, headers: { "Content-Type": "text/html;charset=UTF-8" },
     });
   }
-
   if (!env.FONDAY_DB) {
     return new Response("DB not configured", { status: 500 });
   }
 
   try {
-  // 푸시 구독자 수 (PUSH_KV)
-  let pushCount = 0;
-  if (env.PUSH_KV) {
-    const allIds = await env.PUSH_KV.get("push:all_ids");
-    pushCount = allIds ? JSON.parse(allIds).length : 0;
-  }
+    const safe = async (stmt: any, method: "first" | "all") => {
+      try { return method === "first" ? await stmt.first() : await stmt.all(); }
+      catch { return method === "first" ? null : { results: [] }; }
+    };
 
-  // 기본 통계 쿼리 (KST 기준)
-  const safeQuery = async (stmt: any, method: "first" | "all") => {
-    try { return method === "first" ? await stmt.first() : await stmt.all(); } catch { return method === "first" ? null : { results: [] }; }
-  };
+    // ── 1. 스캔 기본 통계 ──────────────────────────────────────────
+    const [
+      totalRow, todayRow, weekRow, monthRow, guestRow,
+      langRows, baumannRows, dailyRows,
+      genderRows, ageRows, scoreDistRows, scoreMetricsRows,
+    ] = await Promise.all([
+      safe(env.FONDAY_DB.prepare("SELECT COUNT(*) as total, AVG(overall_score) as avg FROM scans"), "first"),
+      safe(env.FONDAY_DB.prepare("SELECT COUNT(*) as cnt FROM scans WHERE date(datetime(created_at,'+9 hours'))=date(datetime('now','+9 hours'))"), "first"),
+      safe(env.FONDAY_DB.prepare("SELECT COUNT(*) as cnt FROM scans WHERE datetime(created_at,'+9 hours')>=datetime('now','+9 hours','-7 days')"), "first"),
+      safe(env.FONDAY_DB.prepare("SELECT COUNT(*) as cnt FROM scans WHERE datetime(created_at,'+9 hours')>=datetime('now','+9 hours','-30 days')"), "first"),
+      safe(env.FONDAY_DB.prepare("SELECT SUM(is_guest) as guest, SUM(1-is_guest) as loggedin FROM scans"), "first"),
+      safe(env.FONDAY_DB.prepare("SELECT lang, COUNT(*) as cnt FROM scans GROUP BY lang ORDER BY cnt DESC"), "all"),
+      safe(env.FONDAY_DB.prepare("SELECT baumann_type, COUNT(*) as cnt FROM scans GROUP BY baumann_type ORDER BY cnt DESC LIMIT 8"), "all"),
+      safe(env.FONDAY_DB.prepare("SELECT date(datetime(created_at,'+9 hours')) as day, COUNT(*) as cnt FROM scans WHERE datetime(created_at,'+9 hours')>=datetime('now','+9 hours','-30 days') GROUP BY day ORDER BY day"), "all"),
+      safe(env.FONDAY_DB.prepare("SELECT gender, COUNT(*) as cnt FROM scans WHERE gender!='' GROUP BY gender ORDER BY cnt DESC"), "all"),
+      safe(env.FONDAY_DB.prepare("SELECT age_group, COUNT(*) as cnt FROM scans WHERE age_group!='' GROUP BY age_group ORDER BY cnt DESC"), "all"),
+      // 점수 분포 (0-9, 10-19, ... 90-100)
+      safe(env.FONDAY_DB.prepare("SELECT (overall_score/10)*10 as bucket, COUNT(*) as cnt FROM scans GROUP BY bucket ORDER BY bucket"), "all"),
+      // 지표별 평균 점수 (scores JSON 파싱은 어렵으므로 overall만)
+      safe(env.FONDAY_DB.prepare("SELECT MIN(overall_score) as min, MAX(overall_score) as max, AVG(overall_score) as avg, COUNT(*) as total FROM scans"), "first"),
+    ]);
 
-  const [
-    totalResult, todayResult, weekResult, guestResult,
-    langResult, baumannResult, dailyResult,
-  ] = await Promise.all([
-    safeQuery(env.FONDAY_DB.prepare("SELECT COUNT(*) as total, AVG(overall_score) as avg_score FROM scans"), "first"),
-    safeQuery(env.FONDAY_DB.prepare("SELECT COUNT(*) as today FROM scans WHERE date(datetime(created_at, '+9 hours')) = date(datetime('now', '+9 hours'))"), "first"),
-    safeQuery(env.FONDAY_DB.prepare("SELECT COUNT(*) as week FROM scans WHERE datetime(created_at, '+9 hours') >= datetime('now', '+9 hours', '-7 days')"), "first"),
-    safeQuery(env.FONDAY_DB.prepare("SELECT SUM(is_guest) as guest, SUM(1-is_guest) as loggedin FROM scans"), "first"),
-    safeQuery(env.FONDAY_DB.prepare("SELECT lang, COUNT(*) as cnt FROM scans GROUP BY lang ORDER BY cnt DESC"), "all"),
-    safeQuery(env.FONDAY_DB.prepare("SELECT baumann_type, COUNT(*) as cnt FROM scans GROUP BY baumann_type ORDER BY cnt DESC LIMIT 8"), "all"),
-    safeQuery(env.FONDAY_DB.prepare("SELECT date(datetime(created_at, '+9 hours')) as day, COUNT(*) as cnt FROM scans WHERE datetime(created_at, '+9 hours') >= datetime('now', '+9 hours', '-14 days') GROUP BY day ORDER BY day"), "all"),
-  ]);
+    // ── 2. 푸시 구독자 수 ──────────────────────────────────────────
+    let pushCount = 0;
+    if (env.PUSH_KV) {
+      const allIds = await env.PUSH_KV.get("push:all_ids").catch(() => null);
+      pushCount = allIds ? JSON.parse(allIds).length : 0;
+    }
 
-  // gender/age_group 컬럼: 마이그레이션 전에는 쿼리 자체가 실패하므로 개별 catch
-  const [recentResult, genderResult, ageGroupResult] = await Promise.all([
-    // recent: gender/age_group 포함 시도, 실패하면 기본 컬럼
-    env.FONDAY_DB.prepare("SELECT overall_score, baumann_type, skin_age, lang, is_guest, gender, age_group, created_at FROM scans ORDER BY created_at DESC LIMIT 20").all()
-      .catch(() => env.FONDAY_DB.prepare("SELECT overall_score, baumann_type, skin_age, lang, is_guest, created_at FROM scans ORDER BY created_at DESC LIMIT 20").all())
-      .catch(() => ({ results: [] })),
-    env.FONDAY_DB.prepare("SELECT gender, COUNT(*) as cnt FROM scans WHERE gender != '' GROUP BY gender ORDER BY cnt DESC").all()
-      .catch(() => ({ results: [] })),
-    env.FONDAY_DB.prepare("SELECT age_group, COUNT(*) as cnt FROM scans WHERE age_group != '' GROUP BY age_group ORDER BY cnt DESC").all()
-      .catch(() => ({ results: [] })),
-  ]);
+    // ── 3. 이벤트 기반 분석 (events 테이블 없으면 graceful skip) ───
+    const eventsExist = await env.FONDAY_DB.prepare(
+      "SELECT name FROM sqlite_master WHERE type='table' AND name='events'"
+    ).first().catch(() => null);
 
-  const total = (totalResult as any)?.total ?? 0;
-  const avgScore = Math.round((totalResult as any)?.avg_score ?? 0);
-  const today = (todayResult as any)?.today ?? 0;
-  const week = (weekResult as any)?.week ?? 0;
-  const guest = (guestResult as any)?.guest ?? 0;
-  const loggedin = (guestResult as any)?.loggedin ?? 0;
-  const dailyRows: any[] = (dailyResult as any)?.results ?? [];
-  const maxDaily = Math.max(...dailyRows.map((r: any) => r.cnt), 1);
+    let tabRows: any[] = [];
+    let featureRows: any[] = [];
+    let funnelRows: any = {};
+    let dailyActiveRows: any[] = [];
+    let eventDailyRows: any[] = [];
 
-  const genderRows: any[] = (genderResult as any)?.results ?? [];
-  const ageGroupRows: any[] = (ageGroupResult as any)?.results ?? [];
-  const genderTotal = genderRows.reduce((s: number, r: any) => s + r.cnt, 0) || 1;
-  const ageTotal = ageGroupRows.reduce((s: number, r: any) => s + r.cnt, 0) || 1;
+    if (eventsExist) {
+      const [tabRes, featureRes, funnelRes, dauRes, eventDailyRes] = await Promise.all([
+        safe(env.FONDAY_DB.prepare(
+          "SELECT json_extract(event_data,'$.tab') as tab, COUNT(*) as cnt FROM events WHERE event_type='tab_view' GROUP BY tab ORDER BY cnt DESC"
+        ), "all"),
+        safe(env.FONDAY_DB.prepare(
+          "SELECT json_extract(event_data,'$.feature') as feature, COUNT(*) as cnt FROM events WHERE event_type='feature_use' GROUP BY feature ORDER BY cnt DESC LIMIT 10"
+        ), "all"),
+        // 퍼널: app_open → scan_start → scan_complete, push_prompt_shown → accepted
+        safe(env.FONDAY_DB.prepare(
+          "SELECT event_type, COUNT(*) as cnt FROM events WHERE event_type IN ('app_open','scan_start','scan_complete','scan_fail','push_prompt_shown','push_prompt_accepted','push_prompt_dismissed','pwa_prompt_shown','pwa_prompt_accepted','pwa_prompt_dismissed') GROUP BY event_type"
+        ), "all"),
+        // DAU 30일 (세션 기준)
+        safe(env.FONDAY_DB.prepare(
+          "SELECT date(datetime(created_at,'+9 hours')) as day, COUNT(DISTINCT session_id) as sessions, COUNT(DISTINCT CASE WHEN user_id!='' THEN user_id END) as users FROM events WHERE event_type='app_open' AND datetime(created_at,'+9 hours')>=datetime('now','+9 hours','-30 days') GROUP BY day ORDER BY day"
+        ), "all"),
+        // 이벤트 유형별 일별 추이 (30일)
+        safe(env.FONDAY_DB.prepare(
+          "SELECT date(datetime(created_at,'+9 hours')) as day, COUNT(*) as cnt FROM events WHERE datetime(created_at,'+9 hours')>=datetime('now','+9 hours','-30 days') GROUP BY day ORDER BY day"
+        ), "all"),
+      ]);
+      tabRows = (tabRes as any)?.results ?? [];
+      featureRows = (featureRes as any)?.results ?? [];
+      dailyActiveRows = (dauRes as any)?.results ?? [];
+      eventDailyRows = (eventDailyRes as any)?.results ?? [];
+      const funnelArr: any[] = (funnelRes as any)?.results ?? [];
+      for (const r of funnelArr) funnelRows[r.event_type] = r.cnt;
+    }
 
-  // 성별 레이블 변환
-  const genderLabel = (g: string) => g === "female" ? "여성" : g === "male" ? "남성" : g;
-  const genderColors: Record<string, string> = { female: "#ec4899", male: "#6366f1" };
+    // ── 4. 기타 데이터 ────────────────────────────────────────────
+    const [recentRows, diaryCountRow, cosmeticsCountRow] = await Promise.all([
+      env.FONDAY_DB.prepare("SELECT overall_score, baumann_type, skin_age, lang, is_guest, gender, age_group, created_at FROM scans ORDER BY created_at DESC LIMIT 20")
+        .all().catch(() => env.FONDAY_DB.prepare("SELECT overall_score, baumann_type, lang, is_guest, created_at FROM scans ORDER BY created_at DESC LIMIT 20").all())
+        .catch(() => ({ results: [] })),
+      safe(env.FONDAY_DB.prepare("SELECT COUNT(*) as cnt FROM diary_entries"), "first"),
+      safe(env.FONDAY_DB.prepare("SELECT COUNT(*) as cnt FROM cosmetics"), "first"),
+    ]);
 
-  // 나이대 순서 정렬 (Korean age group 순서)
-  const AGE_ORDER = ["10대","20대 초반","20대 후반","30대 초반","30대 후반","40대 초반","40대 후반","50대+"];
-  const sortedAgeRows = [...ageGroupRows].sort((a, b) => {
-    const ai = AGE_ORDER.indexOf(a.age_group);
-    const bi = AGE_ORDER.indexOf(b.age_group);
-    return (ai === -1 ? 99 : ai) - (bi === -1 ? 99 : bi);
-  });
+    // ── 계산 ──────────────────────────────────────────────────────
+    const total = (totalRow as any)?.total ?? 0;
+    const avgScore = Math.round((totalRow as any)?.avg ?? 0);
+    const todayCnt = (todayRow as any)?.cnt ?? 0;
+    const weekCnt = (weekRow as any)?.cnt ?? 0;
+    const monthCnt = (monthRow as any)?.cnt ?? 0;
+    const guest = (guestRow as any)?.guest ?? 0;
+    const loggedin = (guestRow as any)?.loggedin ?? 0;
+    const loginRate = total > 0 ? Math.round(loggedin / total * 100) : 0;
 
-  const html = `<!DOCTYPE html>
+    const pushOptInRate = (funnelRows["push_prompt_shown"] ?? 0) > 0
+      ? Math.round((funnelRows["push_prompt_accepted"] ?? 0) / funnelRows["push_prompt_shown"] * 100) : 0;
+    const scanConvRate = (funnelRows["scan_start"] ?? 0) > 0
+      ? Math.round((funnelRows["scan_complete"] ?? 0) / funnelRows["scan_start"] * 100) : 0;
+    const pwaAcceptRate = (funnelRows["pwa_prompt_shown"] ?? 0) > 0
+      ? Math.round((funnelRows["pwa_prompt_accepted"] ?? 0) / funnelRows["pwa_prompt_shown"] * 100) : 0;
+
+    const dailyScanArr: any[] = (dailyRows as any)?.results ?? [];
+    const maxDaily = Math.max(...dailyScanArr.map((r: any) => r.cnt), 1);
+    const maxDAU = Math.max(...dailyActiveRows.map((r: any) => r.sessions), 1);
+    const maxEventDaily = Math.max(...eventDailyRows.map((r: any) => r.cnt), 1);
+
+    const scoreDistArr: any[] = (scoreDistRows as any)?.results ?? [];
+    const maxScoreDist = Math.max(...scoreDistArr.map((r: any) => r.cnt), 1);
+
+    const genderArr: any[] = (genderRows as any)?.results ?? [];
+    const genderTotal = genderArr.reduce((s: number, r: any) => s + r.cnt, 0) || 1;
+    const AGE_ORDER = ["10대","20대 초반","20대 후반","30대 초반","30대 후반","40대 초반","40대 후반","50대+"];
+    const ageArr: any[] = [...((ageRows as any)?.results ?? [])].sort((a, b) =>
+      (AGE_ORDER.indexOf(a.age_group) + 99) % 99 - (AGE_ORDER.indexOf(b.age_group) + 99) % 99
+    );
+
+    const scoreColors = ["#ef4444","#f97316","#f59e0b","#eab308","#84cc16","#22c55e","#10b981","#14b8a6","#06b6d4","#2D5F4F"];
+
+    const TAB_LABEL: Record<string, string> = {
+      scan: "스캔", routine: "루틴", diary: "일기", magazine: "매거진", my: "MY",
+    };
+
+    // ── HTML 렌더 ─────────────────────────────────────────────────
+    const html = `<!DOCTYPE html>
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Fonday Admin</title>
-  <style>
-    * { box-sizing: border-box; }
-    body { font-family: -apple-system, sans-serif; max-width: 900px; margin: 0 auto; padding: 24px 20px 60px; background: #faf9f6; color: #1c1917; }
-    h1 { font-size: 22px; font-weight: 900; color: #2D5F4F; margin: 0 0 4px; }
-    h2 { font-size: 14px; font-weight: 700; color: #78716c; margin: 28px 0 10px; text-transform: uppercase; letter-spacing: .05em; }
-    .cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 20px 0; }
-    .card { background: white; border-radius: 16px; padding: 18px 16px; box-shadow: 0 1px 6px rgba(0,0,0,0.06); }
-    .card .num { font-size: 30px; font-weight: 900; color: #2D5F4F; line-height: 1; }
-    .card .label { font-size: 12px; color: #a8a29e; margin-top: 5px; }
-    .grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
-    .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-    .panel { background: white; border-radius: 16px; padding: 18px; box-shadow: 0 1px 6px rgba(0,0,0,0.06); }
-    table { width: 100%; border-collapse: collapse; background: white; border-radius: 16px; overflow: hidden; box-shadow: 0 1px 6px rgba(0,0,0,0.06); }
-    th { background: #f5f5f4; padding: 9px 14px; text-align: left; font-size: 11px; color: #78716c; font-weight: 600; text-transform: uppercase; }
-    td { padding: 9px 14px; font-size: 13px; border-top: 1px solid #f5f5f4; }
-    .badge { display: inline-block; padding: 2px 8px; border-radius: 20px; font-size: 11px; font-weight: 700; background: #ecfdf5; color: #2D5F4F; }
-    .badge-guest { background: #fef3c7; color: #92400e; }
-    .badge-f { background: #fce7f3; color: #9d174d; }
-    .badge-m { background: #ede9fe; color: #5b21b6; }
-    .bar-wrap { display: flex; flex-direction: column; gap: 6px; }
-    .bar-row { display: flex; align-items: center; gap: 8px; font-size: 12px; }
-    .bar-label { width: 64px; text-align: right; color: #78716c; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .bar-bg { flex: 1; background: #f5f5f4; border-radius: 99px; height: 10px; }
-    .bar-fill { height: 10px; border-radius: 99px; background: #2D5F4F; }
-    .bar-val { width: 32px; font-weight: 700; color: #2D5F4F; font-size: 12px; }
-    .chart { display: flex; align-items: flex-end; gap: 4px; height: 80px; margin-top: 8px; }
-    .chart-col { display: flex; flex-direction: column; align-items: center; flex: 1; gap: 4px; }
-    .chart-bar { width: 100%; background: #2D5F4F; border-radius: 4px 4px 0 0; min-height: 2px; }
-    .chart-label { font-size: 9px; color: #a8a29e; white-space: nowrap; }
-    .pie { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
-    .pie-item { display: flex; align-items: center; gap: 6px; font-size: 12px; }
-    .dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
-    .gender-bars { display: flex; gap: 8px; align-items: flex-end; height: 64px; margin: 8px 0; }
-    .gender-col { display: flex; flex-direction: column; align-items: center; gap: 4px; flex: 1; }
-    .gender-bar { width: 100%; border-radius: 6px 6px 0 0; }
-    .gender-label { font-size: 11px; color: #78716c; font-weight: 700; }
-    .gender-pct { font-size: 13px; font-weight: 900; color: #1c1917; }
-    @media(max-width:640px) { .cards { grid-template-columns: repeat(2,1fr); } .grid3,.grid2 { grid-template-columns: 1fr; } }
-  </style>
+  <style>${CSS}</style>
 </head>
 <body>
-  <h1>🌿 Fonday Admin</h1>
-  <p style="color:#a8a29e;font-size:12px;margin:0 0 4px">${nowKST()} KST · <a href="" style="color:#2D5F4F">새로고침</a></p>
+  <h1>🌿 Fonday Admin Dashboard</h1>
+  <p style="color:#a8a29e;font-size:12px;margin:4px 0 16px">${nowKST()} KST &nbsp;·&nbsp; <a href="" style="color:#2D5F4F;font-weight:700">새로고침</a></p>
 
-  <div class="cards">
-    <div class="card">
-      <div class="num">${total}</div>
-      <div class="label">전체 스캔</div>
-    </div>
-    <div class="card">
-      <div class="num">${today}</div>
-      <div class="label">오늘 스캔 (KST)</div>
-    </div>
-    <div class="card">
-      <div class="num">${week}</div>
-      <div class="label">7일 스캔</div>
-    </div>
-    <div class="card">
-      <div class="num">${pushCount}</div>
-      <div class="label">푸시 구독자</div>
-    </div>
-    <div class="card">
-      <div class="num">${avgScore}</div>
-      <div class="label">평균 점수</div>
-    </div>
-    <div class="card">
-      <div class="num">${loggedin}</div>
-      <div class="label">로그인 스캔</div>
-    </div>
-    <div class="card">
-      <div class="num">${guest}</div>
-      <div class="label">비로그인 스캔</div>
-    </div>
-    <div class="card">
-      <div class="num">${total > 0 ? Math.round(loggedin / total * 100) : 0}%</div>
-      <div class="label">로그인 전환율</div>
+  <nav class="nav">
+    <a href="#overview">개요</a>
+    <a href="#funnel">퍼널</a>
+    <a href="#scan">스캔 분석</a>
+    <a href="#users">유저 분석</a>
+    <a href="#features">피처 사용률</a>
+    <a href="#engagement">참여도</a>
+    <a href="#recent">최근 스캔</a>
+  </nav>
+
+  <!-- ═══ 개요 ═══════════════════════════════════════════════════ -->
+  <div id="overview" class="section">
+    <h2>개요</h2>
+    <div class="cards">
+      <div class="card"><div class="num">${total.toLocaleString()}</div><div class="label">전체 스캔</div></div>
+      <div class="card"><div class="num">${todayCnt}</div><div class="label">오늘 스캔 (KST)</div></div>
+      <div class="card"><div class="num">${weekCnt}</div><div class="label">7일 스캔</div><div class="sub">${monthCnt} / 30일</div></div>
+      <div class="card"><div class="num">${pushCount}</div><div class="label">푸시 구독자</div></div>
+      <div class="card"><div class="num">${avgScore}</div><div class="label">평균 점수</div><div class="sub">${(scoreMetricsRows as any)?.min ?? 0} ~ ${(scoreMetricsRows as any)?.max ?? 0}</div></div>
+      <div class="card"><div class="num">${loggedin}</div><div class="label">로그인 스캔</div><div class="sub">${loginRate}% 전환율</div></div>
+      <div class="card"><div class="num">${guest}</div><div class="label">비로그인 스캔</div></div>
+      <div class="card"><div class="num">${(diaryCountRow as any)?.cnt ?? 0}</div><div class="label">일기 항목</div><div class="sub">${(cosmeticsCountRow as any)?.cnt ?? 0} 화장품</div></div>
     </div>
   </div>
 
-  <h2>최근 14일 스캔 추이 (KST)</h2>
-  <div class="panel">
-    <div class="chart">
-      ${dailyRows.map((r: any) => `
-        <div class="chart-col">
-          <div class="chart-bar" style="height:${Math.round(r.cnt / maxDaily * 72)}px" title="${r.cnt}건"></div>
-          <div class="chart-label">${r.day?.slice(5) ?? ""}</div>
-        </div>`).join("")}
-    </div>
-  </div>
-
-  <div class="grid3" style="margin-top:12px">
+  <!-- ═══ 퍼널 ════════════════════════════════════════════════════ -->
+  <div id="funnel" class="section">
+    <h2>전환 퍼널 ${!eventsExist ? '<span style="color:#f59e0b;font-weight:600">(events 테이블 미생성 — /api/admin/d1-migrate4 실행 필요)</span>' : ''}</h2>
     <div class="panel">
-      <h2 style="margin-top:0">성별 분포</h2>
-      ${genderRows.length === 0
-        ? `<p style="font-size:12px;color:#a8a29e">데이터 없음</p>`
-        : `<div class="gender-bars">
-          ${genderRows.map((r: any) => {
+      <h3>스캔 퍼널</h3>
+      <div class="funnel">
+        <div class="funnel-step">
+          <div class="funnel-num">${(funnelRows["app_open"] ?? 0).toLocaleString()}</div>
+          <div class="funnel-label">앱 오픈</div>
+        </div>
+        <div class="funnel-step">
+          <div class="funnel-num">${(funnelRows["scan_start"] ?? 0).toLocaleString()}</div>
+          <div class="funnel-label">스캔 시작</div>
+          <div class="funnel-rate">${(funnelRows["app_open"] ?? 0) > 0 ? Math.round((funnelRows["scan_start"] ?? 0) / funnelRows["app_open"] * 100) : 0}%</div>
+        </div>
+        <div class="funnel-step">
+          <div class="funnel-num">${(funnelRows["scan_complete"] ?? 0).toLocaleString()}</div>
+          <div class="funnel-label">스캔 완료</div>
+          <div class="funnel-rate">${scanConvRate}%</div>
+        </div>
+        <div class="funnel-step" style="background:#fef3c7">
+          <div class="funnel-num" style="color:#92400e">${(funnelRows["scan_fail"] ?? 0).toLocaleString()}</div>
+          <div class="funnel-label">스캔 실패</div>
+          <div class="funnel-rate" style="color:#ef4444">${(funnelRows["scan_start"] ?? 0) > 0 ? Math.round((funnelRows["scan_fail"] ?? 0) / funnelRows["scan_start"] * 100) : 0}%</div>
+        </div>
+      </div>
+    </div>
+    <div class="grid2" style="margin-top:10px">
+      <div class="panel">
+        <h3>푸시 알림 퍼널</h3>
+        <div class="funnel">
+          <div class="funnel-step"><div class="funnel-num">${(funnelRows["push_prompt_shown"] ?? 0)}</div><div class="funnel-label">프롬프트 노출</div></div>
+          <div class="funnel-step"><div class="funnel-num">${(funnelRows["push_prompt_accepted"] ?? 0)}</div><div class="funnel-label">수락</div><div class="funnel-rate">${pushOptInRate}%</div></div>
+          <div class="funnel-step"><div class="funnel-num">${(funnelRows["push_prompt_dismissed"] ?? 0)}</div><div class="funnel-label">거절</div></div>
+        </div>
+      </div>
+      <div class="panel">
+        <h3>PWA 설치 퍼널</h3>
+        <div class="funnel">
+          <div class="funnel-step"><div class="funnel-num">${(funnelRows["pwa_prompt_shown"] ?? 0)}</div><div class="funnel-label">설치 프롬프트</div></div>
+          <div class="funnel-step"><div class="funnel-num">${(funnelRows["pwa_prompt_accepted"] ?? 0)}</div><div class="funnel-label">설치 수락</div><div class="funnel-rate">${pwaAcceptRate}%</div></div>
+          <div class="funnel-step"><div class="funnel-num">${(funnelRows["pwa_prompt_dismissed"] ?? 0)}</div><div class="funnel-label">거절</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ 스캔 분석 ════════════════════════════════════════════════ -->
+  <div id="scan" class="section">
+    <h2>스캔 분석</h2>
+    <div class="grid2">
+      <div class="panel">
+        <h3>30일 일별 스캔 추이</h3>
+        <div class="chart">
+          ${dailyScanArr.map((r: any) => `
+            <div class="chart-col">
+              <div class="chart-bar" style="height:${Math.round(r.cnt / maxDaily * 64)}px" title="${r.day}: ${r.cnt}건"></div>
+              <div class="chart-label">${(r.day ?? "").slice(5)}</div>
+            </div>`).join("") || '<p style="font-size:11px;color:#a8a29e;margin:0">데이터 없음</p>'}
+        </div>
+      </div>
+      <div class="panel">
+        <h3>점수 분포</h3>
+        <div class="score-dist">
+          ${scoreDistArr.map((r: any) => {
+            const bucket = Number(r.bucket);
+            const color = scoreColors[Math.min(Math.floor(bucket / 10), 9)];
+            return `<div class="score-col">
+              <div class="score-bar" style="background:${color};height:${Math.round(r.cnt / maxScoreDist * 50)}px" title="${bucket}~${bucket+9}점: ${r.cnt}명"></div>
+              <div class="score-label">${bucket}</div>
+            </div>`;
+          }).join("") || '<p style="font-size:11px;color:#a8a29e;margin:0">데이터 없음</p>'}
+        </div>
+      </div>
+    </div>
+    <div class="grid3" style="margin-top:10px">
+      <div class="panel">
+        <h3>바우만 타입 TOP8</h3>
+        <div class="bar-wrap">
+          ${((baumannRows as any)?.results ?? []).map((r: any) => {
+            const pct = total > 0 ? Math.round(r.cnt / total * 100) : 0;
+            return `<div class="bar-row">
+              <div class="bar-label">${r.baumann_type || "??"}</div>
+              <div class="bar-bg"><div class="bar-fill" style="width:${pct}%"></div></div>
+              <div class="bar-val">${r.cnt}</div>
+              <div class="bar-pct">${pct}%</div>
+            </div>`;
+          }).join("") || '<p style="font-size:11px;color:#a8a29e;margin:0">데이터 없음</p>'}
+        </div>
+      </div>
+      <div class="panel">
+        <h3>성별 분포</h3>
+        <div class="bar-wrap">
+          ${genderArr.map((r: any) => {
             const pct = Math.round(r.cnt / genderTotal * 100);
-            const color = genderColors[r.gender] ?? "#2D5F4F";
-            return `<div class="gender-col">
-              <div class="gender-pct">${pct}%</div>
-              <div class="gender-bar" style="background:${color};height:${Math.max(8, Math.round(pct * 0.5))}px"></div>
-              <div class="gender-label">${genderLabel(r.gender)}</div>
-              <div style="font-size:11px;color:#a8a29e">${r.cnt}명</div>
+            const color = r.gender === "female" ? "#ec4899" : r.gender === "male" ? "#6366f1" : "#2D5F4F";
+            const label = r.gender === "female" ? "여성" : r.gender === "male" ? "남성" : r.gender;
+            return `<div class="bar-row">
+              <div class="bar-label">${label}</div>
+              <div class="bar-bg"><div class="bar-fill" style="width:${pct}%;background:${color}"></div></div>
+              <div class="bar-val">${r.cnt}</div>
+              <div class="bar-pct">${pct}%</div>
+            </div>`;
+          }).join("") || '<p style="font-size:11px;color:#a8a29e;margin:0">데이터 없음</p>'}
+        </div>
+      </div>
+      <div class="panel">
+        <h3>나이대 분포</h3>
+        <div class="bar-wrap">
+          ${ageArr.length === 0
+            ? '<p style="font-size:11px;color:#a8a29e;margin:0">데이터 없음</p>'
+            : ageArr.map((r: any) => {
+                const ageTotal2 = ageArr.reduce((s: number, x: any) => s + x.cnt, 0) || 1;
+                const pct = Math.round(r.cnt / ageTotal2 * 100);
+                return `<div class="bar-row">
+                  <div class="bar-label-wide">${r.age_group}</div>
+                  <div class="bar-bg"><div class="bar-fill" style="width:${pct}%"></div></div>
+                  <div class="bar-val">${r.cnt}</div>
+                  <div class="bar-pct">${pct}%</div>
+                </div>`;
+              }).join("")
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ 유저 분석 ════════════════════════════════════════════════ -->
+  <div id="users" class="section">
+    <h2>유저 분석</h2>
+    <div class="grid3">
+      <div class="panel">
+        <h3>언어 분포</h3>
+        <div class="pie-row">
+          ${((langRows as any)?.results ?? []).map((r: any, i: number) => {
+            const colors = ["#2D5F4F","#f59e0b","#6366f1","#ef4444","#10b981"];
+            const langTotal = ((langRows as any)?.results ?? []).reduce((s: number, x: any) => s + x.cnt, 0) || 1;
+            const pct = Math.round(r.cnt / langTotal * 100);
+            return `<div class="pie-item"><div class="dot" style="background:${colors[i % colors.length]}"></div>${(r.lang ?? "ko").toUpperCase()} ${r.cnt} (${pct}%)</div>`;
+          }).join("")}
+        </div>
+        <div class="bar-wrap" style="margin-top:10px">
+          ${((langRows as any)?.results ?? []).map((r: any) => {
+            const langTotal = ((langRows as any)?.results ?? []).reduce((s: number, x: any) => s + x.cnt, 0) || 1;
+            const pct = Math.round(r.cnt / langTotal * 100);
+            const colors: Record<string,string> = { ko: "#2D5F4F", en: "#f59e0b", ja: "#6366f1" };
+            const color = colors[r.lang ?? "ko"] ?? "#2D5F4F";
+            return `<div class="bar-row">
+              <div class="bar-label">${(r.lang ?? "ko").toUpperCase()}</div>
+              <div class="bar-bg"><div class="bar-fill" style="width:${pct}%;background:${color}"></div></div>
+              <div class="bar-val">${r.cnt}</div>
             </div>`;
           }).join("")}
-        </div>`
-      }
-    </div>
-
-    <div class="panel">
-      <h2 style="margin-top:0">언어 분포</h2>
-      <div class="pie">
-        ${((langResult as any)?.results ?? []).map((r: any, i: number) => {
-          const colors = ["#2D5F4F","#F59E0B","#6366F1","#EF4444"];
-          return `<div class="pie-item"><div class="dot" style="background:${colors[i % colors.length]}"></div>${r.lang?.toUpperCase()} ${r.cnt}건</div>`;
-        }).join("")}
+        </div>
       </div>
-    </div>
-
-    <div class="panel">
-      <h2 style="margin-top:0">바우만 타입 TOP</h2>
-      <div class="bar-wrap">
-        ${((baumannResult as any)?.results ?? []).slice(0, 5).map((r: any) => {
-          const pct = total > 0 ? Math.round(r.cnt / total * 100) : 0;
-          return `<div class="bar-row">
-            <div class="bar-label">${r.baumann_type || "??"}</div>
-            <div class="bar-bg"><div class="bar-fill" style="width:${pct}%"></div></div>
-            <div class="bar-val">${r.cnt}</div>
-          </div>`;
-        }).join("")}
+      <div class="panel">
+        <h3>로그인 vs 게스트</h3>
+        <div style="margin-top:8px">
+          <div class="metric-row">
+            <span>로그인 스캔</span>
+            <span style="font-weight:700;color:#2D5F4F">${loggedin} (${loginRate}%)</span>
+          </div>
+          <div class="metric-row">
+            <span>게스트 스캔</span>
+            <span style="font-weight:700;color:#92400e">${guest} (${100 - loginRate}%)</span>
+          </div>
+          <div class="metric-row">
+            <span>푸시 구독자</span>
+            <span style="font-weight:700;color:#6366f1">${pushCount}</span>
+          </div>
+          <div class="metric-row">
+            <span>푸시 옵트인율</span>
+            <span style="font-weight:700;color:#f59e0b">${pushOptInRate}%</span>
+          </div>
+        </div>
+      </div>
+      <div class="panel">
+        <h3>수익화 신호</h3>
+        <div style="margin-top:8px">
+          <div class="metric-row">
+            <span>화장품 등록 수</span>
+            <span style="font-weight:700">${(cosmeticsCountRow as any)?.cnt ?? 0}</span>
+          </div>
+          <div class="metric-row">
+            <span>일기 항목 수</span>
+            <span style="font-weight:700">${(diaryCountRow as any)?.cnt ?? 0}</span>
+          </div>
+          <div class="metric-row">
+            <span>스캔 완료율</span>
+            <span style="font-weight:700;color:#10b981">${scanConvRate}%</span>
+          </div>
+          <div class="metric-row">
+            <span>PWA 설치 전환율</span>
+            <span style="font-weight:700;color:#6366f1">${pwaAcceptRate}%</span>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 
-  <h2>나이대 분포</h2>
-  <div class="panel">
-    <div class="bar-wrap">
-      ${sortedAgeRows.length === 0
-        ? `<p style="font-size:12px;color:#a8a29e;margin:0">데이터 없음 (마이그레이션 후 새 스캔부터 수집됩니다)</p>`
-        : sortedAgeRows.map((r: any) => {
-          const pct = Math.round(r.cnt / ageTotal * 100);
-          return `<div class="bar-row">
-            <div class="bar-label" style="width:80px">${r.age_group}</div>
-            <div class="bar-bg"><div class="bar-fill" style="width:${pct}%"></div></div>
-            <div class="bar-val">${r.cnt}</div>
-            <div style="font-size:11px;color:#a8a29e">${pct}%</div>
-          </div>`;
-        }).join("")
-      }
+  <!-- ═══ 피처 사용률 ══════════════════════════════════════════════ -->
+  <div id="features" class="section">
+    <h2>피처 사용률 ${!eventsExist ? '<span style="color:#f59e0b;font-weight:600">(events 테이블 필요)</span>' : ''}</h2>
+    <div class="grid2">
+      <div class="panel">
+        <h3>탭 방문 비율</h3>
+        ${tabRows.length === 0
+          ? '<p style="font-size:11px;color:#a8a29e;margin:0">데이터 없음</p>'
+          : (() => {
+              const tabTotal = tabRows.reduce((s: number, r: any) => s + r.cnt, 0) || 1;
+              const tabColors: Record<string,string> = { scan: "#2D5F4F", routine: "#f59e0b", diary: "#6366f1", magazine: "#ec4899", my: "#10b981" };
+              return `<div class="bar-wrap">
+                ${tabRows.map((r: any) => {
+                  const pct = Math.round(r.cnt / tabTotal * 100);
+                  const color = tabColors[r.tab] ?? "#2D5F4F";
+                  return `<div class="bar-row">
+                    <div class="bar-label">${TAB_LABEL[r.tab] ?? r.tab}</div>
+                    <div class="bar-bg"><div class="bar-fill" style="width:${pct}%;background:${color}"></div></div>
+                    <div class="bar-val">${r.cnt}</div>
+                    <div class="bar-pct">${pct}%</div>
+                  </div>`;
+                }).join("")}
+              </div>`;
+            })()
+        }
+      </div>
+      <div class="panel">
+        <h3>피처 사용 TOP10</h3>
+        ${featureRows.length === 0
+          ? '<p style="font-size:11px;color:#a8a29e;margin:0">데이터 없음</p>'
+          : (() => {
+              const featureTotal = featureRows.reduce((s: number, r: any) => s + r.cnt, 0) || 1;
+              return `<div class="bar-wrap">
+                ${featureRows.filter((r: any) => r.feature).map((r: any) => {
+                  const pct = Math.round(r.cnt / featureTotal * 100);
+                  return `<div class="bar-row">
+                    <div class="bar-label">${r.feature}</div>
+                    <div class="bar-bg"><div class="bar-fill" style="width:${pct}%"></div></div>
+                    <div class="bar-val">${r.cnt}</div>
+                    <div class="bar-pct">${pct}%</div>
+                  </div>`;
+                }).join("")}
+              </div>`;
+            })()
+        }
+      </div>
     </div>
   </div>
 
-  <h2>최근 스캔 20건</h2>
-  <table>
-    <tr><th>점수</th><th>바우만</th><th>피부나이</th><th>성별</th><th>나이대</th><th>언어</th><th>유형</th><th>시간(KST)</th></tr>
-    ${((recentResult as any)?.results ?? []).map((r: any) => `
-      <tr>
-        <td><strong>${r.overall_score}</strong></td>
-        <td><span class="badge">${r.baumann_type || "?"}</span></td>
-        <td>${r.skin_age ?? "-"}</td>
-        <td><span class="badge ${r.gender === 'female' ? 'badge-f' : r.gender === 'male' ? 'badge-m' : ''}">${r.gender === 'female' ? '여성' : r.gender === 'male' ? '남성' : '-'}</span></td>
-        <td style="font-size:12px">${r.age_group || "-"}</td>
-        <td>${(r.lang ?? "ko").toUpperCase()}</td>
-        <td><span class="badge ${r.is_guest ? 'badge-guest' : ''}">${r.is_guest ? "비로그인" : "로그인"}</span></td>
-        <td style="color:#a8a29e;font-size:12px">${toKST(r.created_at)}</td>
-      </tr>`).join("")}
-  </table>
+  <!-- ═══ 참여도 ════════════════════════════════════════════════════ -->
+  <div id="engagement" class="section">
+    <h2>참여도 & 활성 유저 ${!eventsExist ? '<span style="color:#f59e0b;font-weight:600">(events 테이블 필요)</span>' : ''}</h2>
+    <div class="grid2">
+      <div class="panel">
+        <h3>30일 DAU (세션 기준)</h3>
+        <div class="chart">
+          ${dailyActiveRows.length === 0
+            ? '<p style="font-size:11px;color:#a8a29e;margin:0">데이터 없음</p>'
+            : dailyActiveRows.map((r: any) => `
+                <div class="chart-col">
+                  <div class="chart-bar" style="height:${Math.round(r.sessions / maxDAU * 64)}px;background:#6366f1" title="${r.day}: ${r.sessions} 세션, ${r.users ?? 0} 로그인유저"></div>
+                  <div class="chart-label">${(r.day ?? "").slice(5)}</div>
+                </div>`).join("")
+          }
+        </div>
+      </div>
+      <div class="panel">
+        <h3>30일 이벤트 발생 추이</h3>
+        <div class="chart">
+          ${eventDailyRows.length === 0
+            ? '<p style="font-size:11px;color:#a8a29e;margin:0">데이터 없음</p>'
+            : eventDailyRows.map((r: any) => `
+                <div class="chart-col">
+                  <div class="chart-bar" style="height:${Math.round(r.cnt / maxEventDaily * 64)}px;background:#f59e0b" title="${r.day}: ${r.cnt}건"></div>
+                  <div class="chart-label">${(r.day ?? "").slice(5)}</div>
+                </div>`).join("")
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ 최근 스캔 ════════════════════════════════════════════════ -->
+  <div id="recent" class="section">
+    <h2>최근 스캔 20건</h2>
+    <table>
+      <tr><th>점수</th><th>바우만</th><th>피부나이</th><th>성별</th><th>나이대</th><th>언어</th><th>유형</th><th>시간 (KST)</th></tr>
+      ${((recentRows as any)?.results ?? []).map((r: any) => `
+        <tr>
+          <td><strong>${r.overall_score}</strong></td>
+          <td><span class="badge">${r.baumann_type || "?"}</span></td>
+          <td>${r.skin_age ?? "-"}</td>
+          <td><span class="badge ${r.gender === "female" ? "badge-f" : r.gender === "male" ? "badge-m" : ""}">${r.gender === "female" ? "여성" : r.gender === "male" ? "남성" : "-"}</span></td>
+          <td style="font-size:11px">${r.age_group || "-"}</td>
+          <td>${(r.lang ?? "ko").toUpperCase()}</td>
+          <td><span class="badge ${r.is_guest ? "badge-guest" : ""}">${r.is_guest ? "비로그인" : "로그인"}</span></td>
+          <td style="color:#a8a29e;font-size:11px">${toKST(r.created_at)}</td>
+        </tr>`).join("")}
+    </table>
+  </div>
+
+  <p style="margin-top:40px;font-size:11px;color:#d4d4d4;text-align:center">
+    Fonday Admin · 이벤트 수집: events 테이블 필요 (POST /api/admin/d1-migrate4 with ADMIN_KEY)
+  </p>
 </body>
 </html>`;
 
-  return new Response(html, {
-    headers: { "Content-Type": "text/html;charset=UTF-8" },
-  });
+    return new Response(html, { headers: { "Content-Type": "text/html;charset=UTF-8" } });
+
   } catch (e: any) {
     console.error("Admin stats error:", e);
-    return new Response(`<pre style="font-family:monospace;padding:24px">Internal server error</pre>`, {
-      status: 500,
-      headers: { "Content-Type": "text/html;charset=UTF-8" },
+    return new Response(`<pre style="font-family:monospace;padding:24px;background:#faf9f6">Error: ${e?.message ?? "unknown"}</pre>`, {
+      status: 500, headers: { "Content-Type": "text/html;charset=UTF-8" },
     });
   }
 };
