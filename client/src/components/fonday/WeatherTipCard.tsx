@@ -32,7 +32,23 @@ export function WeatherTipCard({ compact, weather: weatherProp }: {
   }, [weatherProp]);
 
   const weather = weatherProp ?? internalWeather;
-  if (denied || !weather) return null;
+  
+  if (denied) return null;
+  
+  // 로딩 상태 처리 (데이터가 아직 없을 때)
+  if (!weather) {
+    return (
+      <div className="px-3.5 py-2.5 border-t border-stone-100/80 animate-pulse" style={{ background: TINT_GREEN }}>
+        <div className="flex items-center gap-3">
+          <div className="w-6 h-6 rounded-full bg-stone-200" />
+          <div className="flex-1 space-y-1.5">
+            <div className="h-3 bg-stone-200 rounded w-1/3" />
+            <div className="h-2 bg-stone-200 rounded w-2/3" />
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const tipKey = getWeatherTipKey(weather);
   const tipRaw = t(`weather.tips.${tipKey}`, { returnObjects: true });

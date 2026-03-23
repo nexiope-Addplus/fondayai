@@ -314,9 +314,12 @@ export function ResultScreen({ weather, surveyData, analysisResult, imageSrc, fa
 
   // 스캔 저장 (로그인 + 분석결과 둘 다 준비됐을 때)
   useEffect(() => {
-    if (!user || !analysisResult || isSaved) return;
-    // Bug 1 fix: 한국어 label 하드코딩 제거 → index 0 (항상 종합점수)
+    if (!user || !analysisResult || !analysisResult.scores || isSaved) return;
     const overallScore = analysisResult.scores[0]?.score || 0;
+    
+    // weatherInfo는 있어도 되고 없어도 되지만, 객체 구조는 유지하도록 방어
+    const safeWeather = weather && typeof weather === 'object' ? weather : null;
+
     fetch("/api/scans", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -329,7 +332,7 @@ export function ResultScreen({ weather, surveyData, analysisResult, imageSrc, fa
         aiComment: analysisResult.aiComment,
         improvements: analysisResult.improvements ?? [],
         cosmetics: analysisResult.cosmetics ?? [],
-        weatherInfo: weather,
+        weatherInfo: safeWeather,
         lang: i18n.language || "ko",
         gender: (surveyData?.genderIdx ?? 0) === 0 ? "female" : "male",
         ageGroup: ["10대","20대 초반","20대 후반","30대 초반","30대 후반","40대 초반","40대 후반","50대+"][surveyData?.ageIdx ?? 2] ?? "",
@@ -349,14 +352,14 @@ export function ResultScreen({ weather, surveyData, analysisResult, imageSrc, fa
           scores: analysisResult.scores,
           skinAge: analysisResult.skinAge,
           aiComment: analysisResult.aiComment,
-          weatherInfo: weather,
+          weatherInfo: safeWeather,
           lang: i18n.language || "ko",
           isGuest: false,
           gender: (surveyData?.genderIdx ?? 0) === 0 ? "female" : "male",
           ageGroup: KO_AGE_GROUPS2[surveyData?.ageIdx ?? 2] ?? "",
         }),
       }).catch(() => {});
-    }).catch(() => {}); // Bug 4 fix: .catch() 추가
+    }).catch(() => {}); 
   }, [user, analysisResult, weather, isSaved, finalType, surveyData]);
 
   // 모달 열릴 때 배경 스크롤 잠금

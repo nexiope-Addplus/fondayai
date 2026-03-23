@@ -59,8 +59,9 @@ export function ScanIdleScreen({
 
   // 케어 브리핑 로드
   useEffect(() => {
-    if (!weather) return;
-    fetch(`/api/care-briefing?temp=${weather.temp}&humidity=${weather.humidity}&aqi=${weather.aqi || ""}`)
+    if (!weather || typeof weather.temp === 'undefined') return;
+    const { temp, humidity, aqi = "" } = weather;
+    fetch(`/api/care-briefing?temp=${temp}&humidity=${humidity}&aqi=${aqi}`)
       .then(res => res.ok ? res.json() : null)
       .then(data => { if (data && data.briefing) setCareBriefing(data); })
       .catch(() => {});

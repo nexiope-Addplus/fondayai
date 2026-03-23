@@ -196,14 +196,24 @@ export default function SkinScanPage() {
     const fetchWeather = (lat: number, lon: number) => {
       fetch(`/api/weather?lat=${lat}&lon=${lon}`)
         .then(res => res.ok ? res.json() : null)
-        .then(data => { if (data && !data.error) setWeatherData(data); })
-        .catch(() => {});
+        .then(data => {
+          if (data && !data.error) {
+            setWeatherData(data);
+          } else {
+            console.warn("[Weather] API error, using default data");
+          }
+        })
+        .catch(err => console.error("[Weather] Fetch failed:", err));
     };
 
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (pos) => fetchWeather(pos.coords.latitude, pos.coords.longitude),
-        () => fetchWeather(37.5665, 126.9780) // Fallback: Seoul
+        (err) => {
+          console.warn("[Weather] Geolocation denied/failed:", err.message);
+          fetchWeather(37.5665, 126.9780); // Fallback: Seoul
+        },
+        { timeout: 5000 }
       );
     } else {
       fetchWeather(37.5665, 126.9780); // Fallback: Seoul
