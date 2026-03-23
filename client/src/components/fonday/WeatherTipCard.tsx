@@ -7,37 +7,13 @@ import type { WeatherData } from "./types";
 import { getWeatherTipKey } from "./utils";
 
 // ─── 날씨 연동 데일리 팁 카드 ─────────────────────────────────────
-export function WeatherTipCard({ compact, weather: weatherProp }: {
+export function WeatherTipCard({ compact, weather }: {
   compact?: boolean;
   weather?: WeatherData | null;
 } = {}) {
   const { t } = useTranslation();
-  const [internalWeather, setInternalWeather] = useState<WeatherData | null>(null);
-  const [denied, setDenied] = useState(false);
 
-  useEffect(() => {
-    // weatherProp이 있으면 fetch 건너뜀
-    if (weatherProp) return;
-    
-    if (!navigator.geolocation) return;
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        const { latitude: lat, longitude: lon } = pos.coords;
-        fetch(`/api/weather?lat=${lat}&lon=${lon}`)
-          .then((r) => r.ok ? r.json() : null)
-          .then((data) => { if (data && !data.error) setInternalWeather(data as WeatherData); })
-          .catch(() => {});
-      },
-      () => setDenied(true),
-      { timeout: 8000 }
-    );
-  }, [weatherProp]);
-
-  const weather = weatherProp || internalWeather;
-  
-  if (denied) return null;
-  
-  // 로딩 상태 처리
+  // 로딩 상태 처리 (데이터가 아직 없을 때)
   if (!weather) {
     return (
       <div className="px-3.5 py-2.5 border-t border-stone-100/80 animate-pulse" style={{ background: TINT_GREEN }}>
