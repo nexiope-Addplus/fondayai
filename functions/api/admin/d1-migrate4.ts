@@ -28,36 +28,41 @@ export const onRequest = async (context: any) => {
 
     const results: string[] = [];
 
-    // events 테이블 생성
-    // 테이블 존재 여부: PRAGMA로 확인 (sqlite_master는 D1에서 미지원)
-    const pragmaInfo = await env.FONDAY_DB.prepare("PRAGMA table_info(events)").all().catch(() => ({ results: [] }));
-    if ((pragmaInfo as any).results?.length > 0) {
-      results.push("events table already exists — skipped");
-    } else {
-      await env.FONDAY_DB.prepare(`
-        CREATE TABLE events (
-          id INTEGER PRIMARY KEY AUTOINCREMENT,
-          user_id TEXT DEFAULT '',
-          session_id TEXT DEFAULT '',
-          event_type TEXT NOT NULL,
-          event_data TEXT DEFAULT '{}',
-          lang TEXT DEFAULT 'ko',
-          is_guest INTEGER DEFAULT 1,
-          created_at TEXT DEFAULT (datetime('now'))
-        )
-      `).run();
-      await env.FONDAY_DB.prepare("CREATE INDEX idx_events_type ON events(event_type)").run();
-      await env.FONDAY_DB.prepare("CREATE INDEX idx_events_created ON events(created_at)").run();
-      await env.FONDAY_DB.prepare("CREATE INDEX idx_events_user ON events(user_id)").run();
-      results.push("events table created with indexes");
-    }
+    await env.FONDAY_DB.prepare(`
+      CREATE TABLE IF NOT EXISTS events (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id TEXT DEFAULT '',
+        session_id TEXT DEFAULT '',
+        event_type TEXT NOT NULL,
+        event_data TEXT DEFAULT '{}',
+        lang TEXT DEFAULT 'ko',
+        is_guest INTEGER DEFAULT 1,
+        created_at TEXT DEFAULT (datetime('now'))
+      )
+    `).run();
+    results.push("events table ok");
+
+    await env.FONDAY_DB.prepare(
+      "CREATE INDEX IF NOT EXISTS idx_events_type ON events(event_type)"
+    ).run();
+    results.push("idx_events_type ok");
+
+    await env.FONDAY_DB.prepare(
+      "CREATE INDEX IF NOT EXISTS idx_events_created ON events(created_at)"
+    ).run();
+    results.push("idx_events_created ok");
+
+    await env.FONDAY_DB.prepare(
+      "CREATE INDEX IF NOT EXISTS idx_events_user ON events(user_id)"
+    ).run();
+    results.push("idx_events_user ok");
 
     return new Response(JSON.stringify({ ok: true, results }), {
       headers: { "Content-Type": "application/json" },
     });
   } catch (e: any) {
     console.error("d1-migrate4 error:", e);
-    return new Response(JSON.stringify({ error: "Internal error" }), {
+    return new Response(JSON.stringify({ error: "Internal error", detail: e?.message ?? "" }), {
       status: 500,
       headers: { "Content-Type": "application/json" },
     });
