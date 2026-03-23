@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Sparkles, Heart, Lock, CalendarDays, Activity,
-  ClipboardList, Camera, ChevronDown, ChevronRight, Flame,
+  ClipboardList, Camera, ChevronDown, ChevronRight, Flame, Bot,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -239,7 +239,7 @@ export function ScanIdleScreen({
                   }}
                 >
                   <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center shrink-0 shadow-sm">
-                    <Bot className={`w-4.5 h-4.5 ${careBriefing.priority === "high" ? "text-rose-500" : "text-emerald-600"}`} />
+                    <Bot className={`w-5 h-5 ${careBriefing.priority === "high" ? "text-rose-500" : "text-emerald-600"}`} />
                   </div>
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center justify-between mb-0.5">
