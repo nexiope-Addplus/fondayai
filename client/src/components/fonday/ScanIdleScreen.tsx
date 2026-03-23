@@ -174,7 +174,12 @@ export function ScanIdleScreen({
       onTouchEnd={handleTouchEnd}
     >
       {/* 상단 헤더 row */}
-      <div className="flex justify-end items-center mb-3 relative" style={{ zIndex: 1 }}>
+      <div className="flex justify-between items-center mb-3 relative" style={{ zIndex: 1 }}>
+        <div className="flex items-center gap-1.5 px-3 py-1 rounded-full"
+          style={{ background: `${SCAN_FROM}22`, border: `1px solid ${SCAN_FROM}50` }}>
+          <Sparkles className="w-3 h-3" style={{ color: SCAN_TO }} />
+          <span className="text-xs font-bold tracking-widest uppercase" style={{ color: SCAN_TO }}>FONDAY AI</span>
+        </div>
         <LangSwitcher />
       </div>
 
@@ -339,21 +344,21 @@ export function ScanIdleScreen({
               <div className="rounded-3xl px-2.5 py-2.5 mb-2.5 sm:rounded-3xl sm:px-3"
                 style={{ background: `${SCAN_FROM}10`, border: `1px solid ${SCAN_FROM}24` }}>
                 <div className="flex items-center justify-between gap-2">
-                  <p className="text-xs font-bold uppercase tracking-[0.14em] truncate min-w-0" style={{ color: SCAN_TO }}>{t("idle.heroBenefitsTitle")}</p>
+                  <p className="text-xs font-bold uppercase tracking-[0.14em] min-w-0" style={{ color: SCAN_TO }}>{t("idle.heroBenefitsTitle")}</p>
                   <span className="text-xs font-bold uppercase tracking-[0.14em] shrink-0" style={{ color: TEXT_SECONDARY }}>{t("idle.heroTag")}</span>
                 </div>
                 <div className="grid grid-cols-1 gap-2 mt-2">
                   <div className="flex items-center gap-2 text-xs font-semibold text-stone-700">
                     <Badge className="h-5 rounded-full px-2 text-xs shrink-0 whitespace-nowrap" style={{ background: "#F3E8E2", color: SCAN_TO }}>{t("result.baumannLabel")}</Badge>
-                    <span className="truncate">{t("idle.heroBenefit1")}</span>
+                    <span>{t("idle.heroBenefit1")}</span>
                   </div>
                   <div className="flex items-center gap-2 text-xs font-semibold text-stone-700">
                     <Badge className="h-5 rounded-full px-2 text-xs shrink-0 whitespace-nowrap" style={{ background: "#E7F7F0", color: DEEP_GREEN }}>{t("result.scores")}</Badge>
-                    <span className="truncate">{t("idle.heroBenefit2")}</span>
+                    <span>{t("idle.heroBenefit2")}</span>
                   </div>
                   <div className="flex items-center gap-2 text-xs font-semibold text-stone-700">
                     <Badge className="h-5 rounded-full px-2 text-xs shrink-0 whitespace-nowrap" style={{ background: "#FFF2E8", color: "#C2410C" }}>{t("result.skinAge")}</Badge>
-                    <span className="truncate">{t("idle.heroBenefit3")}</span>
+                    <span>{t("idle.heroBenefit3")}</span>
                   </div>
                 </div>
               </div>

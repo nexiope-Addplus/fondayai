@@ -22,6 +22,14 @@ export function ResultDiaryCard({
 }) {
   const { t } = useTranslation();
   const scanCount = history.filter((entry) => new Date(entry.createdAt).toISOString().slice(0, 10) !== new Date().toISOString().slice(0, 10)).length + 1;
+  const totalScans = (() => {
+    try {
+      const stored = parseInt(localStorage.getItem("fonday_total_scans") ?? "0", 10);
+      return stored > 0 ? stored : history.length + 1;
+    } catch {
+      return history.length + 1;
+    }
+  })();
   const delta = previousScore !== null ? overallScore - previousScore : 0;
 
   return (
@@ -64,7 +72,7 @@ export function ResultDiaryCard({
             </div>
             <div className="flex-1 rounded-2xl py-2 px-2 text-center" style={{ background: "#F0FDF4" }}>
               <p className="text-xs font-bold text-stone-400 mb-0.5">{t("result.totalScans")}</p>
-              <p className="text-sm font-bold" style={{ color: "#059669" }}>{history.length + 1}</p>
+              <p className="text-sm font-bold" style={{ color: "#059669" }}>{totalScans}</p>
             </div>
             <button
               onClick={(event) => {

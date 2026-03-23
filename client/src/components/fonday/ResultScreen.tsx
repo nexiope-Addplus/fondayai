@@ -285,7 +285,16 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
     if (!user) return;
     fetch("/api/scans")
       .then(res => res.json())
-      .then(data => { if (Array.isArray(data)) setHistory(data); })
+      .then(data => {
+        if (Array.isArray(data)) {
+          setHistory(data);
+          try {
+            if (!localStorage.getItem("fonday_total_scans") && data.length > 0) {
+              localStorage.setItem("fonday_total_scans", String(data.length));
+            }
+          } catch {}
+        }
+      })
       .catch(() => {});
   }, [user]);
 
@@ -377,6 +386,10 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
       setIsSaved(true);
       if (data?.id) setCurrentScanId(data.id);
       if (data?.shareToken) setCurrentShareToken(data.shareToken);
+      try {
+        const prev = parseInt(localStorage.getItem("fonday_total_scans") ?? "0", 10);
+        localStorage.setItem("fonday_total_scans", String(prev + 1));
+      } catch {}
       
       // D1 챌린지 데이터 동기화
       const KO_AGE_GROUPS2 = ["10대","20대 초반","20대 후반","30대 초반","30대 후반","40대 초반","40대 후반","50대+"];

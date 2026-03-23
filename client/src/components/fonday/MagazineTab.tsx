@@ -150,16 +150,17 @@ export function MagazineTab() {
   const [latestScan, setLatestScan] = useState<any | null>(null);
 
   useEffect(() => {
-    fetch("/api/ranking")
-      .then((res) => (res.ok ? res.json() : null))
-      .then((data) => setRankingData(normalizeRankingData(data)))
-      .catch(() => setRankingData(null));
     fetch("/api/scans")
       .then((res) => (res.ok ? res.json() : []))
       .then((data) => {
-        if (Array.isArray(data) && data.length > 0) setLatestScan(data[0]);
+        const scan = Array.isArray(data) && data.length > 0 ? data[0] : null;
+        if (scan) setLatestScan(scan);
+        const score = scan?.overallScore ? Number(scan.overallScore) : null;
+        return fetch(`/api/ranking${score ? `?myScore=${score}` : ""}`);
       })
-      .catch(() => setLatestScan(null));
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => setRankingData(normalizeRankingData(data)))
+      .catch(() => setRankingData(null));
   }, []);
 
   const weakestScores = useMemo(() => {
@@ -433,7 +434,7 @@ export function MagazineTab() {
                 style={{ background: `linear-gradient(145deg, ${featured.bgFrom}, ${featured.bgTo})` }}
               >
                 {/* 이미지 영역 */}
-                <div className="relative" style={{ height: 200 }}>
+                <div className="relative" style={{ height: 140 }}>
                   <div className="absolute inset-0 opacity-10"
                     style={{ backgroundImage: "radial-gradient(circle at 20% 80%, white 1.5px, transparent 1.5px), radial-gradient(circle at 80% 20%, white 1.5px, transparent 1.5px)", backgroundSize: "28px 28px" }} />
                   {/* 장식 원 */}
