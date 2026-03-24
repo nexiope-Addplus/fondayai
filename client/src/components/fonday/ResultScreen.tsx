@@ -487,7 +487,7 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
         setIsPartnerSuccess(true);
         setTimeout(() => { setShowPartnership(false); setIsPartnerSuccess(false); setPartnerForm({ name: "", company: "", email: "", message: "" }); }, 2000);
       }
-    } catch { alert("오류가 발생했습니다."); }
+    } catch { alert(t("common.error", "오류가 발생했습니다.")); }
     finally { setIsPartnerSubmitting(false); }
   };
 
@@ -505,7 +505,7 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
         setIsSuccess(true);
         setTimeout(() => { setShowWaitlist(false); setIsSuccess(false); setEmail(""); }, 2000);
       }
-    } catch { alert("오류가 발생했습니다."); }
+    } catch { alert(t("common.error", "오류가 발생했습니다.")); }
     finally { setIsSubmitting(false); }
   };
 

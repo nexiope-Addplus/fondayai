@@ -244,8 +244,8 @@ export default function BattlePage() {
                       <PolarAngleAxis dataKey="subject" tick={{ fill: "#78716c", fontSize: 10, fontWeight: 600 }} />
                       <PolarRadiusAxis angle={90} domain={[0, 100]} tick={false} axisLine={false} />
                       
-                      <Radar name="친구" dataKey="friend" stroke={SCAN_TO} fill={SCAN_TO} fillOpacity={0.2} strokeWidth={2} />
-                      <Radar name="나" dataKey="me" stroke={DEEP_GREEN} fill={DEEP_GREEN} fillOpacity={0.4} strokeWidth={2} />
+                      <Radar name={t("battle.friend")} dataKey="friend" stroke={SCAN_TO} fill={SCAN_TO} fillOpacity={0.2} strokeWidth={2} />
+                      <Radar name={t("battle.me")} dataKey="me" stroke={DEEP_GREEN} fill={DEEP_GREEN} fillOpacity={0.4} strokeWidth={2} />
                       
                       <Legend 
                         iconType="circle" 

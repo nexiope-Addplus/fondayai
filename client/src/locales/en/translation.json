@@ -1274,6 +1274,7 @@
     "close": "Close",
     "refresh": "Refresh",
     "loading": "Loading",
-    "collapse": "Collapse"
+    "collapse": "Collapse",
+    "error": "An error occurred."
   }
 }

@@ -1274,6 +1274,7 @@
     "collapse": "접기",
     "close": "닫기",
     "refresh": "새로고침",
-    "loading": "불러오는 중"
+    "loading": "불러오는 중",
+    "error": "오류가 발생했습니다."
   }
 }
