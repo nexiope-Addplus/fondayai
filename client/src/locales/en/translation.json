@@ -1,4 +1,12 @@
 {
+  "routineChecklist": {
+    "title": "Today's Routine",
+    "empty": "Register products in the Routine tab",
+    "am": "Morning",
+    "pm": "Evening",
+    "checked": "{{count}} used",
+    "hint": "Check daily to track which products actually work"
+  },
   "nav": {
     "scan": "Home",
     "routine": "Routine",
