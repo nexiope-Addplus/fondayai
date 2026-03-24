@@ -273,7 +273,10 @@ export default {
     const now = new Date();
     const hour = now.getUTCHours();
 
-    if (hour === 22) {
+    if (hour === 0) {
+      // KST 09:00 — 화장품 효과 리마인더
+      ctx.waitUntil(sendCosmeticEffectReminders(env));
+    } else if (hour === 22) {
       // KST 07:00 — 스캔 리마인더 + 날씨 케어 동시 발송
       ctx.waitUntil(Promise.all([
         sendScanReminderToAll(env),
@@ -1296,6 +1299,133 @@ async function sendBedtimeCarePushToAll(env) {
       }, env);
     } catch (e) {
       console.error(`[bedtime-care] id=${id} error:`, e.message);
+    }
+  }
+}
+
+// ─── 화장품 효과 리마인더 (KST 09:00) ─────────────────────────────
+// 등록 3일/7일/14일 차 화장품에 대해 효과 추적 알림 발송
+async function sendCosmeticEffectReminders(env) {
+  const kv = env.PUSH_KV;
+  const db = env.FONDAY_DB;
+  if (!kv || !db) { console.log("[cosmetic-remind] KV or DB not bound"); return; }
+
+  const allIdsRaw = await kv.get("push:all_ids");
+  if (!allIdsRaw) return;
+  const allIds = JSON.parse(allIdsRaw);
+
+  const today = new Date();
+  const toDateStr = (d) => d.toISOString().slice(0, 10);
+  const milestones = [3, 7, 14];
+  const targetDates = milestones.map(days => {
+    const d = new Date(today); d.setDate(d.getDate() - days);
+    return { days, dateStr: toDateStr(d) };
+  });
+
+  for (const id of allIds) {
+    try {
+      const raw = await kv.get(`push:sub:${id}`);
+      if (!raw) continue;
+      const record = JSON.parse(raw);
+      const { subscription, lang } = record;
+      const care = getCareSettings(record);
+      if (!care.enabled) continue;
+
+      // 이 유저의 화장품 중 3/7/14일 전에 등록된 것 찾기
+      // user_id는 subscription endpoint 기반 해시이므로 DB에서 직접 조회 어려움
+      // → KV에 user_id가 저장되어 있는지 확인
+      const userId = record.userId;
+      if (!userId) continue;
+
+      const cosmetics = await db
+        .prepare("SELECT id, name, category, opened_at, created_at FROM cosmetics WHERE user_id = ? AND status = 'active'")
+        .bind(userId)
+        .all();
+      const items = cosmetics.results || [];
+      if (items.length === 0) continue;
+
+      // 스캔 데이터 조회 (최근 20개)
+      let scans = [];
+      try {
+        const scansKvRaw = await kv.get(`scans:${userId}`);
+        if (scansKvRaw) scans = JSON.parse(scansKvRaw);
+      } catch {}
+
+      for (const item of items) {
+        const startDate = (item.opened_at || item.created_at || "").slice(0, 10);
+        if (!startDate) continue;
+
+        const matched = targetDates.find(t => t.dateStr === startDate);
+        if (!matched) continue;
+
+        // 효과 계산: 등록 전후 스캔 점수 비교
+        const startTs = new Date(startDate).getTime();
+        const beforeScans = scans.filter(s => new Date(s.createdAt).getTime() < startTs).slice(0, 3);
+        const afterScans = scans.filter(s => new Date(s.createdAt).getTime() >= startTs).slice(0, 5);
+
+        const beforeAvg = beforeScans.length > 0
+          ? Math.round(beforeScans.reduce((sum, s) => sum + (Number(s.overallScore) || 0), 0) / beforeScans.length)
+          : null;
+        const afterAvg = afterScans.length > 0
+          ? Math.round(afterScans.reduce((sum, s) => sum + (Number(s.overallScore) || 0), 0) / afterScans.length)
+          : null;
+        const delta = beforeAvg != null && afterAvg != null ? afterAvg - beforeAvg : null;
+
+        const productName = item.name || item.category;
+        let title, body;
+
+        if (lang === "en") {
+          title = `✨ ${productName} — Day ${matched.days}`;
+          if (matched.days === 3) {
+            body = delta != null
+              ? `3 days in! Your score shifted by ${delta >= 0 ? "+" : ""}${delta} since starting. Keep scanning daily for better tracking.`
+              : `3 days in! Keep scanning daily to track the effect of ${productName}.`;
+          } else if (matched.days === 7) {
+            body = delta != null
+              ? `1 week with ${productName}! Overall score ${delta >= 0 ? "+" : ""}${delta}. ${delta >= 3 ? "Looking good! 🎉" : delta <= -3 ? "Might want to check this." : "Steady so far."}`
+              : `1 week with ${productName}! Scan today to see your 7-day effect report.`;
+          } else {
+            body = delta != null
+              ? `2-week report for ${productName}: score ${delta >= 0 ? "+" : ""}${delta}. ${delta >= 5 ? "This product seems to work for you! 🌟" : delta <= -5 ? "Consider reviewing this product." : "Check the full report in the Routine tab."}`
+              : `2 weeks with ${productName}! Check your effect report in the Routine tab.`;
+          }
+        } else if (lang === "ja") {
+          title = `✨ ${productName} — ${matched.days}日目`;
+          if (matched.days === 3) {
+            body = delta != null
+              ? `3日経過！スコアが${delta >= 0 ? "+" : ""}${delta}変化しました。毎日スキャンして効果を追跡しましょう。`
+              : `3日経過！毎日スキャンして${productName}の効果を追跡しましょう。`;
+          } else if (matched.days === 7) {
+            body = delta != null
+              ? `${productName}を1週間使用！総合スコア${delta >= 0 ? "+" : ""}${delta}。${delta >= 3 ? "良い感じです！🎉" : delta <= -3 ? "確認した方が良いかもしれません。" : "安定しています。"}`
+              : `${productName}を1週間使用！今日スキャンして7日間の効果を確認しましょう。`;
+          } else {
+            body = delta != null
+              ? `${productName}の2週間レポート：スコア${delta >= 0 ? "+" : ""}${delta}。${delta >= 5 ? "この製品はあなたに合っているようです！🌟" : delta <= -5 ? "この製品を見直してみてください。" : "ルーティンタブで詳細レポートを確認してください。"}`
+              : `${productName}を2週間使用！ルーティンタブで効果レポートを確認しましょう。`;
+          }
+        } else {
+          title = `✨ ${productName} — ${matched.days}일차`;
+          if (matched.days === 3) {
+            body = delta != null
+              ? `3일째! 사용 시작 후 점수가 ${delta >= 0 ? "+" : ""}${delta}점 변화했어요. 매일 스캔하면 더 정확한 효과를 확인할 수 있어요.`
+              : `3일째! 매일 스캔하면 ${productName}의 효과를 추적할 수 있어요.`;
+          } else if (matched.days === 7) {
+            body = delta != null
+              ? `${productName} 1주일! 종합 점수 ${delta >= 0 ? "+" : ""}${delta}점. ${delta >= 3 ? "좋은 흐름이에요! 🎉" : delta <= -3 ? "한번 확인해보세요." : "안정적이에요."}`
+              : `${productName} 1주일! 오늘 스캔하면 7일 효과 리포트를 볼 수 있어요.`;
+          } else {
+            body = delta != null
+              ? `${productName} 2주 리포트: 점수 ${delta >= 0 ? "+" : ""}${delta}점. ${delta >= 5 ? "이 제품 잘 맞는 것 같아요! 🌟" : delta <= -5 ? "이 제품을 재검토해보세요." : "루틴 탭에서 자세한 리포트를 확인하세요."}`
+              : `${productName} 2주차! 루틴 탭에서 효과 리포트를 확인하세요.`;
+          }
+        }
+
+        await sendPush(subscription, { title, body, url: "/" }, env);
+        console.log(`[cosmetic-remind] ${id} ${productName} day ${matched.days} sent`);
+      }
+    } catch (e) {
+      console.error(`[cosmetic-remind] id=${id} error:`, e.message);
     }
   }
 }

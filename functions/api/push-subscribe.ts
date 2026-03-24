@@ -21,6 +21,13 @@ export const onRequest = async (context: any) => {
   if (request.method === "POST") {
     const body: any = await request.json();
     const { subscription, baumannType, lang, scoreSummary, careSettings } = body;
+    // 유저 ID (화장품 효과 리마인더에 필요)
+    let userId: string | null = null;
+    try {
+      const { getUserFromCookie } = await import("../_utils/jwt");
+      const user = await getUserFromCookie(request, env.JWT_SECRET!);
+      if (user?.id) userId = user.id;
+    } catch {}
 
     if (!subscription?.endpoint) {
       return new Response(JSON.stringify({ error: "subscription required" }), { status: 400, headers: CORS });
@@ -58,6 +65,7 @@ export const onRequest = async (context: any) => {
         lang: lang || prev?.lang || "ko",
         scoreSummary: nextScoreSummary.length ? nextScoreSummary : (prev?.scoreSummary || []),
         careSettings: { ...(prev?.careSettings || {}), ...nextCareSettings },
+        userId: userId || prev?.userId || null,
         createdAt: prev?.createdAt || new Date().toISOString(),
         updatedAt: new Date().toISOString(),
       };
