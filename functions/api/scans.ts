@@ -92,31 +92,31 @@ export const onRequest = async (context: any) => {
         });
       }
 
-      env.FONDAY_DB.prepare(
+      const scanId = crypto.randomUUID();
+      // 전체 컬럼 INSERT 시도, 실패하면 기본 컬럼으로 fallback
+      await env.FONDAY_DB.prepare(
         `INSERT OR IGNORE INTO scans
            (id, user_id, overall_score, baumann_type, skin_age, ai_comment, scores,
             weather_info, share_token, lang, is_guest, gender, age_group, city, country, referrer, provider, device_info, created_at)
          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?, ?, ?, ?, ?, ?, ?)`
       ).bind(
-        crypto.randomUUID(),
-        user.id,
-        body.overallScore ?? 0,
-        body.baumannType ?? "",
-        body.skinAge ?? null,
-        body.aiComment ?? "",
-        JSON.stringify(body.scores ?? []),
-        JSON.stringify(body.weatherInfo ?? null),
-        shareToken,
-        body.lang ?? "ko",
-        body.gender ?? "",
-        body.ageGroup ?? "",
-        city,
-        country,
-        referrer,
-        user.provider || "",
-        deviceInfo,
-        createdAt
-      ).run().catch(() => {});
+        scanId, user.id, body.overallScore ?? 0, body.baumannType ?? "", body.skinAge ?? null,
+        body.aiComment ?? "", JSON.stringify(body.scores ?? []), JSON.stringify(body.weatherInfo ?? null),
+        shareToken, body.lang ?? "ko", body.gender ?? "", body.ageGroup ?? "",
+        city, country, referrer, user.provider || "", deviceInfo, createdAt
+      ).run().catch(async () => {
+        // fallback: 새 컬럼 없이 저장
+        await env.FONDAY_DB.prepare(
+          `INSERT OR IGNORE INTO scans
+             (id, user_id, overall_score, baumann_type, skin_age, ai_comment, scores,
+              weather_info, share_token, lang, is_guest, gender, age_group, created_at)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?, ?)`
+        ).bind(
+          scanId, user.id, body.overallScore ?? 0, body.baumannType ?? "", body.skinAge ?? null,
+          body.aiComment ?? "", JSON.stringify(body.scores ?? []), JSON.stringify(body.weatherInfo ?? null),
+          shareToken, body.lang ?? "ko", body.gender ?? "", body.ageGroup ?? "", createdAt
+        ).run().catch(() => {});
+      });
     }
 
     return new Response(JSON.stringify(newScan), { headers: CORS });
