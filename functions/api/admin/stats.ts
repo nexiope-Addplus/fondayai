@@ -212,7 +212,7 @@ export const onRequest = async (context: any) => {
       safe(env.FONDAY_DB.prepare(`
         SELECT c.user_id, c.name, c.brand, c.category, c.created_at,
           (SELECT COUNT(*) FROM cosmetics c2 WHERE c2.user_id = c.user_id AND c2.status='active') as total
-        FROM cosmetics c WHERE c.status='active' ORDER BY c.created_at DESC LIMIT 50
+        FROM cosmetics c WHERE c.status='active' ORDER BY c.user_id, c.created_at DESC LIMIT 100
       `), "all"),
     ]);
 
@@ -600,23 +600,51 @@ export const onRequest = async (context: any) => {
     </div>
   </div>
 
-  <!-- ═══ 화장품 등록 현황 ═════════════════════════════════════════ -->
+  <!-- ═══ 화장품 등록 현황 (유저별 접기/펼치기) ═══════════════════ -->
   <div id="cosmetics" class="section">
     <h2>화장품 등록 현황</h2>
     ${cosmeticsArr.length === 0
       ? '<p style="font-size:12px;color:#a8a29e;margin:0">등록된 화장품 없음</p>'
-      : `<table class="cosmetics-table">
-          <tr><th>유저ID</th><th>제품명</th><th>브랜드</th><th>카테고리</th><th>등록일</th><th>총 등록</th></tr>
-          ${cosmeticsArr.map((r: any) => `
-            <tr>
-              <td style="font-size:11px;color:#78716c" title="${r.user_id || ''}">${(r.user_id || "?").slice(0, 8)}...</td>
-              <td><strong>${r.name || "-"}</strong></td>
-              <td>${r.brand || "-"}</td>
-              <td><span class="badge">${r.category || "-"}</span></td>
-              <td style="color:#a8a29e;font-size:11px">${toKST(r.created_at)}</td>
-              <td style="font-weight:700;color:#4A7C6E">${r.total ?? 0}</td>
-            </tr>`).join("")}
-        </table>`
+      : (() => {
+          // 유저별 그룹핑
+          const userMap = new Map<string, any[]>();
+          for (const r of cosmeticsArr) {
+            const uid = r.user_id || "unknown";
+            if (!userMap.has(uid)) userMap.set(uid, []);
+            userMap.get(uid)!.push(r);
+          }
+          return Array.from(userMap.entries()).map(([uid, items], idx) => {
+            const shortId = uid.slice(0, 12) + "...";
+            const provider = items[0]?.provider || "";
+            const providerBadge = provider === "kakao" ? "badge-kakao" : provider === "google" ? "badge-google" : provider === "line" ? "badge-line" : "";
+            const providerLabel = provider ? (PROVIDER_LABEL[provider] ?? provider) : "";
+            return `
+            <div class="panel" style="margin-bottom:8px">
+              <div style="display:flex;align-items:center;justify-content:space-between;cursor:pointer" onclick="var el=document.getElementById('cosm-${idx}');el.style.display=el.style.display==='none'?'':'none';this.querySelector('.toggle-icon').textContent=el.style.display==='none'?'▶':'▼'">
+                <div style="display:flex;align-items:center;gap:8px">
+                  <span class="toggle-icon" style="font-size:10px;color:#a8a29e">▶</span>
+                  <span style="font-size:12px;font-weight:700;color:#78716c" title="${uid}">${shortId}</span>
+                  ${providerLabel ? '<span class="badge ' + providerBadge + '">' + providerLabel + '</span>' : ''}
+                  <span class="badge">${items.length}개 등록</span>
+                </div>
+                <span style="font-size:11px;color:#a8a29e">${toKST(items[0]?.created_at).slice(0, 10)}</span>
+              </div>
+              <div id="cosm-${idx}" style="display:none;margin-top:10px">
+                <table style="box-shadow:none">
+                  <tr><th>제품명</th><th>브랜드</th><th>카테고리</th><th>시간대</th><th>등록일</th></tr>
+                  ${items.map((r: any) => `
+                    <tr>
+                      <td><strong>${r.name || "-"}</strong></td>
+                      <td>${r.brand || "-"}</td>
+                      <td><span class="badge">${r.category || "-"}</span></td>
+                      <td style="font-size:11px">${r.time_of_day === "am" ? "🌅 아침" : r.time_of_day === "pm" ? "🌙 저녁" : "종일"}</td>
+                      <td style="color:#a8a29e;font-size:11px">${toKST(r.created_at)}</td>
+                    </tr>`).join("")}
+                </table>
+              </div>
+            </div>`;
+          }).join("");
+        })()
     }
   </div>
 
