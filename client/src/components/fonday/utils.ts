@@ -996,6 +996,159 @@ export function buildDiaryReportModel({
       ? `直近${snapshots.length}回のスキャンと7日分の日記を総合すると、最優先課題は${focusConcerns[0]?.titles.ja || "基礎コンディション"}です。${focusConcerns[1]?.titles.ja || "生活パターン"}と${focusConcerns[2]?.titles.ja || "ルーティン安定性"}も補助課題として見えるため、単発ケアより優先順位を分けた管理が有効です。`
       : `Across ${snapshots.length} recent scans and the last 7 days of diary data, the highest burden is on ${focusConcerns[0]?.titles.en || "baseline condition"}. ${focusConcerns[1]?.titles.en || "lifestyle pattern"} and ${focusConcerns[2]?.titles.en || "routine stability"} are secondary drivers, so a prioritized plan will work better than one-off fixes.`;
 
+  // ── 주간 일별 트렌드 데이터 (라인 차트용) ──
+  const last7Days: string[] = [];
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date(); d.setDate(d.getDate() - i);
+    last7Days.push(d.toISOString().slice(0, 10));
+  }
+  const dailyTrend = last7Days.map((dateStr) => {
+    const scan = snapshots.find((s: any) => new Date(s.createdAt).toISOString().slice(0, 10) === dateStr);
+    return {
+      date: dateStr.slice(5),
+      score: scan ? Number(scan.overallScore) || 0 : null,
+    };
+  });
+
+  // ── 이번주 vs 지난주 항목별 비교 ──
+  const thisWeekScans = snapshots.slice(0, Math.min(7, snapshots.length));
+  const lastWeekScans = snapshots.slice(Math.min(7, snapshots.length), Math.min(14, snapshots.length));
+  const scoreComparison = (analysisResult?.scores || []).slice(0, 10).map((item: any, idx: number) => {
+    const thisWeekValues = thisWeekScans.map((s: any) => {
+      const scores = Array.isArray(s.scores) ? s.scores : [];
+      return Number(scores[idx]?.score) || 0;
+    }).filter((v: number) => v > 0);
+    const lastWeekValues = lastWeekScans.map((s: any) => {
+      const scores = Array.isArray(s.scores) ? s.scores : [];
+      return Number(scores[idx]?.score) || 0;
+    }).filter((v: number) => v > 0);
+    const thisAvg = thisWeekValues.length > 0 ? Math.round(thisWeekValues.reduce((a: number, b: number) => a + b, 0) / thisWeekValues.length) : 0;
+    const lastAvg = lastWeekValues.length > 0 ? Math.round(lastWeekValues.reduce((a: number, b: number) => a + b, 0) / lastWeekValues.length) : 0;
+    return {
+      label: item.label || t(`scores.${idx}`),
+      thisWeek: thisAvg,
+      lastWeek: lastAvg,
+      delta: lastAvg > 0 ? thisAvg - lastAvg : null,
+    };
+  });
+
+  // ── 주간 피부 건강 등급 ──
+  const weeklyGrade = (() => {
+    const avg = recentMean || overallScore || 0;
+    const adherenceNum = weeklyReport.incompleteDays === 0 ? 100 : Math.max(48, 100 - weeklyReport.incompleteDays * 12);
+    const composite = Math.round(avg * 0.7 + adherenceNum * 0.3);
+    if (composite >= 90) return { grade: "A+", color: "#059669", bg: "#ECFDF5" };
+    if (composite >= 80) return { grade: "A", color: "#059669", bg: "#ECFDF5" };
+    if (composite >= 70) return { grade: "B+", color: "#2563EB", bg: "#EFF6FF" };
+    if (composite >= 60) return { grade: "B", color: "#2563EB", bg: "#EFF6FF" };
+    if (composite >= 50) return { grade: "C", color: "#D97706", bg: "#FFFBEB" };
+    return { grade: "D", color: "#DC2626", bg: "#FEF2F2" };
+  })();
+
+  // ── 바우만 타입별 맞춤 계절 인사이트 ──
+  const baumannSeasonInsight = (() => {
+    const month = new Date().getMonth() + 1;
+    const season = month >= 3 && month <= 5 ? "spring" : month >= 6 && month <= 8 ? "summer" : month >= 9 && month <= 11 ? "autumn" : "winter";
+    const typeChar = finalType?.[0] || "D"; // O or D
+    const sensChar = finalType?.[1] || "R"; // S or R
+    const tips: string[] = [];
+    if (lang === "ko") {
+      if (season === "spring") {
+        tips.push("봄 환절기에는 꽃가루와 미세먼지가 피부 장벽을 자극합니다.");
+        if (sensChar === "S") tips.push("민감성 피부는 이중 세안보다 저자극 클렌저 한 번이 더 안전합니다.");
+        if (typeChar === "D") tips.push("건성 피부는 봄에도 보습 크림을 줄이지 마세요. 바람이 수분을 빼앗아요.");
+        if (typeChar === "O") tips.push("지성 피부도 봄에는 유수분 밸런스가 무너질 수 있어요. 가벼운 수분 에센스를 추가하세요.");
+      } else if (season === "summer") {
+        tips.push("여름 자외선과 높은 습도에 대비하세요.");
+        if (typeChar === "O") tips.push("지성 피부는 논코메도제닉 선크림으로 모공 부담을 줄이세요.");
+        if (sensChar === "S") tips.push("민감성 피부는 물리적 선크림(무기자차)이 더 안전합니다.");
+      } else if (season === "autumn") {
+        tips.push("가을 환절기는 여름 손상 회복이 핵심입니다.");
+        if (typeChar === "D") tips.push("건성 피부는 세라마이드 함유 제품으로 장벽을 다시 쌓아올리세요.");
+      } else {
+        tips.push("겨울 건조 환경에서 피부 장벽 보호가 최우선입니다.");
+        if (typeChar === "D") tips.push("건성 피부는 밤에 오일 세럼 + 크림 이중 보습이 효과적이에요.");
+        if (typeChar === "O") tips.push("지성 피부도 겨울에는 가벼운 보습제가 필요합니다. 피지가 줄어도 장벽은 약해져요.");
+      }
+    } else if (lang === "ja") {
+      if (season === "spring") { tips.push("春の花粉やPM2.5が肌バリアを刺激します。"); if (sensChar === "S") tips.push("敏感肌はダブル洗顔より低刺激クレンザー1回が安全です。"); }
+      else if (season === "summer") { tips.push("夏の紫外線と高湿度に備えましょう。"); if (typeChar === "O") tips.push("脂性肌はノンコメドジェニック日焼け止めで毛穴負担を軽減。"); }
+      else if (season === "autumn") { tips.push("秋は夏のダメージ回復が重要です。"); }
+      else { tips.push("冬の乾燥環境では肌バリア保護が最優先です。"); if (typeChar === "D") tips.push("乾燥肌は夜にオイルセラム＋クリームの二重保湿が効果的。"); }
+    } else {
+      if (season === "spring") { tips.push("Spring pollen and dust can stress your skin barrier."); if (sensChar === "S") tips.push("Sensitive skin should use a gentle cleanser once rather than double cleansing."); }
+      else if (season === "summer") { tips.push("Prepare for summer UV and humidity."); if (typeChar === "O") tips.push("Oily skin: use non-comedogenic sunscreen to ease pore burden."); }
+      else if (season === "autumn") { tips.push("Autumn is key for recovering summer damage."); }
+      else { tips.push("Winter dryness means barrier protection is the top priority."); if (typeChar === "D") tips.push("Dry skin: oil serum + cream double moisture at night works well."); }
+    }
+    return tips;
+  })();
+
+  // ── 오늘/내일 실행 플랜 ──
+  const dailyActionPlan = (() => {
+    const topConcern = focusConcerns[0]?.key || "hydration";
+    if (lang === "ko") {
+      return {
+        morning: [
+          "저자극 클렌저로 가볍게 세안",
+          topConcern === "hydration" ? "수분 에센스 → 보습 크림 순서로 레이어링" : topConcern === "redness" ? "진정 토너 → 시카 크림 순서" : "비타민C 세럼 → 선크림",
+          "SPF 50+ 선크림 필수 (2시간마다 덧바르기)",
+        ],
+        evening: [
+          "이중 세안 (클렌징 오일 → 폼 클렌저)",
+          topConcern === "hydration" ? "히알루론산 세럼 → 세라마이드 크림" : topConcern === "redness" ? "마데카소사이드 앰플 → 판테놀 크림" : "레티놀 세럼 (주 2~3회) → 보습 크림",
+          "아이크림으로 눈가 보습 마무리",
+        ],
+      };
+    }
+    if (lang === "ja") {
+      return {
+        morning: [
+          "低刺激クレンザーで優しく洗顔",
+          topConcern === "hydration" ? "水分エッセンス → 保湿クリーム" : topConcern === "redness" ? "鎮静トナー → シカクリーム" : "ビタミンCセラム → 日焼け止め",
+          "SPF50+ 日焼け止め必須",
+        ],
+        evening: [
+          "ダブル洗顔（オイル → フォーム）",
+          topConcern === "hydration" ? "ヒアルロン酸セラム → セラミドクリーム" : topConcern === "redness" ? "マデカソサイドアンプル → パンテノールクリーム" : "レチノールセラム（週2-3回）→ 保湿クリーム",
+          "アイクリームで目元保湿",
+        ],
+      };
+    }
+    return {
+      morning: [
+        "Gentle cleanser wash",
+        topConcern === "hydration" ? "Hydrating essence → Moisturizer" : topConcern === "redness" ? "Calming toner → Cica cream" : "Vitamin C serum → Sunscreen",
+        "SPF 50+ sunscreen (reapply every 2h)",
+      ],
+      evening: [
+        "Double cleanse (oil → foam)",
+        topConcern === "hydration" ? "Hyaluronic acid serum → Ceramide cream" : topConcern === "redness" ? "Centella ampoule → Panthenol cream" : "Retinol serum (2-3x/week) → Moisturizer",
+        "Eye cream for under-eye hydration",
+      ],
+    };
+  })();
+
+  // ── 다음 스캔 추천 ──
+  const nextScanRecommendation = (() => {
+    const daysSinceLast = snapshots.length > 0
+      ? Math.floor((Date.now() - new Date(snapshots[0].createdAt).getTime()) / 86400000)
+      : 999;
+    if (lang === "ko") {
+      if (daysSinceLast === 0) return "오늘 스캔 완료! 내일 같은 시간에 다시 스캔하면 변화를 정확히 추적할 수 있어요.";
+      if (daysSinceLast <= 2) return `마지막 스캔 ${daysSinceLast}일 전. 오늘 스캔하면 트렌드가 더 정확해져요.`;
+      return `${daysSinceLast}일 동안 스캔이 없어요. 지금 스캔하면 피부 변화를 놓치지 않아요.`;
+    }
+    if (lang === "ja") {
+      if (daysSinceLast === 0) return "今日のスキャン完了！明日同じ時間にスキャンすると変化を正確に追跡できます。";
+      if (daysSinceLast <= 2) return `最後のスキャンは${daysSinceLast}日前。今日スキャンするとトレンドがより正確になります。`;
+      return `${daysSinceLast}日間スキャンがありません。今スキャンして肌の変化を見逃さないようにしましょう。`;
+    }
+    if (daysSinceLast === 0) return "Today's scan done! Scan again at the same time tomorrow for accurate tracking.";
+    if (daysSinceLast <= 2) return `Last scan ${daysSinceLast} day(s) ago. Scanning today improves trend accuracy.`;
+    return `No scan for ${daysSinceLast} days. Scan now to not miss skin changes.`;
+  })();
+
   return {
     copy,
     periodLabel: `${periodStart} - ${periodEnd}`,
@@ -1024,6 +1177,17 @@ export function buildDiaryReportModel({
     cosmeticsSignal: myCosmetics.length > 0
       ? copy.cosmeticsReady.replace("{{count}}", String(myCosmetics.length))
       : copy.cosmeticsMissing,
+    // ── 새 데이터 ──
+    dailyTrend,
+    scoreComparison,
+    weeklyGrade,
+    baumannSeasonInsight,
+    dailyActionPlan,
+    nextScanRecommendation,
+    trendDelta,
+    recentMean: Math.round(recentMean),
+    previousMean: Math.round(previousMean),
+    finalType,
   };
 }
 
