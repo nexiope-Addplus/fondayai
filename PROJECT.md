@@ -304,6 +304,20 @@ CREATE TABLE IF NOT EXISTS cosmetics (
 - 날짜+유저 seed 기반 매일 다른 메뉴 선택 + 이전 발송 중복 방지
 - **Worker 수동 배포 필요**: `npx wrangler deploy`
 
+### 화장품 효과 리마인더 알림
+- KST 09:00(UTC 0) 크론 추가 (기존 슬롯에 합침, Free plan 5개 제한 유지)
+- 화장품 등록 **3일/7일/14일차**에 자동 효과 추적 알림 발송
+- D1에서 화장품 조회 → 등록일 기준 매칭 → 전후 스캔 점수 비교
+- 개인화 메시지: "+4점 좋은 흐름이에요 🎉" / "재검토해보세요" 등
+- ko/en/ja 3개 언어 지원
+- `push-subscribe.ts`에 `userId` 저장 추가 (화장품 DB 조회용)
+- 스킨케어 알림 ON이면 자동 발송 (별도 토글 없음)
+
+### 푸시 알림 테스트 인프라
+- `/api/test-push` Pages Functions 엔드포인트 생성 (ADMIN_KEY 인증)
+- Worker `/test-push` ADMIN_KEY 환경변수 등록
+- Worker 재배포 완료: 식사 메뉴 다양화 + 효과 리마인더 반영
+
 ### 로그인/번역 버그 수정
 - OAuth 플로우에 `state` 파라미터로 언어 전달 → 로그인 후 언어 유지 (kakao/google/line)
 - 공유 버튼 `${type}형 공유하기` 하드코딩 → `t("result.shareType")` 번역 키
@@ -461,8 +475,8 @@ CREATE TABLE IF NOT EXISTS cosmetics (
 ## 11. TODO / 다음 작업
 
 ### 우선순위 작업
-- [ ] **화장품 효과 알람**: 등록 3/7/14일 후 효과 추적 푸시 알림
-- [ ] **Worker 배포**: `npx wrangler deploy` (식사 메뉴 다양화 반영)
+- [x] **화장품 효과 알람**: 등록 3/7/14일 후 효과 추적 푸시 알림 ✅
+- [x] **Worker 배포**: `npx wrangler deploy` (식사 메뉴 다양화 + 효과 리마인더) ✅
 - [ ] **ResultScreen 리팩토링**: 1100줄+ → 레이아웃/상태훅/섹션 컴포넌트 분리
 - [ ] **포인트 활용처**: 출석 포인트 → 기능 언락 (상세 리포트 등) — 사용처 기획 완료 후
 - [ ] **주간 리포트 푸시**: "이번 주 피부 점수 +3점, 가장 효과 좋은 제품: OOO"
@@ -480,6 +494,9 @@ CREATE TABLE IF NOT EXISTS cosmetics (
 
 | 커밋 | 내용 |
 |------|------|
+| 69a2c6f | feat: 화장품 효과 리마인더 알림 (3/7/14일차) |
+| 4e4b1e5 | feat: 테스트 푸시 API 추가 (/api/test-push) |
+| 8286030 | docs: PROJECT.md 세션 3 작업 내용 반영 |
 | c57cc6d | fix(i18n): 나머지 하드코딩 한국어 alert 번역 처리 |
 | 042937b | fix(i18n): 누락 번역 키 추가 + EN/JA 번역 개선 |
 | a362988 | feat: 일기 리포트 프리미엄 리디자인 — Fonday AI 어드바이저 |
