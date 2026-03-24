@@ -1,6 +1,8 @@
 export const onRequest = (context: any) => {
   const { request, env } = context;
-  const origin = new URL(request.url).origin;
+  const url = new URL(request.url);
+  const origin = url.origin;
+  const lang = url.searchParams.get("lang") || "ko";
 
   const params = new URLSearchParams({
     client_id: env.GOOGLE_CLIENT_ID,
@@ -9,6 +11,7 @@ export const onRequest = (context: any) => {
     scope: "openid email profile",
     access_type: "offline",
     prompt: "select_account",
+    state: lang,
   });
 
   return Response.redirect(

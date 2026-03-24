@@ -235,7 +235,8 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
   const openLoginPopup = useCallback((provider: "kakao" | "line" | "google", returnTab?: string) => {
     if (returnTab) localStorage.setItem("fonday_return_tab", returnTab);
     if (analysisResult) localStorage.setItem("pendingResult", JSON.stringify({ analysisResult, surveyData, imageBase64 }));
-    window.location.href = `/auth/${provider}`;
+    const lang = localStorage.getItem("fonday_lang") || "ko";
+    window.location.href = `/auth/${provider}?lang=${lang}`;
   }, [analysisResult, surveyData, imageBase64]);
 
   const handleGoogleLogin = () => openLoginPopup("google");

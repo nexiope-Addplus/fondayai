@@ -1,14 +1,16 @@
 export const onRequest = (context: any) => {
   const { request, env } = context;
-  const origin = new URL(request.url).origin;
+  const url = new URL(request.url);
+  const origin = url.origin;
+  const lang = url.searchParams.get("lang") || "ko";
 
   const params = new URLSearchParams({
     response_type: "code",
     client_id: env.LINE_CHANNEL_ID,
     redirect_uri: `${origin}/auth/line/callback`,
-    state: crypto.randomUUID(),
+    state: `${lang}_${crypto.randomUUID().slice(0, 8)}`,
     scope: "profile openid",
-    disable_auto_login: "true",  // iOS에서 LINE 앱 자동 실행 방지 → 웹 폼 로그인
+    disable_auto_login: "true",
   });
 
   return Response.redirect(

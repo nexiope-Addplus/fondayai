@@ -4,7 +4,11 @@ import en from "./locales/en/translation.json";
 import ko from "./locales/ko/translation.json";
 import ja from "./locales/ja/translation.json";
 
-const savedLang = localStorage.getItem("fonday_lang") || "en";
+// URL ?lang= 파라미터 우선 (OAuth 콜백에서 언어 복원용)
+const urlLang = new URLSearchParams(window.location.search).get("lang");
+const cookieLang = document.cookie.match(/fonday_lang=(\w+)/)?.[1];
+const savedLang = urlLang || localStorage.getItem("fonday_lang") || cookieLang || "en";
+if (urlLang) localStorage.setItem("fonday_lang", urlLang);
 
 i18n
   .use(initReactI18next)

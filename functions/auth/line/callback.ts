@@ -4,6 +4,8 @@ export const onRequest = async (context: any) => {
   const { request, env } = context;
   const url = new URL(request.url);
   const code = url.searchParams.get("code");
+  const stateRaw = url.searchParams.get("state") || "ko";
+  const lang = stateRaw.split("_")[0] || "ko";
 
   if (!code) {
     return Response.redirect("/", 302);
@@ -54,13 +56,11 @@ export const onRequest = async (context: any) => {
     const jwt = await createJWT(user, env.JWT_SECRET!);
     const maxAge = 60 * 60 * 24 * 30; // 30일
 
-    return new Response(null, {
-      status: 302,
-      headers: {
-        Location: "/?login=success",
-        "Set-Cookie": `fonday_session=${jwt}; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=${maxAge}`,
-      },
-    });
+    const headers = new Headers();
+    headers.append("Location", `/?login=success&lang=${lang}`);
+    headers.append("Set-Cookie", `fonday_session=${jwt}; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=${maxAge}`);
+    headers.append("Set-Cookie", `fonday_lang=${lang}; Path=/; Max-Age=${maxAge}`);
+    return new Response(null, { status: 302, headers });
   } catch (e: any) {
     console.error("[LINE OAuth] callback error:", e.message);
     return Response.redirect("/", 302);

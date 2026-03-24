@@ -7,6 +7,7 @@ export const onRequest = async (context: any) => {
   const errorRedirect = (stage: string) =>
     Response.redirect(`${homeUrl}?login_error=${encodeURIComponent(stage)}`, 302);
   const code = url.searchParams.get("code");
+  const lang = url.searchParams.get("state") || "ko";
 
   if (!code) {
     return errorRedirect("google_missing_code");
@@ -56,13 +57,11 @@ export const onRequest = async (context: any) => {
     const jwt = await createJWT(user, env.JWT_SECRET!);
     const maxAge = 60 * 60 * 24 * 30; // 30일
 
-    return new Response(null, {
-      status: 302,
-      headers: {
-        Location: `${homeUrl}?login=success`,
-        "Set-Cookie": `fonday_session=${jwt}; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=${maxAge}`,
-      },
-    });
+    const headers = new Headers();
+    headers.append("Location", `${homeUrl}?login=success&lang=${lang}`);
+    headers.append("Set-Cookie", `fonday_session=${jwt}; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=${maxAge}`);
+    headers.append("Set-Cookie", `fonday_lang=${lang}; Path=/; Max-Age=${maxAge}`);
+    return new Response(null, { status: 302, headers });
   } catch (e: any) {
     console.error("[Google OAuth] callback error:", e.message);
     return errorRedirect("google_callback_exception");

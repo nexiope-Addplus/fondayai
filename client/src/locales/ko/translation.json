@@ -373,7 +373,8 @@
       "step3": "어떤 화장품이 효과 있는지 확인하세요"
     },
     "goRoutine": "루틴 탭에서 효과를 확인하세요",
-    "goRoutineDesc": "등록된 화장품 {{count}}개의 효과를 추적 중"
+    "goRoutineDesc": "등록된 화장품 {{count}}개의 효과를 추적 중",
+    "shareType": "{{type}}형 공유하기"
   },
   "diary": {
     "routineTitle": "오늘의 루틴",

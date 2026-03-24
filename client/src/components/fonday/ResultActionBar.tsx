@@ -45,7 +45,7 @@ export function ResultActionBar({
         ) : (
           <>
             <Share2 className="w-4 h-4" aria-hidden="true" />
-            <span className="text-[12px]">{baumannType ? `${baumannType}형 공유하기` : t("result.share")}</span>
+            <span className="text-[12px]">{baumannType ? t("result.shareType", { type: baumannType }) : t("result.share")}</span>
           </>
         )}
       </Button>

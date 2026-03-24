@@ -373,7 +373,8 @@
       "step3": "どの化粧品が効果的か確認しましょう"
     },
     "goRoutine": "ルーティンタブで効果を確認",
-    "goRoutineDesc": "登録済み化粧品{{count}}個を追跡中"
+    "goRoutineDesc": "登録済み化粧品{{count}}個を追跡中",
+    "shareType": "{{type}}型をシェア"
   },
   "diary": {
     "routineTitle": "今日のルーティン",

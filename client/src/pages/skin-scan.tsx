@@ -159,7 +159,8 @@ export default function SkinScanPage() {
   // 팝업 로그인 (DiaryTab·MyScreen 등에서 사용)
   const openLoginPopup = useCallback((provider: "kakao" | "line" | "google", returnTab?: string) => {
     if (returnTab) localStorage.setItem("fonday_return_tab", returnTab);
-    window.location.href = `/auth/${provider}`;
+    const lang = localStorage.getItem("fonday_lang") || "ko";
+    window.location.href = `/auth/${provider}?lang=${lang}`;
   }, []);
 
   // 로그인 후 게스트 스캔 연결
