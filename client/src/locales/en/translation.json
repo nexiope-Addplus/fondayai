@@ -358,7 +358,15 @@
     "viewBtn": "View",
     "totalScans": "Total Scans",
     "diaryView": "Open Diary",
-    "prevRecords": "Previous Records"
+    "prevRecords": "Previous Records",
+    "nextSteps": {
+      "title": "Next Steps",
+      "step1": "Register your skincare products",
+      "step2": "Scan again tomorrow",
+      "step3": "See which products actually work"
+    },
+    "goRoutine": "Check product effects in Routine tab",
+    "goRoutineDesc": "Tracking {{count}} registered products"
   },
   "diary": {
     "routineTitle": "Today's Routine",

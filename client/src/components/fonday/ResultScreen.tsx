@@ -858,6 +858,52 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
           loading={!user}
         />
 
+        {/* ── 다음 스텝 가이드 (첫 스캔 또는 화장품 미등록 시) ── */}
+        {history.length === 0 && (
+          <motion.div variants={fadeChild} className="rounded-3xl p-4 border"
+            style={{ background: TINT_GREEN, borderColor: `${DEEP_GREEN}20` }}>
+            <p className="text-xs font-semibold uppercase tracking-[0.14em] mb-3" style={{ color: DEEP_GREEN, fontFamily: FONT_DISPLAY }}>
+              {t("result.nextSteps.title", "다음 스텝")}
+            </p>
+            <div className="space-y-2.5">
+              <div className="flex items-center gap-3">
+                <div className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold text-white shrink-0" style={{ background: DEEP_GREEN }}>1</div>
+                <p className="text-[13px] font-medium text-stone-700">{t("result.nextSteps.step1", "사용 중인 화장품을 등록하세요")}</p>
+              </div>
+              <div className="flex items-center gap-3">
+                <div className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold text-white shrink-0" style={{ background: DEEP_GREEN }}>2</div>
+                <p className="text-[13px] font-medium text-stone-700">{t("result.nextSteps.step2", "내일 다시 스캔하세요")}</p>
+              </div>
+              <div className="flex items-center gap-3">
+                <div className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold text-white shrink-0" style={{ background: DEEP_GREEN }}>3</div>
+                <p className="text-[13px] font-medium text-stone-700">{t("result.nextSteps.step3", "어떤 화장품이 효과 있는지 확인하세요")}</p>
+              </div>
+            </div>
+          </motion.div>
+        )}
+
+        {/* ── 루틴 탭으로 이동 유도 (화장품 등록 후) ── */}
+        {myCosmetics.length > 0 && (
+          <motion.div variants={fadeChild}>
+            <button onClick={onGoRoutine}
+              className="w-full flex items-center justify-between p-4 rounded-2xl active:opacity-70"
+              style={{ background: TINT_GREEN, border: `1px solid ${DEEP_GREEN}20` }}>
+              <div className="flex items-center gap-3 min-w-0">
+                <Leaf className="w-5 h-5 shrink-0" style={{ color: DEEP_GREEN }} />
+                <div className="text-left min-w-0">
+                  <p className="text-[13px] font-bold" style={{ color: DEEP_GREEN }}>
+                    {t("result.goRoutine", "루틴 탭에서 효과를 확인하세요")}
+                  </p>
+                  <p className="text-[11px] mt-0.5" style={{ color: TEXT_TERTIARY }}>
+                    {t("result.goRoutineDesc", "등록된 화장품 {{count}}개의 효과를 추적 중", { count: myCosmetics.length })}
+                  </p>
+                </div>
+              </div>
+              <ArrowRight className="w-4 h-4 shrink-0" style={{ color: DEEP_GREEN }} />
+            </button>
+          </motion.div>
+        )}
+
         <motion.div variants={fadeChild} className="rounded-3xl px-4 py-3 border"
           style={{ background: BG_BASE, borderColor: BORDER_COLOR }}>
           <div className="flex flex-wrap items-center gap-2">

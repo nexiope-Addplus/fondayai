@@ -358,7 +358,15 @@
     "viewBtn": "보기",
     "totalScans": "총 스캔",
     "diaryView": "일기 보기",
-    "prevRecords": "이전 측정 기록"
+    "prevRecords": "이전 측정 기록",
+    "nextSteps": {
+      "title": "다음 스텝",
+      "step1": "사용 중인 화장품을 등록하세요",
+      "step2": "내일 다시 스캔하세요",
+      "step3": "어떤 화장품이 효과 있는지 확인하세요"
+    },
+    "goRoutine": "루틴 탭에서 효과를 확인하세요",
+    "goRoutineDesc": "등록된 화장품 {{count}}개의 효과를 추적 중"
   },
   "diary": {
     "routineTitle": "오늘의 루틴",

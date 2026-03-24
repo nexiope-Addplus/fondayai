@@ -358,7 +358,15 @@
     "viewBtn": "見る",
     "totalScans": "スキャン数",
     "diaryView": "日記を見る",
-    "prevRecords": "過去の記録"
+    "prevRecords": "過去の記録",
+    "nextSteps": {
+      "title": "次のステップ",
+      "step1": "使用中の化粧品を登録してください",
+      "step2": "明日もう一度スキャンしてください",
+      "step3": "どの化粧品が効果的か確認しましょう"
+    },
+    "goRoutine": "ルーティンタブで効果を確認",
+    "goRoutineDesc": "登録済み化粧品{{count}}個を追跡中"
   },
   "diary": {
     "routineTitle": "今日のルーティン",
