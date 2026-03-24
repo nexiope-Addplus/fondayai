@@ -706,9 +706,21 @@ export const onRequest = async (context: any) => {
   <div id="recent" class="section">
     <h2>최근 스캔 100건</h2>
     <div class="date-filter">
-      <label for="scanDateFilter" style="font-size:12px;font-weight:700;color:#78716c">날짜 필터:</label>
+      <label style="font-size:12px;font-weight:700;color:#78716c">필터:</label>
       <input type="date" id="scanDateFilter" onchange="filterScans()" />
-      <button onclick="document.getElementById('scanDateFilter').value='';filterScans()">초기화</button>
+      <select id="loginFilter" onchange="filterScans()" style="padding:6px 10px;border:1.5px solid #e7e5e4;border-radius:8px;font-size:12px;background:white">
+        <option value="">전체</option>
+        <option value="login">로그인만</option>
+        <option value="guest">비로그인만</option>
+      </select>
+      <select id="providerFilter" onchange="filterScans()" style="padding:6px 10px;border:1.5px solid #e7e5e4;border-radius:8px;font-size:12px;background:white">
+        <option value="">전체 로그인방식</option>
+        <option value="kakao">카카오</option>
+        <option value="google">Google</option>
+        <option value="line">LINE</option>
+      </select>
+      <button onclick="document.getElementById('scanDateFilter').value='';document.getElementById('loginFilter').value='';document.getElementById('providerFilter').value='';filterScans()">초기화</button>
+      <span id="filterCount" style="font-size:11px;color:#a8a29e;margin-left:8px"></span>
     </div>
     <table id="scanTable">
       <thead>
@@ -723,7 +735,7 @@ export const onRequest = async (context: any) => {
         const cityDisplay = r.city ? (r.city + (r.country ? ' (' + r.country + ')' : '')) : "-";
         const referrerDisplay = r.referrer ? (REFERRER_LABEL[r.referrer] ?? r.referrer) : "-";
         return `
-        <tr data-date="${dateStr}">
+        <tr data-date="${dateStr}" data-login="${r.is_guest ? 'guest' : 'login'}" data-provider="${r.provider || ''}">
           <td><strong>${r.overall_score}</strong></td>
           <td><span class="badge">${r.baumann_type || "?"}</span></td>
           <td>${r.skin_age ?? "-"}</td>
@@ -769,15 +781,23 @@ export const onRequest = async (context: any) => {
   <script>
     function filterScans() {
       var dateVal = document.getElementById('scanDateFilter').value;
+      var loginVal = document.getElementById('loginFilter').value;
+      var providerVal = document.getElementById('providerFilter').value;
       var rows = document.querySelectorAll('#scanTable tbody tr');
+      var shown = 0;
       for (var i = 0; i < rows.length; i++) {
         var rowDate = rows[i].getAttribute('data-date');
-        if (!dateVal || rowDate === dateVal) {
-          rows[i].style.display = '';
-        } else {
-          rows[i].style.display = 'none';
-        }
+        var rowLogin = rows[i].getAttribute('data-login');
+        var rowProvider = rows[i].getAttribute('data-provider');
+        var match = true;
+        if (dateVal && rowDate !== dateVal) match = false;
+        if (loginVal && rowLogin !== loginVal) match = false;
+        if (providerVal && rowProvider !== providerVal) match = false;
+        rows[i].style.display = match ? '' : 'none';
+        if (match) shown++;
       }
+      var counter = document.getElementById('filterCount');
+      if (counter) counter.textContent = shown + '건 표시';
     }
   </script>
 </body>

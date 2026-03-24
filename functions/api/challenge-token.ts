@@ -41,8 +41,8 @@ export const onRequest = async (context: any) => {
         expirationTtl: 60 * 60 * 24 * 30,
       });
 
-      // D1 저장 (관리자 조회용, 영구)
-      if (env.FONDAY_DB) {
+      // D1 저장 (게스트만 — 로그인 유저는 /api/scans에서 이미 저장)
+      if (env.FONDAY_DB && isGuest !== false) {
         await env.FONDAY_DB.prepare(
           `INSERT OR IGNORE INTO scans (id, overall_score, baumann_type, skin_age, ai_comment, scores, share_token, lang, is_guest, gender, age_group, created_at)
            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
