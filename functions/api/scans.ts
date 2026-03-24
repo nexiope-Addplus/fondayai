@@ -64,13 +64,30 @@ export const onRequest = async (context: any) => {
       await env.SCANS_KV.put(`share:${shareToken}`, JSON.stringify(newScan));
     }
 
-    // D1에도 저장 (관리자 통계용) — gender/age_group 포함
+    // Cloudflare에서 도시/국가 정보 추출
+    const cf = (request as any).cf || {};
+    const city = cf.city || "";
+    const country = cf.country || "";
+    const referrer = body.referrer || "";
+
+    // D1에도 저장 (관리자 통계용)
     if (env.FONDAY_DB) {
+      // 새 컬럼 자동 추가 (없으면 무시)
+      for (const col of ["city", "country", "referrer", "provider"]) {
+        await env.FONDAY_DB.prepare(
+          `SELECT ${col} FROM scans LIMIT 0`
+        ).all().catch(async () => {
+          await env.FONDAY_DB.prepare(
+            `ALTER TABLE scans ADD COLUMN ${col} TEXT DEFAULT ''`
+          ).run().catch(() => {});
+        });
+      }
+
       env.FONDAY_DB.prepare(
         `INSERT OR IGNORE INTO scans
            (id, user_id, overall_score, baumann_type, skin_age, ai_comment, scores,
-            weather_info, share_token, lang, is_guest, gender, age_group, created_at)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?, ?)`
+            weather_info, share_token, lang, is_guest, gender, age_group, city, country, referrer, provider, created_at)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?, ?, ?, ?, ?, ?)`
       ).bind(
         crypto.randomUUID(),
         user.id,
@@ -84,6 +101,10 @@ export const onRequest = async (context: any) => {
         body.lang ?? "ko",
         body.gender ?? "",
         body.ageGroup ?? "",
+        city,
+        country,
+        referrer,
+        user.provider || "",
         createdAt
       ).run().catch(() => {});
     }

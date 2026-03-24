@@ -16,6 +16,26 @@ function Router() {
   );
 }
 
+// 유입 경로 추적 (첫 방문 시 저장)
+if (!sessionStorage.getItem("fonday_ref")) {
+  const params = new URLSearchParams(window.location.search);
+  const source = params.get("utm_source") || params.get("ref") || "";
+  const ref = document.referrer || "";
+  const channel = source
+    || (ref.includes("instagram") ? "instagram"
+    : ref.includes("threads") ? "threads"
+    : ref.includes("t.co") || ref.includes("twitter") ? "twitter"
+    : ref.includes("facebook") ? "facebook"
+    : ref.includes("google") ? "google_search"
+    : ref.includes("naver") ? "naver_search"
+    : ref.includes("daum") ? "daum_search"
+    : ref.includes("yahoo") ? "yahoo_search"
+    : ref ? "referral"
+    : "direct");
+  sessionStorage.setItem("fonday_ref", channel);
+  localStorage.setItem("fonday_referrer", channel);
+}
+
 function App() {
   return (
     <ThemeProvider attribute="class" defaultTheme="light">
