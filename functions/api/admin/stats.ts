@@ -136,6 +136,9 @@ export const onRequest = async (context: any) => {
       langRows, baumannRows, dailyRows,
       genderRows, ageRows, scoreDistRows, scoreMetricsRows,
       providerRows,
+      retentionRow, retentionDailyRows,
+      hourlyRows, realtimeScanRow,
+      cosmeticsCategoryRows,
     ] = await Promise.all([
       safe(env.FONDAY_DB.prepare("SELECT COUNT(*) as total, AVG(overall_score) as avg FROM scans"), "first"),
       safe(env.FONDAY_DB.prepare("SELECT COUNT(*) as cnt FROM scans WHERE date(datetime(created_at,'+9 hours'))=date(datetime('now','+9 hours'))"), "first"),
@@ -153,6 +156,35 @@ export const onRequest = async (context: any) => {
       safe(env.FONDAY_DB.prepare("SELECT MIN(overall_score) as min, MAX(overall_score) as max, AVG(overall_score) as avg, COUNT(*) as total FROM scans"), "first"),
       // 로그인 방식 분포
       safe(env.FONDAY_DB.prepare("SELECT provider, COUNT(*) as cnt FROM scans WHERE provider != '' GROUP BY provider ORDER BY cnt DESC"), "all"),
+      // 7일 내 재스캔율 (같은 user_id가 2회 이상)
+      safe(env.FONDAY_DB.prepare(`
+        SELECT COUNT(DISTINCT user_id) as returning_users
+        FROM scans WHERE user_id != '' AND user_id NOT LIKE 'v_%'
+        AND datetime(created_at,'+9 hours') >= datetime('now','+9 hours','-7 days')
+        AND user_id IN (SELECT user_id FROM scans GROUP BY user_id HAVING COUNT(*) >= 2)
+      `), "first"),
+      // 일별 재방문 유저 수 (30일)
+      safe(env.FONDAY_DB.prepare(`
+        SELECT date(datetime(created_at,'+9 hours')) as day,
+          COUNT(DISTINCT user_id) as users,
+          COUNT(DISTINCT CASE WHEN user_id IN (SELECT user_id FROM scans s2 WHERE s2.created_at < scans.created_at AND s2.user_id = scans.user_id) THEN user_id END) as returning
+        FROM scans WHERE user_id != '' AND datetime(created_at,'+9 hours') >= datetime('now','+9 hours','-30 days')
+        GROUP BY day ORDER BY day
+      `), "all"),
+      // 시간대별 스캔 분포 (0~23시)
+      safe(env.FONDAY_DB.prepare(`
+        SELECT CAST(strftime('%H', datetime(created_at, '+9 hours')) AS INTEGER) as hour, COUNT(*) as cnt
+        FROM scans GROUP BY hour ORDER BY hour
+      `), "all"),
+      // 실시간: 최근 1시간 스캔 수
+      safe(env.FONDAY_DB.prepare(`
+        SELECT COUNT(*) as cnt FROM scans
+        WHERE datetime(created_at) >= datetime('now', '-1 hour')
+      `), "first"),
+      // 카테고리별 화장품 등록 수
+      safe(env.FONDAY_DB.prepare(`
+        SELECT category, COUNT(*) as cnt FROM cosmetics WHERE status='active' GROUP BY category ORDER BY cnt DESC
+      `), "all"),
     ]);
 
     // ── 2. 푸시 구독자 수 ──────────────────────────────────────────
@@ -172,9 +204,11 @@ export const onRequest = async (context: any) => {
     let funnelRows: any = {};
     let dailyActiveRows: any[] = [];
     let eventDailyRows: any[] = [];
+    let realtimeSessionsRow: any = null;
+    let pushAppOpensRow: any = null;
 
     if (eventsExist) {
-      const [tabRes, featureRes, funnelRes, dauRes, eventDailyRes] = await Promise.all([
+      const [tabRes, featureRes, funnelRes, dauRes, eventDailyRes, rtSessionsRes, pushOpensRes] = await Promise.all([
         safe(env.FONDAY_DB.prepare(
           "SELECT json_extract(event_data,'$.tab') as tab, COUNT(*) as cnt FROM events WHERE event_type='tab_view' GROUP BY tab ORDER BY cnt DESC"
         ), "all"),
@@ -193,6 +227,14 @@ export const onRequest = async (context: any) => {
         safe(env.FONDAY_DB.prepare(
           "SELECT date(datetime(created_at,'+9 hours')) as day, COUNT(*) as cnt FROM events WHERE datetime(created_at,'+9 hours')>=datetime('now','+9 hours','-30 days') GROUP BY day ORDER BY day"
         ), "all"),
+        // 실시간 세션 (15분)
+        safe(env.FONDAY_DB.prepare(
+          "SELECT COUNT(DISTINCT session_id) as sessions FROM events WHERE datetime(created_at) >= datetime('now', '-15 minutes')"
+        ), "first"),
+        // 푸시 후 앱 오픈 (7일)
+        safe(env.FONDAY_DB.prepare(
+          "SELECT COUNT(*) as opens FROM events WHERE event_type='app_open' AND datetime(created_at,'+9 hours') >= datetime('now','+9 hours','-7 days')"
+        ), "first"),
       ]);
       tabRows = (tabRes as any)?.results ?? [];
       featureRows = (featureRes as any)?.results ?? [];
@@ -200,6 +242,8 @@ export const onRequest = async (context: any) => {
       eventDailyRows = (eventDailyRes as any)?.results ?? [];
       const funnelArr: any[] = (funnelRes as any)?.results ?? [];
       for (const r of funnelArr) funnelRows[r.event_type] = r.cnt;
+      realtimeSessionsRow = rtSessionsRes;
+      pushAppOpensRow = pushOpensRes;
     }
 
     // ── 4. 기타 데이터 ────────────────────────────────────────────
@@ -290,6 +334,28 @@ export const onRequest = async (context: any) => {
     const providerTotal = providerArr.reduce((s: number, r: any) => s + r.cnt, 0) || 1;
     const providerColors: Record<string, string> = { kakao: "#FEE500", google: "#4285F4", line: "#06C755" };
 
+    // ── 리텐션 계산 ──────────────────────────────────────────────
+    const returningUsers = (retentionRow as any)?.returning_users ?? 0;
+    const weekUniqueUsers = weekCnt > 0 ? weekCnt : 1; // approximate
+    const retentionDailyArr: any[] = (retentionDailyRows as any)?.results ?? [];
+    const maxRetentionDaily = Math.max(...retentionDailyArr.map((r: any) => r.users), 1);
+
+    // ── 시간대별 계산 ──────────────────────────────────────────
+    const hourlyArr: any[] = (hourlyRows as any)?.results ?? [];
+    const maxHourly = Math.max(...hourlyArr.map((r: any) => r.cnt), 1);
+    const peakHour = hourlyArr.reduce((best: any, r: any) => r.cnt > (best?.cnt ?? 0) ? r : best, null);
+
+    // ── 실시간 계산 ──────────────────────────────────────────
+    const realtimeScans = (realtimeScanRow as any)?.cnt ?? 0;
+    const realtimeSessions = (realtimeSessionsRow as any)?.sessions ?? 0;
+
+    // ── 푸시 효과 계산 ──────────────────────────────────────────
+    const pushAppOpens7d = (pushAppOpensRow as any)?.opens ?? 0;
+
+    // ── 화장품 카테고리 계산 ──────────────────────────────────────
+    const cosmeticsCatArr: any[] = (cosmeticsCategoryRows as any)?.results ?? [];
+    const maxCosmeticsCat = Math.max(...cosmeticsCatArr.map((r: any) => r.cnt), 1);
+
     const maxCity = Math.max(...cityArr.map((r: any) => r.cnt), 1);
     const maxReferrer = Math.max(...referrerArr.map((r: any) => r.cnt), 1);
 
@@ -316,6 +382,8 @@ export const onRequest = async (context: any) => {
     <a href="#location">접속 지역</a>
     <a href="#referrer">유입 경로</a>
     <a href="#cosmetics">화장품</a>
+    <a href="#retention">리텐션</a>
+    <a href="#timepattern">시간대</a>
     <a href="#features">피처 사용률</a>
     <a href="#engagement">참여도</a>
     <a href="#recent">최근 스캔</a>
@@ -325,6 +393,14 @@ export const onRequest = async (context: any) => {
   <div id="overview" class="section">
     <h2>개요</h2>
     <div class="cards">
+      <div class="card" style="border:2px solid #4A7C6E;background:#ecfdf5">
+        <div style="display:flex;align-items:center;gap:6px">
+          <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#22c55e;box-shadow:0 0 6px #22c55e"></span>
+          <span style="font-size:11px;font-weight:700;color:#4A7C6E">실시간</span>
+        </div>
+        <div class="num" style="margin-top:6px">${realtimeSessions > 0 ? realtimeSessions : realtimeScans}</div>
+        <div class="label">${realtimeSessions > 0 ? realtimeSessions + '명 접속 중 (15분)' : realtimeScans + '건 스캔 (1시간)'}</div>
+      </div>
       <div class="card"><div class="num">${total.toLocaleString()}</div><div class="label">전체 스캔</div></div>
       <div class="card"><div class="num">${todayCnt}</div><div class="label">오늘 스캔 (KST)</div></div>
       <div class="card"><div class="num">${weekCnt}</div><div class="label">7일 스캔</div><div class="sub">${monthCnt} / 30일</div></div>
@@ -380,6 +456,41 @@ export const onRequest = async (context: any) => {
           <div class="funnel-step"><div class="funnel-num">${(funnelRows["pwa_prompt_dismissed"] ?? 0)}</div><div class="funnel-label">거절</div></div>
         </div>
       </div>
+    </div>
+
+    <!-- 이탈 지점 분석 -->
+    <div class="panel" style="margin-top:10px">
+      <h3>이탈 지점 분석 (DROP-OFF)</h3>
+      ${!eventsExist
+        ? '<p style="font-size:12px;color:#a8a29e;margin:0">이벤트 추적 미설정 — /api/admin/d1-migrate4 실행 필요</p>'
+        : (() => {
+            const steps = [
+              { key: "app_open", label: "앱 오픈" },
+              { key: "scan_start", label: "스캔 시작" },
+              { key: "scan_complete", label: "스캔 완료" },
+            ];
+            const stepValues = steps.map(s => ({ ...s, cnt: funnelRows[s.key] ?? 0 }));
+            return '<div style="display:flex;flex-direction:column;gap:6px">' +
+              stepValues.map((s, i) => {
+                const prevCnt = i > 0 ? stepValues[i - 1].cnt : s.cnt;
+                const convRate = prevCnt > 0 ? Math.round(s.cnt / prevCnt * 100) : 0;
+                const dropRate = i > 0 ? (100 - convRate) : 0;
+                const barWidth = stepValues[0].cnt > 0 ? Math.round(s.cnt / stepValues[0].cnt * 100) : 0;
+                return '<div style="display:flex;align-items:center;gap:10px">' +
+                  '<div style="width:80px;text-align:right;font-size:11px;font-weight:600;color:#78716c">' + s.label + '</div>' +
+                  '<div style="flex:1;background:#f5f5f4;border-radius:6px;height:28px;position:relative;overflow:hidden">' +
+                    '<div style="height:100%;background:' + (i === 0 ? '#4A7C6E' : '#4A7C6E') + ';width:' + barWidth + '%;border-radius:6px;display:flex;align-items:center;padding:0 8px">' +
+                      '<span style="font-size:11px;font-weight:700;color:white">' + s.cnt.toLocaleString() + '</span>' +
+                    '</div>' +
+                  '</div>' +
+                  '<div style="width:60px;font-size:11px;text-align:right">' +
+                    (i > 0 ? '<span style="color:#ef4444;font-weight:700">-' + dropRate + '%</span>' : '') +
+                  '</div>' +
+                '</div>';
+              }).join('') +
+            '</div>';
+          })()
+      }
     </div>
   </div>
 
@@ -557,6 +668,70 @@ export const onRequest = async (context: any) => {
     </div>
   </div>
 
+  <!-- ═══ 리텐션 ═══════════════════════════════════════════════════ -->
+  <div id="retention" class="section">
+    <h2>리텐션 (재방문율)</h2>
+    <div class="grid2">
+      <div class="panel">
+        <h3>7일 재방문율</h3>
+        <div style="text-align:center;padding:16px 0">
+          <div style="font-size:40px;font-weight:900;color:#4A7C6E">${returningUsers}</div>
+          <div style="font-size:12px;color:#78716c;margin-top:4px">7일 내 2회 이상 스캔 유저</div>
+        </div>
+      </div>
+      <div class="panel">
+        <h3>30일 일별 신규 vs 재방문</h3>
+        <div class="chart">
+          ${retentionDailyArr.length === 0
+            ? '<p style="font-size:11px;color:#a8a29e;margin:0">데이터 없음</p>'
+            : retentionDailyArr.map((r: any) => {
+                const newUsers = (r.users ?? 0) - (r.returning ?? 0);
+                const totalH = Math.round((r.users ?? 0) / maxRetentionDaily * 64);
+                const retH = Math.round((r.returning ?? 0) / maxRetentionDaily * 64);
+                const newH = totalH - retH;
+                return '<div class="chart-col">' +
+                  '<div style="display:flex;flex-direction:column;align-items:center;width:100%">' +
+                    '<div style="width:100%;background:#f59e0b;border-radius:3px 3px 0 0;height:' + newH + 'px" title="' + (r.day ?? '') + ': 신규 ' + newUsers + '"></div>' +
+                    '<div style="width:100%;background:#4A7C6E;height:' + retH + 'px" title="' + (r.day ?? '') + ': 재방문 ' + (r.returning ?? 0) + '"></div>' +
+                  '</div>' +
+                  '<div class="chart-label">' + ((r.day ?? '').slice(5)) + '</div>' +
+                '</div>';
+              }).join('')
+          }
+        </div>
+        <div style="display:flex;gap:12px;margin-top:8px">
+          <div style="display:flex;align-items:center;gap:4px;font-size:10px"><div style="width:10px;height:10px;border-radius:2px;background:#f59e0b"></div>신규</div>
+          <div style="display:flex;align-items:center;gap:4px;font-size:10px"><div style="width:10px;height:10px;border-radius:2px;background:#4A7C6E"></div>재방문</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ 시간대별 사용 패턴 ═══════════════════════════════════════ -->
+  <div id="timepattern" class="section">
+    <h2>시간대별 사용 패턴 (KST)</h2>
+    <div class="panel">
+      <h3>24시간 스캔 분포 ${peakHour ? '&nbsp;<span style="color:#f59e0b;font-weight:700">피크: ' + peakHour.hour + '시 (' + peakHour.cnt + '건)</span>' : ''}</h3>
+      <div style="display:flex;align-items:flex-end;gap:2px;height:100px;margin-top:8px">
+        ${(() => {
+          const fullHours = Array.from({length: 24}, (_, i) => {
+            const match = hourlyArr.find((r: any) => r.hour === i);
+            return { hour: i, cnt: match?.cnt ?? 0 };
+          });
+          return fullHours.map((r: any) => {
+            const isPeak = peakHour && r.hour === peakHour.hour;
+            const barH = Math.round(r.cnt / maxHourly * 88);
+            return '<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px">' +
+              '<div style="font-size:8px;color:#78716c;font-weight:600">' + (r.cnt > 0 ? r.cnt : '') + '</div>' +
+              '<div style="width:100%;background:' + (isPeak ? '#f59e0b' : '#4A7C6E') + ';border-radius:3px 3px 0 0;height:' + barH + 'px;min-height:2px"></div>' +
+              '<div style="font-size:8px;color:#a8a29e">' + r.hour + '</div>' +
+            '</div>';
+          }).join('');
+        })()}
+      </div>
+    </div>
+  </div>
+
   <!-- ═══ 접속 지역 ═══════════════════════════════════════════════ -->
   <div id="location" class="section">
     <h2>접속 지역 TOP15</h2>
@@ -603,6 +778,24 @@ export const onRequest = async (context: any) => {
   <!-- ═══ 화장품 등록 현황 (유저별 접기/펼치기) ═══════════════════ -->
   <div id="cosmetics" class="section">
     <h2>화장품 등록 현황</h2>
+
+    <!-- 카테고리별 분포 -->
+    <div class="panel" style="margin-bottom:10px">
+      <h3>카테고리별 등록 수</h3>
+      ${cosmeticsCatArr.length === 0
+        ? '<p style="font-size:11px;color:#a8a29e;margin:0">등록된 화장품 없음</p>'
+        : '<div class="bar-wrap">' +
+            cosmeticsCatArr.map((r: any) => {
+              const pct = Math.round(r.cnt / maxCosmeticsCat * 100);
+              return '<div class="bar-row">' +
+                '<div class="bar-label-wide">' + (r.category || "미분류") + '</div>' +
+                '<div class="bar-bg"><div class="bar-fill" style="width:' + pct + '%;background:#7C3AED"></div></div>' +
+                '<div class="bar-val">' + r.cnt + '</div>' +
+              '</div>';
+            }).join('') +
+          '</div>'
+      }
+    </div>
     ${cosmeticsArr.length === 0
       ? '<p style="font-size:12px;color:#a8a29e;margin:0">등록된 화장품 없음</p>'
       : (() => {
@@ -700,6 +893,31 @@ export const onRequest = async (context: any) => {
   <!-- ═══ 참여도 ════════════════════════════════════════════════════ -->
   <div id="engagement" class="section">
     <h2>참여도 & 활성 유저 ${!eventsExist ? '<span style="color:#f59e0b;font-weight:600">(events 테이블 필요)</span>' : ''}</h2>
+
+    <!-- 푸시 알림 효과 -->
+    <div class="panel" style="margin-bottom:10px">
+      <h3>푸시 알림 효과</h3>
+      <div style="display:flex;gap:16px;flex-wrap:wrap;margin-top:8px">
+        <div style="flex:1;min-width:120px;background:#f5f5f4;border-radius:10px;padding:14px;text-align:center">
+          <div style="font-size:24px;font-weight:900;color:#6366f1">${pushCount}</div>
+          <div style="font-size:11px;color:#78716c;margin-top:4px">푸시 구독자</div>
+        </div>
+        <div style="flex:1;min-width:120px;background:#f5f5f4;border-radius:10px;padding:14px;text-align:center">
+          <div style="font-size:24px;font-weight:900;color:#4A7C6E">${eventsExist ? pushAppOpens7d : '-'}</div>
+          <div style="font-size:11px;color:#78716c;margin-top:4px">7일 앱 오픈 수</div>
+        </div>
+        <div style="flex:1;min-width:120px;background:#f5f5f4;border-radius:10px;padding:14px;text-align:center">
+          <div style="font-size:24px;font-weight:900;color:#f59e0b">${pushCount > 0 && eventsExist ? Math.round(pushAppOpens7d / pushCount * 100) + '%' : '-'}</div>
+          <div style="font-size:11px;color:#78716c;margin-top:4px">구독자 대비 오픈율</div>
+        </div>
+        <div style="flex:1;min-width:120px;background:#f5f5f4;border-radius:10px;padding:14px;text-align:center">
+          <div style="font-size:24px;font-weight:900;color:#10b981">${weekCnt > 0 ? (pushCount / weekCnt * 100).toFixed(1) + '%' : '-'}</div>
+          <div style="font-size:11px;color:#78716c;margin-top:4px">7일 스캔 대비 구독률</div>
+        </div>
+      </div>
+      ${!eventsExist ? '<p style="font-size:11px;color:#f59e0b;margin:8px 0 0">이벤트 추적 미설정 — 푸시 구독자 수와 스캔 빈도만 표시</p>' : ''}
+    </div>
+
     <div class="grid2">
       <div class="panel">
         <h3>30일 DAU (세션 기준)</h3>
