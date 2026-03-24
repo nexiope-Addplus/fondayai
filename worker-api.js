@@ -301,60 +301,210 @@ export default {
   }
 };
 
-// ─── 식단 푸시 데이터 (피부 타입 × 언어 × 식사) ─────────────────
+// ─── 식단 푸시 데이터 (피부 타입 × 언어 × 식사) — 배열로 다양화 ─────────────────
 const MEAL_TIPS = {
   ko: {
     lunch: {
-      O: { menu: "현미밥 + 구운 연어 + 시금치 샐러드", tip: "저GI 식단으로 피지 분비를 조절해요. 아연이 풍부한 연어가 모공을 정화합니다." },
-      D: { menu: "아보카도 통곡물 토스트 + 달걀", tip: "오메가3와 비타민E가 피부 지질막을 강화해 건조함을 줄여요." },
-      S: { menu: "강황 닭가슴살 + 브로콜리 찜", tip: "강황의 커큐민이 염증을 억제해 민감성 붉은기를 진정시켜요." },
-      P: { menu: "딸기 요거트 볼 + 피망 볶음밥", tip: "비타민C가 멜라닌 합성 효소를 억제해 기미 예방에 효과적이에요." },
-      W: { menu: "달걀찜 + 블루베리 + 견과류", tip: "항산화물질이 콜라겐 분해 효소를 억제해 주름을 예방해요." },
-      default: { menu: "균형 잡힌 한식 정식 (밥 + 국 + 반찬 3가지)", tip: "다양한 영양소가 건강한 피부를 유지하는 데 도움이 돼요." },
+      O: [
+        { menu: "현미밥 + 구운 연어 + 시금치 샐러드", tip: "저GI 식단으로 피지 분비를 조절해요. 아연이 풍부한 연어가 모공을 정화합니다." },
+        { menu: "퀴노아 샐러드 + 닭가슴살 + 아몬드", tip: "저당 식단과 양질의 단백질이 피지 밸런스를 유지해요." },
+        { menu: "메밀국수 + 두부 + 미나리", tip: "가벼운 탄수화물과 식물성 단백질로 피지 과다를 예방해요." },
+        { menu: "잡곡밥 + 청국장찌개 + 콩나물", tip: "발효식품이 장 건강을 개선해 피지 조절에 도움이 돼요." },
+      ],
+      D: [
+        { menu: "아보카도 통곡물 토스트 + 달걀", tip: "오메가3와 비타민E가 피부 지질막을 강화해 건조함을 줄여요." },
+        { menu: "연어 포케 볼 + 현미밥", tip: "오메가3가 풍부한 연어가 피부 수분 장벽을 보호해요." },
+        { menu: "호두 크림 파스타 + 루꼴라", tip: "견과류의 건강한 지방이 피부 보습을 내부에서 돕습니다." },
+        { menu: "버섯 리조또 + 올리브오일 드레싱", tip: "버섯의 비타민D와 올리브오일이 건조한 피부를 안정시켜요." },
+      ],
+      S: [
+        { menu: "강황 닭가슴살 + 브로콜리 찜", tip: "강황의 커큐민이 염증을 억제해 민감성 붉은기를 진정시켜요." },
+        { menu: "부드러운 두부찌개 + 시금치나물", tip: "순한 식재료 중심의 식사가 피부 자극을 최소화해요." },
+        { menu: "오트밀 포리지 + 바나나 + 꿀", tip: "순한 곡물과 과일로 소화 부담을 줄이면 피부 민감도가 낮아져요." },
+        { menu: "흰살생선 구이 + 감자 퓨레", tip: "자극 없는 담백한 식단이 민감한 피부를 안정시켜요." },
+      ],
+      P: [
+        { menu: "딸기 요거트 볼 + 피망 볶음밥", tip: "비타민C가 멜라닌 합성 효소를 억제해 기미 예방에 효과적이에요." },
+        { menu: "오렌지 치킨 샐러드 + 파프리카", tip: "감귤류의 비타민C가 색소 침착을 예방하고 톤을 균일하게 해요." },
+        { menu: "키위 스무디볼 + 그래놀라", tip: "키위의 비타민C와 항산화 성분이 맑은 피부를 유지해요." },
+        { menu: "토마토 리코펜 파스타 + 샐러드", tip: "리코펜이 자외선 손상을 줄이고 색소 침착을 완화해요." },
+      ],
+      W: [
+        { menu: "달걀찜 + 블루베리 + 견과류", tip: "항산화물질이 콜라겐 분해 효소를 억제해 주름을 예방해요." },
+        { menu: "콜라겐 보충 사골국 + 잡곡밥", tip: "사골의 천연 콜라겐이 피부 탄력을 직접 보충해요." },
+        { menu: "삼색 나물비빔밥 + 미역국", tip: "해조류의 미네랄이 피부 재생을 촉진하고 탄력을 유지해요." },
+        { menu: "장어덮밥 + 콩나물국", tip: "비타민A가 풍부한 장어가 피부 세포 재생을 촉진해요." },
+      ],
+      default: [
+        { menu: "균형 잡힌 한식 정식 (밥 + 국 + 반찬 3가지)", tip: "다양한 영양소가 건강한 피부를 유지하는 데 도움이 돼요." },
+        { menu: "제철 재료 비빔밥 + 된장국", tip: "다양한 색깔의 제철 재료로 피부에 필요한 영양을 채워요." },
+        { menu: "두부김치 + 잡곡밥 + 미역국", tip: "발효식품과 해조류로 장 건강과 피부 건강을 동시에 챙겨요." },
+      ],
     },
     dinner: {
-      O: { menu: "두부 야채볶음 + 된장국", tip: "프로바이오틱스가 풍부한 된장이 장-피부 축을 강화해요." },
-      D: { menu: "연어 스테이크 + 올리브오일 샐러드", tip: "건강한 지방이 피부 장벽을 복구하고 수분을 잡아줘요." },
-      S: { menu: "고등어 구이 + 김치 + 나물", tip: "오메가3와 프로바이오틱스가 피부 면역을 안정시켜요." },
-      P: { menu: "토마토 달걀볶음 + 시금치나물", tip: "토마토의 리코펜과 시금치의 엽산이 색소 회복을 도와요." },
-      W: { menu: "닭날개 조림 + 석류 주스", tip: "콜라겐 원료(닭날개)와 레스베라트롤(석류)이 탄력을 높여요." },
-      default: { menu: "생선 + 제철 채소 중심 저녁", tip: "가벼운 저녁으로 피부 야간 재생을 도와요." },
+      O: [
+        { menu: "두부 야채볶음 + 된장국", tip: "프로바이오틱스가 풍부한 된장이 장-피부 축을 강화해요." },
+        { menu: "닭가슴살 샐러드 + 현미밥", tip: "저녁에는 가벼운 단백질 중심으로 피지 부담을 줄이세요." },
+        { menu: "새우 채소 볶음 + 미소국", tip: "저지방 해산물과 발효 수프로 깔끔하게 마무리하세요." },
+        { menu: "버섯 수프 + 통밀빵", tip: "가벼운 저녁이 밤사이 피지 분비를 줄이는 데 도움이 돼요." },
+      ],
+      D: [
+        { menu: "연어 스테이크 + 올리브오일 샐러드", tip: "건강한 지방이 피부 장벽을 복구하고 수분을 잡아줘요." },
+        { menu: "아보카도 새우 타코 + 라임", tip: "아보카도의 모노불포화 지방이 밤사이 피부 보습을 도와요." },
+        { menu: "크림 버섯 리조또 + 견과류 토핑", tip: "저녁에 건강한 지방을 보충하면 아침 건조감이 줄어요." },
+        { menu: "전복죽 + 참기름 나물", tip: "전복의 아미노산이 밤사이 피부 재생을 돕고 보습을 유지해요." },
+      ],
+      S: [
+        { menu: "고등어 구이 + 김치 + 나물", tip: "오메가3와 프로바이오틱스가 피부 면역을 안정시켜요." },
+        { menu: "흰살생선 찜 + 순두부", tip: "자극 없는 순한 저녁 식단으로 피부 진정 효과를 높여요." },
+        { menu: "양배추 쌈밥 + 된장찌개", tip: "양배추의 비타민U가 피부 점막을 보호하고 진정시켜요." },
+        { menu: "닭가슴살 수프 + 감자", tip: "따뜻하고 부드러운 수프가 민감한 피부를 안정시켜요." },
+      ],
+      P: [
+        { menu: "토마토 달걀볶음 + 시금치나물", tip: "토마토의 리코펜과 시금치의 엽산이 색소 회복을 도와요." },
+        { menu: "비트 샐러드 + 구운 닭가슴살", tip: "비트의 베타인이 피부 세포 순환을 도와 색소를 개선해요." },
+        { menu: "당근 수프 + 통밀빵 + 파프리카", tip: "베타카로틴이 피부 톤을 균일하게 하고 멜라닌을 조절해요." },
+        { menu: "연어 샐러드 + 레몬 드레싱", tip: "비타민C와 오메가3가 함께 색소 침착 개선을 가속해요." },
+      ],
+      W: [
+        { menu: "닭날개 조림 + 석류 주스", tip: "콜라겐 원료(닭날개)와 레스베라트롤(석류)이 탄력을 높여요." },
+        { menu: "족발 + 깻잎쌈 + 마늘", tip: "족발의 천연 콜라겐과 깻잎의 항산화 성분이 주름을 예방해요." },
+        { menu: "사골국 + 잡곡밥 + 나물", tip: "사골의 젤라틴이 피부 탄력을 보충하고 주름을 완화해요." },
+        { menu: "삼겹살 쌈 + 부추무침 + 마늘", tip: "동물성 콜라겐과 부추의 비타민K가 탄력 유지에 도움이 돼요." },
+      ],
+      default: [
+        { menu: "생선 + 제철 채소 중심 저녁", tip: "가벼운 저녁으로 피부 야간 재생을 도와요." },
+        { menu: "닭가슴살 구이 + 샐러드 + 현미", tip: "단백질과 채소 중심 저녁으로 피부 회복을 도와요." },
+        { menu: "콩국수 + 오이 + 토마토", tip: "식물성 단백질과 수분이 풍부한 저녁으로 피부를 가볍게 해요." },
+      ],
     },
   },
   en: {
     lunch: {
-      O: { menu: "Brown rice + Grilled salmon + Spinach salad", tip: "Low-GI diet controls sebum. Zinc-rich salmon cleanses pores." },
-      D: { menu: "Avocado whole-grain toast + Eggs", tip: "Omega-3 & Vitamin E strengthen the skin lipid barrier to fight dryness." },
-      S: { menu: "Turmeric chicken + Steamed broccoli", tip: "Curcumin in turmeric suppresses inflammation and calms redness." },
-      P: { menu: "Strawberry yogurt bowl + Bell pepper rice", tip: "Vitamin C inhibits melanin synthesis enzymes to prevent dark spots." },
-      W: { menu: "Steamed egg + Blueberries + Mixed nuts", tip: "Antioxidants inhibit collagen-degrading enzymes to prevent wrinkles." },
-      default: { menu: "Balanced meal with protein, veggies & whole grains", tip: "A variety of nutrients helps maintain healthy, glowing skin." },
+      O: [
+        { menu: "Brown rice + Grilled salmon + Spinach salad", tip: "Low-GI diet controls sebum. Zinc-rich salmon cleanses pores." },
+        { menu: "Quinoa bowl + Grilled chicken + Almonds", tip: "Low-sugar meals with quality protein keep oil levels balanced." },
+        { menu: "Soba noodles + Tofu + Watercress", tip: "Light carbs and plant protein help prevent excess sebum." },
+      ],
+      D: [
+        { menu: "Avocado whole-grain toast + Eggs", tip: "Omega-3 & Vitamin E strengthen the skin lipid barrier to fight dryness." },
+        { menu: "Salmon poke bowl + Brown rice", tip: "Omega-3 rich salmon protects your skin's moisture barrier." },
+        { menu: "Walnut cream pasta + Arugula", tip: "Healthy fats from nuts help moisturize skin from within." },
+      ],
+      S: [
+        { menu: "Turmeric chicken + Steamed broccoli", tip: "Curcumin in turmeric suppresses inflammation and calms redness." },
+        { menu: "Gentle tofu stew + Spinach", tip: "Mild ingredients minimize skin irritation for sensitive types." },
+        { menu: "Oatmeal porridge + Banana + Honey", tip: "Gentle grains reduce digestive stress and lower skin sensitivity." },
+      ],
+      P: [
+        { menu: "Strawberry yogurt bowl + Bell pepper rice", tip: "Vitamin C inhibits melanin synthesis enzymes to prevent dark spots." },
+        { menu: "Orange chicken salad + Bell peppers", tip: "Citrus vitamin C prevents pigmentation and evens skin tone." },
+        { menu: "Kiwi smoothie bowl + Granola", tip: "Kiwi's vitamin C and antioxidants maintain a clear complexion." },
+      ],
+      W: [
+        { menu: "Steamed egg + Blueberries + Mixed nuts", tip: "Antioxidants inhibit collagen-degrading enzymes to prevent wrinkles." },
+        { menu: "Bone broth soup + Mixed grain rice", tip: "Natural collagen in bone broth directly supports skin elasticity." },
+        { menu: "Colorful bibimbap + Seaweed soup", tip: "Seaweed minerals promote skin renewal and maintain firmness." },
+      ],
+      default: [
+        { menu: "Balanced meal with protein, veggies & whole grains", tip: "A variety of nutrients helps maintain healthy, glowing skin." },
+        { menu: "Seasonal grain bowl with mixed toppings", tip: "Colorful seasonal ingredients supply essential skin nutrients." },
+      ],
     },
     dinner: {
-      O: { menu: "Tofu stir-fry + Miso soup", tip: "Probiotic-rich miso strengthens the gut-skin axis." },
-      D: { menu: "Salmon steak + Olive oil salad", tip: "Healthy fats repair the skin barrier and lock in moisture." },
-      S: { menu: "Grilled mackerel + Kimchi + Seasoned greens", tip: "Omega-3 & probiotics stabilize skin immunity." },
-      P: { menu: "Tomato egg stir-fry + Sautéed spinach", tip: "Lycopene (tomato) & folate (spinach) aid pigmentation recovery." },
-      W: { menu: "Braised chicken wings + Pomegranate juice", tip: "Collagen from chicken wings + resveratrol from pomegranate boost elasticity." },
-      default: { menu: "Light fish & seasonal vegetables for dinner", tip: "A light dinner supports skin overnight regeneration." },
+      O: [
+        { menu: "Tofu stir-fry + Miso soup", tip: "Probiotic-rich miso strengthens the gut-skin axis." },
+        { menu: "Grilled chicken salad + Brown rice", tip: "Light protein at dinner reduces overnight oil production." },
+        { menu: "Shrimp veggie stir-fry + Miso broth", tip: "Low-fat seafood keeps the evening meal light on pores." },
+      ],
+      D: [
+        { menu: "Salmon steak + Olive oil salad", tip: "Healthy fats repair the skin barrier and lock in moisture." },
+        { menu: "Avocado shrimp tacos + Lime", tip: "Avocado's monounsaturated fats support overnight skin hydration." },
+        { menu: "Creamy mushroom risotto + Walnut topping", tip: "Healthy fats at dinner reduce morning dryness." },
+      ],
+      S: [
+        { menu: "Grilled mackerel + Kimchi + Seasoned greens", tip: "Omega-3 & probiotics stabilize skin immunity." },
+        { menu: "Steamed white fish + Silken tofu", tip: "Gentle dinner ingredients help calm irritated skin overnight." },
+        { menu: "Cabbage wraps + Soybean paste stew", tip: "Cabbage's vitamin U protects and soothes skin membranes." },
+      ],
+      P: [
+        { menu: "Tomato egg stir-fry + Sautéed spinach", tip: "Lycopene (tomato) & folate (spinach) aid pigmentation recovery." },
+        { menu: "Beet salad + Grilled chicken breast", tip: "Beetroot betaine supports cell turnover and improves pigmentation." },
+        { menu: "Carrot soup + Whole wheat bread", tip: "Beta-carotene helps even skin tone and regulate melanin." },
+      ],
+      W: [
+        { menu: "Braised chicken wings + Pomegranate juice", tip: "Collagen from chicken wings + resveratrol from pomegranate boost elasticity." },
+        { menu: "Bone broth + Mixed grain rice + Greens", tip: "Gelatin in bone broth replenishes skin elasticity." },
+        { menu: "Pork belly wraps + Garlic chives", tip: "Animal collagen and vitamin K from chives help maintain firmness." },
+      ],
+      default: [
+        { menu: "Light fish & seasonal vegetables for dinner", tip: "A light dinner supports skin overnight regeneration." },
+        { menu: "Grilled chicken + Salad + Brown rice", tip: "Protein and veggie-focused dinner supports skin recovery." },
+      ],
     },
   },
   ja: {
     lunch: {
-      O: { menu: "玄米 + 焼きサーモン + ほうれん草サラダ", tip: "低GI食で皮脂分泌を調節。亜鉛豊富なサーモンが毛穴を清潔に保ちます。" },
-      D: { menu: "アボカド全粒粉トースト + 卵", tip: "オメガ3とビタミンEが肌の脂質バリアを強化し乾燥を改善します。" },
-      S: { menu: "ターメリックチキン + ブロッコリー蒸し", tip: "クルクミンが炎症を抑え、敏感肌の赤みを鎮めます。" },
-      P: { menu: "いちごヨーグルトボウル + パプリカ炒め飯", tip: "ビタミンCがメラニン合成酵素を阻害し、シミを予防します。" },
-      W: { menu: "茶碗蒸し + ブルーベリー + ナッツ", tip: "抗酸化物質がコラーゲン分解酵素を阻害し、しわを予防します。" },
-      default: { menu: "栄養バランスの取れた和定食", tip: "さまざまな栄養素が健康的な肌を維持するのに役立ちます。" },
+      O: [
+        { menu: "玄米 + 焼きサーモン + ほうれん草サラダ", tip: "低GI食で皮脂分泌を調節。亜鉛豊富なサーモンが毛穴を清潔に保ちます。" },
+        { menu: "キヌアボウル + グリルチキン + アーモンド", tip: "低糖質と良質なタンパク質で皮脂バランスを維持します。" },
+        { menu: "蕎麦 + 豆腐 + クレソン", tip: "軽い炭水化物と植物性タンパク質で皮脂過剰を防ぎます。" },
+      ],
+      D: [
+        { menu: "アボカド全粒粉トースト + 卵", tip: "オメガ3とビタミンEが肌の脂質バリアを強化し乾燥を改善します。" },
+        { menu: "サーモンポケボウル + 玄米", tip: "オメガ3豊富なサーモンが肌の水分バリアを保護します。" },
+        { menu: "くるみクリームパスタ + ルッコラ", tip: "ナッツの健康的な脂肪が肌の保湿を内側からサポートします。" },
+      ],
+      S: [
+        { menu: "ターメリックチキン + ブロッコリー蒸し", tip: "クルクミンが炎症を抑え、敏感肌の赤みを鎮めます。" },
+        { menu: "優しい豆腐スープ + ほうれん草", tip: "刺激の少ない食材で肌への負担を最小限にします。" },
+        { menu: "オートミール + バナナ + はちみつ", tip: "やさしい穀物で消化負担を減らし、肌の敏感度を下げます。" },
+      ],
+      P: [
+        { menu: "いちごヨーグルトボウル + パプリカ炒め飯", tip: "ビタミンCがメラニン合成酵素を阻害し、シミを予防します。" },
+        { menu: "オレンジチキンサラダ + パプリカ", tip: "柑橘類のビタミンCが色素沈着を防ぎ、肌トーンを均一にします。" },
+        { menu: "キウイスムージーボウル + グラノーラ", tip: "キウイのビタミンCと抗酸化成分が澄んだ肌を維持します。" },
+      ],
+      W: [
+        { menu: "茶碗蒸し + ブルーベリー + ナッツ", tip: "抗酸化物質がコラーゲン分解酵素を阻害し、しわを予防します。" },
+        { menu: "骨だしスープ + 雑穀ご飯", tip: "骨だしの天然コラーゲンが肌の弾力を直接補充します。" },
+        { menu: "三色ナムルビビンバ + わかめスープ", tip: "海藻のミネラルが肌の再生を促進し、ハリを維持します。" },
+      ],
+      default: [
+        { menu: "栄養バランスの取れた和定食", tip: "さまざまな栄養素が健康的な肌を維持するのに役立ちます。" },
+        { menu: "旬の食材を使った彩り豊かな丼", tip: "色とりどりの旬の食材が肌に必要な栄養を補います。" },
+      ],
     },
     dinner: {
-      O: { menu: "豆腐野菜炒め + 味噌汁", tip: "プロバイオティクス豊富な味噌が腸-皮膚軸を強化します。" },
-      D: { menu: "サーモンステーキ + オリーブオイルサラダ", tip: "良質な脂肪が肌バリアを修復し、潤いを閉じ込めます。" },
-      S: { menu: "サバの塩焼き + キムチ + 和え物", tip: "オメガ3とプロバイオティクスが肌の免疫を安定させます。" },
-      P: { menu: "トマト卵炒め + ほうれん草のおひたし", tip: "リコペン(トマト)と葉酸(ほうれん草)が色素沈着の回復を助けます。" },
-      W: { menu: "手羽先の煮込み + ザクロジュース", tip: "コラーゲン(手羽先)とレスベラトロール(ザクロ)が弾力を高めます。" },
-      default: { menu: "魚と旬の野菜中心の夕食", tip: "軽い夕食が肌の夜間再生をサポートします。" },
+      O: [
+        { menu: "豆腐野菜炒め + 味噌汁", tip: "プロバイオティクス豊富な味噌が腸-皮膚軸を強化します。" },
+        { menu: "グリルチキンサラダ + 玄米", tip: "軽めのタンパク質で夜間の皮脂分泌を抑えます。" },
+        { menu: "エビ野菜炒め + 味噌ブロス", tip: "低脂肪のシーフードで毛穴に負担をかけない夕食を。" },
+      ],
+      D: [
+        { menu: "サーモンステーキ + オリーブオイルサラダ", tip: "良質な脂肪が肌バリアを修復し、潤いを閉じ込めます。" },
+        { menu: "アボカドエビタコス + ライム", tip: "アボカドの一価不飽和脂肪酸が夜間の肌の保湿をサポートします。" },
+        { menu: "クリームきのこリゾット + くるみトッピング", tip: "夕食の健康的な脂肪が朝の乾燥感を軽減します。" },
+      ],
+      S: [
+        { menu: "サバの塩焼き + キムチ + 和え物", tip: "オメガ3とプロバイオティクスが肌の免疫を安定させます。" },
+        { menu: "蒸し白身魚 + 絹ごし豆腐", tip: "やさしい夕食の食材が刺激を受けた肌を一晩で鎮めます。" },
+        { menu: "キャベツ巻き + 味噌煮込み", tip: "キャベツのビタミンUが肌の粘膜を保護し鎮静させます。" },
+      ],
+      P: [
+        { menu: "トマト卵炒め + ほうれん草のおひたし", tip: "リコペン(トマト)と葉酸(ほうれん草)が色素沈着の回復を助けます。" },
+        { menu: "ビーツサラダ + グリルチキン", tip: "ビーツのベタインが細胞ターンオーバーを促進し色素沈着を改善します。" },
+        { menu: "にんじんスープ + 全粒粉パン", tip: "ベータカロテンが肌トーンを均一にし、メラニンを調節します。" },
+      ],
+      W: [
+        { menu: "手羽先の煮込み + ザクロジュース", tip: "コラーゲン(手羽先)とレスベラトロール(ザクロ)が弾力を高めます。" },
+        { menu: "骨だしスープ + 雑穀ご飯 + ナムル", tip: "骨だしのゼラチンが肌の弾力を補充します。" },
+        { menu: "豚バラ巻き + ニラ和え + にんにく", tip: "動物性コラーゲンとニラのビタミンKがハリの維持に役立ちます。" },
+      ],
+      default: [
+        { menu: "魚と旬の野菜中心の夕食", tip: "軽い夕食が肌の夜間再生をサポートします。" },
+        { menu: "グリルチキン + サラダ + 玄米", tip: "タンパク質と野菜中心の夕食が肌の回復をサポートします。" },
+      ],
     },
   },
 };
@@ -616,19 +766,27 @@ function getMealTip({ baumannType, lang, meal, scoreSummary, subscriberId, mealH
   const addonData = ((MEAL_VARIETY[lang] || MEAL_VARIETY.ko)[meal] || {});
 
   // 바우만 4글자 전체 매칭 (우선순위: O/D → S/R → P/N → W/T)
+  // 배열 형태 지원: 매칭된 타입의 메뉴를 모두 모아서 로테이션
   const priority = ["O", "D", "S", "R", "P", "N", "W", "T"];
   const matched = priority.filter(l => baumannType?.includes(l) && mealData[l]);
-  const baseOptions = matched.length > 0
-    ? matched.map(key => ({ key, ...mealData[key] }))
-    : [{ key: "default", ...mealData.default }];
+  const baseOptions = [];
+  if (matched.length > 0) {
+    for (const key of matched) {
+      const items = Array.isArray(mealData[key]) ? mealData[key] : [mealData[key]];
+      items.forEach((item, i) => baseOptions.push({ key: `${key}_${i}`, ...item }));
+    }
+  } else {
+    const defaults = Array.isArray(mealData.default) ? mealData.default : [mealData.default];
+    defaults.forEach((item, i) => baseOptions.push({ key: `default_${i}`, ...item }));
+  }
   const dateSeed = new Date().toISOString().slice(0, 10);
   const base = pickVariant(baseOptions, `${subscriberId}:${meal}:base:${focus}:${dateSeed}`, history?.baseKey) || baseOptions[0];
   const addonOptions = addonData[focus] || addonData.default || [];
   const addon = pickVariant(addonOptions, `${subscriberId}:${meal}:addon:${focus}:${dateSeed}`, history?.addonKey);
   const secondaryTips = matched
-    .filter(key => key !== base.key)
+    .filter(key => key !== base.key.split("_")[0])
     .slice(0, 1)
-    .map(key => mealData[key].tip);
+    .map(key => { const items = Array.isArray(mealData[key]) ? mealData[key] : [mealData[key]]; return items[0]?.tip; });
   const tipParts = [base.tip, addon?.tip, ...secondaryTips].filter(Boolean);
 
   return {
