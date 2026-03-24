@@ -42,6 +42,7 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [showReportCard, setShowReportCard] = useState(false);
   const [showAllSignals, setShowAllSignals] = useState(false);
+  const [routineLogs, setRoutineLogs] = useState<{ date_str: string; cosmetic_ids: string[] }[]>([]);
 
   const loadData = async () => {
     if (!user) {
@@ -61,6 +62,11 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
       const items = Array.isArray(cosmeticsData) ? cosmeticsData : [];
       setList(items);
       setScans(Array.isArray(scansData) ? scansData : []);
+
+      fetch("/api/routine-log")
+        .then(r => r.ok ? r.json() : [])
+        .then(data => setRoutineLogs(Array.isArray(data) ? data : []))
+        .catch(() => {});
 
       if (items.length > 0) {
         setOptimizing(true);
@@ -98,7 +104,7 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
         }
       : undefined,
   );
-  const productSignals = buildCosmeticCorrelationSignals(list, scans, t);
+  const productSignals = buildCosmeticCorrelationSignals(list, scans, t, routineLogs);
   const latestScan = scans.length > 0 ? scans[0] : null;
   const latestBaumannType = latestScan?.baumannType ?? "";
   const latestScores = (() => {

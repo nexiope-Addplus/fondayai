@@ -1185,6 +1185,7 @@ export function buildCosmeticCorrelationSignals(
   cosmetics: CosmeticItem[],
   scans: CosmeticSignalScan[],
   t: (key: string, options?: any) => string,
+  routineLogs?: { date_str: string; cosmetic_ids: string[] }[],
 ): CosmeticCorrelationSignal[] {
   if (cosmetics.length === 0 || scans.length === 0) return [];
 
@@ -1213,14 +1214,32 @@ export function buildCosmeticCorrelationSignals(
         ? observedAfterScans
         : sortedScans.filter(({ ts }) => ts >= startTs).slice(0, 4).map(({ scan }) => scan);
 
-      if (afterScans.length === 0) return null;
+      // If routine logs are provided, filter after scans to days this product was actually used
+      let filteredAfterScans = afterScans;
+      if (routineLogs && routineLogs.length > 0) {
+        const usedDates = new Set(
+          routineLogs
+            .filter(log => log.cosmetic_ids.includes(item.id))
+            .map(log => log.date_str)
+        );
+        if (usedDates.size > 0) {
+          const filtered = afterScans.filter(scan => {
+            const scanDate = new Date(scan.createdAt).toISOString().slice(0, 10);
+            return usedDates.has(scanDate);
+          });
+          // Only use filtered if it has results; otherwise fall back to all afterScans
+          if (filtered.length > 0) filteredAfterScans = filtered;
+        }
+      }
+
+      if (filteredAfterScans.length === 0) return null;
 
       const comparisonBaselineScans = baselineScans.length > 0
         ? baselineScans
-        : afterScans.slice(0, Math.max(1, Math.min(2, Math.floor(afterScans.length / 2) || 1)));
+        : filteredAfterScans.slice(0, Math.max(1, Math.min(2, Math.floor(filteredAfterScans.length / 2) || 1)));
       const comparisonAfterScans = baselineScans.length > 0
-        ? afterScans
-        : afterScans.slice(-Math.max(1, Math.min(2, afterScans.length)));
+        ? filteredAfterScans
+        : filteredAfterScans.slice(-Math.max(1, Math.min(2, filteredAfterScans.length)));
 
       const baselineOverall = average(
         comparisonBaselineScans.map((scan) => Number(scan.overallScore) || 0).filter((value) => value > 0)
@@ -1294,7 +1313,7 @@ export function buildCosmeticCorrelationSignals(
         startedAt: item.opened_at || item.created_at || null,
         daysTracked,
         beforeCount: baselineScans.length,
-        afterCount: afterScans.length,
+        afterCount: filteredAfterScans.length,
         confidence,
         overallDelta: overallDelta !== null ? Math.round(overallDelta * 10) / 10 : null,
         topScoreIndex: top?.index ?? null,

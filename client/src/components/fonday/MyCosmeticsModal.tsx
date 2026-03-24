@@ -31,6 +31,7 @@ export function MyCosmeticsModal({ onClose, onAddNew, scans = [] }: { onClose: (
   const [optimized, setOptimized] = useState<OptimizedRoutine | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [selectedItem, setSelectedItem] = useState<CosmeticItem | null>(null);
+  const [routineLogs, setRoutineLogs] = useState<{ date_str: string; cosmetic_ids: string[] }[]>([]);
 
   useEffect(() => {
     fetch("/api/cosmetics").then(r => r.json()).then(data => {
@@ -48,6 +49,11 @@ export function MyCosmeticsModal({ onClose, onAddNew, scans = [] }: { onClose: (
         }).catch(() => {}).finally(() => setOptimizing(false));
       }
     }).catch(() => setLoading(false));
+
+    fetch("/api/routine-log")
+      .then(r => r.ok ? r.json() : [])
+      .then(data => setRoutineLogs(Array.isArray(data) ? data : []))
+      .catch(() => {});
   }, []);
 
   const fallbackGuide = buildRoutineGuide(list, t);
@@ -56,7 +62,7 @@ export function MyCosmeticsModal({ onClose, onAddNew, scans = [] }: { onClose: (
     pm: optimized.pm?.map((item) => item.id),
     conflicts: optimized.conflicts,
   } : undefined);
-  const productSignals = buildCosmeticCorrelationSignals(list, scans, t);
+  const productSignals = buildCosmeticCorrelationSignals(list, scans, t, routineLogs);
   const selectedSignal = selectedItem ? productSignals.find((signal) => signal.itemId === selectedItem.id) || null : null;
 
   const getOrderedItems = (period: "am" | "pm"): CosmeticItem[] => {
