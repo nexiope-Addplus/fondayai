@@ -10,13 +10,13 @@ export function LangSwitcher() {
   const langs = ["EN", "KO", "JA"];
   const current = (i18nHook.language || "en").toUpperCase();
   return (
-    <div className="flex items-center gap-0.5 bg-white/80 backdrop-blur-sm rounded-full px-2 py-1 shadow-sm">
+    <div className="flex items-center gap-0">
       {langs.map((lang) => (
         <button
           key={lang}
           onClick={() => i18nHook.changeLanguage(lang.toLowerCase())}
-          className="text-xs font-bold px-3 py-2.5 rounded-full transition-all min-h-[44px] min-w-[44px] flex items-center justify-center"
-          style={current === lang ? { color: SCAN_TO } : { color: "#B0A898" }}
+          className="text-[11px] font-semibold px-2 py-1.5 rounded-full transition-all min-h-[32px] min-w-[32px] flex items-center justify-center"
+          style={current === lang ? { color: SCAN_TO } : { color: "#C4BBB2" }}
         >
           {lang}
         </button>

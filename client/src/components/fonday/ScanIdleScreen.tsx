@@ -175,10 +175,8 @@ export function ScanIdleScreen({
       onTouchEnd={handleTouchEnd}
     >
       {/* 상단 헤더 row */}
-      <div className="flex justify-between items-center mb-3 relative" style={{ zIndex: 1 }}>
-        <div className="flex items-center gap-1.5">
-          <span className="text-sm font-medium tracking-wide" style={{ color: TEXT_SECONDARY, fontFamily: FONT_DISPLAY }}>Fonday AI</span>
-        </div>
+      <div className="flex justify-between items-center mb-5 relative" style={{ zIndex: 1 }}>
+        <span className="text-lg font-bold tracking-tight" style={{ color: "#1C1917", fontFamily: FONT_DISPLAY }}>Fonday AI</span>
         <LangSwitcher />
       </div>
 
