@@ -249,7 +249,10 @@ export const onRequest = async (context: any) => {
     // ── 4. 기타 데이터 ────────────────────────────────────────────
     const [recentRows, diaryCountRow, cosmeticsCountRow, cosmeticsListRows] = await Promise.all([
       env.FONDAY_DB.prepare("SELECT user_id, overall_score, baumann_type, skin_age, lang, is_guest, gender, age_group, scores, city, country, referrer, provider, device_info, created_at FROM scans ORDER BY created_at DESC LIMIT 100")
-        .all().catch(() => env.FONDAY_DB.prepare("SELECT user_id, overall_score, baumann_type, skin_age, lang, is_guest, gender, age_group, city, country, referrer, provider, created_at FROM scans ORDER BY created_at DESC LIMIT 100").all())
+        .all()
+        .catch(() => env.FONDAY_DB.prepare("SELECT user_id, overall_score, baumann_type, skin_age, lang, is_guest, gender, age_group, city, country, referrer, provider, created_at FROM scans ORDER BY created_at DESC LIMIT 100").all())
+        .catch(() => env.FONDAY_DB.prepare("SELECT overall_score, baumann_type, skin_age, lang, is_guest, gender, age_group, created_at FROM scans ORDER BY created_at DESC LIMIT 100").all())
+        .catch(() => env.FONDAY_DB.prepare("SELECT overall_score, baumann_type, lang, is_guest, created_at FROM scans ORDER BY created_at DESC LIMIT 100").all())
         .catch(() => ({ results: [] })),
       safe(env.FONDAY_DB.prepare("SELECT COUNT(*) as cnt FROM diary_entries"), "first"),
       safe(env.FONDAY_DB.prepare("SELECT COUNT(*) as cnt FROM cosmetics"), "first"),
