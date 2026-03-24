@@ -75,7 +75,7 @@ function GradeCard({ cosmetic, grade }: { cosmetic: CosmeticItem; grade: Cosmeti
         <div className="mt-3">
           <div className="flex items-center justify-between gap-2 mb-1">
             <p className="text-[11px] font-semibold uppercase tracking-wider truncate min-w-0" style={{ color: TEXT_TERTIARY, fontFamily: FONT_DISPLAY }}>{t("cosmeticsReport.compatibility")}</p>
-            <p className="text-[11px] font-light shrink-0" style={{ color: cfg.color, fontFamily: FONT_DISPLAY }}>{grade.score}{t("result.scoreSuffix")}</p>
+            <p className="text-[11px] font-normal shrink-0" style={{ color: cfg.color, fontFamily: FONT_DISPLAY }}>{grade.score}{t("result.scoreSuffix")}</p>
           </div>
           <div className="h-1.5 rounded-full bg-stone-100 overflow-hidden">
             <motion.div
@@ -162,7 +162,7 @@ function GradeSummaryBar({ grades }: { grades: CosmeticGrade[] }) {
       <div className="flex items-center justify-between">
         <div>
           <p className="text-xs font-bold uppercase tracking-wider" style={{ color: TEXT_TERTIARY, fontFamily: FONT_DISPLAY }}>{t("cosmeticsReport.avgScore")}</p>
-          <p className="text-3xl font-light mt-0.5" style={{ color: cfg.color, fontFamily: FONT_DISPLAY }}>{avg}{t("result.scoreSuffix")}</p>
+          <p className="text-3xl font-normal mt-0.5" style={{ color: cfg.color, fontFamily: FONT_DISPLAY }}>{avg}{t("result.scoreSuffix")}</p>
         </div>
         <div className="flex gap-1.5">
           {(["A", "B", "C", "D", "F"] as const).map((g) => counts[g] ? (

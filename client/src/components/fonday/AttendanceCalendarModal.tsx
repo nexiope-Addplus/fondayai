@@ -33,7 +33,7 @@ export function AttendanceCalendarModal({ onClose }: { onClose: () => void }) {
         <div className="flex items-center justify-between mb-1">
           <h2 className="text-base font-semibold" style={{ color: DEEP_GREEN }}>{t("attendance.calendarTitle")}</h2>
           <div className="flex items-center gap-1.5">
-            <span className="text-xs font-light px-2.5 py-0.5 rounded-full text-white"
+            <span className="text-xs font-normal px-2.5 py-0.5 rounded-full text-white"
               style={{ fontFamily: FONT_DISPLAY, background: "#F59E0B" }}>
               {t("attendance.totalPoints", { n: data.totalPoints })}
             </span>

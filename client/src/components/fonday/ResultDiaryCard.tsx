@@ -50,7 +50,7 @@ export function ResultDiaryCard({
           <div className="mt-3 rounded-2xl p-3" style={{ background: delta > 0 ? "#F0FDF4" : delta < 0 ? "#FFF5F5" : "#F8F7F5" }}>
             {previousScore !== null ? (
               <div className="flex items-center gap-3">
-                <span className="text-[28px] font-light leading-none" style={{ fontFamily: FONT_DISPLAY, color: delta > 0 ? "#059669" : delta < 0 ? "#DC2626" : "#A8A29E" }}>
+                <span className="text-[28px] font-normal leading-none" style={{ fontFamily: FONT_DISPLAY, color: delta > 0 ? "#059669" : delta < 0 ? "#DC2626" : "#A8A29E" }}>
                   {delta > 0 ? "▲" : delta < 0 ? "▼" : "―"} {t("result.diary.deltaPoint", { n: Math.abs(delta) })}
                 </span>
                 <p className="text-xs text-stone-500 leading-snug whitespace-pre-line">
@@ -65,14 +65,14 @@ export function ResultDiaryCard({
           <div className="flex gap-2 mt-2">
             <div className="flex-1 rounded-2xl py-2 px-2 text-center" style={{ background: TINT_WARM }}>
               <p className="text-xs font-semibold text-stone-400 mb-0.5">{t("result.diary.streak")}</p>
-              <p className="text-sm font-light flex items-center justify-center gap-0.5" style={{ fontFamily: FONT_DISPLAY, color: SCAN_TO }}>
+              <p className="text-sm font-normal flex items-center justify-center gap-0.5" style={{ fontFamily: FONT_DISPLAY, color: SCAN_TO }}>
                 {streakCount || 1}
                 <Flame className="w-3.5 h-3.5 inline ml-0.5" style={{ color: SCAN_TO }} />
               </p>
             </div>
             <div className="flex-1 rounded-2xl py-2 px-2 text-center" style={{ background: "#F0FDF4" }}>
               <p className="text-xs font-semibold text-stone-400 mb-0.5">{t("result.totalScans")}</p>
-              <p className="text-sm font-light" style={{ fontFamily: FONT_DISPLAY, color: "#059669" }}>{totalScans}</p>
+              <p className="text-sm font-normal" style={{ fontFamily: FONT_DISPLAY, color: "#059669" }}>{totalScans}</p>
             </div>
             <button
               onClick={(event) => {

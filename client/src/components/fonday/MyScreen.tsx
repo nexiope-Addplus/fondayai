@@ -74,14 +74,14 @@ export function MyScreen({
           <div className="flex items-start justify-between gap-3">
             <div>
               <p className="text-xs font-medium tracking-widest uppercase mb-1" style={{ color: SCAN_TO, fontFamily: FONT_DISPLAY }}>FONDAY</p>
-              <h1 className="text-2xl font-light" style={{ color: DEEP_GREEN, fontFamily: FONT_DISPLAY }}>{t("nav.my")}</h1>
+              <h1 className="text-2xl font-normal" style={{ color: DEEP_GREEN, fontFamily: FONT_DISPLAY }}>{t("nav.my")}</h1>
               <p className="text-[13px] mt-1" style={{ color: TEXT_TERTIARY }}>
                 {user ? (user.username || user.email || t("nav.my")) : t("attendance.loginDesc")}
               </p>
             </div>
             <div className="rounded-2xl px-3 py-2 text-right shrink-0 border" style={{ borderColor: BORDER_COLOR }}>
               <p className="text-[11px] font-medium uppercase tracking-[0.12em]" style={{ color: TEXT_TERTIARY }}>points</p>
-              <p className="text-[24px] font-light leading-none mt-1" style={{ color: DEEP_GREEN, fontFamily: FONT_DISPLAY }}>{attendance.totalPoints}</p>
+              <p className="text-[24px] font-normal leading-none mt-1" style={{ color: DEEP_GREEN, fontFamily: FONT_DISPLAY }}>{attendance.totalPoints}</p>
             </div>
           </div>
           <div className="flex flex-wrap gap-2 mt-4">

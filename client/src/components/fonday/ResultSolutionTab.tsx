@@ -59,11 +59,11 @@ export function ResultSolutionTab(props: any) {
                 transition={{ delay: i * 0.08 }} className="flex gap-3 p-4 rounded-2xl"
                 style={{ background: "#FFFFFF", border: `1px solid ${BORDER_COLOR}` }}>
                 <div className="shrink-0">
-                  <div className="w-9 h-9 rounded-2xl flex items-center justify-center text-xs font-light"
+                  <div className="w-9 h-9 rounded-2xl flex items-center justify-center text-xs font-normal"
                     style={{ fontFamily: FONT_DISPLAY, background: i === 0 ? TINT_WARM : i === 1 ? TINT_GREEN : "#F6F4FB", color: i === 0 ? SCAN_TO : i === 1 ? DEEP_GREEN : "#7C3AED" }}>
                     {i + 1}
                   </div>
-                  <p className="text-xs font-light text-center mt-1"
+                  <p className="text-xs font-normal text-center mt-1"
                     style={{ fontFamily: FONT_DISPLAY, color: i === 0 ? SCAN_TO : i === 1 ? DEEP_GREEN : "#7C3AED" }}>STEP</p>
                 </div>
                 <div>

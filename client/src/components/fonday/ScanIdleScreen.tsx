@@ -291,7 +291,7 @@ export function ScanIdleScreen({
         <div className="flex items-center justify-between gap-2 mb-3">
           <span className="text-xs font-medium tracking-wide" style={{ color: TEXT_TERTIARY, fontFamily: FONT_DISPLAY }}>{t("idle.heroBadge")}</span>
         </div>
-        <h1 className="text-[30px] font-light leading-[1.15] mb-2 px-1" style={{ color: "#1C1917", fontFamily: FONT_DISPLAY }}>
+        <h1 className="text-[30px] font-normal leading-[1.15] mb-2 px-1" style={{ color: "#1C1917", fontFamily: FONT_DISPLAY }}>
           {t("idle.subtitle1")}<br />{t("idle.subtitle3")}
         </h1>
         <p className="text-[14px] leading-[1.7] px-1 mb-4" style={{ color: TEXT_SECONDARY }}>
@@ -399,17 +399,17 @@ export function ScanIdleScreen({
                 <p className="text-[11px] font-medium uppercase tracking-[0.12em]" style={{ color: TEXT_TERTIARY }}>
                   {t("result.overall")}
                 </p>
-                <p className="text-[24px] font-light mt-1" style={{ color: DEEP_GREEN, fontFamily: FONT_DISPLAY }}>{latestScan.overallScore ?? "—"}</p>
+                <p className="text-[24px] font-normal mt-1" style={{ color: DEEP_GREEN, fontFamily: FONT_DISPLAY }}>{latestScan.overallScore ?? "—"}</p>
               </div>
             </div>
             <div className="grid grid-cols-3 gap-2 mt-3">
               <div className="rounded-2xl p-3 border" style={{ borderColor: BORDER_COLOR }}>
                 <p className="text-[11px] leading-tight" style={{ color: TEXT_TERTIARY }}>{t("result.skinAge")}</p>
-                <p className="text-[16px] font-light mt-1 truncate" style={{ color: DEEP_GREEN, fontFamily: FONT_DISPLAY }}>{latestScan.skinAge ?? "—"}</p>
+                <p className="text-[16px] font-normal mt-1 truncate" style={{ color: DEEP_GREEN, fontFamily: FONT_DISPLAY }}>{latestScan.skinAge ?? "—"}</p>
               </div>
               <div className="rounded-2xl p-3 border" style={{ borderColor: BORDER_COLOR }}>
                 <p className="text-[11px] leading-tight" style={{ color: TEXT_TERTIARY }}>{t("result.baumannLabel")}</p>
-                <p className="text-[16px] font-light mt-1 truncate" style={{ color: SCAN_TO, fontFamily: FONT_DISPLAY }}>{latestScan.baumannType || "—"}</p>
+                <p className="text-[16px] font-normal mt-1 truncate" style={{ color: SCAN_TO, fontFamily: FONT_DISPLAY }}>{latestScan.baumannType || "—"}</p>
               </div>
               <div className="rounded-2xl p-3 border" style={{ borderColor: BORDER_COLOR }}>
                 <p className="text-[11px] leading-tight" style={{ color: TEXT_TERTIARY }}>{t("my.focusTitle")}</p>

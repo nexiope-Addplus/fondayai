@@ -243,7 +243,7 @@ export function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: AppU
           <div className="rounded-3xl p-5 mb-4"
             style={{ background: DEEP_GREEN }}>
             <p className="text-xs font-medium tracking-widest uppercase mb-1 text-white/70" style={{ fontFamily: FONT_DISPLAY }}>FONDAY</p>
-            <h1 className="text-2xl font-light text-white" style={{ fontFamily: FONT_DISPLAY }}>{t("modal.diary.title")} ✦</h1>
+            <h1 className="text-2xl font-normal text-white" style={{ fontFamily: FONT_DISPLAY }}>{t("modal.diary.title")} ✦</h1>
             <p className="text-[12px] text-white/80 mt-2 text-kr-pretty">{t("result.login.desc")}</p>
           </div>
         </div>
@@ -307,22 +307,22 @@ export function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: AppU
         <div className="rounded-3xl p-5 mb-4"
           style={{ background: "#FFFFFF", border: `1px solid ${BORDER_COLOR}` }}>
           <p className="text-xs font-medium tracking-widest uppercase mb-1" style={{ color: SCAN_TO, fontFamily: FONT_DISPLAY }}>FONDAY</p>
-          <h1 className="text-2xl font-light" style={{ color: DEEP_GREEN, fontFamily: FONT_DISPLAY }}>{t("modal.diary.title")}</h1>
+          <h1 className="text-2xl font-normal" style={{ color: DEEP_GREEN, fontFamily: FONT_DISPLAY }}>{t("modal.diary.title")}</h1>
           <p className="text-[13px] mt-2 text-kr-pretty" style={{ color: TEXT_TERTIARY }}>
             {finalType ? `${finalType} · ` : ""}{totalRecords > 0 ? `${t("modal.diary.countLabel", { count: totalRecords })}` : t("result.diary.firstRecord")}
           </p>
           <div className="grid grid-cols-3 gap-2 mt-4">
             <div className="rounded-2xl p-3 text-center border" style={{ borderColor: BORDER_COLOR }}>
               <p className="text-[11px] font-medium whitespace-nowrap" style={{ color: TEXT_TERTIARY }}>{t("result.overall")}</p>
-              <p className="text-[24px] font-light mt-1" style={{ color: SCAN_TO, fontFamily: FONT_DISPLAY }}>{overallScore || "—"}</p>
+              <p className="text-[24px] font-normal mt-1" style={{ color: SCAN_TO, fontFamily: FONT_DISPLAY }}>{overallScore || "—"}</p>
             </div>
             <div className="rounded-2xl p-3 text-center border" style={{ borderColor: BORDER_COLOR }}>
               <p className="text-[11px] font-medium whitespace-nowrap" style={{ color: TEXT_TERTIARY }}>{t("result.diary.avg7d")}</p>
-              <p className="text-[24px] font-light mt-1" style={{ color: "#7C3AED", fontFamily: FONT_DISPLAY }}>{avgScore || "—"}</p>
+              <p className="text-[24px] font-normal mt-1" style={{ color: "#7C3AED", fontFamily: FONT_DISPLAY }}>{avgScore || "—"}</p>
             </div>
             <div className="rounded-2xl p-3 text-center border" style={{ borderColor: BORDER_COLOR }}>
               <p className="text-[11px] font-medium whitespace-nowrap" style={{ color: TEXT_TERTIARY }}>{t("diary.routineTitle")}</p>
-              <p className="text-[24px] font-light mt-1" style={{ color: DEEP_GREEN, fontFamily: FONT_DISPLAY }}>{diaryTodoProgress.total > 0 ? `${diaryTodoProgress.done}/${diaryTodoProgress.total}` : (diaryMemoReady ? "1/1" : "0/1")}</p>
+              <p className="text-[24px] font-normal mt-1" style={{ color: DEEP_GREEN, fontFamily: FONT_DISPLAY }}>{diaryTodoProgress.total > 0 ? `${diaryTodoProgress.done}/${diaryTodoProgress.total}` : (diaryMemoReady ? "1/1" : "0/1")}</p>
             </div>
           </div>
         </div>

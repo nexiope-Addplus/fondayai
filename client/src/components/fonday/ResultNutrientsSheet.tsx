@@ -79,7 +79,7 @@ export function ResultNutrientsSheet({
                         <div className="w-8 h-8 rounded-full flex items-center justify-center text-base border" style={{ background: "#FFFFFF", borderColor: BORDER_COLOR }}>
                           {NUTRIENT_ICONS[letter]}
                         </div>
-                        <p className="text-xs font-light text-center mt-0.5" style={{ fontFamily: FONT_DISPLAY, color }}>{letter}</p>
+                        <p className="text-xs font-normal text-center mt-0.5" style={{ fontFamily: FONT_DISPLAY, color }}>{letter}</p>
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-[13px] font-semibold mb-0.5" style={{ color }}>{nutrient.name}</p>

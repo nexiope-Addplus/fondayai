@@ -247,7 +247,7 @@ export function MagazineTab() {
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
                     <p className="text-[11px] font-bold text-white/60 uppercase tracking-widest mb-1" style={{ fontFamily: FONT_DISPLAY }}>{t("idle.latestEyebrow")}</p>
-                    <p className="text-[44px] font-light text-white leading-none" style={{ fontFamily: FONT_DISPLAY }}>{latestOverall}</p>
+                    <p className="text-[44px] font-normal text-white leading-none" style={{ fontFamily: FONT_DISPLAY }}>{latestOverall}</p>
                     {avgDelta !== 0 && (
                       <p className="text-[11px] text-white/60 mt-1">
                         {avgDelta > 0 ? `▲ +${avgDelta}` : `▼ ${avgDelta}`} {t("ranking.avgScore")}
@@ -258,7 +258,7 @@ export function MagazineTab() {
                     <div className="px-3 py-2 rounded-2xl mb-2" style={{ background: "rgba(255,255,255,0.15)" }}>
                       <p className="text-[11px] text-white/60 mb-0.5" style={{ fontFamily: FONT_DISPLAY }}>{t("ranking.topLabel")}</p>
                       {rankingData.myPercentile !== undefined ? (
-                        <p className="text-[20px] font-light text-white leading-none" style={{ fontFamily: FONT_DISPLAY }}>
+                        <p className="text-[20px] font-normal text-white leading-none" style={{ fontFamily: FONT_DISPLAY }}>
                           {t("ranking.myPercentile", { percent: rankingData.myPercentile })}
                         </p>
                       ) : (
@@ -278,17 +278,17 @@ export function MagazineTab() {
               <div className="rounded-2xl px-4 py-3 flex items-center gap-0 bg-white" style={{ border: `1px solid ${BORDER_COLOR}` }}>
                 <div className="flex-1 text-center min-w-0">
                   <p className="text-[11px] truncate" style={{ color: TEXT_TERTIARY }}>{t("ranking.avgScore")}</p>
-                  <p className="text-[17px] font-light" style={{ color: DEEP_GREEN, fontFamily: FONT_DISPLAY }}>{rankingData.avgScore || "—"}</p>
+                  <p className="text-[17px] font-normal" style={{ color: DEEP_GREEN, fontFamily: FONT_DISPLAY }}>{rankingData.avgScore || "—"}</p>
                 </div>
                 <div className="w-px h-7 shrink-0" style={{ background: BORDER_COLOR }} />
                 <div className="flex-1 text-center min-w-0">
                   <p className="text-[11px] truncate" style={{ color: TEXT_TERTIARY }}>{t("ranking.topScore")}</p>
-                  <p className="text-[17px] font-light" style={{ color: SCAN_TO, fontFamily: FONT_DISPLAY }}>{rankingData.topScore || "—"}</p>
+                  <p className="text-[17px] font-normal" style={{ color: SCAN_TO, fontFamily: FONT_DISPLAY }}>{rankingData.topScore || "—"}</p>
                 </div>
                 <div className="w-px h-7 shrink-0" style={{ background: BORDER_COLOR }} />
                 <div className="flex-1 text-center min-w-0">
                   <p className="text-[11px] truncate" style={{ color: TEXT_TERTIARY }}>{t("result.totalScans")}</p>
-                  <p className="text-[17px] font-light text-stone-700" style={{ fontFamily: FONT_DISPLAY }}>{rankingData.totalScans || "—"}</p>
+                  <p className="text-[17px] font-normal text-stone-700" style={{ fontFamily: FONT_DISPLAY }}>{rankingData.totalScans || "—"}</p>
                 </div>
               </div>
             </motion.div>
@@ -330,7 +330,7 @@ export function MagazineTab() {
                       return (
                         <div key={i} className="flex-1 rounded-2xl p-2.5 text-center" style={{ background: "#FFF5F5" }}>
                           <p className="text-[11px] mb-1 leading-tight line-clamp-2" style={{ color: TEXT_TERTIARY }}>{label}</p>
-                          <p className="text-[20px] font-light leading-none" style={{ color: "#DC2626", fontFamily: FONT_DISPLAY }}>{score}</p>
+                          <p className="text-[20px] font-normal leading-none" style={{ color: "#DC2626", fontFamily: FONT_DISPLAY }}>{score}</p>
                         </div>
                       );
                     })}

@@ -36,7 +36,7 @@ export function SkinPredictionCard({
           </div>
           <div className="rounded-2xl px-3 py-2 text-right shrink-0" style={{ background: "#F5F3FF", border: "1px solid #E9D5FF" }}>
             <p className="text-xs font-semibold text-violet-500" style={{ fontFamily: FONT_DISPLAY }}>{t("result.prediction.rewardLabel")}</p>
-            <p className="text-[20px] font-light leading-none text-violet-700" style={{ fontFamily: FONT_DISPLAY }}>+{rewardPts}</p>
+            <p className="text-[20px] font-normal leading-none text-violet-700" style={{ fontFamily: FONT_DISPLAY }}>+{rewardPts}</p>
             <p className="text-xs text-violet-400 mt-1">{t("result.prediction.rewardSub")}</p>
           </div>
         </div>
@@ -64,7 +64,7 @@ export function SkinPredictionCard({
                 <p className="text-xs text-stone-400 mt-0.5">{t("result.prediction.goodCaption")}</p>
               </div>
               <div className="text-right shrink-0">
-                <p className="text-[28px] font-light leading-none text-emerald-600" style={{ fontFamily: FONT_DISPLAY }}>{good.score}</p>
+                <p className="text-[28px] font-normal leading-none text-emerald-600" style={{ fontFamily: FONT_DISPLAY }}>{good.score}</p>
                 <p className="text-xs font-semibold text-emerald-500 mt-0.5">+{goodDelta}</p>
               </div>
             </div>
@@ -86,7 +86,7 @@ export function SkinPredictionCard({
                 <p className="text-xs text-stone-400 mt-0.5">{t("result.prediction.badCaption")}</p>
               </div>
               <div className="text-right shrink-0">
-                <p className="text-[28px] font-light leading-none text-orange-500" style={{ fontFamily: FONT_DISPLAY }}>{bad.score}</p>
+                <p className="text-[28px] font-normal leading-none text-orange-500" style={{ fontFamily: FONT_DISPLAY }}>{bad.score}</p>
                 <p className="text-xs font-semibold text-orange-400 mt-0.5">-{Math.abs(badDelta)}</p>
               </div>
             </div>

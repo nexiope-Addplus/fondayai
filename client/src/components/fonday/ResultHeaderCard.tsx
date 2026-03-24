@@ -91,8 +91,8 @@ export function ResultHeaderCard({
             </div>
             <div className="mt-2 rounded-2xl px-2.5 py-2 text-center border"
               style={{ background: BG_MUTED, borderColor: BORDER_COLOR }}>
-              <p className="text-xs font-light uppercase tracking-[0.14em]" style={{ color: TEXT_TERTIARY, fontFamily: FONT_DISPLAY }}>{t("result.baumannLabel")}</p>
-              <p className="text-lg font-light leading-none mt-1" style={{ color: SCAN_TO, fontFamily: FONT_DISPLAY }}>{finalType}</p>
+              <p className="text-xs font-medium uppercase tracking-[0.14em]" style={{ color: TEXT_TERTIARY, fontFamily: FONT_DISPLAY }}>{t("result.baumannLabel")}</p>
+              <p className="text-lg font-normal leading-none mt-1" style={{ color: SCAN_TO, fontFamily: FONT_DISPLAY }}>{finalType}</p>
             </div>
           </div>
 
@@ -100,7 +100,7 @@ export function ResultHeaderCard({
             <div className="rounded-3xl px-2.5 py-2.5 mb-2.5 sm:rounded-3xl sm:px-3 border"
               style={{ background: BG_MUTED, borderColor: BORDER_COLOR }}>
               <div className="flex items-center justify-between gap-2">
-                <p className="text-xs font-light uppercase tracking-[0.14em]" style={{ color: TEXT_TERTIARY, fontFamily: FONT_DISPLAY }}>{t("result.scores")}</p>
+                <p className="text-xs font-medium uppercase tracking-[0.14em]" style={{ color: TEXT_TERTIARY, fontFamily: FONT_DISPLAY }}>{t("result.scores")}</p>
                 <button
                   onClick={() => setShowAnalysis(true)}
                   className="rounded-full px-2.5 py-1 text-xs font-semibold whitespace-nowrap border"
@@ -133,7 +133,7 @@ export function ResultHeaderCard({
           <div className="col-span-2 rounded-2xl px-4 py-3.5 border" style={{ background: BG_MUTED, borderColor: BORDER_COLOR }}>
             <div className="min-w-0 flex items-end justify-center gap-2">
               <p className="text-[15px] font-medium tracking-[-0.01em] text-stone-500">{t("result.overall")} :</p>
-              <p className="text-[36px] font-light leading-none" style={{ color: SCAN_TO, fontFamily: FONT_DISPLAY }}>
+              <p className="text-[36px] font-normal leading-none" style={{ color: SCAN_TO, fontFamily: FONT_DISPLAY }}>
                 <CountUp value={overallScore} />{t("result.scoreSuffix")}
               </p>
             </div>
@@ -142,16 +142,16 @@ export function ResultHeaderCard({
             </p>
           </div>
           <div className="rounded-2xl px-3 py-3 flex flex-col items-center justify-center text-center min-w-0 border" style={{ background: BG_MUTED, borderColor: BORDER_COLOR }}>
-            <p className="text-xs font-light uppercase tracking-[0.08em] text-center" style={{ color: TEXT_TERTIARY, fontFamily: FONT_DISPLAY }}>{t("result.skinAge")}</p>
-            <p className="text-[27px] font-light leading-none mt-1.5" style={{ color: "#7C3AED", fontFamily: FONT_DISPLAY }}>
+            <p className="text-xs font-medium uppercase tracking-[0.08em] text-center" style={{ color: TEXT_TERTIARY, fontFamily: FONT_DISPLAY }}>{t("result.skinAge")}</p>
+            <p className="text-[27px] font-normal leading-none mt-1.5" style={{ color: "#7C3AED", fontFamily: FONT_DISPLAY }}>
               {analysisResult?.skinAge && analysisResult.skinAge > 0
                 ? <CountUp value={analysisResult.skinAge} />
                 : "—"}
             </p>
           </div>
           <div className="rounded-2xl px-3 py-3 flex flex-col items-center justify-center text-center min-w-0 border" style={{ background: BG_MUTED, borderColor: BORDER_COLOR }}>
-            <p className="text-xs font-light uppercase tracking-[0.08em] text-center" style={{ color: TEXT_TERTIARY, fontFamily: FONT_DISPLAY }}>{t("ranking.topLabel")}</p>
-            <p className="text-[21px] font-light leading-none mt-1.5 break-keep text-center" style={{ color: "#D97706", fontFamily: FONT_DISPLAY }}>
+            <p className="text-xs font-medium uppercase tracking-[0.08em] text-center" style={{ color: TEXT_TERTIARY, fontFamily: FONT_DISPLAY }}>{t("ranking.topLabel")}</p>
+            <p className="text-[21px] font-normal leading-none mt-1.5 break-keep text-center" style={{ color: "#D97706", fontFamily: FONT_DISPLAY }}>
               {rankingData && rankingData.myPercentile !== undefined ? t("ranking.myPercentile", { percent: rankingData.myPercentile }) : "—"}
             </p>
           </div>
@@ -165,7 +165,7 @@ export function ResultHeaderCard({
                 <Microscope className="w-5 h-5" style={{ color: SCAN_TO }} />
               </div>
               <div className="min-w-0">
-                <p className="text-xs font-light uppercase tracking-[0.16em]" style={{ color: TEXT_TERTIARY, fontFamily: FONT_DISPLAY }}>{t("result.baumannLabel")}</p>
+                <p className="text-xs font-medium uppercase tracking-[0.16em]" style={{ color: TEXT_TERTIARY, fontFamily: FONT_DISPLAY }}>{t("result.baumannLabel")}</p>
                 <div className="flex items-center gap-2 mt-1 flex-wrap">
                   <p className="text-lg font-bold leading-none" style={{ color: DEEP_GREEN }}>{finalType}</p>
                   <button onClick={() => setShowBaumannInfo(v => !v)}
@@ -218,7 +218,7 @@ export function ResultHeaderCard({
               className="mt-3 block w-full rounded-2xl px-3 py-2.5 text-left border"
               style={{ background: BG_BASE, borderColor: BORDER_COLOR }}
             >
-              <p className="text-xs font-light uppercase tracking-[0.14em]" style={{ color: TEXT_TERTIARY, fontFamily: FONT_DISPLAY }}>{t("result.aiComment")}</p>
+              <p className="text-xs font-medium uppercase tracking-[0.14em]" style={{ color: TEXT_TERTIARY, fontFamily: FONT_DISPLAY }}>{t("result.aiComment")}</p>
               <p className="text-xs text-stone-600 mt-1 leading-relaxed text-kr-pretty line-clamp-2">
                 {analysisResult.aiComment}
               </p>

@@ -135,7 +135,7 @@ export function ResultAnalysisSheet({
                         <span className="text-xs font-semibold" style={{ color }}>
                           {t(`scores.${index}`)}
                         </span>
-                        <span className="ml-auto text-xs font-light" style={{ fontFamily: FONT_DISPLAY, color }}>
+                        <span className="ml-auto text-xs font-normal" style={{ fontFamily: FONT_DISPLAY, color }}>
                           {item.score}
                           {t("result.scoreSuffix")}
                         </span>
@@ -185,7 +185,7 @@ export function ResultAnalysisSheet({
                           style={{ background: BG_MUTED, borderColor: BORDER_COLOR }}
                         >
                           <div className="flex items-center gap-1.5 mb-1">
-                            <span className="text-[17px] font-light" style={{ fontFamily: FONT_DISPLAY, color }}>
+                            <span className="text-[17px] font-normal" style={{ fontFamily: FONT_DISPLAY, color }}>
                               {letter}
                             </span>
                             <span className="text-[12px] font-semibold text-stone-700">

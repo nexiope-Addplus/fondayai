@@ -206,7 +206,7 @@ export function DiaryReportTab({ diaryReport, reportLang, routineGuide, weeklyRe
               <p className="text-xs font-semibold tracking-[0.16em] uppercase" style={{ fontFamily: FONT_DISPLAY, color: TEXT_TERTIARY }}>
                 {reportConsultText.brief}
               </p>
-              <p className="text-[20px] font-light mt-1 text-kr-pretty" style={{ fontFamily: FONT_DISPLAY, color: DEEP_GREEN }}>
+              <p className="text-[20px] font-normal mt-1 text-kr-pretty" style={{ fontFamily: FONT_DISPLAY, color: DEEP_GREEN }}>
                 {reportLang === "ko" ? "이번 주 피부 컨설팅" : reportLang === "ja" ? "今週の肌コンサルティング" : "This Week's Skin Consult"}
               </p>
               <p className="text-xs text-stone-500 mt-1 leading-relaxed text-kr-pretty">
@@ -228,15 +228,15 @@ export function DiaryReportTab({ diaryReport, reportLang, routineGuide, weeklyRe
           <div className="grid grid-cols-3 gap-2 mt-4">
             <div className="rounded-2xl p-3 text-center" style={{ background: "#FFFFFF" }}>
               <p className="text-xs font-semibold text-stone-400">{diaryReport.copy.scans}</p>
-              <p className="text-[20px] font-light mt-1" style={{ fontFamily: FONT_DISPLAY, color: DEEP_GREEN }}>{diaryReport.scanCount}</p>
+              <p className="text-[20px] font-normal mt-1" style={{ fontFamily: FONT_DISPLAY, color: DEEP_GREEN }}>{diaryReport.scanCount}</p>
             </div>
             <div className="rounded-2xl p-3 text-center" style={{ background: "#FFFFFF" }}>
               <p className="text-xs font-semibold text-stone-400">{diaryReport.copy.diary}</p>
-              <p className="text-[20px] font-light mt-1" style={{ fontFamily: FONT_DISPLAY, color: SCAN_TO }}>{diaryReport.memoCount}</p>
+              <p className="text-[20px] font-normal mt-1" style={{ fontFamily: FONT_DISPLAY, color: SCAN_TO }}>{diaryReport.memoCount}</p>
             </div>
             <div className="rounded-2xl p-3 text-center" style={{ background: "#FFFFFF" }}>
               <p className="text-xs font-semibold text-stone-400">{diaryReport.copy.adherence}</p>
-              <p className="text-[20px] font-light mt-1" style={{ fontFamily: FONT_DISPLAY, color: "#0F766E" }}>{diaryReport.adherence}</p>
+              <p className="text-[20px] font-normal mt-1" style={{ fontFamily: FONT_DISPLAY, color: "#0F766E" }}>{diaryReport.adherence}</p>
             </div>
           </div>
         </CardContent>
@@ -279,7 +279,7 @@ export function DiaryReportTab({ diaryReport, reportLang, routineGuide, weeklyRe
           <div className="space-y-2.5 mt-3">
             {causeEstimateItems.map((item, index) => (
               <div key={`${item}-${index}`} className="rounded-2xl p-3 flex items-start gap-3" style={{ background: "#F8F5F2" }}>
-                <div className="w-7 h-7 rounded-xl flex items-center justify-center shrink-0 text-xs font-light" style={{ fontFamily: FONT_DISPLAY, background: "#FFFFFF", color: SCAN_TO }}>
+                <div className="w-7 h-7 rounded-xl flex items-center justify-center shrink-0 text-xs font-normal" style={{ fontFamily: FONT_DISPLAY, background: "#FFFFFF", color: SCAN_TO }}>
                   {index + 1}
                 </div>
                 <p className="text-[12px] text-stone-700 leading-relaxed text-kr-pretty">{item}</p>
@@ -297,7 +297,7 @@ export function DiaryReportTab({ diaryReport, reportLang, routineGuide, weeklyRe
           <div className="space-y-2.5 mt-3">
             {consultantActionItems.map((item, index) => (
               <div key={`${item}-${index}`} className="rounded-2xl p-3 flex items-start gap-3" style={{ background: index === 0 ? TINT_WARM : index === 1 ? TINT_GREEN : "#F6F4FB" }}>
-                <div className="w-7 h-7 rounded-xl flex items-center justify-center shrink-0 text-xs font-light" style={{ fontFamily: FONT_DISPLAY, background: "#FFFFFF", color: index === 0 ? SCAN_TO : index === 1 ? DEEP_GREEN : "#7C3AED" }}>
+                <div className="w-7 h-7 rounded-xl flex items-center justify-center shrink-0 text-xs font-normal" style={{ fontFamily: FONT_DISPLAY, background: "#FFFFFF", color: index === 0 ? SCAN_TO : index === 1 ? DEEP_GREEN : "#7C3AED" }}>
                   {index + 1}
                 </div>
                 <p className="text-[12px] text-stone-700 leading-relaxed text-kr-pretty">{item}</p>
@@ -343,7 +343,7 @@ export function DiaryReportTab({ diaryReport, reportLang, routineGuide, weeklyRe
                 <div className="rounded-2xl px-3 py-2 shrink-0 text-right"
                   style={{ background: `${concern.accent}12`, border: `1px solid ${concern.accent}20` }}>
                   <p className="text-xs font-semibold" style={{ fontFamily: FONT_DISPLAY, color: concern.accent }}>{diaryReport.copy.avgRisk}</p>
-                  <p className="text-[20px] font-light leading-none mt-1" style={{ fontFamily: FONT_DISPLAY, color: concern.accent }}>{concern.avgRisk}</p>
+                  <p className="text-[20px] font-normal leading-none mt-1" style={{ fontFamily: FONT_DISPLAY, color: concern.accent }}>{concern.avgRisk}</p>
                 </div>
               </div>
               <div className="mt-3 h-2 rounded-full bg-stone-100 overflow-hidden">
@@ -534,7 +534,7 @@ export function DiaryReportTab({ diaryReport, reportLang, routineGuide, weeklyRe
           <div className="space-y-2.5 mt-3">
             {avoidMistakes.map((item, index) => (
               <div key={`${item}-${index}`} className="rounded-2xl p-3 flex items-start gap-3" style={{ background: "#FFF7ED" }}>
-                <div className="w-7 h-7 rounded-xl flex items-center justify-center shrink-0 text-xs font-light" style={{ fontFamily: FONT_DISPLAY, background: "#FFFFFF", color: "#C2410C" }}>
+                <div className="w-7 h-7 rounded-xl flex items-center justify-center shrink-0 text-xs font-normal" style={{ fontFamily: FONT_DISPLAY, background: "#FFFFFF", color: "#C2410C" }}>
                   !
                 </div>
                 <p className="text-[12px] text-stone-700 leading-relaxed text-kr-pretty">{item}</p>
@@ -594,17 +594,17 @@ export function DiaryReportTab({ diaryReport, reportLang, routineGuide, weeklyRe
             </div>
             <div className="rounded-3xl px-3 py-2 shrink-0 text-right" style={{ background: "#FFFFFF" }}>
               <p className="text-xs font-semibold text-stone-400">WEEK 2</p>
-              <p className="text-[20px] font-light mt-1" style={{ fontFamily: FONT_DISPLAY, color: DEEP_GREEN }}>{diaryReport.forecast.week2}</p>
+              <p className="text-[20px] font-normal mt-1" style={{ fontFamily: FONT_DISPLAY, color: DEEP_GREEN }}>{diaryReport.forecast.week2}</p>
             </div>
           </div>
           <div className="grid grid-cols-2 gap-3 mt-4">
             <div className="rounded-2xl p-3" style={{ background: "#FFFFFF" }}>
               <p className="text-xs font-semibold text-stone-400">WEEK 1</p>
-              <p className="text-2xl font-light mt-1" style={{ fontFamily: FONT_DISPLAY, color: SCAN_TO }}>{diaryReport.forecast.week1}</p>
+              <p className="text-2xl font-normal mt-1" style={{ fontFamily: FONT_DISPLAY, color: SCAN_TO }}>{diaryReport.forecast.week1}</p>
             </div>
             <div className="rounded-2xl p-3" style={{ background: "#FFFFFF" }}>
               <p className="text-xs font-semibold text-stone-400">WEEK 2</p>
-              <p className="text-2xl font-light mt-1" style={{ fontFamily: FONT_DISPLAY, color: DEEP_GREEN }}>{diaryReport.forecast.week2}</p>
+              <p className="text-2xl font-normal mt-1" style={{ fontFamily: FONT_DISPLAY, color: DEEP_GREEN }}>{diaryReport.forecast.week2}</p>
             </div>
           </div>
         </CardContent>

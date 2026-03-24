@@ -69,7 +69,7 @@ export function ResultImprovementsSheet({
                   >
                     <div className="shrink-0">
                       <div
-                        className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-light border"
+                        className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-normal border"
                         style={{ fontFamily: FONT_DISPLAY, background: "#FFFFFF", borderColor: BORDER_COLOR, color: index === 0 ? SCAN_TO : index === 1 ? DEEP_GREEN : "#7C3AED" }}
                       >
                         {index + 1}

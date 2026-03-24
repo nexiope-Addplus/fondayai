@@ -788,7 +788,7 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
             style={{ borderColor: SCAN_TO, color: SCAN_TO }}>
             <Camera className="w-4 h-4" /> {t("result.back")}
           </Button>
-          <h2 className="text-xl font-light tracking-tight" style={{ color: DEEP_GREEN, fontFamily: FONT_DISPLAY }}>{t("result.title")}</h2>
+          <h2 className="text-xl font-normal tracking-tight" style={{ color: DEEP_GREEN, fontFamily: FONT_DISPLAY }}>{t("result.title")}</h2>
         </div>
 
         {/* 압축형 결과 헤더 */}
@@ -818,7 +818,7 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
               <div className="flex items-center gap-2 mb-2">
                 <div className="w-7 h-7 rounded-xl flex items-center justify-center text-sm shrink-0 border"
                   style={{ background: BG_MUTED, borderColor: BORDER_COLOR }}><Target className="w-4 h-4" style={{ color: SCAN_TO }} /></div>
-                <p className="text-xs font-light uppercase tracking-[0.14em]" style={{ color: TEXT_TERTIARY, fontFamily: FONT_DISPLAY }}>
+                <p className="text-xs font-medium uppercase tracking-[0.14em]" style={{ color: TEXT_TERTIARY, fontFamily: FONT_DISPLAY }}>
                   {t("result.todayAction")}
                 </p>
               </div>
@@ -840,7 +840,7 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
         <motion.div variants={fadeChild} className="rounded-3xl px-4 py-3 border"
           style={{ background: BG_BASE, borderColor: BORDER_COLOR }}>
           <div className="flex flex-wrap items-center gap-2">
-            <span className="text-xs font-light uppercase tracking-[0.14em]" style={{ color: TEXT_TERTIARY, fontFamily: FONT_DISPLAY }}>
+            <span className="text-xs font-medium uppercase tracking-[0.14em]" style={{ color: TEXT_TERTIARY, fontFamily: FONT_DISPLAY }}>
               {t("result.hub.eyebrow")}
             </span>
             <button onClick={onGoRoutine} className="rounded-full px-3 py-1.5 text-xs font-semibold" style={{ background: TINT_GREEN, color: DEEP_GREEN }}>

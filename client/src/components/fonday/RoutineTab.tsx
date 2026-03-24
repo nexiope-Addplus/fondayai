@@ -166,7 +166,7 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
             <Droplets className="w-7 h-7" style={{ color: DEEP_GREEN }} />
           </div>
           <p className="text-xs font-medium tracking-widest uppercase mb-2" style={{ color: SCAN_TO, fontFamily: FONT_DISPLAY }}>{t("nav.routine")}</p>
-          <h2 className="text-xl font-light" style={{ color: DEEP_GREEN, fontFamily: FONT_DISPLAY }}>{t("cosmetics.myTitle")}</h2>
+          <h2 className="text-xl font-normal" style={{ color: DEEP_GREEN, fontFamily: FONT_DISPLAY }}>{t("cosmetics.myTitle")}</h2>
           <p className="text-[13px] text-stone-500 mt-2 text-kr-pretty">
             {t("cosmetics.loginDesc")}
           </p>
@@ -265,7 +265,7 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
       <div className="rounded-3xl p-5 bg-white" style={{ border: `1px solid ${BORDER_COLOR}` }}>
         <div>
           <p className="text-xs font-bold tracking-widest uppercase mb-1" style={{ color: SCAN_TO, fontFamily: FONT_DISPLAY }}>{t("nav.routine")}</p>
-          <h1 className="text-2xl font-light" style={{ color: DEEP_GREEN, fontFamily: FONT_DISPLAY }}>{t("cosmetics.myTitle")}</h1>
+          <h1 className="text-2xl font-normal" style={{ color: DEEP_GREEN, fontFamily: FONT_DISPLAY }}>{t("cosmetics.myTitle")}</h1>
           <p className="text-[12px] text-stone-500 mt-1 text-kr-pretty">
             {t("cosmetics.routineSubtitle")}
           </p>

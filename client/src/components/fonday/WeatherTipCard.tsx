@@ -131,7 +131,7 @@ export function MiniScoreBarIdle({ label, score, color, delay, delta }: {
           }}
         />
       </div>
-      <span className="text-[10px] font-light flex-shrink-0 w-6 text-right mt-0.5" style={{ fontFamily: FONT_DISPLAY, color }}>{score}</span>
+      <span className="text-[11px] font-normal flex-shrink-0 w-6 text-right mt-0.5" style={{ fontFamily: FONT_DISPLAY, color }}>{score}</span>
       {delta != null && delta !== 0 && (
         <span className={`text-[10px] font-bold flex-shrink-0 w-8 text-right mt-0.5 ${delta > 0 ? "text-emerald-500" : "text-rose-500"}`}>
           {delta > 0 ? `+${delta}` : `${delta}`}
