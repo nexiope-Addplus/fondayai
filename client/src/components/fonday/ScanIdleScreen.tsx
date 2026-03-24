@@ -301,8 +301,8 @@ export function ScanIdleScreen({
         </motion.div>
       )}
 
-      {/* ── 헤더 + 히어로 미리보기 ── */}
-      <motion.div variants={fadeChild} className="mb-4 relative" style={{ zIndex: 1 }}>
+      {/* ── 헤더 + 히어로 미리보기 (신규 유저만) ── */}
+      {!latestScan && <motion.div variants={fadeChild} className="mb-4 relative" style={{ zIndex: 1 }}>
         <div className="flex items-center justify-between gap-2 mb-3">
           <span className="text-xs font-medium tracking-wide" style={{ color: TEXT_TERTIARY, fontFamily: FONT_DISPLAY }}>{t("idle.heroBadge")}</span>
         </div>
@@ -377,7 +377,7 @@ export function ScanIdleScreen({
             </div>
           </div>
         </div>
-      </motion.div>
+      </motion.div>}
 
       <motion.div variants={fadeChild} className="mb-4 relative" style={{ zIndex: 1 }}>
         {scanLoading && (
