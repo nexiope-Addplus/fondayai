@@ -2,6 +2,7 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import { House, Sparkles, BookOpen, Compass, User } from "lucide-react";
 import { SCAN_TO } from "./constants";
+import { haptic } from "./utils";
 import type { TabId, ScanState } from "./types";
 
 // ─── 언어 선택 버튼 ──────────────────────────────────────────────
@@ -38,7 +39,7 @@ export function BottomNav({ active, onChange, scanState }: {
     return (
       <button
         key={tab}
-        onClick={() => onChange(tab)}
+        onClick={() => { haptic("light"); onChange(tab); }}
         aria-current={isActive ? "page" : undefined}
         className={`relative flex flex-col items-center justify-center gap-0.5 transition-colors ${isActive ? "text-[#C97062]" : "text-stone-400"}`}
       >

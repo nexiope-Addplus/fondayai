@@ -12,7 +12,7 @@ import {
   BG_BASE, BG_MUTED, BORDER_COLOR, FONT_DISPLAY,
 } from "./constants";
 import type { WeatherData, WeatherTipKey } from "./types";
-import { getStreak, getAttendance, getDaysSinceLastScan, getWeatherTipKey, buildCosmeticCorrelationSignals, todayStr } from "./utils";
+import { getStreak, getAttendance, getDaysSinceLastScan, getWeatherTipKey, buildCosmeticCorrelationSignals, todayStr, haptic } from "./utils";
 import { AttendanceCalendarModal } from "./MyScreen";
 import { WeatherTipCard, MiniScoreBarIdle } from "./WeatherTipCard";
 import { LangSwitcher } from "./BottomNav";
@@ -119,7 +119,7 @@ export function ScanIdleScreen({
     if (dy > 0 && window.scrollY === 0) setPullY(Math.min(dy, 80));
   };
   const handleTouchEnd = () => {
-    if (pullY >= 70) window.location.reload();
+    if (pullY >= 70) { haptic("medium"); window.location.reload(); }
     setPullY(0);
   };
 
@@ -274,7 +274,7 @@ export function ScanIdleScreen({
       {!latestScan && !scanLoading && (
         <motion.div variants={fadeChild} className="mb-3 relative" style={{ zIndex: 1 }}>
           <button
-            onClick={onScan}
+            onClick={() => { haptic("medium"); onScan(); }}
             className="w-full rounded-2xl px-5 py-4 text-left flex items-center gap-3 active:opacity-80 transition-opacity"
             style={{ background: DEEP_GREEN }}
           >
@@ -573,7 +573,7 @@ export function ScanIdleScreen({
 
           <motion.div variants={fadeChild} className="mt-auto relative" style={{ zIndex: 1 }}>
             <motion.button
-              onClick={onScan}
+              onClick={() => { haptic("medium"); onScan(); }}
               className="w-full py-4 sm:py-[18px] rounded-xl text-white text-[15px] sm:text-[16px] font-semibold tracking-tight"
               style={{ background: DEEP_GREEN }}
               whileHover={{ scale: reducedMotion ? 1 : 1.01 }}
@@ -593,7 +593,7 @@ export function ScanIdleScreen({
       {latestScan && (
         <motion.div variants={fadeChild} className="relative" style={{ zIndex: 1 }}>
           <button
-            onClick={onScan}
+            onClick={() => { haptic("medium"); onScan(); }}
             className="w-full flex items-center justify-center gap-2 py-3.5 rounded-2xl text-[14px] font-semibold active:opacity-80 transition-opacity"
             style={{ background: `${DEEP_GREEN}10`, color: DEEP_GREEN }}
           >
@@ -679,7 +679,7 @@ function HomeRoutineWidget({ onOpenRoutine }: { onOpenRoutine?: () => void }) {
         {cosmetics.slice(0, 5).map((item: any) => {
           const checked = checkedIds.includes(item.id);
           return (
-            <button key={item.id} onClick={() => handleToggle(item.id)}
+            <button key={item.id} onClick={() => { haptic("light"); handleToggle(item.id); }}
               className="w-full flex items-center gap-2.5 rounded-xl px-2.5 py-2 text-left transition-colors"
               style={{ background: checked ? `${DEEP_GREEN}08` : "transparent" }}>
               <div className="w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 transition-all"

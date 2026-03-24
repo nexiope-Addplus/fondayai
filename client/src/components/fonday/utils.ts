@@ -203,6 +203,18 @@ export function isIOS(): boolean {
 export function isAndroid(): boolean {
   return /Android/i.test(navigator.userAgent);
 }
+// ─── 햅틱 피드백 ────────────────────────────────────────────────────────────
+export function haptic(style: "light" | "medium" | "success" = "light") {
+  if (typeof navigator === "undefined" || !("vibrate" in navigator)) return;
+  try {
+    switch (style) {
+      case "light": navigator.vibrate(6); break;
+      case "medium": navigator.vibrate(12); break;
+      case "success": navigator.vibrate([8, 50, 12]); break;
+    }
+  } catch {}
+}
+
 export function isPWA(): boolean {
   return window.matchMedia("(display-mode: standalone)").matches || !!(navigator as any).standalone;
 }

@@ -26,7 +26,7 @@ import {
   markChallengeUsed, markShareUsed,
   getDiaryMemo,
   getDiaryTodos, saveDiaryTodos, getDiaryTodoProgress, initDiaryTodosFromRoutine,
-  buildCosmeticsInsights, buildRoutineGuide, buildCosmeticCorrelationSignals,
+  buildCosmeticsInsights, buildRoutineGuide, buildCosmeticCorrelationSignals, haptic,
   pickFoodOption, dedupeFoods,
   isIOS, isPWA,
 } from "./utils";
@@ -186,7 +186,7 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
     // 출석 체크인 (오늘 첫 스캔이면 팝업)
     const isNew = checkinToday();
     if (isNew) {
-      timers.push(setTimeout(() => setShowCheckinSheet(true), 1200));
+      timers.push(setTimeout(() => { haptic("success"); setShowCheckinSheet(true); }, 1200));
     }
     // 예측 루틴 → 오늘 Todo로 자동 저장 (오늘 처음이면)
     if (analysisResult?.prediction?.good?.routine) {

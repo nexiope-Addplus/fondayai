@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { Droplets, Check, Plus, LogIn, ChevronDown } from "lucide-react";
 import type { CosmeticItem } from "./types";
+import { haptic } from "./utils";
 import type { CosmeticCorrelationSignal } from "./utils";
 import {
   BORDER_COLOR,
@@ -253,7 +254,7 @@ function ChecklistRow({
   return (
     <button
       type="button"
-      onClick={() => onToggle(item.id)}
+      onClick={() => { haptic("light"); onToggle(item.id); }}
       className="w-full flex items-center gap-2.5 rounded-2xl px-3 py-2.5 text-left transition-colors duration-200"
       style={{ background: checked ? `${DEEP_GREEN}08` : "transparent" }}
     >
