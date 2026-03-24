@@ -4,7 +4,6 @@ import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { Droplets, Check, Plus, LogIn, ChevronDown } from "lucide-react";
 import type { CosmeticItem } from "./types";
 import { haptic } from "./utils";
-import type { CosmeticCorrelationSignal } from "./utils";
 import {
   BORDER_COLOR,
   DEEP_GREEN,
@@ -15,6 +14,21 @@ import {
   fadeChild,
 } from "./constants";
 
+export type CosmeticGrade = {
+  id: string;
+  grade: string;
+  score: number;
+  summary: string;
+};
+
+const GRADE_COLORS: Record<string, { bg: string; color: string }> = {
+  A: { bg: "#E8F5EC", color: "#2D7D46" },
+  B: { bg: "#EFF6FF", color: "#2563EB" },
+  C: { bg: "#FFF7ED", color: "#C2410C" },
+  D: { bg: "#FEF2F2", color: "#DC2626" },
+  F: { bg: "#FEF2F2", color: "#DC2626" },
+};
+
 type RoutineChecklistProps = {
   cosmetics: CosmeticItem[];
   checkedIds: string[];
@@ -23,7 +37,7 @@ type RoutineChecklistProps = {
   onLogin?: () => void;
   user?: any;
   loading?: boolean;
-  signals?: CosmeticCorrelationSignal[];
+  grades?: CosmeticGrade[];
 };
 
 export function RoutineChecklist({
@@ -34,7 +48,7 @@ export function RoutineChecklist({
   onLogin,
   user,
   loading = false,
-  signals = [],
+  grades = [],
 }: RoutineChecklistProps) {
   const { t } = useTranslation();
   const reducedMotion = useReducedMotion();
@@ -48,27 +62,13 @@ export function RoutineChecklist({
   const uncheckedItems = cosmetics.filter((c) => !checkedIds.includes(c.id));
   const hasChecked = checkedCount > 0;
 
-  // 각 화장품 ID → signal 매핑
-  const signalMap = new Map(signals.map((s) => [s.itemId, s]));
+  const gradeMap = new Map(grades.map((g) => [g.id, g]));
 
-  const getEffectLabel = (id: string) => {
-    const sig = signalMap.get(id);
-    if (!sig) return null;
-    if (sig.confidence === "early") return { text: t("routineChecklist.tracking", "추적 중"), color: TEXT_TERTIARY, delta: null };
-    // 같이 사용 중인 제품이 많으면 개별 효과를 단정할 수 없음
-    if (sig.coUsedProducts.length >= 3 && sig.confidence !== "strong") {
-      return { text: t("routineChecklist.coUsed", "함께 사용 중"), color: TEXT_TERTIARY, delta: null };
-    }
-    const idx = sig.topScoreIndex;
-    const delta = sig.topScoreDelta;
-    if (idx == null || delta == null) return null;
-    const metric = t(`scores.${idx}`);
-    const positive = delta >= 0;
-    return {
-      text: `${metric} ${positive ? "+" : ""}${delta}`,
-      color: positive ? "#2D7D46" : "#C2410C",
-      delta,
-    };
+  const getGradeLabel = (id: string) => {
+    const g = gradeMap.get(id);
+    if (!g) return null;
+    const style = GRADE_COLORS[g.grade] || GRADE_COLORS.C;
+    return { grade: g.grade, score: g.score, summary: g.summary, ...style };
   };
 
   return (
@@ -155,11 +155,11 @@ export function RoutineChecklist({
               </div>
             </button>
 
-            {/* ── 접힌 상태: 체크된 제품 요약 + 효과 ── */}
+            {/* ── 접힌 상태: 체크된 제품 요약 + 등급 ── */}
             {!expanded && hasChecked && (
               <div className="mt-3 space-y-1.5">
                 {checkedItems.slice(0, 4).map((item) => {
-                  const effect = getEffectLabel(item.id);
+                  const g = getGradeLabel(item.id);
                   return (
                     <div key={item.id} className="flex items-center justify-between gap-2 rounded-xl px-3 py-2"
                       style={{ background: `${DEEP_GREEN}06` }}>
@@ -167,10 +167,15 @@ export function RoutineChecklist({
                         <Check className="w-3.5 h-3.5 shrink-0" style={{ color: DEEP_GREEN }} />
                         <span className="text-[13px] font-medium truncate" style={{ color: DEEP_GREEN }}>{item.name}</span>
                       </div>
-                      {effect && (
+                      {g ? (
                         <span className="text-[11px] font-bold shrink-0 rounded-full px-2 py-0.5"
-                          style={{ background: effect.delta != null && effect.delta >= 0 ? "#E8F5EC" : effect.delta != null ? "#FFF7ED" : "#F3F2F0", color: effect.color }}>
-                          {effect.text}
+                          style={{ background: g.bg, color: g.color }}>
+                          {g.grade} {g.score}
+                        </span>
+                      ) : (
+                        <span className="text-[11px] font-bold shrink-0 rounded-full px-2 py-0.5"
+                          style={{ background: "#F3F2F0", color: TEXT_TERTIARY }}>
+                          —
                         </span>
                       )}
                     </div>
@@ -202,7 +207,6 @@ export function RoutineChecklist({
                   className="overflow-hidden"
                 >
                   <div className="mt-3 space-y-3">
-                    {/* 미체크 항목 먼저 (체크 유도) */}
                     {uncheckedItems.length > 0 && (
                       <div>
                         <p className="text-[11px] font-bold uppercase tracking-wider mb-1.5" style={{ color: TEXT_TERTIARY }}>
@@ -210,12 +214,11 @@ export function RoutineChecklist({
                         </p>
                         <div className="space-y-1">
                           {uncheckedItems.map((item) => (
-                            <ChecklistRow key={item.id} item={item} checked={false} onToggle={onToggle} effect={getEffectLabel(item.id)} />
+                            <ChecklistRow key={item.id} item={item} checked={false} onToggle={onToggle} gradeInfo={getGradeLabel(item.id)} />
                           ))}
                         </div>
                       </div>
                     )}
-                    {/* 체크된 항목 */}
                     {checkedItems.length > 0 && (
                       <div>
                         <p className="text-[11px] font-bold uppercase tracking-wider mb-1.5" style={{ color: DEEP_GREEN }}>
@@ -223,7 +226,7 @@ export function RoutineChecklist({
                         </p>
                         <div className="space-y-1">
                           {checkedItems.map((item) => (
-                            <ChecklistRow key={item.id} item={item} checked onToggle={onToggle} effect={getEffectLabel(item.id)} />
+                            <ChecklistRow key={item.id} item={item} checked onToggle={onToggle} gradeInfo={getGradeLabel(item.id)} />
                           ))}
                         </div>
                       </div>
@@ -248,12 +251,12 @@ function ChecklistRow({
   item,
   checked,
   onToggle,
-  effect,
+  gradeInfo,
 }: {
   item: CosmeticItem;
   checked: boolean;
   onToggle: (id: string) => void;
-  effect: { text: string; color: string; delta: number | null } | null;
+  gradeInfo: { grade: string; score: number; summary: string; bg: string; color: string } | null;
 }) {
   return (
     <button
@@ -262,7 +265,6 @@ function ChecklistRow({
       className="w-full flex items-center gap-2.5 rounded-2xl px-3 py-2.5 text-left transition-colors duration-200"
       style={{ background: checked ? `${DEEP_GREEN}08` : "transparent" }}
     >
-      {/* Checkbox */}
       <div
         className="w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 transition-all duration-200"
         style={{
@@ -273,21 +275,23 @@ function ChecklistRow({
         {checked && <Check className="w-3 h-3 text-white" strokeWidth={3} />}
       </div>
 
-      {/* Name */}
       <span className="text-[13px] font-medium truncate flex-1 min-w-0"
         style={{ color: checked ? DEEP_GREEN : "#374151" }}>
         {item.name}
       </span>
 
-      {/* Effect badge */}
-      {effect && (
-        <span className="text-[11px] font-bold shrink-0 rounded-full px-2 py-0.5"
-          style={{
-            background: effect.delta != null && effect.delta >= 0 ? "#E8F5EC" : effect.delta != null ? "#FFF7ED" : "#F3F2F0",
-            color: effect.color,
-          }}>
-          {effect.text}
-        </span>
+      {gradeInfo ? (
+        <div className="flex items-center gap-1 shrink-0">
+          <span className="text-[11px] font-bold rounded-full px-2 py-0.5"
+            style={{ background: gradeInfo.bg, color: gradeInfo.color }}>
+            {gradeInfo.grade}
+          </span>
+          <span className="text-[11px] font-semibold" style={{ color: gradeInfo.color }}>
+            {gradeInfo.score}
+          </span>
+        </div>
+      ) : (
+        <span className="text-[11px] shrink-0" style={{ color: TEXT_TERTIARY }}>—</span>
       )}
     </button>
   );

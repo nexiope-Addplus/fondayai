@@ -109,6 +109,7 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
   const [showQuestSheet, setShowQuestSheet] = useState(false);
   const [showPwaPopup, setShowPwaPopup] = useState(false);
   const [checkedCosmeticIds, setCheckedCosmeticIds] = useState<string[]>([]);
+  const [cosmeticGrades, setCosmeticGrades] = useState<{id:string;grade:string;score:number;summary:string}[]>([]);
 
   // PWA 설치 팝업: 결과 페이지 50% 스크롤 후 표시 (콘텐츠 가치 체험 후 유도)
   const pwaTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -444,6 +445,23 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
     }
   }, [activeTab]);
 
+  // 화장품 등급 로드
+  useEffect(() => {
+    if (!user || !analysisResult || myCosmetics.length === 0) return;
+    fetch("/api/cosmetics/grade", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        baumannType: finalType,
+        scores: analysisResult.scores,
+        lang: i18n.language || "ko",
+      }),
+    })
+      .then(r => r.ok ? r.json() : [])
+      .then(data => { if (Array.isArray(data)) setCosmeticGrades(data); })
+      .catch(() => {});
+  }, [user, myCosmetics.length > 0, analysisResult]); // eslint-disable-line react-hooks/exhaustive-deps
+
   useEffect(() => {
     if (!user) return;
     fetch(`/api/routine-log?date=${todayStr()}`)
@@ -501,7 +519,7 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
   const previousScore = history.length > 0 ? parseInt(history[0]?.overallScore || "0", 10) || null : null;
   const cosmeticsInsights = buildCosmeticsInsights(myCosmetics, overallScore, previousScore, t);
   const routineGuide = buildRoutineGuide(myCosmetics, t);
-  const cosmeticSignals = buildCosmeticCorrelationSignals(myCosmetics, history, t);
+  // cosmeticSignals는 RoutineTab에서 사용, 여기서는 grade API 사용
   const todayRoutine = analysisResult?.prediction?.good?.routine ?? [];
   const morningTask = todayRoutine[0] ?? analysisResult?.improvements?.[0]?.title ?? t("result.actionCard.fallbackFocus");
   const eveningTask = todayRoutine[1] ?? analysisResult?.improvements?.[1]?.title ?? analysisResult?.improvements?.[0]?.title ?? t("result.actionCard.eveningFallback");
@@ -859,7 +877,7 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
           onLogin={isKo ? handleKakaoLogin : handleLineLogin}
           user={user}
           loading={false}
-          signals={cosmeticSignals}
+          grades={cosmeticGrades}
         />
 
         {/* ── 다음 스텝 가이드 (첫 스캔 또는 화장품 미등록 시) ── */}
