@@ -65,6 +65,15 @@ td { padding: 8px 12px; font-size: 12px; border-top: 1px solid #f5f5f4; }
 .score-col { display: flex; flex-direction: column; align-items: center; flex: 1; }
 .score-bar { width: 100%; border-radius: 2px 2px 0 0; min-height: 2px; }
 .score-label { font-size: 7px; color: #a8a29e; margin-top: 2px; }
+.date-filter { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+.date-filter input { padding: 6px 12px; border: 1.5px solid #e7e5e4; border-radius: 10px; font-size: 13px; outline: none; font-family: inherit; }
+.date-filter input:focus { border-color: #4A7C6E; }
+.date-filter button { padding: 6px 14px; background: #f5f5f4; border: none; border-radius: 10px; font-size: 12px; font-weight: 700; color: #78716c; cursor: pointer; }
+.date-filter button:hover { background: #ecfdf5; color: #4A7C6E; }
+.badge-kakao { background: #FEE500; color: #3C1E1E; }
+.badge-google { background: #E8F0FE; color: #1a73e8; }
+.badge-line { background: #E6FFE6; color: #06C755; }
+.cosmetics-table td { max-width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 @media(max-width:640px) { .cards { grid-template-columns: repeat(2,1fr); } .grid4,.grid3,.grid2 { grid-template-columns: 1fr; } .funnel { flex-direction: column; } .funnel-step { border-right: none; border-bottom: 2px solid white; } .funnel-step:first-child { border-radius: 10px 10px 0 0; } .funnel-step:last-child { border-radius: 0 0 10px 10px; } }
 `;
 
@@ -126,6 +135,7 @@ export const onRequest = async (context: any) => {
       totalRow, todayRow, weekRow, monthRow, guestRow,
       langRows, baumannRows, dailyRows,
       genderRows, ageRows, scoreDistRows, scoreMetricsRows,
+      providerRows,
     ] = await Promise.all([
       safe(env.FONDAY_DB.prepare("SELECT COUNT(*) as total, AVG(overall_score) as avg FROM scans"), "first"),
       safe(env.FONDAY_DB.prepare("SELECT COUNT(*) as cnt FROM scans WHERE date(datetime(created_at,'+9 hours'))=date(datetime('now','+9 hours'))"), "first"),
@@ -141,6 +151,8 @@ export const onRequest = async (context: any) => {
       safe(env.FONDAY_DB.prepare("SELECT (overall_score/10)*10 as bucket, COUNT(*) as cnt FROM scans GROUP BY bucket ORDER BY bucket"), "all"),
       // 지표별 평균 점수 (scores JSON 파싱은 어렵으므로 overall만)
       safe(env.FONDAY_DB.prepare("SELECT MIN(overall_score) as min, MAX(overall_score) as max, AVG(overall_score) as avg, COUNT(*) as total FROM scans"), "first"),
+      // 로그인 방식 분포
+      safe(env.FONDAY_DB.prepare("SELECT provider, COUNT(*) as cnt FROM scans WHERE provider != '' GROUP BY provider ORDER BY cnt DESC"), "all"),
     ]);
 
     // ── 2. 푸시 구독자 수 ──────────────────────────────────────────
@@ -191,13 +203,40 @@ export const onRequest = async (context: any) => {
     }
 
     // ── 4. 기타 데이터 ────────────────────────────────────────────
-    const [recentRows, diaryCountRow, cosmeticsCountRow] = await Promise.all([
-      env.FONDAY_DB.prepare("SELECT overall_score, baumann_type, skin_age, lang, is_guest, gender, age_group, created_at FROM scans ORDER BY created_at DESC LIMIT 20")
-        .all().catch(() => env.FONDAY_DB.prepare("SELECT overall_score, baumann_type, lang, is_guest, created_at FROM scans ORDER BY created_at DESC LIMIT 20").all())
+    const [recentRows, diaryCountRow, cosmeticsCountRow, cosmeticsListRows] = await Promise.all([
+      env.FONDAY_DB.prepare("SELECT overall_score, baumann_type, skin_age, lang, is_guest, gender, age_group, city, country, referrer, provider, created_at FROM scans ORDER BY created_at DESC LIMIT 100")
+        .all().catch(() => env.FONDAY_DB.prepare("SELECT overall_score, baumann_type, skin_age, lang, is_guest, gender, age_group, created_at FROM scans ORDER BY created_at DESC LIMIT 100").all())
         .catch(() => ({ results: [] })),
       safe(env.FONDAY_DB.prepare("SELECT COUNT(*) as cnt FROM diary_entries"), "first"),
       safe(env.FONDAY_DB.prepare("SELECT COUNT(*) as cnt FROM cosmetics"), "first"),
+      safe(env.FONDAY_DB.prepare(`
+        SELECT c.user_id, c.name, c.brand, c.category, c.created_at,
+          (SELECT COUNT(*) FROM cosmetics c2 WHERE c2.user_id = c.user_id AND c2.status='active') as total
+        FROM cosmetics c WHERE c.status='active' ORDER BY c.created_at DESC LIMIT 50
+      `), "all"),
     ]);
+
+    // ── 5. 도시/유입경로 데이터 (컬럼 미존재시 graceful) ──────────
+    let cityArr: any[] = [];
+    let referrerArr: any[] = [];
+    let cityDataAvailable = true;
+    let referrerDataAvailable = true;
+
+    try {
+      const cityRes = await safe(env.FONDAY_DB.prepare("SELECT city, country, COUNT(*) as cnt FROM scans WHERE city != '' GROUP BY city, country ORDER BY cnt DESC LIMIT 15"), "all");
+      cityArr = (cityRes as any)?.results ?? [];
+    } catch {
+      cityDataAvailable = false;
+    }
+    if (cityArr.length === 0) cityDataAvailable = false;
+
+    try {
+      const referrerRes = await safe(env.FONDAY_DB.prepare("SELECT referrer, COUNT(*) as cnt FROM scans WHERE referrer != '' GROUP BY referrer ORDER BY cnt DESC LIMIT 10"), "all");
+      referrerArr = (referrerRes as any)?.results ?? [];
+    } catch {
+      referrerDataAvailable = false;
+    }
+    if (referrerArr.length === 0) referrerDataAvailable = false;
 
     // ── 계산 ──────────────────────────────────────────────────────
     const total = (totalRow as any)?.total ?? 0;
@@ -237,6 +276,25 @@ export const onRequest = async (context: any) => {
       scan: "스캔", routine: "루틴", diary: "일기", magazine: "매거진", my: "MY",
     };
 
+    const PROVIDER_LABEL: Record<string, string> = {
+      kakao: "카카오", google: "Google", line: "LINE",
+    };
+
+    const REFERRER_LABEL: Record<string, string> = {
+      instagram: "인스타그램", google_search: "구글 검색", direct: "직접 방문",
+      twitter: "트위터/X", facebook: "페이스북", naver: "네이버", kakaotalk: "카카오톡",
+      youtube: "유튜브", tiktok: "틱톡", blog: "블로그",
+    };
+
+    const providerArr: any[] = (providerRows as any)?.results ?? [];
+    const providerTotal = providerArr.reduce((s: number, r: any) => s + r.cnt, 0) || 1;
+    const providerColors: Record<string, string> = { kakao: "#FEE500", google: "#4285F4", line: "#06C755" };
+
+    const maxCity = Math.max(...cityArr.map((r: any) => r.cnt), 1);
+    const maxReferrer = Math.max(...referrerArr.map((r: any) => r.cnt), 1);
+
+    const cosmeticsArr: any[] = (cosmeticsListRows as any)?.results ?? [];
+
     // ── HTML 렌더 ─────────────────────────────────────────────────
     const html = `<!DOCTYPE html>
 <html lang="ko">
@@ -255,6 +313,9 @@ export const onRequest = async (context: any) => {
     <a href="#funnel">퍼널</a>
     <a href="#scan">스캔 분석</a>
     <a href="#users">유저 분석</a>
+    <a href="#location">접속 지역</a>
+    <a href="#referrer">유입 경로</a>
+    <a href="#cosmetics">화장품</a>
     <a href="#features">피처 사용률</a>
     <a href="#engagement">참여도</a>
     <a href="#recent">최근 스캔</a>
@@ -473,6 +534,90 @@ export const onRequest = async (context: any) => {
         </div>
       </div>
     </div>
+
+    <!-- 로그인 방식 분포 -->
+    <div class="panel" style="margin-top:10px">
+      <h3>로그인 방식 분포</h3>
+      ${providerArr.length === 0
+        ? '<p style="font-size:11px;color:#a8a29e;margin:0">데이터 없음</p>'
+        : `<div class="bar-wrap">
+            ${providerArr.map((r: any) => {
+              const pct = Math.round(r.cnt / providerTotal * 100);
+              const color = providerColors[r.provider] ?? "#4A7C6E";
+              const label = PROVIDER_LABEL[r.provider] ?? r.provider;
+              return `<div class="bar-row">
+                <div class="bar-label">${label}</div>
+                <div class="bar-bg"><div class="bar-fill" style="width:${pct}%;background:${color}"></div></div>
+                <div class="bar-val">${r.cnt}</div>
+                <div class="bar-pct">${pct}%</div>
+              </div>`;
+            }).join("")}
+          </div>`
+      }
+    </div>
+  </div>
+
+  <!-- ═══ 접속 지역 ═══════════════════════════════════════════════ -->
+  <div id="location" class="section">
+    <h2>접속 지역 TOP15</h2>
+    <div class="panel">
+      <h3>도시별 스캔 수</h3>
+      ${!cityDataAvailable
+        ? '<p style="font-size:12px;color:#a8a29e;margin:0">데이터 수집 중</p>'
+        : `<div class="bar-wrap">
+            ${cityArr.map((r: any) => {
+              const pct = Math.round(r.cnt / maxCity * 100);
+              return `<div class="bar-row">
+                <div class="bar-label-wide">${r.city}${r.country ? ' (' + r.country + ')' : ''}</div>
+                <div class="bar-bg"><div class="bar-fill" style="width:${pct}%"></div></div>
+                <div class="bar-val">${r.cnt}</div>
+              </div>`;
+            }).join("")}
+          </div>`
+      }
+    </div>
+  </div>
+
+  <!-- ═══ 유입 경로 ═══════════════════════════════════════════════ -->
+  <div id="referrer" class="section">
+    <h2>유입 경로 분석</h2>
+    <div class="panel">
+      <h3>유입 경로별 스캔 수</h3>
+      ${!referrerDataAvailable
+        ? '<p style="font-size:12px;color:#a8a29e;margin:0">데이터 수집 중</p>'
+        : `<div class="bar-wrap">
+            ${referrerArr.map((r: any) => {
+              const pct = Math.round(r.cnt / maxReferrer * 100);
+              const label = REFERRER_LABEL[r.referrer] ?? r.referrer;
+              return `<div class="bar-row">
+                <div class="bar-label-wide">${label}</div>
+                <div class="bar-bg"><div class="bar-fill" style="width:${pct}%;background:#6366f1"></div></div>
+                <div class="bar-val">${r.cnt}</div>
+              </div>`;
+            }).join("")}
+          </div>`
+      }
+    </div>
+  </div>
+
+  <!-- ═══ 화장품 등록 현황 ═════════════════════════════════════════ -->
+  <div id="cosmetics" class="section">
+    <h2>화장품 등록 현황</h2>
+    ${cosmeticsArr.length === 0
+      ? '<p style="font-size:12px;color:#a8a29e;margin:0">등록된 화장품 없음</p>'
+      : `<table class="cosmetics-table">
+          <tr><th>유저ID</th><th>제품명</th><th>브랜드</th><th>카테고리</th><th>등록일</th><th>총 등록</th></tr>
+          ${cosmeticsArr.map((r: any) => `
+            <tr>
+              <td style="font-size:11px;color:#78716c" title="${r.user_id || ''}">${(r.user_id || "?").slice(0, 8)}...</td>
+              <td><strong>${r.name || "-"}</strong></td>
+              <td>${r.brand || "-"}</td>
+              <td><span class="badge">${r.category || "-"}</span></td>
+              <td style="color:#a8a29e;font-size:11px">${toKST(r.created_at)}</td>
+              <td style="font-weight:700;color:#4A7C6E">${r.total ?? 0}</td>
+            </tr>`).join("")}
+        </table>`
+    }
   </div>
 
   <!-- ═══ 피처 사용률 ══════════════════════════════════════════════ -->
@@ -559,11 +704,26 @@ export const onRequest = async (context: any) => {
 
   <!-- ═══ 최근 스캔 ════════════════════════════════════════════════ -->
   <div id="recent" class="section">
-    <h2>최근 스캔 20건</h2>
-    <table>
-      <tr><th>점수</th><th>바우만</th><th>피부나이</th><th>성별</th><th>나이대</th><th>언어</th><th>유형</th><th>시간 (KST)</th></tr>
-      ${((recentRows as any)?.results ?? []).map((r: any) => `
-        <tr>
+    <h2>최근 스캔 100건</h2>
+    <div class="date-filter">
+      <label for="scanDateFilter" style="font-size:12px;font-weight:700;color:#78716c">날짜 필터:</label>
+      <input type="date" id="scanDateFilter" onchange="filterScans()" />
+      <button onclick="document.getElementById('scanDateFilter').value='';filterScans()">초기화</button>
+    </div>
+    <table id="scanTable">
+      <thead>
+        <tr><th>점수</th><th>바우만</th><th>피부나이</th><th>성별</th><th>나이대</th><th>언어</th><th>유형</th><th>도시</th><th>유입경로</th><th>로그인방식</th><th>시간 (KST)</th></tr>
+      </thead>
+      <tbody>
+      ${((recentRows as any)?.results ?? []).map((r: any) => {
+        const kstTime = toKST(r.created_at);
+        const dateStr = kstTime.slice(0, 10);
+        const providerLabel = r.provider ? (PROVIDER_LABEL[r.provider] ?? r.provider) : "-";
+        const providerBadge = r.provider === "kakao" ? "badge-kakao" : r.provider === "google" ? "badge-google" : r.provider === "line" ? "badge-line" : "";
+        const cityDisplay = r.city ? (r.city + (r.country ? ' (' + r.country + ')' : '')) : "-";
+        const referrerDisplay = r.referrer ? (REFERRER_LABEL[r.referrer] ?? r.referrer) : "-";
+        return `
+        <tr data-date="${dateStr}">
           <td><strong>${r.overall_score}</strong></td>
           <td><span class="badge">${r.baumann_type || "?"}</span></td>
           <td>${r.skin_age ?? "-"}</td>
@@ -571,8 +731,13 @@ export const onRequest = async (context: any) => {
           <td style="font-size:11px">${r.age_group || "-"}</td>
           <td>${(r.lang ?? "ko").toUpperCase()}</td>
           <td><span class="badge ${r.is_guest ? "badge-guest" : ""}">${r.is_guest ? "비로그인" : "로그인"}</span></td>
-          <td style="color:#a8a29e;font-size:11px">${toKST(r.created_at)}</td>
-        </tr>`).join("")}
+          <td style="font-size:11px">${cityDisplay}</td>
+          <td style="font-size:11px">${referrerDisplay}</td>
+          <td>${providerLabel !== "-" ? '<span class="badge ' + providerBadge + '">' + providerLabel + '</span>' : "-"}</td>
+          <td style="color:#a8a29e;font-size:11px">${kstTime}</td>
+        </tr>`;
+      }).join("")}
+      </tbody>
     </table>
   </div>
 
@@ -600,6 +765,21 @@ export const onRequest = async (context: any) => {
   <p style="margin-top:24px;font-size:11px;color:#d4d4d4;text-align:center">
     Fonday Admin · events 테이블 미생성 시: POST /api/admin/d1-migrate4
   </p>
+
+  <script>
+    function filterScans() {
+      var dateVal = document.getElementById('scanDateFilter').value;
+      var rows = document.querySelectorAll('#scanTable tbody tr');
+      for (var i = 0; i < rows.length; i++) {
+        var rowDate = rows[i].getAttribute('data-date');
+        if (!dateVal || rowDate === dateVal) {
+          rows[i].style.display = '';
+        } else {
+          rows[i].style.display = 'none';
+        }
+      }
+    }
+  </script>
 </body>
 </html>`;
 
