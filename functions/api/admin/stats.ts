@@ -125,6 +125,13 @@ export const onRequest = async (context: any) => {
   }
 
   try {
+    // 새 컬럼 자동 마이그레이션 (없으면 추가)
+    for (const col of ["city", "country", "referrer", "provider", "device_info", "user_id"]) {
+      await env.FONDAY_DB.prepare(`SELECT ${col} FROM scans LIMIT 0`).all().catch(async () => {
+        await env.FONDAY_DB.prepare(`ALTER TABLE scans ADD COLUMN ${col} TEXT DEFAULT ''`).run().catch(() => {});
+      });
+    }
+
     const safe = async (stmt: any, method: "first" | "all") => {
       try { return method === "first" ? await stmt.first() : await stmt.all(); }
       catch { return method === "first" ? null : { results: [] }; }
