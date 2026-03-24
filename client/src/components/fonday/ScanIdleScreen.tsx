@@ -455,6 +455,12 @@ export function ScanIdleScreen({
           </div>
         )}
 
+        {/* ── 홈 루틴 체크 위젯 (로그인 유저, 화장품 등록 시) ── */}
+        {latestScan && (() => {
+          // 간단한 inline 체크리스트 — 등록된 화장품 fetch는 부모에서 불필요, 별도 fetch
+          return <HomeRoutineWidget onOpenRoutine={onOpenRoutine} />;
+        })()}
+
         <div className="grid grid-cols-[1fr_auto] gap-2">
           <button
             onClick={() => setShowCalendar(true)}
@@ -594,5 +600,80 @@ export function ScanIdleScreen({
       </div>
     </motion.div>
     </>
+  );
+}
+
+// ─── 홈 루틴 체크 위젯 ───────────────────────────────────────────
+function HomeRoutineWidget({ onOpenRoutine }: { onOpenRoutine?: () => void }) {
+  const { t } = useTranslation();
+  const [cosmetics, setCosmetics] = useState<any[]>([]);
+  const [checkedIds, setCheckedIds] = useState<string[]>([]);
+  const [loaded, setLoaded] = useState(false);
+
+  useEffect(() => {
+    Promise.all([
+      fetch("/api/cosmetics").then(r => r.ok ? r.json() : []),
+      fetch(`/api/routine-log?date=${todayStr()}`).then(r => r.ok ? r.json() : { cosmetic_ids: [] }),
+    ])
+      .then(([items, log]) => {
+        setCosmetics(Array.isArray(items) ? items : []);
+        setCheckedIds(Array.isArray(log.cosmetic_ids) ? log.cosmetic_ids : []);
+      })
+      .catch(() => {})
+      .finally(() => setLoaded(true));
+  }, []);
+
+  if (!loaded || cosmetics.length === 0) return null;
+
+  const checkedCount = checkedIds.filter(id => cosmetics.some((c: any) => c.id === id)).length;
+  const total = cosmetics.length;
+
+  const handleToggle = (id: string) => {
+    const next = checkedIds.includes(id)
+      ? checkedIds.filter(x => x !== id)
+      : [...checkedIds, id];
+    setCheckedIds(next);
+    fetch("/api/routine-log", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ date_str: todayStr(), cosmetic_ids: next }),
+    }).catch(() => {});
+  };
+
+  return (
+    <div className="rounded-2xl bg-white px-4 py-3.5 mb-3 border" style={{ borderColor: BORDER_COLOR }}>
+      <div className="flex items-center justify-between mb-2.5">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.14em]" style={{ color: DEEP_GREEN, fontFamily: FONT_DISPLAY }}>
+          {t("routineChecklist.title", "오늘 사용한 화장품")}
+        </p>
+        <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full"
+          style={{ background: `${DEEP_GREEN}12`, color: DEEP_GREEN }}>
+          {checkedCount}/{total}
+        </span>
+      </div>
+      <div className="space-y-1">
+        {cosmetics.slice(0, 5).map((item: any) => {
+          const checked = checkedIds.includes(item.id);
+          return (
+            <button key={item.id} onClick={() => handleToggle(item.id)}
+              className="w-full flex items-center gap-2.5 rounded-xl px-2.5 py-2 text-left transition-colors"
+              style={{ background: checked ? `${DEEP_GREEN}08` : "transparent" }}>
+              <div className="w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 transition-all"
+                style={{ background: checked ? DEEP_GREEN : "transparent", borderColor: checked ? DEEP_GREEN : "#D1CBC3" }}>
+                {checked && <span className="text-white text-[10px] font-bold">✓</span>}
+              </div>
+              <span className="text-[13px] font-medium truncate" style={{ color: checked ? DEEP_GREEN : "#374151" }}>
+                {item.name}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+      {cosmetics.length > 5 && onOpenRoutine && (
+        <button onClick={onOpenRoutine} className="mt-2 text-xs font-semibold" style={{ color: DEEP_GREEN }}>
+          +{cosmetics.length - 5}{t("routineChecklist.more", "개 더보기")}
+        </button>
+      )}
+    </div>
   );
 }
