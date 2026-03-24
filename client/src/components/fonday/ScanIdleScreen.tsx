@@ -535,59 +535,73 @@ export function ScanIdleScreen({
         </div>
       </motion.div>
 
-      {/* 단계 표시 */}
-      <motion.div variants={fadeChild} className="mb-4 relative" style={{ zIndex: 1 }}>
-        <div className="bg-white rounded-2xl px-3 py-2.5 border"
-          style={{ borderColor: BORDER_COLOR }}>
-          <h2 className="text-xs font-semibold text-stone-400 text-center mb-2 tracking-widest uppercase">
-            {t("idle.stepsTitle")}
-          </h2>
-          <div className="flex items-start justify-between">
-            {STEPS.map((step, i) => (
-              <div key={i} className="flex items-start" style={{ flex: 1 }}>
-                <div className="flex flex-col items-center gap-1 flex-1">
-                  <div className="w-8 h-8 rounded-full flex items-center justify-center text-sm"
-                    style={step.active
-                      ? { background: TINT_WARM }
-                      : { background: "#F4F4F5" }}>
-                    <step.Icon className="w-4 h-4" style={{ color: step.active ? SCAN_TO : "#A9998E" }} />
+      {/* ── 신규 유저: 단계 표시 + 개인정보 + CTA ── */}
+      {!latestScan && (
+        <>
+          <motion.div variants={fadeChild} className="mb-4 relative" style={{ zIndex: 1 }}>
+            <div className="bg-white rounded-2xl px-3 py-2.5 border"
+              style={{ borderColor: BORDER_COLOR }}>
+              <h2 className="text-xs font-semibold text-stone-400 text-center mb-2 tracking-widest uppercase">
+                {t("idle.stepsTitle")}
+              </h2>
+              <div className="flex items-start justify-between">
+                {STEPS.map((step, i) => (
+                  <div key={i} className="flex items-start" style={{ flex: 1 }}>
+                    <div className="flex flex-col items-center gap-1 flex-1">
+                      <div className="w-8 h-8 rounded-full flex items-center justify-center text-sm"
+                        style={step.active ? { background: TINT_WARM } : { background: "#F4F4F5" }}>
+                        <step.Icon className="w-4 h-4" style={{ color: step.active ? SCAN_TO : "#A9998E" }} />
+                      </div>
+                      <div className="text-center">
+                        <div className="text-xs font-semibold text-stone-700">{step.title}</div>
+                        <div className="text-xs text-stone-400 mt-0.5 leading-tight">{step.sub}</div>
+                      </div>
+                    </div>
+                    {i < 2 && <div className="text-stone-200 text-sm pt-2 flex-shrink-0">›</div>}
                   </div>
-                  <div className="text-center">
-                    <div className="text-xs font-semibold text-stone-700">{step.title}</div>
-                    <div className="text-xs text-stone-400 mt-0.5 leading-tight">{step.sub}</div>
-                  </div>
-                </div>
-                {i < 2 && <div className="text-stone-200 text-sm pt-2 flex-shrink-0">›</div>}
+                ))}
               </div>
-            ))}
-          </div>
-        </div>
-      </motion.div>
+            </div>
+          </motion.div>
 
-      {/* 개인정보 보호 배지 */}
-      <motion.div variants={fadeChild} className="mb-4 relative" style={{ zIndex: 1 }}>
-        <div className="flex items-center justify-center gap-1.5 px-3.5 py-2.5">
-          <Lock className="w-3.5 h-3.5 flex-shrink-0" style={{ color: TEXT_TERTIARY }} />
-          <span className="text-xs font-medium" style={{ color: TEXT_TERTIARY }}>{t("idle.privacy")}</span>
-        </div>
-      </motion.div>
+          <motion.div variants={fadeChild} className="mb-4 relative" style={{ zIndex: 1 }}>
+            <div className="flex items-center justify-center gap-1.5 px-3.5 py-2.5">
+              <Lock className="w-3.5 h-3.5 flex-shrink-0" style={{ color: TEXT_TERTIARY }} />
+              <span className="text-xs font-medium" style={{ color: TEXT_TERTIARY }}>{t("idle.privacy")}</span>
+            </div>
+          </motion.div>
 
-      {/* CTA 버튼 */}
-      <motion.div variants={fadeChild} className="mt-auto relative" style={{ zIndex: 1 }}>
-        <motion.button
-          onClick={onScan}
-          className="w-full py-4 sm:py-[18px] rounded-xl text-white text-[15px] sm:text-[16px] font-semibold tracking-tight"
-          style={{ background: DEEP_GREEN }}
-          whileHover={{ scale: reducedMotion ? 1 : 1.01 }}
-          whileTap={{ scale: reducedMotion ? 1 : 0.97 }}
-        >
-          {t("idle.ctaBtn")}
-        </motion.button>
-        <p className="text-center text-xs mt-2.5" style={{ color: TEXT_SECONDARY }}>
-          <Sparkles className="w-3 h-3 inline mr-1" style={{ color: SCAN_FROM }} />
-          {t("idle.ctaHint")}
-        </p>
-      </motion.div>
+          <motion.div variants={fadeChild} className="mt-auto relative" style={{ zIndex: 1 }}>
+            <motion.button
+              onClick={onScan}
+              className="w-full py-4 sm:py-[18px] rounded-xl text-white text-[15px] sm:text-[16px] font-semibold tracking-tight"
+              style={{ background: DEEP_GREEN }}
+              whileHover={{ scale: reducedMotion ? 1 : 1.01 }}
+              whileTap={{ scale: reducedMotion ? 1 : 0.97 }}
+            >
+              {t("idle.ctaBtn")}
+            </motion.button>
+            <p className="text-center text-xs mt-2.5" style={{ color: TEXT_SECONDARY }}>
+              <Sparkles className="w-3 h-3 inline mr-1" style={{ color: SCAN_FROM }} />
+              {t("idle.ctaHint")}
+            </p>
+          </motion.div>
+        </>
+      )}
+
+      {/* ── 리턴 유저: 간결한 재스캔 버튼 ── */}
+      {latestScan && (
+        <motion.div variants={fadeChild} className="relative" style={{ zIndex: 1 }}>
+          <button
+            onClick={onScan}
+            className="w-full flex items-center justify-center gap-2 py-3.5 rounded-2xl text-[14px] font-semibold active:opacity-80 transition-opacity"
+            style={{ background: `${DEEP_GREEN}10`, color: DEEP_GREEN }}
+          >
+            <Camera className="w-4 h-4" />
+            {t("idle.rescan", "오늘의 피부 스캔하기")}
+          </button>
+        </motion.div>
+      )}
 
       <div className="text-center pt-4 pb-4 relative" style={{ zIndex: 1 }}>
         <a href="/privacy.html" className="text-xs underline inline-flex items-center min-h-[44px] px-2" style={{ color: TEXT_SECONDARY }}>

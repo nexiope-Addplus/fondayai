@@ -117,7 +117,8 @@
     "greetingWeatherHumid": "湿度が高い日！軽めのスキンケアで快適に過ごしましょう。",
     "greetingWeatherCloudy": "曇りでもUVはあります！日焼け止めは必須ですよ。",
     "quickScan": "今すぐ肌をスキャン",
-    "quickScanSub": "30秒で完了 · 完全無料"
+    "quickScanSub": "30秒で完了 · 完全無料",
+    "rescan": "今日の肌をスキャン"
   },
   "camera": {
     "noCamera": "カメラが使えません。写真を選んでください。",

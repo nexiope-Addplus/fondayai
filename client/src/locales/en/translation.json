@@ -117,7 +117,8 @@
     "greetingWeatherHumid": "High humidity today! Go for lightweight skincare products.",
     "greetingWeatherCloudy": "Overcast, but UV is still there! Sunscreen is a must.",
     "quickScan": "Scan Your Skin Now",
-    "quickScanSub": "Takes 30 seconds · Free"
+    "quickScanSub": "Takes 30 seconds · Free",
+    "rescan": "Scan Today"
   },
   "camera": {
     "noCamera": "Camera unavailable. Please select a photo instead.",

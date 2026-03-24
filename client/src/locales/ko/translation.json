@@ -117,7 +117,8 @@
     "greetingWeatherHumid": "습도가 높아요! 가벼운 제형으로 피부를 편안하게 해요.",
     "greetingWeatherCloudy": "흐린 날에도 자외선은 있어요! 선크림은 꼭 챙기세요.",
     "quickScan": "지금 바로 피부 스캔하기",
-    "quickScanSub": "30초면 끝나요 · 완전 무료"
+    "quickScanSub": "30초면 끝나요 · 완전 무료",
+    "rescan": "오늘의 피부 스캔하기"
   },
   "camera": {
     "noCamera": "카메라를 사용할 수 없습니다. 사진으로 선택해 주세요.",
