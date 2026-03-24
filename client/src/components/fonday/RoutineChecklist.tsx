@@ -2,7 +2,7 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 import { useReducedMotion } from "framer-motion";
-import { Droplets, Check, Plus } from "lucide-react";
+import { Droplets, Check, Plus, LogIn } from "lucide-react";
 import type { CosmeticItem } from "./types";
 import {
   BORDER_COLOR,
@@ -10,6 +10,7 @@ import {
   FONT_DISPLAY,
   SCAN_TO,
   TEXT_TERTIARY,
+  TINT_GREEN,
   fadeChild,
 } from "./constants";
 
@@ -18,6 +19,8 @@ type RoutineChecklistProps = {
   checkedIds: string[];
   onToggle: (id: string) => void;
   onRegister?: () => void;
+  onLogin?: () => void;
+  user?: any;
   loading?: boolean;
 };
 
@@ -26,6 +29,8 @@ export function RoutineChecklist({
   checkedIds,
   onToggle,
   onRegister,
+  onLogin,
+  user,
   loading = false,
 }: RoutineChecklistProps) {
   const { t } = useTranslation();
@@ -73,8 +78,28 @@ export function RoutineChecklist({
           )}
         </div>
 
+        {/* 비로그인 상태 — 로그인 유도 */}
+        {!user && onLogin && (
+          <div className="py-4 text-center">
+            <p
+              className="text-[13px] font-normal mb-3 whitespace-pre-line leading-relaxed"
+              style={{ color: TEXT_TERTIARY }}
+            >
+              {t("routineChecklist.loginDesc", "화장품을 등록하고\n어떤 제품이 내 피부에 효과 있는지 추적하세요")}
+            </p>
+            <button
+              onClick={onLogin}
+              className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-[13px] font-semibold transition-opacity active:opacity-70"
+              style={{ background: DEEP_GREEN, color: "#FFFFFF" }}
+            >
+              <LogIn className="w-4 h-4" />
+              {t("routineChecklist.login", "로그인하고 시작하기")}
+            </button>
+          </div>
+        )}
+
         {/* Loading state */}
-        {loading && (
+        {user && loading && (
           <div className="py-6 flex justify-center">
             <div
               className="w-5 h-5 rounded-full border-2 border-t-transparent animate-spin"

@@ -855,7 +855,9 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
             }).catch(() => {});
           }}
           onRegister={() => setShowCosmeticsRegister(true)}
-          loading={!user}
+          onLogin={isKo ? handleKakaoLogin : handleLineLogin}
+          user={user}
+          loading={false}
         />
 
         {/* ── 다음 스텝 가이드 (첫 스캔 또는 화장품 미등록 시) ── */}

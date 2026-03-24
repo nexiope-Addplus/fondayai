@@ -6,7 +6,9 @@
     "am": "Morning",
     "pm": "Evening",
     "checked": "{{count}} used",
-    "hint": "Check daily to track which products actually work"
+    "hint": "Check daily to track which products actually work",
+    "loginDesc": "Register your products and\ntrack which ones actually work for your skin",
+    "login": "Sign in to start"
   },
   "nav": {
     "scan": "Home",
