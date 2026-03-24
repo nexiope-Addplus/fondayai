@@ -42,7 +42,7 @@ import { ResultHeaderCard } from "./ResultHeaderCard";
 import { ResultOverlayPopups } from "./ResultOverlayPopups";
 import { ResultModals } from "./ResultModals";
 import { CosmeticsReportCard } from "./CosmeticsReportCard";
-import { RoutineLogInput } from "./RoutineLogInput";
+import { RoutineChecklist } from "./RoutineChecklist";
 
 // ─── 피부 예측 카드 ────────────────────────────────────────────────
 export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, imageBase64, onBack, onGoMagazine, onOpenDiary, onGoRoutine, onGoMy, user, deferredPrompt, onShowInstallGuide }: any) {
@@ -108,7 +108,7 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
   const [showOnboarding, setShowOnboarding] = useState(() => !localStorage.getItem("fonday_onboarding_done"));
   const [showQuestSheet, setShowQuestSheet] = useState(false);
   const [showPwaPopup, setShowPwaPopup] = useState(false);
-  const [routineProducts, setRoutineProducts] = useState<string[]>([]);
+  const [checkedCosmeticIds, setCheckedCosmeticIds] = useState<string[]>([]);
 
   // PWA 설치 팝업: 결과 페이지 50% 스크롤 후 표시 (콘텐츠 가치 체험 후 유도)
   const pwaTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -443,6 +443,17 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
       container.scrollTo({ top: content.offsetTop - 8, behavior: "smooth" });
     }
   }, [activeTab]);
+
+  useEffect(() => {
+    if (!user) return;
+    fetch(`/api/routine-log?date=${todayStr()}`)
+      .then(r => r.ok ? r.json() : { cosmetic_ids: [] })
+      .then(data => {
+        const ids = Array.isArray(data.cosmetic_ids) ? data.cosmetic_ids : [];
+        setCheckedCosmeticIds(ids);
+      })
+      .catch(() => {});
+  }, [user]);
 
   const handlePartnershipSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -828,13 +839,22 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
           );
         })()}
 
-        {/* 루틴 로그 — 오늘 사용한 화장품 기록 */}
-        <RoutineLogInput
-          initialProducts={routineProducts}
-          onSave={(products) => {
-            setRoutineProducts(products);
-            localStorage.setItem("fonday_routine_" + todayStr(), JSON.stringify(products));
+        {/* 루틴 체크리스트 — 오늘 사용한 화장품 체크 */}
+        <RoutineChecklist
+          cosmetics={myCosmetics}
+          checkedIds={checkedCosmeticIds}
+          onToggle={(id) => {
+            const next = checkedCosmeticIds.includes(id)
+              ? checkedCosmeticIds.filter(x => x !== id)
+              : [...checkedCosmeticIds, id];
+            setCheckedCosmeticIds(next);
+            fetch("/api/routine-log", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ date_str: todayStr(), cosmetic_ids: next }),
+            }).catch(() => {});
           }}
+          loading={!user}
         />
 
         <motion.div variants={fadeChild} className="rounded-3xl px-4 py-3 border"
