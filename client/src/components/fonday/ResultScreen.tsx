@@ -773,9 +773,9 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
       console.error("[share]", e);
       if (e instanceof Error) {
         if (e.name === "AbortError") {
-          alert("이미지 생성 시간이 초과되었습니다. 잠시 후 다시 시도해 주세요.");
+          alert(t("common.timeout", "이미지 생성 시간이 초과되었습니다."));
         } else {
-          alert(`공유 실패: ${e.message}`);
+          alert(t("common.shareFail", "공유에 실패했습니다."));
         }
       }
     } finally {

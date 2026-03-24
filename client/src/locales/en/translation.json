@@ -992,7 +992,8 @@
     "errorDesc": "Invalid link.",
     "homeBtn": "Back to Home",
     "loadError": "Failed to load data.",
-    "notFound": "Challenge info not found."
+    "notFound": "Challenge info not found.",
+    "linkCopied": "Challenge link copied!"
   },
   "share": {
     "rankLabel": "Ranker",
@@ -1275,6 +1276,8 @@
     "refresh": "Refresh",
     "loading": "Loading",
     "collapse": "Collapse",
-    "error": "An error occurred."
+    "error": "An error occurred.",
+    "timeout": "Image generation timed out.",
+    "shareFail": "Sharing failed."
   }
 }

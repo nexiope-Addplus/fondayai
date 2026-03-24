@@ -199,7 +199,7 @@ export function ReportTab({ user }: { user: any }) {
                   }).catch(console.error);
                 } else {
                   navigator.clipboard.writeText(shareUrl).then(() => {
-                    alert("챌린지 링크가 복사되었습니다! 친구에게 보내서 겨뤄보세요.");
+                    alert(t("battle.linkCopied", "챌린지 링크가 복사되었습니다!"));
                   });
                 }
               }}
