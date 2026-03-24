@@ -24,10 +24,10 @@ export function useAICareSettings(analysisResult: AnalysisResult | null) {
 
   const aiCareLabels = i18n.language?.startsWith("en")
     ? {
-        title: "AI Care",
+        title: "Skincare Alerts",
         desc: "All-day skin coaching: scan, meals, hydration, UV, weather & bedtime routine.",
-        on: "AI Care On",
-        off: "Turn On AI Care",
+        on: "Alerts ON",
+        off: "Get Alerts",
         scan: "📷 Scan",
         meal: "🥗 Meals",
         hydration: "💧 Hydration",
@@ -39,10 +39,10 @@ export function useAICareSettings(analysisResult: AnalysisResult | null) {
       }
     : i18n.language?.startsWith("ja")
       ? {
-          title: "AI密着ケア",
+          title: "スキンケア通知",
           desc: "スキャン・食事・水分・UV・天気・就寝ケアまで丸ごと管理します。",
-          on: "AI密着ケア ON",
-          off: "AI密着ケアを有効化",
+          on: "通知 ON",
+          off: "通知を受け取る",
           scan: "📷 スキャン",
           meal: "🥗 食事",
           hydration: "💧 水分",
@@ -53,10 +53,10 @@ export function useAICareSettings(analysisResult: AnalysisResult | null) {
           schedule: "08:00 天気 · 07:30 スキャン · 10:00 UV · 12:00 昼食 · 15:00 水分 · 18:00 夕食 · ルーティン · 23:00 就寝",
         }
       : {
-          title: "AI 밀착케어",
+          title: "스킨케어 알림",
           desc: "하루 종일 피부 코칭: 스캔, 식단, 수분, UV, 날씨, 취침 루틴까지.",
-          on: "AI 밀착케어 ON",
-          off: "AI 밀착케어 켜기",
+          on: "알림 ON",
+          off: "알림 받기",
           scan: "📷 스캔",
           meal: "🥗 식단",
           hydration: "💧 수분",

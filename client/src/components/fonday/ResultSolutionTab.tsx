@@ -114,7 +114,7 @@ export function ResultSolutionTab(props: any) {
               />
             )}
 
-            {/* ── AI 밀착케어 ── */}
+            {/* ── 알림 설정 ── */}
             <div className="rounded-3xl p-4" style={{ background: "#FFFFFF" }}>
               <div className="flex items-center justify-between gap-3">
                 <div className="flex items-center gap-2.5">
@@ -131,7 +131,7 @@ export function ResultSolutionTab(props: any) {
                   className="shrink-0 rounded-full px-3 py-1.5 text-xs font-semibold"
                   style={pushSubscribed
                     ? { background: `${DEEP_GREEN}18`, color: DEEP_GREEN, border: `1px solid ${DEEP_GREEN}33` }
-                    : { background: TINT_NEUTRAL, color: SCAN_TO }}>
+                    : { background: SCAN_TO, color: "#FFFFFF" }}>
                   {pushLoading ? "..." : pushSubscribed ? aiCareLabels.on : aiCareLabels.off}
                 </button>
               </div>
