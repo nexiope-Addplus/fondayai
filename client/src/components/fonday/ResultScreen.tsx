@@ -854,6 +854,7 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
               body: JSON.stringify({ date_str: todayStr(), cosmetic_ids: next }),
             }).catch(() => {});
           }}
+          onRegister={() => setShowCosmeticsRegister(true)}
           loading={!user}
         />
 

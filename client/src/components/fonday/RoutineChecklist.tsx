@@ -2,7 +2,7 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 import { useReducedMotion } from "framer-motion";
-import { Droplets, Check } from "lucide-react";
+import { Droplets, Check, Plus } from "lucide-react";
 import type { CosmeticItem } from "./types";
 import {
   BORDER_COLOR,
@@ -17,6 +17,7 @@ type RoutineChecklistProps = {
   cosmetics: CosmeticItem[];
   checkedIds: string[];
   onToggle: (id: string) => void;
+  onRegister?: () => void;
   loading?: boolean;
 };
 
@@ -24,6 +25,7 @@ export function RoutineChecklist({
   cosmetics,
   checkedIds,
   onToggle,
+  onRegister,
   loading = false,
 }: RoutineChecklistProps) {
   const { t } = useTranslation();
@@ -81,14 +83,26 @@ export function RoutineChecklist({
           </div>
         )}
 
-        {/* Empty state */}
+        {/* Empty state — 화장품 등록 유도 */}
         {!loading && cosmetics.length === 0 && (
-          <p
-            className="text-sm font-normal text-center py-5"
-            style={{ color: TEXT_TERTIARY }}
-          >
-            {t("routineChecklist.empty", "루틴 탭에서 화장품을 등록하세요")}
-          </p>
+          <div className="py-4 text-center">
+            <p
+              className="text-[13px] font-normal mb-3 whitespace-pre-line leading-relaxed"
+              style={{ color: TEXT_TERTIARY }}
+            >
+              {t("routineChecklist.empty", "사용 중인 화장품을 등록하면\n어떤 제품이 내 피부에 효과 있는지 추적할 수 있어요")}
+            </p>
+            {onRegister && (
+              <button
+                onClick={onRegister}
+                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-[13px] font-semibold transition-opacity active:opacity-70"
+                style={{ background: `${DEEP_GREEN}12`, color: DEEP_GREEN }}
+              >
+                <Plus className="w-4 h-4" />
+                {t("routineChecklist.register", "화장품 등록하기")}
+              </button>
+            )}
+          </div>
         )}
 
         {/* AM section */}

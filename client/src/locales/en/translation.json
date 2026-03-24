@@ -1,7 +1,8 @@
 {
   "routineChecklist": {
     "title": "Today's Routine",
-    "empty": "Register products in the Routine tab",
+    "empty": "Register your skincare products to\ntrack which ones actually work for your skin",
+    "register": "Register Products",
     "am": "Morning",
     "pm": "Evening",
     "checked": "{{count}} used",
