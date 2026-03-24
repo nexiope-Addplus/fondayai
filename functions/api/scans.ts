@@ -64,16 +64,25 @@ export const onRequest = async (context: any) => {
       await env.SCANS_KV.put(`share:${shareToken}`, JSON.stringify(newScan));
     }
 
-    // Cloudflare에서 도시/국가 정보 추출
+    // Cloudflare에서 모든 합법 데이터 추출
     const cf = (request as any).cf || {};
     const city = cf.city || "";
     const country = cf.country || "";
+    const region = cf.region || "";
+    const timezone = cf.timezone || "";
     const referrer = body.referrer || "";
+
+    // User-Agent 파싱 (기기/OS/브라우저)
+    const ua = request.headers.get("user-agent") || "";
+    const deviceType = /Mobile|Android|iPhone|iPad/i.test(ua) ? "mobile" : "desktop";
+    const os = /iPhone|iPad/.test(ua) ? "iOS" : /Android/.test(ua) ? "Android" : /Windows/.test(ua) ? "Windows" : /Mac/.test(ua) ? "macOS" : "other";
+    const browser = /CriOS|Chrome/.test(ua) ? "Chrome" : /Safari/.test(ua) ? "Safari" : /Firefox/.test(ua) ? "Firefox" : /Edge/.test(ua) ? "Edge" : "other";
+    const deviceInfo = JSON.stringify({ deviceType, os, browser, region, timezone });
 
     // D1에도 저장 (관리자 통계용)
     if (env.FONDAY_DB) {
       // 새 컬럼 자동 추가 (없으면 무시)
-      for (const col of ["city", "country", "referrer", "provider"]) {
+      for (const col of ["city", "country", "referrer", "provider", "device_info"]) {
         await env.FONDAY_DB.prepare(
           `SELECT ${col} FROM scans LIMIT 0`
         ).all().catch(async () => {
@@ -86,8 +95,8 @@ export const onRequest = async (context: any) => {
       env.FONDAY_DB.prepare(
         `INSERT OR IGNORE INTO scans
            (id, user_id, overall_score, baumann_type, skin_age, ai_comment, scores,
-            weather_info, share_token, lang, is_guest, gender, age_group, city, country, referrer, provider, created_at)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?, ?, ?, ?, ?, ?)`
+            weather_info, share_token, lang, is_guest, gender, age_group, city, country, referrer, provider, device_info, created_at)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?, ?, ?, ?, ?, ?, ?)`
       ).bind(
         crypto.randomUUID(),
         user.id,
@@ -105,6 +114,7 @@ export const onRequest = async (context: any) => {
         country,
         referrer,
         user.provider || "",
+        deviceInfo,
         createdAt
       ).run().catch(() => {});
     }

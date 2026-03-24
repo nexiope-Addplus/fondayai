@@ -204,8 +204,8 @@ export const onRequest = async (context: any) => {
 
     // ── 4. 기타 데이터 ────────────────────────────────────────────
     const [recentRows, diaryCountRow, cosmeticsCountRow, cosmeticsListRows] = await Promise.all([
-      env.FONDAY_DB.prepare("SELECT overall_score, baumann_type, skin_age, lang, is_guest, gender, age_group, city, country, referrer, provider, created_at FROM scans ORDER BY created_at DESC LIMIT 100")
-        .all().catch(() => env.FONDAY_DB.prepare("SELECT overall_score, baumann_type, skin_age, lang, is_guest, gender, age_group, created_at FROM scans ORDER BY created_at DESC LIMIT 100").all())
+      env.FONDAY_DB.prepare("SELECT user_id, overall_score, baumann_type, skin_age, lang, is_guest, gender, age_group, scores, city, country, referrer, provider, device_info, created_at FROM scans ORDER BY created_at DESC LIMIT 100")
+        .all().catch(() => env.FONDAY_DB.prepare("SELECT user_id, overall_score, baumann_type, skin_age, lang, is_guest, gender, age_group, city, country, referrer, provider, created_at FROM scans ORDER BY created_at DESC LIMIT 100").all())
         .catch(() => ({ results: [] })),
       safe(env.FONDAY_DB.prepare("SELECT COUNT(*) as cnt FROM diary_entries"), "first"),
       safe(env.FONDAY_DB.prepare("SELECT COUNT(*) as cnt FROM cosmetics"), "first"),
@@ -750,35 +750,78 @@ export const onRequest = async (context: any) => {
       <button onclick="document.getElementById('scanDateFilter').value='';document.getElementById('loginFilter').value='';document.getElementById('providerFilter').value='';filterScans()">초기화</button>
       <span id="filterCount" style="font-size:11px;color:#a8a29e;margin-left:8px"></span>
     </div>
-    <table id="scanTable">
-      <thead>
-        <tr><th>점수</th><th>바우만</th><th>피부나이</th><th>성별</th><th>나이대</th><th>언어</th><th>유형</th><th>도시</th><th>유입경로</th><th>로그인방식</th><th>시간 (KST)</th></tr>
-      </thead>
-      <tbody>
-      ${((recentRows as any)?.results ?? []).map((r: any) => {
+    <div id="scanTable">
+      ${((recentRows as any)?.results ?? []).map((r: any, idx: number) => {
         const kstTime = toKST(r.created_at);
         const dateStr = kstTime.slice(0, 10);
-        const providerLabel = r.provider ? (PROVIDER_LABEL[r.provider] ?? r.provider) : "-";
+        const providerLabel = r.provider ? (PROVIDER_LABEL[r.provider] ?? r.provider) : "";
         const providerBadge = r.provider === "kakao" ? "badge-kakao" : r.provider === "google" ? "badge-google" : r.provider === "line" ? "badge-line" : "";
-        const cityDisplay = r.city ? (r.city + (r.country ? ' (' + r.country + ')' : '')) : "-";
-        const referrerDisplay = r.referrer ? (REFERRER_LABEL[r.referrer] ?? r.referrer) : "-";
+        const cityDisplay = r.city ? (r.city + (r.country ? ' (' + r.country + ')' : '')) : "";
+        const referrerDisplay = r.referrer ? (REFERRER_LABEL[r.referrer] ?? r.referrer) : "";
+        const userId = r.user_id || "";
+        const shortUserId = userId.length > 12 ? userId.slice(0, 12) + "..." : userId;
+        // device_info 파싱
+        let device: any = {};
+        try { device = JSON.parse(r.device_info || "{}"); } catch {}
+        // scores 파싱
+        let scoreItems: any[] = [];
+        try { scoreItems = JSON.parse(r.scores || "[]"); } catch {}
         return `
-        <tr data-date="${dateStr}" data-login="${r.is_guest ? 'guest' : 'login'}" data-provider="${r.provider || ''}">
-          <td><strong>${r.overall_score}</strong></td>
-          <td><span class="badge">${r.baumann_type || "?"}</span></td>
-          <td>${r.skin_age ?? "-"}</td>
-          <td><span class="badge ${r.gender === "female" ? "badge-f" : r.gender === "male" ? "badge-m" : ""}">${r.gender === "female" ? "여성" : r.gender === "male" ? "남성" : "-"}</span></td>
-          <td style="font-size:11px">${r.age_group || "-"}</td>
-          <td>${(r.lang ?? "ko").toUpperCase()}</td>
-          <td><span class="badge ${r.is_guest ? "badge-guest" : ""}">${r.is_guest ? "비로그인" : "로그인"}</span></td>
-          <td style="font-size:11px">${cityDisplay}</td>
-          <td style="font-size:11px">${referrerDisplay}</td>
-          <td>${providerLabel !== "-" ? '<span class="badge ' + providerBadge + '">' + providerLabel + '</span>' : "-"}</td>
-          <td style="color:#a8a29e;font-size:11px">${kstTime}</td>
-        </tr>`;
+        <div class="panel scan-row" data-date="${dateStr}" data-login="${r.is_guest ? 'guest' : 'login'}" data-provider="${r.provider || ''}" style="margin-bottom:6px;padding:10px 14px;cursor:pointer" onclick="var d=document.getElementById('sd-${idx}');d.style.display=d.style.display==='none'?'':'none';this.querySelector('.stoggle').textContent=d.style.display==='none'?'▶':'▼'">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap">
+            <div style="display:flex;align-items:center;gap:8px">
+              <span class="stoggle" style="font-size:10px;color:#a8a29e">▶</span>
+              <strong style="font-size:16px;color:#4A7C6E">${r.overall_score}</strong>
+              <span class="badge">${r.baumann_type || "?"}</span>
+              <span class="badge ${r.is_guest ? 'badge-guest' : ''}">${r.is_guest ? '비로그인' : '로그인'}</span>
+              ${providerLabel ? '<span class="badge ' + providerBadge + '">' + providerLabel + '</span>' : ''}
+              ${cityDisplay ? '<span style="font-size:11px;color:#78716c">' + cityDisplay + '</span>' : ''}
+            </div>
+            <span style="font-size:11px;color:#a8a29e">${kstTime}</span>
+          </div>
+          <div id="sd-${idx}" style="display:none;margin-top:12px" onclick="event.stopPropagation()">
+            <div class="grid3" style="gap:8px;margin-bottom:10px">
+              <div style="background:#f5f5f4;border-radius:10px;padding:10px">
+                <div style="font-size:10px;color:#a8a29e;text-transform:uppercase;font-weight:700">유저 ID</div>
+                <div style="font-size:12px;font-weight:600;margin-top:4px;word-break:break-all" title="${userId}">${shortUserId || "-"}</div>
+              </div>
+              <div style="background:#f5f5f4;border-radius:10px;padding:10px">
+                <div style="font-size:10px;color:#a8a29e;text-transform:uppercase;font-weight:700">피부나이</div>
+                <div style="font-size:16px;font-weight:700;color:#7C3AED;margin-top:4px">${r.skin_age ?? "-"}</div>
+              </div>
+              <div style="background:#f5f5f4;border-radius:10px;padding:10px">
+                <div style="font-size:10px;color:#a8a29e;text-transform:uppercase;font-weight:700">성별 / 나이대</div>
+                <div style="font-size:12px;font-weight:600;margin-top:4px">${r.gender === "female" ? "여성" : r.gender === "male" ? "남성" : "-"} · ${r.age_group || "-"}</div>
+              </div>
+            </div>
+            <div class="grid3" style="gap:8px;margin-bottom:10px">
+              <div style="background:#f5f5f4;border-radius:10px;padding:10px">
+                <div style="font-size:10px;color:#a8a29e;text-transform:uppercase;font-weight:700">언어</div>
+                <div style="font-size:12px;font-weight:600;margin-top:4px">${(r.lang ?? "ko").toUpperCase()}</div>
+              </div>
+              <div style="background:#f5f5f4;border-radius:10px;padding:10px">
+                <div style="font-size:10px;color:#a8a29e;text-transform:uppercase;font-weight:700">유입 경로</div>
+                <div style="font-size:12px;font-weight:600;margin-top:4px">${referrerDisplay || "-"}</div>
+              </div>
+              <div style="background:#f5f5f4;border-radius:10px;padding:10px">
+                <div style="font-size:10px;color:#a8a29e;text-transform:uppercase;font-weight:700">기기</div>
+                <div style="font-size:12px;font-weight:600;margin-top:4px">${device.os || "-"} · ${device.browser || "-"} · ${device.deviceType || "-"}</div>
+              </div>
+            </div>
+            ${scoreItems.length > 1 ? `
+              <div style="font-size:10px;color:#a8a29e;text-transform:uppercase;font-weight:700;margin-bottom:6px">10개 항목 점수</div>
+              <div style="display:flex;flex-wrap:wrap;gap:4px">
+                ${scoreItems.map((s: any) => `
+                  <span style="font-size:11px;padding:3px 8px;border-radius:20px;background:#f5f5f4;font-weight:600">
+                    ${s.label?.replace(/\s/g,'') ?? '?'} <strong style="color:#4A7C6E">${s.score ?? '-'}</strong>
+                  </span>
+                `).join("")}
+              </div>
+            ` : ''}
+          </div>
+        </div>`;
       }).join("")}
-      </tbody>
-    </table>
+    </div>
   </div>
 
   <!-- ═══ 데이터 초기화 ══════════════════════════════════════════════ -->
@@ -811,7 +854,7 @@ export const onRequest = async (context: any) => {
       var dateVal = document.getElementById('scanDateFilter').value;
       var loginVal = document.getElementById('loginFilter').value;
       var providerVal = document.getElementById('providerFilter').value;
-      var rows = document.querySelectorAll('#scanTable tbody tr');
+      var rows = document.querySelectorAll('#scanTable .scan-row');
       var shown = 0;
       for (var i = 0; i < rows.length; i++) {
         var rowDate = rows[i].getAttribute('data-date');
