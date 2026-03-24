@@ -55,6 +55,10 @@ export function RoutineChecklist({
     const sig = signalMap.get(id);
     if (!sig) return null;
     if (sig.confidence === "early") return { text: t("routineChecklist.tracking", "추적 중"), color: TEXT_TERTIARY, delta: null };
+    // 같이 사용 중인 제품이 많으면 개별 효과를 단정할 수 없음
+    if (sig.coUsedProducts.length >= 3 && sig.confidence !== "strong") {
+      return { text: t("routineChecklist.coUsed", "함께 사용 중"), color: TEXT_TERTIARY, delta: null };
+    }
     const idx = sig.topScoreIndex;
     const delta = sig.topScoreDelta;
     if (idx == null || delta == null) return null;

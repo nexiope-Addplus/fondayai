@@ -624,6 +624,7 @@ function HomeRoutineWidget({ onOpenRoutine }: { onOpenRoutine?: () => void }) {
   const [checkedIds, setCheckedIds] = useState<string[]>([]);
   const [topSignal, setTopSignal] = useState<any | null>(null);
   const [loaded, setLoaded] = useState(false);
+  const [showAll, setShowAll] = useState(false);
 
   useEffect(() => {
     Promise.all([
@@ -676,7 +677,7 @@ function HomeRoutineWidget({ onOpenRoutine }: { onOpenRoutine?: () => void }) {
         </span>
       </div>
       <div className="space-y-1">
-        {cosmetics.slice(0, 5).map((item: any) => {
+        {(showAll ? cosmetics : cosmetics.slice(0, 5)).map((item: any) => {
           const checked = checkedIds.includes(item.id);
           return (
             <button key={item.id} onClick={() => { haptic("light"); handleToggle(item.id); }}
@@ -693,9 +694,14 @@ function HomeRoutineWidget({ onOpenRoutine }: { onOpenRoutine?: () => void }) {
           );
         })}
       </div>
-      {cosmetics.length > 5 && onOpenRoutine && (
-        <button onClick={onOpenRoutine} className="mt-2 text-xs font-semibold" style={{ color: DEEP_GREEN }}>
+      {cosmetics.length > 5 && !showAll && (
+        <button onClick={() => setShowAll(true)} className="mt-2 text-xs font-semibold" style={{ color: DEEP_GREEN }}>
           +{cosmetics.length - 5}{t("routineChecklist.more", "개 더보기")}
+        </button>
+      )}
+      {showAll && cosmetics.length > 5 && (
+        <button onClick={() => setShowAll(false)} className="mt-2 text-xs font-semibold" style={{ color: TEXT_TERTIARY }}>
+          {t("routineChecklist.collapse", "접기")}
         </button>
       )}
 
