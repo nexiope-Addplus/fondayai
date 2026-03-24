@@ -85,6 +85,7 @@
 │   │   │   ├── AttendanceCalendarModal.tsx 출석 달력 모달
 │   │   │   ├── MyCosmeticsModal.tsx 내 화장품 목록 모달
 │   │   │   ├── CosmeticsRegisterModal.tsx 화장품 등록 모달
+│   │   │   ├── RoutineChecklist.tsx  루틴 체크리스트 (접기/펼치기, 성분 등급)
 │   │   │   ├── ScanIdleScreen.tsx   스캔 대기 화면 (AI 케어 브리핑 카드 추가)
 │   │   │   ├── ScanningScreen.tsx   분석 중 화면
 │   │   │   ├── SurveyScreen.tsx     설문 화면
@@ -135,6 +136,7 @@
 │   │   ├── ranking.ts               GET /api/ranking (대량 데이터 성능 최적화)
 │   │   ├── challenge-token.ts       POST /api/challenge-token (비로그인 지원)
 │   │   ├── diary.ts                 GET/POST /api/diary (피부 일기 서버 동기화)
+│   │   ├── routine-log.ts          GET/POST /api/routine-log (날짜별 사용 화장품)
 │   │   ├── push-subscribe.ts        POST /api/push-subscribe
 │   │   ├── generate-share.ts        POST /api/generate-share (공유 이미지 생성)
 │   │   ├── weather.ts               GET /api/weather
@@ -249,6 +251,16 @@ CREATE TABLE IF NOT EXISTS diary_entries (
   UNIQUE(user_id, date_str)
 );
 
+-- 루틴 로그 (날짜별 사용 화장품 체크)
+CREATE TABLE IF NOT EXISTS routine_logs (
+  id TEXT PRIMARY KEY,
+  user_id TEXT NOT NULL,
+  date_str TEXT NOT NULL,
+  cosmetic_ids TEXT NOT NULL DEFAULT '[]',
+  updated_at TEXT NOT NULL
+);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_routine_logs_user_date ON routine_logs(user_id, date_str);
+
 -- 화장품 루틴
 CREATE TABLE IF NOT EXISTS cosmetics (
   id TEXT PRIMARY KEY,
@@ -278,7 +290,44 @@ CREATE TABLE IF NOT EXISTS cosmetics (
 
 ---
 
-## 5-0. 최근 주요 업데이트 (2026-03-24 기준)
+## 5-0. 최근 주요 업데이트 (2026-03-24 세션 2)
+
+### 가독성 개선
+- Fraunces 폰트 `font-light`(300) → `font-normal`(400) 전체 18개 파일 일괄 변경
+- 작은 uppercase 라벨 `font-medium`(500)으로 강화
+- `text-[10px]` → `text-[11px]` WCAG 최소 크기 준수 (WeatherTipCard, ScanIdleScreen)
+- 홈 헤더 "Fonday AI" 브랜드 강화 (`text-lg font-bold`), 언어 스위처 축소
+- 소셜 카운트 텍스트 줄바꿈 방지 (`whitespace-nowrap`)
+
+### 루틴 체크리스트 기능 (RoutineLogInput → RoutineChecklist)
+- **기존**: 자유 텍스트 입력 → localStorage만 저장 → 아무 데도 활용 안 됨
+- **변경**: 등록된 화장품 체크박스 → 서버 D1 저장 → 효과 추적 연동
+- `/api/routine-log` API 신규 생성 (GET/POST, D1 `routine_logs` 테이블)
+- `RoutineChecklist` 컴포넌트: 접기/펼치기, 성분 기반 등급(A~F) 표시
+- Gemini `/api/cosmetics/grade` 연동: 바우만 타입 + 현재 점수 기반 호환도
+- 비로그인 → 로그인 유도 / 미등록 → 화장품 등록 유도
+- `buildCosmeticCorrelationSignals`에 routine-log 실사용 데이터 반영
+
+### UX 흐름 전면 개선
+- **홈 신규 유저**: 상단 스캔 CTA 버튼 즉시 노출
+- **홈 리턴 유저**: 히어로+미리보기+3단계 숨김 → 대시보드화 (날씨→최근결과→루틴체크→효과보드→재스캔)
+- **홈 루틴 위젯**: 스캔 없이도 매일 화장품 체크 가능 + 효과 보드 노출
+- **결과화면**: 첫 스캔 시 "다음 스텝" 3단계 가이드 + 화장품 등록 후 루틴 탭 이동 유도
+- **일기 탭**: 오늘 스캔 없으면 "스캔하지 않았어요" 유도 카드
+- **AI 밀착케어** → "스킨케어 알림" 리네이밍 + OFF 버튼 CTA 강화
+- **바텀 네비**: 루틴 아이콘 Droplets → Sparkles 변경
+- **햅틱 피드백**: 체크 토글(light), 탭 전환(light), CTA(medium), 풀투리프레시(medium), 출석 성공(success 패턴)
+
+### 신규 파일
+- `client/src/components/fonday/RoutineChecklist.tsx` — 체크리스트 UI (접기/펼치기, 등급 표시)
+- `functions/api/routine-log.ts` — 날짜별 사용 화장품 저장/조회 API
+
+### 삭제된 파일
+- `client/src/components/fonday/RoutineLogInput.tsx` — 자유 텍스트 입력 (RoutineChecklist로 대체)
+
+---
+
+## 5-0-prev. 이전 업데이트 (2026-03-24 세션 1)
 
 ### 디자인 시스템 수립 및 전체 적용
 
@@ -388,9 +437,11 @@ CREATE TABLE IF NOT EXISTS cosmetics (
 ## 11. TODO / 다음 작업
 
 ### 우선순위 작업
-- [ ] **사용자 경험 고도화**: 화장품 효과 신호(Correlation Signal)가 실제 기상 데이터와 연동되어 "추운 날 효과가 좋은 제품" 등의 통계 제공
+- [ ] **ResultScreen 리팩토링**: 1100줄+ → 레이아웃/상태훅/섹션 컴포넌트 분리 (기능 정리 완료 후)
+- [ ] **포인트 활용처**: 출석 포인트 → 기능 언락 (상세 리포트, 성분 분석 등)
+- [ ] **주간 리포트 푸시**: "이번 주 피부 점수 +3점, 가장 효과 좋은 제품: OOO" 비활성 유저 복귀 유도
 - [ ] **성분 분석 강화**: 화장품 상세 시트에 OCR을 통한 전성분 자동 추출 및 유해 성분 체크 고도화
-- [ ] **PWA 최적화**: 오프라인 모드에서의 기본적인 데이터 조회 및 스캔 큐잉 기능 점검
+- [ ] **PWA 최적화**: 오프라인 모드 (체크리스트/일기 오프라인 저장 + 온라인 동기화)
 - [ ] **결제 시스템**: 로드맵 Phase 3에 따른 포트원/Stripe 연동 기초 설계
 
 ### 리팩토링 예정
@@ -403,6 +454,26 @@ CREATE TABLE IF NOT EXISTS cosmetics (
 
 | 커밋 | 내용 |
 |------|------|
+| 8782f71 | feat: 체크리스트 효과 표시를 성분 기반 등급으로 변경 |
+| 212ddb9 | fix(ux): 홈 더보기 → 목록 펼치기로 변경 + 효과 표시 중복값 개선 |
+| 9af79fd | feat(ux): 햅틱 피드백 추가 — 체크/네비/CTA/출석 |
+| e9e4ab0 | feat(ux): 홈 대시보드화 — 리턴 유저 불필요 섹션 숨김 |
+| 4fc5ad2 | feat(ux): RoutineChecklist 접기/펼치기 + 제품별 효과 표시 |
+| 85679ad | feat(ux): 홈 간소화 + 루틴 탭 아이콘 개선 |
+| 29610b6 | feat(ux): 비로그인 시 루틴 체크리스트에 로그인 유도 추가 |
+| dc11279 | feat(ux): 홈 효과 보드 노출 |
+| d8da564 | feat(ux): 홈에 루틴 체크 위젯 추가 |
+| e24681b | feat(ux): 결과화면 다음 스텝 가이드 + 루틴 탭 연결 강화 |
+| aa8c712 | feat(ux): 홈 상단에 스캔 CTA 버튼 추가 |
+| 08840d3 | feat(ux): "AI 밀착케어" → "알림 설정" 리네이밍 |
+| 1099399 | feat: 화장품 미등록 시 등록 유도 UI 추가 |
+| c72e5f9 | feat(correlation): routine-log 데이터를 correlation signals에 연결 |
+| 44bd003 | feat: ResultScreen에서 RoutineLogInput을 RoutineChecklist로 교체 |
+| 5771983 | feat: RoutineChecklist 컴포넌트 추가 |
+| e99a39d | feat(api): /api/routine-log 엔드포인트 추가 |
+| 4e79548 | fix: 소셜 카운트 텍스트 줄바꿈 방지 + text-[10px] WCAG 위반 수정 |
+| 4de86f9 | style: 전체 Fraunces 폰트 가독성 개선 (18개 파일) |
+| 3f0b7f3 | style: 홈 헤더 브랜드 강화 + 언어 스위처 축소 |
 | 930b2c4 | style: DiaryTab/MyScreen 타이포 스케일 통일 |
 | 4c0af84 | style: ScanIdleScreen 타이포/정렬/여백 세밀 조정 |
 | 1815de5 | style: 전체 화면 미니멀 리디자인 (5개 화면 shadow→border, FONT_DISPLAY) |
