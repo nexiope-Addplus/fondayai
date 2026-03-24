@@ -603,21 +603,32 @@ export function ScanIdleScreen({
   );
 }
 
-// ─── 홈 루틴 체크 위젯 ───────────────────────────────────────────
+// ─── 홈 루틴 체크 위젯 + 효과 보드 ──────────────────────────────
 function HomeRoutineWidget({ onOpenRoutine }: { onOpenRoutine?: () => void }) {
   const { t } = useTranslation();
   const [cosmetics, setCosmetics] = useState<any[]>([]);
   const [checkedIds, setCheckedIds] = useState<string[]>([]);
+  const [topSignal, setTopSignal] = useState<any | null>(null);
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
     Promise.all([
       fetch("/api/cosmetics").then(r => r.ok ? r.json() : []),
       fetch(`/api/routine-log?date=${todayStr()}`).then(r => r.ok ? r.json() : { cosmetic_ids: [] }),
+      fetch("/api/scans").then(r => r.ok ? r.json() : []),
     ])
-      .then(([items, log]) => {
-        setCosmetics(Array.isArray(items) ? items : []);
+      .then(([items, log, scans]) => {
+        const cosmeticItems = Array.isArray(items) ? items : [];
+        setCosmetics(cosmeticItems);
         setCheckedIds(Array.isArray(log.cosmetic_ids) ? log.cosmetic_ids : []);
+        // 효과 보드: 가장 강한 시그널 찾기
+        if (cosmeticItems.length > 0 && Array.isArray(scans) && scans.length >= 2) {
+          const { buildCosmeticCorrelationSignals } = require("./utils");
+          const signals = buildCosmeticCorrelationSignals(cosmeticItems, scans, t);
+          if (signals.length > 0 && signals[0].confidence !== "early") {
+            setTopSignal(signals[0]);
+          }
+        }
       })
       .catch(() => {})
       .finally(() => setLoaded(true));
@@ -673,6 +684,27 @@ function HomeRoutineWidget({ onOpenRoutine }: { onOpenRoutine?: () => void }) {
         <button onClick={onOpenRoutine} className="mt-2 text-xs font-semibold" style={{ color: DEEP_GREEN }}>
           +{cosmetics.length - 5}{t("routineChecklist.more", "개 더보기")}
         </button>
+      )}
+
+      {/* ── 효과 보드 (가장 효과 좋은 제품) ── */}
+      {topSignal && (
+        <div className="mt-3 pt-3" style={{ borderTop: `1px solid ${BORDER_COLOR}` }}>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.14em] mb-2" style={{ color: SCAN_TO, fontFamily: FONT_DISPLAY }}>
+            {t("idle.effectBoard", "효과 추적")}
+          </p>
+          <div className="flex items-center gap-3">
+            <div className="flex-1 min-w-0">
+              <p className="text-[13px] font-bold text-stone-800 truncate">{topSignal.itemName}</p>
+              <p className="text-[11px] mt-0.5 leading-snug text-kr-pretty" style={{ color: TEXT_TERTIARY }}>{topSignal.note}</p>
+            </div>
+            {topSignal.topScoreDelta != null && (
+              <span className="rounded-full px-2.5 py-1 text-xs font-bold shrink-0"
+                style={{ background: topSignal.topScoreDelta >= 0 ? "#E8F5EC" : "#FFF7ED", color: topSignal.topScoreDelta >= 0 ? "#2D7D46" : "#C2410C" }}>
+                {topSignal.topScoreDelta >= 0 ? "+" : ""}{topSignal.topScoreDelta}
+              </span>
+            )}
+          </div>
+        </div>
       )}
     </div>
   );
