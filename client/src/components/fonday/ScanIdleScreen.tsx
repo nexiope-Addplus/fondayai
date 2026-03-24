@@ -270,6 +270,23 @@ export function ScanIdleScreen({
         );
       })()}
 
+      {/* ── 상단 스캔 CTA (신규 유저가 바로 시작할 수 있도록) ── */}
+      {!latestScan && !scanLoading && (
+        <motion.div variants={fadeChild} className="mb-3 relative" style={{ zIndex: 1 }}>
+          <button
+            onClick={onScan}
+            className="w-full rounded-2xl px-5 py-4 text-left flex items-center gap-3 active:opacity-80 transition-opacity"
+            style={{ background: DEEP_GREEN }}
+          >
+            <Camera className="w-5 h-5 text-white shrink-0" />
+            <div>
+              <p className="text-[14px] font-bold text-white">{t("idle.quickScan", "지금 바로 피부 스캔하기")}</p>
+              <p className="text-[11px] text-white/70 mt-0.5">{t("idle.quickScanSub", "30초면 끝나요 · 완전 무료")}</p>
+            </div>
+          </button>
+        </motion.div>
+      )}
+
       {/* 컴백 배너 (3일+ 경과 시) */}
       {daysSince !== null && daysSince >= 3 && (
         <motion.div variants={fadeChild} className="mb-3 relative" style={{ zIndex: 1 }}>

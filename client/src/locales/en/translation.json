@@ -109,7 +109,9 @@
     "greetingWeatherSunny": "Clear skies today! Don't forget your sunscreen before heading out.",
     "greetingWeatherDry": "Air is dry today! Stay on top of your hydration routine.",
     "greetingWeatherHumid": "High humidity today! Go for lightweight skincare products.",
-    "greetingWeatherCloudy": "Overcast, but UV is still there! Sunscreen is a must."
+    "greetingWeatherCloudy": "Overcast, but UV is still there! Sunscreen is a must.",
+    "quickScan": "Scan Your Skin Now",
+    "quickScanSub": "Takes 30 seconds · Free"
   },
   "camera": {
     "noCamera": "Camera unavailable. Please select a photo instead.",
@@ -359,7 +361,9 @@
     "prevRecords": "Previous Records"
   },
   "diary": {
-    "routineTitle": "Today's Routine"
+    "routineTitle": "Today's Routine",
+    "scanNudge": "You haven't scanned today",
+    "scanNudgeDesc": "Scan to track your skin changes"
   },
   "modal": {
     "analysis": {

@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import i18n from "../../i18n";
 import { AnimatePresence, motion } from "framer-motion";
 import {
+  Camera,
   ClipboardList,
   Lock,
 } from "lucide-react";
@@ -330,6 +331,28 @@ export function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: AppU
 
       {/* 콘텐츠 */}
       <div ref={diaryScrollRef} className="flex-1 overflow-y-auto overscroll-contain pb-24">
+        {overallScore === 0 && (
+          <div className="mx-5 mt-3 mb-0">
+            <button
+              onClick={onBack}
+              className="w-full flex items-center gap-3 p-4 rounded-2xl active:opacity-70"
+              style={{ background: TINT_GREEN, border: `1px solid ${DEEP_GREEN}20` }}
+            >
+              <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
+                style={{ background: `${DEEP_GREEN}18` }}>
+                <Camera className="w-5 h-5" style={{ color: DEEP_GREEN }} />
+              </div>
+              <div className="text-left min-w-0">
+                <p className="text-[13px] font-bold" style={{ color: DEEP_GREEN }}>
+                  {t("diary.scanNudge", "오늘 아직 스캔하지 않았어요")}
+                </p>
+                <p className="text-[11px] mt-0.5" style={{ color: TEXT_TERTIARY }}>
+                  {t("diary.scanNudgeDesc", "스캔하면 피부 변화를 추적할 수 있어요")}
+                </p>
+              </div>
+            </button>
+          </div>
+        )}
         <div ref={diaryTabNavRef} className="px-5 pt-2 pb-0 sticky top-0 z-20" style={{ background: `${BG_BASE}F0` }}>
           <div className="flex gap-2 p-2 rounded-3xl mb-3" style={{ background: "#FFFFFF", border: `1px solid ${BORDER_COLOR}` }}>
             {tabs.map(({ id, label }) => (
