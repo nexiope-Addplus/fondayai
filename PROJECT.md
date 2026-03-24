@@ -290,7 +290,31 @@ CREATE TABLE IF NOT EXISTS cosmetics (
 
 ---
 
-## 5-0. 최근 주요 업데이트 (2026-03-24 세션 2)
+## 5-0. 최근 주요 업데이트 (2026-03-24 세션 3)
+
+### 일기 리포트 프리미엄 리디자인 — "Fonday AI 어드바이저"
+- **"상담실장"** → **"Fonday AI 어드바이저"** 전체 리네이밍 (ko/en/ja)
+- 17개 섹션 구성의 프리미엄 컨설팅 리포트 (추후 유료화 대상)
+- **신규 섹션**: 주간 등급(A+~D), 7일 트렌드 라인 차트, 이번주 vs 지난주 비교, 바우만 타입 계절 인사이트, 오늘의 실행 플랜(아침/저녁), 다음 스캔 추천 CTA
+- **데이터 모델 확장** (utils.ts): `dailyTrend`, `scoreComparison`, `weeklyGrade`, `baumannSeasonInsight`, `dailyActionPlan`, `nextScanRecommendation` 추가
+
+### 식사 메뉴 다양화
+- `MEAL_TIPS`: 단일 메뉴 → 배열(3~4개)로 확장 (ko/en/ja 전부)
+- O/D/S/P/W 각 타입별 점심 4개, 저녁 4개 로테이션
+- 날짜+유저 seed 기반 매일 다른 메뉴 선택 + 이전 발송 중복 방지
+- **Worker 수동 배포 필요**: `npx wrangler deploy`
+
+### 로그인/번역 버그 수정
+- OAuth 플로우에 `state` 파라미터로 언어 전달 → 로그인 후 언어 유지 (kakao/google/line)
+- 공유 버튼 `${type}형 공유하기` 하드코딩 → `t("result.shareType")` 번역 키
+- Google/LINE 로그인: `www.fondayai.com` 리디렉트 URI 등록 필요 (콘솔 설정)
+- battle.tsx "친구"/"나" 하드코딩 → `t()` 처리
+- ResultScreen/ReportTab 하드코딩 alert → `t()` 처리
+- `common.error`, `common.timeout`, `common.shareFail`, `battle.linkCopied` 번역 키 추가
+
+---
+
+## 5-0-prev2. 이전 업데이트 (2026-03-24 세션 2)
 
 ### 가독성 개선
 - Fraunces 폰트 `font-light`(300) → `font-normal`(400) 전체 18개 파일 일괄 변경
@@ -437,12 +461,14 @@ CREATE TABLE IF NOT EXISTS cosmetics (
 ## 11. TODO / 다음 작업
 
 ### 우선순위 작업
-- [ ] **ResultScreen 리팩토링**: 1100줄+ → 레이아웃/상태훅/섹션 컴포넌트 분리 (기능 정리 완료 후)
-- [ ] **포인트 활용처**: 출석 포인트 → 기능 언락 (상세 리포트, 성분 분석 등)
-- [ ] **주간 리포트 푸시**: "이번 주 피부 점수 +3점, 가장 효과 좋은 제품: OOO" 비활성 유저 복귀 유도
-- [ ] **성분 분석 강화**: 화장품 상세 시트에 OCR을 통한 전성분 자동 추출 및 유해 성분 체크 고도화
-- [ ] **PWA 최적화**: 오프라인 모드 (체크리스트/일기 오프라인 저장 + 온라인 동기화)
-- [ ] **결제 시스템**: 로드맵 Phase 3에 따른 포트원/Stripe 연동 기초 설계
+- [ ] **화장품 효과 알람**: 등록 3/7/14일 후 효과 추적 푸시 알림
+- [ ] **Worker 배포**: `npx wrangler deploy` (식사 메뉴 다양화 반영)
+- [ ] **ResultScreen 리팩토링**: 1100줄+ → 레이아웃/상태훅/섹션 컴포넌트 분리
+- [ ] **포인트 활용처**: 출석 포인트 → 기능 언락 (상세 리포트 등) — 사용처 기획 완료 후
+- [ ] **주간 리포트 푸시**: "이번 주 피부 점수 +3점, 가장 효과 좋은 제품: OOO"
+- [ ] **성분 분석 강화**: OCR 전성분 자동 추출 + 유해 성분 체크
+- [ ] **PWA 최적화**: 오프라인 체크리스트/일기 + 온라인 동기화
+- [ ] **결제 시스템**: 일기 리포트 유료화 (Fonday AI 어드바이저 프리미엄)
 
 ### 리팩토링 예정
 - [ ] `ResultScreen.tsx` 내 `useShareHandler`, `useQuestBoard`, `useRoutineTodos` 훅 추출 (코드 다이어트)
@@ -454,6 +480,11 @@ CREATE TABLE IF NOT EXISTS cosmetics (
 
 | 커밋 | 내용 |
 |------|------|
+| c57cc6d | fix(i18n): 나머지 하드코딩 한국어 alert 번역 처리 |
+| 042937b | fix(i18n): 누락 번역 키 추가 + EN/JA 번역 개선 |
+| a362988 | feat: 일기 리포트 프리미엄 리디자인 — Fonday AI 어드바이저 |
+| 7cbb175 | feat: 식사 메뉴 다양화 — 피부 타입별 3~4개 로테이션 |
+| cbee8bf | fix: 공유 버튼 번역 + OAuth 로그인 후 언어 유지 |
 | 8782f71 | feat: 체크리스트 효과 표시를 성분 기반 등급으로 변경 |
 | 212ddb9 | fix(ux): 홈 더보기 → 목록 펼치기로 변경 + 효과 표시 중복값 개선 |
 | 9af79fd | feat(ux): 햅틱 피드백 추가 — 체크/네비/CTA/출석 |
