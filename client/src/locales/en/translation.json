@@ -5,10 +5,14 @@
     "register": "Register Products",
     "am": "Morning",
     "pm": "Evening",
-    "checked": "{{count}} used",
+    "checked": "Used",
     "hint": "Check daily to track which products actually work",
     "loginDesc": "Register your products and\ntrack which ones actually work for your skin",
-    "login": "Sign in to start"
+    "login": "Sign in to start",
+    "tracking": "Tracking",
+    "tapToCheck": "Tap to check products you used today",
+    "unchecked": "Unchecked",
+    "more": " more"
   },
   "nav": {
     "scan": "Home",

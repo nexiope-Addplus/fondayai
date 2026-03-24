@@ -26,7 +26,7 @@ import {
   markChallengeUsed, markShareUsed,
   getDiaryMemo,
   getDiaryTodos, saveDiaryTodos, getDiaryTodoProgress, initDiaryTodosFromRoutine,
-  buildCosmeticsInsights, buildRoutineGuide,
+  buildCosmeticsInsights, buildRoutineGuide, buildCosmeticCorrelationSignals,
   pickFoodOption, dedupeFoods,
   isIOS, isPWA,
 } from "./utils";
@@ -501,6 +501,7 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
   const previousScore = history.length > 0 ? parseInt(history[0]?.overallScore || "0", 10) || null : null;
   const cosmeticsInsights = buildCosmeticsInsights(myCosmetics, overallScore, previousScore, t);
   const routineGuide = buildRoutineGuide(myCosmetics, t);
+  const cosmeticSignals = buildCosmeticCorrelationSignals(myCosmetics, history, t);
   const todayRoutine = analysisResult?.prediction?.good?.routine ?? [];
   const morningTask = todayRoutine[0] ?? analysisResult?.improvements?.[0]?.title ?? t("result.actionCard.fallbackFocus");
   const eveningTask = todayRoutine[1] ?? analysisResult?.improvements?.[1]?.title ?? analysisResult?.improvements?.[0]?.title ?? t("result.actionCard.eveningFallback");
@@ -858,6 +859,7 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
           onLogin={isKo ? handleKakaoLogin : handleLineLogin}
           user={user}
           loading={false}
+          signals={cosmeticSignals}
         />
 
         {/* ── 다음 스텝 가이드 (첫 스캔 또는 화장품 미등록 시) ── */}
