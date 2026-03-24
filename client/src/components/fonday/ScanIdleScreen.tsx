@@ -12,7 +12,7 @@ import {
   BG_BASE, BG_MUTED, BORDER_COLOR, FONT_DISPLAY,
 } from "./constants";
 import type { WeatherData, WeatherTipKey } from "./types";
-import { getStreak, getAttendance, getDaysSinceLastScan, getWeatherTipKey } from "./utils";
+import { getStreak, getAttendance, getDaysSinceLastScan, getWeatherTipKey, buildCosmeticCorrelationSignals, todayStr } from "./utils";
 import { AttendanceCalendarModal } from "./MyScreen";
 import { WeatherTipCard, MiniScoreBarIdle } from "./WeatherTipCard";
 import { LangSwitcher } from "./BottomNav";
@@ -623,7 +623,6 @@ function HomeRoutineWidget({ onOpenRoutine }: { onOpenRoutine?: () => void }) {
         setCheckedIds(Array.isArray(log.cosmetic_ids) ? log.cosmetic_ids : []);
         // 효과 보드: 가장 강한 시그널 찾기
         if (cosmeticItems.length > 0 && Array.isArray(scans) && scans.length >= 2) {
-          const { buildCosmeticCorrelationSignals } = require("./utils");
           const signals = buildCosmeticCorrelationSignals(cosmeticItems, scans, t);
           if (signals.length > 0 && signals[0].confidence !== "early") {
             setTopSignal(signals[0]);
