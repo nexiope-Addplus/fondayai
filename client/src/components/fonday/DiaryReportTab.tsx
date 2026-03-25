@@ -125,38 +125,38 @@ export function DiaryReportTab({
   const reportConsultText =
     reportLang === "ko"
       ? {
-          brief: "Fonday AI 어드바이저 브리핑",
+          brief: "Fonday 어드바이저 브리핑",
           briefSub:
             "최근 스캔과 일기 기록을 바탕으로 이번 주 피부 흐름을 정리했습니다.",
-          insight: "Fonday AI 어드바이저 해석",
+          insight: "Fonday 어드바이저 해석",
           priorities: "이번 주 우선 과제",
           causes: "원인 추정",
-          consultantPlan: "Fonday AI 어드바이저 제안",
+          consultantPlan: "Fonday 어드바이저 제안",
           routineAdjust: "루틴 조정 제안",
           lifestyle: "생활 변수 해석",
           procedureGuide: "시술 후 회복 가이드",
         }
       : reportLang === "ja"
         ? {
-            brief: "Fonday AIアドバイザー要約",
+            brief: "Fondayアドバイザー要約",
             briefSub:
               "直近のスキャンと日記記録をもとに、今週の肌の流れを整理しました。",
-            insight: "Fonday AIアドバイザー解釈",
+            insight: "Fondayアドバイザー解釈",
             priorities: "今週の優先課題",
             causes: "原因推定",
-            consultantPlan: "Fonday AIアドバイザー提案",
+            consultantPlan: "Fondayアドバイザー提案",
             routineAdjust: "ルーティン調整提案",
             lifestyle: "生活要因の解釈",
             procedureGuide: "施術後の回復ガイド",
           }
         : {
-            brief: "Fonday AI Advisor Brief",
+            brief: "Fonday Advisor Brief",
             briefSub:
               "This week is framed like a real skin consultation, using your recent scans and diary notes.",
-            insight: "Fonday AI Advisor Interpretation",
+            insight: "Fonday Advisor Interpretation",
             priorities: "Top priorities this week",
             causes: "Likely drivers",
-            consultantPlan: "Fonday AI Advisor Recommendations",
+            consultantPlan: "Fonday Advisor Recommendations",
             routineAdjust: "Routine adjustments",
             lifestyle: "Lifestyle interpretation",
             procedureGuide: "Post-procedure recovery guide",
@@ -313,7 +313,7 @@ export function DiaryReportTab({
       ═══════════════════════════════════════════════════════════════════════ */}
       <Card
         className="border-none rounded-3xl overflow-hidden"
-        style={{ background: TINT_WARM, border: `1px solid ${BORDER_COLOR}` }}
+        style={{ background: TINT_WARM, boxShadow: "0 1px 6px rgba(0,0,0,0.04)" }}
       >
         <CardContent className="p-5">
           {/* Branding + Grade */}
@@ -326,9 +326,9 @@ export function DiaryReportTab({
               >
                 {L(
                   reportLang,
-                  "Fonday AI 어드바이저",
-                  "Fonday AI Advisor",
-                  "Fonday AIアドバイザー",
+                  "Fonday 어드바이저",
+                  "Fonday Advisor",
+                  "Fondayアドバイザー",
                 )}
               </p>
             </div>
@@ -377,7 +377,7 @@ export function DiaryReportTab({
               "今週の肌コンサルティング",
             )}
           </p>
-          <p className="text-xs text-stone-500 mt-1 leading-relaxed text-center text-kr-pretty">
+          <p className="text-xs text-[#8C8078] mt-1 leading-relaxed text-center text-kr-pretty">
             {consultantHeadline}
           </p>
 
@@ -393,7 +393,7 @@ export function DiaryReportTab({
 
           {/* Period + Stats grid */}
           <div className="mt-4 text-center">
-            <p className="text-xs font-semibold text-stone-500">
+            <p className="text-xs font-semibold text-[#8C8078]">
               {diaryReport.copy.period}
             </p>
             <p
@@ -459,7 +459,7 @@ export function DiaryReportTab({
           className="border-none rounded-3xl overflow-hidden"
           style={{
             background: "#FFFFFF",
-            border: `1px solid ${BORDER_COLOR}`,
+            boxShadow: "0 1px 6px rgba(0,0,0,0.04)",
           }}
         >
           <CardContent className="p-5">
@@ -510,7 +510,7 @@ export function DiaryReportTab({
                   <Tooltip
                     contentStyle={{
                       borderRadius: 16,
-                      border: `1px solid ${BORDER_COLOR}`,
+                      boxShadow: "0 1px 6px rgba(0,0,0,0.04)",
                       fontSize: 12,
                       fontWeight: 600,
                     }}
@@ -575,7 +575,7 @@ export function DiaryReportTab({
           className="border-none rounded-3xl overflow-hidden"
           style={{
             background: "#FFFFFF",
-            border: `1px solid ${BORDER_COLOR}`,
+            boxShadow: "0 1px 6px rgba(0,0,0,0.04)",
           }}
         >
           <CardContent className="p-5">
@@ -594,7 +594,7 @@ export function DiaryReportTab({
                   className="rounded-2xl p-3"
                   style={{ background: BG_MUTED }}
                 >
-                  <p className="text-xs font-semibold text-stone-500 truncate">
+                  <p className="text-xs font-semibold text-[#8C8078] truncate">
                     {m.label}
                   </p>
                   <div className="flex items-end justify-between mt-1.5">
@@ -630,7 +630,7 @@ export function DiaryReportTab({
       ═══════════════════════════════════════════════════════════════════════ */}
       <Card
         className="border-none rounded-3xl overflow-hidden"
-        style={{ background: "#FFFFFF", border: `1px solid ${BORDER_COLOR}` }}
+        style={{ background: "#FFFFFF", boxShadow: "0 1px 6px rgba(0,0,0,0.04)" }}
       >
         <CardContent className="p-5">
           <div className="flex items-start gap-3">
@@ -659,10 +659,10 @@ export function DiaryReportTab({
                   {diaryReport.trendDesc}
                 </span>
               </div>
-              <p className="text-[13px] text-stone-600 mt-3 leading-relaxed text-kr-pretty">
+              <p className="text-[13px] text-[#8C8078] mt-3 leading-relaxed text-kr-pretty">
                 {diaryReport.executiveSummary}
               </p>
-              <p className="text-xs text-stone-500 mt-2 leading-relaxed text-kr-pretty">
+              <p className="text-xs text-[#8C8078] mt-2 leading-relaxed text-kr-pretty">
                 {diaryReport.routineDesc}
               </p>
             </div>
@@ -673,7 +673,7 @@ export function DiaryReportTab({
       {/* ─── Cause Estimates ───────────────────────────────────────────────── */}
       <Card
         className="border-none rounded-3xl overflow-hidden"
-        style={{ background: "#FFFFFF", border: `1px solid ${BORDER_COLOR}` }}
+        style={{ background: "#FFFFFF", boxShadow: "0 1px 6px rgba(0,0,0,0.04)" }}
       >
         <CardContent className="p-4">
           <SectionLabel>{reportConsultText.causes}</SectionLabel>
@@ -706,7 +706,7 @@ export function DiaryReportTab({
       {/* ─── Priorities ────────────────────────────────────────────────────── */}
       <Card
         className="border-none rounded-3xl overflow-hidden"
-        style={{ background: "#FFFFFF", border: `1px solid ${BORDER_COLOR}` }}
+        style={{ background: "#FFFFFF", boxShadow: "0 1px 6px rgba(0,0,0,0.04)" }}
       >
         <CardContent className="p-4">
           <SectionLabel>{reportConsultText.priorities}</SectionLabel>
@@ -753,11 +753,11 @@ export function DiaryReportTab({
       ═══════════════════════════════════════════════════════════════════════ */}
       <Card
         className="border-none rounded-3xl overflow-hidden"
-        style={{ background: "#FFFFFF", border: `1px solid ${BORDER_COLOR}` }}
+        style={{ background: "#FFFFFF", boxShadow: "0 1px 6px rgba(0,0,0,0.04)" }}
       >
         <CardContent className="p-4">
           <SectionLabel>{reportDetailText.radarTitle}</SectionLabel>
-          <p className="text-xs text-stone-500 mt-1">
+          <p className="text-xs text-[#8C8078] mt-1">
             {reportDetailText.radarSub}
           </p>
           <div className="w-full h-72 pt-2">
@@ -824,7 +824,7 @@ export function DiaryReportTab({
             className="border-none rounded-3xl overflow-hidden"
             style={{
               background: "#FFFFFF",
-              border: `1px solid ${BORDER_COLOR}`,
+              boxShadow: "0 1px 6px rgba(0,0,0,0.04)",
             }}
           >
             <CardContent className="p-4">
@@ -836,7 +836,7 @@ export function DiaryReportTab({
                   >
                     {concern.titles[reportLang]}
                   </p>
-                  <p className="text-[12px] text-stone-500 mt-1 leading-relaxed">
+                  <p className="text-[12px] text-[#8C8078] mt-1 leading-relaxed">
                     {concern.summaries[reportLang]}
                   </p>
                 </div>
@@ -889,7 +889,7 @@ export function DiaryReportTab({
           className="border-none rounded-3xl overflow-hidden"
           style={{
             background: `linear-gradient(135deg, ${TINT_GREEN} 0%, ${TINT_WARM} 100%)`,
-            border: `1px solid ${BORDER_COLOR}`,
+            boxShadow: "0 1px 6px rgba(0,0,0,0.04)",
           }}
         >
           <CardContent className="p-5">
@@ -949,7 +949,7 @@ export function DiaryReportTab({
           className="border-none rounded-3xl overflow-hidden"
           style={{
             background: "#FFFFFF",
-            border: `1px solid ${BORDER_COLOR}`,
+            boxShadow: "0 1px 6px rgba(0,0,0,0.04)",
           }}
         >
           <CardContent className="p-5">
@@ -1027,17 +1027,17 @@ export function DiaryReportTab({
           className="border-none rounded-3xl overflow-hidden"
           style={{
             background: "#FFFFFF",
-            border: `1px solid ${BORDER_COLOR}`,
+            boxShadow: "0 1px 6px rgba(0,0,0,0.04)",
           }}
         >
           <CardContent className="p-4">
             <SectionLabel>{diaryReport.copy.ingredients}</SectionLabel>
-            <p className="text-xs text-stone-500 mt-1 text-kr-pretty">
+            <p className="text-xs text-[#8C8078] mt-1 text-kr-pretty">
               {L(
                 reportLang,
-                "Fonday AI 어드바이저가 우선 추천하는 성분 처방입니다.",
+                "Fonday 어드바이저가 우선 추천하는 성분 처방입니다.",
                 "Top ingredient prescriptions the AI Advisor would prioritize.",
-                "Fonday AIアドバイザーが優先して勧める成分処方です。",
+                "Fondayアドバイザーが優先して勧める成分処方です。",
               )}
             </p>
             <div className="space-y-3 mt-3">
@@ -1054,11 +1054,11 @@ export function DiaryReportTab({
                     >
                       {item.name}
                     </p>
-                    <span className="text-xs font-semibold px-2 py-1 rounded-full bg-white/80 text-stone-500">
+                    <span className="text-xs font-semibold px-2 py-1 rounded-full bg-white/80 text-[#8C8078]">
                       {item.concern}
                     </span>
                   </div>
-                  <p className="text-xs text-stone-600 mt-2 leading-relaxed">
+                  <p className="text-xs text-[#8C8078] mt-2 leading-relaxed">
                     {item.reason}
                   </p>
                 </div>
@@ -1071,12 +1071,12 @@ export function DiaryReportTab({
           className="border-none rounded-3xl overflow-hidden"
           style={{
             background: "#FFFFFF",
-            border: `1px solid ${BORDER_COLOR}`,
+            boxShadow: "0 1px 6px rgba(0,0,0,0.04)",
           }}
         >
           <CardContent className="p-4">
             <SectionLabel>{diaryReport.copy.procedures}</SectionLabel>
-            <p className="text-xs text-stone-500 mt-1 text-kr-pretty">
+            <p className="text-xs text-[#8C8078] mt-1 text-kr-pretty">
               {L(
                 reportLang,
                 "시술이 필요하다면 먼저 검토할 만한 방향입니다.",
@@ -1111,13 +1111,13 @@ export function DiaryReportTab({
                       {diaryReport.copy.recommended}
                     </span>
                   </div>
-                  <p className="text-xs text-stone-600 mt-2 leading-relaxed">
+                  <p className="text-xs text-[#8C8078] mt-2 leading-relaxed">
                     {item.reason}
                   </p>
                 </div>
               ))}
             </div>
-            <p className="text-xs text-stone-500 mt-3 leading-relaxed">
+            <p className="text-xs text-[#8C8078] mt-3 leading-relaxed">
               {diaryReport.copy.procedureNote}
             </p>
           </CardContent>
@@ -1132,7 +1132,7 @@ export function DiaryReportTab({
           className="border-none rounded-3xl overflow-hidden"
           style={{
             background: "#FFFFFF",
-            border: `1px solid ${BORDER_COLOR}`,
+            boxShadow: "0 1px 6px rgba(0,0,0,0.04)",
           }}
         >
           <CardContent className="p-4">
@@ -1144,7 +1144,7 @@ export function DiaryReportTab({
                 reportDetailText.ingredientTrack,
               )}
             </SectionLabel>
-            <p className="text-xs text-stone-500 mt-1">
+            <p className="text-xs text-[#8C8078] mt-1">
               {reportDetailText.ingredientTrackSub}
             </p>
             <div className="space-y-3 mt-3">
@@ -1230,12 +1230,12 @@ export function DiaryReportTab({
             className="border-none rounded-3xl overflow-hidden"
             style={{
               background: "#FFFFFF",
-              border: `1px solid ${BORDER_COLOR}`,
+              boxShadow: "0 1px 6px rgba(0,0,0,0.04)",
             }}
           >
             <CardContent className="p-4">
               <SectionLabel>{diaryReport.copy.cosmeticsSignal}</SectionLabel>
-              <p className="text-[12px] text-stone-600 mt-2 leading-relaxed text-kr-pretty">
+              <p className="text-[12px] text-[#8C8078] mt-2 leading-relaxed text-kr-pretty">
                 {diaryReport.cosmeticsSignal}
               </p>
               {routineGuide.cautions.length > 0 && (
@@ -1258,7 +1258,7 @@ export function DiaryReportTab({
             className="border-none rounded-3xl overflow-hidden"
             style={{
               background: "#FFFFFF",
-              border: `1px solid ${BORDER_COLOR}`,
+              boxShadow: "0 1px 6px rgba(0,0,0,0.04)",
             }}
           >
             <CardContent className="p-4">
@@ -1270,7 +1270,7 @@ export function DiaryReportTab({
                     className="rounded-2xl p-3"
                     style={{ background: TINT_NEUTRAL }}
                   >
-                    <p className="text-[12px] text-stone-600 leading-relaxed">
+                    <p className="text-[12px] text-[#8C8078] leading-relaxed">
                       {item}
                     </p>
                   </div>
@@ -1286,7 +1286,7 @@ export function DiaryReportTab({
       ═══════════════════════════════════════════════════════════════════════ */}
       <Card
         className="border-none rounded-3xl overflow-hidden"
-        style={{ background: "#FFFFFF", border: `1px solid ${BORDER_COLOR}` }}
+        style={{ background: "#FFFFFF", boxShadow: "0 1px 6px rgba(0,0,0,0.04)" }}
       >
         <CardContent className="p-4">
           <SectionLabel>{reportConsultText.routineAdjust}</SectionLabel>
@@ -1374,7 +1374,7 @@ export function DiaryReportTab({
       ═══════════════════════════════════════════════════════════════════════ */}
       <Card
         className="border-none rounded-3xl overflow-hidden"
-        style={{ background: "#FFFFFF", border: `1px solid ${BORDER_COLOR}` }}
+        style={{ background: "#FFFFFF", boxShadow: "0 1px 6px rgba(0,0,0,0.04)" }}
       >
         <CardContent className="p-4">
           <SectionLabel>{reportConsultText.lifestyle}</SectionLabel>
@@ -1389,7 +1389,7 @@ export function DiaryReportTab({
                   background: index === 0 ? "#F5F9FF" : TINT_NEUTRAL,
                 }}
               >
-                <p className="text-[12px] text-stone-600 leading-relaxed text-kr-pretty">
+                <p className="text-[12px] text-[#8C8078] leading-relaxed text-kr-pretty">
                   {item}
                 </p>
               </div>
@@ -1483,7 +1483,7 @@ export function DiaryReportTab({
         className="border-none rounded-3xl overflow-hidden"
         style={{
           background: TINT_GREEN,
-          border: `1px solid ${BORDER_COLOR}`,
+          boxShadow: "0 1px 6px rgba(0,0,0,0.04)",
         }}
       >
         <CardContent className="p-5">
@@ -1491,7 +1491,7 @@ export function DiaryReportTab({
             <Target className="w-4 h-4" style={{ color: DEEP_GREEN }} />
             <SectionLabel>{reportDetailText.forecastTitle}</SectionLabel>
           </div>
-          <p className="text-[13px] text-stone-600 mt-3 leading-relaxed text-kr-pretty">
+          <p className="text-[13px] text-[#8C8078] mt-3 leading-relaxed text-kr-pretty">
             {diaryReport.forecast.note}
           </p>
           <div className="grid grid-cols-2 gap-3 mt-4">
@@ -1549,7 +1549,7 @@ export function DiaryReportTab({
           className="border-none rounded-3xl overflow-hidden"
           style={{
             background: `linear-gradient(135deg, ${TINT_WARM} 0%, #FFFFFF 100%)`,
-            border: `1px solid ${BORDER_COLOR}`,
+            boxShadow: "0 1px 6px rgba(0,0,0,0.04)",
           }}
         >
           <CardContent className="p-5">
@@ -1587,7 +1587,7 @@ export function DiaryReportTab({
       ═══════════════════════════════════════════════════════════════════════ */}
       <Card
         className="border-none rounded-3xl overflow-hidden"
-        style={{ background: "#FFFFFF", border: `1px solid ${BORDER_COLOR}` }}
+        style={{ background: "#FFFFFF", boxShadow: "0 1px 6px rgba(0,0,0,0.04)" }}
       >
         <CardContent className="p-5">
           <SectionLabel>
@@ -1605,9 +1605,9 @@ export function DiaryReportTab({
             <p className="text-[11px] text-stone-400 text-center">
               {L(
                 reportLang,
-                "Fonday AI 어드바이저 리포트",
-                "Fonday AI Advisor Report",
-                "Fonday AIアドバイザーレポート",
+                "Fonday 어드바이저 리포트",
+                "Fonday Advisor Report",
+                "Fondayアドバイザーレポート",
               )}{" "}
               — {diaryReport.periodLabel}
             </p>
