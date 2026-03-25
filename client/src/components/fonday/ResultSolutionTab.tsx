@@ -74,11 +74,11 @@ export function ResultSolutionTab(props: any) {
             )}
             {(analysisResult?.cosmetics ?? []).length > 0 && (
               <>
-                <div className="flex items-center gap-2 pt-2 pb-1">
-                  <div className="w-9 h-9 rounded-2xl flex items-center justify-center" style={{ background: TINT_WARM }}>
+                <div className="pt-5 mt-5" style={{ borderTop: "1px solid #EBE8E4" }}>
+                  <div className="flex items-center gap-2 mb-3">
                     <Sparkles className="w-4 h-4" style={{ color: SCAN_TO }} />
+                    <p className="text-[14px] font-bold" style={{ color: "#5C4F4A" }}>{t("modal.improvements.cosmetics")}</p>
                   </div>
-                  <p className="text-xs font-semibold uppercase tracking-[0.14em]" style={{ fontFamily: FONT_DISPLAY, color: TEXT_TERTIARY }}>{t("modal.improvements.cosmetics")}</p>
                 </div>
                 <div className="space-y-4">
                   {(analysisResult.cosmetics as { type: string; key: string; reason: string }[]).map((item, i) => (
@@ -103,13 +103,15 @@ export function ResultSolutionTab(props: any) {
             )}
             </div>
 
-            {/* ── AI 피부 예측 카드 ── */}
+            {/* ── AI 피부 예측 ── */}
             {analysisResult?.prediction && (
+              <div className="pt-5 mt-5" style={{ borderTop: "1px solid #EBE8E4" }}>
               <SkinPredictionCard
                 prediction={analysisResult.prediction}
                 currentScore={analysisResult.scores[0]?.score ?? 0}
                 onOpenDiary={handleDiaryEntry}
               />
+              </div>
             )}
 
             {/* ── 알림 설정 ── */}

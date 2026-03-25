@@ -402,8 +402,8 @@ export function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: AppU
                   <div>
                     <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0">
-                        <p className="text-xs font-bold tracking-[0.16em] uppercase" style={{ color: SCAN_TO }}>{t("modal.diary.reminderTitle")}</p>
-                        <p className="text-base font-bold mt-1 text-kr-pretty" style={{ color: DEEP_GREEN }}>{t("modal.diary.reminderHeadline")}</p>
+                        <p className="text-[11px] font-bold tracking-[0.08em]" style={{ color: SCAN_TO }}>{t("modal.diary.reminderTitle")}</p>
+                        <p className="text-[15px] font-bold mt-1 text-kr-pretty" style={{ color: "#5C4F4A" }}>{t("modal.diary.reminderHeadline")}</p>
                         <p className="text-xs text-stone-500 mt-1 leading-relaxed text-kr-pretty">
                           {t("modal.diary.reminderDesc")} {aiCareSettings.enabled ? "" : t("modal.diary.aiCareWarn")}
                         </p>

@@ -65,12 +65,10 @@ export function ResultNutritionTab({ analysisResult }: any) {
                 )}
 
                 {/* 피해야 할 것 */}
-                <div className="pt-1">
-                  <div className="flex items-center gap-2 mb-3 pt-2 border-t border-stone-100">
-                    <div className="w-9 h-9 rounded-2xl flex items-center justify-center" style={{ background: "#FFF7ED" }}>
-                      <AlertCircle className="w-4 h-4 text-amber-500 shrink-0" />
-                    </div>
-                    <p className="text-xs font-semibold uppercase tracking-[0.14em]" style={{ fontFamily: FONT_DISPLAY, color: TEXT_TERTIARY }}>{t("nutrients.avoidTitle")}</p>
+                <div className="pt-5 mt-5" style={{ borderTop: "1px solid #EBE8E4" }}>
+                  <div className="flex items-center gap-2 mb-4">
+                    <AlertCircle className="w-4 h-4 text-amber-500 shrink-0" />
+                    <p className="text-[14px] font-bold" style={{ color: "#5C4F4A" }}>{t("nutrients.avoidTitle")}</p>
                   </div>
                   <div className="space-y-3">
                     {analysisResult.nutritionTips.avoidFoods.map((item: { emoji: string; food: string; reason: string }, idx: number) => (
