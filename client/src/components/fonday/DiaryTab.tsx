@@ -62,6 +62,7 @@ import {
 
 import { DiaryRoutinePreviewCard, DiaryCalendarView, DiaryTimeline } from "./DiaryHelpers";
 import { DiaryReportTab } from "./DiaryReportTab";
+import { useAICareSettings } from "./useAICareSettings";
 
 export function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: AppUser | null; analysisResult: AnalysisResult | null; onBack?: () => void; onLogin?: (p: "kakao"|"line"|"google", tab: string) => void }) {
   const { t } = useTranslation();
@@ -72,6 +73,8 @@ export function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: AppU
   const [aiCareSettings, setAICareSettings] = useState<AICareSettings>(() => getAICareSettings());
   const [reminderPushWarn, setReminderPushWarn] = useState(false);
   const [myCosmetics, setMyCosmetics] = useState<CosmeticItem[]>([]);
+  const { pushSubscribed, pushLoading, handlePushToggle, updateAICareOption, aiCareLabels,
+    aiCareSettings: hookAiCareSettings } = useAICareSettings(analysisResult);
   // Bug 7 fix: stale closure 방지용 ref
   const reminderSettingsRef = useRef(reminderSettings);
   useEffect(() => { reminderSettingsRef.current = reminderSettings; }, [reminderSettings]);
@@ -491,6 +494,48 @@ export function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: AppU
                         );
                       })}
                     </div>
+                  </div>
+
+                  {/* ── AI 밀착케어 알림 ── */}
+                  <div className="mt-5 pt-5" style={{ borderTop: `1px solid ${BORDER_COLOR}` }}>
+                    <div className="flex items-center justify-between gap-3">
+                      <div className="min-w-0">
+                        <p className="text-[11px] font-bold tracking-[0.08em]" style={{ color: SCAN_TO }}>{aiCareLabels.title}</p>
+                        <p className="text-xs text-stone-500 mt-1 leading-relaxed text-kr-pretty">{aiCareLabels.desc}</p>
+                      </div>
+                      <button onClick={() => handlePushToggle()} disabled={pushLoading}
+                        className="shrink-0 rounded-full px-3 py-1.5 text-xs font-semibold"
+                        style={pushSubscribed
+                          ? { background: TINT_GREEN, color: "#059669" }
+                          : { background: SCAN_TO, color: "#FFFFFF" }}>
+                        {pushLoading ? "..." : pushSubscribed ? aiCareLabels.on : aiCareLabels.off}
+                      </button>
+                    </div>
+                    {pushSubscribed && (
+                      <div className="flex gap-2 mt-3 flex-wrap">
+                        {([
+                          ["scan", aiCareLabels.scan],
+                          ["meal", aiCareLabels.meal],
+                          ["hydration", aiCareLabels.hydration],
+                          ["routine", aiCareLabels.routine],
+                          ["uvCare", aiCareLabels.uvCare],
+                          ["bedtime", aiCareLabels.bedtime],
+                          ["weatherCare", aiCareLabels.weatherCare],
+                        ] as const).map(([key, label]) => {
+                          const isActive = hookAiCareSettings[key];
+                          return (
+                            <button key={key}
+                              onClick={() => updateAICareOption(key, !hookAiCareSettings[key])}
+                              className="rounded-full px-3 py-1 text-xs font-semibold transition-colors"
+                              style={isActive
+                                ? { background: `${SCAN_FROM}20`, color: SCAN_TO, border: `1px solid ${SCAN_TO}33` }
+                                : { background: TINT_NEUTRAL, color: "#9A8F80", border: "1px solid #ECE6DE" }}>
+                              {label}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>

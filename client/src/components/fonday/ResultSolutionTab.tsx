@@ -1,7 +1,7 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
-import { ScanLine, Leaf, Sparkles, Star, Bot, Thermometer, Droplets, Flame, Shield, Microscope, ArrowRight, Utensils } from "lucide-react";
+import { ScanLine, Leaf, Sparkles, Star, Utensils } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DEEP_GREEN, SCAN_TO, SCAN_FROM, TINT_WARM, TINT_GREEN, TINT_NEUTRAL, BG_MUTED, BORDER_COLOR, FONT_DISPLAY, TEXT_TERTIARY, SHADOW_CARD } from "./constants";
 import { SkinPredictionCard } from "./SkinPredictionCard";
@@ -10,10 +10,7 @@ export function ResultSolutionTab(props: any) {
   const { t } = useTranslation();
   const {
     user, cosmeticCount, setShowCosmeticsRegister, setShowCosmeticsGate,
-    analysisResult, handleDiaryEntry,
-    pushSubscribed, pushLoading, handlePushToggle,
-    aiCareSettings, updateAICareOption, aiCareLabels,
-    setShowWaitlist, goTo,
+    analysisResult, handleDiaryEntry, goTo,
   } = props;
 
   return (
