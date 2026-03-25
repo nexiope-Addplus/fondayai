@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import {
   BG_BASE,
+  BG_MUTED,
   BORDER_COLOR,
   DEEP_GREEN,
   FONT_DISPLAY,

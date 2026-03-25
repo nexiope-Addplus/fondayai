@@ -26,6 +26,7 @@ import type {
 } from "./types";
 import {
   BG_BASE,
+  BG_MUTED,
   BORDER_COLOR,
   DEEP_GREEN,
   FONT_DISPLAY,
