@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 import { ScanLine, Leaf, Sparkles, Star, Bot, Thermometer, Droplets, Flame, Shield, Microscope, ArrowRight, Utensils } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { DEEP_GREEN, SCAN_TO, SCAN_FROM, TINT_WARM, TINT_GREEN, TINT_NEUTRAL, BG_MUTED, BORDER_COLOR, FONT_DISPLAY, TEXT_TERTIARY } from "./constants";
+import { DEEP_GREEN, SCAN_TO, SCAN_FROM, TINT_WARM, TINT_GREEN, TINT_NEUTRAL, BG_MUTED, BORDER_COLOR, FONT_DISPLAY, TEXT_TERTIARY, SHADOW_CARD } from "./constants";
 import { SkinPredictionCard } from "./SkinPredictionCard";
 
 export function ResultSolutionTab(props: any) {
@@ -74,7 +74,7 @@ export function ResultSolutionTab(props: any) {
             )}
             {(analysisResult?.cosmetics ?? []).length > 0 && (
               <>
-                <div className="pt-5 mt-5" style={{ borderTop: "1px solid #EBE8E4" }}>
+                <div className="pt-5 mt-5" style={{ borderTop: `1px solid ${BORDER_COLOR}` }}>
                   <div className="flex items-center gap-2 mb-3">
                     <Sparkles className="w-4 h-4" style={{ color: SCAN_TO }} />
                     <p className="text-[14px] font-bold" style={{ color: "#5C4F4A" }}>{t("modal.improvements.cosmetics")}</p>
@@ -105,7 +105,7 @@ export function ResultSolutionTab(props: any) {
 
             {/* ── AI 피부 예측 ── */}
             {analysisResult?.prediction && (
-              <div className="pt-5 mt-5" style={{ borderTop: "1px solid #EBE8E4" }}>
+              <div className="pt-5 mt-5" style={{ borderTop: `1px solid ${BORDER_COLOR}` }}>
               <SkinPredictionCard
                 prediction={analysisResult.prediction}
                 currentScore={analysisResult.scores[0]?.score ?? 0}

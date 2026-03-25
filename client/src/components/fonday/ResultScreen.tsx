@@ -16,6 +16,7 @@ import {
   TEXT_TERTIARY,
   TINT_WARM, TINT_GREEN, TINT_NEUTRAL, SCORE_LABEL_MAP, NUTRIENT_COLORS,
   SCORE_COLORS, fadeChild, stagger, MISSION_POINTS,
+  PAGE_GRADIENT,
 } from "./constants";
 import type { CosmeticItem, StreakData, RankingData, MissionState, TodoItem } from "./types";
 import {
@@ -809,7 +810,7 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
     <motion.div
       ref={resultScrollRef}
       className="h-[calc(100dvh-60px)] overflow-y-auto"
-      style={{ background: "linear-gradient(180deg, #FDFCFA 0%, #F8F5F1 50%, #FDFCFA 100%)" }}
+      style={{ background: PAGE_GRADIENT }}
       initial={{ opacity: 0, y: 28 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}

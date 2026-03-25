@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import { Sun, Moon, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { DEEP_GREEN, SCAN_FROM, SCAN_TO, TINT_WARM, TINT_GREEN, TINT_NEUTRAL, BORDER_COLOR, FONT_DISPLAY, TEXT_TERTIARY } from "./constants";
+import { DEEP_GREEN, SCAN_FROM, SCAN_TO, TINT_WARM, TINT_GREEN, TINT_NEUTRAL, BORDER_COLOR, FONT_DISPLAY, TEXT_TERTIARY, SHADOW_CARD } from "./constants";
 import { ResultDiaryCard } from "./ResultDiaryCard";
 import { ResultLoginCard } from "./ResultLoginCard";
 
@@ -32,7 +32,7 @@ export function ResultRoutineTab(props: any) {
           <motion.div
             initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }}
             className="rounded-3xl p-4 flex items-start gap-3"
-            style={{ background: "#FFFFFF", boxShadow: "0 1px 6px rgba(0,0,0,0.04)" }}
+            style={{ background: "#FFFFFF", boxShadow: SHADOW_CARD }}
           >
             <span className="text-xl shrink-0 mt-0.5">✨</span>
             <div className="flex-1 min-w-0">

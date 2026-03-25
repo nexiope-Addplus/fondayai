@@ -2,7 +2,7 @@ import { useTranslation } from "react-i18next";
 import { Bot, CheckCircle2 } from "lucide-react";
 
 import type { PredictionScenario } from "./types";
-import { DEEP_GREEN, SCAN_TO, FONT_DISPLAY, TEXT_TERTIARY } from "./constants";
+import { DEEP_GREEN, SCAN_TO, FONT_DISPLAY, TEXT_TERTIARY, RADIUS_CARD, RADIUS_SUB } from "./constants";
 
 export function SkinPredictionCard({
   prediction,
@@ -31,7 +31,7 @@ export function SkinPredictionCard({
             <p className="text-xs" style={{ color: "#8C8078" }}>{t("result.prediction.currentScore", { score: currentScore })}</p>
           </div>
         </div>
-        <div className="rounded-[16px] px-3 py-2 text-right shrink-0" style={{ background: "#F5F3FF" }}>
+        <div className="px-3 py-2 text-right shrink-0" style={{ borderRadius: RADIUS_SUB, background: "#F5F3FF" }}>
           <p className="text-xs font-semibold text-violet-500">{t("result.prediction.rewardLabel")}</p>
           <p className="text-[20px] font-bold leading-none text-violet-700">+{rewardPts}</p>
           <p className="text-[11px] text-violet-400 mt-0.5">{t("result.prediction.rewardSub")}</p>
@@ -53,7 +53,7 @@ export function SkinPredictionCard({
       </div>
 
       {/* 좋은 방향 — 녹색 배경 (기능적 색상 유지) */}
-      <div className="rounded-[20px] p-4" style={{ background: "#F0FDF4" }}>
+      <div className="p-4" style={{ borderRadius: RADIUS_CARD, background: "#F0FDF4" }}>
         <div className="flex items-start justify-between gap-3 mb-3">
           <div className="min-w-0">
             <p className="text-xs font-bold text-emerald-600">{t("result.prediction.bestRoute")}</p>
@@ -77,7 +77,7 @@ export function SkinPredictionCard({
       </div>
 
       {/* 위험 방향 — 주황 배경 (기능적 색상 유지) */}
-      <div className="rounded-[20px] p-4" style={{ background: "#FFF7ED" }}>
+      <div className="p-4" style={{ borderRadius: RADIUS_CARD, background: "#FFF7ED" }}>
         <div className="flex items-start justify-between gap-3 mb-3">
           <div className="min-w-0">
             <p className="text-xs font-bold text-orange-500">{t("result.prediction.riskRoute")}</p>

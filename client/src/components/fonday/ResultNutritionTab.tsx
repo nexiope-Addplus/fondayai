@@ -65,7 +65,7 @@ export function ResultNutritionTab({ analysisResult }: any) {
                 )}
 
                 {/* 피해야 할 것 */}
-                <div className="pt-5 mt-5" style={{ borderTop: "1px solid #EBE8E4" }}>
+                <div className="pt-5 mt-5" style={{ borderTop: `1px solid ${BORDER_COLOR}` }}>
                   <div className="flex items-center gap-2 mb-4">
                     <AlertCircle className="w-4 h-4 text-amber-500 shrink-0" />
                     <p className="text-[14px] font-bold" style={{ color: "#5C4F4A" }}>{t("nutrients.avoidTitle")}</p>
