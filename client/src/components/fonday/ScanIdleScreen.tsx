@@ -279,96 +279,61 @@ export function ScanIdleScreen({
         </motion.div>
       )}
 
-      {/* ── 히어로: 헤드라인 + CTA (신규 유저, 첫 화면 = 포스터) ── */}
-      {!latestScan && <motion.div variants={fadeChild} className="mb-8 relative" style={{ zIndex: 1 }}>
-        <h1 className="text-[30px] font-light leading-[1.15] mb-4 mt-4" style={{ color: "#1C1917", fontFamily: FONT_DISPLAY }}>
-          {t("idle.subtitle1")}<br />{t("idle.subtitle3")}
-        </h1>
-        <p className="text-[15px] leading-[1.7] mb-6" style={{ color: TEXT_SECONDARY }}>
-          {t("idle.subtitle4")}
-        </p>
-        <motion.button
-          onClick={() => { haptic("medium"); onScan(); }}
-          className="w-full py-4 rounded-2xl text-white text-[15px] font-semibold tracking-tight"
-          style={{ background: DEEP_GREEN }}
-          whileHover={{ scale: reducedMotion ? 1 : 1.01 }}
-          whileTap={{ scale: reducedMotion ? 1 : 0.97 }}
-        >
-          {t("idle.ctaBtn")}
-        </motion.button>
-        <p className="text-center text-xs mt-3" style={{ color: TEXT_TERTIARY }}>
-          {t("idle.ctaHint")}
-        </p>
-      </motion.div>}
+      {/* ── 히어로: 얼굴 이미지 + 헤드라인 + CTA (신규 유저, 포스터 스타일) ── */}
+      {!latestScan && !scanLoading && (
+        <motion.div variants={fadeChild} className="mb-8 relative" style={{ zIndex: 1 }}>
+          {/* 히어로 이미지 — 시각적 앵커 */}
+          <div className="relative rounded-3xl overflow-hidden mb-6 bg-stone-100" style={{ aspectRatio: "4/3" }}>
+            <img
+              src="/face-model.png"
+              alt="skin analysis preview"
+              className="w-full h-full object-cover"
+              style={{ objectPosition: "center 20%" }}
+            />
+            <motion.div className="absolute left-0 right-0 h-[2px] z-10"
+              style={{ background: `linear-gradient(90deg, transparent 0%, ${SCAN_TO}CC 40%, ${SCAN_FROM} 50%, ${SCAN_TO}CC 60%, transparent 100%)` }}
+              animate={reducedMotion ? { top: "50%" } : { top: ["10%", "85%", "10%"] }}
+              transition={reducedMotion ? {} : { duration: 3, repeat: Infinity, ease: "easeInOut" }} />
+            <div className="absolute inset-x-0 bottom-0 h-32"
+              style={{ background: "linear-gradient(to top, rgba(20,20,20,0.6), transparent)" }} />
+            <div className="absolute top-4 left-4 w-8 h-8 border-t-2 border-l-2 rounded-tl-xl" style={{ borderColor: `${SCAN_TO}AA` }} />
+            <div className="absolute top-4 right-4 w-8 h-8 border-t-2 border-r-2 rounded-tr-xl" style={{ borderColor: `${SCAN_TO}AA` }} />
+            <div className="absolute bottom-5 left-5 text-white">
+              <p className="text-xs font-bold uppercase tracking-[0.16em] text-white/60">{t("idle.heroMbtiLabel")}</p>
+              <p className="text-[28px] font-bold leading-none mt-0.5" style={{ fontFamily: FONT_DISPLAY }}>OSNT</p>
+            </div>
+            <div className="absolute bottom-5 right-5">
+              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full backdrop-blur-md"
+                style={{ background: "rgba(255,255,255,0.15)" }}>
+                <Heart className="w-3 h-3 text-white/80" />
+                <span className="text-[11px] font-bold text-white/90">{socialCount.toLocaleString()}+</span>
+              </div>
+            </div>
+          </div>
 
-      {/* ── 미리보기 카드 (스크롤 아래, 신규 유저) ── */}
-      {!latestScan && <motion.div variants={fadeChild} className="mb-8 relative" style={{ zIndex: 1 }}>
-        <p className="text-xs font-semibold uppercase tracking-[0.14em] mb-4" style={{ color: TEXT_TERTIARY, fontFamily: FONT_DISPLAY }}>{t("idle.heroBadge")}</p>
-        <div className="rounded-3xl p-3 border sm:rounded-3xl sm:p-3.5"
-          style={{ background: "#FFFFFF", boxShadow: "0 8px 24px rgba(74,124,110,0.06)", borderColor: BORDER_COLOR }}>
-          <div className="flex items-center justify-between mb-3">
-            <div>
-              <div className="text-[13px] font-semibold text-stone-700">{t("idle.previewTitle")}</div>
-              <div className="text-[12px]" style={{ color: TEXT_TERTIARY }}>{t("idle.previewSub")}</div>
-            </div>
-            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full shrink-0"
-              style={{ background: `${SCAN_FROM}16`, color: SCAN_TO }}>
-              <Heart className="w-3 h-3 shrink-0" />
-              <span className="text-[11px] leading-tight font-bold whitespace-nowrap">{t("idle.socialCount", { n: socialCount.toLocaleString() })}</span>
-            </div>
-          </div>
-          <div className="grid grid-cols-[100px_1fr] gap-2 items-stretch sm:grid-cols-[116px_1fr] sm:gap-2.5 md:grid-cols-[132px_1fr] md:gap-3">
-            <div className="relative rounded-3xl overflow-hidden min-h-[168px] bg-stone-100 sm:rounded-3xl sm:min-h-[176px]">
-              <img
-                src="/face-model.png"
-                alt="preview"
-                className="w-full h-full object-cover"
-                style={{ objectPosition: "center top" }}
-              />
-              <motion.div className="absolute left-0 right-0 h-[2px] z-10"
-                style={{ background: `linear-gradient(90deg, transparent 0%, ${SCAN_TO}CC 40%, ${SCAN_FROM} 50%, ${SCAN_TO}CC 60%, transparent 100%)` }}
-                animate={reducedMotion ? { top: "50%" } : { top: ["5%", "88%", "5%"] }}
-                transition={reducedMotion ? {} : { duration: 3, repeat: Infinity, ease: "easeInOut" }} />
-              <div className="absolute inset-x-0 bottom-0 h-24"
-                style={{ background: "linear-gradient(to top, rgba(20,20,20,0.55), transparent)" }} />
-              <div className="absolute top-3 left-3 w-7 h-7 border-t-2 border-l-2 rounded-tl-lg" style={{ borderColor: SCAN_TO }} />
-              <div className="absolute top-3 right-3 w-7 h-7 border-t-2 border-r-2 rounded-tr-lg" style={{ borderColor: SCAN_TO }} />
-              <div className="absolute bottom-3 left-3 text-white">
-                <p className="text-xs sm:text-xs font-bold uppercase tracking-[0.16em] text-white/75">{t("idle.heroMbtiLabel")}</p>
-                <p className="text-[22px] sm:text-2xl font-bold leading-none">OSNT</p>
-              </div>
-            </div>
-            <div className="flex flex-col">
-              <div className="rounded-3xl px-2.5 py-2.5 mb-2.5 sm:rounded-3xl sm:px-3"
-                style={{ background: `${SCAN_FROM}10`, border: `1px solid ${SCAN_FROM}24` }}>
-                <div className="flex items-center justify-between gap-1">
-                  <p className="text-[11px] font-bold uppercase tracking-[0.08em] truncate min-w-0" style={{ color: SCAN_TO }}>{t("idle.heroBenefitsTitle")}</p>
-                  <span className="text-[11px] font-bold uppercase tracking-[0.08em] shrink-0 ml-1" style={{ color: TEXT_SECONDARY }}>{t("idle.heroTag")}</span>
-                </div>
-                <div className="grid grid-cols-1 gap-2 mt-2">
-                  <div className="flex items-center gap-2 text-xs font-semibold text-stone-700">
-                    <Badge className="h-5 rounded-full px-2 text-xs shrink-0 whitespace-nowrap" style={{ background: "#F3E8E2", color: SCAN_TO }}>{t("result.baumannLabel")}</Badge>
-                    <span>{t("idle.heroBenefit1")}</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-xs font-semibold text-stone-700">
-                    <Badge className="h-5 rounded-full px-2 text-xs shrink-0 whitespace-nowrap" style={{ background: "#E7F7F0", color: DEEP_GREEN }}>{t("result.scores")}</Badge>
-                    <span>{t("idle.heroBenefit2")}</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-xs font-semibold text-stone-700">
-                    <Badge className="h-5 rounded-full px-2 text-xs shrink-0 whitespace-nowrap" style={{ background: "#FFF2E8", color: "#C2410C" }}>{t("result.skinAge")}</Badge>
-                    <span>{t("idle.heroBenefit3")}</span>
-                  </div>
-                </div>
-              </div>
-              <div className="flex flex-col gap-1.5">
-                {PREVIEW_SCORES.map(({ idx, score, color }, i) => (
-                  <MiniScoreBarIdle key={idx} label={t(`scores.${idx}`)} score={score} color={color} delay={500 + i * 100} />
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      </motion.div>}
+          {/* 헤드라인 + 설명 */}
+          <h1 className="text-[30px] font-light leading-[1.15] mb-3" style={{ color: "#1C1917", fontFamily: FONT_DISPLAY }}>
+            {t("idle.subtitle1")}<br />{t("idle.subtitle3")}
+          </h1>
+          <p className="text-[14px] leading-[1.7] mb-6" style={{ color: TEXT_SECONDARY }}>
+            {t("idle.subtitle4")}
+          </p>
+
+          {/* CTA */}
+          <motion.button
+            onClick={() => { haptic("medium"); onScan(); }}
+            className="w-full py-4 rounded-2xl text-white text-[15px] font-semibold tracking-tight"
+            style={{ background: DEEP_GREEN }}
+            whileHover={{ scale: reducedMotion ? 1 : 1.01 }}
+            whileTap={{ scale: reducedMotion ? 1 : 0.97 }}
+          >
+            {t("idle.ctaBtn")}
+          </motion.button>
+          <p className="text-center text-xs mt-3" style={{ color: TEXT_TERTIARY }}>
+            {t("idle.ctaHint")}
+          </p>
+        </motion.div>
+      )}
 
       <motion.div variants={fadeChild} className="mb-8 relative" style={{ zIndex: 1 }}>
         {scanLoading && (
@@ -392,55 +357,38 @@ export function ScanIdleScreen({
           </div>
         )}
         {!scanLoading && latestScan && (
-          <div className="rounded-2xl bg-white px-4 py-4 mb-4 border" style={{ borderColor: BORDER_COLOR }}>
-            <div className="flex items-start justify-between gap-3">
-              <div className="min-w-0">
-                <p className="text-[11px] font-medium tracking-[0.14em] uppercase" style={{ color: TEXT_TERTIARY, fontFamily: FONT_DISPLAY }}>
-                  {t("idle.latestEyebrow")}
-                </p>
-                <p className="text-[16px] font-semibold mt-1" style={{ color: "#1C1917" }}>{t("idle.latestTitle")}</p>
-                <p className="text-[13px] mt-1 text-kr-pretty" style={{ color: TEXT_SECONDARY }}>{t("idle.latestDesc")}</p>
-              </div>
-              <div className="rounded-2xl px-3 py-2 text-right shrink-0 border" style={{ borderColor: BORDER_COLOR }}>
-                <p className="text-[11px] font-medium uppercase tracking-[0.12em]" style={{ color: TEXT_TERTIARY }}>
-                  {t("result.overall")}
-                </p>
-                <p className="text-[24px] font-normal mt-1" style={{ color: DEEP_GREEN, fontFamily: FONT_DISPLAY }}>{latestScan.overallScore ?? "—"}</p>
-              </div>
-            </div>
-            <div className="grid grid-cols-3 gap-2 mt-3">
-              <div className="rounded-2xl p-3 border" style={{ borderColor: BORDER_COLOR }}>
-                <p className="text-[11px] leading-tight" style={{ color: TEXT_TERTIARY }}>{t("result.skinAge")}</p>
-                <p className="text-[16px] font-normal mt-1 truncate" style={{ color: DEEP_GREEN, fontFamily: FONT_DISPLAY }}>{latestScan.skinAge ?? "—"}</p>
-              </div>
-              <div className="rounded-2xl p-3 border" style={{ borderColor: BORDER_COLOR }}>
-                <p className="text-[11px] leading-tight" style={{ color: TEXT_TERTIARY }}>{t("result.baumannLabel")}</p>
-                <p className="text-[16px] font-normal mt-1 truncate" style={{ color: SCAN_TO, fontFamily: FONT_DISPLAY }}>{latestScan.baumannType || "—"}</p>
-              </div>
-              <div className="rounded-2xl p-3 border" style={{ borderColor: BORDER_COLOR }}>
-                <p className="text-[11px] leading-tight" style={{ color: TEXT_TERTIARY }}>{t("my.focusTitle")}</p>
-                <p className="text-[12px] font-semibold mt-1 line-clamp-2 leading-tight text-kr-pretty" style={{ color: "#1C1917" }}>
-                  {Array.isArray(latestScan.scores) && latestScan.scores.length > 1
-                    ? [...latestScan.scores].slice(1).sort((a: any, b: any) => Number(a.score) - Number(b.score))[0]?.label || "—"
-                    : "—"}
-                </p>
-              </div>
-            </div>
-            <div className="flex flex-wrap gap-2 mt-3">
+          <div className="mb-4">
+            {/* One Big Number — 시각적 앵커 */}
+            <div className="text-center py-4">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.16em] mb-2" style={{ color: TEXT_TERTIARY }}>
+                {t("result.overall")}
+              </p>
+              <p className="text-[56px] font-light leading-none" style={{ color: DEEP_GREEN, fontFamily: FONT_DISPLAY }}>
+                {latestScan.overallScore ?? "—"}
+              </p>
               {latestScoreDelta !== null && (
-                <span className="rounded-full px-2.5 py-1 text-xs font-bold" style={{ background: latestScoreDelta >= 0 ? "#E8F5EC" : "#FFF7ED", color: latestScoreDelta >= 0 ? "#2D7D46" : "#C2410C" }}>
+                <span className="inline-block mt-2 text-[13px] font-semibold" style={{ color: latestScoreDelta >= 0 ? "#2D7D46" : "#C2410C" }}>
                   {latestScoreDelta >= 0 ? "+" : ""}{latestScoreDelta}{t("result.scoreSuffix")}
                 </span>
               )}
+            </div>
+
+            {/* 핵심 요약 한 줄 */}
+            <div className="flex items-center justify-center gap-3 py-3">
+              <span className="text-[14px] font-semibold" style={{ color: SCAN_TO, fontFamily: FONT_DISPLAY }}>
+                {latestScan.baumannType || "—"}
+              </span>
+              <span className="w-1 h-1 rounded-full" style={{ background: BORDER_COLOR }} />
+              <span className="text-[14px]" style={{ color: TEXT_SECONDARY }}>
+                {t("result.skinAge")} {latestScan.skinAge ?? "—"}
+              </span>
               {latestWeakMetric?.label && (
-                <span className="rounded-full px-2.5 py-1 text-xs font-bold" style={{ background: "#F7F4FB", color: "#6D4CC2" }}>
-                  {t("idle.latestFocus", { concern: latestWeakMetric.label })}
-                </span>
-              )}
-              {daysSince !== null && (
-                <span className="rounded-full px-2.5 py-1 text-xs font-bold" style={{ background: "#F8FAFD", color: DEEP_GREEN }}>
-                  {t("idle.latestRecency", { days: daysSince })}
-                </span>
+                <>
+                  <span className="w-1 h-1 rounded-full" style={{ background: BORDER_COLOR }} />
+                  <span className="text-[13px]" style={{ color: TEXT_SECONDARY }}>
+                    {latestWeakMetric.label}
+                  </span>
+                </>
               )}
             </div>
           </div>
@@ -457,12 +405,12 @@ export function ScanIdleScreen({
 
       {/* 바우만 설명 더보기 accordion */}
       <motion.div variants={fadeChild} className="mb-8 relative" style={{ zIndex: 1 }}>
-        <div className="rounded-2xl bg-white border" style={{ borderColor: BORDER_COLOR }}>
+        <div className="rounded-2xl" style={{ background: BG_MUTED }}>
           <button onClick={() => setShowBaumannExp(v => !v)}
-            className="w-full flex items-center justify-between px-4 py-3">
+            className="w-full flex items-center justify-between px-4 py-3.5">
             <div className="flex items-center gap-2">
-              <Activity className="w-4 h-4" />
-              <p className="text-sm font-bold text-stone-800">{t("idle.baumannSectionTitle")}</p>
+              <Activity className="w-4 h-4" style={{ color: TEXT_SECONDARY }} />
+              <p className="text-[14px] font-semibold text-stone-700">{t("idle.baumannSectionTitle")}</p>
             </div>
             <div className="flex items-center gap-1.5">
               {!showBaumannExp && <span className="text-xs font-bold text-stone-400">O/D · S/R · P/N · W/T</span>}
