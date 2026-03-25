@@ -97,14 +97,14 @@ export function ResultHeaderCard({
           </div>
 
           <div className="flex flex-col">
-            <div className="rounded-3xl px-2.5 py-2.5 mb-2.5 sm:rounded-3xl sm:px-3 border"
-              style={{ background: BG_MUTED, borderColor: BORDER_COLOR }}>
-              <div className="flex items-center justify-between gap-2">
-                <p className="text-xs font-medium uppercase tracking-[0.14em]" style={{ color: TEXT_TERTIARY, fontFamily: FONT_DISPLAY }}>{t("result.scores")}</p>
+            <div className="rounded-[16px] px-2.5 py-2.5 mb-2.5"
+              style={{ background: BG_MUTED }}>
+              <div className="flex items-center justify-between gap-1.5">
+                <p className="text-[11px] font-bold whitespace-nowrap truncate" style={{ color: "#6B5D55" }}>{t("result.scores")}</p>
                 <button
                   onClick={() => setShowAnalysis(true)}
-                  className="rounded-full px-2.5 py-1 text-xs font-semibold whitespace-nowrap border"
-                  style={{ background: BG_BASE, color: SCAN_TO, borderColor: BORDER_COLOR }}
+                  className="rounded-full px-2 py-0.5 text-[10px] font-semibold whitespace-nowrap"
+                  style={{ background: TINT_WARM, color: SCAN_TO }}
                 >
                   {t("modal.analysis.title")} {t("result.viewBtn")}
                 </button>

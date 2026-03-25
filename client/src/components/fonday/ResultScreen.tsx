@@ -817,11 +817,15 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
       <motion.div className="px-5 pt-6 pb-40 space-y-6" variants={stagger} initial="initial" animate="animate">
         {/* 헤더 */}
         <div className="flex justify-between items-center">
-          <Button variant="outline" size="sm" onClick={onBack} className="rounded-full gap-1.5 hover:bg-rose-50"
-            style={{ borderColor: SCAN_TO, color: SCAN_TO }}>
+          <button onClick={onBack}
+            className="flex items-center gap-1.5 px-3 py-2 rounded-full text-[13px] font-semibold active:opacity-70"
+            style={{ background: TINT_WARM, color: SCAN_TO }}>
             <Camera className="w-4 h-4" /> {t("result.back")}
-          </Button>
-          <h2 className="text-[16px] font-bold tracking-tight" style={{ color: "#5C4F4A" }}>{t("result.titleShort", "피부 리포트")}</h2>
+          </button>
+          <div className="flex items-center gap-2">
+            <img src="/fonday-logo.svg" alt="Fonday" className="h-5" style={{ objectFit: "contain" }} />
+            <span className="text-[14px] font-bold" style={{ color: "#5C4F4A" }}>피부 리포트</span>
+          </div>
         </div>
 
         {/* 압축형 결과 헤더 */}
