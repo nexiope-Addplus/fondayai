@@ -821,7 +821,7 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
             style={{ borderColor: SCAN_TO, color: SCAN_TO }}>
             <Camera className="w-4 h-4" /> {t("result.back")}
           </Button>
-          <h2 className="text-lg font-bold tracking-tight" style={{ color: "#5C4F4A" }}>{t("result.title")}</h2>
+          <h2 className="text-[16px] font-bold tracking-tight" style={{ color: "#5C4F4A" }}>{t("result.titleShort", "피부 리포트")}</h2>
         </div>
 
         {/* 압축형 결과 헤더 */}
@@ -883,29 +883,7 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
           grades={cosmeticGrades}
         />
 
-        {/* ── 다음 스텝 가이드 (첫 스캔 또는 화장품 미등록 시) ── */}
-        {history.length === 0 && (
-          <motion.div variants={fadeChild} className="rounded-[20px] p-4"
-            style={{ background: TINT_GREEN }}>
-            <p className="text-xs font-semibold uppercase tracking-[0.14em] mb-3" style={{ color: DEEP_GREEN, fontFamily: FONT_DISPLAY }}>
-              {t("result.nextSteps.title", "다음 스텝")}
-            </p>
-            <div className="space-y-2.5">
-              <div className="flex items-center gap-3">
-                <div className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold text-white shrink-0" style={{ background: DEEP_GREEN }}>1</div>
-                <p className="text-[13px] font-medium text-[#6B5D55]">{t("result.nextSteps.step1", "사용 중인 화장품을 등록하세요")}</p>
-              </div>
-              <div className="flex items-center gap-3">
-                <div className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold text-white shrink-0" style={{ background: DEEP_GREEN }}>2</div>
-                <p className="text-[13px] font-medium text-[#6B5D55]">{t("result.nextSteps.step2", "내일 다시 스캔하세요")}</p>
-              </div>
-              <div className="flex items-center gap-3">
-                <div className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold text-white shrink-0" style={{ background: DEEP_GREEN }}>3</div>
-                <p className="text-[13px] font-medium text-[#6B5D55]">{t("result.nextSteps.step3", "어떤 화장품이 효과 있는지 확인하세요")}</p>
-              </div>
-            </div>
-          </motion.div>
-        )}
+        {/* Next Step 제거 — 루틴 체크리스트/루틴 유도 버튼이 같은 역할 */}
 
         {/* ── 루틴 탭으로 이동 유도 (화장품 등록 후) ── */}
         {myCosmetics.length > 0 && (

@@ -174,13 +174,13 @@
   },
   "result": {
     "back": "Retake",
-    "title": "FondayAI Skin Report",
+    "title": "Fonday Skin Report",
     "overall": "Overall",
     "skinAge": "Skin Age",
     "baumannLabel": "My Skin MBTI",
     "baumannSuffix": "",
     "mbtiSub": "Based on Baumann Skin Type",
-    "aiComment": "FondayAI Skin Assessment",
+    "aiComment": "Fonday Skin Assessment",
     "scores": "10-Point Skin Score",
     "scoreSuffix": "pts",
     "locked": {
@@ -522,7 +522,7 @@
     "scores": "10-Point Skin Score",
     "baumannLabel": "Baumann",
     "baumannSuffix": "Type",
-    "aiComment": "FondayAI Skin Assessment",
+    "aiComment": "Fonday Skin Assessment",
     "overall": "Overall",
     "skinAge": "Skin Age"
   },

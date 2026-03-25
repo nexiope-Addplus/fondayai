@@ -116,9 +116,9 @@ export function MiniScoreBarIdle({ label, score, color, delay, delta }: {
     return () => clearTimeout(timer);
   }, [delay]);
   return (
-    <div className="flex items-start gap-2">
-      <span className="text-[11px] flex-shrink-0 w-[80px] leading-snug break-words" style={{ color: TEXT_SECONDARY }}>{label}</span>
-      <div className="flex-1 h-[5px] rounded-full overflow-hidden mt-1" style={{ background: "#E8E0D8" }}>
+    <div className="flex items-center gap-2">
+      <span className="text-[11px] font-medium flex-shrink-0 w-[72px] truncate" style={{ color: "#6B5D55" }}>{label}</span>
+      <div className="flex-1 h-[5px] rounded-full overflow-hidden" style={{ background: "#E8E0D8" }}>
         <div
           className="h-full rounded-full"
           style={{
@@ -128,9 +128,9 @@ export function MiniScoreBarIdle({ label, score, color, delay, delta }: {
           }}
         />
       </div>
-      <span className="text-[11px] font-normal flex-shrink-0 w-6 text-right mt-0.5" style={{ fontFamily: FONT_DISPLAY, color }}>{score}</span>
+      <span className="text-[11px] font-bold flex-shrink-0 w-6 text-right" style={{ color }}>{score}</span>
       {delta != null && delta !== 0 && (
-        <span className={`text-[11px] font-bold flex-shrink-0 w-8 text-right mt-0.5 ${delta > 0 ? "text-emerald-500" : "text-rose-500"}`}>
+        <span className={`text-[11px] font-bold flex-shrink-0 w-8 text-right ${delta > 0 ? "text-emerald-500" : "text-rose-500"}`}>
           {delta > 0 ? `+${delta}` : `${delta}`}
         </span>
       )}

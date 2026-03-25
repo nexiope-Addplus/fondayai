@@ -174,13 +174,13 @@
   },
   "result": {
     "back": "다시 촬영",
-    "title": "FondayAI 피부 리포트",
+    "title": "Fonday 피부 리포트",
     "overall": "종합점수",
     "skinAge": "피부나이",
     "baumannLabel": "나의 피부 MBTI",
     "baumannSuffix": "",
     "mbtiSub": "Baumann Skin Type 기반",
-    "aiComment": "FondayAI 의 피부 총평",
+    "aiComment": "Fonday 피부 총평",
     "scores": "10가지 항목별 점수",
     "scoreSuffix": "점",
     "locked": {
@@ -522,7 +522,7 @@
     "scores": "10가지 항목별 점수",
     "baumannLabel": "바우만",
     "baumannSuffix": "형",
-    "aiComment": "FondayAI 의 피부 총평",
+    "aiComment": "Fonday 피부 총평",
     "overall": "종합점수",
     "skinAge": "피부나이"
   },
