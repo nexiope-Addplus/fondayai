@@ -846,24 +846,7 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
           previousScores={history.length > 0 ? history[0]?.scores : null}
         />
 
-        {/* ── 오늘의 핵심 액션 카드 ── */}
-        {(analysisResult?.improvements ?? []).length > 0 && (() => {
-          const top = (analysisResult.improvements as { title: string; desc: string }[])[0];
-          return (
-            <motion.div variants={fadeChild} className="rounded-[20px] p-4"
-              style={{ background: BG_MUTED }}>
-              <div className="flex items-center gap-2 mb-2">
-                <div className="w-7 h-7 rounded-full flex items-center justify-center text-sm shrink-0"
-                  style={{ background: TINT_WARM }}><Target className="w-4 h-4" style={{ color: SCAN_TO }} /></div>
-                <p className="text-xs font-medium uppercase tracking-[0.14em]" style={{ color: TEXT_TERTIARY, fontFamily: FONT_DISPLAY }}>
-                  {t("result.todayAction")}
-                </p>
-              </div>
-              <p className="text-sm font-bold text-[#5C4F4A] leading-tight mb-1">{top.title}</p>
-              <p className="text-xs text-stone-500 leading-relaxed">{top.desc}</p>
-            </motion.div>
-          );
-        })()}
+        {/* 핵심 액션은 헤더카드 안에서 한 줄로 표시 — 별도 카드 제거 */}
 
         {/* 루틴 체크리스트 — 오늘 사용한 화장품 체크 */}
         <RoutineChecklist
@@ -887,50 +870,7 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
           grades={cosmeticGrades}
         />
 
-        {/* Next Step 제거 — 루틴 체크리스트/루틴 유도 버튼이 같은 역할 */}
-
-        {/* ── 루틴 탭으로 이동 유도 (화장품 등록 후) ── */}
-        {myCosmetics.length > 0 && (
-          <motion.div variants={fadeChild}>
-            <button onClick={onGoRoutine}
-              className="w-full flex items-center justify-between p-4 rounded-[20px] active:opacity-70"
-              style={{ background: TINT_GREEN }}>
-              <div className="flex items-center gap-3 min-w-0">
-                <Leaf className="w-5 h-5 shrink-0" style={{ color: DEEP_GREEN }} />
-                <div className="text-left min-w-0">
-                  <p className="text-[13px] font-bold" style={{ color: DEEP_GREEN }}>
-                    {t("result.goRoutine", "루틴 탭에서 효과를 확인하세요")}
-                  </p>
-                  <p className="text-[11px] mt-0.5" style={{ color: TEXT_TERTIARY }}>
-                    {t("result.goRoutineDesc", "등록된 화장품 {{count}}개의 효과를 추적 중", { count: myCosmetics.length })}
-                  </p>
-                </div>
-              </div>
-              <ArrowRight className="w-4 h-4 shrink-0" style={{ color: DEEP_GREEN }} />
-            </button>
-          </motion.div>
-        )}
-
-        <motion.div variants={fadeChild} className="rounded-[20px] px-4 py-3"
-          style={{ background: BG_MUTED }}>
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="text-xs font-semibold uppercase tracking-[0.14em]" style={{ color: "#8C8078" }}>
-              {t("result.hub.eyebrow")}
-            </span>
-            <button onClick={onGoRoutine} className="rounded-full px-3 py-1.5 text-xs font-semibold" style={{ background: TINT_GREEN, color: DEEP_GREEN }}>
-              {t("nav.routine")}
-            </button>
-            <button onClick={onOpenDiary} className="rounded-full px-3 py-1.5 text-xs font-semibold" style={{ background: TINT_WARM, color: SCAN_TO }}>
-              {t("nav.diary")}
-            </button>
-            <button onClick={onGoMagazine} className="rounded-full px-3 py-1.5 text-xs font-semibold" style={{ background: BG_MUTED, color: "#6B5D55" }}>
-              {t("nav.magazine")}
-            </button>
-            <button onClick={onGoMy} className="rounded-full px-3 py-1.5 text-xs font-semibold" style={{ background: BG_MUTED, color: "#6B5D55" }}>
-              {t("nav.my")}
-            </button>
-          </div>
-        </motion.div>
+        {/* 루틴 유도 + 허브 카드 제거 — 하단 네비바가 같은 역할 */}
 
         <div ref={tabNavRef} className="rounded-full p-1.5 sticky top-0 z-20"
           style={{ background: BG_MUTED }}>

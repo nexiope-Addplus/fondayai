@@ -167,22 +167,24 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
   if (!user) {
     return (
       <div className="min-h-[calc(100dvh-64px)] px-4 pt-6 pb-28" style={{ background: "linear-gradient(180deg, #FDFCFA 0%, #F8F5F1 50%, #FDFCFA 100%)" }}>
-        <div className="mb-8">
-          <div className="w-12 h-12 rounded-full mb-4 flex items-center justify-center" style={{ background: TINT_GREEN }}>
-            <Droplets className="w-6 h-6" style={{ color: DEEP_GREEN }} />
+        <div className="mb-6">
+          <div className="flex items-center gap-2.5 mb-1">
+            <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ background: TINT_GREEN }}>
+              <Droplets className="w-4 h-4" style={{ color: DEEP_GREEN }} />
+            </div>
+            <h2 className="text-[20px] font-bold" style={{ color: "#5C4F4A" }}>{t("cosmetics.myTitle")}</h2>
           </div>
-          <h2 className="text-[22px] font-bold mb-2" style={{ color: "#5C4F4A" }}>{t("cosmetics.myTitle")}</h2>
-          <p className="text-[14px] leading-relaxed text-kr-pretty" style={{ color: "#8C8078" }}>
+          <p className="text-[14px] leading-relaxed text-kr-pretty" style={{ color: "#8C8078", marginLeft: 42 }}>
             {t("cosmetics.loginDesc")}
           </p>
         </div>
 
         <div className="rounded-[20px] p-5 mb-6" style={{ background: "#FFFFFF", boxShadow: "0 1px 6px rgba(0,0,0,0.04)" }}>
           <div className="space-y-2 mb-5">
-            <div className="rounded-2xl px-4 py-3 bg-white">
+            <div className="rounded-2xl px-4 py-3" style={{ background: BG_MUTED }}>
               <p className="text-[13px] font-semibold text-[#5C4F4A]">{t("cosmetics.routineRepresentativeTitle")}</p>
             </div>
-            <div className="rounded-2xl px-4 py-3 bg-white">
+            <div className="rounded-2xl px-4 py-3" style={{ background: BG_MUTED }}>
               <p className="text-[13px] font-semibold text-[#5C4F4A]">{t("cosmetics.signalSectionTitle")}</p>
             </div>
           </div>
@@ -206,8 +208,8 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
             )}
             <button
               onClick={() => onLogin ? onLogin("google", "routine") : (localStorage.setItem("fonday_return_tab", "routine"), window.location.href = "/auth/google")}
-              className="w-full font-bold text-[13px] bg-white text-[#6B5D55] flex items-center justify-center"
-              style={{ height: 48, borderRadius: 24 }}
+              className="w-full font-bold text-[13px] text-[#6B5D55] flex items-center justify-center"
+              style={{ height: 48, borderRadius: 24, background: BG_MUTED }}
             >
               {t("attendance.google")}
             </button>
