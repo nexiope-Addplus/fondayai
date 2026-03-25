@@ -89,10 +89,12 @@ export function MyScreen({
                 {user ? (user.username || user.email || t("nav.my")) : t("attendance.loginDesc")}
               </p>
             </div>
-            <div className="px-3 py-2 text-right shrink-0" style={{ borderRadius: RADIUS_SUB, background: BG_MUTED }}>
-              <p className="text-[11px] font-semibold uppercase tracking-[0.12em]" style={{ color: "#8C8078" }}>points</p>
-              <p className="text-[24px] font-normal leading-none mt-1" style={{ color: DEEP_GREEN, fontFamily: FONT_DISPLAY }}>{attendance.totalPoints}</p>
-            </div>
+            {user && (
+              <div className="px-3 py-2 text-right shrink-0" style={{ borderRadius: RADIUS_SUB, background: BG_MUTED }}>
+                <p className="text-[11px] font-semibold uppercase tracking-[0.12em]" style={{ color: "#8C8078" }}>points</p>
+                <p className="text-[24px] font-normal leading-none mt-1" style={{ color: DEEP_GREEN, fontFamily: FONT_DISPLAY }}>{attendance.totalPoints}</p>
+              </div>
+            )}
           </div>
         </div>
       </div>

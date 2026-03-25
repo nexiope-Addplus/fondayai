@@ -248,26 +248,31 @@ export function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: AppU
     return (
       <div className="flex flex-col" style={{ background: PAGE_GRADIENT, minHeight: "calc(100dvh - 64px)" }}>
         <div className="px-4 pt-6 pb-28">
-          <div className="mb-8">
-            <div className="w-12 h-12 rounded-full mb-4 flex items-center justify-center" style={{ background: TINT_WARM }}>
-              <Lock className="w-5 h-5" style={{ color: SCAN_TO }} />
+          <div className="mb-6">
+            <div className="flex items-center gap-2.5 mb-1">
+              <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ background: TINT_WARM }}>
+                <BookOpen className="w-4 h-4" style={{ color: SCAN_TO }} />
+              </div>
+              <h1 className="text-[22px] font-extrabold" style={{ color: "#4A403A", fontFamily: FONT_HEADING }}>{t("modal.diary.title")}</h1>
             </div>
-            <h1 className="text-[22px] font-extrabold mb-2" style={{ color: "#4A403A", fontFamily: FONT_HEADING }}>{t("modal.diary.title")}</h1>
-            <p className="text-[14px] leading-relaxed text-kr-pretty" style={{ color: "#8C8078" }}>{t("result.login.desc")}</p>
+            <p className="text-[13px] text-kr-pretty" style={{ color: "#8C8078", marginLeft: 42 }}>{t("diary.loginDesc", "로그인으로 내 피부 일기를 시작하세요.")}</p>
           </div>
 
-          <div className="grid grid-cols-3 gap-2.5 mb-6">
-            <div className="p-3 text-center" style={{ borderRadius: RADIUS_SUB, background: TINT_WARM }}>
-              <p className="text-[11px] font-semibold" style={{ color: "#8C8078" }}>{t("result.diary.avg7d")}</p>
-              <p className="text-lg font-bold mt-1" style={{ color: SCAN_TO, fontFamily: FONT_DISPLAY }}>--</p>
-            </div>
-            <div className="p-3 text-center" style={{ borderRadius: RADIUS_SUB, background: "#F5F3FF" }}>
-              <p className="text-[11px] font-semibold" style={{ color: "#8C8078" }}>{t("modal.diary.timelineTab")}</p>
-              <p className="text-lg font-bold mt-1" style={{ color: "#7C3AED", fontFamily: FONT_DISPLAY }}>--</p>
-            </div>
-            <div className="p-3 text-center" style={{ borderRadius: RADIUS_SUB, background: TINT_GREEN }}>
-              <p className="text-[11px] font-semibold" style={{ color: "#8C8078" }}>{t("modal.diary.calendarTab")}</p>
-              <p className="text-lg font-bold mt-1" style={{ color: DEEP_GREEN, fontFamily: FONT_DISPLAY }}>--</p>
+          <div className="mb-6">
+            <p className="text-[14px] font-bold mb-3" style={{ color: "#5C4F4A" }}>{t("diary.loginValueTitle", "피부 일기를 쓰면")}</p>
+            <div className="space-y-2.5">
+              <div className="flex items-center gap-2.5">
+                <Camera className="w-4 h-4 shrink-0" style={{ color: DEEP_GREEN }} />
+                <p className="text-[13px]" style={{ color: "#6B5D55" }}>{t("diary.loginValue1", "매일 피부 점수 변화를 기록해요")}</p>
+              </div>
+              <div className="flex items-center gap-2.5">
+                <ClipboardList className="w-4 h-4 shrink-0" style={{ color: SCAN_TO }} />
+                <p className="text-[13px]" style={{ color: "#6B5D55" }}>{t("diary.loginValue2", "7일 평균으로 피부 트렌드를 확인해요")}</p>
+              </div>
+              <div className="flex items-center gap-2.5">
+                <BookOpen className="w-4 h-4 shrink-0" style={{ color: "#7C3AED" }} />
+                <p className="text-[13px]" style={{ color: "#6B5D55" }}>{t("diary.loginValue3", "캘린더에서 한눈에 관리해요")}</p>
+              </div>
             </div>
           </div>
 

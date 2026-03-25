@@ -2,13 +2,13 @@ import React, { useState, useRef, useEffect, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import {
-  Sparkles, Heart, Lock, Activity,
+  Sparkles, Lock, Activity,
   ClipboardList, Camera, ChevronDown, Bot,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import {
   BAUMANN_COLORS, DEEP_GREEN, SCAN_FROM, SCAN_TO, TEXT_SECONDARY, TEXT_TERTIARY,
-  TINT_GREEN, TINT_WARM, SCORE_COLORS, stagger, fadeChild,
+  TINT_GREEN, SCORE_COLORS, stagger, fadeChild,
   BG_BASE, BG_MUTED, BORDER_COLOR, FONT_DISPLAY, FONT_HEADING,
   SHADOW_CARD, SHADOW_ELEVATED, RADIUS_CARD, RADIUS_ITEM, PAGE_GRADIENT,
 } from "./constants";
@@ -37,7 +37,6 @@ export function ScanIdleScreen({
   const streak = getStreak();
   const daysSince = getDaysSinceLastScan();
   const [showBaumannExp, setShowBaumannExp] = useState(false);
-  const [socialCount, setSocialCount] = useState(0);
   const [pullY, setPullY] = useState(0);
   const [idleWeather, setIdleWeather] = useState<WeatherData | null>(null);
   const [latestScan, setLatestScan] = useState<any | null>(null);
@@ -122,20 +121,7 @@ export function ScanIdleScreen({
     setPullY(0);
   };
 
-  useEffect(() => {
-    const today = new Date();
-    const seed = today.getFullYear() * 10000 + (today.getMonth() + 1) * 100 + today.getDate();
-    const target = Math.floor(2000 + Math.abs(Math.sin(seed) * 1500));
-    let current = 0;
-    const stepMs = 16;
-    const increment = target / (1500 / stepMs);
-    const timer = setInterval(() => {
-      current += increment;
-      if (current >= target) { setSocialCount(target); clearInterval(timer); }
-      else setSocialCount(Math.floor(current));
-    }, stepMs);
-    return () => clearInterval(timer);
-  }, []);
+
 
   const PREVIEW_SCORES = [
     { idx: 0, score: 82, color: SCORE_COLORS[0] },
@@ -241,20 +227,20 @@ export function ScanIdleScreen({
         </motion.div>
       )}
 
-      {/* ── 히어로: 그리팅 → 헤드라인 → 이미지 → CTA (신규 유저) ── */}
+      {/* ── 히어로: 헤드라인 → 이미지(16:9) → 3단계 → CTA (신규 유저) ── */}
       {!latestScan && !scanLoading && (
-        <motion.div variants={fadeChild} className="mb-8 relative" style={{ zIndex: 1 }}>
-          {/* 헤드라인 — Pretendard Bold, 한글 자연스러운 볼드 */}
+        <motion.div variants={fadeChild} className="mb-4 relative" style={{ zIndex: 1 }}>
+          {/* 헤드라인 */}
           <h1 className="text-[26px] font-extrabold leading-[1.3] mt-1 mb-2" style={{ color: "#4A403A", fontFamily: FONT_HEADING }}>
             {t("idle.subtitle1")}<br />{t("idle.subtitle3")}
           </h1>
-          <p className="text-[14px] leading-[1.7] mb-5" style={{ color: TEXT_SECONDARY }}>
+          <p className="text-[14px] leading-[1.7] mb-4" style={{ color: TEXT_SECONDARY }}>
             {t("idle.subtitle4")}
           </p>
 
-          {/* 얼굴 이미지 — 3:4 세로, 그림자, Sage Green 스캔라인 */}
-          <div className="relative overflow-hidden mb-5 bg-stone-100"
-            style={{ aspectRatio: "4/3", borderRadius: 24, boxShadow: SHADOW_ELEVATED }}>
+          {/* 얼굴 이미지 — 16:9 가로, 스크롤 없이 CTA까지 보이도록 */}
+          <div className="relative overflow-hidden mb-4 bg-stone-100"
+            style={{ aspectRatio: "16/9", borderRadius: 20, boxShadow: SHADOW_ELEVATED }}>
             <img
               src="/face-model.png"
               alt="skin analysis preview"
@@ -265,21 +251,26 @@ export function ScanIdleScreen({
               style={{ background: `linear-gradient(90deg, transparent 0%, ${DEEP_GREEN}CC 40%, ${DEEP_GREEN} 50%, ${DEEP_GREEN}CC 60%, transparent 100%)` }}
               animate={reducedMotion ? { top: "50%" } : { top: ["8%", "88%", "8%"] }}
               transition={reducedMotion ? {} : { duration: 3.5, repeat: Infinity, ease: "easeInOut" }} />
-            <div className="absolute inset-x-0 bottom-0 h-24"
-              style={{ background: "linear-gradient(to top, rgba(20,20,20,0.5), transparent)" }} />
-            <div className="absolute top-4 left-4 w-7 h-7 border-t-2 border-l-2 rounded-tl-lg" style={{ borderColor: `${DEEP_GREEN}88` }} />
-            <div className="absolute top-4 right-4 w-7 h-7 border-t-2 border-r-2 rounded-tr-lg" style={{ borderColor: `${DEEP_GREEN}88` }} />
-            <div className="absolute bottom-4 left-4 text-white">
-              <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/50">{t("idle.heroMbtiLabel")}</p>
-              <p className="text-[24px] font-normal leading-none mt-0.5" style={{ fontFamily: FONT_DISPLAY }}>OSNT</p>
+            <div className="absolute inset-x-0 bottom-0 h-16"
+              style={{ background: "linear-gradient(to top, rgba(20,20,20,0.45), transparent)" }} />
+            <div className="absolute top-3 left-3 w-6 h-6 border-t-2 border-l-2 rounded-tl-lg" style={{ borderColor: `${DEEP_GREEN}88` }} />
+            <div className="absolute top-3 right-3 w-6 h-6 border-t-2 border-r-2 rounded-tr-lg" style={{ borderColor: `${DEEP_GREEN}88` }} />
+            <div className="absolute bottom-3 left-3 text-white">
+              <p className="text-[24px] font-normal leading-none" style={{ fontFamily: FONT_DISPLAY }}>OSNT</p>
             </div>
-            <div className="absolute bottom-4 right-4">
-              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full backdrop-blur-md"
-                style={{ background: "rgba(255,255,255,0.12)" }}>
-                <Heart className="w-3 h-3 text-white/70" />
-                <span className="text-[11px] font-bold text-white/80">{socialCount.toLocaleString()}+</span>
-              </div>
-            </div>
+          </div>
+
+          {/* 3단계 compact — 한 줄로 */}
+          <div className="flex items-center justify-center gap-2 mb-4">
+            {STEPS.map((step, i) => (
+              <React.Fragment key={i}>
+                <div className="flex items-center gap-1.5">
+                  <step.Icon className="w-3.5 h-3.5" style={{ color: step.active ? SCAN_TO : "#A9998E" }} />
+                  <span className="text-[12px] font-medium" style={{ color: "#6B5D55" }}>{step.title}</span>
+                </div>
+                {i < 2 && <span className="text-stone-300 text-[11px]">›</span>}
+              </React.Fragment>
+            ))}
           </div>
 
           {/* CTA — pill 형태, 부드러운 Salmon */}
@@ -297,7 +288,7 @@ export function ScanIdleScreen({
           >
             {t("idle.ctaBtn")}
           </motion.button>
-          <p className="text-center text-[12px] mt-2.5" style={{ color: TEXT_TERTIARY }}>
+          <p className="text-center text-[12px] mt-2" style={{ color: TEXT_TERTIARY }}>
             {t("idle.ctaHint")}
           </p>
         </motion.div>
@@ -358,8 +349,8 @@ export function ScanIdleScreen({
         {/* 출석 캘린더는 MY탭으로 이동 — 홈 흐름 정리 */}
       </motion.div>
 
-      {/* 날씨 상세 — 스크롤 아래 */}
-      {idleWeather && (
+      {/* 날씨 상세 — 리턴 유저에게만 (신규 유저에겐 그리팅으로 충분) */}
+      {idleWeather && latestScan && (
         <motion.div variants={fadeChild} className="mb-8 relative" style={{ zIndex: 1 }}>
           <WeatherTipCard compact weather={idleWeather} />
         </motion.div>
@@ -407,39 +398,14 @@ export function ScanIdleScreen({
         </div>
       </motion.div>
 
-      {/* ── 신규 유저: 단계 표시 (독립 섹션, 카드 없이 여유롭게) ── */}
-      {!latestScan && (
-        <>
-          <motion.div variants={fadeChild} className="mb-8 relative" style={{ zIndex: 1 }}>
-            <p className="text-xs font-semibold text-stone-400 text-center mb-4 tracking-widest uppercase">
-              {t("idle.stepsTitle")}
-            </p>
-            <div className="flex items-start justify-between">
-              {STEPS.map((step, i) => (
-                <div key={i} className="flex items-start" style={{ flex: 1 }}>
-                  <div className="flex flex-col items-center gap-1.5 flex-1">
-                    <div className="w-10 h-10 rounded-full flex items-center justify-center"
-                      style={step.active ? { background: TINT_WARM } : { background: BG_MUTED }}>
-                      <step.Icon className="w-4.5 h-4.5" style={{ color: step.active ? SCAN_TO : "#A9998E" }} />
-                    </div>
-                    <div className="text-center">
-                      <p className="text-xs font-semibold text-[#6B5D55]">{step.title}</p>
-                      <p className="text-xs text-stone-400 mt-0.5 leading-tight">{step.sub}</p>
-                    </div>
-                  </div>
-                  {i < 2 && <div className="text-stone-200 text-sm pt-3 flex-shrink-0">›</div>}
-                </div>
-              ))}
-            </div>
-          </motion.div>
-
-          <motion.div variants={fadeChild} className="mb-8 relative" style={{ zIndex: 1 }}>
-            <div className="flex items-center justify-center gap-1.5">
-              <Lock className="w-3.5 h-3.5 flex-shrink-0" style={{ color: TEXT_TERTIARY }} />
-              <span className="text-xs font-medium" style={{ color: TEXT_TERTIARY }}>{t("idle.privacy")}</span>
-            </div>
-          </motion.div>
-        </>
+      {/* ── 신규 유저: 프라이버시 안내 (CTA 아래) ── */}
+      {!latestScan && !scanLoading && (
+        <motion.div variants={fadeChild} className="mb-8 relative" style={{ zIndex: 1 }}>
+          <div className="flex items-center justify-center gap-1.5">
+            <Lock className="w-3.5 h-3.5 flex-shrink-0" style={{ color: TEXT_TERTIARY }} />
+            <span className="text-xs font-medium" style={{ color: TEXT_TERTIARY }}>{t("idle.privacy")}</span>
+          </div>
+        </motion.div>
       )}
 
       {/* ── 리턴 유저: 간결한 재스캔 버튼 ── */}

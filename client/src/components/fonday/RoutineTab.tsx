@@ -186,12 +186,21 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
         </div>
 
         <div className="p-5 mb-6" style={{ borderRadius: RADIUS_CARD, background: "#FFFFFF", boxShadow: SHADOW_CARD }}>
-          <div className="space-y-2 mb-5">
-            <div className="rounded-2xl px-4 py-3" style={{ background: BG_MUTED }}>
-              <p className="text-[13px] font-semibold text-[#5C4F4A]">{t("cosmetics.routineRepresentativeTitle")}</p>
-            </div>
-            <div className="rounded-2xl px-4 py-3" style={{ background: BG_MUTED }}>
-              <p className="text-[13px] font-semibold text-[#5C4F4A]">{t("cosmetics.signalSectionTitle")}</p>
+          <div className="mb-5">
+            <p className="text-[14px] font-bold mb-3" style={{ color: "#5C4F4A" }}>{t("cosmetics.loginValueTitle", "로그인하면 이런 걸 할 수 있어요")}</p>
+            <div className="space-y-2.5">
+              <div className="flex items-center gap-2.5">
+                <Sun className="w-4 h-4 shrink-0" style={{ color: DEEP_GREEN }} />
+                <p className="text-[13px]" style={{ color: "#6B5D55" }}>{t("cosmetics.loginValue1", "AM/PM 루틴을 자동으로 정리해줘요")}</p>
+              </div>
+              <div className="flex items-center gap-2.5">
+                <Sparkles className="w-4 h-4 shrink-0" style={{ color: SCAN_TO }} />
+                <p className="text-[13px]" style={{ color: "#6B5D55" }}>{t("cosmetics.loginValue2", "화장품별 피부 변화를 추적해요")}</p>
+              </div>
+              <div className="flex items-center gap-2.5">
+                <AlertTriangle className="w-4 h-4 shrink-0" style={{ color: "#D97706" }} />
+                <p className="text-[13px]" style={{ color: "#6B5D55" }}>{t("cosmetics.loginValue3", "성분 충돌을 미리 알려줘요")}</p>
+              </div>
             </div>
           </div>
           <div className="space-y-2.5">
