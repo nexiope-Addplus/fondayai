@@ -96,7 +96,7 @@ export function ResultCosmeticsGateSheet({
                 <button
                   onClick={() => onLogin("line")}
                   className="w-full py-3.5 rounded-2xl text-sm font-semibold flex items-center justify-center gap-2 text-white"
-                  style={{ background: "#06C755" }}
+                  style={{ background: DEEP_GREEN }}
                 >
                   <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
                     <path

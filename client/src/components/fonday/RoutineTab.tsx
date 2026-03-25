@@ -197,7 +197,7 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
               <button
                 onClick={() => onLogin ? onLogin("line", "routine") : (localStorage.setItem("fonday_return_tab", "routine"), window.location.href = "/auth/line")}
                 className="w-full h-11 rounded-xl font-bold text-[13px] flex items-center justify-center border-0 text-white"
-                style={{ background: "#06C755" }}
+                style={{ background: DEEP_GREEN }}
               >
                 {t("attendance.line")}
               </button>

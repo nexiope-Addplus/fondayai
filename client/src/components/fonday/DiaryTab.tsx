@@ -283,7 +283,7 @@ export function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: AppU
                 ) : (
                   <Button onClick={() => onLogin ? onLogin("line", "diary") : (localStorage.setItem("fonday_return_tab", "diary"), window.location.href = "/auth/line")}
                     className="w-full h-12 rounded-xl font-bold gap-2 border-0 shadow-sm text-white"
-                    style={{ background: "#06C755" }}>
+                    style={{ background: DEEP_GREEN }}>
                     <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 1C4.582 1 1 3.79 1 7.222c0 2.03 1.09 3.84 2.8 5.04-.12.44-.77 2.96-.8 3.15a.2.2 0 0 0 .3.22l3.72-2.46c.6.09 1.3.14 1.98.14 4.418 0 8-2.791 8-6.222C17 3.79 13.418 1 9 1Z" fill="white"/></svg>
                     {t("result.login.line")}
                   </Button>
