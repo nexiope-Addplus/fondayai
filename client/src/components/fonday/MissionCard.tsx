@@ -56,7 +56,7 @@ export function MissionCard() {
               style={{ background: done ? "#FAFAF9" : TINT_NEUTRAL }}>
               <div className="flex items-center gap-2 min-w-0">
                 {done ? <CheckCircle2 className="w-4 h-4 text-emerald-500" /> : <Lock className="w-4 h-4 text-stone-300" />}
-                <span className={`text-[12px] font-medium truncate ${done ? "text-stone-400 line-through" : "text-stone-700"}`}>
+                <span className={`text-[12px] font-medium truncate ${done ? "text-stone-400 line-through" : "text-[#6B5D55]"}`}>
                   {t(`mission.${id}`)}
                 </span>
               </div>

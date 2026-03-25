@@ -31,7 +31,7 @@ export function RoutineUpdateSheet({ open, onClose, morningRoutineItems, evening
                         <div key={`suggest-am-${index}`} className="flex items-center gap-2">
                           <span className="w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold text-white shrink-0"
                             style={{ background: DEEP_GREEN }}>{index + 1}</span>
-                          <p className="text-xs font-semibold text-stone-700 leading-tight text-kr-pretty">{item}</p>
+                          <p className="text-xs font-semibold text-[#6B5D55] leading-tight text-kr-pretty">{item}</p>
                         </div>
                       ))}
                     </div>
@@ -43,7 +43,7 @@ export function RoutineUpdateSheet({ open, onClose, morningRoutineItems, evening
                         <div key={`suggest-pm-${index}`} className="flex items-center gap-2">
                           <span className="w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold text-white shrink-0"
                             style={{ background: SCAN_TO }}>{index + 1}</span>
-                          <p className="text-xs font-semibold text-stone-700 leading-tight text-kr-pretty">{item}</p>
+                          <p className="text-xs font-semibold text-[#6B5D55] leading-tight text-kr-pretty">{item}</p>
                         </div>
                       ))}
                     </div>

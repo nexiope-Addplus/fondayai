@@ -182,7 +182,7 @@ export function MyCosmeticsModal({ onClose, onAddNew, scans = [] }: { onClose: (
                       {productSignals.slice(0, 2).map((signal) => (
                         <div key={signal.itemId} className="rounded-2xl bg-white px-3 py-3">
                           <div className="flex items-center justify-between gap-2">
-                            <p className="text-[12px] font-semibold text-stone-800 truncate">{signal.itemName}</p>
+                            <p className="text-[12px] font-semibold text-[#5C4F4A] truncate">{signal.itemName}</p>
                             <span className="rounded-full px-2 py-0.5 text-xs font-bold shrink-0" style={{ background: `${DEEP_GREEN}10`, color: DEEP_GREEN }}>
                               {t(`cosmetics.signalConfidence.${signal.confidence}`)}
                             </span>
@@ -256,7 +256,7 @@ export function MyCosmeticsModal({ onClose, onAddNew, scans = [] }: { onClose: (
                     <div className="space-y-2.5">
                       {routinePlan.conflicts.map((c, i) => (
                         <div key={i} className="rounded-2xl bg-white p-3">
-                          <p className="text-xs font-bold text-stone-700 mb-0.5">{c.productNames.join(" + ")}</p>
+                          <p className="text-xs font-bold text-[#6B5D55] mb-0.5">{c.productNames.join(" + ")}</p>
                           <p className="text-xs text-stone-500">{c.reason}</p>
                           {c.resolution && <p className="text-xs mt-1 font-medium" style={{ color: DEEP_GREEN }}>{c.resolution}</p>}
                         </div>
@@ -293,7 +293,7 @@ export function MyCosmeticsModal({ onClose, onAddNew, scans = [] }: { onClose: (
                           </div>
                       }
                       <div className="mt-3">
-                        <p className="text-xs font-semibold text-stone-800 truncate">{item.name}</p>
+                        <p className="text-xs font-semibold text-[#5C4F4A] truncate">{item.name}</p>
                         <p className="text-xs text-stone-400 truncate">{item.brand || t("cosmetics.noBrand")}</p>
                         {productSignals.find((signal) => signal.itemId === item.id) && (
                           <p className="text-xs mt-2 line-clamp-2 text-kr-pretty" style={{ color: SCAN_TO }}>
@@ -351,7 +351,7 @@ export function MyCosmeticsModal({ onClose, onAddNew, scans = [] }: { onClose: (
                     </div>
                 }
                 <div className="min-w-0 flex-1">
-                  <p className="text-lg font-bold text-stone-800 text-kr-pretty">{selectedItem.name}</p>
+                  <p className="text-lg font-bold text-[#5C4F4A] text-kr-pretty">{selectedItem.name}</p>
                   <p className="text-[12px] text-stone-400 mt-1">{selectedItem.brand || t("cosmetics.noBrand")}</p>
                   <div className="flex flex-wrap gap-1.5 mt-2">
                     <span className="px-2.5 py-1 rounded-full text-xs font-bold"

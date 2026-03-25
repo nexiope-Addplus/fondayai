@@ -188,7 +188,7 @@ export function ResultAnalysisSheet({
                             <span className="text-[17px] font-normal" style={{ fontFamily: FONT_DISPLAY, color }}>
                               {letter}
                             </span>
-                            <span className="text-[12px] font-semibold text-stone-700">
+                            <span className="text-[12px] font-semibold text-[#6B5D55]">
                               {t(`baumann.${letter}.name`)}
                             </span>
                           </div>

@@ -143,7 +143,7 @@ function ArticleModal({ article, onClose }: { article: MagazineArticle; onClose:
                 {article.author ? article.author[0] : "?"}
               </div>
               <div>
-                <p className="text-[12px] font-bold text-stone-800">{article.author}</p>
+                <p className="text-[12px] font-bold text-[#5C4F4A]">{article.author}</p>
                 <p className="text-xs text-stone-400">{article.authorRole} · {article.date}</p>
               </div>
             </div>
@@ -288,7 +288,7 @@ export function MagazineTab() {
                 <div className="w-px h-7 shrink-0" style={{ background: BORDER_COLOR }} />
                 <div className="flex-1 text-center min-w-0">
                   <p className="text-[11px] truncate" style={{ color: TEXT_TERTIARY }}>{t("result.totalScans")}</p>
-                  <p className="text-[17px] font-normal text-stone-700" style={{ fontFamily: FONT_DISPLAY }}>{rankingData.totalScans || "—"}</p>
+                  <p className="text-[17px] font-normal text-[#6B5D55]" style={{ fontFamily: FONT_DISPLAY }}>{rankingData.totalScans || "—"}</p>
                 </div>
               </div>
             </motion.div>

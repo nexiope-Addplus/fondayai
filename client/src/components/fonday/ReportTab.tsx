@@ -167,7 +167,7 @@ export function ReportTab({ user }: { user: any }) {
                           <div className="w-6 h-6 rounded-full flex items-center justify-center bg-stone-50 shadow-sm">
                             <Icon className="w-3.5 h-3.5" style={{ color }} />
                           </div>
-                          <span className="text-stone-700">{t(`scores.${i}`)}</span>
+                          <span className="text-[#6B5D55]">{t(`scores.${i}`)}</span>
                         </div>
                         <span style={{ color }}>{item.score}{t("result.scoreSuffix")}</span>
                       </div>

@@ -109,7 +109,7 @@ export function ResultNutrientsSheet({
                         <div key={index} className="flex gap-2 items-start">
                           <span className="text-xs font-semibold text-orange-400 shrink-0 mt-0.5">✕</span>
                           <div>
-                            <p className="text-[12px] font-semibold text-stone-700">{food}</p>
+                            <p className="text-[12px] font-semibold text-[#6B5D55]">{food}</p>
                             <p className="text-xs text-stone-400">{why}</p>
                           </div>
                         </div>
@@ -127,7 +127,7 @@ export function ResultNutrientsSheet({
                         <div key={index} className="flex gap-2 items-start">
                           <span className="text-xs font-semibold text-violet-400 shrink-0 mt-0.5">✕</span>
                           <div>
-                            <p className="text-[12px] font-semibold text-stone-700">{food}</p>
+                            <p className="text-[12px] font-semibold text-[#6B5D55]">{food}</p>
                             <p className="text-xs text-stone-400">{why}</p>
                           </div>
                         </div>

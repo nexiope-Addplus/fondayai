@@ -348,7 +348,7 @@ export default function SkinScanPage() {
                   <div className="w-16 h-16 rounded-3xl flex items-center justify-center mb-5" style={{ background: "#FEF2F2" }}>
                     <AlertCircle className="w-8 h-8 text-rose-500" />
                   </div>
-                  <h2 className="text-xl font-bold text-stone-800 mb-2">{t("scan.errorTitle")}</h2>
+                  <h2 className="text-xl font-bold text-[#5C4F4A] mb-2">{t("scan.errorTitle")}</h2>
                   <p className="text-sm text-stone-500 mb-2 text-kr-pretty">{t("scan.errorDesc")}</p>
                   {scanError && (
                     <p className="text-xs text-stone-400 bg-stone-100 rounded-xl px-4 py-2 mb-6 max-w-xs break-all">{scanError}</p>

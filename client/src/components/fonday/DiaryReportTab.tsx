@@ -694,7 +694,7 @@ export function DiaryReportTab({
                 >
                   {index + 1}
                 </div>
-                <p className="text-[12px] text-stone-700 leading-relaxed text-kr-pretty">
+                <p className="text-[12px] text-[#6B5D55] leading-relaxed text-kr-pretty">
                   {item}
                 </p>
               </div>
@@ -739,7 +739,7 @@ export function DiaryReportTab({
                 >
                   {index + 1}
                 </div>
-                <p className="text-[12px] text-stone-700 leading-relaxed text-kr-pretty">
+                <p className="text-[12px] text-[#6B5D55] leading-relaxed text-kr-pretty">
                   {item}
                 </p>
               </div>
@@ -930,7 +930,7 @@ export function DiaryReportTab({
                     className="w-4 h-4 mt-0.5 shrink-0"
                     style={{ color: DEEP_GREEN }}
                   />
-                  <p className="text-[12px] text-stone-700 leading-relaxed text-kr-pretty">
+                  <p className="text-[12px] text-[#6B5D55] leading-relaxed text-kr-pretty">
                     {tip}
                   </p>
                 </div>
@@ -982,7 +982,7 @@ export function DiaryReportTab({
                     >
                       {i + 1}
                     </span>
-                    <p className="text-[12px] text-stone-700 leading-relaxed text-kr-pretty">
+                    <p className="text-[12px] text-[#6B5D55] leading-relaxed text-kr-pretty">
                       {step}
                     </p>
                   </div>
@@ -1008,7 +1008,7 @@ export function DiaryReportTab({
                     >
                       {i + 1}
                     </span>
-                    <p className="text-[12px] text-stone-700 leading-relaxed text-kr-pretty">
+                    <p className="text-[12px] text-[#6B5D55] leading-relaxed text-kr-pretty">
                       {step}
                     </p>
                   </div>
@@ -1342,7 +1342,7 @@ export function DiaryReportTab({
               <p className="text-xs font-semibold uppercase tracking-[0.12em] text-emerald-700">
                 {L(reportLang, "유지", "Keep", "維持")}
               </p>
-              <p className="text-[12px] font-semibold mt-2 text-stone-700 text-kr-pretty">
+              <p className="text-[12px] font-semibold mt-2 text-[#6B5D55] text-kr-pretty">
                 {routineAdjustPlan.keep}
               </p>
             </div>
@@ -1353,7 +1353,7 @@ export function DiaryReportTab({
               >
                 {L(reportLang, "줄이기", "Reduce", "減らす")}
               </p>
-              <p className="text-[12px] font-semibold mt-2 text-stone-700 text-kr-pretty">
+              <p className="text-[12px] font-semibold mt-2 text-[#6B5D55] text-kr-pretty">
                 {routineAdjustPlan.reduce}
               </p>
             </div>
@@ -1361,7 +1361,7 @@ export function DiaryReportTab({
               <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[#7C3AED]">
                 {L(reportLang, "추가", "Add", "追加")}
               </p>
-              <p className="text-[12px] font-semibold mt-2 text-stone-700 text-kr-pretty">
+              <p className="text-[12px] font-semibold mt-2 text-[#6B5D55] text-kr-pretty">
                 {routineAdjustPlan.add}
               </p>
             </div>
@@ -1466,7 +1466,7 @@ export function DiaryReportTab({
                     className="w-4 h-4 mt-0.5 shrink-0"
                     style={{ color: "#C2410C" }}
                   />
-                  <p className="text-[12px] text-stone-700 leading-relaxed text-kr-pretty">
+                  <p className="text-[12px] text-[#6B5D55] leading-relaxed text-kr-pretty">
                     {item}
                   </p>
                 </div>
@@ -1569,7 +1569,7 @@ export function DiaryReportTab({
                     "次回スキャン推奨",
                   )}
                 </p>
-                <p className="text-[13px] text-stone-700 mt-1 leading-relaxed text-kr-pretty">
+                <p className="text-[13px] text-[#6B5D55] mt-1 leading-relaxed text-kr-pretty">
                   {nextScanRecommendation}
                 </p>
               </div>
@@ -1598,7 +1598,7 @@ export function DiaryReportTab({
               "締めコメント",
             )}
           </SectionLabel>
-          <p className="text-[13px] text-stone-700 mt-3 leading-relaxed text-kr-pretty">
+          <p className="text-[13px] text-[#6B5D55] mt-3 leading-relaxed text-kr-pretty">
             {closingComment}
           </p>
           <div className="mt-4 pt-3 border-t" style={{ borderColor: BORDER_COLOR }}>

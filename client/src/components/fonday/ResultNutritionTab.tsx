@@ -38,7 +38,7 @@ export function ResultNutritionTab({ analysisResult }: any) {
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-0.5 flex-wrap">
-                          <p className="text-sm font-semibold text-stone-800">{item.name}</p>
+                          <p className="text-sm font-semibold text-[#5C4F4A]">{item.name}</p>
                           <span className="text-xs font-medium rounded-full px-2 py-0.5 shrink-0"
                             style={{ background: "#FFFFFF", color: "#7C3AED" }}>
                             {SCORE_LABEL_MAP[item.targetScore] !== undefined ? t(`scores.${SCORE_LABEL_MAP[item.targetScore]}`) : item.targetScore}
@@ -81,7 +81,7 @@ export function ResultNutritionTab({ analysisResult }: any) {
                           <span className="text-xl">{item.emoji}</span>
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="text-[12px] font-semibold text-stone-700 mb-0.5">{item.food}</p>
+                          <p className="text-[12px] font-semibold text-[#6B5D55] mb-0.5">{item.food}</p>
                           <p className="text-xs text-stone-400">{item.reason}</p>
                         </div>
                       </div>

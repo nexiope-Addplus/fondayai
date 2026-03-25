@@ -63,7 +63,7 @@ export function ResultOverlayPopups({
             style={{ boxShadow: "0 8px 32px rgba(0,0,0,0.18)" }}
           >
             <Target className="w-6 h-6" />
-            <p className="font-black text-stone-800 text-[14px]">{t("mission.newAchieve")}</p>
+            <p className="font-black text-[#5C4F4A] text-[14px]">{t("mission.newAchieve")}</p>
             <p className="text-[12px] text-stone-500">{t(`mission.${missionPops[0]}`)}</p>
           </motion.div>
         )}

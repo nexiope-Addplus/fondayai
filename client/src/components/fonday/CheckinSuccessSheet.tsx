@@ -33,7 +33,7 @@ export function CheckinSuccessSheet({ onKakao, onLine, onGoogle, onDismiss, user
             style={{ background: "linear-gradient(135deg, #E09882, #C97062)" }}>
             <CheckCircle2 className="w-7 h-7 text-white" />
           </div>
-          <h2 className="text-lg font-semibold text-stone-800 mb-1">{t("attendance.title")}</h2>
+          <h2 className="text-lg font-semibold text-[#5C4F4A] mb-1">{t("attendance.title")}</h2>
         </div>
 
         {!user && (
@@ -47,7 +47,7 @@ export function CheckinSuccessSheet({ onKakao, onLine, onGoogle, onDismiss, user
           <div className="flex flex-col gap-2.5">
             {i18n.language === "ko" ? (
               <button onClick={onKakao}
-                className="w-full py-3.5 rounded-2xl text-sm font-bold text-stone-800 flex items-center justify-center gap-2"
+                className="w-full py-3.5 rounded-2xl text-sm font-bold text-[#5C4F4A] flex items-center justify-center gap-2"
                 style={{ background: "#FEE500" }}>
                 <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path fillRule="evenodd" clipRule="evenodd" d="M9 1C4.582 1 1 3.79 1 7.222c0 2.154 1.386 4.045 3.484 5.14L3.62 15.5a.25.25 0 0 0 .368.274L7.9 13.39A9.63 9.63 0 0 0 9 13.444c4.418 0 8-2.791 8-6.222C17 3.79 13.418 1 9 1Z" fill="#3C1E1E"/></svg>
                 {t("attendance.kakao")}
@@ -61,7 +61,7 @@ export function CheckinSuccessSheet({ onKakao, onLine, onGoogle, onDismiss, user
               </button>
             )}
             <button onClick={onGoogle}
-              className="w-full py-3.5 rounded-2xl text-sm font-bold text-stone-700 flex items-center justify-center gap-2 bg-white">
+              className="w-full py-3.5 rounded-2xl text-sm font-bold text-[#6B5D55] flex items-center justify-center gap-2 bg-white">
               <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="w-4 h-4" />
               {t("attendance.google")}
             </button>

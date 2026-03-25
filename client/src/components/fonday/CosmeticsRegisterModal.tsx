@@ -160,11 +160,11 @@ export function CosmeticsRegisterModal({ onClose, onSuccess }: { onClose: () => 
 
               <div className="flex gap-2">
                 <button onClick={() => cameraInputRef.current?.click()}
-                  className="flex-1 py-3.5 rounded-2xl text-[13px] font-bold bg-stone-50 text-stone-700 flex items-center justify-center gap-1.5 active:opacity-70">
+                  className="flex-1 py-3.5 rounded-2xl text-[13px] font-bold bg-stone-50 text-[#6B5D55] flex items-center justify-center gap-1.5 active:opacity-70">
                   📷 {t("cosmetics.scanPhoto")}
                 </button>
                 <button onClick={() => galleryInputRef.current?.click()}
-                  className="flex-1 py-3.5 rounded-2xl text-[13px] font-bold bg-stone-50 text-stone-700 flex items-center justify-center gap-1.5 active:opacity-70">
+                  className="flex-1 py-3.5 rounded-2xl text-[13px] font-bold bg-stone-50 text-[#6B5D55] flex items-center justify-center gap-1.5 active:opacity-70">
                   🖼 {t("cosmetics.orGallery")}
                 </button>
               </div>
@@ -190,12 +190,12 @@ export function CosmeticsRegisterModal({ onClose, onSuccess }: { onClose: () => 
                   <div>
                     <label className="text-xs font-semibold text-stone-400 uppercase tracking-wider mb-1 block">제품명</label>
                     <input value={name} onChange={e => setName(e.target.value)}
-                      className="w-full px-3 py-2.5 rounded-xl text-[13px] font-medium text-stone-800 outline-none focus:border-[#4A7C6E] bg-stone-50" />
+                      className="w-full px-3 py-2.5 rounded-xl text-[13px] font-medium text-[#5C4F4A] outline-none focus:border-[#4A7C6E] bg-stone-50" />
                   </div>
                   <div>
                     <label className="text-xs font-semibold text-stone-400 uppercase tracking-wider mb-1 block">브랜드</label>
                     <input value={brand} onChange={e => setBrand(e.target.value)}
-                      className="w-full px-3 py-2.5 rounded-xl text-[13px] font-medium text-stone-800 outline-none focus:border-[#4A7C6E] bg-stone-50" />
+                      className="w-full px-3 py-2.5 rounded-xl text-[13px] font-medium text-[#5C4F4A] outline-none focus:border-[#4A7C6E] bg-stone-50" />
                   </div>
                 </div>
               </div>
@@ -228,7 +228,7 @@ export function CosmeticsRegisterModal({ onClose, onSuccess }: { onClose: () => 
               <div>
                 <label className="text-xs font-semibold text-stone-400 uppercase tracking-wider mb-2 block">{t("cosmetics.openedLabel")}</label>
                 <input type="date" value={openedAt} onChange={e => setOpenedAt(e.target.value)}
-                  className="w-full px-4 py-3.5 rounded-2xl text-[14px] font-medium text-stone-800 outline-none focus:border-[#4A7C6E] bg-stone-50" />
+                  className="w-full px-4 py-3.5 rounded-2xl text-[14px] font-medium text-[#5C4F4A] outline-none focus:border-[#4A7C6E] bg-stone-50" />
               </div>
 
               <div>
@@ -238,7 +238,7 @@ export function CosmeticsRegisterModal({ onClose, onSuccess }: { onClose: () => 
                   onChange={e => setIngredients(e.target.value)}
                   rows={3}
                   placeholder={t("cosmetics.ingredientsPlaceholder")}
-                  className="w-full px-4 py-3 rounded-2xl text-[13px] font-medium text-stone-800 outline-none focus:border-[#4A7C6E] bg-stone-50 resize-none"
+                  className="w-full px-4 py-3 rounded-2xl text-[13px] font-medium text-[#5C4F4A] outline-none focus:border-[#4A7C6E] bg-stone-50 resize-none"
                 />
               </div>
 
@@ -270,7 +270,7 @@ export function CosmeticsRegisterModal({ onClose, onSuccess }: { onClose: () => 
               initial={{ y: 80 }} animate={{ y: 0 }} exit={{ y: 80 }}>
               <div className="w-10 h-1 rounded-full bg-stone-200 mx-auto mb-5" />
               <div className="flex justify-center mb-3"><Ban className="w-10 h-10 text-stone-300" /></div>
-              <p className="text-base font-semibold text-stone-800 text-center mb-2">{t("cosmetics.notSkincareTitle")}</p>
+              <p className="text-base font-semibold text-[#5C4F4A] text-center mb-2">{t("cosmetics.notSkincareTitle")}</p>
               <p className="text-[13px] text-stone-500 text-center leading-relaxed whitespace-pre-line mb-5">
                 {t("cosmetics.notSkincareDesc", { type: nonSkincareType })}
               </p>

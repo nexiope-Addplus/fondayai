@@ -108,7 +108,7 @@ export function MyScreen({
                   </div>
               }
               <div className="min-w-0">
-                <p className="text-[14px] font-bold text-stone-800 truncate">{user.username || user.email || "사용자"}</p>
+                <p className="text-[14px] font-bold text-[#5C4F4A] truncate">{user.username || user.email || "사용자"}</p>
                 <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
                   {user.provider === "kakao" && (
                     <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-xs font-bold text-[#3C1E1E]" style={{ background: "#FEE500" }}>
@@ -141,7 +141,7 @@ export function MyScreen({
         ) : (
           <div className="p-4 rounded-2xl bg-white space-y-3" style={{ border: `1px solid ${BORDER_COLOR}` }}>
             <div className="text-center mb-2">
-              <p className="text-[14px] font-bold text-stone-700 mb-1">{t("report.loginRequired")}</p>
+              <p className="text-[14px] font-bold text-[#6B5D55] mb-1">{t("report.loginRequired")}</p>
               <p className="text-[12px] text-stone-400">{t("attendance.loginDesc")}</p>
             </div>
             {i18n.language === "ko" ? (
@@ -160,7 +160,7 @@ export function MyScreen({
               </button>
             )}
             <button onClick={() => onLogin ? onLogin("google", "my") : (localStorage.setItem("fonday_return_tab", "my"), window.location.href = "/auth/google")}
-              className="w-full h-11 rounded-xl font-bold text-[13px] gap-2 bg-white text-stone-700 flex items-center justify-center">
+              className="w-full h-11 rounded-xl font-bold text-[13px] gap-2 bg-white text-[#6B5D55] flex items-center justify-center">
               <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="w-4 h-4" />
               {t("attendance.google")}
             </button>
@@ -177,7 +177,7 @@ export function MyScreen({
               <CalendarDays className="w-5 h-5" style={{ color: SCAN_TO }} />
             </div>
             <div className="text-left min-w-0">
-              <p className="text-[14px] font-bold text-stone-800 truncate">{t("attendance.calendarTitle")}</p>
+              <p className="text-[14px] font-bold text-[#5C4F4A] truncate">{t("attendance.calendarTitle")}</p>
               <p className="text-xs text-stone-400 truncate">{t("attendance.totalPoints", { n: attendance.totalPoints })}</p>
             </div>
           </div>
@@ -200,13 +200,13 @@ export function MyScreen({
               <button onClick={onBack}
                 className="w-full flex items-center justify-between p-3 rounded-2xl active:opacity-70"
                 style={{ background: "#F8FAFD" }}>
-                <span className="text-[13px] font-semibold text-stone-800">{t("nav.scan")}</span>
+                <span className="text-[13px] font-semibold text-[#5C4F4A]">{t("nav.scan")}</span>
                 <ChevronRight className="w-4 h-4 text-stone-300" />
               </button>
               <button onClick={onGoRoutine}
                 className="w-full flex items-center justify-between p-3 rounded-2xl active:opacity-70"
                 style={{ background: "#F8FAFD" }}>
-                <span className="text-[13px] font-semibold text-stone-800">{t("nav.routine")}</span>
+                <span className="text-[13px] font-semibold text-[#5C4F4A]">{t("nav.routine")}</span>
                 <ChevronRight className="w-4 h-4 text-stone-300" />
               </button>
             </div>
@@ -219,7 +219,7 @@ export function MyScreen({
             <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: "#F6F4FB" }}>
               <Sparkles className="w-4.5 h-4.5" style={{ color: "#7C3AED" }} />
             </div>
-            <p className="text-[14px] font-bold text-stone-800">{t("nav.language")}</p>
+            <p className="text-[14px] font-bold text-[#5C4F4A]">{t("nav.language")}</p>
           </div>
           <div className="flex gap-1">
             {(["en", "ko", "ja"] as const).map(lang => (
@@ -242,7 +242,7 @@ export function MyScreen({
             <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0" style={{ background: "#FFF7ED" }}>
               <SmartphoneNfc className="w-5 h-5" style={{ color: "#C2410C" }} />
             </div>
-            <p className="text-[14px] font-bold text-stone-800 truncate">{t("nav.install")}</p>
+            <p className="text-[14px] font-bold text-[#5C4F4A] truncate">{t("nav.install")}</p>
           </div>
           <ChevronRight className="w-4 h-4 text-stone-300 shrink-0" />
         </button>

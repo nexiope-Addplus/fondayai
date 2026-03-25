@@ -70,7 +70,7 @@ export function ResultCosmeticsGateSheet({
                   >
                     <span className="text-white text-xs font-bold">✓</span>
                   </div>
-                  <span className="text-[12px] text-stone-700 font-medium">{bullet}</span>
+                  <span className="text-[12px] text-[#6B5D55] font-medium">{bullet}</span>
                 </div>
               ))}
             </div>
@@ -110,7 +110,7 @@ export function ResultCosmeticsGateSheet({
 
               <button
                 onClick={() => onLogin("google")}
-                className="w-full py-3.5 rounded-2xl text-sm font-semibold flex items-center justify-center gap-2 bg-white text-stone-700"
+                className="w-full py-3.5 rounded-2xl text-sm font-semibold flex items-center justify-center gap-2 bg-white text-[#6B5D55]"
               >
                 <img
                   src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"

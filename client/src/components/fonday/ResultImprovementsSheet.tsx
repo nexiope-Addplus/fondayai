@@ -79,7 +79,7 @@ export function ResultImprovementsSheet({
                       </p>
                     </div>
                     <div>
-                      <p className="text-[13px] font-semibold text-stone-800 mb-0.5">{item.title}</p>
+                      <p className="text-[13px] font-semibold text-[#5C4F4A] mb-0.5">{item.title}</p>
                       <p className="text-[12px] text-stone-500 leading-relaxed">{item.desc}</p>
                     </div>
                   </motion.div>
@@ -108,7 +108,7 @@ export function ResultImprovementsSheet({
                         </div>
                         <div>
                           <div className="flex items-center gap-1.5 mb-0.5">
-                            <span className="text-sm font-semibold text-stone-800">{item.type}</span>
+                            <span className="text-sm font-semibold text-[#5C4F4A]">{item.type}</span>
                             <span className="text-xs px-1.5 py-0.5 rounded-full font-medium" style={{ background: "#FFFFFF", color: "#D97706" }}>
                               {item.key}
                             </span>

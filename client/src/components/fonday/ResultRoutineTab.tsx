@@ -36,7 +36,7 @@ export function ResultRoutineTab(props: any) {
           >
             <span className="text-xl shrink-0 mt-0.5">✨</span>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold text-stone-800 mb-0.5">{t("result.onboarding.title")}</p>
+              <p className="text-sm font-semibold text-[#5C4F4A] mb-0.5">{t("result.onboarding.title")}</p>
               <p className="text-xs text-stone-500 leading-relaxed text-kr-pretty">{t("result.onboarding.sub")}</p>
               <button
                 onClick={() => { localStorage.setItem("fonday_onboarding_done", "1"); setShowOnboarding(false); }}

@@ -60,7 +60,7 @@ export function ScanningScreen({ imageSrc }: { imageSrc: string | null }) {
       </div>
       <div className="mt-8 text-center space-y-3">
         <AnimatePresence mode="wait">
-          <motion.p key={textIdx} className="font-semibold text-xl text-stone-800"
+          <motion.p key={textIdx} className="font-semibold text-xl text-[#5C4F4A]"
             initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.3 }}>
             {texts[textIdx]}
           </motion.p>

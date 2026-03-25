@@ -73,7 +73,7 @@ export function SkinPredictionCard({
               {good.routine?.map((routine, index) => (
                 <div key={index} className="flex items-center gap-2 rounded-xl bg-white/70 px-3 py-2">
                   <CheckCircle2 className="w-3.5 h-3.5 shrink-0 text-emerald-500" />
-                  <span className="text-xs font-medium text-stone-700 leading-tight text-kr-pretty">{routine}</span>
+                  <span className="text-xs font-medium text-[#6B5D55] leading-tight text-kr-pretty">{routine}</span>
                 </div>
               ))}
             </div>

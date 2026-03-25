@@ -106,7 +106,7 @@ export default function BattlePage() {
         <div className="w-16 h-16 rounded-full flex items-center justify-center mb-2" style={{ background: BG_MUTED }}>
           <Shield className="w-8 h-8 text-stone-300" />
         </div>
-        <h2 className="text-xl font-black text-stone-800">{t("battle.errorTitle")}</h2>
+        <h2 className="text-xl font-black text-[#5C4F4A]">{t("battle.errorTitle")}</h2>
         <p className="text-stone-500 text-sm">{error || t("battle.errorDesc")}</p>
         <Button onClick={() => setLocation("/")} className="mt-4 rounded-xl px-6" variant="outline">
           {t("battle.homeBtn")}
@@ -273,7 +273,7 @@ export default function BattlePage() {
                       <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ background: BG_MUTED }}>
                         <Zap className="w-4 h-4 text-stone-400" />
                       </div>
-                      <span className="text-[12px] font-bold text-stone-700">{item.subject}</span>
+                      <span className="text-[12px] font-bold text-[#6B5D55]">{item.subject}</span>
                     </div>
 
                     <div className="flex-1 flex justify-center px-4">
@@ -289,7 +289,7 @@ export default function BattlePage() {
                     <div className="flex flex-col items-end w-[60px] shrink-0 text-xs">
                       <div className="flex items-center gap-1.5 mb-1 text-stone-500">
                         <span>{t("battle.friend")}</span>
-                        <span className="font-light text-[12px] text-stone-800" style={{ fontFamily: FONT_DISPLAY }}>{item.friend}</span>
+                        <span className="font-light text-[12px] text-[#5C4F4A]" style={{ fontFamily: FONT_DISPLAY }}>{item.friend}</span>
                       </div>
                       <div className="flex items-center gap-1.5" style={{ color: DEEP_GREEN }}>
                         <span>{t("battle.me")}</span>

@@ -854,7 +854,7 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
                   {t("result.todayAction")}
                 </p>
               </div>
-              <p className="text-sm font-bold text-stone-800 leading-tight mb-1">{top.title}</p>
+              <p className="text-sm font-bold text-[#5C4F4A] leading-tight mb-1">{top.title}</p>
               <p className="text-xs text-stone-500 leading-relaxed">{top.desc}</p>
             </motion.div>
           );
@@ -892,15 +892,15 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
             <div className="space-y-2.5">
               <div className="flex items-center gap-3">
                 <div className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold text-white shrink-0" style={{ background: DEEP_GREEN }}>1</div>
-                <p className="text-[13px] font-medium text-stone-700">{t("result.nextSteps.step1", "사용 중인 화장품을 등록하세요")}</p>
+                <p className="text-[13px] font-medium text-[#6B5D55]">{t("result.nextSteps.step1", "사용 중인 화장품을 등록하세요")}</p>
               </div>
               <div className="flex items-center gap-3">
                 <div className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold text-white shrink-0" style={{ background: DEEP_GREEN }}>2</div>
-                <p className="text-[13px] font-medium text-stone-700">{t("result.nextSteps.step2", "내일 다시 스캔하세요")}</p>
+                <p className="text-[13px] font-medium text-[#6B5D55]">{t("result.nextSteps.step2", "내일 다시 스캔하세요")}</p>
               </div>
               <div className="flex items-center gap-3">
                 <div className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold text-white shrink-0" style={{ background: DEEP_GREEN }}>3</div>
-                <p className="text-[13px] font-medium text-stone-700">{t("result.nextSteps.step3", "어떤 화장품이 효과 있는지 확인하세요")}</p>
+                <p className="text-[13px] font-medium text-[#6B5D55]">{t("result.nextSteps.step3", "어떤 화장품이 효과 있는지 확인하세요")}</p>
               </div>
             </div>
           </motion.div>

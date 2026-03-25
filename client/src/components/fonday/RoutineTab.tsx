@@ -178,10 +178,10 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
           </p>
           <div className="space-y-2 mt-5 text-left">
             <div className="rounded-2xl px-4 py-3" style={{ background: "#F8FAFD" }}>
-              <p className="text-[12px] font-semibold text-stone-800">{t("cosmetics.routineRepresentativeTitle")}</p>
+              <p className="text-[12px] font-semibold text-[#5C4F4A]">{t("cosmetics.routineRepresentativeTitle")}</p>
             </div>
             <div className="rounded-2xl px-4 py-3" style={{ background: "#F8FAFD" }}>
-              <p className="text-[12px] font-semibold text-stone-800">{t("cosmetics.signalSectionTitle")}</p>
+              <p className="text-[12px] font-semibold text-[#5C4F4A]">{t("cosmetics.signalSectionTitle")}</p>
             </div>
           </div>
           <div className="mt-5 space-y-3">
@@ -204,7 +204,7 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
             )}
             <button
               onClick={() => onLogin ? onLogin("google", "routine") : (localStorage.setItem("fonday_return_tab", "routine"), window.location.href = "/auth/google")}
-              className="w-full h-11 rounded-xl font-bold text-[13px] bg-white text-stone-700 flex items-center justify-center"
+              className="w-full h-11 rounded-xl font-bold text-[13px] bg-white text-[#6B5D55] flex items-center justify-center"
             >
               {t("attendance.google")}
             </button>
@@ -235,7 +235,7 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
                   <div key={`effect-${signal.itemId}`} className="rounded-2xl p-3" style={{ background: "#FAF8F5" }}>
                     <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0">
-                        <p className="text-[12px] font-bold text-stone-800 truncate">{signal.itemName}</p>
+                        <p className="text-[12px] font-bold text-[#5C4F4A] truncate">{signal.itemName}</p>
                         <p className="text-xs text-stone-500 mt-1 text-kr-pretty">{signal.note}</p>
                       </div>
                       <span className="rounded-full px-2 py-0.5 text-xs font-bold shrink-0" style={{ background: `${positive ? DEEP_GREEN : SCAN_TO}12`, color: positive ? DEEP_GREEN : SCAN_TO }}>
@@ -245,15 +245,15 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
                     <div className="grid grid-cols-3 gap-2 mt-3">
                       <div className="rounded-2xl p-2.5 bg-white">
                         <p className="text-xs text-stone-400">{t("cosmetics.effectMetricLabel")}</p>
-                        <p className="text-xs font-bold mt-1 text-stone-800">{mainMetric}</p>
+                        <p className="text-xs font-bold mt-1 text-[#5C4F4A]">{mainMetric}</p>
                       </div>
                       <div className="rounded-2xl p-2.5 bg-white">
                         <p className="text-xs text-stone-400">{t("cosmetics.effectTrackedLabel")}</p>
-                        <p className="text-xs font-bold mt-1 text-stone-800">{t("cosmetics.effectTrackedValue", { days: signal.daysTracked })}</p>
+                        <p className="text-xs font-bold mt-1 text-[#5C4F4A]">{t("cosmetics.effectTrackedValue", { days: signal.daysTracked })}</p>
                       </div>
                       <div className="rounded-2xl p-2.5 bg-white">
                         <p className="text-xs text-stone-400">{t("cosmetics.effectScanLabel")}</p>
-                        <p className="text-xs font-bold mt-1 text-stone-800">{t("cosmetics.effectScanValue", { count: signal.afterCount })}</p>
+                        <p className="text-xs font-bold mt-1 text-[#5C4F4A]">{t("cosmetics.effectScanValue", { count: signal.afterCount })}</p>
                       </div>
                     </div>
                   </div>
@@ -334,7 +334,7 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
             {topSignal ? (
               <>
                 <div className="flex items-center justify-between gap-2 mt-2">
-                  <p className="text-[13px] font-semibold text-stone-800 truncate min-w-0">{topSignal.itemName}</p>
+                  <p className="text-[13px] font-semibold text-[#5C4F4A] truncate min-w-0">{topSignal.itemName}</p>
                   <span className="rounded-full px-2 py-0.5 text-xs font-bold shrink-0" style={{ background: `${SCAN_TO}12`, color: SCAN_TO }}>
                     {t(`cosmetics.signalConfidence.${topSignal.confidence}`)}
                   </span>
@@ -356,7 +356,7 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
             </div>
             <div className="rounded-2xl p-3" style={{ background: "#FFFFFF" }}>
               <p className="text-[11px] text-stone-400 leading-tight truncate">{t("cosmetics.effectTrackedProductsLabel")}</p>
-              <p className="text-[18px] font-bold mt-1 text-stone-800">{productSignals.length}</p>
+              <p className="text-[18px] font-bold mt-1 text-[#5C4F4A]">{productSignals.length}</p>
             </div>
           </div>
           {list.length > 0 && latestAnalysisResult && (
@@ -382,7 +382,7 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
             <div className="w-14 h-14 rounded-3xl mx-auto mb-3 flex items-center justify-center" style={{ background: `${DEEP_GREEN}12`, color: DEEP_GREEN }}>
               <Droplets className="w-7 h-7" />
             </div>
-            <p className="text-[14px] font-bold text-stone-700 mb-1">{t("cosmetics.myEmpty")}</p>
+            <p className="text-[14px] font-bold text-[#6B5D55] mb-1">{t("cosmetics.myEmpty")}</p>
             <p className="text-[12px] text-stone-400">{t("cosmetics.myEmptyDesc")}</p>
           </div>
         ) : (
@@ -459,7 +459,7 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
                     return (
                     <div key={signal.itemId} className="rounded-2xl p-3" style={{ background: "#F8FAFD" }}>
                       <div className="flex items-center justify-between gap-2">
-                        <p className="text-[12px] font-semibold text-stone-800 truncate min-w-0">{signal.itemName}</p>
+                        <p className="text-[12px] font-semibold text-[#5C4F4A] truncate min-w-0">{signal.itemName}</p>
                         <div className="flex items-center gap-1.5 shrink-0">
                           <span className="rounded-full px-2 py-0.5 text-xs font-bold" style={{ background: positive ? `${DEEP_GREEN}12` : `${SCAN_TO}12`, color: positive ? DEEP_GREEN : SCAN_TO }}>
                             {positive ? "+" : ""}{deltaValue}
@@ -497,7 +497,7 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
                 <div className="space-y-2.5">
                   {routinePlan.conflicts.map((conflict, index) => (
                     <div key={index} className="rounded-2xl bg-white p-3">
-                      <p className="text-xs font-bold text-stone-700 mb-0.5 line-clamp-2">{conflict.productNames.join(" + ")}</p>
+                      <p className="text-xs font-bold text-[#6B5D55] mb-0.5 line-clamp-2">{conflict.productNames.join(" + ")}</p>
                       <p className="text-xs text-stone-500">{conflict.reason}</p>
                       {conflict.resolution && <p className="text-xs mt-1 font-medium" style={{ color: DEEP_GREEN }}>{conflict.resolution}</p>}
                     </div>
@@ -531,7 +531,7 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
                         </div>
                       )}
                       <div className="mt-3">
-                        <p className="text-xs font-semibold text-stone-800 truncate">{item.name}</p>
+                        <p className="text-xs font-semibold text-[#5C4F4A] truncate">{item.name}</p>
                         <p className="text-xs text-stone-400 truncate">{item.brand || t("cosmetics.noBrand")}</p>
                         {signal && <p className="text-xs mt-2 line-clamp-2 text-kr-pretty" style={{ color: SCAN_TO }}>{signal.note}</p>}
                         <div className="flex flex-wrap gap-1.5 mt-2">
@@ -620,7 +620,7 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
                   </div>
                 )}
                 <div className="min-w-0 flex-1">
-                  <p className="text-lg font-bold text-stone-800 text-kr-pretty">{selectedItem.name}</p>
+                  <p className="text-lg font-bold text-[#5C4F4A] text-kr-pretty">{selectedItem.name}</p>
                   <p className="text-[12px] text-stone-400 mt-1">{selectedItem.brand || t("cosmetics.noBrand")}</p>
                   <div className="flex flex-wrap gap-1.5 mt-2">
                     <span className="px-2.5 py-1 rounded-full text-xs font-bold" style={{ background: `${DEEP_GREEN}12`, color: DEEP_GREEN }}>
