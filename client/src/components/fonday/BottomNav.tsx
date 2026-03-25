@@ -1,6 +1,6 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { House, Sparkles, BookOpen, Compass, User } from "lucide-react";
+import { House, History, BookOpen, Compass, User } from "lucide-react";
 import { SCAN_TO, BORDER_COLOR, TINT_WARM } from "./constants";
 import { haptic } from "./utils";
 import type { TabId, ScanState } from "./types";
@@ -61,7 +61,7 @@ export function BottomNav({ active, onChange, scanState }: {
       <div className="max-w-md mx-auto px-2">
         <div className="grid grid-cols-4 h-[64px]">
           {btn("scan", <House className="w-5 h-5" />, t("nav.scan"))}
-          {btn("routine", <Sparkles className="w-5 h-5" />, t("nav.routine"))}
+          {btn("routine", <History className="w-5 h-5" />, t("nav.routine"))}
           {btn("diary", <BookOpen className="w-5 h-5" />, t("nav.diary"))}
           {btn("my", <User className="w-5 h-5" />, t("nav.my"))}
         </div>
