@@ -281,7 +281,7 @@ export function ScanIdleScreen({
 
       {/* ── 히어로: 헤드라인 + CTA (신규 유저, 첫 화면 = 포스터) ── */}
       {!latestScan && <motion.div variants={fadeChild} className="mb-8 relative" style={{ zIndex: 1 }}>
-        <h1 className="text-[34px] font-light leading-[1.12] mb-4 mt-4" style={{ color: "#1C1917", fontFamily: FONT_DISPLAY }}>
+        <h1 className="text-[30px] font-light leading-[1.15] mb-4 mt-4" style={{ color: "#1C1917", fontFamily: FONT_DISPLAY }}>
           {t("idle.subtitle1")}<br />{t("idle.subtitle3")}
         </h1>
         <p className="text-[15px] leading-[1.7] mb-6" style={{ color: TEXT_SECONDARY }}>
