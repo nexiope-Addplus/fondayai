@@ -809,6 +809,7 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
     <motion.div
       ref={resultScrollRef}
       className="h-[calc(100dvh-60px)] overflow-y-auto"
+      style={{ background: "linear-gradient(180deg, #FDFCFA 0%, #F8F5F1 50%, #FDFCFA 100%)" }}
       initial={{ opacity: 0, y: 28 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
@@ -820,7 +821,7 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
             style={{ borderColor: SCAN_TO, color: SCAN_TO }}>
             <Camera className="w-4 h-4" /> {t("result.back")}
           </Button>
-          <h2 className="text-xl font-normal tracking-tight" style={{ color: DEEP_GREEN, fontFamily: FONT_DISPLAY }}>{t("result.title")}</h2>
+          <h2 className="text-lg font-bold tracking-tight" style={{ color: "#5C4F4A" }}>{t("result.title")}</h2>
         </div>
 
         {/* 압축형 결과 헤더 */}
@@ -845,11 +846,11 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
         {(analysisResult?.improvements ?? []).length > 0 && (() => {
           const top = (analysisResult.improvements as { title: string; desc: string }[])[0];
           return (
-            <motion.div variants={fadeChild} className="rounded-3xl p-4 border"
-              style={{ background: BG_BASE, borderColor: BORDER_COLOR }}>
+            <motion.div variants={fadeChild} className="rounded-[20px] p-4"
+              style={{ background: BG_MUTED }}>
               <div className="flex items-center gap-2 mb-2">
-                <div className="w-7 h-7 rounded-xl flex items-center justify-center text-sm shrink-0 border"
-                  style={{ background: BG_MUTED, borderColor: BORDER_COLOR }}><Target className="w-4 h-4" style={{ color: SCAN_TO }} /></div>
+                <div className="w-7 h-7 rounded-full flex items-center justify-center text-sm shrink-0"
+                  style={{ background: TINT_WARM }}><Target className="w-4 h-4" style={{ color: SCAN_TO }} /></div>
                 <p className="text-xs font-medium uppercase tracking-[0.14em]" style={{ color: TEXT_TERTIARY, fontFamily: FONT_DISPLAY }}>
                   {t("result.todayAction")}
                 </p>
@@ -884,8 +885,8 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
 
         {/* ── 다음 스텝 가이드 (첫 스캔 또는 화장품 미등록 시) ── */}
         {history.length === 0 && (
-          <motion.div variants={fadeChild} className="rounded-3xl p-4 border"
-            style={{ background: TINT_GREEN, borderColor: `${DEEP_GREEN}20` }}>
+          <motion.div variants={fadeChild} className="rounded-[20px] p-4"
+            style={{ background: TINT_GREEN }}>
             <p className="text-xs font-semibold uppercase tracking-[0.14em] mb-3" style={{ color: DEEP_GREEN, fontFamily: FONT_DISPLAY }}>
               {t("result.nextSteps.title", "다음 스텝")}
             </p>
@@ -910,8 +911,8 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
         {myCosmetics.length > 0 && (
           <motion.div variants={fadeChild}>
             <button onClick={onGoRoutine}
-              className="w-full flex items-center justify-between p-4 rounded-2xl active:opacity-70"
-              style={{ background: TINT_GREEN, border: `1px solid ${DEEP_GREEN}20` }}>
+              className="w-full flex items-center justify-between p-4 rounded-[20px] active:opacity-70"
+              style={{ background: TINT_GREEN }}>
               <div className="flex items-center gap-3 min-w-0">
                 <Leaf className="w-5 h-5 shrink-0" style={{ color: DEEP_GREEN }} />
                 <div className="text-left min-w-0">
@@ -928,10 +929,10 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
           </motion.div>
         )}
 
-        <motion.div variants={fadeChild} className="rounded-3xl px-4 py-3 border"
-          style={{ background: BG_BASE, borderColor: BORDER_COLOR }}>
+        <motion.div variants={fadeChild} className="rounded-[20px] px-4 py-3"
+          style={{ background: BG_MUTED }}>
           <div className="flex flex-wrap items-center gap-2">
-            <span className="text-xs font-medium uppercase tracking-[0.14em]" style={{ color: TEXT_TERTIARY, fontFamily: FONT_DISPLAY }}>
+            <span className="text-xs font-semibold uppercase tracking-[0.14em]" style={{ color: "#8C8078" }}>
               {t("result.hub.eyebrow")}
             </span>
             <button onClick={onGoRoutine} className="rounded-full px-3 py-1.5 text-xs font-semibold" style={{ background: TINT_GREEN, color: DEEP_GREEN }}>
@@ -940,17 +941,17 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
             <button onClick={onOpenDiary} className="rounded-full px-3 py-1.5 text-xs font-semibold" style={{ background: TINT_WARM, color: SCAN_TO }}>
               {t("nav.diary")}
             </button>
-            <button onClick={onGoMagazine} className="rounded-full px-3 py-1.5 text-xs font-semibold border" style={{ background: BG_BASE, color: DEEP_GREEN, borderColor: BORDER_COLOR }}>
+            <button onClick={onGoMagazine} className="rounded-full px-3 py-1.5 text-xs font-semibold" style={{ background: BG_MUTED, color: "#6B5D55" }}>
               {t("nav.magazine")}
             </button>
-            <button onClick={onGoMy} className="rounded-full px-3 py-1.5 text-xs font-semibold border" style={{ background: BG_BASE, color: DEEP_GREEN, borderColor: BORDER_COLOR }}>
+            <button onClick={onGoMy} className="rounded-full px-3 py-1.5 text-xs font-semibold" style={{ background: BG_MUTED, color: "#6B5D55" }}>
               {t("nav.my")}
             </button>
           </div>
         </motion.div>
 
-        <div ref={tabNavRef} className="rounded-3xl p-2 sticky top-0 z-20 border"
-          style={{ background: BG_MUTED, borderColor: BORDER_COLOR }}>
+        <div ref={tabNavRef} className="rounded-full p-1.5 sticky top-0 z-20"
+          style={{ background: BG_MUTED }}>
           <div className="flex gap-2">
             {([
               { id: "routine" as const,   label: t("result.tab.routine"),   icon: <CheckCircle2 className="w-4 h-4" />, activeBg: "#F7FBF8", activeText: DEEP_GREEN },
@@ -960,7 +961,7 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
               const isActive = activeTab === id;
               return (
                 <button key={id} onClick={() => goTo(id)}
-                  className="flex-1 flex items-center justify-center gap-2 py-3 rounded-3xl text-xs font-medium transition-all"
+                  className="flex-1 flex items-center justify-center gap-2 py-3 rounded-full text-xs font-semibold transition-all"
                   style={isActive
                     ? { background: activeBg, color: activeText }
                     : { background: BG_BASE, color: "#A8A29E" }}>
