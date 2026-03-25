@@ -74,8 +74,13 @@ export function MyScreen({
         <div className="mb-5">
           <div className="flex items-start justify-between gap-3">
             <div>
-              <h1 className="text-[22px] font-bold" style={{ color: "#5C4F4A" }}>{t("nav.my")}</h1>
-              <p className="text-[13px] mt-1" style={{ color: "#8C8078" }}>
+              <div className="flex items-center gap-2.5 mb-1">
+                <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ background: TINT_WARM }}>
+                  <User className="w-4 h-4" style={{ color: SCAN_TO }} />
+                </div>
+                <h1 className="text-[20px] font-bold" style={{ color: "#5C4F4A" }}>{t("nav.my")}</h1>
+              </div>
+              <p className="text-[13px]" style={{ color: "#8C8078", marginLeft: 42 }}>
                 {user ? (user.username || user.email || t("nav.my")) : t("attendance.loginDesc")}
               </p>
             </div>
@@ -90,7 +95,7 @@ export function MyScreen({
       <div className="px-4 space-y-3">
         {/* 프로필 */}
         {user ? (
-          <div className="flex items-center justify-between p-4 rounded-[20px]" style={{ background: BG_MUTED }}>
+          <div className="flex items-center justify-between p-4 rounded-[20px]" style={{ background: "#FFFFFF", boxShadow: "0 1px 6px rgba(0,0,0,0.04)" }}>
             <div className="flex items-center gap-3">
               {user.avatar
                 ? <img src={user.avatar} alt={user.username || "프로필"} className="w-10 h-10 rounded-full" width={40} height={40} loading="lazy" />
@@ -200,7 +205,7 @@ export function MyScreen({
         )}
 
         {/* 언어 설정 */}
-        <div className="flex items-center justify-between p-4 rounded-[20px]" style={{ background: BG_MUTED }}>
+        <div className="flex items-center justify-between p-4 rounded-[20px]" style={{ background: "#FFFFFF", boxShadow: "0 1px 6px rgba(0,0,0,0.04)" }}>
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: "#F6F4FB" }}>
               <Sparkles className="w-4.5 h-4.5" style={{ color: "#7C3AED" }} />

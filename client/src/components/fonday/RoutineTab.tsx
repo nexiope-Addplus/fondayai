@@ -177,7 +177,7 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
           </p>
         </div>
 
-        <div className="rounded-[20px] p-5 mb-6" style={{ background: BG_MUTED }}>
+        <div className="rounded-[20px] p-5 mb-6" style={{ background: "#FFFFFF", boxShadow: "0 1px 6px rgba(0,0,0,0.04)" }}>
           <div className="space-y-2 mb-5">
             <div className="rounded-2xl px-4 py-3 bg-white">
               <p className="text-[13px] font-semibold text-[#5C4F4A]">{t("cosmetics.routineRepresentativeTitle")}</p>
@@ -215,7 +215,7 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
         </div>
 
         {productSignals.length > 0 && (
-          <div className="rounded-[20px] p-4" style={{ background: BG_MUTED }}>
+          <div className="rounded-[20px] p-4" style={{ background: "#FFFFFF", boxShadow: "0 1px 6px rgba(0,0,0,0.04)" }}>
             <div className="flex items-start justify-between gap-3 mb-3">
               <div>
                 <p className="text-xs font-bold tracking-[0.14em] uppercase" style={{ color: SCAN_TO, fontFamily: FONT_DISPLAY }}>
@@ -272,8 +272,13 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
   return (
     <div className="min-h-[calc(100dvh-64px)] px-4 pt-5 pb-28" style={{ background: "linear-gradient(180deg, #FDFCFA 0%, #F8F5F1 50%, #FDFCFA 100%)" }}>
       <div className="mb-6">
-        <h1 className="text-[22px] font-bold mb-1" style={{ color: "#5C4F4A" }}>{t("cosmetics.myTitle")}</h1>
-        <p className="text-[13px] text-kr-pretty" style={{ color: "#8C8078" }}>
+        <div className="flex items-center gap-2.5 mb-1">
+          <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ background: TINT_GREEN }}>
+            <Droplets className="w-4 h-4" style={{ color: DEEP_GREEN }} />
+          </div>
+          <h1 className="text-[20px] font-bold" style={{ color: "#5C4F4A" }}>{t("cosmetics.myTitle")}</h1>
+        </div>
+        <p className="text-[13px] text-kr-pretty" style={{ color: "#8C8078", marginLeft: 42 }}>
           {t("cosmetics.routineSubtitle")}
         </p>
 
@@ -299,7 +304,7 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
           {t("cosmetics.scanBtn")}
         </button>
 
-        <div className="mt-5 rounded-[20px] p-4" style={{ background: BG_MUTED }}>
+        <div className="mt-5 rounded-[20px] p-4" style={{ background: "#FFFFFF", boxShadow: "0 1px 6px rgba(0,0,0,0.04)" }}>
           <div className="flex items-start justify-between gap-3">
             <div>
               <p className="text-xs font-bold tracking-[0.14em] uppercase" style={{ color: SCAN_TO, fontFamily: FONT_DISPLAY }}>
@@ -378,7 +383,7 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
             <div className="w-6 h-6 border-2 border-stone-200 border-t-stone-400 rounded-full animate-spin" />
           </div>
         ) : list.length === 0 ? (
-          <div className="rounded-[20px] p-8 text-center" style={{ background: BG_MUTED }}>
+          <div className="rounded-[20px] p-8 text-center" style={{ background: "#FFFFFF", boxShadow: "0 1px 6px rgba(0,0,0,0.04)" }}>
             <div className="w-12 h-12 rounded-full mx-auto mb-3 flex items-center justify-center" style={{ background: `${DEEP_GREEN}12`, color: DEEP_GREEN }}>
               <Droplets className="w-6 h-6" />
             </div>
@@ -389,7 +394,7 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
           <>
             <div className="grid gap-3">
               {sections.map(({ key, title, accent, bg }) => (
-                <div key={key} className="rounded-[20px] p-4" style={{ background: BG_MUTED }}>
+                <div key={key} className="rounded-[20px] p-4" style={{ background: "#FFFFFF", boxShadow: "0 1px 6px rgba(0,0,0,0.04)" }}>
                   <div className="flex items-center justify-between gap-3 mb-3">
                     <div>
                       <p className="text-[15px] font-bold" style={{ color: DEEP_GREEN }}>{title}</p>
@@ -431,7 +436,7 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
             </div>
 
             {productSignals.length > 0 && (
-              <div className="rounded-[20px] p-4" style={{ background: BG_MUTED }}>
+              <div className="rounded-[20px] p-4" style={{ background: "#FFFFFF", boxShadow: "0 1px 6px rgba(0,0,0,0.04)" }}>
                 <div className="flex items-start justify-between gap-2 mb-3">
                   <div className="min-w-0">
                     <p className="text-[15px] font-bold" style={{ color: DEEP_GREEN }}>{t("cosmetics.signalSectionTitle")}</p>

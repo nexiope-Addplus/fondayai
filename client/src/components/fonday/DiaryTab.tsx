@@ -6,6 +6,7 @@ import {
   Camera,
   ClipboardList,
   Lock,
+  BookOpen,
 } from "lucide-react";
 import {
   Line,
@@ -265,7 +266,7 @@ export function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: AppU
             </div>
           </div>
 
-          <div className="rounded-[20px] p-5" style={{ background: BG_MUTED }}>
+          <div className="rounded-[20px] p-5" style={{ background: "#FFFFFF", boxShadow: "0 1px 6px rgba(0,0,0,0.04)" }}>
             <div className="space-y-2.5">
               {i18n.language === "ko" ? (
                 <button onClick={() => onLogin ? onLogin("kakao", "diary") : (localStorage.setItem("fonday_return_tab", "diary"), window.location.href = "/auth/kakao")}
@@ -300,8 +301,13 @@ export function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: AppU
       {/* 헤더 */}
       <div className="shrink-0 px-4 pt-5 pb-0">
         <div className="mb-4">
-          <h1 className="text-[22px] font-bold mb-1" style={{ color: "#5C4F4A" }}>{t("modal.diary.title")}</h1>
-          <p className="text-[13px] text-kr-pretty" style={{ color: "#8C8078" }}>
+          <div className="flex items-center gap-2.5 mb-1">
+            <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ background: TINT_WARM }}>
+              <BookOpen className="w-4 h-4" style={{ color: SCAN_TO }} />
+            </div>
+            <h1 className="text-[20px] font-bold" style={{ color: "#5C4F4A" }}>{t("modal.diary.title")}</h1>
+          </div>
+          <p className="text-[13px] text-kr-pretty" style={{ color: "#8C8078", marginLeft: 42 }}>
             {finalType ? `${finalType} · ` : ""}{totalRecords > 0 ? `${t("modal.diary.countLabel", { count: totalRecords })}` : t("result.diary.firstRecord")}
           </p>
           <div className="grid grid-cols-3 gap-2 mt-4">

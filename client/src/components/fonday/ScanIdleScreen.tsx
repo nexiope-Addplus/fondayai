@@ -304,7 +304,7 @@ export function ScanIdleScreen({
 
       <motion.div variants={fadeChild} className="mb-8 relative" style={{ zIndex: 1 }}>
         {scanLoading && (
-          <div className={`rounded-[20px] px-4 py-4 mb-4${reducedMotion ? "" : " animate-pulse"}`} style={{ background: BG_MUTED }}>
+          <div className={`rounded-[20px] px-4 py-4 mb-4${reducedMotion ? "" : " animate-pulse"}`} style={{ background: "#FFFFFF", boxShadow: "0 1px 6px rgba(0,0,0,0.04)" }}>
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0 flex-1">
                 <div className="h-3 w-20 rounded-full bg-stone-200/50 mb-2" />
@@ -371,7 +371,7 @@ export function ScanIdleScreen({
 
       {/* 바우만 설명 더보기 accordion */}
       <motion.div variants={fadeChild} className="mb-8 relative" style={{ zIndex: 1 }}>
-        <div className="rounded-[20px]" style={{ background: BG_MUTED }}>
+        <div className="rounded-[20px]" style={{ background: "#FFFFFF", boxShadow: "0 1px 6px rgba(0,0,0,0.04)" }}>
           <button onClick={() => setShowBaumannExp(v => !v)}
             className="w-full flex items-center justify-between px-4 py-3.5">
             <div className="flex items-center gap-2">
@@ -523,7 +523,7 @@ function HomeRoutineWidget({ onOpenRoutine }: { onOpenRoutine?: () => void }) {
   };
 
   return (
-    <div className="rounded-[20px] px-4 py-3.5 mb-3" style={{ background: BG_MUTED }}>
+    <div className="rounded-[20px] px-4 py-3.5 mb-3" style={{ background: "#FFFFFF", boxShadow: "0 1px 6px rgba(0,0,0,0.04)" }}>
       <div className="flex items-center justify-between mb-2.5">
         <p className="text-[11px] font-semibold uppercase tracking-[0.14em]" style={{ color: DEEP_GREEN, fontFamily: FONT_DISPLAY }}>
           {t("routineChecklist.title", "오늘 사용한 화장품")}
