@@ -307,6 +307,68 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
           <Plus className="w-4 h-4" />
           {t("cosmetics.scanBtn")}
         </button>
+
+        {/* 화장품 성적표 — 핵심 기능 */}
+        <div className="mt-6 rounded-[20px] p-5" style={{ background: "#FFFFFF", boxShadow: "0 1px 6px rgba(0,0,0,0.04)" }}>
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <p className="text-[15px] font-bold" style={{ color: "#5C4F4A" }}>
+                {t("cosmetics.dashboardTitle")}
+              </p>
+              <p className="text-[12px] mt-0.5" style={{ color: "#8C8078" }}>
+                {t("cosmetics.dashboardDesc")}
+              </p>
+            </div>
+            {list.length > 0 && latestAnalysisResult && (
+              <button
+                onClick={() => setShowReportCard(true)}
+                className="w-9 h-9 rounded-full flex items-center justify-center shrink-0"
+                style={{ background: TINT_WARM }}
+              >
+                <Sparkles className="w-4 h-4" style={{ color: SCAN_TO }} />
+              </button>
+            )}
+          </div>
+
+          {/* 요약 숫자 */}
+          <div className="flex items-center gap-3 mb-4">
+            {routineStats.map((stat) => (
+              <div key={stat.key} className="flex items-center gap-1.5">
+                <span className="text-[18px] font-bold" style={{ color: stat.color }}>{stat.value}</span>
+                <span className="text-[11px]" style={{ color: "#8C8078" }}>{stat.label}</span>
+              </div>
+            ))}
+          </div>
+
+          {/* 가장 효과 좋은 제품 */}
+          {topSignal ? (
+            <div className="rounded-[16px] p-3.5" style={{ background: BG_MUTED }}>
+              <p className="text-[11px] font-bold mb-1.5" style={{ color: DEEP_GREEN }}>{t("cosmetics.signalTopTitle")}</p>
+              <div className="flex items-center justify-between gap-2">
+                <p className="text-[13px] font-bold truncate" style={{ color: "#5C4F4A" }}>{topSignal.itemName}</p>
+                <span className="rounded-full px-2 py-0.5 text-[11px] font-bold shrink-0" style={{ background: TINT_WARM, color: SCAN_TO }}>
+                  {t(`cosmetics.signalConfidence.${topSignal.confidence}`)}
+                </span>
+              </div>
+              <p className="text-[12px] mt-1 text-kr-pretty" style={{ color: "#8C8078" }}>{topSignal.note}</p>
+            </div>
+          ) : (
+            <div className="rounded-[16px] p-3.5" style={{ background: BG_MUTED }}>
+              <p className="text-[12px]" style={{ color: "#8C8078" }}>{t("cosmetics.signalEmpty")}</p>
+            </div>
+          )}
+
+          {list.length > 0 && latestAnalysisResult && (
+            <button
+              onClick={() => setShowReportCard(true)}
+              className="w-full mt-3 flex items-center justify-center gap-2 text-[13px] font-bold"
+              style={{ background: "#C97062", color: "#FFFFFF", height: 44, borderRadius: 22 }}
+            >
+              <Sparkles className="w-4 h-4" />
+              {t("cosmeticsReport.title")}
+            </button>
+          )}
+        </div>
       </div>
 
       <div className="space-y-3 mt-5">
