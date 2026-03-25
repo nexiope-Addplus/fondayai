@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
-import { BookOpen, Flame, LineChart as LineChartIcon } from "lucide-react";
+import { NotebookPen, Flame, LineChart as LineChartIcon } from "lucide-react";
 
 import { DEEP_GREEN, SCAN_TO, TINT_NEUTRAL, TINT_WARM, BORDER_COLOR, FONT_DISPLAY, BG_MUTED } from "./constants";
 import { Card, CardContent } from "@/components/ui/card";
@@ -82,7 +82,7 @@ export function ResultDiaryCard({
               className="flex-1 rounded-2xl py-2 px-2 flex flex-col items-center justify-center gap-0.5 text-white active:scale-95 transition-all"
               style={{ background: `linear-gradient(135deg, ${DEEP_GREEN}, #4A7C6E)` }}
             >
-              <BookOpen className="w-3.5 h-3.5" />
+              <NotebookPen className="w-3.5 h-3.5" />
               <p className="text-xs font-semibold">{t("result.diaryView")}</p>
             </button>
           </div>

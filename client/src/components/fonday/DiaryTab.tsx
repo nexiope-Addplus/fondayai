@@ -6,7 +6,7 @@ import {
   Camera,
   ClipboardList,
   Lock,
-  BookOpen,
+  NotebookPen,
 } from "lucide-react";
 import {
   Line,
@@ -254,7 +254,7 @@ export function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: AppU
           <div className="mb-8">
             <div className="flex items-center gap-2.5 mb-1">
               <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ background: TINT_WARM }}>
-                <BookOpen className="w-4 h-4" style={{ color: SCAN_TO }} />
+                <NotebookPen className="w-4 h-4" style={{ color: SCAN_TO }} />
               </div>
               <h1 className="text-[22px] font-extrabold" style={{ color: "#4A403A", fontFamily: FONT_HEADING }}>{t("modal.diary.title")}</h1>
             </div>
@@ -273,7 +273,7 @@ export function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: AppU
                 <p className="text-[13px]" style={{ color: "#6B5D55" }}>{t("diary.loginValue2", "7일 평균으로 피부 트렌드를 확인해요")}</p>
               </div>
               <div className="flex items-center gap-2.5">
-                <BookOpen className="w-4 h-4 shrink-0" style={{ color: "#7C3AED" }} />
+                <NotebookPen className="w-4 h-4 shrink-0" style={{ color: "#7C3AED" }} />
                 <p className="text-[13px]" style={{ color: "#6B5D55" }}>{t("diary.loginValue3", "캘린더에서 한눈에 관리해요")}</p>
               </div>
             </div>
@@ -316,7 +316,7 @@ export function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: AppU
         <div className="mb-4">
           <div className="flex items-center gap-2.5 mb-1">
             <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ background: TINT_WARM }}>
-              <BookOpen className="w-4 h-4" style={{ color: SCAN_TO }} />
+              <NotebookPen className="w-4 h-4" style={{ color: SCAN_TO }} />
             </div>
             <h1 className="text-[22px] font-extrabold" style={{ color: "#4A403A", fontFamily: FONT_HEADING }}>{t("modal.diary.title")}</h1>
           </div>
