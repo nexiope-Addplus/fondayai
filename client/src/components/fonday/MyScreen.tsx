@@ -8,6 +8,7 @@ import {
   ChevronRight,
   CalendarDays,
   SmartphoneNfc,
+  Microscope, Thermometer, Droplets, Flame, Shield, ArrowRight,
 } from "lucide-react";
 import {
   BG_BASE,
@@ -229,6 +230,42 @@ export function MyScreen({
               <p className="text-[14px] font-bold text-[#5C4F4A] truncate">{t("nav.install")}</p>
             </div>
             <ChevronRight className="w-4 h-4 text-stone-300 shrink-0" />
+          </button>
+        </div>
+
+        {/* ── Fonday 디바이스 COMING SOON ── */}
+        <div className="p-5" style={{ borderRadius: RADIUS_CARD, background: "#FFFFFF", boxShadow: SHADOW_CARD }}>
+          <div className="flex items-start justify-between gap-3 mb-4">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ fontFamily: "'Fraunces', Georgia, serif", color: "#B0A898" }}>COMING SOON</p>
+              <p className="text-[17px] font-semibold mt-1" style={{ color: DEEP_GREEN }}>{t("result.deviceTeaser.title")}</p>
+              <p className="text-xs text-stone-400 mt-1">{t("result.deviceTeaser.sub")}</p>
+            </div>
+            <div className="w-12 h-12 rounded-2xl flex items-center justify-center shrink-0"
+              style={{ background: TINT_WARM }}>
+              <Microscope className="w-6 h-6" style={{ color: "#C97062" }} />
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-2 mb-4">
+            {[
+              { icon: Thermometer, label: t("result.locked.skinTemp"), color: "#E09882" },
+              { icon: Droplets, label: t("result.locked.moisture"), color: "#3B82C4" },
+              { icon: Flame, label: t("result.locked.oil"), color: "#F59E0B" },
+              { icon: Shield, label: t("result.locked.barrier"), color: "#10B981" },
+            ].map((item, i) => {
+              const Icon = item.icon;
+              return (
+                <div key={i} className="flex items-center gap-2 p-2.5 rounded-xl" style={{ background: BG_MUTED }}>
+                  <Icon className="w-4 h-4 shrink-0" style={{ color: item.color }} />
+                  <p className="text-xs font-semibold text-stone-600">{item.label}</p>
+                </div>
+              );
+            })}
+          </div>
+          <button
+            className="w-full flex items-center justify-center gap-1.5 text-[12px] font-semibold"
+            style={{ background: TINT_WARM, color: SCAN_TO, height: 44, borderRadius: 22 }}>
+            {t("result.earlybird")} <ArrowRight className="w-4 h-4" />
           </button>
         </div>
       </div>

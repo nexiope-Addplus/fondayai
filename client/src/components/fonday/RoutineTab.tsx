@@ -48,6 +48,7 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [showReportCard, setShowReportCard] = useState(false);
   const [showAllSignals, setShowAllSignals] = useState(false);
+  const [showAllCollection, setShowAllCollection] = useState(false);
   const [routineLogs, setRoutineLogs] = useState<{ date_str: string; cosmetic_ids: string[] }[]>([]);
 
   const loadData = async () => {
@@ -507,7 +508,7 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
                 <p className="text-xs text-stone-400 mt-0.5">{t("cosmetics.collectionSub")}</p>
               </div>
               <div className="grid grid-cols-2 gap-2.5">
-                {list.map((item) => {
+                {(showAllCollection ? list : list.slice(0, 4)).map((item) => {
                   const signal = productSignals.find((entry) => entry.itemId === item.id) || null;
                   return (
                     <button
@@ -546,6 +547,15 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
                   );
                 })}
               </div>
+              {list.length > 4 && (
+                <button
+                  onClick={() => setShowAllCollection(v => !v)}
+                  className="w-full mt-3 text-center text-[13px] font-semibold py-2"
+                  style={{ color: DEEP_GREEN }}
+                >
+                  {showAllCollection ? t("common.collapse", "접기") : t("common.viewAll", { count: list.length, defaultValue: `전체 ${list.length}개 보기` })}
+                </button>
+              )}
             </div>
           </>
         )}
