@@ -501,20 +501,23 @@ export function ScanIdleScreen({
       {!latestScan && (
         <>
           <motion.div variants={fadeChild} className="mb-8 relative" style={{ zIndex: 1 }}>
-            <p className="text-xs font-semibold text-stone-400 mb-6 tracking-widest uppercase">
+            <p className="text-xs font-semibold text-stone-400 text-center mb-4 tracking-widest uppercase">
               {t("idle.stepsTitle")}
             </p>
-            <div className="space-y-5">
+            <div className="flex items-start justify-between">
               {STEPS.map((step, i) => (
-                <div key={i} className="flex items-start gap-4">
-                  <div className="w-10 h-10 rounded-2xl flex items-center justify-center shrink-0"
-                    style={step.active ? { background: TINT_WARM } : { background: "#F4F4F5" }}>
-                    <step.Icon className="w-5 h-5" style={{ color: step.active ? SCAN_TO : "#A9998E" }} />
+                <div key={i} className="flex items-start" style={{ flex: 1 }}>
+                  <div className="flex flex-col items-center gap-1.5 flex-1">
+                    <div className="w-10 h-10 rounded-2xl flex items-center justify-center"
+                      style={step.active ? { background: TINT_WARM } : { background: "#F4F4F5" }}>
+                      <step.Icon className="w-5 h-5" style={{ color: step.active ? SCAN_TO : "#A9998E" }} />
+                    </div>
+                    <div className="text-center">
+                      <p className="text-xs font-semibold text-stone-700">{step.title}</p>
+                      <p className="text-xs text-stone-400 mt-0.5 leading-tight">{step.sub}</p>
+                    </div>
                   </div>
-                  <div className="pt-0.5">
-                    <p className="text-[14px] font-semibold text-stone-800">{step.title}</p>
-                    <p className="text-[13px] mt-0.5" style={{ color: TEXT_SECONDARY }}>{step.sub}</p>
-                  </div>
+                  {i < 2 && <div className="text-stone-200 text-sm pt-3 flex-shrink-0">›</div>}
                 </div>
               ))}
             </div>
