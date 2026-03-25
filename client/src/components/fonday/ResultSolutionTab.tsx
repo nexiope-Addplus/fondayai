@@ -1,7 +1,7 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
-import { ScanLine, Leaf, Sparkles, Star, Utensils } from "lucide-react";
+import { ScanLine, Lightbulb, Sparkles, Star, Utensils } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DEEP_GREEN, SCAN_TO, SCAN_FROM, TINT_WARM, TINT_GREEN, TINT_NEUTRAL, BG_MUTED, BORDER_COLOR, FONT_DISPLAY, TEXT_TERTIARY, SHADOW_CARD } from "./constants";
 import { SkinPredictionCard } from "./SkinPredictionCard";
@@ -44,7 +44,7 @@ export function ResultSolutionTab(props: any) {
 
             <div className="flex items-center gap-2 mb-1">
               <div className="w-9 h-9 rounded-2xl flex items-center justify-center" style={{ background: TINT_GREEN }}>
-                <Leaf className="w-4 h-4" style={{ color: DEEP_GREEN }} />
+                <Lightbulb className="w-4 h-4" style={{ color: DEEP_GREEN }} />
               </div>
               <div>
                 <p className="text-xs font-semibold uppercase tracking-[0.14em]" style={{ fontFamily: FONT_DISPLAY, color: TEXT_TERTIARY }}>{t("modal.improvements.title")}</p>
