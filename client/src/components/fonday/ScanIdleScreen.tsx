@@ -146,7 +146,7 @@ export function ScanIdleScreen({
   const STEPS = [
     { Icon: ClipboardList, title: t("idle.step1"), sub: t("idle.step1Sub"), active: true },
     { Icon: Camera, title: t("idle.step2"), sub: t("idle.step2Sub"), active: false },
-    { Icon: Activity, title: t("idle.step3"), sub: t("idle.step3Sub"), active: false },
+    { Icon: Sparkles, title: t("idle.step3"), sub: t("idle.step3Sub"), active: false },
   ];
   const previousScan = recentScans[1] ?? null;
   const latestScoreDelta = latestScan && previousScan
@@ -244,15 +244,15 @@ export function ScanIdleScreen({
       {!latestScan && !scanLoading && (
         <motion.div variants={fadeChild} className="mb-8 relative" style={{ zIndex: 1 }}>
           {/* 헤드라인 — Pretendard Bold, 한글 자연스러운 볼드 */}
-          <h1 className="text-[26px] font-bold leading-[1.3] mt-2 mb-3" style={{ color: "#1C1917" }}>
+          <h1 className="text-[26px] font-bold leading-[1.3] mt-1 mb-2" style={{ color: "#1C1917" }}>
             {t("idle.subtitle1")}<br />{t("idle.subtitle3")}
           </h1>
-          <p className="text-[14px] leading-[1.7] mb-6" style={{ color: TEXT_SECONDARY }}>
+          <p className="text-[14px] leading-[1.7] mb-5" style={{ color: TEXT_SECONDARY }}>
             {t("idle.subtitle4")}
           </p>
 
           {/* 얼굴 이미지 — 3:4 세로, 그림자, Sage Green 스캔라인 */}
-          <div className="relative overflow-hidden mb-6 bg-stone-100"
+          <div className="relative overflow-hidden mb-5 bg-stone-100"
             style={{ aspectRatio: "3/4", borderRadius: 28, boxShadow: "0 12px 40px rgba(28,25,23,0.08)" }}>
             <img
               src="/face-model.png"
@@ -281,21 +281,22 @@ export function ScanIdleScreen({
             </div>
           </div>
 
-          {/* CTA — Salmon 계열, 따뜻한 초대 */}
+          {/* CTA — pill 형태, 부드러운 Salmon */}
           <motion.button
             onClick={() => { haptic("medium"); onScan(); }}
-            className="w-full rounded-2xl text-white text-[15px] font-semibold tracking-tight"
+            className="w-full text-white text-[15px] font-semibold flex items-center justify-center gap-2"
             style={{
-              background: "linear-gradient(180deg, #C97062 0%, #B5635A 100%)",
-              boxShadow: "0 4px 20px rgba(201,112,98,0.3)",
-              height: 56,
+              background: "#C97062",
+              boxShadow: "0 2px 12px rgba(201,112,98,0.2)",
+              height: 52,
+              borderRadius: 26,
             }}
-            whileHover={{ scale: reducedMotion ? 1 : 1.01 }}
+            whileHover={{ scale: reducedMotion ? 1 : 1.02 }}
             whileTap={{ scale: reducedMotion ? 1 : 0.97 }}
           >
             {t("idle.ctaBtn")}
           </motion.button>
-          <p className="text-center text-xs mt-3" style={{ color: TEXT_TERTIARY }}>
+          <p className="text-center text-[12px] mt-2.5" style={{ color: TEXT_TERTIARY }}>
             {t("idle.ctaHint")}
           </p>
         </motion.div>
@@ -429,9 +430,9 @@ export function ScanIdleScreen({
               {STEPS.map((step, i) => (
                 <div key={i} className="flex items-start" style={{ flex: 1 }}>
                   <div className="flex flex-col items-center gap-1.5 flex-1">
-                    <div className="w-10 h-10 rounded-[14px] flex items-center justify-center"
+                    <div className="w-10 h-10 rounded-full flex items-center justify-center"
                       style={step.active ? { background: TINT_WARM } : { background: BG_MUTED }}>
-                      <step.Icon className="w-5 h-5" style={{ color: step.active ? SCAN_TO : "#A9998E" }} />
+                      <step.Icon className="w-4.5 h-4.5" style={{ color: step.active ? SCAN_TO : "#A9998E" }} />
                     </div>
                     <div className="text-center">
                       <p className="text-xs font-semibold text-stone-700">{step.title}</p>
