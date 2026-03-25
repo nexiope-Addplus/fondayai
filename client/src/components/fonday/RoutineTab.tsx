@@ -166,45 +166,48 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
 
   if (!user) {
     return (
-      <div className="min-h-[calc(100dvh-64px)] px-5 pt-6 pb-28" style={{ background: BG_BASE }}>
-        <div className="rounded-[28px] bg-white p-6 text-center" style={{ border: `1px solid ${BORDER_COLOR}` }}>
-          <div className="w-14 h-14 rounded-3xl mx-auto mb-4 flex items-center justify-center" style={{ background: TINT_GREEN }}>
-            <Droplets className="w-7 h-7" style={{ color: DEEP_GREEN }} />
+      <div className="min-h-[calc(100dvh-64px)] px-4 pt-6 pb-28" style={{ background: "linear-gradient(180deg, #FDFCFA 0%, #F8F5F1 50%, #FDFCFA 100%)" }}>
+        <div className="mb-8">
+          <div className="w-12 h-12 rounded-full mb-4 flex items-center justify-center" style={{ background: TINT_GREEN }}>
+            <Droplets className="w-6 h-6" style={{ color: DEEP_GREEN }} />
           </div>
-          <p className="text-xs font-medium tracking-widest uppercase mb-2" style={{ color: SCAN_TO, fontFamily: FONT_DISPLAY }}>{t("nav.routine")}</p>
-          <h2 className="text-xl font-normal" style={{ color: DEEP_GREEN, fontFamily: FONT_DISPLAY }}>{t("cosmetics.myTitle")}</h2>
-          <p className="text-[13px] text-stone-500 mt-2 text-kr-pretty">
+          <h2 className="text-[22px] font-bold mb-2" style={{ color: "#5C4F4A" }}>{t("cosmetics.myTitle")}</h2>
+          <p className="text-[14px] leading-relaxed text-kr-pretty" style={{ color: "#8C8078" }}>
             {t("cosmetics.loginDesc")}
           </p>
-          <div className="space-y-2 mt-5 text-left">
-            <div className="rounded-2xl px-4 py-3" style={{ background: "#F8FAFD" }}>
-              <p className="text-[12px] font-semibold text-[#5C4F4A]">{t("cosmetics.routineRepresentativeTitle")}</p>
+        </div>
+
+        <div className="rounded-[20px] p-5 mb-6" style={{ background: BG_MUTED }}>
+          <div className="space-y-2 mb-5">
+            <div className="rounded-2xl px-4 py-3 bg-white">
+              <p className="text-[13px] font-semibold text-[#5C4F4A]">{t("cosmetics.routineRepresentativeTitle")}</p>
             </div>
-            <div className="rounded-2xl px-4 py-3" style={{ background: "#F8FAFD" }}>
-              <p className="text-[12px] font-semibold text-[#5C4F4A]">{t("cosmetics.signalSectionTitle")}</p>
+            <div className="rounded-2xl px-4 py-3 bg-white">
+              <p className="text-[13px] font-semibold text-[#5C4F4A]">{t("cosmetics.signalSectionTitle")}</p>
             </div>
           </div>
-          <div className="mt-5 space-y-3">
+          <div className="space-y-2.5">
             {i18n.language === "ko" ? (
               <button
                 onClick={() => onLogin ? onLogin("kakao", "routine") : (localStorage.setItem("fonday_return_tab", "routine"), window.location.href = "/auth/kakao")}
-                className="w-full h-11 rounded-xl font-bold text-[13px] flex items-center justify-center border-0 text-[#3C1E1E]"
-                style={{ background: "#FEE500" }}
+                className="w-full font-bold text-[13px] flex items-center justify-center border-0 text-[#3C1E1E]"
+                style={{ background: "#FEE500", height: 48, borderRadius: 24 }}
               >
                 {t("attendance.kakao")}
               </button>
             ) : (
               <button
                 onClick={() => onLogin ? onLogin("line", "routine") : (localStorage.setItem("fonday_return_tab", "routine"), window.location.href = "/auth/line")}
-                className="w-full h-11 rounded-xl font-bold text-[13px] flex items-center justify-center border-0 text-white"
-                style={{ background: DEEP_GREEN }}
+                className="w-full font-bold text-[13px] flex items-center justify-center border-0 text-white"
+                style={{ background: "#C97062", height: 48, borderRadius: 24 }}
               >
                 {t("attendance.line")}
               </button>
             )}
             <button
               onClick={() => onLogin ? onLogin("google", "routine") : (localStorage.setItem("fonday_return_tab", "routine"), window.location.href = "/auth/google")}
-              className="w-full h-11 rounded-xl font-bold text-[13px] bg-white text-[#6B5D55] flex items-center justify-center"
+              className="w-full font-bold text-[13px] bg-white text-[#6B5D55] flex items-center justify-center"
+              style={{ height: 48, borderRadius: 24 }}
             >
               {t("attendance.google")}
             </button>
@@ -212,7 +215,7 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
         </div>
 
         {productSignals.length > 0 && (
-          <div className="mt-4 rounded-3xl p-4" style={{ background: "#FFFFFF", border: `1px solid ${BORDER_COLOR}` }}>
+          <div className="rounded-[20px] p-4" style={{ background: BG_MUTED }}>
             <div className="flex items-start justify-between gap-3 mb-3">
               <div>
                 <p className="text-xs font-bold tracking-[0.14em] uppercase" style={{ color: SCAN_TO, fontFamily: FONT_DISPLAY }}>
