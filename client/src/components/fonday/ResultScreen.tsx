@@ -900,7 +900,7 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
             const startX = (e.currentTarget as any)._touchX;
             if (startX == null) return;
             const diff = e.changedTouches[0].clientX - startX;
-            if (Math.abs(diff) < 40) return;
+            if (Math.abs(diff) < 80) return;
             const cur = TAB_SEQUENCE.indexOf(activeTab);
             if (diff < 0 && cur < TAB_SEQUENCE.length - 1) goTo(TAB_SEQUENCE[cur + 1]);
             else if (diff > 0 && cur > 0) goTo(TAB_SEQUENCE[cur - 1]);
