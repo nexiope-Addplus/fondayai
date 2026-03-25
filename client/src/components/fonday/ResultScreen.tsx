@@ -940,7 +940,7 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
             <button onClick={onOpenDiary} className="rounded-full px-3 py-1.5 text-xs font-semibold" style={{ background: TINT_WARM, color: SCAN_TO }}>
               {t("nav.diary")}
             </button>
-            <button onClick={onGoMagazine} className="rounded-full px-3 py-1.5 text-xs font-semibold border" style={{ background: BG_BASE, color: "#7C3AED", borderColor: BORDER_COLOR }}>
+            <button onClick={onGoMagazine} className="rounded-full px-3 py-1.5 text-xs font-semibold border" style={{ background: BG_BASE, color: DEEP_GREEN, borderColor: BORDER_COLOR }}>
               {t("nav.magazine")}
             </button>
             <button onClick={onGoMy} className="rounded-full px-3 py-1.5 text-xs font-semibold border" style={{ background: BG_BASE, color: DEEP_GREEN, borderColor: BORDER_COLOR }}>
