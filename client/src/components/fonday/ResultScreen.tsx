@@ -862,8 +862,11 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
               <p className="text-[14px] font-bold mt-0.5" style={{ color: "#5C4F4A" }}>
                 {analysisResult.improvements[0].title}
               </p>
-              <p className="text-[12px] mt-0.5 line-clamp-1 text-kr-pretty" style={{ color: "#8C8078" }}>
-                {morningTask} · {eveningTask}
+              <p className="text-[12px] mt-1 text-kr-pretty" style={{ color: "#8C8078" }}>
+                {t("result.actionCard.phaseMorning")}: {morningTask}
+              </p>
+              <p className="text-[12px] mt-0.5 text-kr-pretty" style={{ color: "#8C8078" }}>
+                {t("result.actionCard.phaseEvening")}: {eveningTask}
               </p>
             </div>
           </div>

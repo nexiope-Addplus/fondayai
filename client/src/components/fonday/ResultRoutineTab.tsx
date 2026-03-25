@@ -49,41 +49,7 @@ export function ResultRoutineTab(props: any) {
           </motion.div>
         )}
 
-        {/* 퀘스트 / 미션 카드 */}
-        <div className="space-y-1">
-          <div>
-            <div className="min-w-0">
-              <p className="text-xs font-semibold tracking-[0.16em] uppercase" style={{ fontFamily: FONT_DISPLAY, color: TEXT_TERTIARY }}>{t("result.actionCard.missionEyebrow")}</p>
-              <p className="text-base font-semibold mt-1 text-kr-pretty" style={{ color: DEEP_GREEN }}>{t("result.actionCard.title")}</p>
-              <p className="text-xs text-stone-500 mt-1.5 leading-relaxed text-kr-pretty">{questStatusDetail}</p>
-            </div>
-            <div className="h-2 rounded-full bg-stone-100 overflow-hidden mt-3">
-              <motion.div
-                className="h-full rounded-full"
-                style={{ background: DEEP_GREEN }}
-                initial={{ width: 0 }}
-                animate={{ width: `${questProgressPct}%` }}
-                transition={{ duration: 0.6, ease: "easeOut" }}
-              />
-            </div>
-            <div className="flex items-center justify-between gap-3 mt-3">
-              <p className="text-xs text-stone-500 line-clamp-1">
-                {nextStreakGoal
-                  ? t("result.actionCard.streakGoal", { days: daysToGoal, goal: nextStreakGoal, reward: nextStreakReward })
-                  : t("result.actionCard.streakDone")}
-              </p>
-              <button
-                onClick={() => setShowQuestSheet(true)}
-                className="rounded-full px-3 py-1.5 text-xs font-medium shrink-0"
-                style={{ background: TINT_WARM, color: SCAN_TO }}
-              >
-                {t("result.actionCard.questTitle", { done: essentialQuests.filter((quest: any) => quest.done).length, total: essentialQuests.length })}
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* 루틴 체크 카드 */}
+        {/* 루틴 체크 카드 — 실제 피부 행동을 최상단에 */}
         <div className="space-y-1">
           <div>
             <div className="flex items-start justify-between gap-3">
@@ -223,6 +189,38 @@ export function ResultRoutineTab(props: any) {
                 onGoSolution={() => goTo("solution")}
               />
         )}
+
+        {/* 퀘스트 / 미션 — 루틴 아래 (게이미피케이션) */}
+        <div className="pt-8 mt-8" style={{ borderTop: `1px solid ${BORDER_COLOR}` }}>
+          <div className="min-w-0">
+            <p className="text-xs font-semibold tracking-[0.16em] uppercase" style={{ fontFamily: FONT_DISPLAY, color: TEXT_TERTIARY }}>{t("result.actionCard.missionEyebrow")}</p>
+            <p className="text-base font-semibold mt-1 text-kr-pretty" style={{ color: DEEP_GREEN }}>{t("result.actionCard.title")}</p>
+            <p className="text-xs text-stone-500 mt-1.5 leading-relaxed text-kr-pretty">{questStatusDetail}</p>
+          </div>
+          <div className="h-2 rounded-full bg-stone-100 overflow-hidden mt-3">
+            <motion.div
+              className="h-full rounded-full"
+              style={{ background: DEEP_GREEN }}
+              initial={{ width: 0 }}
+              animate={{ width: `${questProgressPct}%` }}
+              transition={{ duration: 0.6, ease: "easeOut" }}
+            />
+          </div>
+          <div className="flex items-center justify-between gap-3 mt-3">
+            <p className="text-xs text-stone-500 line-clamp-1">
+              {nextStreakGoal
+                ? t("result.actionCard.streakGoal", { days: daysToGoal, goal: nextStreakGoal, reward: nextStreakReward })
+                : t("result.actionCard.streakDone")}
+            </p>
+            <button
+              onClick={() => setShowQuestSheet(true)}
+              className="rounded-full px-3 py-1.5 text-xs font-medium shrink-0"
+              style={{ background: TINT_WARM, color: SCAN_TO }}
+            >
+              {t("result.actionCard.questTitle", { done: essentialQuests.filter((quest: any) => quest.done).length, total: essentialQuests.length })}
+            </button>
+          </div>
+        </div>
 
           </div>
   );
