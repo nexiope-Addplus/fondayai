@@ -229,10 +229,10 @@ export function ScanIdleScreen({
       {/* 컴백 배너 (3일+ 경과 시) */}
       {daysSince !== null && daysSince >= 3 && (
         <motion.div variants={fadeChild} className="mb-3 relative" style={{ zIndex: 1 }}>
-          <div className="flex items-center gap-2 px-4 py-2.5 rounded-2xl text-[12px] font-semibold"
+          <div className="flex items-center gap-2 px-4 py-2.5 rounded-full text-[12px] font-semibold"
             style={daysSince >= 7
-              ? { background: "#FFF7ED", color: "#C2410C", border: "1px solid #FED7AA" }
-              : { background: "#F0FAF6", color: "#166534", border: "1px solid #BBF7D0" }}>
+              ? { background: "#FFF7ED", color: "#C2410C" }
+              : { background: "#F0FAF6", color: "#166534" }}>
             {daysSince >= 7
               ? t("streak.comeback7", { days: daysSince })
               : t("streak.comeback3", { days: daysSince })}
@@ -304,22 +304,14 @@ export function ScanIdleScreen({
 
       <motion.div variants={fadeChild} className="mb-8 relative" style={{ zIndex: 1 }}>
         {scanLoading && (
-          <div className={`rounded-2xl bg-white px-4 py-4 mb-4 border${reducedMotion ? "" : " animate-pulse"}`} style={{ borderColor: BORDER_COLOR }}>
+          <div className={`rounded-[20px] px-4 py-4 mb-4${reducedMotion ? "" : " animate-pulse"}`} style={{ background: BG_MUTED }}>
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0 flex-1">
-                <div className="h-3 w-20 rounded-full bg-stone-100 mb-2" />
-                <div className="h-4 w-36 rounded-full bg-stone-100 mb-1.5" />
-                <div className="h-3 w-48 rounded-full bg-stone-100" />
+                <div className="h-3 w-20 rounded-full bg-stone-200/50 mb-2" />
+                <div className="h-4 w-36 rounded-full bg-stone-200/50 mb-1.5" />
+                <div className="h-3 w-48 rounded-full bg-stone-200/50" />
               </div>
-              <div className="rounded-2xl px-3 py-2 shrink-0 w-16 h-14 bg-stone-100" />
-            </div>
-            <div className="grid grid-cols-3 gap-2 mt-3">
-              {[1,2,3].map(i => (
-                <div key={i} className="rounded-2xl p-3 bg-stone-50">
-                  <div className="h-2.5 w-10 rounded-full bg-stone-100 mb-2" />
-                  <div className="h-4 w-8 rounded-full bg-stone-100" />
-                </div>
-              ))}
+              <div className="rounded-2xl shrink-0 w-16 h-14 bg-stone-200/50" />
             </div>
           </div>
         )}
@@ -459,8 +451,8 @@ export function ScanIdleScreen({
         <motion.div variants={fadeChild} className="relative" style={{ zIndex: 1 }}>
           <button
             onClick={() => { haptic("medium"); onScan(); }}
-            className="w-full flex items-center justify-center gap-2 py-3.5 rounded-2xl text-[14px] font-semibold active:opacity-80 transition-opacity"
-            style={{ background: `${DEEP_GREEN}10`, color: DEEP_GREEN }}
+            className="w-full flex items-center justify-center gap-2 text-[14px] font-semibold active:opacity-80 transition-opacity"
+            style={{ background: `${DEEP_GREEN}10`, color: DEEP_GREEN, height: 48, borderRadius: 24 }}
           >
             <Camera className="w-4 h-4" />
             {t("idle.rescan", "오늘의 피부 스캔하기")}
@@ -531,7 +523,7 @@ function HomeRoutineWidget({ onOpenRoutine }: { onOpenRoutine?: () => void }) {
   };
 
   return (
-    <div className="rounded-2xl bg-white px-4 py-3.5 mb-3 border" style={{ borderColor: BORDER_COLOR }}>
+    <div className="rounded-[20px] px-4 py-3.5 mb-3" style={{ background: BG_MUTED }}>
       <div className="flex items-center justify-between mb-2.5">
         <p className="text-[11px] font-semibold uppercase tracking-[0.14em]" style={{ color: DEEP_GREEN, fontFamily: FONT_DISPLAY }}>
           {t("routineChecklist.title", "오늘 사용한 화장품")}
@@ -552,7 +544,7 @@ function HomeRoutineWidget({ onOpenRoutine }: { onOpenRoutine?: () => void }) {
                 style={{ background: checked ? DEEP_GREEN : "transparent", borderColor: checked ? DEEP_GREEN : "#D1CBC3" }}>
                 {checked && <span className="text-white text-[10px] font-bold">✓</span>}
               </div>
-              <span className="text-[13px] font-medium truncate" style={{ color: checked ? DEEP_GREEN : "#374151" }}>
+              <span className="text-[13px] font-medium truncate" style={{ color: checked ? DEEP_GREEN : "#6B5D55" }}>
                 {item.name}
               </span>
             </button>
@@ -572,7 +564,7 @@ function HomeRoutineWidget({ onOpenRoutine }: { onOpenRoutine?: () => void }) {
 
       {/* ── 효과 보드 (가장 효과 좋은 제품) ── */}
       {topSignal && (
-        <div className="mt-3 pt-3" style={{ borderTop: `1px solid ${BORDER_COLOR}` }}>
+        <div className="mt-3 pt-3">
           <p className="text-[11px] font-semibold uppercase tracking-[0.14em] mb-2" style={{ color: SCAN_TO, fontFamily: FONT_DISPLAY }}>
             {t("idle.effectBoard", "효과 추적")}
           </p>
