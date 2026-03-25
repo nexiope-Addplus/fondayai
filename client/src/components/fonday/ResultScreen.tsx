@@ -847,7 +847,27 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
           previousScores={history.length > 0 ? history[0]?.scores : null}
         />
 
-        {/* 핵심 액션은 헤더카드 안에서 한 줄로 표시 — 별도 카드 제거 */}
+        {/* ── 오늘의 핵심 액션 요약 ── */}
+        {analysisResult?.improvements?.[0] && (
+          <div className="flex items-start gap-3 px-4 py-3.5"
+            style={{ borderRadius: 16, background: TINT_GREEN }}>
+            <div className="w-8 h-8 rounded-full flex items-center justify-center shrink-0 mt-0.5"
+              style={{ background: "#FFFFFF" }}>
+              <Sparkles className="w-4 h-4" style={{ color: DEEP_GREEN }} />
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.1em]" style={{ color: DEEP_GREEN }}>
+                {t("result.todayFocus", "오늘의 핵심")}
+              </p>
+              <p className="text-[14px] font-bold mt-0.5" style={{ color: "#5C4F4A" }}>
+                {analysisResult.improvements[0].title}
+              </p>
+              <p className="text-[12px] mt-0.5 line-clamp-1 text-kr-pretty" style={{ color: "#8C8078" }}>
+                {morningTask} · {eveningTask}
+              </p>
+            </div>
+          </div>
+        )}
 
         {/* 루틴 체크리스트 — 오늘 사용한 화장품 체크 */}
         <RoutineChecklist
