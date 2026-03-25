@@ -306,7 +306,7 @@ export function ScanIdleScreen({
         <div className="flex items-center justify-between gap-2 mb-3">
           <span className="text-xs font-medium tracking-wide" style={{ color: TEXT_TERTIARY, fontFamily: FONT_DISPLAY }}>{t("idle.heroBadge")}</span>
         </div>
-        <h1 className="text-[30px] font-normal leading-[1.15] mb-2 px-1" style={{ color: "#1C1917", fontFamily: FONT_DISPLAY }}>
+        <h1 className="text-[30px] font-light leading-[1.15] mb-2 px-1" style={{ color: "#1C1917", fontFamily: FONT_DISPLAY }}>
           {t("idle.subtitle1")}<br />{t("idle.subtitle3")}
         </h1>
         <p className="text-[14px] leading-[1.7] px-1 mb-4" style={{ color: TEXT_SECONDARY }}>
