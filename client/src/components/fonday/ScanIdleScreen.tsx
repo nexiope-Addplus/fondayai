@@ -3,19 +3,18 @@ import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import {
   Sparkles, Lock, Activity,
-  ClipboardList, Camera, ChevronDown, Bot,
+  ClipboardList, Camera, ChevronDown,
 } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
 import {
-  BAUMANN_COLORS, DEEP_GREEN, SCAN_FROM, SCAN_TO, TEXT_SECONDARY, TEXT_TERTIARY,
-  TINT_GREEN, SCORE_COLORS, stagger, fadeChild,
-  BG_BASE, BG_MUTED, BORDER_COLOR, FONT_DISPLAY, FONT_HEADING,
+  BAUMANN_COLORS, DEEP_GREEN, SCAN_TO, TEXT_SECONDARY, TEXT_TERTIARY,
+  SCORE_COLORS, stagger, fadeChild,
+  BG_MUTED, BORDER_COLOR, FONT_DISPLAY, FONT_HEADING,
   SHADOW_CARD, SHADOW_ELEVATED, RADIUS_CARD, RADIUS_ITEM, PAGE_GRADIENT,
 } from "./constants";
 import type { WeatherData, WeatherTipKey } from "./types";
 import { getStreak, getDaysSinceLastScan, getWeatherTipKey, buildCosmeticCorrelationSignals, todayStr, haptic } from "./utils";
 // AttendanceCalendarModal은 MY탭에서만 사용
-import { WeatherTipCard, MiniScoreBarIdle } from "./WeatherTipCard";
+import { WeatherTipCard } from "./WeatherTipCard";
 import { LangSwitcher } from "./BottomNav";
 
 // ─── 메인 스캔 화면 ───────────────────────────────────────────────
@@ -155,7 +154,7 @@ export function ScanIdleScreen({
       onTouchEnd={handleTouchEnd}
     >
       {/* 상단 헤더 row */}
-      <div className="flex justify-between items-center mb-5 relative" style={{ zIndex: 1 }}>
+      <div className="flex justify-between items-center mb-4 relative" style={{ zIndex: 1 }}>
         <img src="/fonday-logo.svg" alt="Fonday" className="h-8" style={{ objectFit: "contain" }} />
         <LangSwitcher />
       </div>
@@ -215,7 +214,7 @@ export function ScanIdleScreen({
 
       {/* 컴백 배너 (3일+ 경과 시) */}
       {daysSince !== null && daysSince >= 3 && (
-        <motion.div variants={fadeChild} className="mb-3 relative" style={{ zIndex: 1 }}>
+        <motion.div variants={fadeChild} className="mb-4 relative" style={{ zIndex: 1 }}>
           <div className="flex items-center gap-2 px-4 py-2.5 rounded-full text-[12px] font-semibold"
             style={daysSince >= 7
               ? { background: "#FFF7ED", color: "#C2410C" }

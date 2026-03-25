@@ -174,7 +174,7 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
   if (!user) {
     return (
       <div className="min-h-[calc(100dvh-64px)] px-4 pt-6 pb-28" style={{ background: PAGE_GRADIENT }}>
-        <div className="mb-6">
+        <div className="mb-8">
           <div className="flex items-center gap-2.5 mb-1">
             <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ background: TINT_GREEN }}>
               <Droplets className="w-4 h-4" style={{ color: DEEP_GREEN }} />
@@ -187,7 +187,7 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
         </div>
 
         <div className="p-5 mb-6" style={{ borderRadius: RADIUS_CARD, background: "#FFFFFF", boxShadow: SHADOW_CARD }}>
-          <div className="mb-5">
+          <div className="mb-4">
             <p className="text-[14px] font-bold mb-3" style={{ color: "#5C4F4A" }}>{t("cosmetics.loginValueTitle", "로그인하면 이런 걸 할 수 있어요")}</p>
             <div className="space-y-2.5">
               <div className="flex items-center gap-2.5">

@@ -251,7 +251,7 @@ export function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: AppU
     return (
       <div className="flex flex-col" style={{ background: PAGE_GRADIENT, minHeight: "calc(100dvh - 64px)" }}>
         <div className="px-4 pt-6 pb-28">
-          <div className="mb-6">
+          <div className="mb-8">
             <div className="flex items-center gap-2.5 mb-1">
               <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ background: TINT_WARM }}>
                 <BookOpen className="w-4 h-4" style={{ color: SCAN_TO }} />
@@ -261,7 +261,7 @@ export function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: AppU
             <p className="text-[13px] text-kr-pretty" style={{ color: "#8C8078", marginLeft: 42 }}>{t("diary.loginDesc", "로그인으로 내 피부 일기를 시작하세요.")}</p>
           </div>
 
-          <div className="mb-6">
+          <div className="mb-8">
             <p className="text-[14px] font-bold mb-3" style={{ color: "#5C4F4A" }}>{t("diary.loginValueTitle", "피부 일기를 쓰면")}</p>
             <div className="space-y-2.5">
               <div className="flex items-center gap-2.5">

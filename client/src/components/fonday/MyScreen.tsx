@@ -77,7 +77,7 @@ export function MyScreen({
     <div className="min-h-[calc(100dvh-64px)] pb-28" style={{ background: PAGE_GRADIENT }}>
       {/* 헤더 */}
       <div className="px-4 pt-5 pb-0">
-        <div className="mb-5">
+        <div className="mb-4">
           <div className="flex items-start justify-between gap-3">
             <div>
               <div className="flex items-center gap-2.5 mb-1">
