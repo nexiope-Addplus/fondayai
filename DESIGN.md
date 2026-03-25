@@ -1,92 +1,132 @@
-# Design System — Fonday AI
+# Design System — Fonday
 
 ## Product Context
 - **What this is:** AI 기반 피부 분석 앱 — 셀카 한 장으로 Skin MBTI 16타입 진단, 맞춤 루틴 추천, 피부 변화 추적
 - **Who it's for:** 피부 관리에 관심 있는 일반 소비자 (한국/일본/영어권)
 - **Space/industry:** 뷰티테크 / 스킨케어 / 헬스테크
-- **Project type:** 모바일 우선 PWA (앱 UI + 랜딩 혼합)
-- **Reference sites:** Typology (typology.com), 화해 (hwahae.co.kr)
+- **Project type:** 모바일 우선 PWA (앱 UI)
+- **Reference sites:** Typology, 화해, Oura Ring, Bear App, Gentler Streak
+- **Target feel:** "Sophisticated Softness" — 세련되지만 부드러운, 신뢰감+따뜻함
 
 ## Aesthetic Direction
-- **Direction:** Minimal / Organic
-- **Decoration level:** Minimal — 타이포그래피와 여백이 주역. 불필요한 배경색, 그라디언트, 텍스처 최소화.
+- **Direction:** Warm Minimal
 - **Mood:** 조용한 자신감. 따뜻하지만 절제된. 전문적이되 친근한 스킨케어 파트너.
-- **Differentiation:** 스킨케어 카테고리의 쿨톤(민트/티아/파란색) 대신 따뜻한 녹색+살몬으로 독자적 아이덴티티.
+- **핵심 원칙:**
+  - 카드는 최소한으로 — 탭 가능한 인터랙션이 있을 때만 사용
+  - 섹션 구분은 여백 + 구분선 + 타이포 계층으로
+  - 색상은 정보를 전달할 때만 (장식용 파스텔 금지)
+  - 앱 내부에서 "AI" 텍스트 사용 안 함 (마케팅/공유용만)
+
+## Brand
+- **로고:** Fonday° (SVG, client/public/fonday-logo.svg)
+- **로고 적용:** 홈 화면 헤더 + 결과 화면 헤더
+- **로고 미적용:** Routine/Diary/MY 탭 (기능 제목 + 아이콘)
 
 ## Typography
-- **Display/Hero:** Fraunces Light (300) — 가볍고 우아한 세리프. 점수, 제목, 브랜드 순간에 사용. 대부분 스킨케어 앱이 산세리프만 쓰는 가운데 차별화 포인트.
-- **Body:** Pretendard — 한국어 렌더링 최적화. 본문, 설명, UI 텍스트 전반.
-- **UI/Labels:** Pretendard Semibold (600) — 라벨, 배지, 네비게이션.
-- **Data/Tables:** Pretendard (font-variant-numeric: tabular-nums) — 점수, 날짜, 수치 정렬.
-- **Code:** JetBrains Mono (필요 시)
-- **Loading:** Google Fonts CDN — `https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,700;1,9..144,400`
-- **Scale:**
-  - Display XL: 56px / Light 300 (Fraunces)
-  - Display: 36px / Light 300 (Fraunces)
-  - H1: 30px / Bold 700 (Pretendard)
-  - H2: 20px / Bold 700 (Pretendard)
-  - Body: 16px / Regular 400
-  - Body Small: 14px / Regular 400
-  - Caption: 13px / Semibold 600
-  - Label: 12px / Semibold 600
-  - Micro: 11px / Semibold 600 (최소 크기, 이 이하 사용 금지)
+- **탭 제목:** Pretendard ExtraBold (800) 22px — 색상 #4A403A
+- **홈 헤드라인:** Pretendard ExtraBold (800) 26px — 색상 #4A403A
+- **섹션 제목:** Pretendard Bold (700) 14-15px — 색상 #5C4F4A
+- **본문:** Pretendard Regular (400) 13-14px — 색상 #8C8078
+- **보조:** Pretendard Regular (400) 12px — 색상 #B0A898
+- **포인트 숫자 (큰 점수):** Fraunces Normal (400) — OSNT, 56px 점수 등 영문/숫자만
+- **FONT_HEADING:** constants.ts의 `FONT_HEADING` 사용
+- **FONT_DISPLAY:** 영문/숫자 포인트에만 사용 (한글 제목에 사용 금지)
 
 ## Color
-- **Approach:** Restrained — 색상을 아껴서 사용. 주 액센트 하나, 보조 액센트 하나, 나머지는 중립.
-- **Primary (Sage Green):** #4A7C6E — 메인 CTA, 점수, 긍정적 지표. 자연+전문성.
-- **Secondary (Salmon):** #C97062 — 보조 액센트, 브랜드 로고, 경고 전 주의 지표.
-- **Neutrals (Warm Stone):**
-  - Base: #FDFCFA (배경)
-  - Muted: #F8F7F5 (섹션 배경)
-  - Surface: #FFFFFF (카드, 입력)
-  - Border: #EBE8E4
-  - Text Primary: #1C1917
-  - Text Secondary: #8C8078
-  - Text Tertiary: #B0A898
-- **Semantic:**
-  - Success: #2D7D46 / bg #E8F5EC
-  - Warning: #C2410C / bg #FFF7ED
-  - Error: #DC2626 / bg #FEF2F2
-  - Info: #3B82F4 / bg #EFF6FF
-- **Dark mode:**
-  - Base: #161412
-  - Surface: #1E1B18
-  - Muted: #242120
-  - Border: #2E2A27
-  - Primary text: #E7E5E4
-  - Sage Green → #7DBFA8 (밝게 조정)
-  - Salmon → #E0988A (밝게 조정)
 
-## Spacing
-- **Base unit:** 8px
-- **Density:** Spacious — 여백이 자신감의 표현. 요소 간 충분한 호흡.
-- **Scale:** 2xs(2) xs(4) sm(8) md(16) lg(24) xl(32) 2xl(48) 3xl(64)
-- **Section gap:** 56px (섹션 간 넉넉한 간격)
+### 텍스트 색상 체계 (따뜻한 브라운)
+| 역할 | 색상 | 용도 |
+|------|------|------|
+| 탭 제목 | #4A403A | ExtraBold 제목 |
+| 헤드라인/강조 | #5C4F4A | 섹션 제목, 카드 제목 |
+| 소제목/라벨 | #6B5D55 | 부제, 라벨, 아이템 이름 |
+| 본문 | #8C8078 | 설명, 부가 정보 |
+| 보조 | #B0A898 | 힌트, placeholder |
+
+**금지:** #1C1917, #000000, text-stone-700, text-stone-800, text-stone-900, text-black
+
+### 액센트 색상
+| 역할 | 색상 | 용도 |
+|------|------|------|
+| Sage Green | #4A7C6E | 분석 UI (스캔라인, 점수, 데이터) |
+| Salmon | #C97062 | 행동 유도 (메인 CTA, 선택 상태) |
+
+### 배경
+- **페이지:** `linear-gradient(180deg, #FDFCFA 0%, #F8F5F1 50%, #FDFCFA 100%)`
+- **카드:** #FFFFFF + `boxShadow: 0 1px 6px rgba(0,0,0,0.04)`
+- **서브 영역:** BG_MUTED (#F8F7F5) — 카드 안에서 구분
+- **기능적 배경:** TINT_GREEN, TINT_WARM — "좋다/나쁘다/주의" 전달 시에만
+
+### 3단계 깊이
+```
+배경 (그라데이션 베이지) ← 가장 뒤
+  └─ 카드 (#FFFFFF + shadow) ← 떠 있는 느낌
+       └─ 서브 요소 (BG_MUTED) ← 카드 안에서 구분
+```
+
+## 버튼 스타일
+
+### 메인 CTA (핵심 행동 1개)
+- 단색 Salmon (#C97062) pill
+- height 52-56px, borderRadius 26-28px
+- boxShadow: 0 2px 12px rgba(201,112,98,0.2)
+- 용도: 홈 스캔 시작, 설문 분석 시작, 성적표 보기
+
+### 보조 버튼 (배민 스타일)
+- 연한 배경 + 동일색 테두리 pill
+- Sage Green: `background: rgba(74,124,110,0.06)` + `border: 1.5px solid rgba(74,124,110,0.18)`
+- Salmon: `background: rgba(201,112,98,0.06)` + `border: 1.5px solid rgba(201,112,98,0.18)`
+- 용도: 공유, 챌린지, 일기 열기, 화장품 추가
+
+### 선택 버튼 (설문)
+- 선택: Salmon 단색 (#C97062) + 흰색 텍스트
+- 미선택: #FFFFFF + `boxShadow: 0 1px 4px rgba(0,0,0,0.05)`
+
+## 카드 사용 규칙
+- **카드 사용:** 탭해서 뭔가 열리는 아이템, 독립적 기능 블록 (알림 설정 등)
+- **카드 미사용:** 정보 표시, 리스트 아이템, 섹션 구분
+- **섹션 구분:** `borderTop: 1px solid #EBE8E4` + `pt-5 mt-5` + 볼드 제목
+
+## 탭 헤더 패턴
+```
+[아이콘 circle] 제목 (ExtraBold 22px)
+               부제 (Regular 13px, indent 42px)
+```
+- Routine: 💧 Droplets (TINT_GREEN)
+- Diary: 📖 BookOpen (TINT_WARM)
+- MY: 👤 User (TINT_WARM)
 
 ## Layout
-- **Approach:** Hybrid — 홈 랜딩은 자유로운 구성, 앱 탭들은 그리드 기반
-- **Grid:** 1열 (모바일 기본), 태블릿 이상에서 max-width 제한
-- **Max content width:** 480px (모바일 PWA 기준)
-- **Border radius:**
-  - sm: 4px (작은 뱃지)
-  - md: 8px (입력 필드)
-  - lg: 12px (버튼, 카드 내부)
-  - xl: 16px (메트릭 카드)
-  - 2xl: 24px (메인 카드)
-  - 3xl: 28px (대형 카드, 모달)
-  - full: 9999px (뱃지, 필)
+- **좌우 패딩:** px-4 (16px)
+- **섹션 간격:** mb-8 (32px) — 모바일 기준
+- **Max content width:** 480px
+- **Border radius:** pill(full), 카드(20px), 서브(16px), 아이템(12px)
 
 ## Motion
-- **Approach:** Minimal-functional — 의미 있는 상태 전환만. 장식적 애니메이션 금지.
-- **Easing:** enter(ease-out: 0.16,1,0.3,1) exit(ease-in: 0.7,0,0.84,0) move(ease-in-out: 0.45,0,0.55,1)
-- **Duration:** micro(80ms) short(200ms) medium(350ms) long(500ms)
-- **Required:** `useReducedMotion()` 적용 필수 (CLAUDE.md 규칙)
-- **Forbidden:** `transition: all`, 레이아웃 프로퍼티(width/height/top/left) 애니메이션
+- **Approach:** Minimal-functional
+- **Required:** `useReducedMotion()` 적용 필수
+- **Forbidden:** `transition: all`, layout property 애니메이션
 
 ## Decisions Log
 | Date | Decision | Rationale |
 |------|----------|-----------|
 | 2026-03-24 | 초기 디자인 시스템 생성 | /design-consultation — 뷰티테크 리서치 기반 |
-| 2026-03-24 | Sage Green #4A7C6E 선택 | Forest #2D5F4F보다 밝고 미니멀 방향에 어울림 |
-| 2026-03-24 | Fraunces Light 디스플레이 폰트 | 산세리프 일색인 카테고리에서 세리프로 차별화 |
-| 2026-03-24 | Minimal aesthetic 확정 | Typology 스타일 절제 — 여백과 타이포그래피가 주역 |
+| 2026-03-24 | Sage Green #4A7C6E 선택 | Forest보다 밝고 미니멀 방향에 어울림 |
+| 2026-03-25 | CTA: Sage Green→Salmon | 따뜻한 배경에 차가운 녹색 CTA는 어색. Salmon이 초대하는 느낌 |
+| 2026-03-25 | 텍스트: 검정→따뜻한 브라운 체계 | #1C1917은 베이지 배경에서 딱딱함. 5단계 브라운 계층 |
+| 2026-03-25 | 헤드라인: Fraunces→Pretendard Bold | 한글에 세리프 어색. Fraunces는 영문/숫자 포인트만 |
+| 2026-03-25 | 카드 최소화 | 카드 남발은 바이브코딩 패턴. 타이포+여백+구분선으로 대체 |
+| 2026-03-25 | 배민 스타일 보조 버튼 | 연한 배경+테두리 pill이 단색보다 부드러움 |
+| 2026-03-25 | 앱 내부 "AI" 텍스트 제거 | 2026년 AI는 당연한 것. 브랜드명만 사용 |
+| 2026-03-25 | 로고 SVG 적용 | PNG→SVG 벡터. 태그라인 없는 Fonday° 버전 |
+
+## 미완료 / 다음 세션 TODO
+- [ ] **화면별 레이아웃 재설계** — CSS 패치가 아닌 근본적 구조 재설계 필요
+- [ ] **모달/시트 화면** — CosmeticsRegister, Analysis 등 팝업 디자인 미적용
+- [ ] **폰트** — LINESeedKR 재시도 또는 다른 둥근 한글 폰트 테스트
+- [ ] **하단 네비바** — 아직 기존 스타일
+- [ ] **홈 화면 리턴 유저** — One Big Number 디자인 실제 확인 필요
+- [ ] **결과 화면 헤더카드 내부** — 아직 border 잔존 가능
+- [ ] **설문 선택 버튼 디자인** — 현재 상태 실물 확인 필요
+- [ ] **반응형** — 태블릿/데스크톱에서 레이아웃 확인
+- [ ] **다크 모드** — 아직 미적용
