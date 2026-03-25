@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { AnimatePresence, motion } from "framer-motion";
-import { ChevronRight, Droplets, AlertTriangle, Plus, Sparkles, X } from "lucide-react";
+import { ChevronRight, Droplets, AlertTriangle, Plus, Sparkles, X, Sun, Moon } from "lucide-react";
 import type { CosmeticItem } from "./types";
 import {
   BG_BASE,
@@ -284,99 +284,29 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
           {t("cosmetics.routineSubtitle")}
         </p>
 
-        <div className="grid grid-cols-2 gap-3 mt-4">
-          <div className="rounded-[16px] p-4" style={{ background: "#F6FBF8" }}>
-            <p className="text-xs font-bold uppercase tracking-[0.12em]" style={{ color: DEEP_GREEN }}>{t("cosmetics.amBtn")}</p>
-            <p className="text-2xl font-bold mt-1" style={{ color: DEEP_GREEN, fontFamily: FONT_DISPLAY }}>{routinePlan.am.length}</p>
-            <p className="text-xs text-stone-400 mt-1">{t("cosmetics.boardStepCount", { count: routinePlan.am.length })}</p>
+        {/* AM/PM 요약 — 아이콘+텍스트 한 줄 */}
+        <div className="flex items-center gap-4 mt-4 mb-4">
+          <div className="flex items-center gap-2">
+            <Sun className="w-4 h-4" style={{ color: DEEP_GREEN }} />
+            <span className="text-[13px] font-semibold" style={{ color: "#5C4F4A" }}>{t("cosmetics.amBtn")}</span>
+            <span className="text-[13px] font-bold" style={{ color: DEEP_GREEN }}>{routinePlan.am.length}</span>
           </div>
-          <div className="rounded-[16px] p-4" style={{ background: "#FFF7F3" }}>
-            <p className="text-xs font-bold uppercase tracking-[0.12em]" style={{ color: SCAN_TO }}>{t("cosmetics.pmBtn")}</p>
-            <p className="text-2xl font-bold mt-1" style={{ color: SCAN_TO, fontFamily: FONT_DISPLAY }}>{routinePlan.pm.length}</p>
-            <p className="text-xs text-stone-400 mt-1">{t("cosmetics.boardStepCount", { count: routinePlan.pm.length })}</p>
+          <span className="w-1 h-1 rounded-full bg-stone-300" />
+          <div className="flex items-center gap-2">
+            <Moon className="w-4 h-4" style={{ color: SCAN_TO }} />
+            <span className="text-[13px] font-semibold" style={{ color: "#5C4F4A" }}>{t("cosmetics.pmBtn")}</span>
+            <span className="text-[13px] font-bold" style={{ color: SCAN_TO }}>{routinePlan.pm.length}</span>
           </div>
         </div>
 
         <button
           onClick={() => setShowRegister(true)}
-          className="w-full mt-4 flex items-center justify-center gap-2 text-[13px] font-semibold"
-          style={{ background: TINT_GREEN, color: DEEP_GREEN, height: 48, borderRadius: 24 }}
+          className="w-full flex items-center justify-center gap-2 text-[13px] font-semibold"
+          style={{ background: TINT_GREEN, color: DEEP_GREEN, height: 44, borderRadius: 22 }}
         >
           <Plus className="w-4 h-4" />
           {t("cosmetics.scanBtn")}
         </button>
-
-        <div className="mt-5 rounded-[20px] p-4" style={{ background: "#FFFFFF", boxShadow: "0 1px 6px rgba(0,0,0,0.04)" }}>
-          <div className="flex items-start justify-between gap-3">
-            <div>
-              <p className="text-xs font-bold tracking-[0.14em] uppercase" style={{ color: SCAN_TO, fontFamily: FONT_DISPLAY }}>
-                {t("cosmetics.dashboardEyebrow")}
-              </p>
-              <p className="text-[15px] font-bold mt-1" style={{ color: DEEP_GREEN }}>
-                {t("cosmetics.dashboardTitle")}
-              </p>
-              <p className="text-[12px] text-stone-500 mt-1 text-kr-pretty">
-                {t("cosmetics.dashboardDesc")}
-              </p>
-            </div>
-            <button
-              onClick={() => list.length > 0 && latestAnalysisResult ? setShowReportCard(true) : setShowRegister(true)}
-              className="w-10 h-10 rounded-2xl flex items-center justify-center shrink-0 cursor-pointer"
-              style={{ background: list.length > 0 && latestAnalysisResult ? `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})` : "#FFFFFF" }}
-              aria-label={t("cosmeticsReport.title")}
-            >
-              <Sparkles className="w-5 h-5" style={{ color: list.length > 0 && latestAnalysisResult ? "#FFFFFF" : SCAN_TO }} />
-            </button>
-          </div>
-          <div className="grid grid-cols-3 gap-2 mt-4">
-            {routineStats.map((stat) => (
-              <div key={stat.key} className="rounded-2xl p-3" style={{ background: stat.tone }}>
-                <p className="text-[11px] text-stone-400 leading-tight truncate">{stat.label}</p>
-                <p className="text-xl font-bold mt-1" style={{ color: stat.color }}>{stat.value}</p>
-              </div>
-            ))}
-          </div>
-          <div className="mt-3 rounded-2xl p-3" style={{ background: "#FFFFFF" }}>
-            <p className="text-xs font-bold" style={{ color: DEEP_GREEN }}>{t("cosmetics.signalTopTitle")}</p>
-            {topSignal ? (
-              <>
-                <div className="flex items-center justify-between gap-2 mt-2">
-                  <p className="text-[13px] font-semibold text-[#5C4F4A] truncate min-w-0">{topSignal.itemName}</p>
-                  <span className="rounded-full px-2 py-0.5 text-xs font-bold shrink-0" style={{ background: `${SCAN_TO}12`, color: SCAN_TO }}>
-                    {t(`cosmetics.signalConfidence.${topSignal.confidence}`)}
-                  </span>
-                </div>
-                <p className="text-xs mt-1 text-kr-pretty" style={{ color: SCAN_TO }}>{topSignal.note}</p>
-              </>
-            ) : (
-              <p className="text-xs mt-2 text-stone-500 text-kr-pretty">{t("cosmetics.signalEmpty")}</p>
-            )}
-          </div>
-          <div className="grid grid-cols-3 gap-2 mt-3">
-            <div className="rounded-2xl p-3" style={{ background: "#FFFFFF" }}>
-              <p className="text-[11px] text-stone-400 leading-tight truncate">{t("cosmetics.effectStrongLabel")}</p>
-              <p className="text-[18px] font-bold mt-1" style={{ color: DEEP_GREEN }}>{strongestSignalCount}</p>
-            </div>
-            <div className="rounded-2xl p-3" style={{ background: "#FFFFFF" }}>
-              <p className="text-[11px] text-stone-400 leading-tight truncate">{t("cosmetics.effectPositiveLabel")}</p>
-              <p className="text-[18px] font-bold mt-1" style={{ color: SCAN_TO }}>{positiveSignalCount}</p>
-            </div>
-            <div className="rounded-2xl p-3" style={{ background: "#FFFFFF" }}>
-              <p className="text-[11px] text-stone-400 leading-tight truncate">{t("cosmetics.effectTrackedProductsLabel")}</p>
-              <p className="text-[18px] font-bold mt-1 text-[#5C4F4A]">{productSignals.length}</p>
-            </div>
-          </div>
-          {list.length > 0 && latestAnalysisResult && (
-            <button
-              onClick={() => setShowReportCard(true)}
-              className="w-full mt-3 rounded-2xl px-4 py-3 flex items-center justify-center gap-2 text-[13px] font-bold cursor-pointer"
-              style={{ background: `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})`, color: "#FFFFFF" }}
-            >
-              <Sparkles className="w-4 h-4" />
-              {t("cosmeticsReport.title")}
-            </button>
-          )}
-        </div>
       </div>
 
       <div className="space-y-3 mt-5">
