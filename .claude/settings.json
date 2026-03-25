@@ -10,7 +10,36 @@
       "Bash(curl -s -X POST 'https://fonday-push-worker.nexiope.workers.dev/test-push' -H 'Content-Type: application/json' --data-raw '{\"\"adminKey\"\":\"\"kimseo8318!@\"\",\"\"type\"\":\"\"test\"\"}')",
       "Bash(npx wrangler:*)",
       "Skill(design-review)",
-      "Skill(design-review:*)"
+      "Skill(design-review:*)",
+      "WebSearch",
+      "WebFetch(domain:www.apple.com)",
+      "Read(//Users/sangwan/Downloads/**)",
+      "Bash(B=~/.claude/skills/gstack/browse/dist/browse)",
+      "Bash($B goto:*)",
+      "Bash($B screenshot:*)",
+      "Bash(grep -rn \"text-stone-800\\\\|text-stone-700\\\\|text-stone-900\\\\|text-black\\\\|#1C1917\\\\|#000\" client/src/components/fonday/*.tsx)",
+      "Bash(grep -rn \"rounded-2xl.*border\\\\|rounded-xl.*border\" client/src/components/fonday/*.tsx)",
+      "Bash(grep -rn \"DEEP_GREEN\\\\|#4A7C6E\" client/src/components/fonday/*.tsx)",
+      "Bash(grep -rn \"FONT_DISPLAY.*FONT_DISPLAY\" client/src/components/fonday/*.tsx)",
+      "Bash(grep -rn \"fontFamily: FONT_DISPLAY\" client/src/components/fonday/*.tsx)",
+      "Bash(grep -rn \"CameraCapture\\\\|text-black\" client/src/components/fonday/*.tsx)",
+      "Bash(grep -rn \"rounded-full.*icon\\\\|Icon.*rounded\" client/src/components/fonday/*.tsx)",
+      "Bash(grep -n \"class.*rounded-[xfl]\" client/src/components/fonday/*.tsx)",
+      "Bash(B=~/.claude/skills/gstack/browse/dist/browse $B goto \"https://dev.fondayai.com\" 2)",
+      "Bash(1 sleep:*)",
+      "Read(//Users/sangwan/fondayai/**)",
+      "Bash(B=~/.claude/skills/gstack/browse/dist/browse $B snapshot -i)",
+      "Bash($B click:*)",
+      "Read(//Users/sangwan/fondayai sed -i  s/className=\"flex items-center justify-between p-4 rounded-2xl bg-white\" style={{ border: `1px solid ${BORDER_COLOR}` }}/className=\"flex items-center justify-between p-4 rounded-[20px]\" style={{ background: BG_MUTED }}/g client/src/components/fonday/MyScreen.tsx sed -i  s/className=\"p-4 rounded-2xl bg-white space-y-3\" style={{ border: `1px solid ${BORDER_COLOR}` }}/className=\"p-4 rounded-[20px] space-y-3\" style={{ background: BG_MUTED }}/g client/src/components/fonday/MyScreen.tsx sed -i  s/className=\"w-full flex items-center justify-between p-4 rounded-2xl bg-white active:opacity-70\"\\\\n.*style={{ border: `1px solid ${BORDER_COLOR}` }}/ client/src/components/fonday/**)",
+      "Bash($B console:*)",
+      "Bash(grep -c \"nextSteps\" /Users/sangwan/fondayai/dist/public/assets/index-*.js)",
+      "Bash(curl -sL \"https://github.com/nickhsine/LINESeedKR/raw/main/fonts/woff2/LINESeedKR-Bd.woff2\" -o /Users/sangwan/fondayai/client/public/fonts/LINESeedKR-Bd.woff2)",
+      "Read(//dev/**)",
+      "Bash($B js:*)"
+    ],
+    "additionalDirectories": [
+      "/Users/sangwan/fondayai/s/\"aiComment\": \"FondayAI 의 피부 총평\"/\"aiComment\": \"Fonday 피부 총평\"",
+      "/Users/sangwan/fondayai/https:/cdn.jsdelivr.net/npm/@aspect-build"
     ]
   }
 }

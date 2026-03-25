@@ -46,7 +46,7 @@ export const BG_BASE = "#FDFCFA";
 export const BG_MUTED = "#F8F7F5";
 export const BORDER_COLOR = "#EBE8E4";
 export const FONT_DISPLAY = "'Fraunces', Georgia, serif";
-export const FONT_HEADING = "'LINESeedKR', Pretendard, sans-serif";
+export const FONT_HEADING = "Pretendard, sans-serif";
 
 // ─── z-index 스케일 ──────────────────────────────────────────────────────────
 export const Z = {
