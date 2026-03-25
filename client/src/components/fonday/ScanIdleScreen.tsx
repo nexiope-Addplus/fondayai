@@ -541,9 +541,9 @@ export function ScanIdleScreen({
           <motion.div variants={fadeChild} className="mb-4 relative" style={{ zIndex: 1 }}>
             <div className="bg-white rounded-2xl px-3 py-2.5 border"
               style={{ borderColor: BORDER_COLOR }}>
-              <h2 className="text-xs font-semibold text-stone-400 text-center mb-2 tracking-widest uppercase">
+              <p className="text-xs font-semibold text-stone-400 text-center mb-2 tracking-widest uppercase">
                 {t("idle.stepsTitle")}
-              </h2>
+              </p>
               <div className="flex items-start justify-between">
                 {STEPS.map((step, i) => (
                   <div key={i} className="flex items-start" style={{ flex: 1 }}>
