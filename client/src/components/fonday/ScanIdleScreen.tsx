@@ -169,7 +169,7 @@ export function ScanIdleScreen({
     >
       {/* 상단 헤더 row */}
       <div className="flex justify-between items-center mb-5 relative" style={{ zIndex: 1 }}>
-        <img src="/fonday-logo.png" alt="Fonday" className="h-7" style={{ objectFit: "contain" }} />
+        <img src="/fonday-logo.svg" alt="Fonday" className="h-8" style={{ objectFit: "contain" }} />
         <LangSwitcher />
       </div>
 
