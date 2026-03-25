@@ -48,6 +48,24 @@ export const BORDER_COLOR = "#EBE8E4";
 export const FONT_DISPLAY = "'Fraunces', Georgia, serif";
 export const FONT_HEADING = "Pretendard, sans-serif";
 
+// Shadow 토큰
+export const SHADOW_CARD = "0 1px 6px rgba(0,0,0,0.04)";
+export const SHADOW_ELEVATED = "0 8px 30px rgba(28,25,23,0.07)";
+
+// Border-radius 토큰
+export const RADIUS_CARD = 20;
+export const RADIUS_SUB = 16;
+export const RADIUS_ITEM = 12;
+export const RADIUS_PILL = 9999;
+
+// 페이지 배경
+export const PAGE_GRADIENT = "linear-gradient(180deg, #FDFCFA 0%, #F8F5F1 50%, #FDFCFA 100%)";
+
+// 텍스트 계층 (DESIGN.md 기준)
+export const TEXT_HEADING = "#4A403A";
+export const TEXT_TITLE = "#5C4F4A";
+export const TEXT_LABEL = "#6B5D55";
+
 // ─── z-index 스케일 ──────────────────────────────────────────────────────────
 export const Z = {
   actionBar: 50,   // ResultActionBar / BottomNav

@@ -39,6 +39,10 @@ import {
   TINT_NEUTRAL,
   TINT_WARM,
   DIARY_CAUSE_TAGS,
+  SHADOW_CARD,
+  RADIUS_CARD,
+  RADIUS_SUB,
+  PAGE_GRADIENT,
 } from "./constants";
 import {
   buildDiaryReportModel,
@@ -242,7 +246,7 @@ export function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: AppU
 
   if (!user) {
     return (
-      <div className="flex flex-col" style={{ background: "linear-gradient(180deg, #FDFCFA 0%, #F8F5F1 50%, #FDFCFA 100%)", minHeight: "calc(100dvh - 64px)" }}>
+      <div className="flex flex-col" style={{ background: PAGE_GRADIENT, minHeight: "calc(100dvh - 64px)" }}>
         <div className="px-4 pt-6 pb-28">
           <div className="mb-8">
             <div className="w-12 h-12 rounded-full mb-4 flex items-center justify-center" style={{ background: TINT_WARM }}>
@@ -253,21 +257,21 @@ export function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: AppU
           </div>
 
           <div className="grid grid-cols-3 gap-2.5 mb-6">
-            <div className="rounded-[16px] p-3 text-center" style={{ background: TINT_WARM }}>
+            <div className="p-3 text-center" style={{ borderRadius: RADIUS_SUB, background: TINT_WARM }}>
               <p className="text-[11px] font-semibold" style={{ color: "#8C8078" }}>{t("result.diary.avg7d")}</p>
               <p className="text-lg font-bold mt-1" style={{ color: SCAN_TO, fontFamily: FONT_DISPLAY }}>--</p>
             </div>
-            <div className="rounded-[16px] p-3 text-center" style={{ background: "#F5F3FF" }}>
+            <div className="p-3 text-center" style={{ borderRadius: RADIUS_SUB, background: "#F5F3FF" }}>
               <p className="text-[11px] font-semibold" style={{ color: "#8C8078" }}>{t("modal.diary.timelineTab")}</p>
               <p className="text-lg font-bold mt-1" style={{ color: "#7C3AED", fontFamily: FONT_DISPLAY }}>--</p>
             </div>
-            <div className="rounded-[16px] p-3 text-center" style={{ background: TINT_GREEN }}>
+            <div className="p-3 text-center" style={{ borderRadius: RADIUS_SUB, background: TINT_GREEN }}>
               <p className="text-[11px] font-semibold" style={{ color: "#8C8078" }}>{t("modal.diary.calendarTab")}</p>
               <p className="text-lg font-bold mt-1" style={{ color: DEEP_GREEN, fontFamily: FONT_DISPLAY }}>--</p>
             </div>
           </div>
 
-          <div className="rounded-[20px] p-5" style={{ background: "#FFFFFF", boxShadow: "0 1px 6px rgba(0,0,0,0.04)" }}>
+          <div className="p-5" style={{ borderRadius: RADIUS_CARD, background: "#FFFFFF", boxShadow: SHADOW_CARD }}>
             <div className="space-y-2.5">
               {i18n.language === "ko" ? (
                 <button onClick={() => onLogin ? onLogin("kakao", "diary") : (localStorage.setItem("fonday_return_tab", "diary"), window.location.href = "/auth/kakao")}
@@ -298,7 +302,7 @@ export function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: AppU
   }
 
   return (
-    <div className="flex flex-col" style={{ background: "linear-gradient(180deg, #FDFCFA 0%, #F8F5F1 50%, #FDFCFA 100%)", minHeight: "calc(100dvh - 64px)" }}>
+    <div className="flex flex-col" style={{ background: PAGE_GRADIENT, minHeight: "calc(100dvh - 64px)" }}>
       {/* 헤더 */}
       <div className="shrink-0 px-4 pt-5 pb-0">
         <div className="mb-4">
@@ -312,15 +316,15 @@ export function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: AppU
             {finalType ? `${finalType} · ` : ""}{totalRecords > 0 ? `${t("modal.diary.countLabel", { count: totalRecords })}` : t("result.diary.firstRecord")}
           </p>
           <div className="grid grid-cols-3 gap-2 mt-4">
-            <div className="rounded-[16px] p-3 text-center" style={{ background: BG_MUTED }}>
+            <div className="p-3 text-center" style={{ borderRadius: RADIUS_SUB, background: BG_MUTED }}>
               <p className="text-[11px] font-semibold whitespace-nowrap" style={{ color: "#8C8078" }}>{t("result.overall")}</p>
               <p className="text-[24px] font-normal mt-1" style={{ color: SCAN_TO, fontFamily: FONT_DISPLAY }}>{overallScore || "—"}</p>
             </div>
-            <div className="rounded-[16px] p-3 text-center" style={{ background: BG_MUTED }}>
+            <div className="p-3 text-center" style={{ borderRadius: RADIUS_SUB, background: BG_MUTED }}>
               <p className="text-[11px] font-semibold whitespace-nowrap" style={{ color: "#8C8078" }}>{t("result.diary.avg7d")}</p>
               <p className="text-[24px] font-normal mt-1" style={{ color: "#7C3AED", fontFamily: FONT_DISPLAY }}>{avgScore || "—"}</p>
             </div>
-            <div className="rounded-[16px] p-3 text-center" style={{ background: BG_MUTED }}>
+            <div className="p-3 text-center" style={{ borderRadius: RADIUS_SUB, background: BG_MUTED }}>
               <p className="text-[11px] font-semibold whitespace-nowrap" style={{ color: "#8C8078" }}>{t("diary.routineTitle")}</p>
               <p className="text-[24px] font-normal mt-1" style={{ color: DEEP_GREEN, fontFamily: FONT_DISPLAY }}>{diaryTodoProgress.total > 0 ? `${diaryTodoProgress.done}/${diaryTodoProgress.total}` : (diaryMemoReady ? "1/1" : "0/1")}</p>
             </div>
@@ -334,8 +338,8 @@ export function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: AppU
           <div className="mx-4 mt-3 mb-0">
             <button
               onClick={onBack}
-              className="w-full flex items-center gap-3 p-4 rounded-[20px] active:opacity-70"
-              style={{ background: TINT_GREEN }}
+              className="w-full flex items-center gap-3 p-4 active:opacity-70"
+              style={{ borderRadius: RADIUS_CARD, background: TINT_GREEN }}
             >
               <div className="w-9 h-9 rounded-full flex items-center justify-center shrink-0"
                 style={{ background: `${DEEP_GREEN}18` }}>
@@ -398,7 +402,7 @@ export function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: AppU
             >
               <DiaryCalendarView allEntries={allEntries} />
               <div className="px-5 pt-3">
-                <div className="rounded-[20px] p-5" style={{ background: "#FFFFFF", boxShadow: "0 1px 6px rgba(0,0,0,0.04)" }}>
+                <div className="p-5" style={{ borderRadius: RADIUS_CARD, background: "#FFFFFF", boxShadow: SHADOW_CARD }}>
                   <div>
                     <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0">

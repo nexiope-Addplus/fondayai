@@ -41,12 +41,13 @@ export function BottomNav({ active, onChange, scanState }: {
         key={tab}
         onClick={() => { haptic("light"); onChange(tab); }}
         aria-current={isActive ? "page" : undefined}
-        className={`relative flex flex-col items-center justify-center gap-0.5 transition-colors ${isActive ? "text-[#C97062]" : "text-stone-400"}`}
+        className={`relative flex flex-col items-center justify-center gap-0.5 transition-colors ${isActive ? "" : "text-stone-400"}`}
+        style={isActive ? { color: SCAN_TO } : undefined}
       >
         {icon}
         <span className="text-[12px] font-semibold leading-none">{label}</span>
         {isActive && (
-          <span className="absolute bottom-1.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-[#C97062]" />
+          <span className="absolute bottom-1.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full" style={{ background: SCAN_TO }} />
         )}
       </button>
     );

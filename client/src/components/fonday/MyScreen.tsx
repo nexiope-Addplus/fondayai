@@ -20,6 +20,10 @@ import {
   TEXT_TERTIARY,
   TINT_WARM,
   TINT_GREEN,
+  SHADOW_CARD,
+  RADIUS_CARD,
+  RADIUS_SUB,
+  PAGE_GRADIENT,
 } from "./constants";
 import { getAttendance } from "./utils";
 import { AttendanceCalendarModal } from "./AttendanceCalendarModal";
@@ -69,7 +73,7 @@ export function MyScreen({
   };
 
   return (
-    <div className="min-h-[calc(100dvh-64px)] pb-28" style={{ background: "linear-gradient(180deg, #FDFCFA 0%, #F8F5F1 50%, #FDFCFA 100%)" }}>
+    <div className="min-h-[calc(100dvh-64px)] pb-28" style={{ background: PAGE_GRADIENT }}>
       {/* 헤더 */}
       <div className="px-4 pt-5 pb-0">
         <div className="mb-5">
@@ -85,7 +89,7 @@ export function MyScreen({
                 {user ? (user.username || user.email || t("nav.my")) : t("attendance.loginDesc")}
               </p>
             </div>
-            <div className="rounded-[16px] px-3 py-2 text-right shrink-0" style={{ background: BG_MUTED }}>
+            <div className="px-3 py-2 text-right shrink-0" style={{ borderRadius: RADIUS_SUB, background: BG_MUTED }}>
               <p className="text-[11px] font-semibold uppercase tracking-[0.12em]" style={{ color: "#8C8078" }}>points</p>
               <p className="text-[24px] font-normal leading-none mt-1" style={{ color: DEEP_GREEN, fontFamily: FONT_DISPLAY }}>{attendance.totalPoints}</p>
             </div>
@@ -93,51 +97,53 @@ export function MyScreen({
         </div>
       </div>
 
-      <div className="px-4 space-y-3">
-        {/* 프로필 */}
+      <div className="px-4">
+        {/* ── 섹션A: 프로필 ── */}
         {user ? (
-          <div className="flex items-center justify-between p-4 rounded-[20px]" style={{ background: "#FFFFFF", boxShadow: "0 1px 6px rgba(0,0,0,0.04)" }}>
-            <div className="flex items-center gap-3">
-              {user.avatar
-                ? <img src={user.avatar} alt={user.username || "프로필"} className="w-10 h-10 rounded-full" width={40} height={40} loading="lazy" />
-                : <div className="w-10 h-10 rounded-full flex items-center justify-center"
-                    style={{ background: TINT_WARM }}>
-                    <User className="w-5 h-5" style={{ color: SCAN_TO }} />
+          <div className="p-4 mb-8" style={{ borderRadius: RADIUS_CARD, background: "#FFFFFF", boxShadow: SHADOW_CARD }}>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                {user.avatar
+                  ? <img src={user.avatar} alt={user.username || "프로필"} className="w-10 h-10 rounded-full" width={40} height={40} loading="lazy" />
+                  : <div className="w-10 h-10 rounded-full flex items-center justify-center"
+                      style={{ background: TINT_WARM }}>
+                      <User className="w-5 h-5" style={{ color: SCAN_TO }} />
+                    </div>
+                }
+                <div className="min-w-0">
+                  <p className="text-[14px] font-bold text-[#5C4F4A] truncate">{user.username || user.email || "사용자"}</p>
+                  <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
+                    {user.provider === "kakao" && (
+                      <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-xs font-bold text-[#3C1E1E]" style={{ background: "#FEE500" }}>
+                        <svg width="10" height="10" viewBox="0 0 18 18" fill="none"><path fillRule="evenodd" clipRule="evenodd" d="M9 1C4.582 1 1 3.79 1 7.222c0 2.154 1.386 4.045 3.484 5.14L3.62 15.5a.25.25 0 0 0 .368.274L7.9 13.39A9.63 9.63 0 0 0 9 13.444c4.418 0 8-2.791 8-6.222C17 3.79 13.418 1 9 1Z" fill="#3C1E1E"/></svg>
+                        카카오
+                      </span>
+                    )}
+                    {user.provider === "line" && (
+                      <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-xs font-bold text-white" style={{ background: DEEP_GREEN }}>
+                        <svg width="10" height="10" viewBox="0 0 18 18" fill="none"><path d="M9 1C4.582 1 1 3.79 1 7.222c0 2.03 1.09 3.84 2.8 5.04-.12.44-.77 2.96-.8 3.15a.2.2 0 0 0 .3.22l3.72-2.46c.6.09 1.3.14 1.98.14 4.418 0 8-2.791 8-6.222C17 3.79 13.418 1 9 1Z" fill="white"/></svg>
+                        LINE
+                      </span>
+                    )}
+                    {user.provider === "google" && (
+                      <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-xs font-bold text-stone-600 bg-white">
+                        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="w-2.5 h-2.5" />
+                        Google
+                      </span>
+                    )}
+                    {user.email && <p className="text-xs text-stone-400 truncate max-w-[160px]">{user.email}</p>}
                   </div>
-              }
-              <div className="min-w-0">
-                <p className="text-[14px] font-bold text-[#5C4F4A] truncate">{user.username || user.email || "사용자"}</p>
-                <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
-                  {user.provider === "kakao" && (
-                    <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-xs font-bold text-[#3C1E1E]" style={{ background: "#FEE500" }}>
-                      <svg width="10" height="10" viewBox="0 0 18 18" fill="none"><path fillRule="evenodd" clipRule="evenodd" d="M9 1C4.582 1 1 3.79 1 7.222c0 2.154 1.386 4.045 3.484 5.14L3.62 15.5a.25.25 0 0 0 .368.274L7.9 13.39A9.63 9.63 0 0 0 9 13.444c4.418 0 8-2.791 8-6.222C17 3.79 13.418 1 9 1Z" fill="#3C1E1E"/></svg>
-                      카카오
-                    </span>
-                  )}
-                  {user.provider === "line" && (
-                    <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-xs font-bold text-white" style={{ background: DEEP_GREEN }}>
-                      <svg width="10" height="10" viewBox="0 0 18 18" fill="none"><path d="M9 1C4.582 1 1 3.79 1 7.222c0 2.03 1.09 3.84 2.8 5.04-.12.44-.77 2.96-.8 3.15a.2.2 0 0 0 .3.22l3.72-2.46c.6.09 1.3.14 1.98.14 4.418 0 8-2.791 8-6.222C17 3.79 13.418 1 9 1Z" fill="white"/></svg>
-                      LINE
-                    </span>
-                  )}
-                  {user.provider === "google" && (
-                    <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-xs font-bold text-stone-600 bg-white">
-                      <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="w-2.5 h-2.5" />
-                      Google
-                    </span>
-                  )}
-                  {user.email && <p className="text-xs text-stone-400 truncate max-w-[160px]">{user.email}</p>}
                 </div>
               </div>
+              <button onClick={handleLogout}
+                className="text-[12px] font-semibold px-3 py-1.5 rounded-xl active:opacity-70"
+                style={{ background: TINT_WARM, color: SCAN_TO }}>
+                {t("modal.diary.logout")}
+              </button>
             </div>
-            <button onClick={handleLogout}
-              className="text-[12px] font-semibold px-3 py-1.5 rounded-xl active:opacity-70"
-              style={{ background: TINT_WARM, color: SCAN_TO }}>
-              {t("modal.diary.logout")}
-            </button>
           </div>
         ) : (
-          <div className="p-4 rounded-[20px] space-y-3" style={{ background: BG_MUTED }}>
+          <div className="p-4 space-y-3 mb-8" style={{ borderRadius: RADIUS_CARD, background: BG_MUTED }}>
             <div className="text-center mb-2">
               <p className="text-[14px] font-bold text-[#6B5D55] mb-1">{t("report.loginRequired")}</p>
               <p className="text-[12px] text-stone-400">{t("attendance.loginDesc")}</p>
@@ -166,80 +172,63 @@ export function MyScreen({
           </div>
         )}
 
-        {/* 출석 달력 */}
-        <button onClick={() => setShowCalendar(true)}
-          className="w-full flex items-center justify-between p-4 rounded-[20px] active:opacity-70"
-          style={{ background: BG_MUTED }}>
-          <div className="flex items-center gap-3 min-w-0">
-            <div className="w-9 h-9 rounded-full flex items-center justify-center shrink-0"
-              style={{ background: TINT_WARM }}>
-              <CalendarDays className="w-5 h-5" style={{ color: SCAN_TO }} />
+        {/* ── 섹션B: 유틸리티 (캘린더 + 언어 + 설치) ── */}
+        <div className="p-4 mb-8" style={{ borderRadius: RADIUS_CARD, background: "#FFFFFF", boxShadow: SHADOW_CARD }}>
+          {/* 출석 달력 */}
+          <button onClick={() => setShowCalendar(true)}
+            className="w-full flex items-center justify-between active:opacity-70">
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="w-9 h-9 rounded-full flex items-center justify-center shrink-0"
+                style={{ background: TINT_WARM }}>
+                <CalendarDays className="w-5 h-5" style={{ color: SCAN_TO }} />
+              </div>
+              <div className="text-left min-w-0">
+                <p className="text-[14px] font-bold text-[#5C4F4A] truncate">{t("attendance.calendarTitle")}</p>
+                <p className="text-xs text-stone-400 truncate">{t("attendance.totalPoints", { n: attendance.totalPoints })}</p>
+              </div>
             </div>
-            <div className="text-left min-w-0">
-              <p className="text-[14px] font-bold text-[#5C4F4A] truncate">{t("attendance.calendarTitle")}</p>
-              <p className="text-xs text-stone-400 truncate">{t("attendance.totalPoints", { n: attendance.totalPoints })}</p>
-            </div>
-          </div>
-          <ChevronRight className="w-4 h-4 text-stone-300 shrink-0" />
-        </button>
+            <ChevronRight className="w-4 h-4 text-stone-300 shrink-0" />
+          </button>
 
-        {user && (
-          <div className="rounded-[20px] p-4" style={{ background: BG_MUTED }}>
-            <p className="text-[14px] font-bold mb-3" style={{ color: "#5C4F4A" }}>
-              계정 정보
-            </p>
-            <div className="mt-4 space-y-2">
-              <button onClick={onBack}
-                className="w-full flex items-center justify-between p-3 rounded-2xl active:opacity-70"
-                style={{ background: "#F8FAFD" }}>
-                <span className="text-[13px] font-semibold text-[#5C4F4A]">{t("nav.scan")}</span>
-                <ChevronRight className="w-4 h-4 text-stone-300" />
-              </button>
-              <button onClick={onGoRoutine}
-                className="w-full flex items-center justify-between p-3 rounded-2xl active:opacity-70"
-                style={{ background: "#F8FAFD" }}>
-                <span className="text-[13px] font-semibold text-[#5C4F4A]">{t("nav.routine")}</span>
-                <ChevronRight className="w-4 h-4 text-stone-300" />
-              </button>
-            </div>
-          </div>
-        )}
+          {/* 구분선 */}
+          <div className="my-4" style={{ borderTop: `1px solid ${BORDER_COLOR}` }} />
 
-        {/* 언어 설정 */}
-        <div className="flex items-center justify-between p-4 rounded-[20px]" style={{ background: "#FFFFFF", boxShadow: "0 1px 6px rgba(0,0,0,0.04)" }}>
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: "#F6F4FB" }}>
-              <Sparkles className="w-4.5 h-4.5" style={{ color: "#7C3AED" }} />
+          {/* 언어 설정 */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: "#F6F4FB" }}>
+                <Sparkles className="w-4.5 h-4.5" style={{ color: "#7C3AED" }} />
+              </div>
+              <p className="text-[14px] font-bold text-[#5C4F4A]">{t("nav.language")}</p>
             </div>
-            <p className="text-[14px] font-bold text-[#5C4F4A]">{t("nav.language")}</p>
+            <div className="flex gap-1">
+              {(["en", "ko", "ja"] as const).map(lang => (
+                <button key={lang} onClick={() => i18n.changeLanguage(lang)}
+                  className={`px-3 py-2.5 rounded-lg text-xs font-bold transition-all min-h-[44px] min-w-[44px] flex items-center justify-center ${
+                    i18n.language === lang ? "" : "text-stone-400 bg-stone-100"
+                  }`}
+                  style={i18n.language === lang ? { background: TINT_WARM, color: SCAN_TO } : {}}>
+                  {lang.toUpperCase()}
+                </button>
+              ))}
+            </div>
           </div>
-          <div className="flex gap-1">
-            {(["en", "ko", "ja"] as const).map(lang => (
-              <button key={lang} onClick={() => i18n.changeLanguage(lang)}
-                className={`px-3 py-2.5 rounded-lg text-xs font-bold transition-all min-h-[44px] min-w-[44px] flex items-center justify-center ${
-                  i18n.language === lang ? "" : "text-stone-400 bg-stone-100"
-                }`}
-                style={i18n.language === lang ? { background: TINT_WARM, color: SCAN_TO } : {}}>
-                {lang.toUpperCase()}
-              </button>
-            ))}
-          </div>
+
+          {/* 구분선 */}
+          <div className="my-4" style={{ borderTop: `1px solid ${BORDER_COLOR}` }} />
+
+          {/* 앱 설치 */}
+          <button onClick={onInstall}
+            className="w-full flex items-center justify-between active:opacity-70">
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="w-9 h-9 rounded-full flex items-center justify-center shrink-0" style={{ background: "#FFF7ED" }}>
+                <SmartphoneNfc className="w-5 h-5" style={{ color: "#C2410C" }} />
+              </div>
+              <p className="text-[14px] font-bold text-[#5C4F4A] truncate">{t("nav.install")}</p>
+            </div>
+            <ChevronRight className="w-4 h-4 text-stone-300 shrink-0" />
+          </button>
         </div>
-
-        {/* 앱 설치 */}
-        <button onClick={onInstall}
-          className="w-full flex items-center justify-between p-4 rounded-[20px] active:opacity-70"
-          style={{ background: BG_MUTED }}>
-          <div className="flex items-center gap-3 min-w-0">
-            <div className="w-9 h-9 rounded-full flex items-center justify-center shrink-0" style={{ background: "#FFF7ED" }}>
-              <SmartphoneNfc className="w-5 h-5" style={{ color: "#C2410C" }} />
-            </div>
-            <p className="text-[14px] font-bold text-[#5C4F4A] truncate">{t("nav.install")}</p>
-          </div>
-          <ChevronRight className="w-4 h-4 text-stone-300 shrink-0" />
-        </button>
-
-        {/* Ultra-MVP: Fonday 디바이스 링크 숨김 — 리텐션 검증 후 복원 */}
       </div>
 
       {/* 출석 달력 모달 */}

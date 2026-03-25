@@ -132,12 +132,13 @@ export function setupAuth(app: Express) {
     )
   );
 
-  // LINE Strategy
+  // LINE Strategy — channelSecret 없으면 건너뜀 (로컬 개발)
+  if (process.env.LINE_CHANNEL_SECRET) {
   passport.use(
     new LineStrategy(
       {
         channelID: process.env.LINE_CHANNEL_ID || "2009518965",
-        channelSecret: process.env.LINE_CHANNEL_SECRET || "",
+        channelSecret: process.env.LINE_CHANNEL_SECRET,
         callbackURL: "/auth/line/callback",
         scope: ["profile", "openid"],
       },
@@ -163,6 +164,7 @@ export function setupAuth(app: Express) {
       }
     )
   );
+  } // end LINE Strategy guard
 
   // Auth Routes
   app.get("/auth/google", passport.authenticate("google", { scope: ["profile", "email"] }));
@@ -179,12 +181,14 @@ export function setupAuth(app: Express) {
     (req, res) => res.redirect("/")
   );
 
-  app.get("/auth/line", passport.authenticate("line"));
-  app.get(
-    "/auth/line/callback",
-    passport.authenticate("line", { failureRedirect: "/login" }),
-    (req, res) => res.redirect("/")
-  );
+  if (process.env.LINE_CHANNEL_SECRET) {
+    app.get("/auth/line", passport.authenticate("line"));
+    app.get(
+      "/auth/line/callback",
+      passport.authenticate("line", { failureRedirect: "/login" }),
+      (req, res) => res.redirect("/")
+    );
+  }
 
   app.post("/api/logout", (req, res, next) => {
     req.logout((err) => {

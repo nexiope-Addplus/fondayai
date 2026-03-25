@@ -16,6 +16,11 @@ import {
   TINT_GREEN,
   TINT_WARM,
   TINT_NEUTRAL,
+  SHADOW_CARD,
+  RADIUS_CARD,
+  RADIUS_SUB,
+  RADIUS_ITEM,
+  PAGE_GRADIENT,
 } from "./constants";
 import {
   inferCosmeticTimeOfDay,
@@ -167,7 +172,7 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
 
   if (!user) {
     return (
-      <div className="min-h-[calc(100dvh-64px)] px-4 pt-6 pb-28" style={{ background: "linear-gradient(180deg, #FDFCFA 0%, #F8F5F1 50%, #FDFCFA 100%)" }}>
+      <div className="min-h-[calc(100dvh-64px)] px-4 pt-6 pb-28" style={{ background: PAGE_GRADIENT }}>
         <div className="mb-6">
           <div className="flex items-center gap-2.5 mb-1">
             <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ background: TINT_GREEN }}>
@@ -180,7 +185,7 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
           </p>
         </div>
 
-        <div className="rounded-[20px] p-5 mb-6" style={{ background: "#FFFFFF", boxShadow: "0 1px 6px rgba(0,0,0,0.04)" }}>
+        <div className="p-5 mb-6" style={{ borderRadius: RADIUS_CARD, background: "#FFFFFF", boxShadow: SHADOW_CARD }}>
           <div className="space-y-2 mb-5">
             <div className="rounded-2xl px-4 py-3" style={{ background: BG_MUTED }}>
               <p className="text-[13px] font-semibold text-[#5C4F4A]">{t("cosmetics.routineRepresentativeTitle")}</p>
@@ -218,7 +223,7 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
         </div>
 
         {productSignals.length > 0 && (
-          <div className="rounded-[20px] p-4" style={{ background: "#FFFFFF", boxShadow: "0 1px 6px rgba(0,0,0,0.04)" }}>
+          <div className="p-4" style={{ borderRadius: RADIUS_CARD, background: "#FFFFFF", boxShadow: SHADOW_CARD }}>
             <div className="flex items-start justify-between gap-3 mb-3">
               <div>
                 <p className="text-xs font-bold tracking-[0.14em] uppercase" style={{ color: SCAN_TO, fontFamily: FONT_DISPLAY }}>
@@ -273,7 +278,7 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
   }
 
   return (
-    <div className="min-h-[calc(100dvh-64px)] px-4 pt-5 pb-28" style={{ background: "linear-gradient(180deg, #FDFCFA 0%, #F8F5F1 50%, #FDFCFA 100%)" }}>
+    <div className="min-h-[calc(100dvh-64px)] px-4 pt-5 pb-28" style={{ background: PAGE_GRADIENT }}>
       <div className="mb-6">
         <div className="flex items-center gap-2.5 mb-1">
           <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ background: TINT_GREEN }}>
@@ -309,27 +314,14 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
           {t("cosmetics.scanBtn")}
         </button>
 
-        {/* 화장품 성적표 — 핵심 기능 */}
-        <div className="mt-6 rounded-[20px] p-5" style={{ background: "#FFFFFF", boxShadow: "0 1px 6px rgba(0,0,0,0.04)" }}>
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <p className="text-[15px] font-bold" style={{ color: "#5C4F4A" }}>
-                {t("cosmetics.dashboardTitle")}
-              </p>
-              <p className="text-[12px] mt-0.5" style={{ color: "#8C8078" }}>
-                {t("cosmetics.dashboardDesc")}
-              </p>
-            </div>
-            {list.length > 0 && latestAnalysisResult && (
-              <button
-                onClick={() => setShowReportCard(true)}
-                className="w-9 h-9 rounded-full flex items-center justify-center shrink-0"
-                style={{ background: TINT_WARM }}
-              >
-                <Sparkles className="w-4 h-4" style={{ color: SCAN_TO }} />
-              </button>
-            )}
-          </div>
+        {/* 화장품 성적표 — 플랫 섹션 */}
+        <div className="mt-8 pt-5" style={{ borderTop: `1px solid ${BORDER_COLOR}` }}>
+          <p className="text-[15px] font-bold" style={{ color: "#5C4F4A" }}>
+            {t("cosmetics.dashboardTitle")}
+          </p>
+          <p className="text-[12px] mt-0.5 mb-4" style={{ color: "#8C8078" }}>
+            {t("cosmetics.dashboardDesc")}
+          </p>
 
           {/* 요약 숫자 */}
           <div className="flex items-center gap-3 mb-4">
@@ -343,7 +335,7 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
 
           {/* 가장 효과 좋은 제품 */}
           {topSignal ? (
-            <div className="pt-3 mt-3" style={{ borderTop: "1px solid #EBE8E4" }}>
+            <div className="pt-4 mt-4" style={{ borderTop: `1px solid ${BORDER_COLOR}` }}>
               <p className="text-[11px] font-bold mb-1.5" style={{ color: DEEP_GREEN }}>{t("cosmetics.signalTopTitle")}</p>
               <div className="flex items-center justify-between gap-2">
                 <p className="text-[13px] font-bold truncate" style={{ color: "#5C4F4A" }}>{topSignal.itemName}</p>
@@ -354,7 +346,7 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
               <p className="text-[12px] mt-1 text-kr-pretty" style={{ color: "#8C8078" }}>{topSignal.note}</p>
             </div>
           ) : (
-            <div className="pt-3 mt-3" style={{ borderTop: "1px solid #EBE8E4" }}>
+            <div className="pt-4 mt-4" style={{ borderTop: `1px solid ${BORDER_COLOR}` }}>
               <p className="text-[12px]" style={{ color: "#8C8078" }}>{t("cosmetics.signalEmpty")}</p>
             </div>
           )}
@@ -362,7 +354,7 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
           {list.length > 0 && latestAnalysisResult && (
             <button
               onClick={() => setShowReportCard(true)}
-              className="w-full mt-3 flex items-center justify-center gap-2 text-[13px] font-bold"
+              className="w-full mt-4 flex items-center justify-center gap-2 text-[13px] font-bold"
               style={{ background: "#C97062", color: "#FFFFFF", height: 44, borderRadius: 22 }}
             >
               <Sparkles className="w-4 h-4" />
@@ -378,7 +370,7 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
             <div className="w-6 h-6 border-2 border-stone-200 border-t-stone-400 rounded-full animate-spin" />
           </div>
         ) : list.length === 0 ? (
-          <div className="rounded-[20px] p-8 text-center" style={{ background: "#FFFFFF", boxShadow: "0 1px 6px rgba(0,0,0,0.04)" }}>
+          <div className="p-8 text-center" style={{ borderRadius: RADIUS_CARD, background: "#FFFFFF", boxShadow: SHADOW_CARD }}>
             <div className="w-12 h-12 rounded-full mx-auto mb-3 flex items-center justify-center" style={{ background: `${DEEP_GREEN}12`, color: DEEP_GREEN }}>
               <Droplets className="w-6 h-6" />
             </div>
@@ -387,7 +379,7 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
           </div>
         ) : (
           <>
-            <div className="rounded-[20px] p-4" style={{ background: "#FFFFFF", boxShadow: "0 1px 6px rgba(0,0,0,0.04)" }}>
+            <div className="p-4" style={{ borderRadius: RADIUS_CARD, background: "#FFFFFF", boxShadow: SHADOW_CARD }}>
               {sections.map(({ key, title, accent, bg }, sectionIdx) => (
                 <div key={key} className={sectionIdx > 0 ? "mt-5 pt-5" : ""} style={sectionIdx > 0 ? { borderTop: "1px solid #EBE8E4" } : {}}>
                   <div className="flex items-center gap-2 mb-3">
@@ -406,8 +398,8 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
                       <button
                         key={`${key}-${item.id}`}
                         onClick={() => setSelectedItem(item)}
-                        className="w-full rounded-[16px] px-3.5 py-3 flex items-center gap-3 text-left"
-                        style={{ background: BG_MUTED }}
+                        className="w-full px-3.5 py-3 flex items-center gap-3 text-left"
+                        style={{ borderRadius: RADIUS_SUB, background: BG_MUTED }}
                       >
                         <span className="w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-bold text-white shrink-0" style={{ background: accent }}>
                           {index + 1}
@@ -425,7 +417,7 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
             </div>
 
             {productSignals.length > 0 && (
-              <div className="rounded-[20px] p-4" style={{ background: "#FFFFFF", boxShadow: "0 1px 6px rgba(0,0,0,0.04)" }}>
+              <div className="pt-8 mt-8" style={{ borderTop: `1px solid ${BORDER_COLOR}` }}>
                 <div className="flex items-start justify-between gap-2 mb-3">
                   <div className="min-w-0">
                     <p className="text-[15px] font-bold" style={{ color: DEEP_GREEN }}>{t("cosmetics.signalSectionTitle")}</p>
@@ -451,7 +443,7 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
                     const deltaValue = signal.topScoreDelta ?? signal.overallDelta ?? 0;
                     const positive = deltaValue >= 0;
                     return (
-                    <div key={signal.itemId} className="rounded-2xl p-3" style={{ background: "#F8FAFD" }}>
+                    <div key={signal.itemId} className="p-3" style={{ borderRadius: RADIUS_ITEM, background: BG_MUTED }}>
                       <div className="flex items-center justify-between gap-2">
                         <p className="text-[12px] font-semibold text-[#5C4F4A] truncate min-w-0">{signal.itemName}</p>
                         <div className="flex items-center gap-1.5 shrink-0">
@@ -464,7 +456,7 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
                         </div>
                       </div>
                       <p className="text-xs mt-1 text-kr-pretty" style={{ color: SCAN_TO }}>{signal.note}</p>
-                      <div className="mt-3 h-2 rounded-full bg-white overflow-hidden">
+                      <div className="mt-3 h-2 rounded-full overflow-hidden" style={{ background: "#FFFFFF" }}>
                         <div
                           className="h-full rounded-full transition-all duration-700"
                           style={{
@@ -480,7 +472,7 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
             )}
 
             {routinePlan.conflicts.length > 0 && (
-              <div className="rounded-[28px] border p-4" style={{ background: "#FFF8F0", borderColor: "#F7E1D1" }}>
+              <div className="border p-4" style={{ borderRadius: RADIUS_CARD, background: "#FFF8F0", borderColor: "#F7E1D1" }}>
                 <div className="flex items-center gap-2 mb-3">
                   <AlertTriangle className="w-4 h-4 shrink-0" style={{ color: SCAN_TO }} />
                   <div>
@@ -500,12 +492,10 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
               </div>
             )}
 
-            <div className="rounded-[28px] border p-4 bg-white" style={{ borderColor: BORDER_COLOR }}>
-              <div className="flex items-center justify-between gap-3 mb-3">
-                <div>
-                  <p className="text-[15px] font-bold" style={{ color: DEEP_GREEN }}>{t("cosmetics.collectionTitle")}</p>
-                  <p className="text-xs text-stone-400">{t("cosmetics.collectionSub")}</p>
-                </div>
+            <div className="pt-8 mt-8" style={{ borderTop: `1px solid ${BORDER_COLOR}` }}>
+              <div className="mb-4">
+                <p className="text-[15px] font-bold" style={{ color: DEEP_GREEN }}>{t("cosmetics.collectionTitle")}</p>
+                <p className="text-xs text-stone-400 mt-0.5">{t("cosmetics.collectionSub")}</p>
               </div>
               <div className="grid grid-cols-2 gap-2.5">
                 {list.map((item) => {
@@ -514,8 +504,8 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
                     <button
                       key={item.id}
                       onClick={() => setSelectedItem(item)}
-                      className="rounded-3xl p-3 bg-stone-50 text-left"
-                      style={{ border: `1px solid ${BORDER_COLOR}` }}
+                      className="p-3 text-left"
+                      style={{ borderRadius: RADIUS_CARD, background: BG_MUTED, border: `1px solid ${BORDER_COLOR}` }}
                     >
                       {item.image_thumbnail ? (
                         <img src={item.image_thumbnail} alt={item.name ?? ""} className="w-full h-28 rounded-2xl object-cover bg-stone-200" loading="lazy" />

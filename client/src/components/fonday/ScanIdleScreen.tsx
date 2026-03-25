@@ -10,6 +10,7 @@ import {
   BAUMANN_COLORS, DEEP_GREEN, SCAN_FROM, SCAN_TO, TEXT_SECONDARY, TEXT_TERTIARY,
   TINT_GREEN, TINT_WARM, SCORE_COLORS, stagger, fadeChild,
   BG_BASE, BG_MUTED, BORDER_COLOR, FONT_DISPLAY, FONT_HEADING,
+  SHADOW_CARD, SHADOW_ELEVATED, RADIUS_CARD, RADIUS_ITEM, PAGE_GRADIENT,
 } from "./constants";
 import type { WeatherData, WeatherTipKey } from "./types";
 import { getStreak, getDaysSinceLastScan, getWeatherTipKey, buildCosmeticCorrelationSignals, todayStr, haptic } from "./utils";
@@ -161,7 +162,7 @@ export function ScanIdleScreen({
     <>
     <motion.div
       className="flex flex-col px-4 pb-8 relative overflow-hidden"
-      style={{ minHeight: "calc(100dvh - 60px)", background: "linear-gradient(180deg, #FDFCFA 0%, #F8F5F1 50%, #FDFCFA 100%)", paddingTop: 20 }}
+      style={{ minHeight: "calc(100dvh - 60px)", background: PAGE_GRADIENT, paddingTop: 20 }}
       variants={stagger} initial="initial" animate="animate"
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
@@ -216,7 +217,7 @@ export function ScanIdleScreen({
         const greetingKey = wKey ? weatherKeyMap[wKey] : fallback.key;
 
         return (
-          <motion.div variants={fadeChild} className="mb-1 relative" style={{ zIndex: 1 }}>
+          <motion.div variants={fadeChild} className="mb-2 relative" style={{ zIndex: 1 }}>
             <p className="text-[13px] leading-relaxed" style={{ color: TEXT_SECONDARY }}>
               {emoji} {t(greetingKey)}
             </p>
@@ -253,7 +254,7 @@ export function ScanIdleScreen({
 
           {/* 얼굴 이미지 — 3:4 세로, 그림자, Sage Green 스캔라인 */}
           <div className="relative overflow-hidden mb-5 bg-stone-100"
-            style={{ aspectRatio: "4/3", borderRadius: 24, boxShadow: "0 8px 30px rgba(28,25,23,0.07)" }}>
+            style={{ aspectRatio: "4/3", borderRadius: 24, boxShadow: SHADOW_ELEVATED }}>
             <img
               src="/face-model.png"
               alt="skin analysis preview"
@@ -304,15 +305,10 @@ export function ScanIdleScreen({
 
       <motion.div variants={fadeChild} className="mb-8 relative" style={{ zIndex: 1 }}>
         {scanLoading && (
-          <div className={`rounded-[20px] px-4 py-4 mb-4${reducedMotion ? "" : " animate-pulse"}`} style={{ background: "#FFFFFF", boxShadow: "0 1px 6px rgba(0,0,0,0.04)" }}>
-            <div className="flex items-start justify-between gap-3">
-              <div className="min-w-0 flex-1">
-                <div className="h-3 w-20 rounded-full bg-stone-200/50 mb-2" />
-                <div className="h-4 w-36 rounded-full bg-stone-200/50 mb-1.5" />
-                <div className="h-3 w-48 rounded-full bg-stone-200/50" />
-              </div>
-              <div className="rounded-2xl shrink-0 w-16 h-14 bg-stone-200/50" />
-            </div>
+          <div className={`py-4 mb-4${reducedMotion ? "" : " animate-pulse"}`}>
+            <div className="h-3 w-20 rounded-full bg-stone-200/50 mb-3" />
+            <div className="h-8 w-24 rounded-full bg-stone-200/50 mx-auto mb-2" />
+            <div className="h-3 w-48 rounded-full bg-stone-200/50 mx-auto" />
           </div>
         )}
         {!scanLoading && latestScan && (
@@ -371,7 +367,7 @@ export function ScanIdleScreen({
 
       {/* 바우만 설명 더보기 accordion */}
       <motion.div variants={fadeChild} className="mb-8 relative" style={{ zIndex: 1 }}>
-        <div className="rounded-[20px]" style={{ background: "#FFFFFF", boxShadow: "0 1px 6px rgba(0,0,0,0.04)" }}>
+        <div style={{ background: "#FFFFFF", boxShadow: SHADOW_CARD, borderRadius: RADIUS_CARD }}>
           <button onClick={() => setShowBaumannExp(v => !v)}
             className="w-full flex items-center justify-between px-4 py-3.5">
             <div className="flex items-center gap-2">
@@ -391,7 +387,7 @@ export function ScanIdleScreen({
                 <p className="text-xs text-stone-500 mb-3 leading-relaxed">{t("idle.baumannSectionDesc")}</p>
                 <div className="space-y-1.5 mb-3">
                   {(t("idle.baumannAxes", { returnObjects: true }) as any[]).map((ax: any, i: number) => (
-                    <div key={i} className="flex items-center gap-3 p-2.5 rounded-xl bg-stone-50">
+                    <div key={i} className="flex items-center gap-3 p-2.5" style={{ borderRadius: RADIUS_ITEM, background: BG_MUTED }}>
                       <p className="text-xs font-semibold text-stone-600 w-16 shrink-0">{ax.label}</p>
                       <p className="text-xs text-stone-400">{ax.desc}</p>
                     </div>
@@ -523,7 +519,7 @@ function HomeRoutineWidget({ onOpenRoutine }: { onOpenRoutine?: () => void }) {
   };
 
   return (
-    <div className="rounded-[20px] px-4 py-3.5 mb-3" style={{ background: "#FFFFFF", boxShadow: "0 1px 6px rgba(0,0,0,0.04)" }}>
+    <div className="px-4 py-3.5 mb-4" style={{ background: "#FFFFFF", boxShadow: SHADOW_CARD, borderRadius: RADIUS_CARD }}>
       <div className="flex items-center justify-between mb-2.5">
         <p className="text-[11px] font-semibold uppercase tracking-[0.14em]" style={{ color: DEEP_GREEN, fontFamily: FONT_DISPLAY }}>
           {t("routineChecklist.title", "오늘 사용한 화장품")}
@@ -564,7 +560,7 @@ function HomeRoutineWidget({ onOpenRoutine }: { onOpenRoutine?: () => void }) {
 
       {/* ── 효과 보드 (가장 효과 좋은 제품) ── */}
       {topSignal && (
-        <div className="mt-3 pt-3">
+        <div className="mt-3 pt-3" style={{ borderTop: `1px solid ${BORDER_COLOR}` }}>
           <p className="text-[11px] font-semibold uppercase tracking-[0.14em] mb-2" style={{ color: SCAN_TO, fontFamily: FONT_DISPLAY }}>
             {t("idle.effectBoard", "효과 추적")}
           </p>
