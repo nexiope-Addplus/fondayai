@@ -74,7 +74,7 @@ export function MyScreen({
   };
 
   return (
-    <div className="min-h-[calc(100dvh-64px)] pb-28" style={{ background: PAGE_GRADIENT }}>
+    <div className="min-h-[calc(100dvh-64px)] pb-20" style={{ background: PAGE_GRADIENT }}>
       {/* 헤더 */}
       <div className="px-4 pt-5 pb-0">
         <div className="mb-4">
@@ -103,7 +103,7 @@ export function MyScreen({
       <div className="px-4">
         {/* ── 섹션A: 프로필 ── */}
         {user ? (
-          <div className="p-4 mb-8" style={{ borderRadius: RADIUS_CARD, background: "#FFFFFF", boxShadow: SHADOW_CARD }}>
+          <div className="p-4 mb-4" style={{ borderRadius: RADIUS_CARD, background: "#FFFFFF", boxShadow: SHADOW_CARD }}>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 {user.avatar
@@ -146,7 +146,7 @@ export function MyScreen({
             </div>
           </div>
         ) : (
-          <div className="p-4 space-y-3 mb-8" style={{ borderRadius: RADIUS_CARD, background: BG_MUTED }}>
+          <div className="p-4 space-y-3 mb-4" style={{ borderRadius: RADIUS_CARD, background: BG_MUTED }}>
             <div className="text-center mb-2">
               <p className="text-[14px] font-bold text-[#6B5D55] mb-1">{t("report.loginRequired")}</p>
               <p className="text-[12px] text-stone-400">{t("attendance.loginDesc")}</p>
@@ -176,7 +176,7 @@ export function MyScreen({
         )}
 
         {/* ── 섹션B: 유틸리티 (캘린더 + 언어 + 설치) ── */}
-        <div className="p-4 mb-8" style={{ borderRadius: RADIUS_CARD, background: "#FFFFFF", boxShadow: SHADOW_CARD }}>
+        <div className="p-4 mb-4" style={{ borderRadius: RADIUS_CARD, background: "#FFFFFF", boxShadow: SHADOW_CARD }}>
           {/* 출석 달력 */}
           <button onClick={() => setShowCalendar(true)}
             className="w-full flex items-center justify-between active:opacity-70">
@@ -231,42 +231,24 @@ export function MyScreen({
             </div>
             <ChevronRight className="w-4 h-4 text-stone-300 shrink-0" />
           </button>
-        </div>
 
-        {/* ── Fonday 디바이스 COMING SOON ── */}
-        <div className="p-5" style={{ borderRadius: RADIUS_CARD, background: "#FFFFFF", boxShadow: SHADOW_CARD }}>
-          <div className="flex items-start justify-between gap-3 mb-4">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ fontFamily: "'Fraunces', Georgia, serif", color: "#B0A898" }}>COMING SOON</p>
-              <p className="text-[17px] font-semibold mt-1" style={{ color: DEEP_GREEN }}>{t("result.deviceTeaser.title")}</p>
-              <p className="text-xs text-stone-400 mt-1">{t("result.deviceTeaser.sub")}</p>
+          {/* 구분선 */}
+          <div className="my-4" style={{ borderTop: `1px solid ${BORDER_COLOR}` }} />
+
+          {/* Fonday 디바이스 COMING SOON — compact */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="w-9 h-9 rounded-2xl flex items-center justify-center shrink-0"
+                style={{ background: TINT_WARM }}>
+                <Microscope className="w-5 h-5" style={{ color: "#C97062" }} />
+              </div>
+              <div className="min-w-0">
+                <p className="text-[14px] font-bold text-[#5C4F4A]">{t("result.deviceTeaser.title")}</p>
+                <p className="text-[11px]" style={{ color: "#B0A898" }}>COMING SOON</p>
+              </div>
             </div>
-            <div className="w-12 h-12 rounded-2xl flex items-center justify-center shrink-0"
-              style={{ background: TINT_WARM }}>
-              <Microscope className="w-6 h-6" style={{ color: "#C97062" }} />
-            </div>
+            <ChevronRight className="w-4 h-4 text-stone-300 shrink-0" />
           </div>
-          <div className="grid grid-cols-2 gap-2 mb-4">
-            {[
-              { icon: Thermometer, label: t("result.locked.skinTemp"), color: "#E09882" },
-              { icon: Droplets, label: t("result.locked.moisture"), color: "#3B82C4" },
-              { icon: Flame, label: t("result.locked.oil"), color: "#F59E0B" },
-              { icon: Shield, label: t("result.locked.barrier"), color: "#10B981" },
-            ].map((item, i) => {
-              const Icon = item.icon;
-              return (
-                <div key={i} className="flex items-center gap-2 p-2.5 rounded-xl" style={{ background: BG_MUTED }}>
-                  <Icon className="w-4 h-4 shrink-0" style={{ color: item.color }} />
-                  <p className="text-xs font-semibold text-stone-600">{item.label}</p>
-                </div>
-              );
-            })}
-          </div>
-          <button
-            className="w-full flex items-center justify-center gap-1.5 text-[12px] font-semibold"
-            style={{ background: TINT_WARM, color: SCAN_TO, height: 44, borderRadius: 22 }}>
-            {t("result.earlybird")} <ArrowRight className="w-4 h-4" />
-          </button>
         </div>
       </div>
 

@@ -869,29 +869,7 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
           </div>
         )}
 
-        {/* 루틴 체크리스트 — 오늘 사용한 화장품 체크 */}
-        <RoutineChecklist
-          cosmetics={myCosmetics}
-          checkedIds={checkedCosmeticIds}
-          onToggle={(id) => {
-            const next = checkedCosmeticIds.includes(id)
-              ? checkedCosmeticIds.filter(x => x !== id)
-              : [...checkedCosmeticIds, id];
-            setCheckedCosmeticIds(next);
-            fetch("/api/routine-log", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ date_str: todayStr(), cosmetic_ids: next }),
-            }).catch(() => {});
-          }}
-          onRegister={() => setShowCosmeticsRegister(true)}
-          onLogin={isKo ? handleKakaoLogin : handleLineLogin}
-          user={user}
-          loading={false}
-          grades={cosmeticGrades}
-        />
-
-        {/* 루틴 유도 + 허브 카드 제거 — 하단 네비바가 같은 역할 */}
+        {/* 루틴 체크는 루틴 탭에서 — 결과 화면은 분석에 집중 */}
 
         <div ref={tabNavRef} className="rounded-full p-1.5 sticky top-0 z-20"
           style={{ background: BG_MUTED }}>

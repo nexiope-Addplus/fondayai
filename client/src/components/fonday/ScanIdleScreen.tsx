@@ -442,7 +442,6 @@ function HomeRoutineWidget({ onOpenRoutine }: { onOpenRoutine?: () => void }) {
   const [checkedIds, setCheckedIds] = useState<string[]>([]);
   const [topSignal, setTopSignal] = useState<any | null>(null);
   const [loaded, setLoaded] = useState(false);
-  const [showAll, setShowAll] = useState(false);
 
   useEffect(() => {
     Promise.all([
@@ -471,76 +470,50 @@ function HomeRoutineWidget({ onOpenRoutine }: { onOpenRoutine?: () => void }) {
   const checkedCount = checkedIds.filter(id => cosmetics.some((c: any) => c.id === id)).length;
   const total = cosmetics.length;
 
-  const handleToggle = (id: string) => {
-    const next = checkedIds.includes(id)
-      ? checkedIds.filter(x => x !== id)
-      : [...checkedIds, id];
-    setCheckedIds(next);
-    fetch("/api/routine-log", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ date_str: todayStr(), cosmetic_ids: next }),
-    }).catch(() => {});
-  };
 
   return (
-    <div className="px-4 py-3.5 mb-4" style={{ background: "#FFFFFF", boxShadow: SHADOW_CARD, borderRadius: RADIUS_CARD }}>
-      <div className="flex items-center justify-between mb-2.5">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.14em]" style={{ color: DEEP_GREEN, fontFamily: FONT_DISPLAY }}>
-          {t("routineChecklist.title", "오늘 사용한 화장품")}
-        </p>
-        <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full"
-          style={{ background: `${DEEP_GREEN}12`, color: DEEP_GREEN }}>
-          {checkedCount}/{total}
-        </span>
-      </div>
-      <div className="space-y-1">
-        {(showAll ? cosmetics : cosmetics.slice(0, 5)).map((item: any) => {
-          const checked = checkedIds.includes(item.id);
-          return (
-            <button key={item.id} onClick={() => { haptic("light"); handleToggle(item.id); }}
-              className="w-full flex items-center gap-2.5 rounded-xl px-2.5 py-2 text-left transition-colors"
-              style={{ background: checked ? `${DEEP_GREEN}08` : "transparent" }}>
-              <div className="w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 transition-all"
-                style={{ background: checked ? DEEP_GREEN : "transparent", borderColor: checked ? DEEP_GREEN : "#D1CBC3" }}>
-                {checked && <span className="text-white text-[10px] font-bold">✓</span>}
-              </div>
-              <span className="text-[13px] font-medium truncate" style={{ color: checked ? DEEP_GREEN : "#6B5D55" }}>
-                {item.name}
-              </span>
-            </button>
-          );
-        })}
-      </div>
-      {cosmetics.length > 5 && !showAll && (
-        <button onClick={() => setShowAll(true)} className="mt-2 text-xs font-semibold" style={{ color: DEEP_GREEN }}>
-          +{cosmetics.length - 5}{t("routineChecklist.more", "개 더보기")}
-        </button>
-      )}
-      {showAll && cosmetics.length > 5 && (
-        <button onClick={() => setShowAll(false)} className="mt-2 text-xs font-semibold" style={{ color: TEXT_TERTIARY }}>
-          {t("routineChecklist.collapse", "접기")}
-        </button>
-      )}
-
-      {/* ── 효과 보드 (가장 효과 좋은 제품) ── */}
-      {topSignal && (
-        <div className="mt-3 pt-3" style={{ borderTop: `1px solid ${BORDER_COLOR}` }}>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.14em] mb-2" style={{ color: SCAN_TO, fontFamily: FONT_DISPLAY }}>
-            {t("idle.effectBoard", "효과 추적")}
-          </p>
-          <div className="flex items-center gap-3">
-            <div className="flex-1 min-w-0">
-              <p className="text-[13px] font-bold text-[#5C4F4A] truncate">{topSignal.itemName}</p>
-              <p className="text-[11px] mt-0.5 leading-snug text-kr-pretty" style={{ color: TEXT_TERTIARY }}>{topSignal.note}</p>
-            </div>
-            {topSignal.topScoreDelta != null && (
-              <span className="rounded-full px-2.5 py-1 text-xs font-bold shrink-0"
-                style={{ background: topSignal.topScoreDelta >= 0 ? "#E8F5EC" : "#FFF7ED", color: topSignal.topScoreDelta >= 0 ? "#2D7D46" : "#C2410C" }}>
-                {topSignal.topScoreDelta >= 0 ? "+" : ""}{topSignal.topScoreDelta}
-              </span>
-            )}
+    <div className="mb-4">
+      {/* 루틴 요약 한 줄 — 탭하면 루틴 탭으로 */}
+      <button
+        onClick={onOpenRoutine}
+        className="w-full flex items-center justify-between px-4 py-3"
+        style={{ borderRadius: RADIUS_CARD, background: "#FFFFFF", boxShadow: SHADOW_CARD }}
+      >
+        <div className="flex items-center gap-2.5">
+          <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ background: `${DEEP_GREEN}12` }}>
+            <span className="text-[13px] font-bold" style={{ color: DEEP_GREEN }}>✓</span>
           </div>
+          <div className="text-left">
+            <p className="text-[13px] font-semibold" style={{ color: "#5C4F4A" }}>
+              {t("routineChecklist.title", "오늘 사용한 화장품")}
+            </p>
+            <p className="text-[11px]" style={{ color: TEXT_TERTIARY }}>
+              {checkedCount}/{total} {t("routineChecklist.completed", "완료")}
+            </p>
+          </div>
+        </div>
+        <span className="text-[12px] font-semibold" style={{ color: DEEP_GREEN }}>
+          {t("routineChecklist.goCheck", "체크하기 ›")}
+        </span>
+      </button>
+
+      {/* 효과 보드 (가장 효과 좋은 제품) */}
+      {topSignal && (
+        <div className="flex items-center gap-3 mt-2 px-4 py-3"
+          style={{ borderRadius: RADIUS_CARD, background: "#FFFFFF", boxShadow: SHADOW_CARD }}>
+          <div className="flex-1 min-w-0">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.14em] mb-1" style={{ color: SCAN_TO, fontFamily: FONT_DISPLAY }}>
+              {t("idle.effectBoard", "효과 추적")}
+            </p>
+            <p className="text-[13px] font-bold text-[#5C4F4A] truncate">{topSignal.itemName}</p>
+            <p className="text-[11px] mt-0.5 leading-snug text-kr-pretty" style={{ color: TEXT_TERTIARY }}>{topSignal.note}</p>
+          </div>
+          {topSignal.topScoreDelta != null && (
+            <span className="rounded-full px-2.5 py-1 text-xs font-bold shrink-0"
+              style={{ background: topSignal.topScoreDelta >= 0 ? "#E8F5EC" : "#FFF7ED", color: topSignal.topScoreDelta >= 0 ? "#2D7D46" : "#C2410C" }}>
+              {topSignal.topScoreDelta >= 0 ? "+" : ""}{topSignal.topScoreDelta}
+            </span>
+          )}
         </div>
       )}
     </div>
