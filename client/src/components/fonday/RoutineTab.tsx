@@ -387,40 +387,34 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
           </div>
         ) : (
           <>
-            <div className="grid gap-3">
-              {sections.map(({ key, title, accent, bg }) => (
-                <div key={key} className="rounded-[20px] p-4" style={{ background: "#FFFFFF", boxShadow: "0 1px 6px rgba(0,0,0,0.04)" }}>
-                  <div className="flex items-center justify-between gap-3 mb-3">
-                    <div>
-                      <p className="text-[15px] font-bold" style={{ color: DEEP_GREEN }}>{title}</p>
-                      <p className="text-xs text-stone-400">
-                        {optimizing
-                          ? t("cosmetics.routineOptimizing")
-                          : routinePlan[key].length > 0
-                          ? t("cosmetics.boardStepCount", { count: routinePlan[key].length })
-                          : t(key === "am" ? "cosmetics.routineEmptyAm" : "cosmetics.routineEmptyPm")}
-                      </p>
-                    </div>
-                    {!optimizing && routinePlan[key].length > 0 && (
-                      <span className="px-2.5 py-1 rounded-full text-xs font-bold" style={{ background: bg, color: accent }}>
-                        {t("cosmetics.routineRepresentativeBadge")}
-                      </span>
-                    )}
+            <div className="rounded-[20px] p-4" style={{ background: "#FFFFFF", boxShadow: "0 1px 6px rgba(0,0,0,0.04)" }}>
+              {sections.map(({ key, title, accent, bg }, sectionIdx) => (
+                <div key={key} className={sectionIdx > 0 ? "mt-5 pt-5" : ""} style={sectionIdx > 0 ? { borderTop: "1px solid #EBE8E4" } : {}}>
+                  <div className="flex items-center gap-2 mb-3">
+                    {key === "am" ? <Sun className="w-4 h-4" style={{ color: accent }} /> : <Moon className="w-4 h-4" style={{ color: accent }} />}
+                    <p className="text-[14px] font-bold" style={{ color: accent }}>{title}</p>
+                    <span className="text-xs" style={{ color: "#8C8078" }}>
+                      {routinePlan[key].length > 0 ? `${routinePlan[key].length}${t("cosmetics.boardStepSuffix", "개")}` : ""}
+                    </span>
                   </div>
-                  <div className="space-y-3">
-                    {routinePlan[key].map((item, index) => (
+                  <div className="space-y-2">
+                    {routinePlan[key].length === 0 ? (
+                      <p className="text-[13px] py-2" style={{ color: "#B0A898" }}>
+                        {t(key === "am" ? "cosmetics.routineEmptyAm" : "cosmetics.routineEmptyPm")}
+                      </p>
+                    ) : routinePlan[key].map((item, index) => (
                       <button
                         key={`${key}-${item.id}`}
                         onClick={() => setSelectedItem(item)}
-                        className="w-full rounded-2xl bg-white px-3.5 py-3 flex items-center gap-3 text-left"
-                        style={{ boxShadow: "0 1px 4px rgba(0,0,0,0.04)" }}
+                        className="w-full rounded-[16px] px-3.5 py-3 flex items-center gap-3 text-left"
+                        style={{ background: BG_MUTED }}
                       >
-                        <span className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold text-white shrink-0" style={{ background: accent }}>
+                        <span className="w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-bold text-white shrink-0" style={{ background: accent }}>
                           {index + 1}
                         </span>
                         <div className="min-w-0 flex-1">
-                          <p className="text-xs font-semibold truncate" style={{ color: DEEP_GREEN }}>{t(`cosmetics.categories.${item.category}`)}</p>
-                          <p className="text-xs text-stone-400 truncate">{item.name}</p>
+                          <p className="text-[13px] font-semibold truncate" style={{ color: "#5C4F4A" }}>{t(`cosmetics.categories.${item.category}`)}</p>
+                          <p className="text-[12px] truncate" style={{ color: "#8C8078" }}>{item.name}</p>
                         </div>
                         <ChevronRight className="w-4 h-4 text-stone-300 shrink-0" />
                       </button>
