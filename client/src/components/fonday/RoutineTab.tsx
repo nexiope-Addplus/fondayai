@@ -343,7 +343,7 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
 
           {/* 가장 효과 좋은 제품 */}
           {topSignal ? (
-            <div className="rounded-[16px] p-3.5" style={{ background: BG_MUTED }}>
+            <div className="pt-3 mt-3" style={{ borderTop: "1px solid #EBE8E4" }}>
               <p className="text-[11px] font-bold mb-1.5" style={{ color: DEEP_GREEN }}>{t("cosmetics.signalTopTitle")}</p>
               <div className="flex items-center justify-between gap-2">
                 <p className="text-[13px] font-bold truncate" style={{ color: "#5C4F4A" }}>{topSignal.itemName}</p>
@@ -354,7 +354,7 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
               <p className="text-[12px] mt-1 text-kr-pretty" style={{ color: "#8C8078" }}>{topSignal.note}</p>
             </div>
           ) : (
-            <div className="rounded-[16px] p-3.5" style={{ background: BG_MUTED }}>
+            <div className="pt-3 mt-3" style={{ borderTop: "1px solid #EBE8E4" }}>
               <p className="text-[12px]" style={{ color: "#8C8078" }}>{t("cosmetics.signalEmpty")}</p>
             </div>
           )}

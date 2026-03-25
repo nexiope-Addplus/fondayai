@@ -31,10 +31,9 @@ export function ResultNutritionTab({ analysisResult }: any) {
                   {analysisResult.nutritionTips.supplements.map((item: { emoji: string; name: string; dose: string; reason: string; targetScore: string }, i: number) => (
                     <motion.div key={i} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: i * 0.07 }}
-                      className="flex items-start gap-3 p-3.5 rounded-2xl"
-                      style={{ background: BG_MUTED }}>
-                      <div className="w-10 h-10 rounded-2xl flex items-center justify-center shrink-0 mt-0.5" style={{ background: "#F6F4FB" }}>
-                        <span className="text-xl">{item.emoji}</span>
+                      className="flex items-start gap-3">
+                      <div className="w-9 h-9 rounded-full flex items-center justify-center shrink-0 mt-0.5" style={{ background: "#F6F4FB" }}>
+                        <span className="text-lg">{item.emoji}</span>
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-0.5 flex-wrap">
@@ -75,10 +74,9 @@ export function ResultNutritionTab({ analysisResult }: any) {
                   </div>
                   <div className="space-y-3">
                     {analysisResult.nutritionTips.avoidFoods.map((item: { emoji: string; food: string; reason: string }, idx: number) => (
-                      <div key={idx} className="flex items-start gap-3 p-3 rounded-2xl"
-                        style={{ background: BG_MUTED }}>
-                        <div className="w-10 h-10 rounded-2xl flex items-center justify-center shrink-0" style={{ background: "#FFF7ED" }}>
-                          <span className="text-xl">{item.emoji}</span>
+                      <div key={idx} className="flex items-start gap-3">
+                        <div className="w-9 h-9 rounded-full flex items-center justify-center shrink-0" style={{ background: "#FFF7ED" }}>
+                          <span className="text-lg">{item.emoji}</span>
                         </div>
                         <div className="flex-1 min-w-0">
                           <p className="text-[12px] font-semibold text-[#6B5D55] mb-0.5">{item.food}</p>

@@ -32,7 +32,7 @@ export function ResultRoutineTab(props: any) {
           <motion.div
             initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }}
             className="rounded-3xl p-4 flex items-start gap-3"
-            style={{ background: "#FFFFFF", border: `1px solid ${BORDER_COLOR}` }}
+            style={{ background: "#FFFFFF", boxShadow: "0 1px 6px rgba(0,0,0,0.04)" }}
           >
             <span className="text-xl shrink-0 mt-0.5">✨</span>
             <div className="flex-1 min-w-0">
@@ -50,8 +50,8 @@ export function ResultRoutineTab(props: any) {
         )}
 
         {/* 퀘스트 / 미션 카드 */}
-        <Card className="rounded-3xl overflow-hidden bg-white" style={{ border: `1px solid ${BORDER_COLOR}` }}>
-          <CardContent className="p-3.5">
+        <div className="space-y-1">
+          <div>
             <div className="min-w-0">
               <p className="text-xs font-semibold tracking-[0.16em] uppercase" style={{ fontFamily: FONT_DISPLAY, color: TEXT_TERTIARY }}>{t("result.actionCard.missionEyebrow")}</p>
               <p className="text-base font-semibold mt-1 text-kr-pretty" style={{ color: DEEP_GREEN }}>{t("result.actionCard.title")}</p>
@@ -80,12 +80,12 @@ export function ResultRoutineTab(props: any) {
                 {t("result.actionCard.questTitle", { done: essentialQuests.filter((quest: any) => quest.done).length, total: essentialQuests.length })}
               </button>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
         {/* 루틴 체크 카드 */}
-        <Card className="rounded-3xl overflow-hidden bg-white" style={{ border: `1px solid ${BORDER_COLOR}` }}>
-          <CardContent className="p-4">
+        <div className="space-y-1">
+          <div>
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
                 <p className="text-xs font-semibold uppercase tracking-[0.16em]" style={{ fontFamily: FONT_DISPLAY, color: TEXT_TERTIARY }}>{t("diary.routineTitle")}</p>
@@ -170,7 +170,7 @@ export function ResultRoutineTab(props: any) {
                 </div>
                 {myCosmetics.length > 0 && (
                   <div className="grid gap-3 md:grid-cols-2">
-                    <div className="rounded-3xl p-3" style={{ background: "#FFFFFF" }}>
+                    <div className="py-2">
                       <p className="text-xs font-semibold" style={{ color: DEEP_GREEN }}>{t("cosmetics.goodComboTitle")}</p>
                       <div className="mt-2 flex flex-wrap gap-1.5">
                         {routineGuide.goodMixes.length > 0 ? routineGuide.goodMixes.slice(0, 3).map((item: any, index: number) => (
@@ -183,7 +183,7 @@ export function ResultRoutineTab(props: any) {
                         )}
                       </div>
                     </div>
-                    <div className="rounded-3xl p-3" style={{ background: "#FFFFFF" }}>
+                    <div className="py-2">
                       <p className="text-xs font-semibold" style={{ color: "#C2410C" }}>{t("cosmetics.cautionTitle")}</p>
                       <div className="mt-2 space-y-1.5">
                         {routineGuide.cautions.length > 0 ? routineGuide.cautions.slice(0, 2).map((item: any, index: number) => (
@@ -200,8 +200,8 @@ export function ResultRoutineTab(props: any) {
                 )}
               </div>
             )}
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
             {/* 피부 일기 카드 / 로그인 카드 */}
             {user === undefined ? (

@@ -54,20 +54,17 @@ export function ResultSolutionTab(props: any) {
                 <p className="text-xs text-stone-400">{t("modal.improvements.sub")}</p>
               </div>
             </div>
-            <div className="rounded-[20px] p-4 space-y-3" style={{ background: "#FFFFFF", boxShadow: "0 1px 6px rgba(0,0,0,0.04)" }}>
+            <div className="space-y-4">
               {(analysisResult?.improvements ?? []).slice(0, 3).map((item: { title: string; desc: string }, i: number) => (
                 <motion.div key={i} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: i * 0.08 }} className="flex gap-3 p-3 rounded-[16px]"
-                  style={{ background: BG_MUTED }}>
-                  <div className="shrink-0">
-                    <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white"
-                      style={{ background: i === 0 ? SCAN_TO : i === 1 ? DEEP_GREEN : "#7C3AED" }}>
-                      {i + 1}
-                    </div>
+                  transition={{ delay: i * 0.08 }} className="flex gap-3">
+                  <div className="w-7 h-7 rounded-full flex items-center justify-center text-[11px] font-bold text-white shrink-0 mt-0.5"
+                    style={{ background: i === 0 ? SCAN_TO : i === 1 ? DEEP_GREEN : "#7C3AED" }}>
+                    {i + 1}
                   </div>
                   <div>
-                    <p className="text-[13px] font-bold text-[#5C4F4A] mb-0.5">{item.title}</p>
-                    <p className="text-[12px] leading-relaxed" style={{ color: "#8C8078" }}>{item.desc}</p>
+                    <p className="text-[14px] font-bold text-[#5C4F4A] mb-1">{item.title}</p>
+                    <p className="text-[13px] leading-relaxed" style={{ color: "#8C8078" }}>{item.desc}</p>
                   </div>
                 </motion.div>
               ))}
@@ -83,22 +80,21 @@ export function ResultSolutionTab(props: any) {
                   </div>
                   <p className="text-xs font-semibold uppercase tracking-[0.14em]" style={{ fontFamily: FONT_DISPLAY, color: TEXT_TERTIARY }}>{t("modal.improvements.cosmetics")}</p>
                 </div>
-                <div className="rounded-[20px] p-4 space-y-3" style={{ background: "#FFFFFF", boxShadow: "0 1px 6px rgba(0,0,0,0.04)" }}>
+                <div className="space-y-4">
                   {(analysisResult.cosmetics as { type: string; key: string; reason: string }[]).map((item, i) => (
                     <motion.div key={`c-${i}`} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.3 + i * 0.07 }}
-                      className="flex items-start gap-3 p-3 rounded-[16px]"
-                      style={{ background: BG_MUTED }}>
-                      <div className="w-8 h-8 rounded-full flex items-center justify-center shrink-0"
+                      className="flex items-start gap-3">
+                      <div className="w-7 h-7 rounded-full flex items-center justify-center shrink-0 mt-0.5"
                         style={{ background: "#FFF7ED" }}>
-                        <Star className="w-4 h-4" style={{ color: "#D97706" }} />
+                        <Star className="w-3.5 h-3.5" style={{ color: "#D97706" }} />
                       </div>
                       <div>
-                        <div className="flex items-center gap-1.5 mb-0.5">
-                          <span className="text-[13px] font-bold text-[#5C4F4A]">{item.type}</span>
+                        <div className="flex items-center gap-1.5 mb-1">
+                          <span className="text-[14px] font-bold text-[#5C4F4A]">{item.type}</span>
                           <span className="text-[11px] px-1.5 py-0.5 rounded-full font-semibold" style={{ background: TINT_WARM, color: "#D97706" }}>{item.key}</span>
                         </div>
-                        <p className="text-[12px] leading-relaxed" style={{ color: "#8C8078" }}>{item.reason}</p>
+                        <p className="text-[13px] leading-relaxed" style={{ color: "#8C8078" }}>{item.reason}</p>
                       </div>
                     </motion.div>
                   ))}
