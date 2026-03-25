@@ -47,7 +47,7 @@ export function ResultSolutionTab(props: any) {
                 <Lightbulb className="w-4 h-4" style={{ color: DEEP_GREEN }} />
               </div>
               <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.14em]" style={{ fontFamily: FONT_DISPLAY, color: TEXT_TERTIARY }}>{t("modal.improvements.title")}</p>
+                <p className="text-xs font-bold uppercase tracking-[0.14em]" style={{ fontFamily: FONT_DISPLAY, color: "#6B5D55" }}>{t("modal.improvements.title")}</p>
                 <p className="text-xs text-stone-400">{t("modal.improvements.sub")}</p>
               </div>
             </div>

@@ -14,7 +14,7 @@ export function ResultNutritionTab({ analysisResult }: any) {
                 <Utensils className="w-4 h-4" style={{ color: "#7C3AED" }} />
               </div>
               <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.14em]" style={{ fontFamily: FONT_DISPLAY, color: TEXT_TERTIARY }}>{t("nutrients.supplementsTitle")}</p>
+                <p className="text-xs font-bold uppercase tracking-[0.14em]" style={{ fontFamily: FONT_DISPLAY, color: "#6B5D55" }}>{t("nutrients.supplementsTitle")}</p>
                 <p className="text-xs text-stone-400">{t("nutrients.supplementsSub")}</p>
               </div>
             </div>

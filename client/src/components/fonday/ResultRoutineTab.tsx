@@ -54,7 +54,7 @@ export function ResultRoutineTab(props: any) {
           <div>
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
-                <p className="text-xs font-semibold uppercase tracking-[0.16em]" style={{ fontFamily: FONT_DISPLAY, color: TEXT_TERTIARY }}>{t("diary.routineTitle")}</p>
+                <p className="text-xs font-bold uppercase tracking-[0.16em]" style={{ fontFamily: FONT_DISPLAY, color: "#6B5D55" }}>{t("diary.routineTitle")}</p>
                 <div className="mt-1 space-y-0.5">
                   <p className="text-[13px] font-semibold leading-snug flex items-center gap-1" style={{ color: DEEP_GREEN }}>
                     <Sun className="w-3.5 h-3.5 shrink-0" />{t("cosmetics.amBtn")}: {morningRoutineItems.join(" + ")}
@@ -112,7 +112,7 @@ export function ResultRoutineTab(props: any) {
               <div className="mt-4 rounded-3xl p-4" style={{ background: TINT_NEUTRAL }}>
                 <div className="flex items-center justify-between gap-3 mb-3">
                   <div>
-                    <p className="text-xs font-semibold uppercase tracking-[0.14em]" style={{ fontFamily: FONT_DISPLAY, color: TEXT_TERTIARY }}>{t("cosmetics.insightTitle")}</p>
+                    <p className="text-xs font-bold uppercase tracking-[0.14em]" style={{ fontFamily: FONT_DISPLAY, color: "#6B5D55" }}>{t("cosmetics.insightTitle")}</p>
                     <p className="text-xs text-stone-400">{t("cosmetics.ctaCount", { count: cosmeticCount })}</p>
                   </div>
                   <div className="flex items-center gap-2">
@@ -193,8 +193,8 @@ export function ResultRoutineTab(props: any) {
         {/* 퀘스트 / 미션 — 루틴 아래 (게이미피케이션) */}
         <div className="pt-8 mt-8" style={{ borderTop: `1px solid ${BORDER_COLOR}` }}>
           <div className="min-w-0">
-            <p className="text-xs font-semibold tracking-[0.16em] uppercase" style={{ fontFamily: FONT_DISPLAY, color: TEXT_TERTIARY }}>{t("result.actionCard.missionEyebrow")}</p>
-            <p className="text-base font-semibold mt-1 text-kr-pretty" style={{ color: DEEP_GREEN }}>{t("result.actionCard.title")}</p>
+            <p className="text-xs font-bold tracking-[0.16em] uppercase" style={{ fontFamily: FONT_DISPLAY, color: "#6B5D55" }}>{t("result.actionCard.missionEyebrow")}</p>
+            <p className="text-base font-bold mt-1 text-kr-pretty" style={{ color: DEEP_GREEN }}>{t("result.actionCard.title")}</p>
             <p className="text-xs text-stone-500 mt-1.5 leading-relaxed text-kr-pretty">{questStatusDetail}</p>
           </div>
           <div className="h-2 rounded-full bg-stone-100 overflow-hidden mt-3">
