@@ -2,8 +2,8 @@ import React, { useState, useRef, useEffect, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import {
-  Sparkles, Heart, Lock, CalendarDays, Activity,
-  ClipboardList, Camera, ChevronDown, ChevronRight, Flame, Bot,
+  Sparkles, Heart, Lock, Activity,
+  ClipboardList, Camera, ChevronDown, Bot,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -12,8 +12,8 @@ import {
   BG_BASE, BG_MUTED, BORDER_COLOR, FONT_DISPLAY,
 } from "./constants";
 import type { WeatherData, WeatherTipKey } from "./types";
-import { getStreak, getAttendance, getDaysSinceLastScan, getWeatherTipKey, buildCosmeticCorrelationSignals, todayStr, haptic } from "./utils";
-import { AttendanceCalendarModal } from "./MyScreen";
+import { getStreak, getDaysSinceLastScan, getWeatherTipKey, buildCosmeticCorrelationSignals, todayStr, haptic } from "./utils";
+// AttendanceCalendarModal은 MY탭에서만 사용
 import { WeatherTipCard, MiniScoreBarIdle } from "./WeatherTipCard";
 import { LangSwitcher } from "./BottomNav";
 
@@ -34,9 +34,7 @@ export function ScanIdleScreen({
   const { t } = useTranslation();
   const reducedMotion = useReducedMotion();
   const streak = getStreak();
-  const attendance = getAttendance();
   const daysSince = getDaysSinceLastScan();
-  const [showCalendar, setShowCalendar] = useState(false);
   const [showBaumannExp, setShowBaumannExp] = useState(false);
   const [socialCount, setSocialCount] = useState(0);
   const [pullY, setPullY] = useState(0);
@@ -161,11 +159,6 @@ export function ScanIdleScreen({
 
   return (
     <>
-      {/* 출석 달력 모달 */}
-      <AnimatePresence>
-        {showCalendar && <AttendanceCalendarModal onClose={() => setShowCalendar(false)} />}
-      </AnimatePresence>
-
     <motion.div
       className="flex flex-col px-3 pb-8 relative overflow-hidden"
       style={{ minHeight: "calc(100dvh - 60px)", background: BG_BASE, paddingTop: 20 }}
@@ -270,22 +263,7 @@ export function ScanIdleScreen({
         );
       })()}
 
-      {/* ── 상단 스캔 CTA (신규 유저가 바로 시작할 수 있도록) ── */}
-      {!latestScan && !scanLoading && (
-        <motion.div variants={fadeChild} className="mb-3 relative" style={{ zIndex: 1 }}>
-          <button
-            onClick={() => { haptic("medium"); onScan(); }}
-            className="w-full rounded-2xl px-5 py-4 text-left flex items-center gap-3 active:opacity-80 transition-opacity"
-            style={{ background: DEEP_GREEN }}
-          >
-            <Camera className="w-5 h-5 text-white shrink-0" />
-            <div>
-              <p className="text-[14px] font-bold text-white">{t("idle.quickScan", "지금 바로 피부 스캔하기")}</p>
-              <p className="text-[11px] text-white/70 mt-0.5">{t("idle.quickScanSub", "30초면 끝나요 · 완전 무료")}</p>
-            </div>
-          </button>
-        </motion.div>
-      )}
+      {/* 상단 스캔 CTA 제거 — 하단 CTA로 통일 (B안 레이아웃) */}
 
       {/* 컴백 배너 (3일+ 경과 시) */}
       {daysSince !== null && daysSince >= 3 && (
@@ -301,18 +279,31 @@ export function ScanIdleScreen({
         </motion.div>
       )}
 
-      {/* ── 헤더 + 히어로 미리보기 (신규 유저만) ── */}
-      {!latestScan && <motion.div variants={fadeChild} className="mb-4 relative" style={{ zIndex: 1 }}>
-        <div className="flex items-center justify-between gap-2 mb-3">
-          <span className="text-xs font-medium tracking-wide" style={{ color: TEXT_TERTIARY, fontFamily: FONT_DISPLAY }}>{t("idle.heroBadge")}</span>
-        </div>
-        <h1 className="text-[30px] font-light leading-[1.15] mb-2 px-1" style={{ color: "#1C1917", fontFamily: FONT_DISPLAY }}>
+      {/* ── 히어로: 헤드라인 + CTA (신규 유저, 첫 화면 = 포스터) ── */}
+      {!latestScan && <motion.div variants={fadeChild} className="mb-14 relative" style={{ zIndex: 1 }}>
+        <h1 className="text-[34px] font-light leading-[1.12] mb-4 mt-4" style={{ color: "#1C1917", fontFamily: FONT_DISPLAY }}>
           {t("idle.subtitle1")}<br />{t("idle.subtitle3")}
         </h1>
-        <p className="text-[14px] leading-[1.7] px-1 mb-4" style={{ color: TEXT_SECONDARY }}>
+        <p className="text-[15px] leading-[1.7] mb-8" style={{ color: TEXT_SECONDARY }}>
           {t("idle.subtitle4")}
         </p>
+        <motion.button
+          onClick={() => { haptic("medium"); onScan(); }}
+          className="w-full py-4 rounded-2xl text-white text-[15px] font-semibold tracking-tight"
+          style={{ background: DEEP_GREEN }}
+          whileHover={{ scale: reducedMotion ? 1 : 1.01 }}
+          whileTap={{ scale: reducedMotion ? 1 : 0.97 }}
+        >
+          {t("idle.ctaBtn")}
+        </motion.button>
+        <p className="text-center text-xs mt-3" style={{ color: TEXT_TERTIARY }}>
+          {t("idle.ctaHint")}
+        </p>
+      </motion.div>}
 
+      {/* ── 미리보기 카드 (스크롤 아래, 신규 유저) ── */}
+      {!latestScan && <motion.div variants={fadeChild} className="mb-14 relative" style={{ zIndex: 1 }}>
+        <p className="text-xs font-semibold uppercase tracking-[0.14em] mb-4" style={{ color: TEXT_TERTIARY, fontFamily: FONT_DISPLAY }}>{t("idle.heroBadge")}</p>
         <div className="rounded-3xl p-3 border sm:rounded-3xl sm:p-3.5"
           style={{ background: "#FFFFFF", boxShadow: "0 8px 24px rgba(74,124,110,0.06)", borderColor: BORDER_COLOR }}>
           <div className="flex items-center justify-between mb-3">
@@ -379,7 +370,7 @@ export function ScanIdleScreen({
         </div>
       </motion.div>}
 
-      <motion.div variants={fadeChild} className="mb-4 relative" style={{ zIndex: 1 }}>
+      <motion.div variants={fadeChild} className="mb-14 relative" style={{ zIndex: 1 }}>
         {scanLoading && (
           <div className={`rounded-2xl bg-white px-4 py-4 mb-4 border${reducedMotion ? "" : " animate-pulse"}`} style={{ borderColor: BORDER_COLOR }}>
             <div className="flex items-start justify-between gap-3">
@@ -461,40 +452,11 @@ export function ScanIdleScreen({
           return <HomeRoutineWidget onOpenRoutine={onOpenRoutine} />;
         })()}
 
-        <div className="grid grid-cols-[1fr_auto] gap-2">
-          <button
-            onClick={() => setShowCalendar(true)}
-            className="flex items-center justify-between gap-3 rounded-2xl px-3.5 py-3 text-left active:opacity-70 border"
-            style={{ background: "#FFFFFF", borderColor: BORDER_COLOR }}
-          >
-            <div className="flex items-center gap-3 min-w-0">
-              <div className="w-9 h-9 rounded-2xl flex items-center justify-center shrink-0" style={{ background: TINT_WARM }}>
-                <CalendarDays className="w-4.5 h-4.5" style={{ color: SCAN_TO }} />
-              </div>
-              <div className="min-w-0">
-                <p className="text-[13px] font-semibold text-stone-800 truncate">{t("attendance.calendarTitle")}</p>
-                <p className="text-[12px] truncate" style={{ color: TEXT_TERTIARY }}>{t("attendance.totalPoints", { n: attendance.totalPoints })}</p>
-              </div>
-            </div>
-            <ChevronRight className="w-4 h-4 text-stone-300 shrink-0" />
-          </button>
-          {streak.count >= 2 && (
-            <div
-              className="rounded-2xl px-3 py-2.5 flex flex-col justify-center min-w-[92px] border"
-              style={{ background: "#FFF7ED", borderColor: BORDER_COLOR }}
-            >
-              <div className="flex items-center gap-1 text-xs font-bold uppercase tracking-[0.12em]" style={{ color: "#C2410C" }}>
-                <Flame className="w-3 h-3" />
-                streak
-              </div>
-              <p className="text-[12px] font-bold mt-1" style={{ color: "#9A3412" }}>{t("streak.badge", { count: streak.count })}</p>
-            </div>
-          )}
-        </div>
+        {/* 출석 캘린더는 MY탭으로 이동 — 홈 흐름 정리 */}
       </motion.div>
 
       {/* 바우만 설명 더보기 accordion */}
-      <motion.div variants={fadeChild} className="mb-4 relative" style={{ zIndex: 1 }}>
+      <motion.div variants={fadeChild} className="mb-14 relative" style={{ zIndex: 1 }}>
         <div className="rounded-2xl bg-white border" style={{ borderColor: BORDER_COLOR }}>
           <button onClick={() => setShowBaumannExp(v => !v)}
             className="w-full flex items-center justify-between px-4 py-3">
@@ -535,56 +497,34 @@ export function ScanIdleScreen({
         </div>
       </motion.div>
 
-      {/* ── 신규 유저: 단계 표시 + 개인정보 + CTA ── */}
+      {/* ── 신규 유저: 단계 표시 (독립 섹션, 카드 없이 여유롭게) ── */}
       {!latestScan && (
         <>
-          <motion.div variants={fadeChild} className="mb-4 relative" style={{ zIndex: 1 }}>
-            <div className="bg-white rounded-2xl px-3 py-2.5 border"
-              style={{ borderColor: BORDER_COLOR }}>
-              <p className="text-xs font-semibold text-stone-400 text-center mb-2 tracking-widest uppercase">
-                {t("idle.stepsTitle")}
-              </p>
-              <div className="flex items-start justify-between">
-                {STEPS.map((step, i) => (
-                  <div key={i} className="flex items-start" style={{ flex: 1 }}>
-                    <div className="flex flex-col items-center gap-1 flex-1">
-                      <div className="w-8 h-8 rounded-full flex items-center justify-center text-sm"
-                        style={step.active ? { background: TINT_WARM } : { background: "#F4F4F5" }}>
-                        <step.Icon className="w-4 h-4" style={{ color: step.active ? SCAN_TO : "#A9998E" }} />
-                      </div>
-                      <div className="text-center">
-                        <div className="text-xs font-semibold text-stone-700">{step.title}</div>
-                        <div className="text-xs text-stone-400 mt-0.5 leading-tight">{step.sub}</div>
-                      </div>
-                    </div>
-                    {i < 2 && <div className="text-stone-200 text-sm pt-2 flex-shrink-0">›</div>}
+          <motion.div variants={fadeChild} className="mb-14 relative" style={{ zIndex: 1 }}>
+            <p className="text-xs font-semibold text-stone-400 mb-6 tracking-widest uppercase">
+              {t("idle.stepsTitle")}
+            </p>
+            <div className="space-y-5">
+              {STEPS.map((step, i) => (
+                <div key={i} className="flex items-start gap-4">
+                  <div className="w-10 h-10 rounded-2xl flex items-center justify-center shrink-0"
+                    style={step.active ? { background: TINT_WARM } : { background: "#F4F4F5" }}>
+                    <step.Icon className="w-5 h-5" style={{ color: step.active ? SCAN_TO : "#A9998E" }} />
                   </div>
-                ))}
-              </div>
+                  <div className="pt-0.5">
+                    <p className="text-[14px] font-semibold text-stone-800">{step.title}</p>
+                    <p className="text-[13px] mt-0.5" style={{ color: TEXT_SECONDARY }}>{step.sub}</p>
+                  </div>
+                </div>
+              ))}
             </div>
           </motion.div>
 
-          <motion.div variants={fadeChild} className="mb-4 relative" style={{ zIndex: 1 }}>
-            <div className="flex items-center justify-center gap-1.5 px-3.5 py-2.5">
+          <motion.div variants={fadeChild} className="mb-8 relative" style={{ zIndex: 1 }}>
+            <div className="flex items-center justify-center gap-1.5">
               <Lock className="w-3.5 h-3.5 flex-shrink-0" style={{ color: TEXT_TERTIARY }} />
               <span className="text-xs font-medium" style={{ color: TEXT_TERTIARY }}>{t("idle.privacy")}</span>
             </div>
-          </motion.div>
-
-          <motion.div variants={fadeChild} className="mt-auto relative" style={{ zIndex: 1 }}>
-            <motion.button
-              onClick={() => { haptic("medium"); onScan(); }}
-              className="w-full py-4 sm:py-[18px] rounded-xl text-white text-[15px] sm:text-[16px] font-semibold tracking-tight"
-              style={{ background: DEEP_GREEN }}
-              whileHover={{ scale: reducedMotion ? 1 : 1.01 }}
-              whileTap={{ scale: reducedMotion ? 1 : 0.97 }}
-            >
-              {t("idle.ctaBtn")}
-            </motion.button>
-            <p className="text-center text-xs mt-2.5" style={{ color: TEXT_SECONDARY }}>
-              <Sparkles className="w-3 h-3 inline mr-1" style={{ color: SCAN_FROM }} />
-              {t("idle.ctaHint")}
-            </p>
           </motion.div>
         </>
       )}
