@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 import { ChevronLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { stagger, fadeChild, TEXT_TERTIARY } from "./constants";
+import { stagger, fadeChild, TEXT_TERTIARY, FONT_HEADING } from "./constants";
 import type { SurveyData } from "./types";
 
 // ─── 설문 화면 ────────────────────────────────────────────────────
@@ -26,7 +26,7 @@ export function SurveyScreen({ onSubmit, onBack }: {
           <Button variant="ghost" size="icon" onClick={onBack} className="-ml-2">
             <ChevronLeft className="w-6 h-6" style={{ color: "#5C4F4A" }} />
           </Button>
-          <h2 className="text-[20px] font-bold" style={{ color: "#5C4F4A" }}>{t("survey.title")}</h2>
+          <h2 className="text-[20px] font-bold" style={{ color: "#5C4F4A", fontFamily: FONT_HEADING }}>{t("survey.title")}</h2>
         </div>
         <p className="text-[13px] ml-10" style={{ color: "#8C8078" }}>{t("survey.subtitle")}</p>
       </motion.div>

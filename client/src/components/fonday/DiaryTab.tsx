@@ -31,6 +31,7 @@ import {
   BORDER_COLOR,
   DEEP_GREEN,
   FONT_DISPLAY,
+  FONT_HEADING,
   SCAN_FROM,
   SCAN_TO,
   TEXT_TERTIARY,
@@ -247,7 +248,7 @@ export function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: AppU
             <div className="w-12 h-12 rounded-full mb-4 flex items-center justify-center" style={{ background: TINT_WARM }}>
               <Lock className="w-5 h-5" style={{ color: SCAN_TO }} />
             </div>
-            <h1 className="text-[22px] font-bold mb-2" style={{ color: "#5C4F4A" }}>{t("modal.diary.title")}</h1>
+            <h1 className="text-[20px] font-bold mb-2" style={{ color: "#5C4F4A", fontFamily: FONT_HEADING }}>{t("modal.diary.title")}</h1>
             <p className="text-[14px] leading-relaxed text-kr-pretty" style={{ color: "#8C8078" }}>{t("result.login.desc")}</p>
           </div>
 
@@ -305,7 +306,7 @@ export function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: AppU
             <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ background: TINT_WARM }}>
               <BookOpen className="w-4 h-4" style={{ color: SCAN_TO }} />
             </div>
-            <h1 className="text-[20px] font-bold" style={{ color: "#5C4F4A" }}>{t("modal.diary.title")}</h1>
+            <h1 className="text-[20px] font-bold" style={{ color: "#5C4F4A", fontFamily: FONT_HEADING }}>{t("modal.diary.title")}</h1>
           </div>
           <p className="text-[13px] text-kr-pretty" style={{ color: "#8C8078", marginLeft: 42 }}>
             {finalType ? `${finalType} · ` : ""}{totalRecords > 0 ? `${t("modal.diary.countLabel", { count: totalRecords })}` : t("result.diary.firstRecord")}

@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import {
   BAUMANN_COLORS, DEEP_GREEN, SCAN_FROM, SCAN_TO, TEXT_SECONDARY, TEXT_TERTIARY,
   TINT_GREEN, TINT_WARM, SCORE_COLORS, stagger, fadeChild,
-  BG_BASE, BG_MUTED, BORDER_COLOR, FONT_DISPLAY,
+  BG_BASE, BG_MUTED, BORDER_COLOR, FONT_DISPLAY, FONT_HEADING,
 } from "./constants";
 import type { WeatherData, WeatherTipKey } from "./types";
 import { getStreak, getDaysSinceLastScan, getWeatherTipKey, buildCosmeticCorrelationSignals, todayStr, haptic } from "./utils";
@@ -244,7 +244,7 @@ export function ScanIdleScreen({
       {!latestScan && !scanLoading && (
         <motion.div variants={fadeChild} className="mb-8 relative" style={{ zIndex: 1 }}>
           {/* 헤드라인 — Pretendard Bold, 한글 자연스러운 볼드 */}
-          <h1 className="text-[26px] font-bold leading-[1.3] mt-1 mb-2" style={{ color: "#5C4F4A" }}>
+          <h1 className="text-[26px] font-bold leading-[1.3] mt-1 mb-2" style={{ color: "#5C4F4A", fontFamily: FONT_HEADING }}>
             {t("idle.subtitle1")}<br />{t("idle.subtitle3")}
           </h1>
           <p className="text-[14px] leading-[1.7] mb-5" style={{ color: TEXT_SECONDARY }}>

@@ -15,6 +15,7 @@ import {
   BORDER_COLOR,
   DEEP_GREEN,
   FONT_DISPLAY,
+  FONT_HEADING,
   SCAN_TO,
   TEXT_TERTIARY,
   TINT_WARM,
@@ -78,7 +79,7 @@ export function MyScreen({
                 <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ background: TINT_WARM }}>
                   <User className="w-4 h-4" style={{ color: SCAN_TO }} />
                 </div>
-                <h1 className="text-[20px] font-bold" style={{ color: "#5C4F4A" }}>{t("nav.my")}</h1>
+                <h1 className="text-[20px] font-bold" style={{ color: "#5C4F4A", fontFamily: FONT_HEADING }}>{t("nav.my")}</h1>
               </div>
               <p className="text-[13px]" style={{ color: "#8C8078", marginLeft: 42 }}>
                 {user ? (user.username || user.email || t("nav.my")) : t("attendance.loginDesc")}
