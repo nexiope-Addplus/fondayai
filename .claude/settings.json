@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git merge:*)",
+      "Bash(git checkout:*)",
+      "Bash(curl -s -X POST https://fondayai.com/api/test-push -H \"Content-Type: application/json\" -d '{\"\"adminKey\"\":\"\"kimseo8318!@\"\",\"\"type\"\":\"\"test\"\"}')",
+      "Bash(curl -v -X POST https://fondayai.com/api/test-push -H \"Content-Type: application/json\" -d '{\"\"\"\"adminKey\"\"\"\":\"\"\"\"kimseo8318!@\"\"\"\",\"\"\"\"type\"\"\"\":\"\"\"\"test\"\"\"\"}')",
+      "Bash(curl -s -X POST https://fonday-push-worker.nexiope.workers.dev/test-push -H \"Content-Type: application/json\" -d '{\"\"adminKey\"\":\"\"kimseo8318!@\"\",\"\"type\"\":\"\"test\"\"}')",
+      "Bash(curl -s -X POST 'https://fonday-push-worker.nexiope.workers.dev/test-push' -H 'Content-Type: application/json' -d '{\"\"adminKey\"\":\"\"kimseo8318!@\"\",\"\"type\"\":\"\"test\"\"}')",
+      "Bash(curl -s -X POST 'https://fonday-push-worker.nexiope.workers.dev/test-push' -H 'Content-Type: application/json' --data-raw '{\"\"adminKey\"\":\"\"kimseo8318!@\"\",\"\"type\"\":\"\"test\"\"}')",
+      "Bash(npx wrangler:*)",
+      "Skill(design-review)",
+      "Skill(design-review:*)"
+    ]
+  }
+}
