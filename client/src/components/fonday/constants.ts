@@ -46,7 +46,7 @@ export const BG_BASE = "#FDFCFA";
 export const BG_MUTED = "#F8F7F5";
 export const BORDER_COLOR = "#EBE8E4";
 export const FONT_DISPLAY = "'Fraunces', Georgia, serif";
-export const FONT_HEADING = "Pretendard, sans-serif";
+export const FONT_HEADING = "'LINESeedKR', Pretendard, sans-serif";
 
 // Shadow 토큰
 export const SHADOW_CARD = "0 1px 6px rgba(0,0,0,0.04)";
