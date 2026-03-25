@@ -44,7 +44,7 @@ export function BottomNav({ active, onChange, scanState }: {
         className={`relative flex flex-col items-center justify-center gap-0.5 transition-colors ${isActive ? "text-[#C97062]" : "text-stone-400"}`}
       >
         {icon}
-        <span className="text-[11px] font-semibold leading-none">{label}</span>
+        <span className="text-[12px] font-semibold leading-none">{label}</span>
         {isActive && (
           <span className="absolute bottom-1.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-[#C97062]" />
         )}
