@@ -160,8 +160,8 @@ export function ScanIdleScreen({
   return (
     <>
     <motion.div
-      className="flex flex-col px-3 pb-8 relative overflow-hidden"
-      style={{ minHeight: "calc(100dvh - 60px)", background: BG_BASE, paddingTop: 20 }}
+      className="flex flex-col px-4 pb-8 relative overflow-hidden"
+      style={{ minHeight: "calc(100dvh - 60px)", background: "linear-gradient(180deg, #FDFCFA 0%, #F8F5F1 50%, #FDFCFA 100%)", paddingTop: 20 }}
       variants={stagger} initial="initial" animate="animate"
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
@@ -216,49 +216,10 @@ export function ScanIdleScreen({
         const greetingKey = wKey ? weatherKeyMap[wKey] : fallback.key;
 
         return (
-          <motion.div variants={fadeChild} className="mb-3 relative" style={{ zIndex: 1 }}>
-            <div className="rounded-2xl overflow-hidden border"
-              style={{ background: "rgba(255,255,255,0.9)", borderColor: BORDER_COLOR }}>
-              {/* 인사 + 날씨 헤더 */}
-              <div className="flex items-center gap-2 px-3.5 py-2.5">
-                <span className="text-base">{emoji}</span>
-                <p className="text-[12px] font-semibold text-stone-600">{t(greetingKey)}</p>
-              </div>
-              <WeatherTipCard compact weather={idleWeather} />
-
-              {/* Ultra-MVP: AI 케어 브리핑 숨김 — 리텐션 검증 후 복원 */}
-              <AnimatePresence>
-                {false && careBriefing && (
-                  <motion.div
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: "auto" }}
-                    exit={{ opacity: 0, height: 0 }}
-                    className="overflow-hidden"
-                  >
-                    <div
-                      className="flex items-start gap-2.5 px-3.5 py-2.5 border-t"
-                      style={{
-                        background: careBriefing.priority === "high" ? "#FFF8F8" : "#F4FBF7",
-                        borderColor: careBriefing.priority === "high" ? "#FECACA" : "#D1FAE5",
-                      }}
-                    >
-                      <Bot className={`w-4 h-4 mt-0.5 shrink-0 ${careBriefing.priority === "high" ? "text-rose-500" : "text-emerald-600"}`} />
-                      <div className="min-w-0 flex-1">
-                        <div className="flex items-center gap-2 mb-0.5">
-                          <p className="text-[11px] font-black uppercase tracking-widest text-stone-400">AI Care</p>
-                          {careBriefing.priority === "high" && (
-                            <span className="text-[11px] font-bold text-rose-500 animate-pulse">!</span>
-                          )}
-                        </div>
-                        <p className="text-[12px] font-semibold text-stone-700 leading-snug break-keep">
-                          {careBriefing.briefing}
-                        </p>
-                      </div>
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
+          <motion.div variants={fadeChild} className="mb-1 relative" style={{ zIndex: 1 }}>
+            <p className="text-[13px] leading-relaxed" style={{ color: TEXT_SECONDARY }}>
+              {emoji} {t(greetingKey)}
+            </p>
           </motion.div>
         );
       })()}
@@ -279,11 +240,20 @@ export function ScanIdleScreen({
         </motion.div>
       )}
 
-      {/* ── 히어로: 얼굴 이미지 + 헤드라인 + CTA (신규 유저, 포스터 스타일) ── */}
+      {/* ── 히어로: 그리팅 → 헤드라인 → 이미지 → CTA (신규 유저) ── */}
       {!latestScan && !scanLoading && (
         <motion.div variants={fadeChild} className="mb-8 relative" style={{ zIndex: 1 }}>
-          {/* 히어로 이미지 — 시각적 앵커 */}
-          <div className="relative rounded-3xl overflow-hidden mb-6 bg-stone-100" style={{ aspectRatio: "4/3" }}>
+          {/* 헤드라인 — 첫 번째로 읽히는 것 */}
+          <h1 className="text-[30px] font-light leading-[1.08] mt-2 mb-3" style={{ color: "#1C1917", fontFamily: FONT_DISPLAY }}>
+            {t("idle.subtitle1")}<br />{t("idle.subtitle3")}
+          </h1>
+          <p className="text-[14px] leading-[1.7] mb-6" style={{ color: TEXT_SECONDARY }}>
+            {t("idle.subtitle4")}
+          </p>
+
+          {/* 얼굴 이미지 — 3:4 세로, 그림자, Sage Green 스캔라인 */}
+          <div className="relative overflow-hidden mb-6 bg-stone-100"
+            style={{ aspectRatio: "3/4", borderRadius: 28, boxShadow: "0 12px 40px rgba(28,25,23,0.08)" }}>
             <img
               src="/face-model.png"
               alt="skin analysis preview"
@@ -291,39 +261,35 @@ export function ScanIdleScreen({
               style={{ objectPosition: "center 20%" }}
             />
             <motion.div className="absolute left-0 right-0 h-[2px] z-10"
-              style={{ background: `linear-gradient(90deg, transparent 0%, ${SCAN_TO}CC 40%, ${SCAN_FROM} 50%, ${SCAN_TO}CC 60%, transparent 100%)` }}
-              animate={reducedMotion ? { top: "50%" } : { top: ["10%", "85%", "10%"] }}
-              transition={reducedMotion ? {} : { duration: 3, repeat: Infinity, ease: "easeInOut" }} />
-            <div className="absolute inset-x-0 bottom-0 h-32"
-              style={{ background: "linear-gradient(to top, rgba(20,20,20,0.6), transparent)" }} />
-            <div className="absolute top-4 left-4 w-8 h-8 border-t-2 border-l-2 rounded-tl-xl" style={{ borderColor: `${SCAN_TO}AA` }} />
-            <div className="absolute top-4 right-4 w-8 h-8 border-t-2 border-r-2 rounded-tr-xl" style={{ borderColor: `${SCAN_TO}AA` }} />
-            <div className="absolute bottom-5 left-5 text-white">
-              <p className="text-xs font-bold uppercase tracking-[0.16em] text-white/60">{t("idle.heroMbtiLabel")}</p>
-              <p className="text-[28px] font-bold leading-none mt-0.5" style={{ fontFamily: FONT_DISPLAY }}>OSNT</p>
+              style={{ background: `linear-gradient(90deg, transparent 0%, ${DEEP_GREEN}CC 40%, ${DEEP_GREEN} 50%, ${DEEP_GREEN}CC 60%, transparent 100%)` }}
+              animate={reducedMotion ? { top: "50%" } : { top: ["8%", "88%", "8%"] }}
+              transition={reducedMotion ? {} : { duration: 3.5, repeat: Infinity, ease: "easeInOut" }} />
+            <div className="absolute inset-x-0 bottom-0 h-36"
+              style={{ background: "linear-gradient(to top, rgba(20,20,20,0.55), transparent)" }} />
+            <div className="absolute top-5 left-5 w-8 h-8 border-t-2 border-l-2 rounded-tl-xl" style={{ borderColor: `${DEEP_GREEN}88` }} />
+            <div className="absolute top-5 right-5 w-8 h-8 border-t-2 border-r-2 rounded-tr-xl" style={{ borderColor: `${DEEP_GREEN}88` }} />
+            <div className="absolute bottom-6 left-6 text-white">
+              <p className="text-xs font-bold uppercase tracking-[0.16em] text-white/50">{t("idle.heroMbtiLabel")}</p>
+              <p className="text-[32px] font-light leading-none mt-1" style={{ fontFamily: FONT_DISPLAY }}>OSNT</p>
             </div>
-            <div className="absolute bottom-5 right-5">
+            <div className="absolute bottom-6 right-6">
               <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full backdrop-blur-md"
-                style={{ background: "rgba(255,255,255,0.15)" }}>
-                <Heart className="w-3 h-3 text-white/80" />
-                <span className="text-[11px] font-bold text-white/90">{socialCount.toLocaleString()}+</span>
+                style={{ background: "rgba(255,255,255,0.12)" }}>
+                <Heart className="w-3 h-3 text-white/70" />
+                <span className="text-[11px] font-bold text-white/80">{socialCount.toLocaleString()}+</span>
               </div>
             </div>
           </div>
 
-          {/* 헤드라인 + 설명 */}
-          <h1 className="text-[30px] font-light leading-[1.15] mb-3" style={{ color: "#1C1917", fontFamily: FONT_DISPLAY }}>
-            {t("idle.subtitle1")}<br />{t("idle.subtitle3")}
-          </h1>
-          <p className="text-[14px] leading-[1.7] mb-6" style={{ color: TEXT_SECONDARY }}>
-            {t("idle.subtitle4")}
-          </p>
-
-          {/* CTA */}
+          {/* CTA — 그라데이션 + 그림자 */}
           <motion.button
             onClick={() => { haptic("medium"); onScan(); }}
-            className="w-full py-4 rounded-2xl text-white text-[15px] font-semibold tracking-tight"
-            style={{ background: DEEP_GREEN }}
+            className="w-full rounded-2xl text-white text-[15px] font-semibold tracking-tight"
+            style={{
+              background: "linear-gradient(180deg, #4A7C6E 0%, #3D6E61 100%)",
+              boxShadow: "0 4px 16px rgba(74,124,110,0.25)",
+              height: 56,
+            }}
             whileHover={{ scale: reducedMotion ? 1 : 1.01 }}
             whileTap={{ scale: reducedMotion ? 1 : 0.97 }}
           >
@@ -403,9 +369,16 @@ export function ScanIdleScreen({
         {/* 출석 캘린더는 MY탭으로 이동 — 홈 흐름 정리 */}
       </motion.div>
 
+      {/* 날씨 상세 — 스크롤 아래 */}
+      {idleWeather && (
+        <motion.div variants={fadeChild} className="mb-8 relative" style={{ zIndex: 1 }}>
+          <WeatherTipCard compact weather={idleWeather} />
+        </motion.div>
+      )}
+
       {/* 바우만 설명 더보기 accordion */}
       <motion.div variants={fadeChild} className="mb-8 relative" style={{ zIndex: 1 }}>
-        <div className="rounded-2xl" style={{ background: BG_MUTED }}>
+        <div className="rounded-[20px]" style={{ background: BG_MUTED }}>
           <button onClick={() => setShowBaumannExp(v => !v)}
             className="w-full flex items-center justify-between px-4 py-3.5">
             <div className="flex items-center gap-2">
@@ -456,8 +429,8 @@ export function ScanIdleScreen({
               {STEPS.map((step, i) => (
                 <div key={i} className="flex items-start" style={{ flex: 1 }}>
                   <div className="flex flex-col items-center gap-1.5 flex-1">
-                    <div className="w-10 h-10 rounded-2xl flex items-center justify-center"
-                      style={step.active ? { background: TINT_WARM } : { background: "#F4F4F5" }}>
+                    <div className="w-10 h-10 rounded-[14px] flex items-center justify-center"
+                      style={step.active ? { background: TINT_WARM } : { background: BG_MUTED }}>
                       <step.Icon className="w-5 h-5" style={{ color: step.active ? SCAN_TO : "#A9998E" }} />
                     </div>
                     <div className="text-center">
