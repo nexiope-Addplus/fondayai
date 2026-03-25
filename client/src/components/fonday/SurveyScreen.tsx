@@ -26,7 +26,7 @@ export function SurveyScreen({ onSubmit, onBack }: {
           <Button variant="ghost" size="icon" onClick={onBack} className="-ml-2">
             <ChevronLeft className="w-6 h-6" style={{ color: "#5C4F4A" }} />
           </Button>
-          <h2 className="text-[20px] font-bold" style={{ color: "#5C4F4A", fontFamily: FONT_HEADING }}>{t("survey.title")}</h2>
+          <h2 className="text-[22px] font-extrabold" style={{ color: "#4A403A", fontFamily: FONT_HEADING }}>{t("survey.title")}</h2>
         </div>
         <p className="text-[13px] ml-10" style={{ color: "#8C8078" }}>{t("survey.subtitle")}</p>
       </motion.div>
