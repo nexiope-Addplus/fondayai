@@ -32,7 +32,7 @@ export function ResultNutritionTab({ analysisResult }: any) {
                     <motion.div key={i} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: i * 0.07 }}
                       className="flex items-start gap-3 p-3.5 rounded-2xl"
-                      style={{ background: "#FFFFFF", border: `1px solid ${BORDER_COLOR}` }}>
+                      style={{ background: BG_MUTED }}>
                       <div className="w-10 h-10 rounded-2xl flex items-center justify-center shrink-0 mt-0.5" style={{ background: "#F6F4FB" }}>
                         <span className="text-xl">{item.emoji}</span>
                       </div>
@@ -54,7 +54,7 @@ export function ResultNutritionTab({ analysisResult }: any) {
                 {/* 수분 목표 */}
                 {analysisResult.nutritionTips.hydrationGoal && (
                   <div className="flex items-center gap-3 rounded-2xl px-4 py-3.5"
-                    style={{ background: "#FFFFFF", border: `1px solid ${BORDER_COLOR}` }}>
+                    style={{ background: BG_MUTED }}>
                     <div className="w-10 h-10 rounded-2xl flex items-center justify-center shrink-0" style={{ background: "#F5F9FF" }}>
                       <span className="text-xl">💧</span>
                     </div>
@@ -76,7 +76,7 @@ export function ResultNutritionTab({ analysisResult }: any) {
                   <div className="space-y-3">
                     {analysisResult.nutritionTips.avoidFoods.map((item: { emoji: string; food: string; reason: string }, idx: number) => (
                       <div key={idx} className="flex items-start gap-3 p-3 rounded-2xl"
-                        style={{ background: "#FFFFFF", border: `1px solid ${BORDER_COLOR}` }}>
+                        style={{ background: BG_MUTED }}>
                         <div className="w-10 h-10 rounded-2xl flex items-center justify-center shrink-0" style={{ background: "#FFF7ED" }}>
                           <span className="text-xl">{item.emoji}</span>
                         </div>

@@ -54,24 +54,24 @@ export function ResultSolutionTab(props: any) {
                 <p className="text-xs text-stone-400">{t("modal.improvements.sub")}</p>
               </div>
             </div>
-            {(analysisResult?.improvements ?? []).slice(0, 3).map((item: { title: string; desc: string }, i: number) => (
-              <motion.div key={i} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.08 }} className="flex gap-3 p-4 rounded-2xl"
-                style={{ background: "#FFFFFF", border: `1px solid ${BORDER_COLOR}` }}>
-                <div className="shrink-0">
-                  <div className="w-9 h-9 rounded-2xl flex items-center justify-center text-xs font-normal"
-                    style={{ fontFamily: FONT_DISPLAY, background: i === 0 ? TINT_WARM : i === 1 ? TINT_GREEN : "#F6F4FB", color: i === 0 ? SCAN_TO : i === 1 ? DEEP_GREEN : "#7C3AED" }}>
-                    {i + 1}
+            <div className="rounded-[20px] p-4 space-y-3" style={{ background: "#FFFFFF", boxShadow: "0 1px 6px rgba(0,0,0,0.04)" }}>
+              {(analysisResult?.improvements ?? []).slice(0, 3).map((item: { title: string; desc: string }, i: number) => (
+                <motion.div key={i} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: i * 0.08 }} className="flex gap-3 p-3 rounded-[16px]"
+                  style={{ background: BG_MUTED }}>
+                  <div className="shrink-0">
+                    <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white"
+                      style={{ background: i === 0 ? SCAN_TO : i === 1 ? DEEP_GREEN : "#7C3AED" }}>
+                      {i + 1}
+                    </div>
                   </div>
-                  <p className="text-xs font-normal text-center mt-1"
-                    style={{ fontFamily: FONT_DISPLAY, color: i === 0 ? SCAN_TO : i === 1 ? DEEP_GREEN : "#7C3AED" }}>STEP</p>
-                </div>
-                <div>
-                  <p className="text-[13px] font-semibold text-[#5C4F4A] mb-0.5">{item.title}</p>
-                  <p className="text-[12px] text-stone-500 leading-relaxed">{item.desc}</p>
-                </div>
-              </motion.div>
-            ))}
+                  <div>
+                    <p className="text-[13px] font-bold text-[#5C4F4A] mb-0.5">{item.title}</p>
+                    <p className="text-[12px] leading-relaxed" style={{ color: "#8C8078" }}>{item.desc}</p>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
             {(analysisResult?.improvements ?? []).length === 0 && (
               <p className="text-center text-sm text-stone-400 py-6">{t("modal.improvements.loading")}</p>
             )}
@@ -83,24 +83,26 @@ export function ResultSolutionTab(props: any) {
                   </div>
                   <p className="text-xs font-semibold uppercase tracking-[0.14em]" style={{ fontFamily: FONT_DISPLAY, color: TEXT_TERTIARY }}>{t("modal.improvements.cosmetics")}</p>
                 </div>
-                {(analysisResult.cosmetics as { type: string; key: string; reason: string }[]).map((item, i) => (
-                  <motion.div key={`c-${i}`} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.3 + i * 0.07 }}
-                    className="flex items-start gap-3 p-4 rounded-2xl"
-                    style={{ background: "#FFFFFF", border: `1px solid ${BORDER_COLOR}` }}>
-                    <div className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0"
-                      style={{ background: "#FFF7ED" }}>
-                      <Star className="w-4 h-4" style={{ color: "#D97706" }} />
-                    </div>
-                    <div>
-                      <div className="flex items-center gap-1.5 mb-0.5">
-                        <span className="text-sm font-semibold text-[#5C4F4A]">{item.type}</span>
-                        <span className="text-xs px-1.5 py-0.5 rounded-full font-medium" style={{ background: "#FFFFFF", color: "#D97706" }}>{item.key}</span>
+                <div className="rounded-[20px] p-4 space-y-3" style={{ background: "#FFFFFF", boxShadow: "0 1px 6px rgba(0,0,0,0.04)" }}>
+                  {(analysisResult.cosmetics as { type: string; key: string; reason: string }[]).map((item, i) => (
+                    <motion.div key={`c-${i}`} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.3 + i * 0.07 }}
+                      className="flex items-start gap-3 p-3 rounded-[16px]"
+                      style={{ background: BG_MUTED }}>
+                      <div className="w-8 h-8 rounded-full flex items-center justify-center shrink-0"
+                        style={{ background: "#FFF7ED" }}>
+                        <Star className="w-4 h-4" style={{ color: "#D97706" }} />
                       </div>
-                      <p className="text-[12px] text-stone-500 leading-relaxed">{item.reason}</p>
-                    </div>
-                  </motion.div>
-                ))}
+                      <div>
+                        <div className="flex items-center gap-1.5 mb-0.5">
+                          <span className="text-[13px] font-bold text-[#5C4F4A]">{item.type}</span>
+                          <span className="text-[11px] px-1.5 py-0.5 rounded-full font-semibold" style={{ background: TINT_WARM, color: "#D97706" }}>{item.key}</span>
+                        </div>
+                        <p className="text-[12px] leading-relaxed" style={{ color: "#8C8078" }}>{item.reason}</p>
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
               </>
             )}
             </div>

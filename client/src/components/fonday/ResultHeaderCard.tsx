@@ -130,7 +130,7 @@ export function ResultHeaderCard({
         </div>
 
         <div className="grid grid-cols-2 gap-1.5 mt-3">
-          <div className="col-span-2 rounded-2xl px-4 py-3.5 border" style={{ background: BG_MUTED, borderColor: BORDER_COLOR }}>
+          <div className="col-span-2 rounded-2xl px-4 py-3.5" style={{ background: BG_MUTED }}>
             <div className="min-w-0 flex items-end justify-center gap-2">
               <p className="text-[15px] font-medium tracking-[-0.01em] text-stone-500">{t("result.overall")} :</p>
               <p className="text-[36px] font-normal leading-none" style={{ color: SCAN_TO, fontFamily: FONT_DISPLAY }}>
@@ -141,7 +141,7 @@ export function ResultHeaderCard({
               {weakestSummary || t("result.actionCard.phaseRecord")}
             </p>
           </div>
-          <div className="rounded-2xl px-3 py-3 flex flex-col items-center justify-center text-center min-w-0 border" style={{ background: BG_MUTED, borderColor: BORDER_COLOR }}>
+          <div className="rounded-2xl px-3 py-3 flex flex-col items-center justify-center text-center min-w-0" style={{ background: BG_MUTED }}>
             <p className="text-xs font-medium uppercase tracking-[0.08em] text-center" style={{ color: TEXT_TERTIARY, fontFamily: FONT_DISPLAY }}>{t("result.skinAge")}</p>
             <p className="text-[27px] font-normal leading-none mt-1.5" style={{ color: "#7C3AED", fontFamily: FONT_DISPLAY }}>
               {analysisResult?.skinAge && analysisResult.skinAge > 0
@@ -149,7 +149,7 @@ export function ResultHeaderCard({
                 : "—"}
             </p>
           </div>
-          <div className="rounded-2xl px-3 py-3 flex flex-col items-center justify-center text-center min-w-0 border" style={{ background: BG_MUTED, borderColor: BORDER_COLOR }}>
+          <div className="rounded-2xl px-3 py-3 flex flex-col items-center justify-center text-center min-w-0" style={{ background: BG_MUTED }}>
             <p className="text-xs font-medium uppercase tracking-[0.08em] text-center" style={{ color: TEXT_TERTIARY, fontFamily: FONT_DISPLAY }}>{t("ranking.topLabel")}</p>
             <p className="text-[21px] font-normal leading-none mt-1.5 break-keep text-center" style={{ color: "#D97706", fontFamily: FONT_DISPLAY }}>
               {rankingData && rankingData.myPercentile !== undefined ? t("ranking.myPercentile", { percent: rankingData.myPercentile }) : "—"}
@@ -157,11 +157,11 @@ export function ResultHeaderCard({
           </div>
         </div>
 
-        <div className="mt-3 rounded-3xl p-3.5 border"
-          style={{ background: BG_BASE, borderColor: BORDER_COLOR }}>
+        <div className="mt-3 rounded-[20px] p-3.5"
+          style={{ background: BG_MUTED }}>
           <div className="flex items-start justify-between gap-3">
             <div className="flex items-start gap-3 min-w-0">
-              <div className="w-11 h-11 rounded-2xl flex items-center justify-center shrink-0 border" style={{ background: BG_MUTED, borderColor: BORDER_COLOR }}>
+              <div className="w-11 h-11 rounded-2xl flex items-center justify-center shrink-0" style={{ background: BG_MUTED }}>
                 <Microscope className="w-5 h-5" style={{ color: SCAN_TO }} />
               </div>
               <div className="min-w-0">
@@ -169,16 +169,16 @@ export function ResultHeaderCard({
                 <div className="flex items-center gap-2 mt-1 flex-wrap">
                   <p className="text-lg font-bold leading-none" style={{ color: DEEP_GREEN }}>{finalType}</p>
                   <button onClick={() => setShowBaumannInfo(v => !v)}
-                    className="text-xs font-semibold px-2.5 py-1 rounded-full transition-all border"
-                    style={{ background: BG_BASE, color: SCAN_TO, borderColor: BORDER_COLOR }}>
+                    className="text-xs font-semibold px-2.5 py-1 rounded-full transition-all"
+                    style={{ background: TINT_WARM, color: SCAN_TO }}>
                     {showBaumannInfo ? t("result.baumannFold") : t("result.baumannExpand")}
                   </button>
                 </div>
                 <p className="text-xs font-medium mt-1 text-stone-500 text-kr-pretty">{t("result.mbtiSub")}</p>
               </div>
             </div>
-            <div className="rounded-full px-3 py-1 text-xs font-semibold shrink-0 flex items-center gap-0.5 border"
-              style={{ background: BG_MUTED, color: DEEP_GREEN, borderColor: BORDER_COLOR }}>
+            <div className="rounded-full px-3 py-1 text-xs font-semibold shrink-0 flex items-center gap-0.5"
+              style={{ background: TINT_GREEN, color: DEEP_GREEN }}>
               <Flame className="w-3 h-3" style={{ color: SCAN_TO }} />{t("streak.badge", { count: currentStreak.count || 1 })}
             </div>
           </div>
@@ -218,7 +218,7 @@ export function ResultHeaderCard({
               className="mt-3 block w-full rounded-2xl px-3 py-2.5 text-left border"
               style={{ background: BG_BASE, borderColor: BORDER_COLOR }}
             >
-              <p className="text-xs font-medium uppercase tracking-[0.14em]" style={{ color: TEXT_TERTIARY, fontFamily: FONT_DISPLAY }}>{t("result.aiComment")}</p>
+              <p className="text-xs font-bold tracking-[0.08em]" style={{ color: "#6B5D55" }}>{t("result.aiComment")}</p>
               <p className="text-xs text-stone-600 mt-1 leading-relaxed text-kr-pretty line-clamp-2">
                 {analysisResult.aiComment}
               </p>
