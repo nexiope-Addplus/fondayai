@@ -244,7 +244,7 @@ export function ScanIdleScreen({
       {!latestScan && !scanLoading && (
         <motion.div variants={fadeChild} className="mb-8 relative" style={{ zIndex: 1 }}>
           {/* 헤드라인 — Pretendard Bold, 한글 자연스러운 볼드 */}
-          <h1 className="text-[26px] font-bold leading-[1.3] mt-1 mb-2" style={{ color: "#3D3632" }}>
+          <h1 className="text-[26px] font-bold leading-[1.3] mt-1 mb-2" style={{ color: "#5C4F4A" }}>
             {t("idle.subtitle1")}<br />{t("idle.subtitle3")}
           </h1>
           <p className="text-[14px] leading-[1.7] mb-5" style={{ color: TEXT_SECONDARY }}>
@@ -384,7 +384,7 @@ export function ScanIdleScreen({
             className="w-full flex items-center justify-between px-4 py-3.5">
             <div className="flex items-center gap-2">
               <Activity className="w-4 h-4" style={{ color: TEXT_SECONDARY }} />
-              <p className="text-[14px] font-semibold text-stone-700">{t("idle.baumannSectionTitle")}</p>
+              <p className="text-[14px] font-semibold text-[#6B5D55]">{t("idle.baumannSectionTitle")}</p>
             </div>
             <div className="flex items-center gap-1.5">
               {!showBaumannExp && <span className="text-xs font-bold text-stone-400">O/D · S/R · P/N · W/T</span>}
@@ -435,7 +435,7 @@ export function ScanIdleScreen({
                       <step.Icon className="w-4.5 h-4.5" style={{ color: step.active ? SCAN_TO : "#A9998E" }} />
                     </div>
                     <div className="text-center">
-                      <p className="text-xs font-semibold text-stone-700">{step.title}</p>
+                      <p className="text-xs font-semibold text-[#6B5D55]">{step.title}</p>
                       <p className="text-xs text-stone-400 mt-0.5 leading-tight">{step.sub}</p>
                     </div>
                   </div>
@@ -578,7 +578,7 @@ function HomeRoutineWidget({ onOpenRoutine }: { onOpenRoutine?: () => void }) {
           </p>
           <div className="flex items-center gap-3">
             <div className="flex-1 min-w-0">
-              <p className="text-[13px] font-bold text-stone-800 truncate">{topSignal.itemName}</p>
+              <p className="text-[13px] font-bold text-[#5C4F4A] truncate">{topSignal.itemName}</p>
               <p className="text-[11px] mt-0.5 leading-snug text-kr-pretty" style={{ color: TEXT_TERTIARY }}>{topSignal.note}</p>
             </div>
             {topSignal.topScoreDelta != null && (

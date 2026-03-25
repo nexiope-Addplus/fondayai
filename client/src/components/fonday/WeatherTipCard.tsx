@@ -44,7 +44,7 @@ export function WeatherTipCard({ compact, weather }: {
         <div className="flex items-start gap-3">
           <span className="text-lg leading-none flex-shrink-0 mt-0.5">{tip.emoji}</span>
           <div className="flex-1 min-w-0">
-            <p className="text-[13px] font-semibold text-stone-700 leading-tight">{tip.title}</p>
+            <p className="text-[13px] font-semibold text-[#6B5D55] leading-tight">{tip.title}</p>
             <p className="text-[12px] text-stone-500 leading-relaxed mt-1">{tip.body}</p>
           </div>
           <div className="flex flex-col items-end gap-1 shrink-0">
@@ -78,7 +78,7 @@ export function WeatherTipCard({ compact, weather }: {
         <div className="flex items-start gap-3">
           <span className="text-3xl leading-none flex-shrink-0">{tip.emoji}</span>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-semibold text-stone-800 mb-1 leading-tight">{tip.title}</p>
+            <p className="text-sm font-semibold text-[#5C4F4A] mb-1 leading-tight">{tip.title}</p>
             <p className="text-[11.5px] text-stone-500 leading-relaxed">{tip.body}</p>
           </div>
         </div>
