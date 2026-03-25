@@ -1,7 +1,7 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { House, Sparkles, BookOpen, Compass, User } from "lucide-react";
-import { SCAN_TO } from "./constants";
+import { SCAN_TO, BORDER_COLOR, TINT_WARM } from "./constants";
 import { haptic } from "./utils";
 import type { TabId, ScanState } from "./types";
 
@@ -41,20 +41,21 @@ export function BottomNav({ active, onChange, scanState }: {
         key={tab}
         onClick={() => { haptic("light"); onChange(tab); }}
         aria-current={isActive ? "page" : undefined}
-        className={`relative flex flex-col items-center justify-center gap-0.5 transition-colors ${isActive ? "" : "text-stone-400"}`}
-        style={isActive ? { color: SCAN_TO } : undefined}
+        className="relative flex flex-col items-center justify-center gap-1 transition-colors"
+        style={{ color: isActive ? SCAN_TO : "#B0A898" }}
       >
-        {icon}
-        <span className="text-[12px] font-semibold leading-none">{label}</span>
-        {isActive && (
-          <span className="absolute bottom-1.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full" style={{ background: SCAN_TO }} />
-        )}
+        <div className="w-10 h-7 flex items-center justify-center rounded-full transition-colors"
+          style={isActive ? { background: TINT_WARM } : undefined}>
+          {icon}
+        </div>
+        <span className={`text-[11px] leading-none ${isActive ? "font-bold" : "font-medium"}`}>{label}</span>
       </button>
     );
   };
   return (
     <nav
-      className="fixed bottom-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-2xl border-t border-stone-100"
+      className="fixed bottom-0 left-0 right-0 z-50 bg-white/92 backdrop-blur-2xl"
+      style={{ borderTop: `1px solid ${BORDER_COLOR}` }}
       style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
     >
       <div className="max-w-md mx-auto px-2">
