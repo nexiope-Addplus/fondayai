@@ -99,13 +99,13 @@ export function ResultRoutineTab(props: any) {
                 </div>
                 <p className="text-xs text-stone-500 mt-1">{t("cosmetics.routineCoachDesc")}</p>
               </div>
-              <Button
+              <button
                 onClick={handleDiaryEntry}
-                className="rounded-full h-8 px-3 text-xs font-semibold shadow-none shrink-0"
-                style={{ background: TINT_NEUTRAL, color: DEEP_GREEN }}
+                className="rounded-full h-9 px-4 text-xs font-semibold shrink-0"
+                style={{ background: "rgba(74,124,110,0.08)", color: DEEP_GREEN, border: "1.5px solid rgba(74,124,110,0.2)" }}
               >
                 {t("result.actionCard.diaryButton")}
-              </Button>
+              </button>
             </div>
 
             <div className="grid gap-3 mt-4 md:grid-cols-2">

@@ -303,7 +303,7 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
         <button
           onClick={() => setShowRegister(true)}
           className="w-full flex items-center justify-center gap-2 text-[13px] font-semibold"
-          style={{ background: TINT_GREEN, color: DEEP_GREEN, height: 44, borderRadius: 22 }}
+          style={{ background: "rgba(74,124,110,0.06)", color: DEEP_GREEN, border: "1.5px solid rgba(74,124,110,0.18)", height: 44, borderRadius: 22 }}
         >
           <Plus className="w-4 h-4" />
           {t("cosmetics.scanBtn")}
