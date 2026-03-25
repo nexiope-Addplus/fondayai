@@ -391,7 +391,7 @@ export function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: AppU
             const startX = (e.currentTarget as any)._touchX;
             if (startX == null) return;
             const diff = e.changedTouches[0].clientX - startX;
-            if (Math.abs(diff) < 40) return;
+            if (Math.abs(diff) < 80) return;
             const cur = diaryTabSequence.indexOf(tab);
             if (diff < 0 && cur < diaryTabSequence.length - 1) goToDiaryTab(diaryTabSequence[cur + 1]);
             else if (diff > 0 && cur > 0) goToDiaryTab(diaryTabSequence[cur - 1]);
