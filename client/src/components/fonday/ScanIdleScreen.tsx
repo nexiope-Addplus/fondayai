@@ -253,7 +253,7 @@ export function ScanIdleScreen({
 
           {/* 얼굴 이미지 — 3:4 세로, 그림자, Sage Green 스캔라인 */}
           <div className="relative overflow-hidden mb-5 bg-stone-100"
-            style={{ aspectRatio: "3/4", borderRadius: 28, boxShadow: "0 12px 40px rgba(28,25,23,0.08)" }}>
+            style={{ aspectRatio: "4/3", borderRadius: 24, boxShadow: "0 8px 30px rgba(28,25,23,0.07)" }}>
             <img
               src="/face-model.png"
               alt="skin analysis preview"
@@ -264,16 +264,16 @@ export function ScanIdleScreen({
               style={{ background: `linear-gradient(90deg, transparent 0%, ${DEEP_GREEN}CC 40%, ${DEEP_GREEN} 50%, ${DEEP_GREEN}CC 60%, transparent 100%)` }}
               animate={reducedMotion ? { top: "50%" } : { top: ["8%", "88%", "8%"] }}
               transition={reducedMotion ? {} : { duration: 3.5, repeat: Infinity, ease: "easeInOut" }} />
-            <div className="absolute inset-x-0 bottom-0 h-36"
-              style={{ background: "linear-gradient(to top, rgba(20,20,20,0.55), transparent)" }} />
-            <div className="absolute top-5 left-5 w-8 h-8 border-t-2 border-l-2 rounded-tl-xl" style={{ borderColor: `${DEEP_GREEN}88` }} />
-            <div className="absolute top-5 right-5 w-8 h-8 border-t-2 border-r-2 rounded-tr-xl" style={{ borderColor: `${DEEP_GREEN}88` }} />
-            <div className="absolute bottom-6 left-6 text-white">
-              <p className="text-xs font-bold uppercase tracking-[0.16em] text-white/50">{t("idle.heroMbtiLabel")}</p>
-              <p className="text-[32px] font-normal leading-none mt-1" style={{ fontFamily: FONT_DISPLAY }}>OSNT</p>
+            <div className="absolute inset-x-0 bottom-0 h-24"
+              style={{ background: "linear-gradient(to top, rgba(20,20,20,0.5), transparent)" }} />
+            <div className="absolute top-4 left-4 w-7 h-7 border-t-2 border-l-2 rounded-tl-lg" style={{ borderColor: `${DEEP_GREEN}88` }} />
+            <div className="absolute top-4 right-4 w-7 h-7 border-t-2 border-r-2 rounded-tr-lg" style={{ borderColor: `${DEEP_GREEN}88` }} />
+            <div className="absolute bottom-4 left-4 text-white">
+              <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/50">{t("idle.heroMbtiLabel")}</p>
+              <p className="text-[24px] font-normal leading-none mt-0.5" style={{ fontFamily: FONT_DISPLAY }}>OSNT</p>
             </div>
-            <div className="absolute bottom-6 right-6">
-              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full backdrop-blur-md"
+            <div className="absolute bottom-4 right-4">
+              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full backdrop-blur-md"
                 style={{ background: "rgba(255,255,255,0.12)" }}>
                 <Heart className="w-3 h-3 text-white/70" />
                 <span className="text-[11px] font-bold text-white/80">{socialCount.toLocaleString()}+</span>
