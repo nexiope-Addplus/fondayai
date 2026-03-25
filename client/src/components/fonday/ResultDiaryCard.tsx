@@ -34,8 +34,8 @@ export function ResultDiaryCard({
 
   return (
     <motion.div whileTap={{ scale: 0.98 }} onClick={() => onOpenDiary?.()} className="cursor-pointer">
-      <Card className="rounded-3xl overflow-hidden" style={{ background: "#FFFFFF", border: `1px solid ${BORDER_COLOR}` }}>
-        <CardContent className="p-4">
+      <div className="space-y-3">
+        <div>
           <div className="flex items-center gap-3">
             <div className="w-11 h-11 rounded-2xl flex items-center justify-center shrink-0" style={{ background: DEEP_GREEN }}>
               <LineChartIcon className="w-5 h-5 text-white" />
@@ -105,8 +105,8 @@ export function ResultDiaryCard({
               </div>
             </div>
           )}
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </motion.div>
   );
 }

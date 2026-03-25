@@ -2,7 +2,7 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 import { Utensils, Pill, AlertCircle } from "lucide-react";
-import { SCORE_LABEL_MAP, BORDER_COLOR, FONT_DISPLAY, TEXT_TERTIARY } from "./constants";
+import { SCORE_LABEL_MAP, BG_MUTED, BORDER_COLOR, FONT_DISPLAY, TEXT_TERTIARY } from "./constants";
 
 export function ResultNutritionTab({ analysisResult }: any) {
   const { t } = useTranslation();

@@ -398,8 +398,8 @@ export function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: AppU
             >
               <DiaryCalendarView allEntries={allEntries} />
               <div className="px-5 pt-3">
-                <Card className="rounded-3xl overflow-hidden" style={{ background: "#FFFFFF", border: `1px solid ${BORDER_COLOR}`, boxShadow: "none" }}>
-                  <CardContent className="p-5">
+                <div className="rounded-[20px] p-5" style={{ background: "#FFFFFF", boxShadow: "0 1px 6px rgba(0,0,0,0.04)" }}>
+                  <div>
                     <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0">
                         <p className="text-xs font-bold tracking-[0.16em] uppercase" style={{ color: SCAN_TO }}>{t("modal.diary.reminderTitle")}</p>
@@ -482,8 +482,8 @@ export function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: AppU
                         );
                       })}
                     </div>
-                  </CardContent>
-                </Card>
+                  </div>
+                </div>
               </div>
               <DiaryRoutinePreviewCard routineGuide={routineGuide} dateStr={todayStr()} />
             </motion.div>
