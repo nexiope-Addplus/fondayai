@@ -243,8 +243,8 @@ export function ScanIdleScreen({
       {/* ── 히어로: 그리팅 → 헤드라인 → 이미지 → CTA (신규 유저) ── */}
       {!latestScan && !scanLoading && (
         <motion.div variants={fadeChild} className="mb-8 relative" style={{ zIndex: 1 }}>
-          {/* 헤드라인 — 첫 번째로 읽히는 것 */}
-          <h1 className="text-[30px] font-light leading-[1.08] mt-2 mb-3" style={{ color: "#1C1917", fontFamily: FONT_DISPLAY }}>
+          {/* 헤드라인 — Pretendard Bold, 한글 자연스러운 볼드 */}
+          <h1 className="text-[26px] font-bold leading-[1.3] mt-2 mb-3" style={{ color: "#1C1917" }}>
             {t("idle.subtitle1")}<br />{t("idle.subtitle3")}
           </h1>
           <p className="text-[14px] leading-[1.7] mb-6" style={{ color: TEXT_SECONDARY }}>
@@ -270,7 +270,7 @@ export function ScanIdleScreen({
             <div className="absolute top-5 right-5 w-8 h-8 border-t-2 border-r-2 rounded-tr-xl" style={{ borderColor: `${DEEP_GREEN}88` }} />
             <div className="absolute bottom-6 left-6 text-white">
               <p className="text-xs font-bold uppercase tracking-[0.16em] text-white/50">{t("idle.heroMbtiLabel")}</p>
-              <p className="text-[32px] font-light leading-none mt-1" style={{ fontFamily: FONT_DISPLAY }}>OSNT</p>
+              <p className="text-[32px] font-normal leading-none mt-1" style={{ fontFamily: FONT_DISPLAY }}>OSNT</p>
             </div>
             <div className="absolute bottom-6 right-6">
               <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full backdrop-blur-md"
@@ -281,13 +281,13 @@ export function ScanIdleScreen({
             </div>
           </div>
 
-          {/* CTA — 그라데이션 + 그림자 */}
+          {/* CTA — Salmon 계열, 따뜻한 초대 */}
           <motion.button
             onClick={() => { haptic("medium"); onScan(); }}
             className="w-full rounded-2xl text-white text-[15px] font-semibold tracking-tight"
             style={{
-              background: "linear-gradient(180deg, #4A7C6E 0%, #3D6E61 100%)",
-              boxShadow: "0 4px 16px rgba(74,124,110,0.25)",
+              background: "linear-gradient(180deg, #C97062 0%, #B5635A 100%)",
+              boxShadow: "0 4px 20px rgba(201,112,98,0.3)",
               height: 56,
             }}
             whileHover={{ scale: reducedMotion ? 1 : 1.01 }}
@@ -329,7 +329,7 @@ export function ScanIdleScreen({
               <p className="text-[11px] font-semibold uppercase tracking-[0.16em] mb-2" style={{ color: TEXT_TERTIARY }}>
                 {t("result.overall")}
               </p>
-              <p className="text-[56px] font-light leading-none" style={{ color: DEEP_GREEN, fontFamily: FONT_DISPLAY }}>
+              <p className="text-[56px] font-normal leading-none" style={{ color: DEEP_GREEN, fontFamily: FONT_DISPLAY }}>
                 {latestScan.overallScore ?? "—"}
               </p>
               {latestScoreDelta !== null && (
