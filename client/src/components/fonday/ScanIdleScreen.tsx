@@ -280,11 +280,11 @@ export function ScanIdleScreen({
       )}
 
       {/* ── 히어로: 헤드라인 + CTA (신규 유저, 첫 화면 = 포스터) ── */}
-      {!latestScan && <motion.div variants={fadeChild} className="mb-14 relative" style={{ zIndex: 1 }}>
+      {!latestScan && <motion.div variants={fadeChild} className="mb-8 relative" style={{ zIndex: 1 }}>
         <h1 className="text-[34px] font-light leading-[1.12] mb-4 mt-4" style={{ color: "#1C1917", fontFamily: FONT_DISPLAY }}>
           {t("idle.subtitle1")}<br />{t("idle.subtitle3")}
         </h1>
-        <p className="text-[15px] leading-[1.7] mb-8" style={{ color: TEXT_SECONDARY }}>
+        <p className="text-[15px] leading-[1.7] mb-6" style={{ color: TEXT_SECONDARY }}>
           {t("idle.subtitle4")}
         </p>
         <motion.button
@@ -302,7 +302,7 @@ export function ScanIdleScreen({
       </motion.div>}
 
       {/* ── 미리보기 카드 (스크롤 아래, 신규 유저) ── */}
-      {!latestScan && <motion.div variants={fadeChild} className="mb-14 relative" style={{ zIndex: 1 }}>
+      {!latestScan && <motion.div variants={fadeChild} className="mb-8 relative" style={{ zIndex: 1 }}>
         <p className="text-xs font-semibold uppercase tracking-[0.14em] mb-4" style={{ color: TEXT_TERTIARY, fontFamily: FONT_DISPLAY }}>{t("idle.heroBadge")}</p>
         <div className="rounded-3xl p-3 border sm:rounded-3xl sm:p-3.5"
           style={{ background: "#FFFFFF", boxShadow: "0 8px 24px rgba(74,124,110,0.06)", borderColor: BORDER_COLOR }}>
@@ -370,7 +370,7 @@ export function ScanIdleScreen({
         </div>
       </motion.div>}
 
-      <motion.div variants={fadeChild} className="mb-14 relative" style={{ zIndex: 1 }}>
+      <motion.div variants={fadeChild} className="mb-8 relative" style={{ zIndex: 1 }}>
         {scanLoading && (
           <div className={`rounded-2xl bg-white px-4 py-4 mb-4 border${reducedMotion ? "" : " animate-pulse"}`} style={{ borderColor: BORDER_COLOR }}>
             <div className="flex items-start justify-between gap-3">
@@ -456,7 +456,7 @@ export function ScanIdleScreen({
       </motion.div>
 
       {/* 바우만 설명 더보기 accordion */}
-      <motion.div variants={fadeChild} className="mb-14 relative" style={{ zIndex: 1 }}>
+      <motion.div variants={fadeChild} className="mb-8 relative" style={{ zIndex: 1 }}>
         <div className="rounded-2xl bg-white border" style={{ borderColor: BORDER_COLOR }}>
           <button onClick={() => setShowBaumannExp(v => !v)}
             className="w-full flex items-center justify-between px-4 py-3">
@@ -500,7 +500,7 @@ export function ScanIdleScreen({
       {/* ── 신규 유저: 단계 표시 (독립 섹션, 카드 없이 여유롭게) ── */}
       {!latestScan && (
         <>
-          <motion.div variants={fadeChild} className="mb-14 relative" style={{ zIndex: 1 }}>
+          <motion.div variants={fadeChild} className="mb-8 relative" style={{ zIndex: 1 }}>
             <p className="text-xs font-semibold text-stone-400 mb-6 tracking-widest uppercase">
               {t("idle.stepsTitle")}
             </p>
