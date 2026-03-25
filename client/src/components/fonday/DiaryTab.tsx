@@ -239,90 +239,81 @@ export function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: AppU
 
   if (!user) {
     return (
-      <div className="flex flex-col" style={{ background: BG_BASE, minHeight: "calc(100dvh - 64px)" }}>
-        <div className="shrink-0 px-5 pt-5 pb-0" style={{ borderBottom: `1px solid ${BORDER_COLOR}` }}>
-          <div className="rounded-3xl p-5 mb-4"
-            style={{ background: DEEP_GREEN }}>
-            <p className="text-xs font-medium tracking-widest uppercase mb-1 text-white/70" style={{ fontFamily: FONT_DISPLAY }}>FONDAY</p>
-            <h1 className="text-2xl font-normal text-white" style={{ fontFamily: FONT_DISPLAY }}>{t("modal.diary.title")} ✦</h1>
-            <p className="text-[12px] text-white/80 mt-2 text-kr-pretty">{t("result.login.desc")}</p>
+      <div className="flex flex-col" style={{ background: "linear-gradient(180deg, #FDFCFA 0%, #F8F5F1 50%, #FDFCFA 100%)", minHeight: "calc(100dvh - 64px)" }}>
+        <div className="px-4 pt-6 pb-28">
+          <div className="mb-8">
+            <div className="w-12 h-12 rounded-full mb-4 flex items-center justify-center" style={{ background: TINT_WARM }}>
+              <Lock className="w-5 h-5" style={{ color: SCAN_TO }} />
+            </div>
+            <h1 className="text-[22px] font-bold mb-2" style={{ color: "#5C4F4A" }}>{t("modal.diary.title")}</h1>
+            <p className="text-[14px] leading-relaxed text-kr-pretty" style={{ color: "#8C8078" }}>{t("result.login.desc")}</p>
           </div>
-        </div>
-        <div className="flex-1 px-5 py-6">
-          <Card className="rounded-3xl overflow-hidden"
-            style={{ background: TINT_WARM, border: `1px solid ${BORDER_COLOR}`, boxShadow: "none" }}>
-            <CardContent className="p-6 text-center">
-              <div className="w-14 h-14 rounded-3xl mx-auto flex items-center justify-center text-white"
-                style={{ background: `linear-gradient(135deg, ${DEEP_GREEN}, ${SCAN_TO})` }}>
-                <Lock className="w-6 h-6" />
-              </div>
-              <p className="text-2xl font-bold mt-4" style={{ color: DEEP_GREEN }}>{t("result.login.title")}</p>
-              <p className="text-[12px] text-stone-500 mt-2 leading-relaxed text-kr-pretty">{t("result.login.desc")}</p>
-              <div className="grid grid-cols-3 gap-2.5 mt-5 text-left">
-                <div className="rounded-2xl p-3" style={{ background: TINT_WARM }}>
-                  <p className="text-xs font-bold text-stone-500">{t("result.diary.avg7d")}</p>
-                  <p className="text-lg font-bold mt-1" style={{ color: SCAN_TO }}>--</p>
-                </div>
-                <div className="rounded-2xl p-3" style={{ background: "#F5F3FF" }}>
-                  <p className="text-xs font-bold text-stone-500">{t("modal.diary.timelineTab")}</p>
-                  <p className="text-lg font-bold mt-1" style={{ color: "#7C3AED" }}>--</p>
-                </div>
-                <div className="rounded-2xl p-3" style={{ background: TINT_GREEN }}>
-                  <p className="text-xs font-bold text-stone-500">{t("modal.diary.calendarTab")}</p>
-                  <p className="text-lg font-bold mt-1" style={{ color: "#059669" }}>--</p>
-                </div>
-              </div>
-              <div className="space-y-3 mt-6">
-                {i18n.language === "ko" ? (
-                  <Button onClick={() => onLogin ? onLogin("kakao", "diary") : (localStorage.setItem("fonday_return_tab", "diary"), window.location.href = "/auth/kakao")}
-                    className="w-full h-12 rounded-xl font-bold gap-2 border-0 shadow-sm text-[#3C1E1E]"
-                    style={{ background: "#FEE500" }}>
-                    <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path fillRule="evenodd" clipRule="evenodd" d="M9 1C4.582 1 1 3.79 1 7.222c0 2.154 1.386 4.045 3.484 5.14L3.62 15.5a.25.25 0 0 0 .368.274L7.9 13.39A9.63 9.63 0 0 0 9 13.444c4.418 0 8-2.791 8-6.222C17 3.79 13.418 1 9 1Z" fill="#3C1E1E"/></svg>
-                    {t("result.login.kakao")}
-                  </Button>
-                ) : (
-                  <Button onClick={() => onLogin ? onLogin("line", "diary") : (localStorage.setItem("fonday_return_tab", "diary"), window.location.href = "/auth/line")}
-                    className="w-full h-12 rounded-xl font-bold gap-2 border-0 shadow-sm text-white"
-                    style={{ background: DEEP_GREEN }}>
-                    <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 1C4.582 1 1 3.79 1 7.222c0 2.03 1.09 3.84 2.8 5.04-.12.44-.77 2.96-.8 3.15a.2.2 0 0 0 .3.22l3.72-2.46c.6.09 1.3.14 1.98.14 4.418 0 8-2.791 8-6.222C17 3.79 13.418 1 9 1Z" fill="white"/></svg>
-                    {t("result.login.line")}
-                  </Button>
-                )}
-                <Button onClick={() => onLogin ? onLogin("google", "diary") : (localStorage.setItem("fonday_return_tab", "diary"), window.location.href = "/auth/google")}
-                  className="w-full h-12 rounded-xl bg-white hover:bg-stone-50 font-bold text-zinc-700 gap-2 shadow-sm">
-                  <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="w-4 h-4" />
-                  {t("result.login.google")}
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+
+          <div className="grid grid-cols-3 gap-2.5 mb-6">
+            <div className="rounded-[16px] p-3 text-center" style={{ background: TINT_WARM }}>
+              <p className="text-[11px] font-semibold" style={{ color: "#8C8078" }}>{t("result.diary.avg7d")}</p>
+              <p className="text-lg font-bold mt-1" style={{ color: SCAN_TO, fontFamily: FONT_DISPLAY }}>--</p>
+            </div>
+            <div className="rounded-[16px] p-3 text-center" style={{ background: "#F5F3FF" }}>
+              <p className="text-[11px] font-semibold" style={{ color: "#8C8078" }}>{t("modal.diary.timelineTab")}</p>
+              <p className="text-lg font-bold mt-1" style={{ color: "#7C3AED", fontFamily: FONT_DISPLAY }}>--</p>
+            </div>
+            <div className="rounded-[16px] p-3 text-center" style={{ background: TINT_GREEN }}>
+              <p className="text-[11px] font-semibold" style={{ color: "#8C8078" }}>{t("modal.diary.calendarTab")}</p>
+              <p className="text-lg font-bold mt-1" style={{ color: DEEP_GREEN, fontFamily: FONT_DISPLAY }}>--</p>
+            </div>
+          </div>
+
+          <div className="rounded-[20px] p-5" style={{ background: BG_MUTED }}>
+            <div className="space-y-2.5">
+              {i18n.language === "ko" ? (
+                <button onClick={() => onLogin ? onLogin("kakao", "diary") : (localStorage.setItem("fonday_return_tab", "diary"), window.location.href = "/auth/kakao")}
+                  className="w-full font-bold gap-2 border-0 text-[#3C1E1E] flex items-center justify-center"
+                  style={{ background: "#FEE500", height: 48, borderRadius: 24 }}>
+                  <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path fillRule="evenodd" clipRule="evenodd" d="M9 1C4.582 1 1 3.79 1 7.222c0 2.154 1.386 4.045 3.484 5.14L3.62 15.5a.25.25 0 0 0 .368.274L7.9 13.39A9.63 9.63 0 0 0 9 13.444c4.418 0 8-2.791 8-6.222C17 3.79 13.418 1 9 1Z" fill="#3C1E1E"/></svg>
+                  {t("result.login.kakao")}
+                </button>
+              ) : (
+                <button onClick={() => onLogin ? onLogin("line", "diary") : (localStorage.setItem("fonday_return_tab", "diary"), window.location.href = "/auth/line")}
+                  className="w-full font-bold gap-2 border-0 text-white flex items-center justify-center"
+                  style={{ background: "#C97062", height: 48, borderRadius: 24 }}>
+                  <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 1C4.582 1 1 3.79 1 7.222c0 2.03 1.09 3.84 2.8 5.04-.12.44-.77 2.96-.8 3.15a.2.2 0 0 0 .3.22l3.72-2.46c.6.09 1.3.14 1.98.14 4.418 0 8-2.791 8-6.222C17 3.79 13.418 1 9 1Z" fill="white"/></svg>
+                  {t("result.login.line")}
+                </button>
+              )}
+              <button onClick={() => onLogin ? onLogin("google", "diary") : (localStorage.setItem("fonday_return_tab", "diary"), window.location.href = "/auth/google")}
+                className="w-full font-bold text-[#6B5D55] gap-2 bg-white flex items-center justify-center"
+                style={{ height: 48, borderRadius: 24 }}>
+                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="w-4 h-4" />
+                {t("result.login.google")}
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col" style={{ background: BG_BASE, minHeight: "calc(100dvh - 64px)" }}>
+    <div className="flex flex-col" style={{ background: "linear-gradient(180deg, #FDFCFA 0%, #F8F5F1 50%, #FDFCFA 100%)", minHeight: "calc(100dvh - 64px)" }}>
       {/* 헤더 */}
-      <div className="shrink-0 px-5 pt-5 pb-0" style={{ borderBottom: `1px solid ${BORDER_COLOR}` }}>
-        <div className="rounded-3xl p-5 mb-4"
-          style={{ background: "#FFFFFF", border: `1px solid ${BORDER_COLOR}` }}>
-          <p className="text-xs font-medium tracking-widest uppercase mb-1" style={{ color: SCAN_TO, fontFamily: FONT_DISPLAY }}>FONDAY</p>
-          <h1 className="text-2xl font-normal" style={{ color: DEEP_GREEN, fontFamily: FONT_DISPLAY }}>{t("modal.diary.title")}</h1>
-          <p className="text-[13px] mt-2 text-kr-pretty" style={{ color: TEXT_TERTIARY }}>
+      <div className="shrink-0 px-4 pt-5 pb-0">
+        <div className="mb-4">
+          <h1 className="text-[22px] font-bold mb-1" style={{ color: "#5C4F4A" }}>{t("modal.diary.title")}</h1>
+          <p className="text-[13px] text-kr-pretty" style={{ color: "#8C8078" }}>
             {finalType ? `${finalType} · ` : ""}{totalRecords > 0 ? `${t("modal.diary.countLabel", { count: totalRecords })}` : t("result.diary.firstRecord")}
           </p>
           <div className="grid grid-cols-3 gap-2 mt-4">
-            <div className="rounded-2xl p-3 text-center border" style={{ borderColor: BORDER_COLOR }}>
-              <p className="text-[11px] font-medium whitespace-nowrap" style={{ color: TEXT_TERTIARY }}>{t("result.overall")}</p>
+            <div className="rounded-[16px] p-3 text-center" style={{ background: BG_MUTED }}>
+              <p className="text-[11px] font-semibold whitespace-nowrap" style={{ color: "#8C8078" }}>{t("result.overall")}</p>
               <p className="text-[24px] font-normal mt-1" style={{ color: SCAN_TO, fontFamily: FONT_DISPLAY }}>{overallScore || "—"}</p>
             </div>
-            <div className="rounded-2xl p-3 text-center border" style={{ borderColor: BORDER_COLOR }}>
-              <p className="text-[11px] font-medium whitespace-nowrap" style={{ color: TEXT_TERTIARY }}>{t("result.diary.avg7d")}</p>
+            <div className="rounded-[16px] p-3 text-center" style={{ background: BG_MUTED }}>
+              <p className="text-[11px] font-semibold whitespace-nowrap" style={{ color: "#8C8078" }}>{t("result.diary.avg7d")}</p>
               <p className="text-[24px] font-normal mt-1" style={{ color: "#7C3AED", fontFamily: FONT_DISPLAY }}>{avgScore || "—"}</p>
             </div>
-            <div className="rounded-2xl p-3 text-center border" style={{ borderColor: BORDER_COLOR }}>
-              <p className="text-[11px] font-medium whitespace-nowrap" style={{ color: TEXT_TERTIARY }}>{t("diary.routineTitle")}</p>
+            <div className="rounded-[16px] p-3 text-center" style={{ background: BG_MUTED }}>
+              <p className="text-[11px] font-semibold whitespace-nowrap" style={{ color: "#8C8078" }}>{t("diary.routineTitle")}</p>
               <p className="text-[24px] font-normal mt-1" style={{ color: DEEP_GREEN, fontFamily: FONT_DISPLAY }}>{diaryTodoProgress.total > 0 ? `${diaryTodoProgress.done}/${diaryTodoProgress.total}` : (diaryMemoReady ? "1/1" : "0/1")}</p>
             </div>
           </div>
@@ -332,13 +323,13 @@ export function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: AppU
       {/* 콘텐츠 */}
       <div ref={diaryScrollRef} className="flex-1 overflow-y-auto overscroll-contain pb-24">
         {overallScore === 0 && (
-          <div className="mx-5 mt-3 mb-0">
+          <div className="mx-4 mt-3 mb-0">
             <button
               onClick={onBack}
-              className="w-full flex items-center gap-3 p-4 rounded-2xl active:opacity-70"
-              style={{ background: TINT_GREEN, border: `1px solid ${DEEP_GREEN}20` }}
+              className="w-full flex items-center gap-3 p-4 rounded-[20px] active:opacity-70"
+              style={{ background: TINT_GREEN }}
             >
-              <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
+              <div className="w-9 h-9 rounded-full flex items-center justify-center shrink-0"
                 style={{ background: `${DEEP_GREEN}18` }}>
                 <Camera className="w-5 h-5" style={{ color: DEEP_GREEN }} />
               </div>
@@ -353,11 +344,11 @@ export function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: AppU
             </button>
           </div>
         )}
-        <div ref={diaryTabNavRef} className="px-5 pt-2 pb-0 sticky top-0 z-20" style={{ background: `${BG_BASE}F0` }}>
-          <div className="flex gap-2 p-2 rounded-3xl mb-3" style={{ background: "#FFFFFF", border: `1px solid ${BORDER_COLOR}` }}>
+        <div ref={diaryTabNavRef} className="px-4 pt-2 pb-0 sticky top-0 z-20" style={{ background: "rgba(253,252,250,0.92)", backdropFilter: "blur(12px)" }}>
+          <div className="flex gap-2 p-1.5 rounded-full mb-3" style={{ background: BG_MUTED }}>
             {tabs.map(({ id, label }) => (
               <button key={id} onClick={() => goToDiaryTab(id)}
-                className={`flex-1 py-2.5 text-[12px] font-medium transition-all rounded-2xl ${
+                className={`flex-1 py-2.5 text-[12px] font-semibold transition-all rounded-full ${
                   tab === id ? "shadow-sm" : "text-stone-400"
                 }`}
                 style={tab === id
