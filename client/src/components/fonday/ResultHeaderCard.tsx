@@ -33,7 +33,6 @@ import {
   BORDER_COLOR,
   DEEP_GREEN,
   FONT_DISPLAY,
-  SCAN_FROM,
   SCAN_TO,
   TEXT_TERTIARY,
   TINT_GREEN,
@@ -80,25 +79,30 @@ export function ResultHeaderCard({
     <Card className="overflow-hidden rounded-3xl border shadow-none"
       style={{ background: BG_BASE, borderColor: BORDER_COLOR }}>
       <CardContent className="p-4">
-        {/* ── 1층: 사진 + 종합점수 (세로 중앙 정렬) ── */}
-        <div className="flex flex-col items-center text-center">
-          <div className="relative rounded-2xl overflow-hidden w-24 h-24 bg-stone-100 mb-3">
+        {/* ── 1층: 사진 + 종합점수 (가로, 꽉 차게) ── */}
+        <div className="flex items-stretch gap-3">
+          <div className="relative rounded-2xl overflow-hidden bg-stone-100 shrink-0" style={{ width: 100, minHeight: 120 }}>
             <img src={faceCroppedSrc || imageSrc} alt="" aria-hidden="true" className="w-full h-full object-cover" style={{ objectPosition: "center 50%" }} />
             <div className="absolute top-2 left-2 w-5 h-5 border-t-2 border-l-2 rounded-tl-lg" style={{ borderColor: SCAN_TO }} />
             <div className="absolute top-2 right-2 w-5 h-5 border-t-2 border-r-2 rounded-tr-lg" style={{ borderColor: SCAN_TO }} />
+            <div className="absolute bottom-2 left-2 w-5 h-5 border-b-2 border-l-2 rounded-bl-lg" style={{ borderColor: SCAN_TO }} />
+            <div className="absolute bottom-2 right-2 w-5 h-5 border-b-2 border-r-2 rounded-br-lg" style={{ borderColor: SCAN_TO }} />
           </div>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.12em]" style={{ color: TEXT_TERTIARY }}>{t("result.overall")}</p>
-          <div className="flex items-end justify-center gap-2 mt-1">
-            <p className="text-[48px] font-normal leading-none" style={{ color: SCAN_TO, fontFamily: FONT_DISPLAY }}>
-              <CountUp value={overallScore} />
-            </p>
-            {scoreDelta !== null && scoreDelta !== 0 && (
-              <span className="text-[15px] font-bold mb-1.5" style={{ color: scoreDelta > 0 ? "#2D7D46" : "#C2410C" }}>
-                {scoreDelta > 0 ? "+" : ""}{scoreDelta}
-              </span>
-            )}
+          <div className="flex-1 min-w-0 flex flex-col justify-center rounded-2xl px-4 py-3" style={{ background: BG_MUTED }}>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.12em]" style={{ color: TEXT_TERTIARY }}>{t("result.overall")}</p>
+            <div className="flex items-end gap-2 mt-1">
+              <p className="text-[44px] font-normal leading-none" style={{ color: SCAN_TO, fontFamily: FONT_DISPLAY }}>
+                <CountUp value={overallScore} />
+              </p>
+              <p className="text-[13px] font-medium mb-1.5" style={{ color: TEXT_TERTIARY }}>{t("result.scoreSuffix")}</p>
+              {scoreDelta !== null && scoreDelta !== 0 && (
+                <span className="text-[14px] font-bold mb-1.5" style={{ color: scoreDelta > 0 ? "#2D7D46" : "#C2410C" }}>
+                  {scoreDelta > 0 ? "+" : ""}{scoreDelta}
+                </span>
+              )}
+            </div>
+            <p className="text-xs text-stone-500 mt-1.5 text-kr-pretty">{weakestSummary || t("result.actionCard.phaseRecord")}</p>
           </div>
-          <p className="text-xs text-stone-500 mt-1.5 text-kr-pretty">{weakestSummary || t("result.actionCard.phaseRecord")}</p>
         </div>
 
         {/* ── 2층: 피부나이 + 순위 + MBTI (3칸 그리드) ── */}
