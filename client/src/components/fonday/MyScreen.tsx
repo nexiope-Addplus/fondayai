@@ -146,7 +146,7 @@ export function MyScreen({
             </div>
           </div>
         ) : (
-          <div className="p-4 space-y-3 mb-4" style={{ borderRadius: RADIUS_CARD, background: BG_MUTED }}>
+          <div className="p-4 space-y-3 mb-4" style={{ borderRadius: RADIUS_CARD, background: "#FFFFFF", boxShadow: SHADOW_CARD }}>
             <div className="text-center mb-2">
               <p className="text-[14px] font-bold text-[#6B5D55] mb-1">{t("report.loginRequired")}</p>
               <p className="text-[12px] text-stone-400">{t("attendance.loginDesc")}</p>

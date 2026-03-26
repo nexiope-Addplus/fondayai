@@ -2,7 +2,7 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 import { Utensils, Pill, AlertCircle } from "lucide-react";
-import { SCORE_LABEL_MAP, BG_MUTED, BORDER_COLOR, FONT_DISPLAY, TEXT_TERTIARY } from "./constants";
+import { SCORE_LABEL_MAP, TINT_GREEN, BORDER_COLOR, FONT_DISPLAY, TEXT_TERTIARY } from "./constants";
 
 export function ResultNutritionTab({ analysisResult }: any) {
   const { t } = useTranslation();
@@ -53,7 +53,7 @@ export function ResultNutritionTab({ analysisResult }: any) {
                 {/* 수분 목표 */}
                 {analysisResult.nutritionTips.hydrationGoal && (
                   <div className="flex items-center gap-3 rounded-2xl px-4 py-3.5"
-                    style={{ background: BG_MUTED }}>
+                    style={{ background: TINT_GREEN }}>
                     <div className="w-10 h-10 rounded-2xl flex items-center justify-center shrink-0" style={{ background: "#F5F9FF" }}>
                       <span className="text-xl">💧</span>
                     </div>

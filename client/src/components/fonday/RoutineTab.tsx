@@ -518,7 +518,7 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
                       key={item.id}
                       onClick={() => setSelectedItem(item)}
                       className="p-3 text-left"
-                      style={{ borderRadius: RADIUS_CARD, background: BG_MUTED, border: `1px solid ${BORDER_COLOR}` }}
+                      style={{ borderRadius: RADIUS_CARD, background: "#FFFFFF", boxShadow: SHADOW_CARD }}
                     >
                       {item.image_thumbnail ? (
                         <img src={item.image_thumbnail} alt={item.name ?? ""} className="w-full h-28 rounded-2xl object-cover bg-stone-200" loading="lazy" />

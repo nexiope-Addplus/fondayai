@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 import { ScanLine, Lightbulb, Sparkles, Star, Utensils } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { DEEP_GREEN, SCAN_TO, SCAN_FROM, TINT_WARM, TINT_GREEN, TINT_NEUTRAL, BG_MUTED, BORDER_COLOR, FONT_DISPLAY, TEXT_TERTIARY, SHADOW_CARD } from "./constants";
+import { DEEP_GREEN, SCAN_TO, SCAN_FROM, TINT_WARM, TINT_GREEN, TINT_NEUTRAL, BG_MUTED, BORDER_COLOR, FONT_DISPLAY, TEXT_TERTIARY, SHADOW_CARD, RADIUS_CARD } from "./constants";
 import { SkinPredictionCard } from "./SkinPredictionCard";
 
 export function ResultSolutionTab(props: any) {
@@ -102,7 +102,7 @@ export function ResultSolutionTab(props: any) {
 
             {/* ── AI 피부 예측 ── */}
             {analysisResult?.prediction && (
-              <div className="pt-5 mt-5" style={{ borderTop: `1px solid ${BORDER_COLOR}` }}>
+              <div className="p-4" style={{ background: "#FFFFFF", boxShadow: SHADOW_CARD, borderRadius: RADIUS_CARD }}>
               <SkinPredictionCard
                 prediction={analysisResult.prediction}
                 currentScore={analysisResult.scores[0]?.score ?? 0}
