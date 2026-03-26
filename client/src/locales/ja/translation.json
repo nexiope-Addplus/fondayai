@@ -12,7 +12,9 @@
     "tracking": "追跡中",
     "tapToCheck": "タップして今日使った化粧品をチェック",
     "unchecked": "未チェック",
-    "more": "個追加"
+    "more": "個追加",
+    "completed": "完了",
+    "goCheck": "チェック ›"
   },
   "nav": {
     "scan": "ホーム",
@@ -118,7 +120,8 @@
     "greetingWeatherCloudy": "曇りでもUVはあります！日焼け止めは必須ですよ。",
     "quickScan": "今すぐ肌をスキャン",
     "quickScanSub": "30秒で完了 · 完全無料",
-    "rescan": "今日の肌をスキャン"
+    "rescan": "今日の肌をスキャン",
+    "effectBoard": "効果トラッカー"
   },
   "camera": {
     "noCamera": "カメラが使えません。写真を選んでください。",

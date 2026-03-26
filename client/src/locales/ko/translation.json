@@ -12,7 +12,9 @@
     "tracking": "추적 중",
     "tapToCheck": "탭하여 오늘 사용한 화장품을 체크하세요",
     "unchecked": "미체크",
-    "more": "개 더"
+    "more": "개 더",
+    "completed": "완료",
+    "goCheck": "체크하기 ›"
   },
   "nav": {
     "scan": "홈",
@@ -118,7 +120,8 @@
     "greetingWeatherCloudy": "흐린 날에도 자외선은 있어요! 선크림은 꼭 챙기세요.",
     "quickScan": "지금 바로 피부 스캔하기",
     "quickScanSub": "30초면 끝나요 · 완전 무료",
-    "rescan": "오늘의 피부 스캔하기"
+    "rescan": "오늘의 피부 스캔하기",
+    "effectBoard": "효과 추적"
   },
   "camera": {
     "noCamera": "카메라를 사용할 수 없습니다. 사진으로 선택해 주세요.",

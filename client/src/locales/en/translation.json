@@ -12,7 +12,9 @@
     "tracking": "Tracking",
     "tapToCheck": "Tap to check products you used today",
     "unchecked": "Unchecked",
-    "more": " more"
+    "more": " more",
+    "completed": "done",
+    "goCheck": "Check ›"
   },
   "nav": {
     "scan": "Home",
@@ -118,7 +120,8 @@
     "greetingWeatherCloudy": "Overcast, but UV is still there! Sunscreen is a must.",
     "quickScan": "Scan Your Skin Now",
     "quickScanSub": "Takes 30 seconds · Free",
-    "rescan": "Scan Today"
+    "rescan": "Scan Today",
+    "effectBoard": "Effect Tracker"
   },
   "camera": {
     "noCamera": "Camera unavailable. Please select a photo instead.",
