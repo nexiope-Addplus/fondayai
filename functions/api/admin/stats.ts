@@ -209,13 +209,14 @@ export const onRequest = async (context: any) => {
     let tabRows: any[] = [];
     let featureRows: any[] = [];
     let funnelRows: any = {};
+    let totalUsersRow: any = { total_sessions: 0, total_users: 0 };
     let dailyActiveRows: any[] = [];
     let eventDailyRows: any[] = [];
     let realtimeSessionsRow: any = null;
     let pushAppOpensRow: any = null;
 
     if (eventsExist) {
-      const [tabRes, featureRes, funnelRes, dauRes, eventDailyRes, rtSessionsRes, pushOpensRes] = await Promise.all([
+      const [tabRes, featureRes, funnelRes, totalUsersRes, dauRes, eventDailyRes, rtSessionsRes, pushOpensRes] = await Promise.all([
         safe(env.FONDAY_DB.prepare(
           "SELECT json_extract(event_data,'$.tab') as tab, COUNT(*) as cnt FROM events WHERE event_type='tab_view' GROUP BY tab ORDER BY cnt DESC"
         ), "all"),
@@ -226,6 +227,10 @@ export const onRequest = async (context: any) => {
         safe(env.FONDAY_DB.prepare(
           "SELECT event_type, COUNT(*) as cnt FROM events WHERE event_type IN ('app_open','scan_start','scan_complete','scan_fail','push_prompt_shown','push_prompt_accepted','push_prompt_dismissed','pwa_prompt_shown','pwa_prompt_accepted','pwa_prompt_dismissed') GROUP BY event_type"
         ), "all"),
+        // 누적 총 사용자 수 (전체 기간)
+        safe(env.FONDAY_DB.prepare(
+          "SELECT COUNT(DISTINCT session_id) as total_sessions, COUNT(DISTINCT CASE WHEN user_id!='' THEN user_id END) as total_users FROM events WHERE event_type='app_open'"
+        ), "first"),
         // DAU 30일 (세션 기준)
         safe(env.FONDAY_DB.prepare(
           "SELECT date(datetime(created_at,'+9 hours')) as day, COUNT(DISTINCT session_id) as sessions, COUNT(DISTINCT CASE WHEN user_id!='' THEN user_id END) as users FROM events WHERE event_type='app_open' AND datetime(created_at,'+9 hours')>=datetime('now','+9 hours','-30 days') GROUP BY day ORDER BY day"
@@ -245,6 +250,7 @@ export const onRequest = async (context: any) => {
       ]);
       tabRows = (tabRes as any)?.results ?? [];
       featureRows = (featureRes as any)?.results ?? [];
+      totalUsersRow = totalUsersRes ?? { total_sessions: 0, total_users: 0 };
       dailyActiveRows = (dauRes as any)?.results ?? [];
       eventDailyRows = (eventDailyRes as any)?.results ?? [];
       const funnelArr: any[] = (funnelRes as any)?.results ?? [];
@@ -926,6 +932,20 @@ export const onRequest = async (context: any) => {
         </div>
       </div>
       ${!eventsExist ? '<p style="font-size:11px;color:#f59e0b;margin:8px 0 0">이벤트 추적 미설정 — 푸시 구독자 수와 스캔 빈도만 표시</p>' : ''}
+    </div>
+
+    <div class="panel" style="margin-bottom:12px">
+      <h3>누적 총 사용자</h3>
+      <div style="display:flex;gap:32px;align-items:baseline">
+        <div>
+          <div style="font-size:36px;font-weight:900;color:#4A7C6E">${(totalUsersRow?.total_sessions ?? 0).toLocaleString()}</div>
+          <div style="font-size:12px;color:#8C8078">순 방문자 (세션 기준)</div>
+        </div>
+        <div>
+          <div style="font-size:36px;font-weight:900;color:#C97062">${(totalUsersRow?.total_users ?? 0).toLocaleString()}</div>
+          <div style="font-size:12px;color:#8C8078">로그인 유저</div>
+        </div>
+      </div>
     </div>
 
     <div class="grid2">
