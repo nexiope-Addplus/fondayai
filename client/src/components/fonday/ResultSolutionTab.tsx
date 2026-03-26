@@ -17,27 +17,30 @@ export function ResultSolutionTab(props: any) {
           <div className="space-y-4">
 
             {/* 화장품 스캔 배너 */}
-            <div className="flex items-center gap-3 px-4 py-3.5 rounded-2xl"
-              style={{ background: TINT_GREEN }}>
-              <div className="w-10 h-10 rounded-2xl flex items-center justify-center shrink-0"
-                style={{ background: "#FFFFFF", color: DEEP_GREEN }}>
-                <ScanLine className="w-5 h-5" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold leading-tight text-kr-pretty" style={{ color: DEEP_GREEN }}>{t("cosmetics.ctaTitle")}</p>
-                <p className="text-xs text-stone-400 leading-tight text-kr-pretty">{t("cosmetics.ctaBannerSub")}</p>
-              </div>
-              {user && cosmeticCount > 0 && (
-                <span className="text-xs font-medium px-2 py-1 rounded-full"
+            <div className="px-4 py-3.5 rounded-2xl" style={{ background: TINT_GREEN }}>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-2xl flex items-center justify-center shrink-0"
                   style={{ background: "#FFFFFF", color: DEEP_GREEN }}>
-                  {t("cosmetics.ctaCount", { count: cosmeticCount })}
-                </span>
-              )}
-              <button onClick={() => user ? setShowCosmeticsRegister(true) : setShowCosmeticsGate(true)}
-                className="shrink-0 px-4 py-2 rounded-xl text-white text-xs font-semibold"
-                style={{ background: DEEP_GREEN }}>
-                + {t("cosmetics.scanBtn")}
-              </button>
+                  <ScanLine className="w-5 h-5" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-semibold leading-snug" style={{ color: DEEP_GREEN }}>{t("cosmetics.ctaTitle")}</p>
+                  <p className="text-xs text-stone-400 leading-snug mt-0.5">{t("cosmetics.ctaBannerSub")}</p>
+                </div>
+              </div>
+              <div className="flex items-center justify-end gap-2 mt-2.5">
+                {user && cosmeticCount > 0 && (
+                  <span className="text-xs font-medium px-2.5 py-1 rounded-full"
+                    style={{ background: "#FFFFFF", color: DEEP_GREEN }}>
+                    {t("cosmetics.ctaCount", { count: cosmeticCount })}
+                  </span>
+                )}
+                <button onClick={() => user ? setShowCosmeticsRegister(true) : setShowCosmeticsGate(true)}
+                  className="px-4 py-2 rounded-xl text-white text-xs font-semibold"
+                  style={{ background: DEEP_GREEN }}>
+                  + {t("cosmetics.scanBtn")}
+                </button>
+              </div>
             </div>
 
             <div className="space-y-3">
