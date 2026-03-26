@@ -97,14 +97,20 @@ export default function SkinScanPage() {
   }, []);
 
   const handleInstall = async () => {
+    // 이미 PWA로 실행 중이면 무시
+    if (window.matchMedia("(display-mode: standalone)").matches) return;
     if (deferredPrompt) {
       trackEvent("pwa_prompt_shown");
       deferredPrompt.prompt();
       const choice = await deferredPrompt.userChoice;
       trackEvent(choice.outcome === "accepted" ? "pwa_prompt_accepted" : "pwa_prompt_dismissed");
       setDeferredPrompt(null);
-    } else {
+    } else if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+      // iOS만 수동 가이드 표시
       setShowInstallGuide(true);
+    } else {
+      // 안드로이드 Chrome: 메뉴 → 홈 화면에 추가 안내
+      alert(t("install.androidHint", "브라우저 메뉴(⋮) → '홈 화면에 추가'를 눌러주세요"));
     }
   };
 
