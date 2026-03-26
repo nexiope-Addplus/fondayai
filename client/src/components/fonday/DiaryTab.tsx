@@ -410,7 +410,7 @@ export function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: AppU
             >
               <DiaryCalendarView allEntries={allEntries} />
               <div className="px-5 pt-3">
-                <div className="p-5" style={{ borderRadius: RADIUS_CARD, background: "#FFFFFF", boxShadow: SHADOW_CARD }}>
+                <div className="pt-5 mt-5" style={{ borderTop: `1px solid ${BORDER_COLOR}` }}>
                   <div>
                     <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0">

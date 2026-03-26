@@ -236,7 +236,7 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
         </div>
 
         {productSignals.length > 0 && (
-          <div className="p-4 mt-4" style={{ borderRadius: RADIUS_CARD, background: "#FFFFFF", boxShadow: SHADOW_CARD }}>
+          <div className="pt-5 mt-5" style={{ borderTop: `1px solid ${BORDER_COLOR}` }}>
             <div className="flex items-start justify-between gap-3 mb-3">
               <div>
                 <p className="text-xs font-bold tracking-[0.14em] uppercase" style={{ color: SCAN_TO, fontFamily: FONT_DISPLAY }}>
@@ -383,7 +383,7 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
             <div className="w-6 h-6 border-2 border-stone-200 border-t-stone-400 rounded-full animate-spin" />
           </div>
         ) : list.length === 0 ? (
-          <div className="p-8 text-center" style={{ borderRadius: RADIUS_CARD, background: "#FFFFFF", boxShadow: SHADOW_CARD }}>
+          <div className="pt-5 mt-5 p-8 text-center" style={{ borderTop: `1px solid ${BORDER_COLOR}` }}>
             <div className="w-12 h-12 rounded-full mx-auto mb-3 flex items-center justify-center" style={{ background: `${DEEP_GREEN}12`, color: DEEP_GREEN }}>
               <Droplets className="w-6 h-6" />
             </div>
@@ -392,7 +392,7 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
           </div>
         ) : (
           <>
-            <div className="p-4 mt-4" style={{ borderRadius: RADIUS_CARD, background: "#FFFFFF", boxShadow: SHADOW_CARD }}>
+            <div className="pt-5 mt-5" style={{ borderTop: `1px solid ${BORDER_COLOR}` }}>
               {sections.map(({ key, title, accent, bg }, sectionIdx) => (
                 <div key={key} className={sectionIdx > 0 ? "mt-5 pt-5" : ""} style={sectionIdx > 0 ? { borderTop: "1px solid #EBE8E4" } : {}}>
                   <div className="flex items-center gap-2 mb-3">

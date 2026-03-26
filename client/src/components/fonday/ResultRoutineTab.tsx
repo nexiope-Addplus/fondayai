@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import { Sun, Moon, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { DEEP_GREEN, SCAN_FROM, SCAN_TO, TINT_WARM, TINT_GREEN, TINT_NEUTRAL, BORDER_COLOR, FONT_DISPLAY, TEXT_TERTIARY, SHADOW_CARD, RADIUS_CARD } from "./constants";
+import { DEEP_GREEN, SCAN_FROM, SCAN_TO, TINT_WARM, TINT_GREEN, TINT_NEUTRAL, BORDER_COLOR, FONT_DISPLAY, TEXT_TERTIARY } from "./constants";
 import { ResultDiaryCard } from "./ResultDiaryCard";
 import { ResultLoginCard } from "./ResultLoginCard";
 
@@ -31,8 +31,8 @@ export function ResultRoutineTab(props: any) {
         {showOnboarding && history.length === 0 && (
           <motion.div
             initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }}
-            className="rounded-3xl p-4 flex items-start gap-3"
-            style={{ background: "#FFFFFF", boxShadow: SHADOW_CARD }}
+            className="pt-5 mt-5 p-4 flex items-start gap-3"
+            style={{ borderTop: `1px solid ${BORDER_COLOR}` }}
           >
             <span className="text-xl shrink-0 mt-0.5">✨</span>
             <div className="flex-1 min-w-0">
@@ -51,7 +51,7 @@ export function ResultRoutineTab(props: any) {
 
         {/* 루틴 체크 카드 — 실제 피부 행동을 최상단에 */}
         <div className="space-y-1 mt-4">
-          <div className="p-4" style={{ background: "#FFFFFF", boxShadow: SHADOW_CARD, borderRadius: RADIUS_CARD }}>
+          <div className="pt-5 mt-5" style={{ borderTop: `1px solid ${BORDER_COLOR}` }}>
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
                 <p className="text-xs font-bold uppercase tracking-[0.16em]" style={{ fontFamily: FONT_DISPLAY, color: "#6B5D55" }}>{t("diary.routineTitle")}</p>
@@ -109,7 +109,7 @@ export function ResultRoutineTab(props: any) {
             </div>
 
             {(routineGuide.goodMixes.length > 0 || routineGuide.cautions.length > 0 || cosmeticsInsights.length > 0) && (
-              <div className="mt-4 p-4" style={{ background: "#FFFFFF", boxShadow: SHADOW_CARD, borderRadius: RADIUS_CARD }}>
+              <div className="mt-5 pt-5" style={{ borderTop: `1px solid ${BORDER_COLOR}` }}>
                 <div className="flex items-center justify-between gap-3 mb-3">
                   <div>
                     <p className="text-xs font-bold uppercase tracking-[0.14em]" style={{ fontFamily: FONT_DISPLAY, color: "#6B5D55" }}>{t("cosmetics.insightTitle")}</p>
@@ -191,7 +191,7 @@ export function ResultRoutineTab(props: any) {
         )}
 
         {/* 퀘스트 / 미션 — 루틴 아래 (게이미피케이션) */}
-        <div className="p-4 mt-4" style={{ background: "#FFFFFF", boxShadow: SHADOW_CARD, borderRadius: RADIUS_CARD }}>
+        <div className="pt-5 mt-5" style={{ borderTop: `1px solid ${BORDER_COLOR}` }}>
           <div className="min-w-0">
             <p className="text-xs font-bold tracking-[0.16em] uppercase" style={{ fontFamily: FONT_DISPLAY, color: "#6B5D55" }}>{t("result.actionCard.missionEyebrow")}</p>
             <p className="text-base font-bold mt-1 text-kr-pretty" style={{ color: DEEP_GREEN }}>{t("result.actionCard.title")}</p>

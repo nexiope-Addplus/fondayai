@@ -103,7 +103,7 @@ export function MyScreen({
       <div className="px-4">
         {/* ── 섹션A: 프로필 ── */}
         {user ? (
-          <div className="p-4 mb-4" style={{ borderRadius: RADIUS_CARD, background: "#FFFFFF", boxShadow: SHADOW_CARD }}>
+          <div className="pt-5 mt-5 mb-4" style={{ borderTop: `1px solid ${BORDER_COLOR}` }}>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 {user.avatar
@@ -176,7 +176,7 @@ export function MyScreen({
         )}
 
         {/* ── 섹션B: 유틸리티 (캘린더 + 언어 + 설치) ── */}
-        <div className="p-4 mb-4" style={{ borderRadius: RADIUS_CARD, background: "#FFFFFF", boxShadow: SHADOW_CARD }}>
+        <div className="pt-5 mt-5 mb-4" style={{ borderTop: `1px solid ${BORDER_COLOR}` }}>
           {/* 출석 달력 */}
           <button onClick={() => setShowCalendar(true)}
             className="w-full flex items-center justify-between active:opacity-70">
