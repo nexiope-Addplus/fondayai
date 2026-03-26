@@ -467,7 +467,7 @@ const FALLBACK_I18N: I18nTexts = {
   recIngredient: "RECOMMENDED INGREDIENT",
   slide4Sub: "맞춤 이너뷰티 솔루션",
   slide5Sub: "오늘은 이거 딱 참아보자!",
-  footerText: "fondayai.com",
+  footerText: "fondayai.com에서 무료 피부분석받기",
 };
 
 // ── CORS + handler ────────────────────────────────────────────────────────────
