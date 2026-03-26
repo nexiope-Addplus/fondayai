@@ -208,25 +208,28 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
             {i18n.language === "ko" ? (
               <button
                 onClick={() => onLogin ? onLogin("kakao", "routine") : (localStorage.setItem("fonday_return_tab", "routine"), window.location.href = "/auth/kakao")}
-                className="w-full font-bold text-[13px] flex items-center justify-center border-0 text-[#3C1E1E]"
+                className="w-full font-bold text-[13px] flex items-center justify-center gap-2 border-0 text-[#3C1E1E]"
                 style={{ background: "#FEE500", height: 48, borderRadius: 24 }}
               >
+                <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path fillRule="evenodd" clipRule="evenodd" d="M9 1C4.582 1 1 3.79 1 7.222c0 2.154 1.386 4.045 3.484 5.14L3.62 15.5a.25.25 0 0 0 .368.274L7.9 13.39A9.63 9.63 0 0 0 9 13.444c4.418 0 8-2.791 8-6.222C17 3.79 13.418 1 9 1Z" fill="#3C1E1E"/></svg>
                 {t("attendance.kakao")}
               </button>
             ) : (
               <button
                 onClick={() => onLogin ? onLogin("line", "routine") : (localStorage.setItem("fonday_return_tab", "routine"), window.location.href = "/auth/line")}
-                className="w-full font-bold text-[13px] flex items-center justify-center border-0 text-white"
-                style={{ background: "#C97062", height: 48, borderRadius: 24 }}
+                className="w-full font-bold text-[13px] flex items-center justify-center gap-2 border-0 text-white"
+                style={{ background: "#06C755", height: 48, borderRadius: 24 }}
               >
+                <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M15 7.56c0-3.16-3.13-5.73-6.98-5.73S1.04 4.4 1.04 7.56c0 2.83 2.47 5.2 5.82 5.65.23.05.53.15.61.35.07.18.05.46.02.64l-.1.58c-.03.18-.14.69.6.38.74-.32 3.98-2.38 5.43-4.07C14.54 9.88 15 8.78 15 7.56Z" fill="white"/></svg>
                 {t("attendance.line")}
               </button>
             )}
             <button
               onClick={() => onLogin ? onLogin("google", "routine") : (localStorage.setItem("fonday_return_tab", "routine"), window.location.href = "/auth/google")}
-              className="w-full font-bold text-[13px] text-[#6B5D55] flex items-center justify-center"
+              className="w-full font-bold text-[13px] text-[#6B5D55] flex items-center justify-center gap-2"
               style={{ height: 48, borderRadius: 24, background: BG_MUTED }}
             >
+              <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="w-4 h-4" />
               {t("attendance.google")}
             </button>
           </div>

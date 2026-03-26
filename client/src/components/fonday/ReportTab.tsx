@@ -47,9 +47,9 @@ export function ReportTab({ user }: { user: any }) {
             </Button>
           ) : (
             <Button onClick={() => { window.location.href = "/auth/line"; }}
-              className="w-full h-12 rounded-xl font-bold gap-2 border-0 text-white" style={{ background: DEEP_GREEN }}>
+              className="w-full h-12 rounded-xl font-bold gap-2 border-0 text-white" style={{ background: "#06C755" }}>
               <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-                <path d="M9 1C4.582 1 1 3.79 1 7.222c0 2.03 1.09 3.84 2.8 5.04-.12.44-.77 2.96-.8 3.15a.2.2 0 0 0 .3.22l3.72-2.46c.6.09 1.3.14 1.98.14 4.418 0 8-2.791 8-6.222C17 3.79 13.418 1 9 1Z" fill="white"/>
+                <path d="M15 7.56c0-3.16-3.13-5.73-6.98-5.73S1.04 4.4 1.04 7.56c0 2.83 2.47 5.2 5.82 5.65.23.05.53.15.61.35.07.18.05.46.02.64l-.1.58c-.03.18-.14.69.6.38.74-.32 3.98-2.38 5.43-4.07C14.54 9.88 15 8.78 15 7.56Z" fill="white"/>
               </svg>
               {t("report.lineLogin")}
             </Button>
