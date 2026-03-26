@@ -321,7 +321,7 @@ export function getAICareSettings(): AICareSettings {
     }
   } catch {}
   return {
-    enabled: false,
+    enabled: true,
     scan: true,
     meal: true,
     hydration: true,
