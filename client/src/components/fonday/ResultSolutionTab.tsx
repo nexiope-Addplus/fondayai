@@ -102,7 +102,7 @@ export function ResultSolutionTab(props: any) {
 
             {/* ── AI 피부 예측 ── */}
             {analysisResult?.prediction && (
-              <div className="p-4" style={{ background: "#FFFFFF", boxShadow: SHADOW_CARD, borderRadius: RADIUS_CARD }}>
+              <div className="p-4 mt-4" style={{ background: "#FFFFFF", boxShadow: SHADOW_CARD, borderRadius: RADIUS_CARD }}>
               <SkinPredictionCard
                 prediction={analysisResult.prediction}
                 currentScore={analysisResult.scores[0]?.score ?? 0}

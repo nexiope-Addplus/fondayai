@@ -236,7 +236,7 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
         </div>
 
         {productSignals.length > 0 && (
-          <div className="p-4" style={{ borderRadius: RADIUS_CARD, background: "#FFFFFF", boxShadow: SHADOW_CARD }}>
+          <div className="p-4 mt-4" style={{ borderRadius: RADIUS_CARD, background: "#FFFFFF", boxShadow: SHADOW_CARD }}>
             <div className="flex items-start justify-between gap-3 mb-3">
               <div>
                 <p className="text-xs font-bold tracking-[0.14em] uppercase" style={{ color: SCAN_TO, fontFamily: FONT_DISPLAY }}>
@@ -392,7 +392,7 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
           </div>
         ) : (
           <>
-            <div className="p-4" style={{ borderRadius: RADIUS_CARD, background: "#FFFFFF", boxShadow: SHADOW_CARD }}>
+            <div className="p-4 mt-4" style={{ borderRadius: RADIUS_CARD, background: "#FFFFFF", boxShadow: SHADOW_CARD }}>
               {sections.map(({ key, title, accent, bg }, sectionIdx) => (
                 <div key={key} className={sectionIdx > 0 ? "mt-5 pt-5" : ""} style={sectionIdx > 0 ? { borderTop: "1px solid #EBE8E4" } : {}}>
                   <div className="flex items-center gap-2 mb-3">

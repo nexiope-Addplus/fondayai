@@ -50,7 +50,7 @@ export function ResultRoutineTab(props: any) {
         )}
 
         {/* 루틴 체크 카드 — 실제 피부 행동을 최상단에 */}
-        <div className="space-y-1">
+        <div className="space-y-1 mt-4">
           <div className="p-4" style={{ background: "#FFFFFF", boxShadow: SHADOW_CARD, borderRadius: RADIUS_CARD }}>
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
