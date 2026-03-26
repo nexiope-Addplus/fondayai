@@ -191,7 +191,7 @@ export function ResultRoutineTab(props: any) {
         )}
 
         {/* 퀘스트 / 미션 — 루틴 아래 (게이미피케이션) */}
-        <div className="p-4" style={{ background: "#FFFFFF", boxShadow: SHADOW_CARD, borderRadius: RADIUS_CARD }}>
+        <div className="p-4 mt-4" style={{ background: "#FFFFFF", boxShadow: SHADOW_CARD, borderRadius: RADIUS_CARD }}>
           <div className="min-w-0">
             <p className="text-xs font-bold tracking-[0.16em] uppercase" style={{ fontFamily: FONT_DISPLAY, color: "#6B5D55" }}>{t("result.actionCard.missionEyebrow")}</p>
             <p className="text-base font-bold mt-1 text-kr-pretty" style={{ color: DEEP_GREEN }}>{t("result.actionCard.title")}</p>
