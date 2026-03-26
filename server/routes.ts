@@ -224,7 +224,7 @@ export async function registerRoutes(
 
       const geminiResponse = await callGemini({
         gcpServiceAccount,
-        model: "gemini-3-flash",
+        model: "gemini-3-flash-preview",
         contents: [
           {
             role: "user",

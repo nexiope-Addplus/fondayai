@@ -192,7 +192,7 @@ export const onRequest = async (context: any) => {
 
       const response = await callGemini({
         gcpServiceAccount: env.GCP_SERVICE_ACCOUNT,
-        model: "gemini-3-flash",
+        model: "gemini-3-flash-preview",
         contents: [
           {
             role: "user",
