@@ -857,7 +857,7 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
             </div>
             <div className="min-w-0 flex-1">
               <p className="text-[11px] font-semibold uppercase tracking-[0.1em]" style={{ color: DEEP_GREEN }}>
-                {t("result.todayFocus", "오늘의 핵심")}
+                {t("result.todayFocus")}
               </p>
               <p className="text-[14px] font-bold mt-0.5" style={{ color: "#5C4F4A" }}>
                 {analysisResult.improvements[0].title}
