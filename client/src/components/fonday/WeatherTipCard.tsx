@@ -117,7 +117,7 @@ export function MiniScoreBarIdle({ label, score, color, delay, delta }: {
   }, [delay]);
   return (
     <div className="flex items-center gap-2">
-      <span className="text-[11px] font-medium flex-shrink-0 w-[72px] truncate" style={{ color: "#6B5D55" }}>{label}</span>
+      <span className="text-[11px] font-medium flex-shrink-0 min-w-[72px] max-w-[100px] truncate" style={{ color: "#6B5D55" }}>{label}</span>
       <div className="flex-1 h-[5px] rounded-full overflow-hidden" style={{ background: "#E8E0D8" }}>
         <div
           className="h-full rounded-full"
