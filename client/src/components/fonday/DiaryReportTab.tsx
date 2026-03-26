@@ -51,11 +51,6 @@ type DiaryReportTabProps = {
   analysisResult: AnalysisResult | null;
 };
 
-/* ─── i18n helper ──────────────────────────────────────────────────────────── */
-function L(reportLang: string, ko: string, en: string, ja: string) {
-  return reportLang === "ko" ? ko : reportLang === "ja" ? ja : en;
-}
-
 /* ─── Section wrapper ──────────────────────────────────────────────────────── */
 function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
@@ -77,91 +72,6 @@ export function DiaryReportTab({
 }: DiaryReportTabProps) {
   const { t } = useTranslation();
 
-  /* ─── text maps (existing) ───────────────────────────────────────────────── */
-  const reportDetailText =
-    reportLang === "ko"
-      ? {
-          radarTitle: "피부 균형 스파이더 그래프",
-          radarSub: "현재 상태와 누적 평균을 한 번에 비교합니다.",
-          ingredientTrack: "성분 반응 추적",
-          ingredientTrackSub:
-            "화장품 개봉 이후 점수 흐름을 기준으로 성분 신호를 추렸습니다.",
-          recoveryGuide: "시술 후 회복 가이드",
-          seasonImpact: "계절/환경 영향 해석",
-          triggerCorrelation: "트리거 상관관계",
-          forecastTitle: "다음 2주 회복 예측",
-          positiveFlow: "긍정 신호",
-          cautionFlow: "주의 신호",
-        }
-      : reportLang === "ja"
-        ? {
-            radarTitle: "肌バランススパイダー",
-            radarSub: "現在状態と累積平均を一目で比較します。",
-            ingredientTrack: "成分反応トラッキング",
-            ingredientTrackSub:
-              "開封後のスコア変化から成分シグナルを抽出しました。",
-            recoveryGuide: "施術後の回復ガイド",
-            seasonImpact: "季節・環境影響の解釈",
-            triggerCorrelation: "トリガー相関",
-            forecastTitle: "今後2週間の回復予測",
-            positiveFlow: "プラスシグナル",
-            cautionFlow: "注意シグナル",
-          }
-        : {
-            radarTitle: "Skin Balance Spider",
-            radarSub:
-              "Compare the current profile against your accumulated average.",
-            ingredientTrack: "Ingredient response tracking",
-            ingredientTrackSub:
-              "Signals are estimated from score shifts after product opening dates.",
-            recoveryGuide: "Post-procedure recovery guide",
-            seasonImpact: "Season & environment interpretation",
-            triggerCorrelation: "Trigger correlation",
-            forecastTitle: "Next 2-week recovery forecast",
-            positiveFlow: "Positive signals",
-            cautionFlow: "Signals to watch",
-          };
-
-  const reportConsultText =
-    reportLang === "ko"
-      ? {
-          brief: "Fonday 어드바이저 브리핑",
-          briefSub:
-            "최근 스캔과 일기 기록을 바탕으로 이번 주 피부 흐름을 정리했습니다.",
-          insight: "Fonday 어드바이저 해석",
-          priorities: "이번 주 우선 과제",
-          causes: "원인 추정",
-          consultantPlan: "Fonday 어드바이저 제안",
-          routineAdjust: "루틴 조정 제안",
-          lifestyle: "생활 변수 해석",
-          procedureGuide: "시술 후 회복 가이드",
-        }
-      : reportLang === "ja"
-        ? {
-            brief: "Fondayアドバイザー要約",
-            briefSub:
-              "直近のスキャンと日記記録をもとに、今週の肌の流れを整理しました。",
-            insight: "Fondayアドバイザー解釈",
-            priorities: "今週の優先課題",
-            causes: "原因推定",
-            consultantPlan: "Fondayアドバイザー提案",
-            routineAdjust: "ルーティン調整提案",
-            lifestyle: "生活要因の解釈",
-            procedureGuide: "施術後の回復ガイド",
-          }
-        : {
-            brief: "Fonday Advisor Brief",
-            briefSub:
-              "This week is framed like a real skin consultation, using your recent scans and diary notes.",
-            insight: "Fonday Advisor Interpretation",
-            priorities: "Top priorities this week",
-            causes: "Likely drivers",
-            consultantPlan: "Fonday Advisor Recommendations",
-            routineAdjust: "Routine adjustments",
-            lifestyle: "Lifestyle interpretation",
-            procedureGuide: "Post-procedure recovery guide",
-          };
-
   /* ─── derived data (existing) ────────────────────────────────────────────── */
   const consultantActionItems = [
     diaryReport.routineHighlights.strong,
@@ -175,64 +85,40 @@ export function DiaryReportTab({
 
   const keyConcern = diaryReport.focusConcerns[0]?.key;
   const reportStatusLabel =
-    reportLang === "ko"
-      ? keyConcern === "redness"
-        ? "민감 관리 우선"
-        : keyConcern === "pigmentation"
-          ? "색소 변동 주의"
-          : keyConcern === "hydration"
-            ? "장벽 회복 우선"
-            : diaryReport.trendKey === "trendUp"
-              ? "안정 회복 단계"
-              : "집중 관리 구간"
-      : reportLang === "ja"
-        ? keyConcern === "redness"
-          ? "敏感管理優先"
-          : keyConcern === "pigmentation"
-            ? "色素変動注意"
-            : keyConcern === "hydration"
-              ? "バリア回復優先"
-              : diaryReport.trendKey === "trendUp"
-                ? "安定回復段階"
-                : "集中管理区間"
-        : keyConcern === "redness"
-          ? "Sensitivity first"
-          : keyConcern === "pigmentation"
-            ? "Pigment watch"
-            : keyConcern === "hydration"
-              ? "Barrier recovery first"
-              : diaryReport.trendKey === "trendUp"
-                ? "Stable recovery phase"
-                : "Focused care phase";
+    keyConcern === "redness"
+      ? t("diaryReport.statusRedness")
+      : keyConcern === "pigmentation"
+        ? t("diaryReport.statusPigmentation")
+        : keyConcern === "hydration"
+          ? t("diaryReport.statusHydration")
+          : diaryReport.trendKey === "trendUp"
+            ? t("diaryReport.statusTrendUp")
+            : t("diaryReport.statusDefault");
 
+  const headlineConcern =
+    diaryReport.focusConcerns[0]?.titles[reportLang] ||
+    t("diaryReport.headlineDefault");
   const consultantHeadline =
     reportLang === "ko"
-      ? `${diaryReport.focusConcerns[0]?.titles.ko || "기초 컨디션"} 중심으로 흐름을 먼저 잡아야 하는 주간입니다.`
-      : reportLang === "ja"
-        ? `${diaryReport.focusConcerns[0]?.titles.ja || "基礎コンディション"}を軸に整える週です。`
-        : `This week should center on stabilizing ${diaryReport.focusConcerns[0]?.titles.en || "your baseline condition"}.`;
+      ? `${headlineConcern}${t("diaryReport.headlineSuffix")}`
+      : t("diaryReport.headlineSuffix", { concern: headlineConcern });
 
   const causeEstimateItems = [
     diaryReport.triggerSignals[0]
-      ? reportLang === "ko"
-        ? `${diaryReport.triggerSignals[0].label}이 있는 날 이후 점수 변동폭이 ${Math.abs(diaryReport.triggerSignals[0].diff)}점 정도 벌어졌습니다.`
-        : reportLang === "ja"
-          ? `${diaryReport.triggerSignals[0].label}がある日にスコア変動が約${Math.abs(diaryReport.triggerSignals[0].diff)}点広がりました。`
-          : `Score volatility widens by about ${Math.abs(diaryReport.triggerSignals[0].diff)} points on days tagged with ${diaryReport.triggerSignals[0].label}.`
+      ? t("diaryReport.causesTriggerScore", {
+          label: diaryReport.triggerSignals[0].label,
+          diff: Math.abs(diaryReport.triggerSignals[0].diff),
+        })
       : "",
     weeklyReport.incompleteDays > 1
-      ? reportLang === "ko"
-        ? `루틴 체크가 끊긴 날이 ${weeklyReport.incompleteDays}일 있어 관리 일관성이 흔들렸습니다.`
-        : reportLang === "ja"
-          ? `ルーティン記録が途切れた日が${weeklyReport.incompleteDays}日あり、管理の一貫性が落ちました。`
-          : `Routine adherence dropped on ${weeklyReport.incompleteDays} days, reducing consistency.`
+      ? t("diaryReport.causesRoutineDrop", {
+          days: weeklyReport.incompleteDays,
+        })
       : "",
     diaryReport.topCauseTags[0]
-      ? reportLang === "ko"
-        ? `${diaryReport.topCauseTags[0]} 패턴이 반복되어 생활 변수 영향이 같이 보입니다.`
-        : reportLang === "ja"
-          ? `${diaryReport.topCauseTags[0]}パターンが繰り返され、生活要因の影響も見えます。`
-          : `${diaryReport.topCauseTags[0]} keeps recurring, suggesting a lifestyle driver as well.`
+      ? t("diaryReport.causesLifestyle", {
+          tag: diaryReport.topCauseTags[0],
+        })
       : "",
   ]
     .filter(Boolean)
@@ -240,43 +126,28 @@ export function DiaryReportTab({
 
   const avoidMistakes = [
     ...routineGuide.cautions.slice(0, 2),
-    reportLang === "ko"
-      ? "좋아졌다고 바로 기능성 루틴 강도를 올리지 마세요."
-      : reportLang === "ja"
-        ? "少し良くなったからといってすぐに強い機能性ケアへ戻さないでください。"
-        : "Do not jump back into stronger actives as soon as things start to look better.",
+    t("diaryReport.avoidMistake"),
   ].slice(0, 3);
 
   const routineAdjustPlan = {
     keep: diaryReport.routineHighlights.strong,
     reduce: diaryReport.routineHighlights.watch,
     add: diaryReport.ingredientPlan[0]
-      ? reportLang === "ko"
-        ? `${diaryReport.ingredientPlan[0].name} 중심 루틴을 천천히 추가`
-        : reportLang === "ja"
-          ? `${diaryReport.ingredientPlan[0].name}中心のケアをゆっくり追加`
-          : `Slowly add a ${diaryReport.ingredientPlan[0].name}-focused step`
+      ? t("diaryReport.routineAddSuffix", {
+          name: diaryReport.ingredientPlan[0].name,
+        })
       : diaryReport.copy.notEnough,
   };
 
   const lifestyleSupportItems = [
     analysisResult?.nutritionTips?.hydrationGoal || "",
     diaryReport.seasonGuide,
-    reportLang === "ko"
-      ? "수면과 자외선 노출 변수를 같이 관리하면 점수 변동폭을 줄이기 쉽습니다."
-      : reportLang === "ja"
-        ? "睡眠と紫外線の変数を一緒に整えるとスコア変動を抑えやすくなります。"
-        : "Managing sleep and UV exposure together will usually reduce score volatility.",
+    t("diaryReport.lifestyleSleep"),
   ]
     .filter(Boolean)
     .slice(0, 2);
 
-  const closingComment =
-    reportLang === "ko"
-      ? "이번 주는 더 많이 하는 것보다, 흔들리지 않게 유지하는 것이 핵심입니다."
-      : reportLang === "ja"
-        ? "今週は増やすことより、ぶれずに維持することが重要です。"
-        : "This week is less about doing more and more about staying steady.";
+  const closingComment = t("diaryReport.closingComment");
 
   /* ─── NEW data fields (safe access) ──────────────────────────────────────── */
   const dailyTrend: { date: string; score: number | null }[] =
@@ -324,12 +195,7 @@ export function DiaryReportTab({
                 className="text-xs font-semibold tracking-[0.16em] uppercase"
                 style={{ fontFamily: FONT_DISPLAY, color: TEXT_TERTIARY }}
               >
-                {L(
-                  reportLang,
-                  "Fonday 어드바이저",
-                  "Fonday Advisor",
-                  "Fondayアドバイザー",
-                )}
+                {t("diaryReport.fondayAdvisor")}
               </p>
             </div>
             {finalType && (
@@ -345,12 +211,7 @@ export function DiaryReportTab({
           {/* Weekly Grade — large */}
           <div className="flex flex-col items-center mt-4">
             <p className="text-xs font-semibold text-stone-400">
-              {L(
-                reportLang,
-                "주간 피부 건강 등급",
-                "Weekly Skin Health Grade",
-                "週間肌健康グレード",
-              )}
+              {t("diaryReport.weeklyGradeLabel")}
             </p>
             <div
               className="w-20 h-20 rounded-full flex items-center justify-center mt-2"
@@ -370,12 +231,7 @@ export function DiaryReportTab({
             className="text-[20px] font-normal mt-4 text-center text-kr-pretty"
             style={{ fontFamily: FONT_DISPLAY, color: DEEP_GREEN }}
           >
-            {L(
-              reportLang,
-              "이번 주 피부 컨설팅",
-              "This Week's Skin Consult",
-              "今週の肌コンサルティング",
-            )}
+            {t("diaryReport.thisWeekConsult")}
           </p>
           <p className="text-xs text-[#8C8078] mt-1 leading-relaxed text-center text-kr-pretty">
             {consultantHeadline}
@@ -464,12 +320,7 @@ export function DiaryReportTab({
         >
           <CardContent className="p-5">
             <SectionLabel>
-              {L(
-                reportLang,
-                "주간 점수 트렌드",
-                "Weekly Score Trend",
-                "週間スコアトレンド",
-              )}
+              {t("diaryReport.weeklyScoreTrend")}
             </SectionLabel>
             <div className="flex items-center gap-2 mt-1">
               {trendDelta >= 0 ? (
@@ -485,7 +336,7 @@ export function DiaryReportTab({
                 {trendDelta}
               </span>
               <span className="text-xs text-stone-400">
-                {L(reportLang, "vs 지난주", "vs last week", "vs 先週")}
+                {t("diaryReport.vsLastWeek")}
               </span>
             </div>
 
@@ -521,12 +372,7 @@ export function DiaryReportTab({
                       stroke={TEXT_TERTIARY}
                       strokeDasharray="4 4"
                       label={{
-                        value: L(
-                          reportLang,
-                          "지난주 평균",
-                          "Last week avg",
-                          "先週平均",
-                        ),
+                        value: t("diaryReport.lastWeekAvg"),
                         fill: TEXT_TERTIARY,
                         fontSize: 11,
                         position: "insideTopRight",
@@ -539,12 +385,7 @@ export function DiaryReportTab({
                       stroke={DEEP_GREEN}
                       strokeDasharray="4 4"
                       label={{
-                        value: L(
-                          reportLang,
-                          "이번주 평균",
-                          "This week avg",
-                          "今週平均",
-                        ),
+                        value: t("diaryReport.thisWeekAvg"),
                         fill: DEEP_GREEN,
                         fontSize: 11,
                         position: "insideBottomRight",
@@ -580,12 +421,7 @@ export function DiaryReportTab({
         >
           <CardContent className="p-5">
             <SectionLabel>
-              {L(
-                reportLang,
-                "지난주 대비 변화",
-                "Week-over-Week Change",
-                "前週比の変化",
-              )}
+              {t("diaryReport.weekOverWeekChange")}
             </SectionLabel>
             <div className="grid grid-cols-2 gap-2.5 mt-3">
               {scoreComparison.map((m) => (
@@ -641,7 +477,7 @@ export function DiaryReportTab({
               <Sparkles className="w-4 h-4" style={{ color: SCAN_TO }} />
             </div>
             <div className="min-w-0">
-              <SectionLabel>{reportConsultText.insight}</SectionLabel>
+              <SectionLabel>{t("diaryReport.insight")}</SectionLabel>
               <div className="flex items-center gap-2 mt-1 flex-wrap">
                 <p
                   className="text-base font-semibold text-kr-pretty"
@@ -676,7 +512,7 @@ export function DiaryReportTab({
         style={{ background: "#FFFFFF", boxShadow: "0 1px 6px rgba(0,0,0,0.04)" }}
       >
         <CardContent className="p-4">
-          <SectionLabel>{reportConsultText.causes}</SectionLabel>
+          <SectionLabel>{t("diaryReport.causes")}</SectionLabel>
           <div className="space-y-2.5 mt-3">
             {causeEstimateItems.map((item, index) => (
               <div
@@ -709,7 +545,7 @@ export function DiaryReportTab({
         style={{ background: "#FFFFFF", boxShadow: "0 1px 6px rgba(0,0,0,0.04)" }}
       >
         <CardContent className="p-4">
-          <SectionLabel>{reportConsultText.priorities}</SectionLabel>
+          <SectionLabel>{t("diaryReport.priorities")}</SectionLabel>
           <div className="space-y-2.5 mt-3">
             {consultantActionItems.map((item, index) => (
               <div
@@ -756,9 +592,9 @@ export function DiaryReportTab({
         style={{ background: "#FFFFFF", boxShadow: "0 1px 6px rgba(0,0,0,0.04)" }}
       >
         <CardContent className="p-4">
-          <SectionLabel>{reportDetailText.radarTitle}</SectionLabel>
+          <SectionLabel>{t("diaryReport.radarTitle")}</SectionLabel>
           <p className="text-xs text-[#8C8078] mt-1">
-            {reportDetailText.radarSub}
+            {t("diaryReport.radarSub")}
           </p>
           <div className="w-full h-72 pt-2">
             <ResponsiveContainer width="100%" height="100%">
@@ -780,7 +616,7 @@ export function DiaryReportTab({
                   axisLine={false}
                 />
                 <Radar
-                  name={L(reportLang, "현재", "Current", "現在")}
+                  name={t("diaryReport.radarCurrent")}
                   dataKey="current"
                   stroke={SCAN_TO}
                   fill={SCAN_TO}
@@ -788,7 +624,7 @@ export function DiaryReportTab({
                   strokeWidth={2}
                 />
                 <Radar
-                  name={L(reportLang, "누적 평균", "Average", "累積平均")}
+                  name={t("diaryReport.radarAverage")}
                   dataKey="average"
                   stroke={DEEP_GREEN}
                   fill={DEEP_GREEN}
@@ -816,7 +652,7 @@ export function DiaryReportTab({
           className="text-xs font-semibold uppercase tracking-[0.14em] px-1"
           style={{ color: SCAN_TO }}
         >
-          {L(reportLang, "핵심 관찰", "Key observations", "主要観察")}
+          {t("diaryReport.keyObservations")}
         </p>
         {diaryReport.focusConcerns.map((concern: any) => (
           <Card
@@ -902,12 +738,7 @@ export function DiaryReportTab({
               </div>
               <div>
                 <SectionLabel>
-                  {L(
-                    reportLang,
-                    "바우만 타입 × 계절 인사이트",
-                    "Baumann Type × Seasonal Insight",
-                    "バウマンタイプ × 季節インサイト",
-                  )}
+                  {t("diaryReport.baumannSeasonInsight")}
                 </SectionLabel>
                 {finalType && (
                   <span
@@ -954,12 +785,7 @@ export function DiaryReportTab({
         >
           <CardContent className="p-5">
             <SectionLabel>
-              {L(
-                reportLang,
-                "오늘의 액션 플랜",
-                "Today's Action Plan",
-                "今日のアクションプラン",
-              )}
+              {t("diaryReport.todayActionPlan")}
             </SectionLabel>
             <div className="grid grid-cols-2 gap-3 mt-4">
               {/* Morning */}
@@ -967,7 +793,7 @@ export function DiaryReportTab({
                 <div className="flex items-center gap-1.5">
                   <Sun className="w-4 h-4" style={{ color: DEEP_GREEN }} />
                   <p className="text-xs font-bold" style={{ color: DEEP_GREEN }}>
-                    {L(reportLang, "모닝", "Morning", "モーニング")}
+                    {t("diaryReport.morning")}
                   </p>
                 </div>
                 {dailyActionPlan.morning.map((step, i) => (
@@ -993,7 +819,7 @@ export function DiaryReportTab({
                 <div className="flex items-center gap-1.5">
                   <Moon className="w-4 h-4" style={{ color: SCAN_TO }} />
                   <p className="text-xs font-bold" style={{ color: SCAN_TO }}>
-                    {L(reportLang, "이브닝", "Evening", "イブニング")}
+                    {t("diaryReport.evening")}
                   </p>
                 </div>
                 {dailyActionPlan.evening.map((step, i) => (
@@ -1033,12 +859,7 @@ export function DiaryReportTab({
           <CardContent className="p-4">
             <SectionLabel>{diaryReport.copy.ingredients}</SectionLabel>
             <p className="text-xs text-[#8C8078] mt-1 text-kr-pretty">
-              {L(
-                reportLang,
-                "Fonday 어드바이저가 우선 추천하는 성분 처방입니다.",
-                "Top ingredient prescriptions the AI Advisor would prioritize.",
-                "Fondayアドバイザーが優先して勧める成分処方です。",
-              )}
+              {t("diaryReport.ingredientPrescriptionSub")}
             </p>
             <div className="space-y-3 mt-3">
               {diaryReport.ingredientPlan.map((item: any) => (
@@ -1077,12 +898,7 @@ export function DiaryReportTab({
           <CardContent className="p-4">
             <SectionLabel>{diaryReport.copy.procedures}</SectionLabel>
             <p className="text-xs text-[#8C8078] mt-1 text-kr-pretty">
-              {L(
-                reportLang,
-                "시술이 필요하다면 먼저 검토할 만한 방향입니다.",
-                "If procedures are on the table, these are worth discussing first.",
-                "施術を考えるなら先に相談しやすい方向です。",
-              )}
+              {t("diaryReport.procedurePlanSub")}
             </p>
             <div className="space-y-3 mt-3">
               {diaryReport.procedurePlan.map((item: any) => (
@@ -1137,22 +953,17 @@ export function DiaryReportTab({
         >
           <CardContent className="p-4">
             <SectionLabel>
-              {L(
-                reportLang,
-                "성분 반응 추적",
-                reportDetailText.ingredientTrack,
-                reportDetailText.ingredientTrack,
-              )}
+              {t("diaryReport.ingredientTrack")}
             </SectionLabel>
             <p className="text-xs text-[#8C8078] mt-1">
-              {reportDetailText.ingredientTrackSub}
+              {t("diaryReport.ingredientTrackSub")}
             </p>
             <div className="space-y-3 mt-3">
               {diaryReport.ingredientSignals.length > 0 ? (
                 <>
                   <div>
                     <p className="text-xs font-semibold uppercase tracking-[0.12em] text-emerald-600">
-                      {reportDetailText.positiveFlow}
+                      {t("diaryReport.positiveFlow")}
                     </p>
                     <div className="space-y-3 mt-2">
                       {diaryReport.ingredientSignals
@@ -1184,7 +995,7 @@ export function DiaryReportTab({
                         color: TEXT_TERTIARY,
                       }}
                     >
-                      {reportDetailText.cautionFlow}
+                      {t("diaryReport.cautionFlow")}
                     </p>
                     <div className="space-y-3 mt-2">
                       {diaryReport.ingredientSignals
@@ -1262,7 +1073,7 @@ export function DiaryReportTab({
             }}
           >
             <CardContent className="p-4">
-              <SectionLabel>{reportConsultText.procedureGuide}</SectionLabel>
+              <SectionLabel>{t("diaryReport.procedureGuide")}</SectionLabel>
               <div className="space-y-3 mt-3">
                 {diaryReport.recoveryGuide.map((item: string) => (
                   <div
@@ -1289,7 +1100,7 @@ export function DiaryReportTab({
         style={{ background: "#FFFFFF", boxShadow: "0 1px 6px rgba(0,0,0,0.04)" }}
       >
         <CardContent className="p-4">
-          <SectionLabel>{reportConsultText.routineAdjust}</SectionLabel>
+          <SectionLabel>{t("diaryReport.routineAdjust")}</SectionLabel>
 
           {/* Memo signals + Cause tags */}
           <div className="grid gap-3 mt-3 md:grid-cols-2">
@@ -1340,7 +1151,7 @@ export function DiaryReportTab({
           <div className="grid gap-3 mt-3 md:grid-cols-3">
             <div className="rounded-2xl p-3" style={{ background: TINT_GREEN }}>
               <p className="text-xs font-semibold uppercase tracking-[0.12em] text-emerald-700">
-                {L(reportLang, "유지", "Keep", "維持")}
+                {t("diaryReport.keep")}
               </p>
               <p className="text-[12px] font-semibold mt-2 text-[#6B5D55] text-kr-pretty">
                 {routineAdjustPlan.keep}
@@ -1351,7 +1162,7 @@ export function DiaryReportTab({
                 className="text-xs font-semibold uppercase tracking-[0.12em]"
                 style={{ fontFamily: FONT_DISPLAY, color: TEXT_TERTIARY }}
               >
-                {L(reportLang, "줄이기", "Reduce", "減らす")}
+                {t("diaryReport.reduce")}
               </p>
               <p className="text-[12px] font-semibold mt-2 text-[#6B5D55] text-kr-pretty">
                 {routineAdjustPlan.reduce}
@@ -1359,7 +1170,7 @@ export function DiaryReportTab({
             </div>
             <div className="rounded-2xl p-3" style={{ background: "#F6F4FB" }}>
               <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[#7C3AED]">
-                {L(reportLang, "추가", "Add", "追加")}
+                {t("diaryReport.add")}
               </p>
               <p className="text-[12px] font-semibold mt-2 text-[#6B5D55] text-kr-pretty">
                 {routineAdjustPlan.add}
@@ -1377,7 +1188,7 @@ export function DiaryReportTab({
         style={{ background: "#FFFFFF", boxShadow: "0 1px 6px rgba(0,0,0,0.04)" }}
       >
         <CardContent className="p-4">
-          <SectionLabel>{reportConsultText.lifestyle}</SectionLabel>
+          <SectionLabel>{t("diaryReport.lifestyle")}</SectionLabel>
 
           {/* Lifestyle support items */}
           <div className="space-y-2.5 mt-3">
@@ -1402,7 +1213,7 @@ export function DiaryReportTab({
               className="text-xs font-semibold uppercase tracking-[0.12em]"
               style={{ color: SCAN_TO }}
             >
-              {reportDetailText.triggerCorrelation}
+              {t("diaryReport.triggerCorrelation")}
             </p>
             <div className="space-y-2.5 mt-2">
               {diaryReport.triggerSignals.length > 0 ? (
@@ -1448,12 +1259,7 @@ export function DiaryReportTab({
               className="text-xs font-semibold uppercase tracking-[0.12em]"
               style={{ color: "#C2410C" }}
             >
-              {L(
-                reportLang,
-                "피해야 할 실수",
-                "Avoid This Week",
-                "避けたいミス",
-              )}
+              {t("diaryReport.avoidThisWeek")}
             </p>
             <div className="space-y-2.5 mt-2">
               {avoidMistakes.map((item, index) => (
@@ -1489,7 +1295,7 @@ export function DiaryReportTab({
         <CardContent className="p-5">
           <div className="flex items-center gap-2.5">
             <Target className="w-4 h-4" style={{ color: DEEP_GREEN }} />
-            <SectionLabel>{reportDetailText.forecastTitle}</SectionLabel>
+            <SectionLabel>{t("diaryReport.forecastTitle")}</SectionLabel>
           </div>
           <p className="text-[13px] text-[#8C8078] mt-3 leading-relaxed text-kr-pretty">
             {diaryReport.forecast.note}
@@ -1562,12 +1368,7 @@ export function DiaryReportTab({
               </div>
               <div className="min-w-0 flex-1">
                 <p className="text-xs font-semibold uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>
-                  {L(
-                    reportLang,
-                    "다음 스캔 추천",
-                    "Next Scan Recommendation",
-                    "次回スキャン推奨",
-                  )}
+                  {t("diaryReport.nextScanRecommendation")}
                 </p>
                 <p className="text-[13px] text-[#6B5D55] mt-1 leading-relaxed text-kr-pretty">
                   {nextScanRecommendation}
@@ -1591,24 +1392,14 @@ export function DiaryReportTab({
       >
         <CardContent className="p-5">
           <SectionLabel>
-            {L(
-              reportLang,
-              "마무리 코멘트",
-              "Closing note",
-              "締めコメント",
-            )}
+            {t("diaryReport.closingNote")}
           </SectionLabel>
           <p className="text-[13px] text-[#6B5D55] mt-3 leading-relaxed text-kr-pretty">
             {closingComment}
           </p>
           <div className="mt-4 pt-3 border-t" style={{ borderColor: BORDER_COLOR }}>
             <p className="text-[11px] text-stone-400 text-center">
-              {L(
-                reportLang,
-                "Fonday 어드바이저 리포트",
-                "Fonday Advisor Report",
-                "Fondayアドバイザーレポート",
-              )}{" "}
+              {t("diaryReport.fondayAdvisorReport")}{" "}
               — {diaryReport.periodLabel}
             </p>
           </div>
