@@ -1085,6 +1085,7 @@
     }
   },
   "cosmetics": {
+    "boardStepSuffix": "개",
     "ctaTitle": "화장품 사진으로 등록하기",
     "ctaDesc": "쓰는 화장품을 등록하면 내 피부 변화와 연결해 분석해드려요",
     "ctaBullet1": "제품 사용 후 점수 변화 추적",

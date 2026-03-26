@@ -1085,6 +1085,7 @@
     }
   },
   "cosmetics": {
+    "boardStepSuffix": "",
     "ctaTitle": "Register with a Product Photo",
     "ctaDesc": "Register your products to connect them with your skin changes",
     "ctaBullet1": "Track score changes after product use",
@@ -1278,6 +1279,7 @@
   },
   "common": {
     "viewAll": "View all {{count}}",
+    "collapse": "Collapse",
     "close": "Close",
     "refresh": "Refresh",
     "loading": "Loading",
