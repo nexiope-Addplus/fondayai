@@ -42,15 +42,15 @@ export const TINT_GREEN = "#EDF5F2";
 export const TINT_NEUTRAL = "#F0F0F1";
 
 // ─── DESIGN.md 디자인 토큰 ────────────────────────────────────────────────────
-export const BG_BASE = "#F4F4F5";
-export const BG_MUTED = "#F0F0F1";
-export const BORDER_COLOR = "#E5E5E7";
+export const BG_BASE = "#FFFFFF";
+export const BG_MUTED = "#F5F5F5";
+export const BORDER_COLOR = "#EBEBEB";
 export const FONT_DISPLAY = "'Fraunces', Georgia, serif";
 export const FONT_HEADING = "'LINESeedKR', Pretendard, sans-serif";
 
 // Shadow 토큰
-export const SHADOW_CARD = "0 2px 8px rgba(0,0,0,0.06)";
-export const SHADOW_ELEVATED = "0 8px 30px rgba(28,25,23,0.07)";
+export const SHADOW_CARD = "0 2px 12px rgba(0,0,0,0.08)";
+export const SHADOW_ELEVATED = "0 8px 32px rgba(0,0,0,0.10)";
 
 // Border-radius 토큰
 export const RADIUS_CARD = 20;
@@ -59,7 +59,7 @@ export const RADIUS_ITEM = 12;
 export const RADIUS_PILL = 9999;
 
 // 페이지 배경
-export const PAGE_GRADIENT = "#F4F4F5";
+export const PAGE_GRADIENT = "#FFFFFF";
 
 // 텍스트 계층 (DESIGN.md 기준)
 export const TEXT_HEADING = "#4A403A";
