@@ -368,8 +368,10 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
   }, []);
 
   // 스캔 저장 (운영 버전 안정성 복구 + weatherInfo 추가)
+  const savingRef = useRef(false);
   useEffect(() => {
-    if (!user || !analysisResult || isSaved) return;
+    if (!user || !analysisResult || isSaved || savingRef.current) return;
+    savingRef.current = true;
     const overallScore = analysisResult.scores?.[0]?.score || 0;
     
     fetch("/api/scans", {
