@@ -43,9 +43,9 @@ export const TINT_NEUTRAL = "#F0F0F1";
 
 // ─── DESIGN.md 디자인 토큰 ────────────────────────────────────────────────────
 export const BG_BASE = "#FFFFFF";
-export const BG_MUTED = "#F5F5F5";
+export const BG_MUTED = "#F5F8F6";
 export const BORDER_COLOR = "#EBEBEB";
-export const FONT_DISPLAY = "'Fraunces', Georgia, serif";
+export const FONT_DISPLAY = "'LINESeedKR', Pretendard, sans-serif";
 export const FONT_HEADING = "'LINESeedKR', Pretendard, sans-serif";
 
 // Shadow 토큰
