@@ -272,7 +272,7 @@ export function DiaryRoutinePreviewCard({ routineGuide, dateStr }: { routineGuid
                       className="mt-3 w-full rounded-2xl bg-white border px-3.5 py-3 flex items-center justify-between gap-3"
                       style={{ borderColor: `${accent}20` }}
                     >
-                      <p className="text-xs font-semibold" style={{ color: accent }}>{title} 완료</p>
+                      <p className="text-xs font-semibold" style={{ color: accent }}>{title} {t("diary.routineComplete", "완료")}</p>
                       <div className={`w-5 h-5 rounded-[6px] border-2 flex items-center justify-center shrink-0 ${
                         completed ? "border-emerald-400 bg-emerald-400" : "border-stone-200 bg-white"
                       }`}>

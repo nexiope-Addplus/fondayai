@@ -380,6 +380,7 @@
   },
   "diary": {
     "routineTitle": "Today's Routine",
+    "routineComplete": "Done",
     "scanNudge": "You haven't scanned today",
     "scanNudgeDesc": "Scan to track your skin changes"
   },

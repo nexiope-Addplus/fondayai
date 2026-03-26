@@ -380,6 +380,7 @@
   },
   "diary": {
     "routineTitle": "오늘의 루틴",
+    "routineComplete": "완료",
     "scanNudge": "오늘 아직 스캔하지 않았어요",
     "scanNudgeDesc": "스캔하면 피부 변화를 추적할 수 있어요"
   },
