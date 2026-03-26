@@ -359,6 +359,7 @@
     "shareLoading": "이미지 생성 중…",
     "partnership": "브랜드 제휴 문의하기",
     "shareText": "오늘 내 피부 점수는 {{score}}점! 바우만 타입은 {{type}}형이 나왔어요.\n#Fonday #AI피부분석 #FondayAI",
+    "challengeText": "내 피부 점수 {{score}}점 이길 수 있어? 🔥\n피부 타입 {{type}}형이랑 대결해봐!",
     "challengeBtn": "친구에게 피부 챌린지 보내기",
     "challengeResult": "챌린지 결과 확인하기",
     "challengeLinkCopied": "챌린지 링크가 복사되었습니다! 친구에게 보내서 겨뤄보세요.",

@@ -1017,8 +1017,8 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
           if (navigator.share) {
             navigator
               .share({
-                title: "Fonday AI 피부 챌린지!",
-                text: t("result.shareText", { score: overallScore, type: finalType }),
+                title: "Fonday° 피부 챌린지",
+                text: t("result.challengeText", { score: overallScore, type: finalType }),
                 url: shareUrl,
               })
               .catch(console.error);

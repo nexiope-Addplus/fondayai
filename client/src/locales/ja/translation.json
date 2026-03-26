@@ -359,6 +359,7 @@
     "shareLoading": "画像生成中…",
     "partnership": "ブランド提携のお問い合わせ",
     "shareText": "今日の肌スコアは{{score}}点！バウマンタイプは{{type}}でした。\n#Fonday #AI肌分析 #FondayAI",
+    "challengeText": "私の肌スコア{{score}}点に勝てる？🔥\n{{type}}タイプと対決してみて！",
     "challengeBtn": "友達に肌チャレンジを送る",
     "challengeResult": "チャレンジ結果を確認",
     "challengeLinkCopied": "チャレンジリンクをコピーしました！友達に送って競いましょう。",
