@@ -1,3 +1,4 @@
+import { callGemini, extractText } from "../../lib/vertex-ai";
 import { getUserFromCookie } from "../../_utils/jwt";
 
 const CORS = {
@@ -56,9 +57,8 @@ export const onRequest = async (context: any) => {
     return new Response(JSON.stringify({ am: [], pm: [], conflicts: [] }), { headers: CORS });
   }
 
-  const apiKey = env.GOOGLE_API_KEY;
-  if (!apiKey) {
-    return new Response(JSON.stringify({ error: "API key 없음" }), { status: 500, headers: CORS });
+  if (!env.GCP_SERVICE_ACCOUNT) {
+    return new Response(JSON.stringify({ error: "GCP_SERVICE_ACCOUNT 없음" }), { status: 500, headers: CORS });
   }
 
   try {
@@ -96,20 +96,14 @@ ${JSON.stringify(cosmeticList, null, 2)}
   "conflicts": [{"productNames":["제품명1","제품명2"],"reason":"충돌 이유","resolution":"해결 방법"}]
 }`;
 
-    const geminiRes = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: { responseMimeType: "application/json" },
-        }),
-      }
-    );
+    const response = await callGemini({
+      gcpServiceAccount: env.GCP_SERVICE_ACCOUNT,
+      model: "gemini-2.5-flash",
+      contents: [{ role: "user", parts: [{ text: prompt }] }],
+      generationConfig: { responseMimeType: "application/json" },
+    });
 
-    const geminiData: any = await geminiRes.json();
-    const text = geminiData?.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
+    const text = extractText(response);
     const parsed = parseGeminiJson(text);
 
     return new Response(JSON.stringify(parsed), { headers: CORS });

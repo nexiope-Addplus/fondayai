@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from "@google/generative-ai";
+import { callGemini, extractText, SAFETY_SETTINGS_NONE } from "../functions/lib/vertex-ai";
 import { randomUUID } from "crypto";
 import { isConfigured, d1Query } from "./d1";
 import type { Scan } from "@shared/schema";
@@ -207,44 +207,41 @@ export async function registerRoutes(
   app.post("/api/analyze-skin", async (req, res) => {
     try {
       const { image, surveyData, lang = "ko" } = req.body;
-      const apiKey = process.env.GOOGLE_API_KEY;
-      
-      if (!apiKey) {
-        console.error("[Server] GOOGLE_API_KEY is missing in process.env");
-        return res.status(500).json({ 
-          message: "서버 설정 오류: API 키가 없습니다.",
-          detail: "환경 변수 GOOGLE_API_KEY가 설정되지 않았습니다."
+      const gcpServiceAccount = process.env.GCP_SERVICE_ACCOUNT;
+
+      if (!gcpServiceAccount) {
+        console.error("[Server] GCP_SERVICE_ACCOUNT is missing in process.env");
+        return res.status(500).json({
+          message: "서버 설정 오류: 서비스 계정이 없습니다.",
+          detail: "환경 변수 GCP_SERVICE_ACCOUNT가 설정되지 않았습니다."
         });
       }
-
-      const genAI = new GoogleGenerativeAI(apiKey);
-      const model = genAI.getGenerativeModel({
-        model: "gemini-2.5-flash",
-        generationConfig: {
-          responseMimeType: "application/json",
-          // @ts-ignore — thinkingConfig is supported by gemini-2.5-flash
-          thinkingConfig: { thinkingBudget: 1024 },
-        },
-        safetySettings: [
-          { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_NONE },
-          { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_NONE },
-          { category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold: HarmBlockThreshold.BLOCK_NONE },
-          { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_NONE },
-        ]
-      });
 
       const prompt = buildPrompt(surveyData, lang);
 
       const base64Data = image.split(",")[1] || image;
       const mimeType = image.startsWith("data:image/png") ? "image/png" : "image/jpeg";
 
-      const result = await model.generateContent([
-        prompt,
-        { inlineData: { data: base64Data, mimeType } }
-      ]);
+      const geminiResponse = await callGemini({
+        gcpServiceAccount,
+        model: "gemini-2.5-flash",
+        contents: [
+          {
+            role: "user",
+            parts: [
+              { text: prompt },
+              { inlineData: { mimeType, data: base64Data } },
+            ],
+          },
+        ],
+        generationConfig: {
+          responseMimeType: "application/json",
+          thinkingConfig: { thinkingBudget: 1024 },
+        },
+        safetySettings: SAFETY_SETTINGS_NONE,
+      });
 
-      const response = await result.response;
-      const text = response.text();
+      const text = extractText(geminiResponse);
 
       console.log("[Gemini] 응답 길이:", text.length, "/ 앞100자:", text.slice(0, 100));
 
@@ -457,11 +454,9 @@ export async function registerRoutes(
     const normalizeCategory = (category?: string) => (!category || !ALLOWED_CATEGORIES.has(category) ? "기타스킨케어" : category);
     const { imageBase64 } = req.body;
     if (!imageBase64) return res.status(400).json({ error: "imageBase64 필요" });
-    const apiKey = process.env.GOOGLE_API_KEY;
-    if (!apiKey) return res.status(500).json({ error: "API key 없음" });
+    const gcpServiceAccount = process.env.GCP_SERVICE_ACCOUNT;
+    if (!gcpServiceAccount) return res.status(500).json({ error: "GCP_SERVICE_ACCOUNT 없음" });
     try {
-      const genAI = new GoogleGenerativeAI(apiKey);
-      const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
       const imageData = imageBase64.replace(/^data:image\/\w+;base64,/, "");
       const mimeType = imageBase64.startsWith("data:image/png") ? "image/png" : "image/jpeg";
       const prompt = `이 화장품 제품 사진을 분석하세요.
@@ -475,11 +470,20 @@ JSON으로만 응답하세요 (다른 텍스트 절대 금지):
 3. 메이크업, 향수, 헤어제품, 바디제품이면 isSkincareRelevant=false 와 category="스킨케어아님" 으로 반환.
 4. 스킨케어 제품이지만 정확한 분류가 애매하면 category="기타스킨케어".
 5. confidence는 사진에서 텍스트/제품 유형이 얼마나 분명한지 high|medium|low 중 하나로 반환.`;
-      const result = await model.generateContent([
-        { inlineData: { mimeType, data: imageData } },
-        prompt
-      ]);
-      const text = result.response.text();
+      const geminiResponse = await callGemini({
+        gcpServiceAccount,
+        model: "gemini-2.5-flash",
+        contents: [
+          {
+            role: "user",
+            parts: [
+              { inlineData: { mimeType, data: imageData } },
+              { text: prompt },
+            ],
+          },
+        ],
+      });
+      const text = extractText(geminiResponse);
       const parsed = parseGeminiJson(text);
       parsed.category = normalizeCategory(parsed.category);
       if (parsed.category === "스킨케어아님") parsed.isSkincareRelevant = false;
@@ -535,11 +539,9 @@ JSON으로만 응답하세요 (다른 텍스트 절대 금지):
     if (!req.isAuthenticated()) return res.status(401).json({ error: "로그인 필요" });
     const { cosmetics } = req.body;
     if (!Array.isArray(cosmetics) || cosmetics.length === 0) return res.json({ am: [], pm: [], conflicts: [] });
-    const apiKey = process.env.GOOGLE_API_KEY;
-    if (!apiKey) return res.status(500).json({ error: "API key 없음" });
+    const gcpServiceAccount = process.env.GCP_SERVICE_ACCOUNT;
+    if (!gcpServiceAccount) return res.status(500).json({ error: "GCP_SERVICE_ACCOUNT 없음" });
     try {
-      const genAI = new GoogleGenerativeAI(apiKey);
-      const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
       const cosmeticList = cosmetics.map((c: any) => ({
         id: c.id,
         name: c.name,
@@ -572,8 +574,13 @@ ${JSON.stringify(cosmeticList, null, 2)}
   "pm": [{"id":"제품id","order":1}, {"id":"제품id","order":2}],
   "conflicts": [{"productNames":["제품명1","제품명2"],"reason":"충돌 이유","resolution":"해결 방법"}]
 }`;
-      const result = await model.generateContent(prompt);
-      const text = result.response.text();
+      const geminiResponse = await callGemini({
+        gcpServiceAccount,
+        model: "gemini-2.5-flash",
+        contents: [{ role: "user", parts: [{ text: prompt }] }],
+        generationConfig: { responseMimeType: "application/json" },
+      });
+      const text = extractText(geminiResponse);
       const parsed = parseGeminiJson(text);
       res.json(parsed);
     } catch (e: any) {
@@ -586,8 +593,8 @@ ${JSON.stringify(cosmeticList, null, 2)}
     if (!req.isAuthenticated()) return res.status(401).json({ error: "로그인 필요" });
     const userId = (req.user as any).id;
     const { baumannType, scores, lang } = req.body;
-    const apiKey = process.env.GOOGLE_API_KEY;
-    if (!apiKey) return res.status(500).json({ error: "API key 없음" });
+    const gcpServiceAccount = process.env.GCP_SERVICE_ACCOUNT;
+    if (!gcpServiceAccount) return res.status(500).json({ error: "GCP_SERVICE_ACCOUNT 없음" });
     if (!isConfigured()) return res.json([]);
     try {
       const cosmeticsResult = await d1Query(
@@ -641,10 +648,12 @@ ${JSON.stringify(cosmeticList, null, 2)}
 
 성분 정보가 없으면 카테고리와 바우만 타입 일반 지식으로 채점하세요. pros/cons/keyIngredients/conflictIngredients는 각각 1-3개로 제한하세요.`;
 
-      const genAI = new GoogleGenerativeAI(apiKey);
-      const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
-      const result = await model.generateContent(prompt);
-      const text = result.response.text();
+      const geminiResponse = await callGemini({
+        gcpServiceAccount,
+        model: "gemini-2.5-flash",
+        contents: [{ role: "user", parts: [{ text: prompt }] }],
+      });
+      const text = extractText(geminiResponse);
       const parsed = parseGeminiJson(text);
       const grades = Array.isArray(parsed) ? parsed : [];
       res.json(grades);

@@ -1,4 +1,4 @@
-import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from "@google/generative-ai";
+import { callGemini, extractText, SAFETY_SETTINGS_NONE } from "../lib/vertex-ai";
 
 function parseGeminiJson(text: string) {
   const jsonStart = text.indexOf("{");
@@ -12,8 +12,8 @@ function parseGeminiJson(text: string) {
     candidate,
     candidate
       .replace(/```json|```/gi, "")
-      .replace(/[“”]/g, '"')
-      .replace(/[‘’]/g, "'")
+      .replace(/[""]/g, '"')
+      .replace(/['']/g, "'")
       .replace(/,\s*([}\]])/g, "$1")
       .replace(/([{,]\s*)([A-Za-z0-9_]+)\s*:/g, '$1"$2":'),
   ];
@@ -178,40 +178,38 @@ export const onRequest = async (context: any) => {
       const rawLang = body.lang ?? "ko";
       const lang = ALLOWED_LANGS.includes(rawLang) ? rawLang : "ko";
 
-      if (!env.GOOGLE_API_KEY) {
-        return new Response(JSON.stringify({ error: "GOOGLE_API_KEY is missing in environment variables." }), {
+      if (!env.GCP_SERVICE_ACCOUNT) {
+        return new Response(JSON.stringify({ error: "GCP_SERVICE_ACCOUNT is missing in environment variables." }), {
           status: 500,
           headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" }
         });
       }
-
-      const genAI = new GoogleGenerativeAI(env.GOOGLE_API_KEY);
-      const model = genAI.getGenerativeModel({
-        model: "gemini-2.5-flash",
-        generationConfig: {
-          responseMimeType: "application/json",
-          // @ts-ignore — thinkingConfig is supported by gemini-2.5-flash
-          thinkingConfig: { thinkingBudget: 1024 },
-        },
-        safetySettings: [
-          { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_NONE },
-          { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_NONE },
-          { category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold: HarmBlockThreshold.BLOCK_NONE },
-          { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_NONE },
-        ]
-      });
 
       const prompt = buildPrompt(surveyData, lang);
 
       const base64Data = image.split(",")[1] || image;
       const mimeType = image.startsWith("data:image/png") ? "image/png" : "image/jpeg";
 
-      const result = await model.generateContent([
-        prompt,
-        { inlineData: { data: base64Data, mimeType } }
-      ]);
+      const response = await callGemini({
+        gcpServiceAccount: env.GCP_SERVICE_ACCOUNT,
+        model: "gemini-2.5-flash",
+        contents: [
+          {
+            role: "user",
+            parts: [
+              { text: prompt },
+              { inlineData: { mimeType, data: base64Data } },
+            ],
+          },
+        ],
+        generationConfig: {
+          responseMimeType: "application/json",
+          thinkingConfig: { thinkingBudget: 1024 },
+        },
+        safetySettings: SAFETY_SETTINGS_NONE,
+      });
 
-      const text = result.response.text();
+      const text = extractText(response);
       const analysisData = parseGeminiJson(text);
 
       // scores: 반드시 10개 항목 강제 보정

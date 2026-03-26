@@ -1,4 +1,4 @@
-import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from "@google/generative-ai";
+import { callGemini, extractText, SAFETY_SETTINGS_NONE } from "./functions/lib/vertex-ai";
 
 function buildPrompt(surveyData, lang) {
   const surveyJson = JSON.stringify(surveyData);
@@ -181,35 +181,34 @@ export default {
         const body = await request.json();
         const { image, surveyData, lang = "ko" } = body;
 
-        if (!env.GOOGLE_API_KEY) {
-          return new Response(JSON.stringify({ error: "API KEY MISSING" }), { 
-            status: 500, 
-            headers: { ...corsHeaders, "Content-Type": "application/json" } 
+        if (!env.GCP_SERVICE_ACCOUNT) {
+          return new Response(JSON.stringify({ error: "GCP_SERVICE_ACCOUNT MISSING" }), {
+            status: 500,
+            headers: { ...corsHeaders, "Content-Type": "application/json" }
           });
         }
-
-        const genAI = new GoogleGenerativeAI(env.GOOGLE_API_KEY);
-        const model = genAI.getGenerativeModel({
-          model: "gemini-2.5-flash",
-          safetySettings: [
-            { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_NONE },
-            { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_NONE },
-            { category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold: HarmBlockThreshold.BLOCK_NONE },
-            { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_NONE },
-          ]
-        });
 
         const prompt = buildPrompt(surveyData, lang);
 
         const base64Data = image.split(",")[1] || image;
         const mimeType = image.startsWith("data:image/png") ? "image/png" : "image/jpeg";
 
-        const result = await model.generateContent([
-          prompt,
-          { inlineData: { data: base64Data, mimeType } }
-        ]);
+        const geminiResponse = await callGemini({
+          gcpServiceAccount: env.GCP_SERVICE_ACCOUNT,
+          model: "gemini-2.5-flash",
+          contents: [
+            {
+              role: "user",
+              parts: [
+                { text: prompt },
+                { inlineData: { mimeType, data: base64Data } },
+              ],
+            },
+          ],
+          safetySettings: SAFETY_SETTINGS_NONE,
+        });
 
-        const text = result.response.text();
+        const text = extractText(geminiResponse);
         const jsonStart = text.indexOf("{");
         const jsonEnd = text.lastIndexOf("}");
         if (jsonStart === -1 || jsonEnd === -1) {

@@ -1,4 +1,4 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { callGemini, extractText } from "../lib/vertex-ai";
 import { getUserFromCookie } from "../_utils/jwt";
 
 const CORS = {
@@ -12,7 +12,7 @@ export const onRequest = async (context: any) => {
   const { request, env } = context;
 
   if (request.method === "OPTIONS") return new Response(null, { headers: CORS });
-  
+
   try {
     const url = new URL(request.url);
     const temp = url.searchParams.get("temp");
@@ -37,9 +37,6 @@ export const onRequest = async (context: any) => {
       }
     }
 
-    const genAI = new GoogleGenerativeAI(env.GOOGLE_API_KEY);
-    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
-
     let prompt = "";
     if (latest && weakest) {
       prompt = `
@@ -47,7 +44,7 @@ export const onRequest = async (context: any) => {
         - 유저의 가장 취약한 지표: ${weakest.label} (점수: ${weakest.score}/100)
         - 현재 날씨: 기온 ${temp}도, 습도 ${humidity}%, 공기질 지수(AQI) ${aqi || '보통'}
         - 유저의 바우만 타입: ${latest.baumannType}
-        
+
         지시사항:
         1. 친절하면서도 전문적인 비서처럼 말하세요.
         2. 날씨 위협 요소와 피부 취약점을 직접 연결하세요.
@@ -58,7 +55,7 @@ export const onRequest = async (context: any) => {
       prompt = `
         당신은 개인 피부 케어 매니저입니다. 현재 날씨 정보를 바탕으로 일반적인 유저에게 오늘 꼭 필요한 피부 케어 '한 문장' 조언을 한국어로 해주세요.
         - 현재 날씨: 기온 ${temp}도, 습도 ${humidity}%, 공기질 지수(AQI) ${aqi || '보통'}
-        
+
         지시사항:
         1. 모든 사람에게 도움될만한 기상 맞춤 조언을 하세요.
         2. 친절하고 구체적인 행동 하나를 제안하세요.
@@ -66,10 +63,15 @@ export const onRequest = async (context: any) => {
       `;
     }
 
-    const result = await model.generateContent(prompt);
-    const briefing = result.response.text().trim();
+    const response = await callGemini({
+      gcpServiceAccount: env.GCP_SERVICE_ACCOUNT,
+      model: "gemini-2.5-flash",
+      contents: [{ role: "user", parts: [{ text: prompt }] }],
+    });
 
-    return new Response(JSON.stringify({ 
+    const briefing = extractText(response).trim();
+
+    return new Response(JSON.stringify({
       briefing,
       priority: Number(humidity) < 30 || Number(temp) > 30 ? "high" : "normal",
       targetMetric: weakest?.label || "일반 케어"

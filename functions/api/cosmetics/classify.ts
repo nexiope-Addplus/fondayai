@@ -1,3 +1,5 @@
+import { callGemini, extractText } from "../../lib/vertex-ai";
+
 const CORS = {
   "Content-Type": "application/json",
   "Access-Control-Allow-Origin": "*",
@@ -36,8 +38,8 @@ function parseGeminiJson(text: string) {
     candidate,
     candidate
       .replace(/```json|```/gi, "")
-      .replace(/[“”]/g, '"')
-      .replace(/[‘’]/g, "'")
+      .replace(/[""]/g, '"')
+      .replace(/['']/g, "'")
       .replace(/,\s*([}\]])/g, "$1")
       .replace(/([{,]\s*)([A-Za-z0-9_]+)\s*:/g, '$1"$2":'),
   ];
@@ -71,9 +73,8 @@ export const onRequest = async (context: any) => {
     return new Response(JSON.stringify({ error: "imageBase64 필요" }), { status: 400, headers: CORS });
   }
 
-  const apiKey = env.GOOGLE_API_KEY;
-  if (!apiKey) {
-    return new Response(JSON.stringify({ error: "API key 없음" }), { status: 500, headers: CORS });
+  if (!env.GCP_SERVICE_ACCOUNT) {
+    return new Response(JSON.stringify({ error: "GCP_SERVICE_ACCOUNT 없음" }), { status: 500, headers: CORS });
   }
 
   try {
@@ -92,27 +93,22 @@ JSON으로만 응답하세요 (다른 텍스트 절대 금지):
 4. 스킨케어 제품이지만 정확한 분류가 애매하면 category="기타스킨케어".
 5. confidence는 사진에서 텍스트/제품 유형이 얼마나 분명한지 high|medium|low 중 하나로 반환.`;
 
-    const geminiRes = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          contents: [
-            {
-              parts: [
-                { inline_data: { mime_type: mimeType, data: imageData } },
-                { text: prompt },
-              ],
-            },
+    const response = await callGemini({
+      gcpServiceAccount: env.GCP_SERVICE_ACCOUNT,
+      model: "gemini-2.5-flash",
+      contents: [
+        {
+          role: "user",
+          parts: [
+            { inlineData: { mimeType, data: imageData } },
+            { text: prompt },
           ],
-          generationConfig: { responseMimeType: "application/json" },
-        }),
-      }
-    );
+        },
+      ],
+      generationConfig: { responseMimeType: "application/json" },
+    });
 
-    const geminiData: any = await geminiRes.json();
-    const text = geminiData?.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
+    const text = extractText(response);
     const parsed = parseGeminiJson(text);
     parsed.category = normalizeCategory(parsed.category);
     if (parsed.category === "스킨케어아님") parsed.isSkincareRelevant = false;

@@ -1,4 +1,4 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { callGemini, extractText } from "../../lib/vertex-ai";
 import { getUserFromCookie } from "../../_utils/jwt";
 
 const CORS = {
@@ -101,11 +101,13 @@ ${cosmeticList}
 ]
 `;
 
-    const genAI = new GoogleGenerativeAI(env.GOOGLE_API_KEY);
-    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
-    const result = await model.generateContent(prompt);
-    const text = result.response.text().trim();
+    const response = await callGemini({
+      gcpServiceAccount: env.GCP_SERVICE_ACCOUNT,
+      model: "gemini-2.5-flash",
+      contents: [{ role: "user", parts: [{ text: prompt }] }],
+    });
 
+    const text = extractText(response).trim();
     const grades = parseGeminiJson(text);
     if (!Array.isArray(grades)) throw new Error("Invalid response format");
 
