@@ -49,7 +49,7 @@ export const FONT_DISPLAY = "'Fraunces', Georgia, serif";
 export const FONT_HEADING = "'LINESeedKR', Pretendard, sans-serif";
 
 // Shadow 토큰
-export const SHADOW_CARD = "0 2px 12px rgba(0,0,0,0.08)";
+export const SHADOW_CARD = "0 0 0 1px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.04)";
 export const SHADOW_ELEVATED = "0 8px 32px rgba(0,0,0,0.10)";
 
 // Border-radius 토큰
