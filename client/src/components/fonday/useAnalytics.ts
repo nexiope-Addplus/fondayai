@@ -46,6 +46,7 @@ export function useAnalytics(lang?: string, isGuest?: boolean) {
       // 논블로킹 fire-and-forget
       fetch("/api/events", {
         method: "POST",
+        credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           event_type: eventType,
