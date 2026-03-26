@@ -305,7 +305,7 @@ export function ScanIdleScreen({
           <div className="mb-4">
             {/* One Big Number — 시각적 앵커 */}
             <div className="text-center py-4">
-              <p className="text-[13px] font-semibold uppercase tracking-[0.12em] mb-2" style={{ color: TEXT_TERTIARY }}>
+              <p className="text-[14px] font-bold uppercase tracking-[0.10em] mb-2" style={{ color: TEXT_TERTIARY }}>
                 {t("result.overall")}
               </p>
               <p className="text-[56px] font-normal leading-none" style={{ color: DEEP_GREEN, fontFamily: FONT_DISPLAY }}>
