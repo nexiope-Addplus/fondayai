@@ -92,8 +92,10 @@ export default function SkinScanPage() {
 
   useEffect(() => {
     const handler = (e: any) => { e.preventDefault(); setDeferredPrompt(e); };
+    const installed = () => { trackEvent("pwa_prompt_accepted"); setDeferredPrompt(null); };
     window.addEventListener("beforeinstallprompt", handler);
-    return () => window.removeEventListener("beforeinstallprompt", handler);
+    window.addEventListener("appinstalled", installed);
+    return () => { window.removeEventListener("beforeinstallprompt", handler); window.removeEventListener("appinstalled", installed); };
   }, []);
 
   const handleInstall = async () => {
