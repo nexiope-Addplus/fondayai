@@ -47,7 +47,7 @@ export function ResultDiaryCard({
             {avatar && <img src={avatar} alt="" aria-hidden="true" className="w-7 h-7 rounded-full shrink-0" />}
           </div>
 
-          <div className="mt-3 rounded-2xl p-3" style={{ background: delta > 0 ? "#F0FDF4" : delta < 0 ? "#FFF5F5" : "#F2F4F3" }}>
+          <div className="mt-3 rounded-2xl p-3" style={{ background: delta > 0 ? "#F0FDF4" : delta < 0 ? "#FFF5F5" : "#F0F0F1" }}>
             {previousScore !== null ? (
               <div className="flex items-center gap-3">
                 <span className="text-[28px] font-normal leading-none" style={{ fontFamily: FONT_DISPLAY, color: delta > 0 ? "#059669" : delta < 0 ? "#DC2626" : "#A8A29E" }}>
