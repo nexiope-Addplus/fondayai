@@ -251,8 +251,10 @@ export default function SkinScanPage() {
     localStorage.removeItem("fonday_return_tab");
   }, [user]);
 
-  // app_open — 최초 마운트 시 1회
+  // app_open — 세션당 1회만
   useEffect(() => {
+    if (sessionStorage.getItem("fonday_app_opened")) return;
+    sessionStorage.setItem("fonday_app_opened", "1");
     trackEvent("app_open", { lang: i18n.language });
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
