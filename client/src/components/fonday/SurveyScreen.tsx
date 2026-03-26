@@ -20,7 +20,7 @@ export function SurveyScreen({ onSubmit, onBack }: {
   const toggleConcern = (i: number) => setConcernIdxs(prev => prev.includes(i) ? prev.filter(x => x !== i) : [...prev, i]);
 
   return (
-    <motion.div className="flex flex-col h-[calc(100dvh-64px)]" style={{ background: "linear-gradient(180deg, #FDFCFA 0%, #F8F5F1 50%, #FDFCFA 100%)" }} variants={stagger} initial="initial" animate="animate">
+    <motion.div className="flex flex-col h-[calc(100dvh-64px)]" style={{ background: "linear-gradient(180deg, #FAFBFB 0%, #F3F6F5 50%, #FAFBFB 100%)" }} variants={stagger} initial="initial" animate="animate">
       <motion.div variants={fadeChild} className="px-5 pt-8 pb-2 shrink-0">
         <div className="flex items-center gap-2 mb-1">
           <Button variant="ghost" size="icon" onClick={onBack} className="-ml-2">

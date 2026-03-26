@@ -52,14 +52,14 @@
 | Salmon | #C97062 | 행동 유도 (메인 CTA, 선택 상태) |
 
 ### 배경
-- **페이지:** `linear-gradient(180deg, #FDFCFA 0%, #F8F5F1 50%, #FDFCFA 100%)`
+- **페이지:** `linear-gradient(180deg, #FAFBFB 0%, #F3F6F5 50%, #FAFBFB 100%)` — 미세 세이지 틴트
 - **카드:** #FFFFFF + `boxShadow: 0 1px 6px rgba(0,0,0,0.04)`
-- **서브 영역:** BG_MUTED (#F8F7F5) — 카드 안에서 구분
-- **기능적 배경:** TINT_GREEN, TINT_WARM — "좋다/나쁘다/주의" 전달 시에만
+- **서브 영역:** BG_MUTED (#F2F4F3) — 카드 안에서 구분
+- **기능적 배경:** TINT_GREEN (#EDF5F2), TINT_WARM (#FDF4F1) — "좋다/나쁘다/주의" 전달 시에만
 
 ### 3단계 깊이
 ```
-배경 (그라데이션 베이지) ← 가장 뒤
+배경 (미세 세이지 틴트) ← 가장 뒤
   └─ 카드 (#FFFFFF + shadow) ← 떠 있는 느낌
        └─ 서브 요소 (BG_MUTED) ← 카드 안에서 구분
 ```
