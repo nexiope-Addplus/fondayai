@@ -62,8 +62,21 @@ async function ensureResvg() {
 }
 
 const PRETENDARD = "https://cdn.jsdelivr.net/npm/pretendard@1.3.9/dist/public/static";
+const LINESEED   = "https://cdn.jsdelivr.net/npm/line-seed-kr@1.0.1/fonts";
 // No version pin — always resolves to latest published @fontsource/noto-sans-jp
 const NOTO_JP    = "https://cdn.jsdelivr.net/npm/@fontsource/noto-sans-jp/files";
+
+async function loadLINESeedKR(): Promise<Uint8Array[]> {
+  try {
+    const [r, b] = await Promise.all([
+      fetch(`${LINESEED}/LINESeedKR-Rg.woff2`).then(x => x.arrayBuffer()),
+      fetch(`${LINESEED}/LINESeedKR-Bd.woff2`).then(x => x.arrayBuffer()),
+    ]);
+    return [new Uint8Array(r), new Uint8Array(b)];
+  } catch {
+    return [];
+  }
+}
 
 async function loadPretendard(): Promise<Uint8Array[]> {
   const [r, b, bk] = await Promise.all([
@@ -92,7 +105,12 @@ async function getFonts(lang: string): Promise<Uint8Array[]> {
       buffers = await loadPretendard();
     }
   } else {
-    buffers = await loadPretendard();
+    // Load LINESeedKR (primary) + Pretendard (fallback) together
+    const [lineSeed, pretendard] = await Promise.all([
+      loadLINESeedKR(),
+      loadPretendard(),
+    ]);
+    buffers = [...lineSeed, ...pretendard];
   }
   fontCache[key] = buffers;
   return buffers;
@@ -163,7 +181,7 @@ function tx(
   size: number, fill: string,
   opts?: { weight?: number; anchor?: "start"|"middle"|"end"; opacity?: number; ff?: string }
 ): string {
-  const { weight = 400, anchor = "start", opacity = 1, ff = "Pretendard" } = opts ?? {};
+  const { weight = 400, anchor = "start", opacity = 1, ff = "LINESeedKR, Pretendard" } = opts ?? {};
   return `<text x="${x}" y="${y}" font-family="${ff}" font-size="${size}" font-weight="${weight}" fill="${fill}" text-anchor="${anchor}" opacity="${opacity}">${esc(content)}</text>`;
 }
 
@@ -175,9 +193,9 @@ function rect(x: number, y: number, w: number, h: number, fill: string, rx = 0):
 function header(dateStr: string, ff: string): { svg: string; y: number } {
   let s = "";
   s += rect(0, 0, W, 10, `url(#grad)`);
-  s += tx(PAD, 80, "FondayAI", 38, "#1E293B", { weight: 900, ff });
+  s += tx(PAD, 80, "Fonday\u00B0", 38, "#4A403A", { weight: 900, ff });
   s += tx(W - PAD, 80, dateStr, 28, SCAN_TO, { weight: 800, anchor: "end", ff });
-  s += rect(PAD, 100, W - PAD * 2, 2, "#E2E8F0");
+  s += rect(PAD, 100, W - PAD * 2, 2, "#EBEBEB");
   return { svg: s, y: 130 };
 }
 
@@ -185,20 +203,17 @@ function header(dateStr: string, ff: string): { svg: string; y: number } {
 function footer(text: string, ff: string): string {
   const FY = H - 110;
   let s = rect(PAD, FY, W - PAD * 2, 80, "white", 40);
-  s += tx(W / 2, FY + 52, text, 26, "#1E293B", { weight: 900, anchor: "middle", ff });
+  s += tx(W / 2, FY + 52, text, 26, "#4A403A", { weight: 900, anchor: "middle", ff });
   return s;
 }
 
 const DEFS = `
   <linearGradient id="grad" x1="0" y1="0" x2="1" y2="0">
     <stop offset="0%" stop-color="${SCAN_FROM}"/><stop offset="100%" stop-color="${SCAN_TO}"/>
-  </linearGradient>
-  <linearGradient id="bgGrad" x1="0" y1="0" x2="0" y2="1">
-    <stop offset="0%" stop-color="#F8FAFC"/><stop offset="100%" stop-color="#F1F5F9"/>
   </linearGradient>`;
 
 function slide(inner: string): string {
-  return `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}"><defs>${DEFS}</defs>${rect(0, 0, W, H, "url(#bgGrad)")}${inner}</svg>`;
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}"><defs>${DEFS}</defs>${rect(0, 0, W, H, "#FFFFFF")}${inner}</svg>`;
 }
 
 // ── Slide 1: Cover ────────────────────────────────────────────────────────────
@@ -211,14 +226,14 @@ function buildSvgSlide1(d: SlideData): string {
 
   // Ranking badge
   if (rankingPercentile !== undefined) {
-    s += rect(W / 2 - 160, y, 320, 64, "#1E293B", 32);
-    s += tx(W / 2, y + 42, `TOP ${rankingPercentile}% ${i18nTexts.rankLabel}`, 30, "#FBBF24", { weight: 900, anchor: "middle", ff });
+    s += rect(W / 2 - 160, y, 320, 64, "#4A403A", 32);
+    s += tx(W / 2, y + 42, `TOP ${rankingPercentile}% ${i18nTexts.rankLabel}`, 30, "#C97062", { weight: 900, anchor: "middle", ff });
     y += 84;
   }
 
   // Baumann type
-  s += tx(W / 2, y + 180, finalType, 200, SCAN_TO, { weight: 900, anchor: "middle", ff });
-  y += 220;
+  s += tx(W / 2, y + 140, finalType, 160, SCAN_TO, { weight: 900, anchor: "middle", ff });
+  y += 180;
 
   // Baumann badges
   const letters = finalType.split("");
@@ -241,15 +256,15 @@ function buildSvgSlide1(d: SlideData): string {
   const totalW = hasSkinAge ? boxW * 2 + 20 : boxW;
   const boxX = (W - totalW) / 2;
 
-  s += rect(boxX, y, boxW, boxH, "white", 24);
+  s += `<rect x="${boxX}" y="${y}" width="${boxW}" height="${boxH}" fill="white" rx="24" stroke="#EBEBEB" stroke-width="1"/>`;
   s += tx(boxX + boxW / 2, y + 76, `${overallScore}${scoreSuffix}`, 72, SCAN_TO, { weight: 900, anchor: "middle", ff });
-  s += tx(boxX + boxW / 2, y + 112, i18nTexts.overallScoreLabel, 26, "#94A3B8", { weight: 700, anchor: "middle", ff });
+  s += tx(boxX + boxW / 2, y + 112, i18nTexts.overallScoreLabel, 26, "#B0A898", { weight: 700, anchor: "middle", ff });
 
   if (hasSkinAge) {
     const bx2 = boxX + boxW + 20;
-    s += rect(bx2, y, boxW, boxH, "white", 24);
-    s += tx(bx2 + boxW / 2, y + 76, `${skinAge}${i18nTexts.skinAgeSuffix}`, 72, "#8B5CF6", { weight: 900, anchor: "middle", ff });
-    s += tx(bx2 + boxW / 2, y + 112, i18nTexts.skinAgeLabel, 26, "#94A3B8", { weight: 700, anchor: "middle", ff });
+    s += `<rect x="${bx2}" y="${y}" width="${boxW}" height="${boxH}" fill="white" rx="24" stroke="#EBEBEB" stroke-width="1"/>`;
+    s += tx(bx2 + boxW / 2, y + 76, `${skinAge}${i18nTexts.skinAgeSuffix}`, 72, "#4A7C6E", { weight: 900, anchor: "middle", ff });
+    s += tx(bx2 + boxW / 2, y + 112, i18nTexts.skinAgeLabel, 26, "#B0A898", { weight: 700, anchor: "middle", ff });
   }
   y += boxH + 30;
 
@@ -257,9 +272,10 @@ function buildSvgSlide1(d: SlideData): string {
   if (aiComment) {
     const lines = wrap(`"${aiComment}"`, 26);
     const cH = 60 + lines.length * 50;
-    s += rect(PAD, y, W - PAD * 2, cH, "white", 24);
+    s += `<rect x="${PAD}" y="${y}" width="${W - PAD * 2}" height="${cH}" fill="white" rx="24" stroke="#EBEBEB" stroke-width="1"/>`;
+    s += rect(PAD, y, 4, cH, SCAN_TO, 2);
     lines.forEach((ln, i) => {
-      s += tx(W / 2, y + 50 + i * 50, ln, 30, "#334155", { weight: 700, anchor: "middle", ff });
+      s += tx(W / 2, y + 50 + i * 50, ln, 30, "#4A403A", { weight: 700, anchor: "middle", ff });
     });
     y += cH + 16;
   }
@@ -275,12 +291,12 @@ function buildSvgSlide2(d: SlideData): string {
   const { svg: hdrSvg, y: hY } = header(dateStr, ff);
   let s = hdrSvg;
 
-  s += tx(PAD, hY + 50, "SKIN SPECS", 52, "#1E293B", { weight: 900, ff });
-  s += tx(PAD, hY + 90, i18nTexts.slide2Sub, 28, "#64748B", { weight: 700, ff });
+  s += tx(PAD, hY + 50, "SKIN SPECS", 52, "#4A403A", { weight: 900, ff });
+  s += tx(PAD, hY + 90, i18nTexts.slide2Sub, 28, "#8C8078", { weight: 700, ff });
 
   const cardY = hY + 120;
   const cardH = H - cardY - 130;
-  s += rect(PAD, cardY, W - PAD * 2, cardH, "white", 24);
+  s += `<rect x="${PAD}" y="${cardY}" width="${W - PAD * 2}" height="${cardH}" fill="white" rx="24" stroke="#EBEBEB" stroke-width="1"/>`;
 
   const rowH = Math.floor(cardH / 10);
   const barX = PAD + 20, barW = W - PAD * 2 - 40;
@@ -294,12 +310,12 @@ function buildSvgSlide2(d: SlideData): string {
     const rowY = cardY + i * rowH;
     const midY = rowY + rowH / 2;
 
-    s += tx(barX, midY + 10, label, 26, "#475569", { weight: 800, ff });
-    s += rect(progressX, midY - 8, progressW, 16, "#F1F5F9", 8);
+    s += tx(barX, midY + 10, label, 26, "#4A403A", { weight: 800, ff });
+    s += rect(progressX, midY - 8, progressW, 16, "#F0F0F0", 8);
     s += rect(progressX, midY - 8, Math.round(progressW * sc.score / 100), 16, color, 8);
     s += tx(barX + barW - scoreW, midY + 10, String(sc.score), 30, color, { weight: 900, anchor: "end", ff });
 
-    if (i < 9) s += rect(barX, rowY + rowH - 1, barW, 1, "#F1F5F9");
+    if (i < 9) s += rect(barX, rowY + rowH - 1, barW, 1, "#F0F0F0");
   });
 
   s += footer(i18nTexts.footerText, ff);
@@ -313,11 +329,11 @@ function buildSvgSlide3(d: SlideData): string {
   const { svg: hdrSvg, y: hY } = header(dateStr, ff);
   let s = hdrSvg;
 
-  s += tx(PAD, hY + 50, "AI SOLUTION", 52, "#1E293B", { weight: 900, ff });
-  s += tx(PAD, hY + 90, i18nTexts.slide3Sub, 28, "#64748B", { weight: 700, ff });
+  s += tx(PAD, hY + 50, "SOLUTION", 52, "#4A403A", { weight: 900, ff });
+  s += tx(PAD, hY + 90, i18nTexts.slide3Sub, 28, "#8C8078", { weight: 700, ff });
 
-  const impColors = ["#F43F5E", "#10B981", "#8B5CF6"];
-  const impBgs = ["#FFF1F2", "#ECFDF5", "#F5F3FF"];
+  const impColors = ["#C97062", "#4A7C6E", "#D97706"];
+  const impBgs = ["#FDF4F1", "#EDF5F2", "#FFF8ED"];
   let y = hY + 130;
   const cardW = W - PAD * 2;
 
@@ -328,9 +344,9 @@ function buildSvgSlide3(d: SlideData): string {
     const cardH = 80 + descLines.length * 44;
     s += rect(PAD, y, cardW, cardH, bg, 20);
     s += rect(PAD, y, 8, cardH, c, 4);
-    s += tx(PAD + 30, y + 40, imp.title, 32, "#1E293B", { weight: 900, ff });
+    s += tx(PAD + 30, y + 40, imp.title, 32, "#4A403A", { weight: 900, ff });
     descLines.forEach((ln, j) => {
-      s += tx(PAD + 30, y + 72 + j * 44, ln, 26, "#475569", { weight: 600, ff });
+      s += tx(PAD + 30, y + 72 + j * 44, ln, 26, "#8C8078", { weight: 600, ff });
     });
     y += cardH + 20;
   });
@@ -339,11 +355,11 @@ function buildSvgSlide3(d: SlideData): string {
     const cos = cosmetics[0];
     const cLines = wrap(cos.reason, 38);
     const cosH = 72 + cLines.length * 40;
-    s += rect(PAD, y, cardW, cosH, "white", 20);
-    s += tx(PAD + 20, y + 36, i18nTexts.recIngredient, 20, "#64748B", { weight: 900, ff });
+    s += `<rect x="${PAD}" y="${y}" width="${cardW}" height="${cosH}" fill="white" rx="20" stroke="#EBEBEB" stroke-width="1"/>`;
+    s += tx(PAD + 20, y + 36, i18nTexts.recIngredient, 20, "#8C8078", { weight: 900, ff });
     s += tx(PAD + 20, y + 68, cos.key, 32, SCAN_TO, { weight: 900, ff });
     cLines.forEach((ln, j) => {
-      s += tx(PAD + 20, y + 68 + 38 + j * 40, ln, 24, "#475569", { weight: 600, ff });
+      s += tx(PAD + 20, y + 68 + 38 + j * 40, ln, 24, "#8C8078", { weight: 600, ff });
     });
   }
 
@@ -358,8 +374,8 @@ function buildSvgSlide4(d: SlideData): string {
   const { svg: hdrSvg, y: hY } = header(dateStr, ff);
   let s = hdrSvg;
 
-  s += tx(PAD, hY + 50, "INNER BEAUTY", 52, "#1E293B", { weight: 900, ff });
-  s += tx(PAD, hY + 90, `${finalType} ${i18nTexts.slide4Sub}`, 28, "#64748B", { weight: 700, ff });
+  s += tx(PAD, hY + 50, "INNER BEAUTY", 52, "#4A403A", { weight: 900, ff });
+  s += tx(PAD, hY + 90, `${finalType} ${i18nTexts.slide4Sub}`, 28, "#8C8078", { weight: 700, ff });
 
   const letters = finalType.split("").filter(l => l in nutrients);
   const colW = (W - PAD * 2 - 20) / 2;
@@ -375,13 +391,13 @@ function buildSvgSlide4(d: SlideData): string {
 
     const whyLines = wrap(nut.why, 20);
     const cardH = 200 + whyLines.length * 38;
-    s += rect(cx, cy, colW, cardH, "white", 20);
+    s += `<rect x="${cx}" y="${cy}" width="${colW}" height="${cardH}" fill="white" rx="20" stroke="#EBEBEB" stroke-width="1"/>`;
     s += rect(cx + 20, cy + 20, 60, 60, `${color}22`, 16);
     s += tx(cx + 50, cy + 62, letter, 36, color, { weight: 900, anchor: "middle", ff });
     s += tx(cx + 20, cy + 110, nut.name, 32, color, { weight: 900, ff });
-    s += tx(cx + 20, cy + 148, nut.foods, 22, "#64748B", { weight: 800, ff });
+    s += tx(cx + 20, cy + 148, nut.foods, 22, "#8C8078", { weight: 800, ff });
     whyLines.forEach((ln, j) => {
-      s += tx(cx + 20, cy + 182 + j * 38, ln, 22, "#475569", { weight: 600, ff });
+      s += tx(cx + 20, cy + 182 + j * 38, ln, 22, "#8C8078", { weight: 600, ff });
     });
   });
 
@@ -396,8 +412,8 @@ function buildSvgSlide5(d: SlideData): string {
   const { svg: hdrSvg, y: hY } = header(dateStr, ff);
   let s = hdrSvg;
 
-  s += tx(PAD, hY + 50, "DANGER ZONE", 52, "#1E293B", { weight: 900, ff });
-  s += tx(PAD, hY + 90, i18nTexts.slide5Sub, 28, "#64748B", { weight: 700, ff });
+  s += tx(PAD, hY + 50, "DANGER ZONE", 52, "#4A403A", { weight: 900, ff });
+  s += tx(PAD, hY + 90, i18nTexts.slide5Sub, 28, "#8C8078", { weight: 700, ff });
 
   function avoidSection(
     items: Array<{ food: string; why: string }>,
@@ -412,7 +428,7 @@ function buildSvgSlide5(d: SlideData): string {
     }
     const sectionH = 80 + itemsH;
 
-    let inner = rect(PAD, startY, W - PAD * 2, sectionH, "white", 20);
+    let inner = `<rect x="${PAD}" y="${startY}" width="${W - PAD * 2}" height="${sectionH}" fill="white" rx="20" stroke="#EBEBEB" stroke-width="1"/>`;
     inner += rect(PAD, startY, W - PAD * 2, 8, topColor, 4);
     inner += tx(PAD + 20, startY + 48, label, 28, topColor, { weight: 900, ff });
     inner += rect(PAD + 20, startY + 60, W - PAD * 2 - 40, 2, `${topColor}40`);
@@ -421,9 +437,9 @@ function buildSvgSlide5(d: SlideData): string {
     items.slice(0, 3).forEach((item, idx) => {
       const whyLines = wrap(item.why, 36);
       inner += tx(PAD + 14, iy + 32, "X", 26, "#EF4444", { weight: 900, ff });
-      inner += tx(PAD + 46, iy + 36, item.food, 30, "#1E293B", { weight: 900, ff });
+      inner += tx(PAD + 46, iy + 36, item.food, 30, "#4A403A", { weight: 900, ff });
       whyLines.forEach((ln, j) => {
-        inner += tx(PAD + 46, iy + 68 + j * 36, ln, 24, "#64748B", { weight: 600, ff });
+        inner += tx(PAD + 46, iy + 68 + j * 36, ln, 24, "#8C8078", { weight: 600, ff });
       });
       iy += itemHeights[idx];
     });
@@ -433,7 +449,7 @@ function buildSvgSlide5(d: SlideData): string {
 
   const sec1 = avoidSection(avoidLunch, "DAYTIME AVOID", "#F59E0B", hY + 130);
   s += sec1.svg;
-  const sec2 = avoidSection(avoidDinner, "NIGHTTIME AVOID", "#8B5CF6", sec1.endY + 20);
+  const sec2 = avoidSection(avoidDinner, "NIGHTTIME AVOID", "#4A403A", sec1.endY + 20);
   s += sec2.svg;
 
   s += footer(i18nTexts.footerText, ff);
@@ -451,7 +467,7 @@ const FALLBACK_I18N: I18nTexts = {
   recIngredient: "RECOMMENDED INGREDIENT",
   slide4Sub: "맞춤 이너뷰티 솔루션",
   slide5Sub: "오늘은 이거 딱 참아보자!",
-  footerText: "피부 챌린지 같이 할 사람? 검색 > Fonday AI",
+  footerText: "Fonday\u00B0 에서 무료 피부분석 받기",
 };
 
 // ── CORS + handler ────────────────────────────────────────────────────────────
@@ -471,7 +487,7 @@ export const onRequest = async (context: any) => {
   catch { return new Response(JSON.stringify({ error: "Invalid JSON" }), { status: 400, headers: CORS }); }
 
   // Compute fontFamily server-side based on lang
-  body.fontFamily = body.lang === "ja" ? "Noto Sans JP" : "Pretendard";
+  body.fontFamily = body.lang === "ja" ? "Noto Sans JP" : "LINESeedKR, Pretendard";
   // Fallback for clients that don't send i18nTexts yet
   if (!body.i18nTexts) body.i18nTexts = FALLBACK_I18N;
 
