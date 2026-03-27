@@ -1172,6 +1172,8 @@
     "effectTrackedValue": "{{days}} days",
     "effectScanLabel": "Linked scans",
     "effectScanValue": "{{count}} scans",
+    "effectGroupSuffix": "and {{count}} more",
+    "effectGroupHint": "These are used together, so individual effects can't be isolated yet. Try switching one product at a time.",
     "signalCardTitle": "Scan correlation briefing",
     "signalMetricLabel": "Strongest moving metric",
     "signalMetricFallback": "Overall condition",

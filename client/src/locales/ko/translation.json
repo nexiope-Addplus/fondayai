@@ -1172,6 +1172,8 @@
     "effectTrackedValue": "{{days}}일",
     "effectScanLabel": "연결 스캔",
     "effectScanValue": "{{count}}회",
+    "effectGroupSuffix": "외 {{count}}개 제품",
+    "effectGroupHint": "동시에 사용 중이라 개별 효과를 구분하기 어려워요. 한 제품씩 바꿔보면 더 정확한 분석이 가능해요.",
     "signalCardTitle": "스캔 상관관계 브리핑",
     "signalMetricLabel": "가장 크게 움직인 항목",
     "signalMetricFallback": "종합 컨디션",

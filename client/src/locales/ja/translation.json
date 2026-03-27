@@ -1170,6 +1170,8 @@
     "effectTrackedValue": "{{days}}日",
     "effectScanLabel": "連動スキャン",
     "effectScanValue": "{{count}}回",
+    "effectGroupSuffix": "他{{count}}製品",
+    "effectGroupHint": "同時に使用中のため個別効果の判別が難しいです。1つずつ切り替えるとより正確な分析ができます。",
     "signalCardTitle": "スキャン相関ブリーフィング",
     "signalMetricLabel": "最も動いた指標",
     "signalMetricFallback": "総合コンディション",

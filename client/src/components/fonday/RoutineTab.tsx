@@ -278,38 +278,58 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
               </div>
             </div>
             <div className="space-y-2.5">
-              {productSignals.slice(0, 3).map((signal) => {
-                const mainMetric = signal.topScoreIndex !== null ? t(`scores.${signal.topScoreIndex}`) : t("cosmetics.signalMetricFallback");
-                const deltaValue = signal.topScoreDelta ?? signal.overallDelta ?? 0;
-                const positive = deltaValue >= 0;
-                return (
-                  <div key={`effect-${signal.itemId}`} className="rounded-2xl p-3" style={{ background: "#FAF8F5" }}>
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="min-w-0">
-                        <p className="text-[12px] font-bold text-[#5C4F4A] truncate">{signal.itemName}</p>
-                        <p className="text-xs text-stone-500 mt-1 text-kr-pretty">{signal.note}</p>
+              {(() => {
+                // 동일 점수+설명 시그널 묶기
+                const grouped: { key: string; signals: typeof productSignals; delta: number; note: string; topScoreIndex: number | null; daysTracked: number; afterCount: number }[] = [];
+                for (const signal of productSignals) {
+                  const delta = signal.topScoreDelta ?? signal.overallDelta ?? 0;
+                  const key = `${delta}_${signal.note}`;
+                  const existing = grouped.find(g => g.key === key);
+                  if (existing) {
+                    existing.signals.push(signal);
+                  } else {
+                    grouped.push({ key, signals: [signal], delta, note: signal.note, topScoreIndex: signal.topScoreIndex, daysTracked: signal.daysTracked, afterCount: signal.afterCount });
+                  }
+                }
+                return grouped.slice(0, 3).map((group) => {
+                  const mainMetric = group.topScoreIndex !== null ? t(`scores.${group.topScoreIndex}`) : t("cosmetics.signalMetricFallback");
+                  const positive = group.delta >= 0;
+                  const names = group.signals.map(s => s.itemName);
+                  const displayName = names.length <= 2 ? names.join(", ") : `${names[0]} ${t("cosmetics.effectGroupSuffix", { count: names.length - 1 })}`;
+                  return (
+                    <div key={group.key} className="rounded-2xl p-3" style={{ background: "#FAF8F5" }}>
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="min-w-0">
+                          <p className="text-[12px] font-bold text-[#5C4F4A]">{displayName}</p>
+                          <p className="text-xs text-stone-500 mt-1 text-kr-pretty">{group.note}</p>
+                          {names.length > 2 && (
+                            <p className="text-xs mt-1.5" style={{ color: SCAN_TO }}>
+                              {t("cosmetics.effectGroupHint", "동시에 사용 중이라 개별 효과를 구분하기 어려워요")}
+                            </p>
+                          )}
+                        </div>
+                        <span className="rounded-full px-2 py-0.5 text-xs font-bold shrink-0" style={{ background: `${positive ? DEEP_GREEN : SCAN_TO}12`, color: positive ? DEEP_GREEN : SCAN_TO }}>
+                          {positive ? "+" : ""}{group.delta}
+                        </span>
                       </div>
-                      <span className="rounded-full px-2 py-0.5 text-xs font-bold shrink-0" style={{ background: `${positive ? DEEP_GREEN : SCAN_TO}12`, color: positive ? DEEP_GREEN : SCAN_TO }}>
-                        {positive ? "+" : ""}{deltaValue}
-                      </span>
+                      <div className="grid grid-cols-3 gap-2 mt-3">
+                        <div className="rounded-2xl p-2.5 bg-white">
+                          <p className="text-xs text-stone-400">{t("cosmetics.effectMetricLabel")}</p>
+                          <p className="text-xs font-bold mt-1 text-[#5C4F4A]">{mainMetric}</p>
+                        </div>
+                        <div className="rounded-2xl p-2.5 bg-white">
+                          <p className="text-xs text-stone-400">{t("cosmetics.effectTrackedLabel")}</p>
+                          <p className="text-xs font-bold mt-1 text-[#5C4F4A]">{t("cosmetics.effectTrackedValue", { days: group.daysTracked })}</p>
+                        </div>
+                        <div className="rounded-2xl p-2.5 bg-white">
+                          <p className="text-xs text-stone-400">{t("cosmetics.effectScanLabel")}</p>
+                          <p className="text-xs font-bold mt-1 text-[#5C4F4A]">{t("cosmetics.effectScanValue", { count: group.afterCount })}</p>
+                        </div>
+                      </div>
                     </div>
-                    <div className="grid grid-cols-3 gap-2 mt-3">
-                      <div className="rounded-2xl p-2.5 bg-white">
-                        <p className="text-xs text-stone-400">{t("cosmetics.effectMetricLabel")}</p>
-                        <p className="text-xs font-bold mt-1 text-[#5C4F4A]">{mainMetric}</p>
-                      </div>
-                      <div className="rounded-2xl p-2.5 bg-white">
-                        <p className="text-xs text-stone-400">{t("cosmetics.effectTrackedLabel")}</p>
-                        <p className="text-xs font-bold mt-1 text-[#5C4F4A]">{t("cosmetics.effectTrackedValue", { days: signal.daysTracked })}</p>
-                      </div>
-                      <div className="rounded-2xl p-2.5 bg-white">
-                        <p className="text-xs text-stone-400">{t("cosmetics.effectScanLabel")}</p>
-                        <p className="text-xs font-bold mt-1 text-[#5C4F4A]">{t("cosmetics.effectScanValue", { count: signal.afterCount })}</p>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
+                  );
+                });
+              })()}
             </div>
           </div>
         )}
