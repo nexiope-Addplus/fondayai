@@ -32,6 +32,7 @@ import {
 import { getAttendance } from "./utils";
 import { AttendanceCalendarModal } from "./AttendanceCalendarModal";
 import { PartnershipModal } from "./PartnershipModal";
+import { WaitlistModal } from "./WaitlistModal";
 import type { AnalysisResult } from "./types";
 
 // Re-export for backward compatibility
@@ -63,6 +64,10 @@ export function MyScreen({
   const [loadingScans, setLoadingScans] = useState(false);
   const [deviceExpanded, setDeviceExpanded] = useState(false);
   const [showProductPage, setShowProductPage] = useState(false);
+  const [showDeviceInquiry, setShowDeviceInquiry] = useState(false);
+  const [deviceEmail, setDeviceEmail] = useState("");
+  const [deviceSubmitting, setDeviceSubmitting] = useState(false);
+  const [deviceSuccess, setDeviceSuccess] = useState(false);
   const [showPartnership, setShowPartnership] = useState(false);
   const [partnerForm, setPartnerForm] = useState({ name: "", company: "", email: "", message: "" });
   const [isPartnerSubmitting, setIsPartnerSubmitting] = useState(false);
@@ -81,6 +86,22 @@ export function MyScreen({
 
   const handleLogout = () => {
     fetch('/api/logout', { method: 'POST' }).then(() => window.location.reload());
+  };
+
+  const handleDeviceInquiry = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setDeviceSubmitting(true);
+    try {
+      const res = await fetch("https://formspree.io/f/xzdjpden", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: deviceEmail, type: "device_inquiry" }),
+      });
+      if (res.ok) {
+        setDeviceSuccess(true);
+        setTimeout(() => { setShowDeviceInquiry(false); setDeviceSuccess(false); setDeviceEmail(""); }, 2000);
+      }
+    } catch {} finally { setDeviceSubmitting(false); }
   };
 
   const handlePartnershipSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -323,15 +344,24 @@ export function MyScreen({
                     />
                   </div>
 
-                  {/* 자세히 보기 버튼 */}
-                  <button
-                    onClick={() => setShowProductPage(true)}
-                    className="w-full flex items-center justify-center gap-2 text-[13px] font-bold py-3 rounded-2xl active:opacity-70"
-                    style={{ background: TINT_WARM, color: SCAN_TO }}
-                  >
-                    <ExternalLink className="w-4 h-4" />
-                    {t("device.learnMore")}
-                  </button>
+                  {/* 자세히 보기 + 문의하기 */}
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => setShowProductPage(true)}
+                      className="flex-1 flex items-center justify-center gap-2 text-[13px] font-bold py-3 rounded-2xl active:opacity-70"
+                      style={{ background: TINT_WARM, color: SCAN_TO }}
+                    >
+                      <ExternalLink className="w-4 h-4" />
+                      {t("device.learnMore")}
+                    </button>
+                    <button
+                      onClick={() => setShowDeviceInquiry(true)}
+                      className="flex-1 flex items-center justify-center gap-2 text-[13px] font-bold py-3 rounded-2xl active:opacity-70"
+                      style={{ background: `${DEEP_GREEN}10`, color: DEEP_GREEN }}
+                    >
+                      {t("device.inquiry", "문의하기")}
+                    </button>
+                  </div>
                 </div>
               </motion.div>
             )}
@@ -400,6 +430,17 @@ export function MyScreen({
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* 디바이스 문의 모달 */}
+      <WaitlistModal
+        open={showDeviceInquiry}
+        onClose={() => setShowDeviceInquiry(false)}
+        email={deviceEmail}
+        onEmailChange={setDeviceEmail}
+        isSubmitting={deviceSubmitting}
+        isSuccess={deviceSuccess}
+        onSubmit={handleDeviceInquiry}
+      />
     </div>
   );
 }
