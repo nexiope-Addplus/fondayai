@@ -827,7 +827,7 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
           </button>
           <div className="flex items-center gap-2">
             <img src="/fonday-logo.svg" alt="Fonday" className="h-5" style={{ objectFit: "contain" }} />
-            <span className="text-[14px] font-bold" style={{ color: "#5C4F4A" }}>{t("result.title")}</span>
+            <span className="text-[14px] font-bold" style={{ color: "#5C4F4A" }}>{t("result.reportLabel", "피부 리포트")}</span>
           </div>
         </div>
 
