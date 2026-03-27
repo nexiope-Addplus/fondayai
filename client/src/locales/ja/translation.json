@@ -1346,5 +1346,14 @@
     "nextScanRecommendation": "次回スキャン推奨",
     "closingNote": "締めコメント",
     "fondayAdvisorReport": "Fondayアドバイザーレポート"
+  },
+  "device": {
+    "description": "肌をリアルタイムで測定する専用デバイス",
+    "skinTemp": "肌温度",
+    "moisture": "水分量",
+    "oil": "皮脂量(TEWL)",
+    "barrier": "肌バリア",
+    "learnMore": "詳しく見る",
+    "watchVideo": "動画を見る"
   }
 }

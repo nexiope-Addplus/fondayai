@@ -1345,5 +1345,14 @@
     "nextScanRecommendation": "다음 스캔 추천",
     "closingNote": "마무리 코멘트",
     "fondayAdvisorReport": "Fonday 어드바이저 리포트"
+  },
+  "device": {
+    "description": "피부를 실시간으로 측정하는 전용 디바이스",
+    "skinTemp": "피부 온도",
+    "moisture": "수분도",
+    "oil": "유분도(TEWL)",
+    "barrier": "피부 장벽",
+    "learnMore": "자세히 보기",
+    "watchVideo": "영상 보기"
   }
 }

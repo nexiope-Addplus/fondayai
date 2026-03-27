@@ -29,6 +29,8 @@ import {
 } from "./utils";
 import { CosmeticsRegisterModal } from "./CosmeticsRegisterModal";
 import { CosmeticsReportCard } from "./CosmeticsReportCard";
+import { RoutineChecklist } from "./RoutineChecklist";
+import { todayStr } from "./utils";
 
 interface OptimizedRoutine {
   am: { id: string; order: number }[];
@@ -50,6 +52,7 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
   const [showAllSignals, setShowAllSignals] = useState(false);
   const [showAllCollection, setShowAllCollection] = useState(false);
   const [routineLogs, setRoutineLogs] = useState<{ date_str: string; cosmetic_ids: string[] }[]>([]);
+  const [checkedIds, setCheckedIds] = useState<string[]>([]);
 
   const loadData = async () => {
     if (!user) {
@@ -99,6 +102,30 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
   useEffect(() => {
     loadData().catch(() => setLoading(false));
   }, [user]);
+
+  // 오늘 체크한 화장품 로드
+  useEffect(() => {
+    if (!user) return;
+    fetch(`/api/routine-log?date=${todayStr()}`)
+      .then((r) => (r.ok ? r.json() : { cosmetic_ids: [] }))
+      .then((data) => {
+        const ids = Array.isArray(data.cosmetic_ids) ? data.cosmetic_ids : [];
+        setCheckedIds(ids);
+      })
+      .catch(() => {});
+  }, [user]);
+
+  const handleCosmeticToggle = (id: string) => {
+    setCheckedIds((prev) => {
+      const next = prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id];
+      fetch("/api/routine-log", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ date: todayStr(), cosmetic_ids: next }),
+      }).catch(() => {});
+      return next;
+    });
+  };
 
   const routinePlan = buildRepresentativeRoutine(
     list,
@@ -428,6 +455,20 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
                 </div>
               ))}
             </div>
+
+            {/* 오늘 사용한 화장품 체크리스트 */}
+            {list.length > 0 && (
+              <div className="mt-6">
+                <RoutineChecklist
+                  cosmetics={list}
+                  checkedIds={checkedIds}
+                  onToggle={handleCosmeticToggle}
+                  onRegister={() => setShowRegister(true)}
+                  user={user}
+                  loading={loading}
+                />
+              </div>
+            )}
 
             {productSignals.length > 0 && (
               <div className="pt-8 mt-8" style={{ borderTop: `1px solid ${BORDER_COLOR}` }}>

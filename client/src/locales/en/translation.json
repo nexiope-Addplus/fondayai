@@ -1346,5 +1346,14 @@
     "nextScanRecommendation": "Next Scan Recommendation",
     "closingNote": "Closing note",
     "fondayAdvisorReport": "Fonday Advisor Report"
+  },
+  "device": {
+    "description": "A dedicated device for real-time skin measurement",
+    "skinTemp": "Skin Temperature",
+    "moisture": "Moisture",
+    "oil": "Oil (TEWL)",
+    "barrier": "Skin Barrier",
+    "learnMore": "Learn More",
+    "watchVideo": "Watch Video"
   }
 }
