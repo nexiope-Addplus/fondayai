@@ -513,34 +513,52 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
                   </div>
                 </div>
                 <div className="space-y-2.5">
-                  {(showAllSignals ? productSignals : productSignals.slice(0, 3)).map((signal) => {
-                    const deltaValue = signal.topScoreDelta ?? signal.overallDelta ?? 0;
-                    const positive = deltaValue >= 0;
-                    return (
-                    <div key={signal.itemId} className="p-3" style={{ borderRadius: RADIUS_ITEM, background: BG_MUTED }}>
-                      <div className="flex items-center justify-between gap-2">
-                        <p className="text-[12px] font-semibold text-[#5C4F4A] truncate min-w-0">{signal.itemName}</p>
-                        <div className="flex items-center gap-1.5 shrink-0">
-                          <span className="rounded-full px-2 py-0.5 text-xs font-bold" style={{ background: positive ? `${DEEP_GREEN}12` : `${SCAN_TO}12`, color: positive ? DEEP_GREEN : SCAN_TO }}>
-                            {positive ? "+" : ""}{deltaValue}
-                          </span>
-                          <span className="rounded-full px-2 py-0.5 text-xs font-bold" style={{ background: `${DEEP_GREEN}12`, color: DEEP_GREEN }}>
-                            {t(`cosmetics.signalConfidence.${signal.confidence}`)}
-                          </span>
+                  {(() => {
+                    const grouped: { key: string; signals: typeof productSignals; delta: number; note: string; confidence: string }[] = [];
+                    const source = showAllSignals ? productSignals : productSignals.slice(0, 3);
+                    for (const signal of source) {
+                      const delta = signal.topScoreDelta ?? signal.overallDelta ?? 0;
+                      const key = `${delta}_${signal.note}`;
+                      const existing = grouped.find(g => g.key === key);
+                      if (existing) { existing.signals.push(signal); }
+                      else { grouped.push({ key, signals: [signal], delta, note: signal.note, confidence: signal.confidence }); }
+                    }
+                    return grouped.map((group) => {
+                      const positive = group.delta >= 0;
+                      const names = group.signals.map(s => s.itemName);
+                      const displayName = names.length <= 2 ? names.join(", ") : `${names[0]} ${t("cosmetics.effectGroupSuffix", { count: names.length - 1 })}`;
+                      return (
+                        <div key={group.key} className="p-3" style={{ borderRadius: RADIUS_ITEM, background: BG_MUTED }}>
+                          <div className="flex items-center justify-between gap-2">
+                            <p className="text-[12px] font-semibold text-[#5C4F4A] min-w-0">{displayName}</p>
+                            <div className="flex items-center gap-1.5 shrink-0">
+                              <span className="rounded-full px-2 py-0.5 text-xs font-bold" style={{ background: positive ? `${DEEP_GREEN}12` : `${SCAN_TO}12`, color: positive ? DEEP_GREEN : SCAN_TO }}>
+                                {positive ? "+" : ""}{group.delta}
+                              </span>
+                              <span className="rounded-full px-2 py-0.5 text-xs font-bold" style={{ background: `${DEEP_GREEN}12`, color: DEEP_GREEN }}>
+                                {t(`cosmetics.signalConfidence.${group.confidence}`)}
+                              </span>
+                            </div>
+                          </div>
+                          <p className="text-xs mt-1 text-kr-pretty" style={{ color: SCAN_TO }}>{group.note}</p>
+                          {names.length > 2 && (
+                            <p className="text-xs mt-1" style={{ color: "#8C8078" }}>
+                              {t("cosmetics.effectGroupHint")}
+                            </p>
+                          )}
+                          <div className="mt-3 h-2 rounded-full overflow-hidden" style={{ background: "#FFFFFF" }}>
+                            <div
+                              className="h-full rounded-full transition-all duration-700"
+                              style={{
+                                width: `${Math.min(100, Math.max(14, Math.abs(group.delta) * 6))}%`,
+                                background: positive ? DEEP_GREEN : SCAN_TO,
+                              }}
+                            />
+                          </div>
                         </div>
-                      </div>
-                      <p className="text-xs mt-1 text-kr-pretty" style={{ color: SCAN_TO }}>{signal.note}</p>
-                      <div className="mt-3 h-2 rounded-full overflow-hidden" style={{ background: "#FFFFFF" }}>
-                        <div
-                          className="h-full rounded-full transition-all duration-700"
-                          style={{
-                            width: `${Math.min(100, Math.max(14, Math.abs(deltaValue) * 6))}%`,
-                            background: positive ? DEEP_GREEN : SCAN_TO,
-                          }}
-                        />
-                      </div>
-                    </div>
-                  )})}
+                      );
+                    });
+                  })()}
                 </div>
               </div>
             )}
