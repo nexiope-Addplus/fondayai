@@ -64,7 +64,7 @@ export function WeatherTipCard({ compact, weather, weakMetric }: {
           </div>
         </div>
         {/* 하단: 지표 뱃지 가로 배열 */}
-        <div className="flex items-center gap-1.5 px-4 pb-3 flex-wrap">
+        <div className="flex items-center justify-center gap-1.5 px-4 pb-3 flex-wrap">
           <span className="text-[11px] font-bold px-2.5 py-1 rounded-full text-white" style={{ background: DEEP_GREEN }}>
             {weather.temp}°C
           </span>
