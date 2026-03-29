@@ -7,9 +7,10 @@ import type { WeatherData } from "./types";
 import { getWeatherTipKey } from "./utils";
 
 // ─── 날씨 연동 데일리 팁 카드 ─────────────────────────────────────
-export function WeatherTipCard({ compact, weather }: {
+export function WeatherTipCard({ compact, weather, weakMetric }: {
   compact?: boolean;
   weather?: WeatherData | null;
+  weakMetric?: string;
 } = {}) {
   const { t } = useTranslation();
 
@@ -46,6 +47,11 @@ export function WeatherTipCard({ compact, weather }: {
           <div className="flex-1 min-w-0">
             <p className="text-[13px] font-semibold text-[#6B5D55] leading-tight">{tip.title}</p>
             <p className="text-[12px] text-stone-500 leading-relaxed mt-1">{tip.body}</p>
+            {weakMetric && (
+              <p className="text-[12px] font-semibold leading-relaxed mt-1" style={{ color: DEEP_GREEN }}>
+                {t("weather.personalTip", { metric: weakMetric })}
+              </p>
+            )}
           </div>
           <div className="flex flex-col items-end gap-1 shrink-0">
             <span className="text-xs font-semibold px-2 py-0.5 rounded-full text-white"
@@ -80,6 +86,11 @@ export function WeatherTipCard({ compact, weather }: {
           <div className="flex-1 min-w-0">
             <p className="text-sm font-semibold text-[#5C4F4A] mb-1 leading-tight">{tip.title}</p>
             <p className="text-[11.5px] text-stone-500 leading-relaxed">{tip.body}</p>
+            {weakMetric && (
+              <p className="text-[12px] font-semibold leading-relaxed mt-1.5" style={{ color: DEEP_GREEN }}>
+                {t("weather.personalTip", { metric: weakMetric })}
+              </p>
+            )}
           </div>
         </div>
 

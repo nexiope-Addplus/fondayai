@@ -7,7 +7,14 @@ import ja from "./locales/ja/translation.json";
 // URL ?lang= 파라미터 우선 (OAuth 콜백에서 언어 복원용)
 const urlLang = new URLSearchParams(window.location.search).get("lang");
 const cookieLang = document.cookie.match(/fonday_lang=(\w+)/)?.[1];
-const savedLang = urlLang || localStorage.getItem("fonday_lang") || cookieLang || "en";
+// 브라우저/시스템 언어 감지 (ko, ja, en)
+function detectBrowserLang(): string {
+  const nav = navigator.language || (navigator as any).userLanguage || "";
+  if (nav.startsWith("ko")) return "ko";
+  if (nav.startsWith("ja")) return "ja";
+  return "en";
+}
+const savedLang = urlLang || localStorage.getItem("fonday_lang") || cookieLang || detectBrowserLang();
 if (urlLang) localStorage.setItem("fonday_lang", urlLang);
 
 i18n

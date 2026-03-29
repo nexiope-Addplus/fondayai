@@ -53,6 +53,8 @@ export function RoutineChecklist({
   const { t } = useTranslation();
   const reducedMotion = useReducedMotion();
   const [expanded, setExpanded] = useState(false);
+  const [doneConfirmed, setDoneConfirmed] = useState(false);
+  const [showDoneToast, setShowDoneToast] = useState(false);
 
   const checkedCount = checkedIds.filter((id) =>
     cosmetics.some((c) => c.id === id)
@@ -155,8 +157,21 @@ export function RoutineChecklist({
               </div>
             </button>
 
-            {/* ── 접힌 상태: 체크된 제품 요약 + 등급 ── */}
-            {!expanded && hasChecked && (
+            {/* ── 접힌 상태: 완료 확인 후 상태 표시 ── */}
+            {!expanded && hasChecked && doneConfirmed && (
+              <div className="mt-3 flex items-center justify-center gap-2 py-2 rounded-xl"
+                style={{ background: `${DEEP_GREEN}08` }}>
+                <span className="text-[13px] font-semibold" style={{ color: DEEP_GREEN }}>
+                  {t("routineChecklist.doneStatus")}
+                </span>
+                <span className="text-[11px]" style={{ color: TEXT_TERTIARY }}>
+                  ({t("routineChecklist.doneSummary", { count: checkedCount })})
+                </span>
+              </div>
+            )}
+
+            {/* ── 접힌 상태: 체크된 제품 요약 + 등급 (완료 미확인) ── */}
+            {!expanded && hasChecked && !doneConfirmed && (
               <div className="mt-3 space-y-1.5">
                 {checkedItems.slice(0, 4).map((item) => {
                   const g = getGradeLabel(item.id);
@@ -235,12 +250,49 @@ export function RoutineChecklist({
                   <p className="text-[11px] font-normal mt-3 leading-relaxed" style={{ color: TEXT_TERTIARY }}>
                     {t("routineChecklist.hint", "매일 체크하면 어떤 화장품이 효과 있는지 추적해요")}
                   </p>
+
+                  {/* 완료 버튼 */}
+                  {checkedCount > 0 && (
+                    <button
+                      onClick={() => {
+                        haptic("medium");
+                        setDoneConfirmed(true);
+                        setExpanded(false);
+                        setShowDoneToast(true);
+                        setTimeout(() => setShowDoneToast(false), 2000);
+                      }}
+                      className="w-full mt-3 flex items-center justify-center gap-2 text-[13px] font-semibold active:opacity-80 transition-opacity"
+                      style={{ background: DEEP_GREEN, color: "#FFFFFF", height: 44, borderRadius: 22 }}
+                    >
+                      <Check className="w-4 h-4" />
+                      {t("routineChecklist.doneBtn")} · {t("routineChecklist.doneSummary", { count: checkedCount })}
+                    </button>
+                  )}
                 </motion.div>
               )}
             </AnimatePresence>
           </>
         )}
       </div>
+
+      {/* 완료 토스트 */}
+      <AnimatePresence>
+        {showDoneToast && (
+          <motion.div
+            initial={reducedMotion ? { opacity: 1 } : { opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={reducedMotion ? { opacity: 0 } : { opacity: 0, y: -8 }}
+            transition={{ duration: 0.2 }}
+            className="mt-2 flex items-center justify-center gap-1.5 py-2 rounded-xl"
+            style={{ background: `${DEEP_GREEN}12` }}
+          >
+            <Check className="w-3.5 h-3.5" style={{ color: DEEP_GREEN }} />
+            <span className="text-[12px] font-semibold" style={{ color: DEEP_GREEN }}>
+              {t("routineChecklist.doneStatus")}
+            </span>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 }

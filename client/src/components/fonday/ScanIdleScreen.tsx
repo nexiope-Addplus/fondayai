@@ -138,6 +138,9 @@ export function ScanIdleScreen({
   const latestScoreDelta = latestScan && previousScan
     ? Number(latestScan.overallScore || 0) - Number(previousScan.overallScore || 0)
     : null;
+  // 마운트 시 한 번만 랜덤 인덱스 결정 (리렌더 시 변경 안 됨)
+  const greetingVariantIdx = useMemo(() => Math.floor(Math.random() * 3), []);
+
   const latestWeakMetric = useMemo(() => {
     if (!Array.isArray(latestScan?.scores) || latestScan.scores.length <= 1) return null;
     return [...latestScan.scores].slice(1).sort((a: any, b: any) => Number(a.score) - Number(b.score))[0];
@@ -173,33 +176,34 @@ export function ScanIdleScreen({
           polluted: "😷", snowy: "❄️", rainy: "🌧️", foggy: "🌫️",
           cold: "🧣", sunny_hot: "🌞", sunny: "☀️", dry: "🌵", humid: "💦", cloudy: "☁️",
         };
-        const weatherKeyMap: Record<WeatherTipKey, string> = {
-          polluted: "idle.greetingWeatherPolluted",
-          snowy:    "idle.greetingWeatherSnowy",
-          rainy:    "idle.greetingWeatherRainy",
-          foggy:    "idle.greetingWeatherFoggy",
-          cold:     "idle.greetingWeatherCold",
-          sunny_hot:"idle.greetingWeatherSunnyHot",
-          sunny:    "idle.greetingWeatherSunny",
-          dry:      "idle.greetingWeatherDry",
-          humid:    "idle.greetingWeatherHumid",
-          cloudy:   "idle.greetingWeatherCloudy",
+        const weatherVariantMap: Record<WeatherTipKey, string[]> = {
+          polluted: ["idle.greetingWeatherPolluted"],
+          snowy:    ["idle.greetingWeatherSnowy"],
+          rainy:    ["idle.greetingWeatherRainy", "idle.greetingWeatherRainy2", "idle.greetingWeatherRainy3"],
+          foggy:    ["idle.greetingWeatherFoggy"],
+          cold:     ["idle.greetingWeatherCold", "idle.greetingWeatherCold2", "idle.greetingWeatherCold3"],
+          sunny_hot:["idle.greetingWeatherSunnyHot"],
+          sunny:    ["idle.greetingWeatherSunny", "idle.greetingWeatherSunny2", "idle.greetingWeatherSunny3"],
+          dry:      ["idle.greetingWeatherDry"],
+          humid:    ["idle.greetingWeatherHumid", "idle.greetingWeatherHumid2", "idle.greetingWeatherHumid3"],
+          cloudy:   ["idle.greetingWeatherCloudy", "idle.greetingWeatherCloudy2", "idle.greetingWeatherCloudy3"],
         };
-        const timeBased = [
-          { range: [0, 6],   emoji: "🌙", key: "idle.greetingNight" },
-          { range: [6, 10],  emoji: "☀️", key: "idle.greetingMorning" },
-          { range: [10, 14], emoji: "🌤️", key: "idle.greetingNoon" },
-          { range: [14, 20], emoji: "💧", key: "idle.greetingAfternoon" },
-          { range: [20, 25], emoji: "🌙", key: "idle.greetingNight" },
+        const timeBasedVariants = [
+          { range: [0, 6],   emoji: "🌙", keys: ["idle.greetingNight", "idle.greetingNight2", "idle.greetingNight3"] },
+          { range: [6, 10],  emoji: "☀️", keys: ["idle.greetingMorning", "idle.greetingMorning2", "idle.greetingMorning3"] },
+          { range: [10, 14], emoji: "🌤️", keys: ["idle.greetingNoon", "idle.greetingNoon2", "idle.greetingNoon3"] },
+          { range: [14, 20], emoji: "💧", keys: ["idle.greetingAfternoon", "idle.greetingAfternoon2", "idle.greetingAfternoon3"] },
+          { range: [20, 25], emoji: "🌙", keys: ["idle.greetingNight", "idle.greetingNight2", "idle.greetingNight3"] },
         ];
-        const fallback = timeBased.find(({ range }) => hour >= range[0] && hour < range[1]);
+        const fallback = timeBasedVariants.find(({ range }) => hour >= range[0] && hour < range[1]);
         if (!fallback) return null;
 
         // 낮 시간대(6~20)에 날씨 데이터가 있으면 날씨 기반 그리팅 사용
         const useWeatherGreeting = idleWeather && hour >= 6 && hour < 20;
         const wKey = useWeatherGreeting ? getWeatherTipKey(idleWeather!) : null;
         const emoji = wKey ? weatherEmojiMap[wKey] : fallback.emoji;
-        const greetingKey = wKey ? weatherKeyMap[wKey] : fallback.key;
+        const variants = wKey ? weatherVariantMap[wKey] : fallback.keys;
+        const greetingKey = variants[greetingVariantIdx % variants.length];
 
         return (
           <motion.div variants={fadeChild} className="mb-2 relative" style={{ zIndex: 1 }}>
@@ -351,7 +355,7 @@ export function ScanIdleScreen({
       {/* 날씨 상세 — 리턴 유저에게만 (신규 유저에겐 그리팅으로 충분) */}
       {idleWeather && latestScan && (
         <motion.div variants={fadeChild} className="mb-8 relative" style={{ zIndex: 1 }}>
-          <WeatherTipCard compact weather={idleWeather} />
+          <WeatherTipCard compact weather={idleWeather} weakMetric={latestWeakMetric?.label} />
         </motion.div>
       )}
 
