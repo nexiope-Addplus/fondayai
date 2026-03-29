@@ -60,9 +60,15 @@ export function WeatherTipCard({ compact, weather, weakMetric }: {
               </p>
             )}
           </div>
-          <div className="flex flex-col items-end gap-1 shrink-0">
+          <div className="flex flex-wrap items-end justify-end gap-1 shrink-0 max-w-[120px]">
             <span className="text-xs font-semibold px-2 py-0.5 rounded-full text-white"
               style={{ background: DEEP_GREEN }}>{weather.temp}°C</span>
+            <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-white/70 text-stone-600">
+              {t("weather.humidity", { val: weather.humidity })}
+            </span>
+            {weather.uvIndex != null && weather.uvIndex > 0 && (
+              <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-white/70 text-stone-600">UV {Math.round(weather.uvIndex)}</span>
+            )}
             {pm25Level && <span className="text-[11px] font-bold px-2 py-0.5 rounded-full" style={{ background: `${pm25Level.color}15`, color: pm25Level.color }}>PM {pm25Level.label}</span>}
           </div>
         </div>
