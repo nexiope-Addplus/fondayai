@@ -41,7 +41,7 @@ export const onRequestGet: PagesFunction = async (ctx) => {
   try {
     const [meteoRes, geoRes, aqRes] = await Promise.all([
       fetch(
-        `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,weather_code,uv_index`
+        `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,weather_code&daily=uv_index_max&timezone=auto&forecast_days=1`
       ),
       fetch(
         `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`,
@@ -84,7 +84,7 @@ export const onRequestGet: PagesFunction = async (ctx) => {
       aqi: aqiVal,
       pm25,
       pm10,
-      uvIndex: current.uv_index ?? null,
+      uvIndex: meteo?.daily?.uv_index_max?.[0] ?? null,
     };
 
     return new Response(JSON.stringify(result), {

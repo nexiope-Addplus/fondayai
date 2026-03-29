@@ -47,30 +47,43 @@ export function WeatherTipCard({ compact, weather, weakMetric }: {
 
   if (compact) {
     return (
-      <div className="px-4 py-3 rounded-2xl"
-        style={{ background: TINT_GREEN }}>
-        <div className="flex items-start gap-3">
-          <span className="text-lg leading-none flex-shrink-0 mt-0.5">{tip.emoji}</span>
-          <div className="flex-1 min-w-0">
-            <p className="text-[13px] font-semibold text-[#6B5D55] leading-tight">{tip.title}</p>
-            <p className="text-[12px] text-stone-500 leading-relaxed mt-1">{tip.body}</p>
-            {weakMetric && (
-              <p className="text-[12px] font-semibold leading-relaxed mt-1" style={{ color: DEEP_GREEN }}>
-                {t("weather.personalTip", { metric: weakMetric })}
-              </p>
-            )}
+      <div className="rounded-2xl overflow-hidden" style={{ background: TINT_GREEN }}>
+        {/* 상단: 팁 내용 */}
+        <div className="px-4 pt-3.5 pb-3">
+          <div className="flex items-start gap-2.5">
+            <span className="text-lg leading-none flex-shrink-0 mt-0.5">{tip.emoji}</span>
+            <div className="flex-1 min-w-0">
+              <p className="text-[13px] font-bold text-[#5C4F4A] leading-snug">{tip.title}</p>
+              <p className="text-[12px] text-stone-500 leading-relaxed mt-1">{tip.body}</p>
+              {weakMetric && (
+                <p className="text-[12px] font-semibold mt-1.5" style={{ color: DEEP_GREEN }}>
+                  {t("weather.personalTip", { metric: weakMetric })}
+                </p>
+              )}
+            </div>
           </div>
-          <div className="flex flex-wrap items-end justify-end gap-1 shrink-0 max-w-[120px]">
-            <span className="text-xs font-semibold px-2 py-0.5 rounded-full text-white"
-              style={{ background: DEEP_GREEN }}>{weather.temp}°C</span>
-            <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-white/70 text-stone-600">
-              {t("weather.humidity", { val: weather.humidity })}
+        </div>
+        {/* 하단: 지표 뱃지 가로 배열 */}
+        <div className="flex items-center gap-1.5 px-4 pb-3 flex-wrap">
+          <span className="text-[11px] font-bold px-2.5 py-1 rounded-full text-white" style={{ background: DEEP_GREEN }}>
+            {weather.temp}°C
+          </span>
+          <span className="text-[11px] font-semibold px-2.5 py-1 rounded-full bg-white/80 text-stone-600">
+            💧 {weather.humidity}%
+          </span>
+          {weather.uvIndex != null && weather.uvIndex > 0 && (
+            <span className="text-[11px] font-bold px-2.5 py-1 rounded-full" style={{
+              background: weather.uvIndex > 7 ? "#FEE2E2" : weather.uvIndex > 5 ? "#FFF7ED" : "rgba(255,255,255,0.8)",
+              color: weather.uvIndex > 7 ? "#DC2626" : weather.uvIndex > 5 ? "#D97706" : "#6B5D55"
+            }}>
+              ☀️ UV {Math.round(weather.uvIndex)}
             </span>
-            {weather.uvIndex != null && weather.uvIndex > 0 && (
-              <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-white/70 text-stone-600">UV {Math.round(weather.uvIndex)}</span>
-            )}
-            {pm25Level && <span className="text-[11px] font-bold px-2 py-0.5 rounded-full" style={{ background: `${pm25Level.color}15`, color: pm25Level.color }}>PM {pm25Level.label}</span>}
-          </div>
+          )}
+          {pm25Level && (
+            <span className="text-[11px] font-bold px-2.5 py-1 rounded-full" style={{ background: `${pm25Level.color}12`, color: pm25Level.color }}>
+              😷 PM {pm25Level.label}
+            </span>
+          )}
         </div>
       </div>
     );
