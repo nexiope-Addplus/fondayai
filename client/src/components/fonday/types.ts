@@ -135,6 +135,9 @@ export type WeatherData = {
   weatherMain: string;
   cityName: string;
   aqi: number | null;
+  pm25?: number | null;
+  pm10?: number | null;
+  uvIndex?: number | null;
 };
 
 export type WeatherTipKey = "polluted" | "snowy" | "rainy" | "foggy" | "cold" | "sunny_hot" | "sunny" | "dry" | "humid" | "cloudy";

@@ -37,6 +37,13 @@ export function WeatherTipCard({ compact, weather, weakMetric }: {
   const fallbackTip = { emoji: "🌤️", title: "오늘의 피부 케어", body: "날씨에 맞춘 스킨케어로 하루를 시작하세요." };
   const tip = (rawTip && typeof rawTip === 'object' && 'emoji' in rawTip) ? rawTip as { emoji: string; title: string; body: string } : fallbackTip;
   const aqiLabel = weather.aqi ? t(`weather.aqi${weather.aqi}`) : null;
+  // 미세먼지 등급 (PM2.5 기준: 0-15 좋음, 15-35 보통, 35-75 나쁨, 75+ 매우나쁨)
+  const pm25Level = weather.pm25 != null
+    ? weather.pm25 <= 15 ? { label: t("weather.pm25Good", "좋음"), color: "#2D7D46" }
+      : weather.pm25 <= 35 ? { label: t("weather.pm25Fair", "보통"), color: "#D97706" }
+      : weather.pm25 <= 75 ? { label: t("weather.pm25Bad", "나쁨"), color: "#C2410C" }
+      : { label: t("weather.pm25VeryBad", "매우나쁨"), color: "#DC2626" }
+    : null;
 
   if (compact) {
     return (
@@ -56,7 +63,7 @@ export function WeatherTipCard({ compact, weather, weakMetric }: {
           <div className="flex flex-col items-end gap-1 shrink-0">
             <span className="text-xs font-semibold px-2 py-0.5 rounded-full text-white"
               style={{ background: DEEP_GREEN }}>{weather.temp}°C</span>
-            {aqiLabel && <span className="text-[11px] font-medium px-2 py-0.5 rounded-full bg-white/60 text-stone-500">{aqiLabel}</span>}
+            {pm25Level && <span className="text-[11px] font-bold px-2 py-0.5 rounded-full" style={{ background: `${pm25Level.color}15`, color: pm25Level.color }}>PM {pm25Level.label}</span>}
           </div>
         </div>
       </div>
@@ -102,9 +109,14 @@ export function WeatherTipCard({ compact, weather, weakMetric }: {
           <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-white/70 text-stone-600">
             {t("weather.humidity", { val: weather.humidity })}
           </span>
-          {aqiLabel && (
+          {pm25Level && (
+            <span className="text-xs font-bold px-2 py-0.5 rounded-full" style={{ background: `${pm25Level.color}15`, color: pm25Level.color }}>
+              PM2.5 {pm25Level.label}{weather.pm25 != null ? ` (${Math.round(weather.pm25)})` : ""}
+            </span>
+          )}
+          {weather.uvIndex != null && weather.uvIndex > 0 && (
             <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-white/70 text-stone-600">
-              {aqiLabel}
+              UV {Math.round(weather.uvIndex)}
             </span>
           )}
         </div>

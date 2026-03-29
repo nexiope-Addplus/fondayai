@@ -39,14 +39,17 @@ export const onRequestGet: PagesFunction = async (ctx) => {
   }
 
   try {
-    const [meteoRes, geoRes] = await Promise.all([
+    const [meteoRes, geoRes, aqRes] = await Promise.all([
       fetch(
-        `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,weather_code`
+        `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,weather_code,uv_index`
       ),
       fetch(
         `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`,
         { headers: { "User-Agent": "FondayAI/1.0" } }
       ),
+      fetch(
+        `https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${lat}&longitude=${lon}&current=pm2_5,pm10,european_aqi`
+      ).catch(() => null),
     ]);
 
     if (!meteoRes.ok) throw new Error(`Open-Meteo error: ${meteoRes.status}`);
@@ -59,14 +62,29 @@ export const onRequestGet: PagesFunction = async (ctx) => {
     const addr = geo?.address ?? {};
     const cityName = addr.city || addr.town || addr.village || addr.county || addr.state || "";
 
+    // Air quality data
+    let aqiVal: number | null = null;
+    let pm25: number | null = null;
+    let pm10: number | null = null;
+    if (aqRes && aqRes.ok) {
+      try {
+        const aq = await aqRes.json() as any;
+        aqiVal = aq?.current?.european_aqi ?? null;
+        pm25 = aq?.current?.pm2_5 ?? null;
+        pm10 = aq?.current?.pm10 ?? null;
+      } catch {}
+    }
+
     const result = {
       temp: Math.round(current.temperature_2m ?? 0),
       humidity: current.relative_humidity_2m ?? 0,
       weatherId: wmoToWeatherId(wmoCode),
       weatherMain: wmoToMain(wmoCode),
       cityName,
-      aqi: null as number | null,
-      uvIndex: null as number | null,
+      aqi: aqiVal,
+      pm25,
+      pm10,
+      uvIndex: current.uv_index ?? null,
     };
 
     return new Response(JSON.stringify(result), {
