@@ -31,7 +31,7 @@ export function ScanIdleScreen({
   onOpenDiscover?: () => void;
   onOpenMy?: () => void;
 }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const reducedMotion = useReducedMotion();
   const streak = getStreak();
   const daysSince = getDaysSinceLastScan();
@@ -101,8 +101,11 @@ export function ScanIdleScreen({
     const temp = idleWeather.temp;
     const humidity = idleWeather.humidity ?? "";
     const aqi = idleWeather.aqi ?? "";
-    
-    fetch(`/api/care-briefing?temp=${temp}&humidity=${humidity}&aqi=${aqi}`)
+    const pm25 = idleWeather.pm25 ?? "";
+    const uv = idleWeather.uvIndex ?? "";
+    const lang = i18n.language || "ko";
+
+    fetch(`/api/care-briefing?temp=${temp}&humidity=${humidity}&aqi=${aqi}&pm25=${pm25}&uv=${uv}&lang=${lang}`, { credentials: "include" })
       .then(res => res.ok ? res.json() : null)
       .then(data => { if (data && data.briefing) setCareBriefing(data); })
       .catch(() => {});
