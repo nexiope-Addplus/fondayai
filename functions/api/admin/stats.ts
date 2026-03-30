@@ -271,8 +271,8 @@ export const onRequest = async (context: any) => {
       safe(env.FONDAY_DB.prepare("SELECT COUNT(*) as cnt FROM cosmetics"), "first"),
       safe(env.FONDAY_DB.prepare(`
         SELECT c.user_id, c.name, c.brand, c.category, c.created_at,
-          (SELECT COUNT(*) FROM cosmetics c2 WHERE c2.user_id = c.user_id AND c2.status='active') as total
-        FROM cosmetics c WHERE c.status='active' ORDER BY c.user_id, c.created_at DESC LIMIT 100
+          (SELECT COUNT(*) FROM cosmetics c2 WHERE c2.user_id = c.user_id) as total
+        FROM cosmetics c ORDER BY c.created_at DESC LIMIT 100
       `), "all"),
     ]);
 
