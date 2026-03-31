@@ -1198,6 +1198,8 @@
     "effectScanValue": "{{count}}回",
     "effectGroupSuffix": "他{{count}}製品",
     "effectGroupHint": "同時に使用中のため個別効果の判別が難しいです。1つずつ切り替えるとより正確な分析ができます。",
+    "effectAllSameTitle": "すべての製品で同じ結果です",
+    "effectAllSameDesc": "毎日同じ製品を同時に使用しているため、個別の効果を区別できません。1つずつ切り替えてみてください。",
     "signalCardTitle": "スキャン相関ブリーフィング",
     "signalMetricLabel": "最も動いた指標",
     "signalMetricFallback": "総合コンディション",

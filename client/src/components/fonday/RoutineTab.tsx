@@ -529,7 +529,26 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
                   {(() => {
                     // 전체보기: 개별 표시, 축소: 그룹화
                     if (showAllSignals) {
-                      return productSignals.map((signal) => {
+                      // 모든 제품이 동일 점수+설명인지 확인
+                      const allSame = productSignals.length > 1 && productSignals.every((s) => {
+                        const d0 = productSignals[0].topScoreDelta ?? productSignals[0].overallDelta ?? 0;
+                        const d = s.topScoreDelta ?? s.overallDelta ?? 0;
+                        return d === d0 && s.note === productSignals[0].note;
+                      });
+                      const items = [];
+                      if (allSame) {
+                        items.push(
+                          <div key="same-notice" className="p-3 rounded-xl text-center" style={{ background: TINT_WARM }}>
+                            <p className="text-[12px] font-semibold" style={{ color: SCAN_TO }}>
+                              {t("cosmetics.effectAllSameTitle", "모든 제품의 분석 결과가 동일해요")}
+                            </p>
+                            <p className="text-[11px] mt-1" style={{ color: TEXT_SECONDARY }}>
+                              {t("cosmetics.effectAllSameDesc", "매일 같은 제품을 동시에 사용하고 있어서 개별 효과를 구분하기 어려워요. 한 제품씩 바꿔보면 더 정확한 분석이 가능해요.")}
+                            </p>
+                          </div>
+                        );
+                      }
+                      items.push(...productSignals.map((signal) => {
                         const deltaValue = signal.topScoreDelta ?? signal.overallDelta ?? 0;
                         const positive = deltaValue >= 0;
                         return (
@@ -548,7 +567,8 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
                             <p className="text-xs mt-1 text-kr-pretty" style={{ color: SCAN_TO }}>{signal.note}</p>
                           </div>
                         );
-                      });
+                      }));
+                      return items;
                     }
                     const grouped: { key: string; signals: typeof productSignals; delta: number; note: string; confidence: string }[] = [];
                     const source = productSignals.slice(0, 3);

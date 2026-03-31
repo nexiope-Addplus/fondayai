@@ -1200,6 +1200,8 @@
     "effectScanValue": "{{count}} scans",
     "effectGroupSuffix": "and {{count}} more",
     "effectGroupHint": "These are used together, so individual effects can't be isolated yet. Try switching one product at a time.",
+    "effectAllSameTitle": "All products show the same result",
+    "effectAllSameDesc": "You're using all products together daily, so individual effects can't be distinguished. Try rotating one product at a time for clearer insights.",
     "signalCardTitle": "Scan correlation briefing",
     "signalMetricLabel": "Strongest moving metric",
     "signalMetricFallback": "Overall condition",

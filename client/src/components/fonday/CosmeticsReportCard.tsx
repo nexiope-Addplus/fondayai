@@ -360,7 +360,13 @@ export function CosmeticsReportCard({
                     style={{ background: "linear-gradient(90deg, #059669, #34d399)" }}
                   />
                 </div>
-                <p className="text-[11px] text-stone-400 mt-2">{t("cosmeticsReport.analyzingDesc")}</p>
+                <p className="text-[11px] mt-2" style={{ color: TEXT_SECONDARY }}>
+                  {progress < 40
+                    ? t("cosmeticsReport.analyzingStep1", "제품 성분을 분석하고 있어요...")
+                    : progress < 75
+                    ? t("cosmeticsReport.analyzingStep2", "피부 타입과 매칭 중이에요...")
+                    : t("cosmeticsReport.analyzingStep3", "거의 다 됐어요, 잠시만 기다려 주세요!")}
+                </p>
               </div>
               {myCosmetics.map((_, i) => (
                 <div key={i} className="rounded-3xl animate-pulse" style={{ height: 80, background: BG_MUTED }} />
