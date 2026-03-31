@@ -1,7 +1,15 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence } from "framer-motion";
-import { BG_MUTED, BORDER_COLOR, DEEP_GREEN, FONT_DISPLAY, SCAN_TO, TEXT_TERTIARY } from "./constants";
+import {
+  BG_MUTED,
+  BORDER_COLOR,
+  DEEP_GREEN,
+  FONT_DISPLAY,
+  SCAN_TO,
+  TEXT_TERTIARY,
+  BG_BASE,
+} from "./constants";
 
 export function RoutineUpdateSheet({ open, onClose, morningRoutineItems, eveningRoutineItems, onApply }: any) {
   const { t } = useTranslation();
@@ -24,7 +32,7 @@ export function RoutineUpdateSheet({ open, onClose, morningRoutineItems, evening
               <p className="text-[12px] text-stone-500 text-center mt-2 leading-relaxed text-kr-pretty">{t("cosmetics.routineUpdateDesc")}</p>
               <div className="mt-5 rounded-3xl p-4 border" style={{ background: BG_MUTED, borderColor: BORDER_COLOR }}>
                 <div className="grid grid-cols-2 gap-2.5">
-                  <div className="rounded-2xl p-3" style={{ background: "#FFFFFF", border: `1px solid ${BORDER_COLOR}` }}>
+                  <div className="rounded-2xl p-3" style={{ background: BG_BASE, border: `1px solid ${BORDER_COLOR}` }}>
                     <p className="text-xs uppercase tracking-[0.14em]" style={{ fontFamily: FONT_DISPLAY, color: TEXT_TERTIARY }}>{t("cosmetics.amBtn")}</p>
                     <div className="mt-2 space-y-1.5">
                       {morningRoutineItems.map((item: any, index: number) => (
@@ -36,7 +44,7 @@ export function RoutineUpdateSheet({ open, onClose, morningRoutineItems, evening
                       ))}
                     </div>
                   </div>
-                  <div className="rounded-2xl p-3" style={{ background: "#FFFFFF", border: `1px solid ${BORDER_COLOR}` }}>
+                  <div className="rounded-2xl p-3" style={{ background: BG_BASE, border: `1px solid ${BORDER_COLOR}` }}>
                     <p className="text-xs uppercase tracking-[0.14em]" style={{ fontFamily: FONT_DISPLAY, color: TEXT_TERTIARY }}>{t("cosmetics.pmBtn")}</p>
                     <div className="mt-2 space-y-1.5">
                       {eveningRoutineItems.map((item: any, index: number) => (

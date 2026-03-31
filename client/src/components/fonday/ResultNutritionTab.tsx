@@ -2,26 +2,36 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 import { Utensils, Pill, AlertCircle } from "lucide-react";
-import { SCORE_LABEL_MAP, TINT_GREEN, BORDER_COLOR, FONT_DISPLAY, TEXT_TERTIARY } from "./constants";
+import {
+  SCORE_LABEL_MAP,
+  TINT_GREEN,
+  BORDER_COLOR,
+  FONT_DISPLAY,
+  TEXT_TERTIARY,
+  BG_BASE,
+  TEXT_TITLE,
+  TEXT_LABEL,
+  COLOR_INFO,
+} from "./constants";
 
 export function ResultNutritionTab({ analysisResult }: any) {
   const { t } = useTranslation();
 
   return (
-          <div className="space-y-4">
+          <div className="space-y-4 pt-5 mt-5" style={{ borderTop: `1px solid ${BORDER_COLOR}` }}>
             <div className="flex items-center gap-2 mb-1">
               <div className="w-9 h-9 rounded-2xl flex items-center justify-center" style={{ background: "#F6F4FB" }}>
-                <Utensils className="w-4 h-4" style={{ color: "#7C3AED" }} />
+                <Utensils className="w-4 h-4" style={{ color: COLOR_INFO }} />
               </div>
               <div>
-                <p className="text-xs font-bold uppercase tracking-[0.14em]" style={{ fontFamily: FONT_DISPLAY, color: "#6B5D55" }}>{t("nutrients.supplementsTitle")}</p>
+                <p className="text-xs font-bold uppercase tracking-[0.14em]" style={{ color: TEXT_LABEL }}>{t("nutrients.supplementsTitle")}</p>
                 <p className="text-xs text-stone-400">{t("nutrients.supplementsSub")}</p>
               </div>
             </div>
 
             {!analysisResult?.nutritionTips ? (
               <div className="flex flex-col items-center justify-center gap-2 py-10 text-stone-400">
-                <Pill className="w-7 h-7" style={{ color: "#7C3AED" }} />
+                <Pill className="w-7 h-7" style={{ color: COLOR_INFO }} />
                 <p className="text-[12px]">{t("nutrients.loadingTips")}</p>
               </div>
             ) : (
@@ -39,11 +49,11 @@ export function ResultNutritionTab({ analysisResult }: any) {
                         <div className="flex items-center gap-2 mb-0.5 flex-wrap">
                           <p className="text-sm font-semibold text-[#5C4F4A]">{item.name}</p>
                           <span className="text-xs font-medium rounded-full px-2 py-0.5 shrink-0"
-                            style={{ background: "#FFFFFF", color: "#7C3AED" }}>
+                            style={{ background: BG_BASE, color: COLOR_INFO }}>
                             {SCORE_LABEL_MAP[item.targetScore] !== undefined ? t(`scores.${SCORE_LABEL_MAP[item.targetScore]}`) : item.targetScore}
                           </span>
                         </div>
-                        <p className="text-xs font-semibold mb-0.5 flex items-center gap-0.5" style={{ color: "#7C3AED" }}><Pill className="w-3 h-3 inline mr-0.5" /> {item.dose}</p>
+                        <p className="text-xs font-semibold mb-0.5 flex items-center gap-0.5" style={{ color: COLOR_INFO }}><Pill className="w-3 h-3 inline mr-0.5" /> {item.dose}</p>
                         <p className="text-xs text-stone-500 leading-relaxed">{item.reason}</p>
                       </div>
                     </motion.div>
@@ -68,7 +78,7 @@ export function ResultNutritionTab({ analysisResult }: any) {
                 <div className="pt-5 mt-5" style={{ borderTop: `1px solid ${BORDER_COLOR}` }}>
                   <div className="flex items-center gap-2 mb-4">
                     <AlertCircle className="w-4 h-4 text-amber-500 shrink-0" />
-                    <p className="text-[14px] font-bold" style={{ color: "#5C4F4A" }}>{t("nutrients.avoidTitle")}</p>
+                    <p className="text-[14px] font-bold" style={{ color: TEXT_TITLE }}>{t("nutrients.avoidTitle")}</p>
                   </div>
                   <div className="space-y-3">
                     {analysisResult.nutritionTips.avoidFoods.map((item: { emoji: string; food: string; reason: string }, idx: number) => (

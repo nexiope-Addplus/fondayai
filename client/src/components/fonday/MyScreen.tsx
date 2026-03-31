@@ -28,6 +28,13 @@ import {
   RADIUS_SUB,
   PAGE_GRADIENT,
   Z,
+  TEXT_HEADING,
+  TEXT_TITLE,
+  TEXT_LABEL,
+  TEXT_SECONDARY,
+  COLOR_WARNING,
+  COLOR_DANGER,
+  COLOR_INFO,
 } from "./constants";
 import { getAttendance } from "./utils";
 import { AttendanceCalendarModal } from "./AttendanceCalendarModal";
@@ -122,7 +129,7 @@ export function MyScreen({
   };
 
   return (
-    <div className="min-h-[calc(100dvh-64px)] pb-20" style={{ background: PAGE_GRADIENT }}>
+    <div className="min-h-[calc(100dvh-64px)] pb-28" style={{ background: PAGE_GRADIENT }}>
       {/* 헤더 */}
       <div className="px-4 pt-5 pb-0">
         <div className="mb-4">
@@ -132,15 +139,15 @@ export function MyScreen({
                 <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ background: TINT_WARM }}>
                   <User className="w-4 h-4" style={{ color: SCAN_TO }} />
                 </div>
-                <h1 className="text-[22px] font-extrabold" style={{ color: "#4A403A", fontFamily: FONT_HEADING }}>{t("nav.my")}</h1>
+                <h1 className="text-[22px] font-extrabold" style={{ color: TEXT_HEADING, fontFamily: FONT_HEADING }}>{t("nav.my")}</h1>
               </div>
-              <p className="text-[13px]" style={{ color: "#8C8078", marginLeft: 42 }}>
+              <p className="text-[13px]" style={{ color: TEXT_SECONDARY, marginLeft: 42 }}>
                 {user ? (user.username || user.email || t("nav.my")) : t("attendance.loginDesc")}
               </p>
             </div>
             {user && (
               <div className="px-3 py-2 text-right shrink-0" style={{ borderRadius: RADIUS_SUB, background: BG_MUTED }}>
-                <p className="text-[11px] font-semibold uppercase tracking-[0.12em]" style={{ color: "#8C8078" }}>points</p>
+                <p className="text-[11px] font-medium uppercase tracking-[0.12em]" style={{ color: TEXT_SECONDARY }}>points</p>
                 <p className="text-[24px] font-normal leading-none mt-1" style={{ color: DEEP_GREEN, fontFamily: FONT_DISPLAY }}>{attendance.totalPoints}</p>
               </div>
             )}
@@ -177,12 +184,12 @@ export function MyScreen({
                       </span>
                     )}
                     {user.provider === "google" && (
-                      <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-xs font-bold text-stone-600 bg-white">
+                      <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-xs font-bold bg-white" style={{ color: TEXT_LABEL }}>
                         <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="w-2.5 h-2.5" />
                         Google
                       </span>
                     )}
-                    {user.email && <p className="text-xs text-stone-400 truncate max-w-[160px]">{user.email}</p>}
+                    {user.email && <p className="text-xs truncate max-w-[160px]" style={{ color: TEXT_TERTIARY }}>{user.email}</p>}
                   </div>
                 </div>
               </div>
@@ -194,10 +201,10 @@ export function MyScreen({
             </div>
           </div>
         ) : (
-          <div className="p-4 space-y-3 mb-4" style={{ borderRadius: RADIUS_CARD, background: "#FFFFFF", boxShadow: SHADOW_CARD }}>
+          <div className="p-4 space-y-3 mb-4" style={{ borderRadius: RADIUS_CARD, background: BG_BASE, boxShadow: SHADOW_CARD }}>
             <div className="text-center mb-2">
               <p className="text-[14px] font-bold text-[#6B5D55] mb-1">{t("report.loginRequired")}</p>
-              <p className="text-[12px] text-stone-400">{t("attendance.loginDesc")}</p>
+              <p className="text-[12px]" style={{ color: TEXT_TERTIARY }}>{t("attendance.loginDesc")}</p>
             </div>
             {i18n.language === "ko" ? (
               <button onClick={() => onLogin ? onLogin("kakao", "my") : (localStorage.setItem("fonday_return_tab", "my"), window.location.href = "/auth/kakao")}
@@ -235,10 +242,10 @@ export function MyScreen({
               </div>
               <div className="text-left min-w-0">
                 <p className="text-[14px] font-bold text-[#5C4F4A] truncate">{t("attendance.calendarTitle")}</p>
-                <p className="text-xs text-stone-400 truncate">{t("attendance.totalPoints", { n: attendance.totalPoints })}</p>
+                <p className="text-xs truncate" style={{ color: TEXT_TERTIARY }}>{t("attendance.totalPoints", { n: attendance.totalPoints })}</p>
               </div>
             </div>
-            <ChevronRight className="w-4 h-4 text-stone-300 shrink-0" />
+            <ChevronRight className="w-4 h-4 shrink-0" style={{ color: TEXT_TERTIARY }} />
           </button>
 
           {/* 구분선 */}
@@ -248,7 +255,7 @@ export function MyScreen({
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: "#F6F4FB" }}>
-                <Sparkles className="w-4.5 h-4.5" style={{ color: "#7C3AED" }} />
+                <Sparkles className="w-4.5 h-4.5" style={{ color: COLOR_INFO }} />
               </div>
               <p className="text-[14px] font-bold text-[#5C4F4A]">{t("nav.language")}</p>
             </div>
@@ -256,7 +263,7 @@ export function MyScreen({
               {(["en", "ko", "ja"] as const).map(lang => (
                 <button key={lang} onClick={() => i18n.changeLanguage(lang)}
                   className={`px-3 py-2.5 rounded-lg text-xs font-bold transition-all min-h-[44px] min-w-[44px] flex items-center justify-center ${
-                    i18n.language === lang ? "" : "text-stone-400 bg-stone-100"
+                    i18n.language === lang ? "" : "bg-stone-100"
                   }`}
                   style={i18n.language === lang ? { background: TINT_WARM, color: SCAN_TO } : {}}>
                   {lang.toUpperCase()}
@@ -273,11 +280,11 @@ export function MyScreen({
             className="w-full flex items-center justify-between active:opacity-70">
             <div className="flex items-center gap-3 min-w-0">
               <div className="w-9 h-9 rounded-full flex items-center justify-center shrink-0" style={{ background: "#FFF7ED" }}>
-                <SmartphoneNfc className="w-5 h-5" style={{ color: "#C2410C" }} />
+                <SmartphoneNfc className="w-5 h-5" style={{ color: COLOR_DANGER }} />
               </div>
               <p className="text-[14px] font-bold text-[#5C4F4A] truncate">{t("nav.install")}</p>
             </div>
-            <ChevronRight className="w-4 h-4 text-stone-300 shrink-0" />
+            <ChevronRight className="w-4 h-4 shrink-0" style={{ color: TEXT_TERTIARY }} />
           </button>
 
           {/* 구분선 */}
@@ -295,12 +302,12 @@ export function MyScreen({
               </div>
               <div className="min-w-0">
                 <p className="text-[14px] font-bold text-[#5C4F4A]">{t("result.deviceTeaser.title")}</p>
-                <p className="text-[11px]" style={{ color: "#B0A898" }}>COMING SOON</p>
+                <p className="text-[11px]" style={{ color: TEXT_TERTIARY }}>COMING SOON</p>
               </div>
             </div>
             <ChevronDown
-              className="w-4 h-4 text-stone-300 shrink-0 transition-transform duration-200"
-              style={{ transform: deviceExpanded ? "rotate(180deg)" : "rotate(0deg)" }}
+              className="w-4 h-4 shrink-0 transition-transform duration-200"
+              style={{ color: TEXT_TERTIARY, transform: deviceExpanded ? "rotate(180deg)" : "rotate(0deg)" }}
             />
           </button>
 
@@ -314,7 +321,7 @@ export function MyScreen({
                 className="overflow-hidden"
               >
                 <div className="mt-4 space-y-4">
-                  <p className="text-[13px]" style={{ color: "#8C8078" }}>
+                  <p className="text-[13px]" style={{ color: TEXT_SECONDARY }}>
                     {t("device.description")}
                   </p>
 
@@ -323,12 +330,12 @@ export function MyScreen({
                     {[
                       { icon: Thermometer, key: "device.skinTemp", color: "#E85D3A" },
                       { icon: Droplets, key: "device.moisture", color: "#2B7FBF" },
-                      { icon: Flame, key: "device.oil", color: "#D97706" },
+                      { icon: Flame, key: "device.oil", color: COLOR_WARNING },
                       { icon: Shield, key: "device.barrier", color: DEEP_GREEN },
                     ].map(({ icon: Icon, key, color }) => (
                       <div key={key} className="flex items-center gap-2 px-3 py-2.5 rounded-2xl" style={{ background: BG_MUTED }}>
                         <Icon className="w-4 h-4 shrink-0" style={{ color }} />
-                        <span className="text-[13px] font-semibold" style={{ color: "#5C4F4A" }}>{t(key)}</span>
+                        <span className="text-[13px] font-semibold" style={{ color: TEXT_TITLE }}>{t(key)}</span>
                       </div>
                     ))}
                   </div>
@@ -371,7 +378,7 @@ export function MyScreen({
         {/* 제휴 문의 */}
         <div className="pt-4 pb-2 text-center">
           <button onClick={() => setShowPartnership(true)}
-            className="text-xs text-stone-400 underline underline-offset-2 hover:text-stone-600 transition-colors">
+            className="text-xs underline underline-offset-2 hover:transition-colors" style={{ color: TEXT_TERTIARY }}>
             {t("result.partnershipLink")}
           </button>
         </div>
@@ -412,13 +419,13 @@ export function MyScreen({
               transition={{ type: "spring", damping: 28, stiffness: 280 }}
             >
               <div className="flex items-center justify-between px-4 py-3 border-b" style={{ borderColor: BORDER_COLOR }}>
-                <p className="text-[14px] font-bold" style={{ color: "#5C4F4A" }}>{t("result.deviceTeaser.title")}</p>
+                <p className="text-[14px] font-bold" style={{ color: TEXT_TITLE }}>{t("result.deviceTeaser.title")}</p>
                 <button
                   onClick={() => setShowProductPage(false)}
                   className="w-8 h-8 rounded-full flex items-center justify-center"
                   style={{ background: BG_MUTED }}
                 >
-                  <X className="w-4 h-4 text-stone-500" />
+                  <X className="w-4 h-4" style={{ color: TEXT_SECONDARY }} />
                 </button>
               </div>
               <iframe

@@ -42,7 +42,7 @@ export function BottomNav({ active, onChange, scanState }: {
         onClick={() => { haptic("light"); onChange(tab); }}
         aria-current={isActive ? "page" : undefined}
         className="relative flex flex-col items-center justify-center gap-1 transition-colors"
-        style={{ color: isActive ? SCAN_TO : "#B0A898" }}
+        style={{ color: isActive ? SCAN_TO : "#8C8078" }}
       >
         <div className="w-10 h-7 flex items-center justify-center rounded-full transition-colors"
           style={isActive ? { background: TINT_WARM } : undefined}>

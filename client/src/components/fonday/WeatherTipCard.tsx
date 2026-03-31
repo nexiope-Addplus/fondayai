@@ -1,8 +1,20 @@
 import React, { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { Sun } from "lucide-react";
-import { DEEP_GREEN, TINT_GREEN, TEXT_SECONDARY, fadeChild, BORDER_COLOR, FONT_DISPLAY, TEXT_TERTIARY } from "./constants";
+import {
+  DEEP_GREEN,
+  TINT_GREEN,
+  TEXT_SECONDARY,
+  fadeChild,
+  BORDER_COLOR,
+  FONT_DISPLAY,
+  TEXT_TERTIARY,
+  TEXT_LABEL,
+  COLOR_SUCCESS,
+  COLOR_WARNING,
+  COLOR_DANGER,
+} from "./constants";
 import type { WeatherData } from "./types";
 import { getWeatherTipKey } from "./utils";
 
@@ -13,6 +25,7 @@ export function WeatherTipCard({ compact, weather, weakMetric }: {
   weakMetric?: string;
 } = {}) {
   const { t } = useTranslation();
+  const reducedMotion = useReducedMotion();
 
   // 로딩 상태 처리 (데이터가 아직 없을 때)
   if (!weather) {
@@ -39,9 +52,9 @@ export function WeatherTipCard({ compact, weather, weakMetric }: {
   const aqiLabel = weather.aqi ? t(`weather.aqi${weather.aqi}`) : null;
   // 미세먼지 등급 (PM2.5 기준: 0-15 좋음, 15-35 보통, 35-75 나쁨, 75+ 매우나쁨)
   const pm25Level = weather.pm25 != null
-    ? weather.pm25 <= 15 ? { label: t("weather.pm25Good", "좋음"), color: "#2D7D46" }
-      : weather.pm25 <= 35 ? { label: t("weather.pm25Fair", "보통"), color: "#D97706" }
-      : weather.pm25 <= 75 ? { label: t("weather.pm25Bad", "나쁨"), color: "#C2410C" }
+    ? weather.pm25 <= 15 ? { label: t("weather.pm25Good", "좋음"), color: COLOR_SUCCESS }
+      : weather.pm25 <= 35 ? { label: t("weather.pm25Fair", "보통"), color: COLOR_WARNING }
+      : weather.pm25 <= 75 ? { label: t("weather.pm25Bad", "나쁨"), color: COLOR_DANGER }
       : { label: t("weather.pm25VeryBad", "매우나쁨"), color: "#DC2626" }
     : null;
 
@@ -65,25 +78,36 @@ export function WeatherTipCard({ compact, weather, weakMetric }: {
         </div>
         {/* 하단: 지표 뱃지 가로 배열 */}
         <div className="flex items-center justify-center gap-1.5 px-4 pb-3 flex-wrap">
-          <span className="text-[11px] font-bold px-2.5 py-1 rounded-full text-white" style={{ background: DEEP_GREEN }}>
-            {weather.temp}°C
-          </span>
-          <span className="text-[11px] font-semibold px-2.5 py-1 rounded-full bg-white/80 text-stone-600">
-            💧 {weather.humidity}%
-          </span>
-          {weather.uvIndex != null && weather.uvIndex > 0 && (
-            <span className="text-[11px] font-bold px-2.5 py-1 rounded-full" style={{
-              background: weather.uvIndex > 7 ? "#FEE2E2" : weather.uvIndex > 5 ? "#FFF7ED" : "rgba(255,255,255,0.8)",
-              color: weather.uvIndex > 7 ? "#DC2626" : weather.uvIndex > 5 ? "#D97706" : "#6B5D55"
-            }}>
-              ☀️ UV {Math.round(weather.uvIndex)}
-            </span>
-          )}
-          {pm25Level && (
-            <span className="text-[11px] font-bold px-2.5 py-1 rounded-full" style={{ background: `${pm25Level.color}12`, color: pm25Level.color }}>
-              😷 PM {pm25Level.label}
-            </span>
-          )}
+          {[
+            <span key="temp" className="text-[11px] font-bold px-2.5 py-1 rounded-full text-white" style={{ background: DEEP_GREEN }}>
+              {weather.temp}°C
+            </span>,
+            <span key="humidity" className="text-[11px] font-semibold px-2.5 py-1 rounded-full bg-white/80 text-stone-600">
+              💧 {weather.humidity}%
+            </span>,
+            weather.uvIndex != null && weather.uvIndex > 0 ? (
+              <span key="uv" className="text-[11px] font-bold px-2.5 py-1 rounded-full" style={{
+                background: weather.uvIndex > 7 ? "#FEE2E2" : weather.uvIndex > 5 ? "#FFF7ED" : "rgba(255,255,255,0.8)",
+                color: weather.uvIndex > 7 ? "#DC2626" : weather.uvIndex > 5 ? COLOR_WARNING : "#6B5D55"
+              }}>
+                ☀️ UV {Math.round(weather.uvIndex)}
+              </span>
+            ) : null,
+            pm25Level ? (
+              <span key="pm" className="text-[11px] font-bold px-2.5 py-1 rounded-full" style={{ background: `${pm25Level.color}12`, color: pm25Level.color }}>
+                😷 PM {pm25Level.label}
+              </span>
+            ) : null,
+          ].filter(Boolean).map((badge, i) => (
+            <motion.span
+              key={i}
+              initial={reducedMotion ? {} : { opacity: 0, scale: 0.8 }}
+              animate={reducedMotion ? {} : { opacity: 1, scale: 1 }}
+              transition={reducedMotion ? {} : { delay: i * 0.1 }}
+            >
+              {badge}
+            </motion.span>
+          ))}
         </div>
       </div>
     );
@@ -95,14 +119,12 @@ export function WeatherTipCard({ compact, weather, weakMetric }: {
         className="rounded-2xl p-4 overflow-hidden relative"
         style={{ background: TINT_GREEN, border: `1px solid ${BORDER_COLOR}` }}
       >
-        <div className="absolute top-0 right-0 w-20 h-20 rounded-bl-full opacity-20"
-          style={{ background: DEEP_GREEN }} />
         <div className="flex items-center gap-1.5 mb-2.5">
           <div className="w-4 h-4 rounded-full flex items-center justify-center"
             style={{ background: DEEP_GREEN }}>
             <Sun className="w-2.5 h-2.5 text-white" />
           </div>
-          <span className="text-xs font-semibold tracking-widest uppercase" style={{ fontFamily: FONT_DISPLAY, color: TEXT_TERTIARY }}>
+          <span className="text-xs font-semibold tracking-widest uppercase" style={{ color: TEXT_TERTIARY }}>
             {t("weather.cardTitle")}
           </span>
         </div>
@@ -159,7 +181,7 @@ export function MiniScoreBarIdle({ label, score, color, delay, delta }: {
   }, [delay]);
   return (
     <div className="flex items-center gap-2">
-      <span className="text-[11px] font-medium flex-shrink-0 min-w-[72px] max-w-[100px] truncate" style={{ color: "#6B5D55" }}>{label}</span>
+      <span className="text-[11px] font-medium flex-shrink-0 min-w-[72px] max-w-[100px] truncate" style={{ color: TEXT_LABEL }}>{label}</span>
       <div className="flex-1 h-[5px] rounded-full overflow-hidden" style={{ background: "#E8E0D8" }}>
         <div
           className="h-full rounded-full"

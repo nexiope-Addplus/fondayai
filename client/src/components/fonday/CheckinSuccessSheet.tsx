@@ -1,6 +1,6 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { CheckCircle2, CalendarDays } from "lucide-react";
 import { BORDER_COLOR, DEEP_GREEN, SCAN_FROM, SCAN_TO, TEXT_TERTIARY } from "./constants";
 import type { AppUser } from "./types";
@@ -15,6 +15,7 @@ export function CheckinSuccessSheet({ onKakao, onLine, onGoogle, onDismiss, user
   user: AppUser | null;
 }) {
   const { t, i18n } = useTranslation();
+  const reducedMotion = useReducedMotion();
   const data = getAttendance();
 
   return (
@@ -22,7 +23,7 @@ export function CheckinSuccessSheet({ onKakao, onLine, onGoogle, onDismiss, user
       <motion.div key="ci-overlay" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
         className="fixed inset-0 z-[980] bg-black/40" onClick={onDismiss} />
       <motion.div key="ci-sheet" initial={{ y: "100%" }} animate={{ y: 0 }} exit={{ y: "100%" }}
-        transition={{ type: "spring", damping: 30, stiffness: 300 }}
+        transition={reducedMotion ? { duration: 0 } : { type: "spring", damping: 30, stiffness: 300 }}
         className="fixed bottom-0 left-0 right-0 z-[990] bg-white rounded-t-3xl max-w-md mx-auto px-5 pb-10 pt-6"
         style={{ borderTop: `1px solid ${BORDER_COLOR}` }}>
         <div className="w-10 h-1 rounded-full bg-stone-200 mx-auto mb-5" />

@@ -3,7 +3,18 @@ import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence, useDragControls } from "framer-motion";
 import { ChevronDown, ChevronUp, Plus, RotateCcw, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { DEEP_GREEN, SCAN_TO, TINT_GREEN, TINT_WARM, BG_MUTED, BORDER_COLOR, FONT_DISPLAY, TEXT_TERTIARY } from "./constants";
+import {
+  DEEP_GREEN,
+  SCAN_TO,
+  TINT_GREEN,
+  TINT_WARM,
+  BG_MUTED,
+  BORDER_COLOR,
+  FONT_DISPLAY,
+  TEXT_TERTIARY,
+  BG_BASE,
+  COLOR_WARNING,
+} from "./constants";
 import type { AnalysisResult, CosmeticItem, CosmeticGrade } from "./types";
 
 // ─── 세션 레벨 캐시 (컴포넌트 재마운트 시에도 유지) ─────────────────
@@ -13,7 +24,7 @@ const _gradeCache: Record<string, CosmeticGrade[]> = {};
 const GRADE_CONFIG: Record<string, { color: string; bg: string; border: string; label: string }> = {
   A: { color: "#059669", bg: "#ECFDF5", border: "#A7F3D0", label: "최적" },
   B: { color: "#0EA5E9", bg: "#F0F9FF", border: "#BAE6FD", label: "적합" },
-  C: { color: "#D97706", bg: "#FFFBEB", border: "#FDE68A", label: "보통" },
+  C: { color: COLOR_WARNING, bg: "#FFFBEB", border: "#FDE68A", label: "보통" },
   D: { color: "#EA580C", bg: "#FFF7ED", border: "#FED7AA", label: "주의" },
   F: { color: "#DC2626", bg: "#FEF2F2", border: "#FECACA", label: "부적합" },
 };
@@ -29,7 +40,7 @@ function GradeCard({ cosmetic, grade }: { cosmetic: CosmeticItem; grade: Cosmeti
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       className="rounded-3xl overflow-hidden"
-      style={{ background: "#FFFFFF", border: `1px solid ${cfg.border}` }}
+      style={{ background: BG_BASE, border: `1px solid ${cfg.border}` }}
     >
       <button
         className="w-full p-4 text-left"

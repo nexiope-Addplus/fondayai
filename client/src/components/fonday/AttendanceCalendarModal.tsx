@@ -1,11 +1,12 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { BORDER_COLOR, DEEP_GREEN, FONT_DISPLAY, SCAN_TO, TEXT_TERTIARY } from "./constants";
 import { getAttendance, todayStr } from "./utils";
 
 export function AttendanceCalendarModal({ onClose }: { onClose: () => void }) {
   const { t } = useTranslation();
+  const reducedMotion = useReducedMotion();
   const data = getAttendance();
   const now = new Date();
   const year = now.getFullYear();
@@ -24,7 +25,7 @@ export function AttendanceCalendarModal({ onClose }: { onClose: () => void }) {
       <motion.div key="att-overlay" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
         className="fixed inset-0 z-[980] bg-black/40" onClick={onClose} />
       <motion.div key="att-sheet" initial={{ y: "100%" }} animate={{ y: 0 }} exit={{ y: "100%" }}
-        transition={{ type: "spring", damping: 30, stiffness: 300 }}
+        transition={reducedMotion ? { duration: 0 } : { type: "spring", damping: 30, stiffness: 300 }}
         className="fixed bottom-0 left-0 right-0 z-[990] bg-white rounded-t-3xl max-w-md mx-auto px-5 pb-10 pt-6"
         style={{ borderTop: `1px solid ${BORDER_COLOR}` }}>
         {/* 핸들 */}

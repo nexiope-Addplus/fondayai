@@ -12,6 +12,9 @@ import {
   TEXT_TERTIARY,
   TINT_GREEN,
   fadeChild,
+  BG_BASE,
+  COLOR_SUCCESS,
+  COLOR_DANGER,
 } from "./constants";
 
 export type CosmeticGrade = {
@@ -22,9 +25,9 @@ export type CosmeticGrade = {
 };
 
 const GRADE_COLORS: Record<string, { bg: string; color: string }> = {
-  A: { bg: "#E8F5EC", color: "#2D7D46" },
+  A: { bg: "#E8F5EC", color: COLOR_SUCCESS },
   B: { bg: "#EFF6FF", color: "#2563EB" },
-  C: { bg: "#FFF7ED", color: "#C2410C" },
+  C: { bg: "#FFF7ED", color: COLOR_DANGER },
   D: { bg: "#FEF2F2", color: "#DC2626" },
   F: { bg: "#FEF2F2", color: "#DC2626" },
 };
@@ -81,7 +84,7 @@ export function RoutineChecklist({
     >
       <div
         className="rounded-3xl p-4"
-        style={{ background: "#FFFFFF", border: `1px solid ${BORDER_COLOR}` }}
+        style={{ background: BG_BASE, border: `1px solid ${BORDER_COLOR}` }}
       >
         {/* ── 비로그인 상태 ── */}
         {!user && onLogin && (

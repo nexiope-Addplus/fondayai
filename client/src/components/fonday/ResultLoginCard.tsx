@@ -2,7 +2,13 @@ import type { ReactNode, Ref } from "react";
 import { useTranslation } from "react-i18next";
 import { Leaf } from "lucide-react";
 
-import { DEEP_GREEN, SCAN_TO, TINT_WARM, BORDER_COLOR } from "./constants";
+import {
+  DEEP_GREEN,
+  SCAN_TO,
+  TINT_WARM,
+  BORDER_COLOR,
+  BG_BASE,
+} from "./constants";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
@@ -21,7 +27,7 @@ export function ResultLoginCard({
 
   return (
     <div ref={loginPromptRef}>
-      <Card className="rounded-3xl p-6 text-center" style={{ background: "#FFFFFF", border: `1px solid ${BORDER_COLOR}` }}>
+      <Card className="rounded-3xl p-6 text-center" style={{ background: BG_BASE, border: `1px solid ${BORDER_COLOR}` }}>
         <CardHeader className="p-0 mb-4">
           <CardTitle className="text-lg font-semibold" style={{ color: DEEP_GREEN }}>{t("result.login.title")}</CardTitle>
           <CardDescription className="text-xs">{t("result.login.desc")}</CardDescription>

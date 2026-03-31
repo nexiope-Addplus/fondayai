@@ -1,15 +1,29 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { Sun, Moon, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { DEEP_GREEN, SCAN_FROM, SCAN_TO, TINT_WARM, TINT_GREEN, TINT_NEUTRAL, BORDER_COLOR, FONT_DISPLAY, TEXT_TERTIARY } from "./constants";
+import {
+  DEEP_GREEN,
+  SCAN_FROM,
+  SCAN_TO,
+  TINT_WARM,
+  TINT_GREEN,
+  TINT_NEUTRAL,
+  BORDER_COLOR,
+  FONT_DISPLAY,
+  TEXT_TERTIARY,
+  BG_BASE,
+  TEXT_LABEL,
+  TEXT_SECONDARY,
+  COLOR_DANGER,
+} from "./constants";
 import { ResultDiaryCard } from "./ResultDiaryCard";
-import { ResultLoginCard } from "./ResultLoginCard";
 
 export function ResultRoutineTab(props: any) {
   const { t } = useTranslation();
+  const reducedMotion = useReducedMotion();
   const {
     showOnboarding, setShowOnboarding, history,
     questStatusDetail, nextStreakGoal, daysToGoal, nextStreakReward,
@@ -30,14 +44,14 @@ export function ResultRoutineTab(props: any) {
         {/* 첫 방문자 온보딩 카드 */}
         {showOnboarding && history.length === 0 && (
           <motion.div
-            initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }}
+            initial={reducedMotion ? {} : { opacity: 0, y: -8 }} animate={reducedMotion ? {} : { opacity: 1, y: 0 }}
             className="pt-5 mt-5 p-4 flex items-start gap-3"
             style={{ borderTop: `1px solid ${BORDER_COLOR}` }}
           >
             <span className="text-xl shrink-0 mt-0.5">✨</span>
             <div className="flex-1 min-w-0">
               <p className="text-sm font-semibold text-[#5C4F4A] mb-0.5">{t("result.onboarding.title")}</p>
-              <p className="text-xs text-stone-500 leading-relaxed text-kr-pretty">{t("result.onboarding.sub")}</p>
+              <p className="text-xs leading-relaxed text-kr-pretty" style={{ color: TEXT_SECONDARY }}>{t("result.onboarding.sub")}</p>
               <button
                 onClick={() => { localStorage.setItem("fonday_onboarding_done", "1"); setShowOnboarding(false); }}
                 className="mt-2 text-xs font-medium rounded-full px-3 py-1"
@@ -54,7 +68,7 @@ export function ResultRoutineTab(props: any) {
           <div className="pt-5 mt-5" style={{ borderTop: `1px solid ${BORDER_COLOR}` }}>
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
-                <p className="text-xs font-bold uppercase tracking-[0.16em]" style={{ fontFamily: FONT_DISPLAY, color: "#6B5D55" }}>{t("diary.routineTitle")}</p>
+                <p className="text-xs font-bold uppercase tracking-[0.16em]" style={{ color: TEXT_LABEL }}>{t("diary.routineTitle")}</p>
                 <div className="mt-1 space-y-0.5">
                   <p className="text-[13px] font-semibold leading-snug flex items-center gap-1" style={{ color: DEEP_GREEN }}>
                     <Sun className="w-3.5 h-3.5 shrink-0" />{t("cosmetics.amBtn")}: {morningRoutineItems.join(" + ")}
@@ -63,7 +77,7 @@ export function ResultRoutineTab(props: any) {
                     <Moon className="w-3.5 h-3.5 shrink-0" />{t("cosmetics.pmBtn")}: {eveningRoutineItems.join(" + ")}
                   </p>
                 </div>
-                <p className="text-xs text-stone-500 mt-1">{t("cosmetics.routineCoachDesc")}</p>
+                <p className="text-xs mt-1" style={{ color: TEXT_SECONDARY }}>{t("cosmetics.routineCoachDesc")}</p>
               </div>
               <button
                 onClick={handleDiaryEntry}
@@ -112,8 +126,8 @@ export function ResultRoutineTab(props: any) {
               <div className="mt-5 pt-5" style={{ borderTop: `1px solid ${BORDER_COLOR}` }}>
                 <div className="flex items-center justify-between gap-3 mb-3">
                   <div>
-                    <p className="text-xs font-bold uppercase tracking-[0.14em]" style={{ fontFamily: FONT_DISPLAY, color: "#6B5D55" }}>{t("cosmetics.insightTitle")}</p>
-                    <p className="text-xs text-stone-400">{t("cosmetics.ctaCount", { count: cosmeticCount })}</p>
+                    <p className="text-xs font-bold uppercase tracking-[0.14em]" style={{ color: TEXT_LABEL }}>{t("cosmetics.insightTitle")}</p>
+                    <p className="text-xs" style={{ color: TEXT_TERTIARY }}>{t("cosmetics.ctaCount", { count: cosmeticCount })}</p>
                   </div>
                   <div className="flex items-center gap-2">
                     {myCosmetics.length > 0 && setShowCosmeticsReport && (
@@ -128,7 +142,7 @@ export function ResultRoutineTab(props: any) {
                     <button
                       onClick={() => user ? setShowCosmeticsRegister(true) : setShowCosmeticsGate(true)}
                       className="rounded-full px-3 py-1.5 text-xs font-medium whitespace-nowrap"
-                      style={{ background: "#FFFFFF", color: DEEP_GREEN }}
+                      style={{ background: BG_BASE, color: DEEP_GREEN }}
                     >
                       + {t("cosmetics.scanBtn")}
                     </button>
@@ -145,20 +159,20 @@ export function ResultRoutineTab(props: any) {
                             {item}
                           </span>
                         )) : (
-                          <p className="text-xs text-stone-400 mt-1">{t("cosmetics.goodComboEmpty")}</p>
+                          <p className="text-xs mt-1" style={{ color: TEXT_TERTIARY }}>{t("cosmetics.goodComboEmpty")}</p>
                         )}
                       </div>
                     </div>
                     <div className="py-2">
-                      <p className="text-xs font-semibold" style={{ color: "#C2410C" }}>{t("cosmetics.cautionTitle")}</p>
+                      <p className="text-xs font-semibold" style={{ color: COLOR_DANGER }}>{t("cosmetics.cautionTitle")}</p>
                       <div className="mt-2 space-y-1.5">
                         {routineGuide.cautions.length > 0 ? routineGuide.cautions.slice(0, 2).map((item: any, index: number) => (
                           <div key={`caution-note-${index}`} className="flex items-start gap-2">
                             <span className="text-xs font-semibold mt-0.5" style={{ color: "#EA580C" }}>!</span>
-                            <p className="text-xs text-stone-600 leading-relaxed text-kr-pretty">{item}</p>
+                            <p className="text-xs leading-relaxed text-kr-pretty" style={{ color: TEXT_LABEL }}>{item}</p>
                           </div>
                         )) : (
-                          <p className="text-xs text-stone-400 mt-1">{t("cosmetics.cautionEmpty")}</p>
+                          <p className="text-xs mt-1" style={{ color: TEXT_TERTIARY }}>{t("cosmetics.cautionEmpty")}</p>
                         )}
                       </div>
                     </div>
@@ -169,7 +183,7 @@ export function ResultRoutineTab(props: any) {
           </div>
         </div>
 
-            {/* 피부 일기 카드 / 로그인 카드 */}
+            {/* 피부 일기 카드 */}
             {user === undefined ? (
               <div className="h-16 rounded-3xl bg-stone-100 animate-pulse" />
             ) : user ? (
@@ -181,33 +195,26 @@ export function ResultRoutineTab(props: any) {
                 avatar={user.avatar}
                 onOpenDiary={onOpenDiary}
               />
-            ) : (
-              <ResultLoginCard
-                loginPromptRef={loginPromptRef}
-                socialLoginButton={socialLoginButton}
-                onGoogleLogin={handleGoogleLogin}
-                onGoSolution={() => goTo("solution")}
-              />
-        )}
+            ) : null}
 
         {/* 퀘스트 / 미션 — 루틴 아래 (게이미피케이션) */}
         <div className="pt-5 mt-5" style={{ borderTop: `1px solid ${BORDER_COLOR}` }}>
           <div className="min-w-0">
-            <p className="text-xs font-bold tracking-[0.16em] uppercase" style={{ fontFamily: FONT_DISPLAY, color: "#6B5D55" }}>{t("result.actionCard.missionEyebrow")}</p>
+            <p className="text-xs font-bold tracking-[0.16em] uppercase" style={{ color: TEXT_LABEL }}>{t("result.actionCard.missionEyebrow")}</p>
             <p className="text-base font-bold mt-1 text-kr-pretty" style={{ color: DEEP_GREEN }}>{t("result.actionCard.title")}</p>
-            <p className="text-xs text-stone-500 mt-1.5 leading-relaxed text-kr-pretty">{questStatusDetail}</p>
+            <p className="text-xs mt-1.5 leading-relaxed text-kr-pretty" style={{ color: TEXT_SECONDARY }}>{questStatusDetail}</p>
           </div>
           <div className="h-2 rounded-full bg-stone-100 overflow-hidden mt-3">
             <motion.div
               className="h-full rounded-full"
               style={{ background: DEEP_GREEN }}
-              initial={{ width: 0 }}
+              initial={reducedMotion ? { width: `${questProgressPct}%` } : { width: 0 }}
               animate={{ width: `${questProgressPct}%` }}
-              transition={{ duration: 0.6, ease: "easeOut" }}
+              transition={reducedMotion ? { duration: 0 } : { duration: 0.6, ease: "easeOut" }}
             />
           </div>
           <div className="flex items-center justify-between gap-3 mt-3">
-            <p className="text-xs text-stone-500 line-clamp-1">
+            <p className="text-xs line-clamp-1" style={{ color: TEXT_SECONDARY }}>
               {nextStreakGoal
                 ? t("result.actionCard.streakGoal", { days: daysToGoal, goal: nextStreakGoal, reward: nextStreakReward })
                 : t("result.actionCard.streakDone")}

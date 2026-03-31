@@ -1,0 +1,15 @@
+{
+  "name": "Figma basics",
+  "nodes": [
+    {
+      "id": "625:2",
+      "name": "Page 2",
+      "type": "CANVAS"
+    }
+  ],
+  "components": {},
+  "componentSets": {},
+  "globalVars": {
+    "styles": {}
+  }
+}

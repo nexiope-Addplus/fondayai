@@ -21,6 +21,11 @@ import {
   RADIUS_SUB,
   RADIUS_ITEM,
   PAGE_GRADIENT,
+  TEXT_HEADING,
+  TEXT_TITLE,
+  TEXT_LABEL,
+  TEXT_SECONDARY,
+  COLOR_WARNING,
 } from "./constants";
 import {
   inferCosmeticTimeOfDay,
@@ -200,34 +205,34 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
 
   if (!user) {
     return (
-      <div className="min-h-[calc(100dvh-64px)] px-4 pt-6 pb-28" style={{ background: PAGE_GRADIENT }}>
+      <div className="min-h-[calc(100dvh-64px)] px-4 pt-5 pb-28" style={{ background: PAGE_GRADIENT }}>
         <div className="mb-8">
           <div className="flex items-center gap-2.5 mb-1">
             <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ background: TINT_GREEN }}>
               <Droplets className="w-4 h-4" style={{ color: DEEP_GREEN }} />
             </div>
-            <h2 className="text-[22px] font-extrabold" style={{ color: "#4A403A", fontFamily: FONT_HEADING }}>{t("cosmetics.myTitle")}</h2>
+            <h2 className="text-[22px] font-extrabold" style={{ color: TEXT_HEADING, fontFamily: FONT_HEADING }}>{t("cosmetics.myTitle")}</h2>
           </div>
-          <p className="text-[14px] leading-relaxed text-kr-pretty" style={{ color: "#8C8078", marginLeft: 42 }}>
+          <p className="text-[14px] leading-relaxed text-kr-pretty" style={{ color: TEXT_SECONDARY, marginLeft: 42 }}>
             {t("cosmetics.loginDesc")}
           </p>
         </div>
 
-        <div className="p-5 mb-6" style={{ borderRadius: RADIUS_CARD, background: "#FFFFFF", boxShadow: SHADOW_CARD }}>
+        <div className="p-5 mb-6" style={{ borderRadius: RADIUS_CARD, background: BG_BASE, boxShadow: SHADOW_CARD }}>
           <div className="mb-4">
-            <p className="text-[14px] font-bold mb-3" style={{ color: "#5C4F4A" }}>{t("cosmetics.loginValueTitle", "로그인하면 이런 걸 할 수 있어요")}</p>
+            <p className="text-[14px] font-bold mb-3" style={{ color: TEXT_TITLE }}>{t("cosmetics.loginValueTitle", "로그인하면 이런 걸 할 수 있어요")}</p>
             <div className="space-y-2.5">
               <div className="flex items-center gap-2.5">
                 <Sun className="w-4 h-4 shrink-0" style={{ color: DEEP_GREEN }} />
-                <p className="text-[13px]" style={{ color: "#6B5D55" }}>{t("cosmetics.loginValue1", "AM/PM 루틴을 자동으로 정리해줘요")}</p>
+                <p className="text-[13px]" style={{ color: TEXT_LABEL }}>{t("cosmetics.loginValue1", "AM/PM 루틴을 자동으로 정리해줘요")}</p>
               </div>
               <div className="flex items-center gap-2.5">
                 <Sparkles className="w-4 h-4 shrink-0" style={{ color: SCAN_TO }} />
-                <p className="text-[13px]" style={{ color: "#6B5D55" }}>{t("cosmetics.loginValue2", "화장품별 피부 변화를 추적해요")}</p>
+                <p className="text-[13px]" style={{ color: TEXT_LABEL }}>{t("cosmetics.loginValue2", "화장품별 피부 변화를 추적해요")}</p>
               </div>
               <div className="flex items-center gap-2.5">
-                <AlertTriangle className="w-4 h-4 shrink-0" style={{ color: "#D97706" }} />
-                <p className="text-[13px]" style={{ color: "#6B5D55" }}>{t("cosmetics.loginValue3", "성분 충돌을 미리 알려줘요")}</p>
+                <AlertTriangle className="w-4 h-4 shrink-0" style={{ color: COLOR_WARNING }} />
+                <p className="text-[13px]" style={{ color: TEXT_LABEL }}>{t("cosmetics.loginValue3", "성분 충돌을 미리 알려줘요")}</p>
               </div>
             </div>
           </div>
@@ -266,13 +271,13 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
           <div className="pt-5 mt-5" style={{ borderTop: `1px solid ${BORDER_COLOR}` }}>
             <div className="flex items-start justify-between gap-3 mb-3">
               <div>
-                <p className="text-xs font-bold tracking-[0.14em] uppercase" style={{ color: SCAN_TO, fontFamily: FONT_DISPLAY }}>
+                <p className="text-xs font-bold tracking-[0.14em] uppercase" style={{ color: SCAN_TO }}>
                   {t("cosmetics.effectBoardEyebrow")}
                 </p>
                 <p className="text-[15px] font-bold mt-1" style={{ color: DEEP_GREEN }}>
                   {t("cosmetics.effectBoardTitle")}
                 </p>
-                <p className="text-xs text-stone-500 mt-1 text-kr-pretty">
+                <p className="text-xs mt-1 text-kr-pretty" style={{ color: TEXT_SECONDARY }}>
                   {t("cosmetics.effectBoardDesc")}
                 </p>
               </div>
@@ -301,7 +306,7 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
                       <div className="flex items-start justify-between gap-3">
                         <div className="min-w-0">
                           <p className="text-[12px] font-bold text-[#5C4F4A]">{displayName}</p>
-                          <p className="text-xs text-stone-500 mt-1 text-kr-pretty">{group.note}</p>
+                          <p className="text-xs mt-1 text-kr-pretty" style={{ color: TEXT_SECONDARY }}>{group.note}</p>
                           {names.length > 2 && (
                             <p className="text-xs mt-1.5" style={{ color: SCAN_TO }}>
                               {t("cosmetics.effectGroupHint", "동시에 사용 중이라 개별 효과를 구분하기 어려워요")}
@@ -314,15 +319,15 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
                       </div>
                       <div className="grid grid-cols-3 gap-2 mt-3">
                         <div className="rounded-2xl p-2.5 bg-white">
-                          <p className="text-xs text-stone-400">{t("cosmetics.effectMetricLabel")}</p>
+                          <p className="text-xs" style={{ color: TEXT_TERTIARY }}>{t("cosmetics.effectMetricLabel")}</p>
                           <p className="text-xs font-bold mt-1 text-[#5C4F4A]">{mainMetric}</p>
                         </div>
                         <div className="rounded-2xl p-2.5 bg-white">
-                          <p className="text-xs text-stone-400">{t("cosmetics.effectTrackedLabel")}</p>
+                          <p className="text-xs" style={{ color: TEXT_TERTIARY }}>{t("cosmetics.effectTrackedLabel")}</p>
                           <p className="text-xs font-bold mt-1 text-[#5C4F4A]">{t("cosmetics.effectTrackedValue", { days: group.daysTracked })}</p>
                         </div>
                         <div className="rounded-2xl p-2.5 bg-white">
-                          <p className="text-xs text-stone-400">{t("cosmetics.effectScanLabel")}</p>
+                          <p className="text-xs" style={{ color: TEXT_TERTIARY }}>{t("cosmetics.effectScanLabel")}</p>
                           <p className="text-xs font-bold mt-1 text-[#5C4F4A]">{t("cosmetics.effectScanValue", { count: group.afterCount })}</p>
                         </div>
                       </div>
@@ -344,9 +349,9 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
           <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ background: TINT_GREEN }}>
             <Droplets className="w-4 h-4" style={{ color: DEEP_GREEN }} />
           </div>
-          <h1 className="text-[22px] font-extrabold" style={{ color: "#4A403A", fontFamily: FONT_HEADING }}>{t("cosmetics.myTitle")}</h1>
+          <h1 className="text-[22px] font-extrabold" style={{ color: TEXT_HEADING, fontFamily: FONT_HEADING }}>{t("cosmetics.myTitle")}</h1>
         </div>
-        <p className="text-[13px] text-kr-pretty" style={{ color: "#8C8078", marginLeft: 42 }}>
+        <p className="text-[13px] text-kr-pretty" style={{ color: TEXT_SECONDARY, marginLeft: 42 }}>
           {t("cosmetics.routineSubtitle")}
         </p>
 
@@ -354,13 +359,13 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
         <div className="flex items-center gap-4 mt-4 mb-4">
           <div className="flex items-center gap-2">
             <Sun className="w-4 h-4" style={{ color: DEEP_GREEN }} />
-            <span className="text-[13px] font-semibold" style={{ color: "#5C4F4A" }}>{t("cosmetics.amBtn")}</span>
+            <span className="text-[13px] font-semibold" style={{ color: TEXT_TITLE }}>{t("cosmetics.amBtn")}</span>
             <span className="text-[13px] font-bold" style={{ color: DEEP_GREEN }}>{routinePlan.am.length}</span>
           </div>
           <span className="w-1 h-1 rounded-full bg-stone-300" />
           <div className="flex items-center gap-2">
             <Moon className="w-4 h-4" style={{ color: SCAN_TO }} />
-            <span className="text-[13px] font-semibold" style={{ color: "#5C4F4A" }}>{t("cosmetics.pmBtn")}</span>
+            <span className="text-[13px] font-semibold" style={{ color: TEXT_TITLE }}>{t("cosmetics.pmBtn")}</span>
             <span className="text-[13px] font-bold" style={{ color: SCAN_TO }}>{routinePlan.pm.length}</span>
           </div>
         </div>
@@ -376,10 +381,10 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
 
         {/* 화장품 성적표 — 플랫 섹션 */}
         <div className="mt-8 pt-5" style={{ borderTop: `1px solid ${BORDER_COLOR}` }}>
-          <p className="text-[15px] font-bold" style={{ color: "#5C4F4A" }}>
+          <p className="text-[15px] font-bold" style={{ color: TEXT_TITLE }}>
             {t("cosmetics.dashboardTitle")}
           </p>
-          <p className="text-[12px] mt-0.5 mb-4" style={{ color: "#8C8078" }}>
+          <p className="text-[12px] mt-0.5 mb-4" style={{ color: TEXT_SECONDARY }}>
             {t("cosmetics.dashboardDesc")}
           </p>
 
@@ -388,7 +393,7 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
             {routineStats.map((stat) => (
               <div key={stat.key} className="flex items-center gap-1.5">
                 <span className="text-[18px] font-bold" style={{ color: stat.color }}>{stat.value}</span>
-                <span className="text-[11px]" style={{ color: "#8C8078" }}>{stat.label}</span>
+                <span className="text-[11px]" style={{ color: TEXT_SECONDARY }}>{stat.label}</span>
               </div>
             ))}
           </div>
@@ -398,16 +403,16 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
             <div className="pt-4 mt-4" style={{ borderTop: `1px solid ${BORDER_COLOR}` }}>
               <p className="text-[11px] font-bold mb-1.5" style={{ color: DEEP_GREEN }}>{t("cosmetics.signalTopTitle")}</p>
               <div className="flex items-center justify-between gap-2">
-                <p className="text-[13px] font-bold truncate" style={{ color: "#5C4F4A" }}>{topSignal.itemName}</p>
+                <p className="text-[13px] font-bold truncate" style={{ color: TEXT_TITLE }}>{topSignal.itemName}</p>
                 <span className="rounded-full px-2 py-0.5 text-[11px] font-bold shrink-0" style={{ background: TINT_WARM, color: SCAN_TO }}>
                   {t(`cosmetics.signalConfidence.${topSignal.confidence}`)}
                 </span>
               </div>
-              <p className="text-[12px] mt-1 text-kr-pretty" style={{ color: "#8C8078" }}>{topSignal.note}</p>
+              <p className="text-[12px] mt-1 text-kr-pretty" style={{ color: TEXT_SECONDARY }}>{topSignal.note}</p>
             </div>
           ) : (
             <div className="pt-4 mt-4" style={{ borderTop: `1px solid ${BORDER_COLOR}` }}>
-              <p className="text-[12px]" style={{ color: "#8C8078" }}>{t("cosmetics.signalEmpty")}</p>
+              <p className="text-[12px]" style={{ color: TEXT_SECONDARY }}>{t("cosmetics.signalEmpty")}</p>
             </div>
           )}
 
@@ -435,7 +440,15 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
               <Droplets className="w-6 h-6" />
             </div>
             <p className="text-[14px] font-bold text-[#6B5D55] mb-1">{t("cosmetics.myEmpty")}</p>
-            <p className="text-[12px] text-stone-400">{t("cosmetics.myEmptyDesc")}</p>
+            <p className="text-[12px] mb-4" style={{ color: TEXT_TERTIARY }}>{t("cosmetics.myEmptyDesc")}</p>
+            <button
+              onClick={() => setShowRegister(true)}
+              className="inline-flex items-center gap-2 text-[13px] font-semibold px-5 py-2.5"
+              style={{ background: DEEP_GREEN, color: "#FFFFFF", borderRadius: 20 }}
+            >
+              <Plus className="w-4 h-4" />
+              {t("cosmetics.scanBtn")}
+            </button>
           </div>
         ) : (
           <>
@@ -445,13 +458,13 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
                   <div className="flex items-center gap-2 mb-3">
                     {key === "am" ? <Sun className="w-4 h-4" style={{ color: accent }} /> : <Moon className="w-4 h-4" style={{ color: accent }} />}
                     <p className="text-[14px] font-bold" style={{ color: accent }}>{title}</p>
-                    <span className="text-xs" style={{ color: "#8C8078" }}>
+                    <span className="text-xs" style={{ color: TEXT_SECONDARY }}>
                       {routinePlan[key].length > 0 ? `${routinePlan[key].length}${t("cosmetics.boardStepSuffix", "개")}` : ""}
                     </span>
                   </div>
                   <div className="space-y-2">
                     {routinePlan[key].length === 0 ? (
-                      <p className="text-[13px] py-2" style={{ color: "#B0A898" }}>
+                      <p className="text-[13px] py-2" style={{ color: TEXT_TERTIARY }}>
                         {t(key === "am" ? "cosmetics.routineEmptyAm" : "cosmetics.routineEmptyPm")}
                       </p>
                     ) : routinePlan[key].map((item, index) => (
@@ -465,10 +478,10 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
                           {index + 1}
                         </span>
                         <div className="min-w-0 flex-1">
-                          <p className="text-[13px] font-semibold truncate" style={{ color: "#5C4F4A" }}>{t(`cosmetics.categories.${item.category}`)}</p>
-                          <p className="text-[12px] truncate" style={{ color: "#8C8078" }}>{item.name}</p>
+                          <p className="text-[13px] font-semibold truncate" style={{ color: TEXT_TITLE }}>{t(`cosmetics.categories.${item.category}`)}</p>
+                          <p className="text-[12px] truncate" style={{ color: TEXT_SECONDARY }}>{item.name}</p>
                         </div>
-                        <ChevronRight className="w-4 h-4 text-stone-300 shrink-0" />
+                        <ChevronRight className="w-4 h-4 shrink-0" style={{ color: TEXT_TERTIARY }} />
                       </button>
                     ))}
                   </div>
@@ -495,7 +508,7 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
                 <div className="flex items-start justify-between gap-2 mb-3">
                   <div className="min-w-0">
                     <p className="text-[15px] font-bold" style={{ color: DEEP_GREEN }}>{t("cosmetics.signalSectionTitle")}</p>
-                    <p className="text-xs text-stone-400 mt-0.5">{t("cosmetics.signalSectionDesc")}</p>
+                    <p className="text-xs mt-0.5" style={{ color: TEXT_TERTIARY }}>{t("cosmetics.signalSectionDesc")}</p>
                   </div>
                   <div className="flex flex-col items-end gap-1.5 shrink-0">
                     <span className="px-2.5 py-1 rounded-full text-xs font-bold whitespace-nowrap" style={{ background: "#EEF4FF", color: "#4A7C6E" }}>
@@ -542,11 +555,11 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
                           </div>
                           <p className="text-xs mt-1 text-kr-pretty" style={{ color: SCAN_TO }}>{group.note}</p>
                           {names.length > 2 && (
-                            <p className="text-xs mt-1" style={{ color: "#8C8078" }}>
+                            <p className="text-xs mt-1" style={{ color: TEXT_SECONDARY }}>
                               {t("cosmetics.effectGroupHint")}
                             </p>
                           )}
-                          <div className="mt-3 h-2 rounded-full overflow-hidden" style={{ background: "#FFFFFF" }}>
+                          <div className="mt-3 h-2 rounded-full overflow-hidden" style={{ background: BG_BASE }}>
                             <div
                               className="h-full rounded-full transition-all duration-700"
                               style={{
@@ -569,14 +582,14 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
                   <AlertTriangle className="w-4 h-4 shrink-0" style={{ color: SCAN_TO }} />
                   <div>
                     <p className="text-[13px] font-bold" style={{ color: SCAN_TO }}>{t("cosmetics.routineConflictTitle")}</p>
-                    <p className="text-xs text-stone-400 mt-0.5">{t("cosmetics.routineConflictDesc")}</p>
+                    <p className="text-xs mt-0.5" style={{ color: TEXT_TERTIARY }}>{t("cosmetics.routineConflictDesc")}</p>
                   </div>
                 </div>
                 <div className="space-y-2.5">
                   {routinePlan.conflicts.map((conflict, index) => (
                     <div key={index} className="rounded-2xl bg-white p-3">
                       <p className="text-xs font-bold text-[#6B5D55] mb-0.5 line-clamp-2">{conflict.productNames.join(" + ")}</p>
-                      <p className="text-xs text-stone-500">{conflict.reason}</p>
+                      <p className="text-xs" style={{ color: TEXT_SECONDARY }}>{conflict.reason}</p>
                       {conflict.resolution && <p className="text-xs mt-1 font-medium" style={{ color: DEEP_GREEN }}>{conflict.resolution}</p>}
                     </div>
                   ))}
@@ -587,7 +600,7 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
             <div className="pt-8 mt-8" style={{ borderTop: `1px solid ${BORDER_COLOR}` }}>
               <div className="mb-4">
                 <p className="text-[15px] font-bold" style={{ color: DEEP_GREEN }}>{t("cosmetics.collectionTitle")}</p>
-                <p className="text-xs text-stone-400 mt-0.5">{t("cosmetics.collectionSub")}</p>
+                <p className="text-xs mt-0.5" style={{ color: TEXT_TERTIARY }}>{t("cosmetics.collectionSub")}</p>
               </div>
               <div className="grid grid-cols-2 gap-2.5">
                 {(showAllCollection ? list : list.slice(0, 4)).map((item) => {
@@ -597,18 +610,18 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
                       key={item.id}
                       onClick={() => setSelectedItem(item)}
                       className="p-3 text-left"
-                      style={{ borderRadius: RADIUS_CARD, background: "#FFFFFF", boxShadow: SHADOW_CARD }}
+                      style={{ borderRadius: RADIUS_CARD, background: BG_BASE, boxShadow: SHADOW_CARD }}
                     >
                       {item.image_thumbnail ? (
                         <img src={item.image_thumbnail} alt={item.name ?? ""} className="w-full h-28 rounded-2xl object-cover bg-stone-200" loading="lazy" />
                       ) : (
                         <div className="w-full h-28 rounded-2xl bg-stone-100 flex items-center justify-center">
-                          <Droplets className="w-7 h-7 text-stone-400" />
+                          <Droplets className="w-7 h-7" style={{ color: TEXT_TERTIARY }} />
                         </div>
                       )}
                       <div className="mt-3">
                         <p className="text-xs font-semibold text-[#5C4F4A] truncate">{item.name}</p>
-                        <p className="text-xs text-stone-400 truncate">{item.brand || t("cosmetics.noBrand")}</p>
+                        <p className="text-xs truncate" style={{ color: TEXT_TERTIARY }}>{item.brand || t("cosmetics.noBrand")}</p>
                         {signal && <p className="text-xs mt-2 line-clamp-2 text-kr-pretty" style={{ color: SCAN_TO }}>{signal.note}</p>}
                         <div className="flex flex-wrap gap-1.5 mt-2">
                           <span className="px-2 py-1 rounded-full text-xs font-bold" style={{ background: `${DEEP_GREEN}12`, color: DEEP_GREEN }}>
@@ -693,7 +706,7 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
                   className="absolute right-5 top-5 w-8 h-8 rounded-full flex items-center justify-center"
                   style={{ background: "#F5F5F4" }}
                 >
-                  <X className="w-4 h-4 text-stone-400" />
+                  <X className="w-4 h-4" style={{ color: TEXT_TERTIARY }} />
                 </button>
               </div>
               <div className="flex items-start gap-3">
@@ -701,12 +714,12 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
                   <img src={selectedItem.image_thumbnail} alt={selectedItem.name ?? ""} className="w-20 h-20 rounded-3xl object-cover bg-stone-100 shrink-0" loading="lazy" />
                 ) : (
                   <div className="w-20 h-20 rounded-3xl bg-stone-100 flex items-center justify-center shrink-0">
-                    <Droplets className="w-8 h-8 text-stone-400" />
+                    <Droplets className="w-8 h-8" style={{ color: TEXT_TERTIARY }} />
                   </div>
                 )}
                 <div className="min-w-0 flex-1">
                   <p className="text-lg font-bold text-[#5C4F4A] text-kr-pretty">{selectedItem.name}</p>
-                  <p className="text-[12px] text-stone-400 mt-1">{selectedItem.brand || t("cosmetics.noBrand")}</p>
+                  <p className="text-[12px] mt-1" style={{ color: TEXT_TERTIARY }}>{selectedItem.brand || t("cosmetics.noBrand")}</p>
                   <div className="flex flex-wrap gap-1.5 mt-2">
                     <span className="px-2.5 py-1 rounded-full text-xs font-bold" style={{ background: `${DEEP_GREEN}12`, color: DEEP_GREEN }}>
                       {t(`cosmetics.categories.${selectedItem.category}`)}
@@ -717,18 +730,18 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
 
               <div className="grid grid-cols-2 gap-2.5 mt-5">
                 <div className="rounded-2xl p-3" style={{ background: TINT_NEUTRAL }}>
-                  <p className="text-xs font-bold uppercase tracking-[0.14em] text-stone-400">{t("cosmetics.openedLabel")}</p>
+                  <p className="text-xs font-bold uppercase tracking-[0.14em]" style={{ color: TEXT_TERTIARY }}>{t("cosmetics.openedLabel")}</p>
                   <p className="text-xs font-semibold mt-1" style={{ color: DEEP_GREEN }}>{selectedItem.opened_at || t("cosmetics.detailUnknown")}</p>
                 </div>
                 <div className="rounded-2xl p-3" style={{ background: TINT_WARM }}>
-                  <p className="text-xs font-bold uppercase tracking-[0.14em] text-stone-400">{t("cosmetics.detailStatusLabel")}</p>
+                  <p className="text-xs font-bold uppercase tracking-[0.14em]" style={{ color: TEXT_TERTIARY }}>{t("cosmetics.detailStatusLabel")}</p>
                   <p className="text-xs font-semibold mt-1" style={{ color: SCAN_TO }}>{t("cosmetics.detailStatusActive")}</p>
                 </div>
               </div>
 
               <div className="mt-4 rounded-3xl p-4 bg-white">
                 <p className="text-xs font-semibold uppercase tracking-[0.14em]" style={{ color: SCAN_TO }}>{t("cosmetics.ingredientsLabel")}</p>
-                <p className="text-[12px] text-stone-600 mt-2 leading-relaxed whitespace-pre-wrap text-kr-pretty">
+                <p className="text-[12px] mt-2 leading-relaxed whitespace-pre-wrap text-kr-pretty" style={{ color: TEXT_LABEL }}>
                   {selectedItem.ingredients?.trim() || t("cosmetics.ingredientsEmpty")}
                 </p>
               </div>
@@ -747,13 +760,13 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
                     <p className="text-[13px] font-semibold mt-2 text-kr-pretty" style={{ color: SCAN_TO }}>{selectedSignal.note}</p>
                     <div className="grid grid-cols-2 gap-2.5 mt-4">
                       <div className="rounded-2xl bg-white p-3">
-                        <p className="text-xs font-bold uppercase tracking-[0.12em] text-stone-400">{t("cosmetics.signalMetricLabel")}</p>
+                        <p className="text-xs font-bold uppercase tracking-[0.12em]" style={{ color: TEXT_TERTIARY }}>{t("cosmetics.signalMetricLabel")}</p>
                         <p className="text-xs font-semibold mt-1" style={{ color: DEEP_GREEN }}>
                           {selectedSignal.topScoreIndex !== null ? t(`scores.${selectedSignal.topScoreIndex}`) : t("cosmetics.signalMetricFallback")}
                         </p>
                       </div>
                       <div className="rounded-2xl bg-white p-3">
-                        <p className="text-xs font-bold uppercase tracking-[0.12em] text-stone-400">{t("cosmetics.signalObservedLabel")}</p>
+                        <p className="text-xs font-bold uppercase tracking-[0.12em]" style={{ color: TEXT_TERTIARY }}>{t("cosmetics.signalObservedLabel")}</p>
                         <p className="text-xs font-semibold mt-1" style={{ color: DEEP_GREEN }}>
                           {t("cosmetics.signalObservedValue", { count: selectedSignal.afterCount, days: Math.min(selectedSignal.daysTracked, 14) })}
                         </p>
@@ -761,7 +774,7 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
                     </div>
                   </>
                 ) : (
-                  <p className="text-[12px] text-stone-500 mt-2 text-kr-pretty">{t("cosmetics.signalEmpty")}</p>
+                  <p className="text-[12px] mt-2 text-kr-pretty" style={{ color: TEXT_SECONDARY }}>{t("cosmetics.signalEmpty")}</p>
                 )}
               </div>
 
@@ -769,7 +782,7 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
                 <button
                   onClick={() => handleDelete(selectedItem.id)}
                   disabled={deletingId === selectedItem.id}
-                  className="flex-1 py-3.5 rounded-2xl font-bold text-[13px] text-stone-600 bg-stone-50 disabled:opacity-40"
+                  className="flex-1 py-3.5 rounded-2xl font-bold text-[13px] bg-stone-50 disabled:opacity-40" style={{ color: TEXT_LABEL }}
                 >
                   {deletingId === selectedItem.id ? "..." : t("cosmetics.deleteConfirm")}
                 </button>

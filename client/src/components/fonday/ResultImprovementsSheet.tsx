@@ -2,7 +2,17 @@ import { AnimatePresence, motion, useDragControls } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import { Leaf, Sparkles, Star, X } from "lucide-react";
 
-import { BG_MUTED, BORDER_COLOR, DEEP_GREEN, FONT_DISPLAY, SCAN_TO, TEXT_TERTIARY } from "./constants";
+import {
+  BG_MUTED,
+  BORDER_COLOR,
+  DEEP_GREEN,
+  FONT_DISPLAY,
+  SCAN_TO,
+  TEXT_TERTIARY,
+  BG_BASE,
+  COLOR_WARNING,
+  COLOR_INFO,
+} from "./constants";
 
 export function ResultImprovementsSheet({
   open,
@@ -70,7 +80,7 @@ export function ResultImprovementsSheet({
                     <div className="shrink-0">
                       <div
                         className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-normal border"
-                        style={{ fontFamily: FONT_DISPLAY, background: "#FFFFFF", borderColor: BORDER_COLOR, color: index === 0 ? SCAN_TO : index === 1 ? DEEP_GREEN : "#7C3AED" }}
+                        style={{ fontFamily: FONT_DISPLAY, background: BG_BASE, borderColor: BORDER_COLOR, color: index === 0 ? SCAN_TO : index === 1 ? DEEP_GREEN : COLOR_INFO }}
                       >
                         {index + 1}
                       </div>
@@ -103,13 +113,13 @@ export function ResultImprovementsSheet({
                         className="flex items-start gap-3 p-4 rounded-2xl border"
                         style={{ background: BG_MUTED, borderColor: BORDER_COLOR }}
                       >
-                        <div className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0 border" style={{ background: "#FFFFFF", borderColor: BORDER_COLOR }}>
-                          <Star className="w-4 h-4" style={{ color: "#D97706" }} />
+                        <div className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0 border" style={{ background: BG_BASE, borderColor: BORDER_COLOR }}>
+                          <Star className="w-4 h-4" style={{ color: COLOR_WARNING }} />
                         </div>
                         <div>
                           <div className="flex items-center gap-1.5 mb-0.5">
                             <span className="text-sm font-semibold text-[#5C4F4A]">{item.type}</span>
-                            <span className="text-xs px-1.5 py-0.5 rounded-full font-medium" style={{ background: "#FFFFFF", color: "#D97706" }}>
+                            <span className="text-xs px-1.5 py-0.5 rounded-full font-medium" style={{ background: BG_BASE, color: COLOR_WARNING }}>
                               {item.key}
                             </span>
                           </div>

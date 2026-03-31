@@ -5,7 +5,7 @@ import { Target } from "lucide-react";
 import { PwaInstallPopup } from "./PwaInstallPopup";
 import { CheckinSuccessSheet } from "./CheckinSuccessSheet";
 import { PushPromptSheet } from "./PushPromptSheet";
-import { dismissPushPrompt } from "./utils";
+import { dismissPushPrompt, haptic } from "./utils";
 
 type ResultOverlayPopupsProps = {
   streakMilestone: number | null;
@@ -35,11 +35,11 @@ export function ResultOverlayPopups({
   const { t } = useTranslation();
   return (
     <>
-      {/* 스트릭 마일스톤 팝업 */}
+      {/* 스트릭 마일스톤 팝업 — 티어별 차등 */}
       <AnimatePresence>
-        {streakMilestone && (
+        {streakMilestone && streakMilestone < 10 && (
           <motion.div
-            key="milestone"
+            key="milestone-small"
             initial={{ opacity: 0, y: -40 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -40 }}
@@ -47,6 +47,33 @@ export function ResultOverlayPopups({
             style={{ background: "#F59E0B" }}
           >
             {t("streak.milestone", { count: streakMilestone })}
+          </motion.div>
+        )}
+        {streakMilestone && streakMilestone >= 10 && streakMilestone < 20 && (
+          <motion.div
+            key="milestone-medium"
+            initial={{ opacity: 0, y: -40, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -40, scale: 0.9 }}
+            onAnimationComplete={() => haptic("medium")}
+            className="fixed top-14 left-1/2 z-[999] -translate-x-1/2 px-8 py-4 rounded-2xl shadow-2xl text-white font-black text-[17px] text-center"
+            style={{ background: "linear-gradient(135deg, #F59E0B, #EF6C00)", minWidth: 220 }}
+          >
+            {t("streak.milestone", { count: streakMilestone })}
+          </motion.div>
+        )}
+        {streakMilestone && streakMilestone >= 20 && (
+          <motion.div
+            key="milestone-large"
+            initial={{ opacity: 0, y: -50, scale: 0.85 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -50, scale: 0.85 }}
+            onAnimationComplete={() => haptic("medium")}
+            className="fixed top-12 left-1/2 z-[999] -translate-x-1/2 px-10 py-5 rounded-3xl shadow-2xl text-white text-center"
+            style={{ background: "linear-gradient(135deg, #F59E0B, #D32F2F)", minWidth: 260, boxShadow: "0 12px 40px rgba(245,158,11,0.35)" }}
+          >
+            <p className="font-black text-[20px] leading-tight">{t("streak.milestone", { count: streakMilestone })}</p>
+            <p className="text-[13px] font-semibold mt-1 text-white/80">{t("streak.deltaUp", { n: streakMilestone })}</p>
           </motion.div>
         )}
       </AnimatePresence>

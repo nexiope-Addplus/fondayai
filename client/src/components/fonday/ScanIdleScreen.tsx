@@ -4,12 +4,34 @@ import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import {
   Sparkles, Lock, Activity,
   ClipboardList, Camera, ChevronDown,
+  Sun, Cloud, CloudRain, Snowflake, Droplets, Wind, CloudSnow, CloudFog, SunDim, Moon, CloudSun,
 } from "lucide-react";
 import {
-  BAUMANN_COLORS, DEEP_GREEN, SCAN_TO, TEXT_SECONDARY, TEXT_TERTIARY,
-  SCORE_COLORS, stagger, fadeChild,
-  BG_MUTED, BORDER_COLOR, FONT_DISPLAY, FONT_HEADING,
-  SHADOW_CARD, SHADOW_ELEVATED, RADIUS_CARD, RADIUS_ITEM, PAGE_GRADIENT,
+  BAUMANN_COLORS,
+  DEEP_GREEN,
+  SCAN_TO,
+  TEXT_SECONDARY,
+  TEXT_TERTIARY,
+  SCORE_COLORS,
+  stagger,
+  fadeChild,
+  BG_MUTED,
+  BORDER_COLOR,
+  FONT_DISPLAY,
+  FONT_HEADING,
+  SHADOW_CARD,
+  SHADOW_ELEVATED,
+  RADIUS_CARD,
+  RADIUS_ITEM,
+  PAGE_GRADIENT,
+  BG_BASE,
+  TEXT_HEADING,
+  TEXT_TITLE,
+  TEXT_LABEL,
+  COLOR_WARNING,
+  COLOR_DANGER,
+  COLOR_INFO,
+  COLOR_SUCCESS,
 } from "./constants";
 import type { WeatherData, WeatherTipKey } from "./types";
 import { getStreak, getDaysSinceLastScan, getWeatherTipKey, buildCosmeticCorrelationSignals, todayStr, haptic } from "./utils";
@@ -152,8 +174,8 @@ export function ScanIdleScreen({
   return (
     <>
     <motion.div
-      className="flex flex-col px-4 pb-8 relative overflow-hidden"
-      style={{ minHeight: "calc(100dvh - 60px)", background: PAGE_GRADIENT, paddingTop: 20 }}
+      className="flex flex-col px-4 pt-5 pb-28 relative overflow-hidden"
+      style={{ minHeight: "calc(100dvh - 60px)", background: PAGE_GRADIENT }}
       variants={stagger} initial="initial" animate="animate"
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
@@ -175,9 +197,17 @@ export function ScanIdleScreen({
       {/* 날씨 기반 그리팅 + 날씨 팁 통합 카드 */}
       {(() => {
         const hour = new Date().getHours();
-        const weatherEmojiMap: Record<WeatherTipKey, string> = {
-          polluted: "😷", snowy: "❄️", rainy: "🌧️", foggy: "🌫️",
-          cold: "🧣", sunny_hot: "🌞", sunny: "☀️", dry: "🌵", humid: "💦", cloudy: "☁️",
+        const weatherIconMap: Record<WeatherTipKey, { icon: React.ComponentType<any>; color: string }> = {
+          polluted: { icon: Wind, color: TEXT_SECONDARY },
+          snowy:    { icon: CloudSnow, color: "#6B9BD2" },
+          rainy:    { icon: CloudRain, color: "#6B9BD2" },
+          foggy:    { icon: CloudFog, color: TEXT_SECONDARY },
+          cold:     { icon: Snowflake, color: "#6B9BD2" },
+          sunny_hot:{ icon: SunDim, color: COLOR_WARNING },
+          sunny:    { icon: Sun, color: COLOR_WARNING },
+          dry:      { icon: Sun, color: COLOR_WARNING },
+          humid:    { icon: Droplets, color: "#2B7FBF" },
+          cloudy:   { icon: Cloud, color: TEXT_SECONDARY },
         };
         const weatherVariantMap: Record<WeatherTipKey, string[]> = {
           polluted: ["idle.greetingWeatherPolluted"],
@@ -192,11 +222,11 @@ export function ScanIdleScreen({
           cloudy:   ["idle.greetingWeatherCloudy", "idle.greetingWeatherCloudy2", "idle.greetingWeatherCloudy3"],
         };
         const timeBasedVariants = [
-          { range: [0, 6],   emoji: "🌙", keys: ["idle.greetingNight", "idle.greetingNight2", "idle.greetingNight3"] },
-          { range: [6, 10],  emoji: "☀️", keys: ["idle.greetingMorning", "idle.greetingMorning2", "idle.greetingMorning3"] },
-          { range: [10, 14], emoji: "🌤️", keys: ["idle.greetingNoon", "idle.greetingNoon2", "idle.greetingNoon3"] },
-          { range: [14, 20], emoji: "💧", keys: ["idle.greetingAfternoon", "idle.greetingAfternoon2", "idle.greetingAfternoon3"] },
-          { range: [20, 25], emoji: "🌙", keys: ["idle.greetingNight", "idle.greetingNight2", "idle.greetingNight3"] },
+          { range: [0, 6],   icon: Moon as React.ComponentType<any>, color: COLOR_INFO, keys: ["idle.greetingNight", "idle.greetingNight2", "idle.greetingNight3"] },
+          { range: [6, 10],  icon: Sun as React.ComponentType<any>, color: COLOR_WARNING, keys: ["idle.greetingMorning", "idle.greetingMorning2", "idle.greetingMorning3"] },
+          { range: [10, 14], icon: CloudSun as React.ComponentType<any>, color: COLOR_WARNING, keys: ["idle.greetingNoon", "idle.greetingNoon2", "idle.greetingNoon3"] },
+          { range: [14, 20], icon: Droplets as React.ComponentType<any>, color: "#2B7FBF", keys: ["idle.greetingAfternoon", "idle.greetingAfternoon2", "idle.greetingAfternoon3"] },
+          { range: [20, 25], icon: Moon as React.ComponentType<any>, color: COLOR_INFO, keys: ["idle.greetingNight", "idle.greetingNight2", "idle.greetingNight3"] },
         ];
         const fallback = timeBasedVariants.find(({ range }) => hour >= range[0] && hour < range[1]);
         if (!fallback) return null;
@@ -204,14 +234,16 @@ export function ScanIdleScreen({
         // 낮 시간대(6~20)에 날씨 데이터가 있으면 날씨 기반 그리팅 사용
         const useWeatherGreeting = idleWeather && hour >= 6 && hour < 20;
         const wKey = useWeatherGreeting ? getWeatherTipKey(idleWeather!) : null;
-        const emoji = wKey ? weatherEmojiMap[wKey] : fallback.emoji;
+        const iconInfo = wKey ? weatherIconMap[wKey] : { icon: fallback.icon, color: fallback.color };
+        const GreetingIcon = iconInfo.icon;
         const variants = wKey ? weatherVariantMap[wKey] : fallback.keys;
         const greetingKey = variants[greetingVariantIdx % variants.length];
 
         return (
           <motion.div variants={fadeChild} className="mb-2 relative" style={{ zIndex: 1 }}>
-            <p className="text-[13px] leading-relaxed" style={{ color: TEXT_SECONDARY }}>
-              {emoji} {t(greetingKey)}
+            <p className="text-[13px] leading-relaxed flex items-center gap-1.5" style={{ color: TEXT_SECONDARY }}>
+              <GreetingIcon className="w-4 h-4 inline-block shrink-0" style={{ color: iconInfo.color }} />
+              {t(greetingKey)}
             </p>
           </motion.div>
         );
@@ -221,10 +253,10 @@ export function ScanIdleScreen({
 
       {/* 컴백 배너 (3일+ 경과 시) */}
       {daysSince !== null && daysSince >= 3 && (
-        <motion.div variants={fadeChild} className="mb-4 relative" style={{ zIndex: 1 }}>
+        <motion.div variants={fadeChild} className="mb-8 relative" style={{ zIndex: 1 }}>
           <div className="flex items-center gap-2 px-4 py-2.5 rounded-full text-[12px] font-semibold"
             style={daysSince >= 7
-              ? { background: "#FFF7ED", color: "#C2410C" }
+              ? { background: "#FFF7ED", color: COLOR_DANGER }
               : { background: "#F0FAF6", color: "#166534" }}>
             {daysSince >= 7
               ? t("streak.comeback7", { days: daysSince })
@@ -235,9 +267,9 @@ export function ScanIdleScreen({
 
       {/* ── 히어로: 헤드라인 → 이미지(16:9) → 3단계 → CTA (신규 유저) ── */}
       {!latestScan && !scanLoading && (
-        <motion.div variants={fadeChild} className="mb-4 relative" style={{ zIndex: 1 }}>
+        <motion.div variants={fadeChild} className="mb-8 relative" style={{ zIndex: 1 }}>
           {/* 헤드라인 */}
-          <h1 className="text-[26px] font-extrabold leading-[1.3] mt-1 mb-2" style={{ color: "#4A403A", fontFamily: FONT_HEADING }}>
+          <h1 className="text-[26px] font-extrabold leading-[1.3] mt-1 mb-2" style={{ color: TEXT_HEADING, fontFamily: FONT_HEADING }}>
             {t("idle.subtitle1")}<br />{t("idle.subtitle3")}
           </h1>
           <p className="text-[14px] leading-[1.7] mb-4" style={{ color: TEXT_SECONDARY }}>
@@ -245,7 +277,7 @@ export function ScanIdleScreen({
           </p>
 
           {/* 얼굴 이미지 — 16:9 가로, 스크롤 없이 CTA까지 보이도록 */}
-          <div className="relative overflow-hidden mb-4 bg-stone-100"
+          <div className="relative overflow-hidden mb-6 bg-stone-100"
             style={{ aspectRatio: "16/9", borderRadius: 20, boxShadow: SHADOW_ELEVATED }}>
             <img
               src="/face-model.png"
@@ -253,9 +285,9 @@ export function ScanIdleScreen({
               className="w-full h-full object-cover"
               style={{ objectPosition: "center 20%" }}
             />
-            <motion.div className="absolute left-0 right-0 h-[2px] z-10"
-              style={{ background: `linear-gradient(90deg, transparent 0%, ${DEEP_GREEN}CC 40%, ${DEEP_GREEN} 50%, ${DEEP_GREEN}CC 60%, transparent 100%)` }}
-              animate={reducedMotion ? { top: "50%" } : { top: ["8%", "88%", "8%"] }}
+            <motion.div className="absolute inset-x-0 h-[2px] z-10"
+              style={{ background: `linear-gradient(90deg, transparent 0%, ${DEEP_GREEN}CC 40%, ${DEEP_GREEN} 50%, ${DEEP_GREEN}CC 60%, transparent 100%)`, top: 0, willChange: "transform" }}
+              animate={reducedMotion ? {} : { top: ["8%", "88%", "8%"] }}
               transition={reducedMotion ? {} : { duration: 3.5, repeat: Infinity, ease: "easeInOut" }} />
             <div className="absolute inset-x-0 bottom-0 h-16"
               style={{ background: "linear-gradient(to top, rgba(20,20,20,0.45), transparent)" }} />
@@ -272,9 +304,9 @@ export function ScanIdleScreen({
               <React.Fragment key={i}>
                 <div className="flex items-center gap-1.5">
                   <step.Icon className="w-3.5 h-3.5" style={{ color: step.active ? SCAN_TO : "#A9998E" }} />
-                  <span className="text-[12px] font-medium" style={{ color: "#6B5D55" }}>{step.title}</span>
+                  <span className="text-[12px] font-medium" style={{ color: TEXT_LABEL }}>{step.title}</span>
                 </div>
-                {i < 2 && <span className="text-stone-300 text-[11px]">›</span>}
+                {i < 2 && <span className="text-[11px]" style={{ color: TEXT_TERTIARY }}>›</span>}
               </React.Fragment>
             ))}
           </div>
@@ -290,11 +322,11 @@ export function ScanIdleScreen({
               borderRadius: 26,
             }}
             whileHover={{ scale: reducedMotion ? 1 : 1.02 }}
-            whileTap={{ scale: reducedMotion ? 1 : 0.97 }}
+            whileTap={{ scale: reducedMotion ? 1 : 0.96, y: reducedMotion ? 0 : 2 }}
           >
             {t("idle.ctaBtn")}
           </motion.button>
-          <p className="text-center text-[12px] mt-2" style={{ color: TEXT_TERTIARY }}>
+          <p className="text-center text-[12px] mt-4" style={{ color: TEXT_TERTIARY }}>
             {t("idle.ctaHint")}
           </p>
         </motion.div>
@@ -319,7 +351,7 @@ export function ScanIdleScreen({
                 {latestScan.overallScore ?? "—"}
               </p>
               {latestScoreDelta !== null && (
-                <span className="inline-block mt-2 text-[13px] font-semibold" style={{ color: latestScoreDelta >= 0 ? "#2D7D46" : "#C2410C" }}>
+                <span className="inline-block mt-2 text-[13px] font-semibold" style={{ color: latestScoreDelta >= 0 ? COLOR_SUCCESS : COLOR_DANGER }}>
                   {latestScoreDelta >= 0 ? "+" : ""}{latestScoreDelta}{t("result.scoreSuffix")}
                 </span>
               )}
@@ -364,7 +396,7 @@ export function ScanIdleScreen({
 
       {/* 바우만 설명 더보기 accordion */}
       <motion.div variants={fadeChild} className="mb-8 relative" style={{ zIndex: 1 }}>
-        <div style={{ background: "#FFFFFF", boxShadow: SHADOW_CARD, borderRadius: RADIUS_CARD }}>
+        <div style={{ background: BG_BASE, boxShadow: SHADOW_CARD, borderRadius: RADIUS_CARD }}>
           <button onClick={() => setShowBaumannExp(v => !v)}
             className="w-full flex items-center justify-between px-4 py-3.5">
             <div className="flex items-center gap-2">
@@ -372,8 +404,8 @@ export function ScanIdleScreen({
               <p className="text-[14px] font-semibold text-[#6B5D55]">{t("idle.baumannSectionTitle")}</p>
             </div>
             <div className="flex items-center gap-1.5">
-              {!showBaumannExp && <span className="text-xs font-bold text-stone-400">O/D · S/R · P/N · W/T</span>}
-              <ChevronDown className={`w-4 h-4 text-stone-400 transition-transform duration-200 ${showBaumannExp ? "rotate-180" : ""}`} />
+              {!showBaumannExp && <span className="text-xs font-bold" style={{ color: TEXT_TERTIARY }}>O/D · S/R · P/N · W/T</span>}
+              <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${showBaumannExp ? "rotate-180" : ""} style={{ color: TEXT_TERTIARY }}`} />
             </div>
           </button>
           <AnimatePresence>
@@ -381,12 +413,12 @@ export function ScanIdleScreen({
               <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }}
                 exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.22 }}
                 className="overflow-hidden px-4 pb-4">
-                <p className="text-xs text-stone-500 mb-3 leading-relaxed">{t("idle.baumannSectionDesc")}</p>
+                <p className="text-xs mb-3 leading-relaxed" style={{ color: TEXT_SECONDARY }}>{t("idle.baumannSectionDesc")}</p>
                 <div className="space-y-1.5 mb-3">
                   {(t("idle.baumannAxes", { returnObjects: true }) as any[]).map((ax: any, i: number) => (
                     <div key={i} className="flex items-center gap-3 p-2.5" style={{ borderRadius: RADIUS_ITEM, background: BG_MUTED }}>
-                      <p className="text-xs font-semibold text-stone-600 w-16 shrink-0">{ax.label}</p>
-                      <p className="text-xs text-stone-400">{ax.desc}</p>
+                      <p className="text-xs font-semibold w-16 shrink-0" style={{ color: TEXT_LABEL }}>{ax.label}</p>
+                      <p className="text-xs" style={{ color: TEXT_TERTIARY }}>{ax.desc}</p>
                     </div>
                   ))}
                 </div>
@@ -479,22 +511,22 @@ function HomeRoutineWidget({ onOpenRoutine }: { onOpenRoutine?: () => void }) {
 
 
   return (
-    <div className="mb-4">
+    <div className="mb-8">
       {/* 루틴 요약 한 줄 — 탭하면 루틴 탭으로 */}
       <button
         onClick={onOpenRoutine}
         className="w-full flex items-center justify-between px-4 py-3"
-        style={{ borderRadius: RADIUS_CARD, background: "#FFFFFF", boxShadow: SHADOW_CARD }}
+        style={{ borderRadius: RADIUS_CARD, background: BG_BASE, boxShadow: SHADOW_CARD }}
       >
         <div className="flex items-center gap-2.5">
           <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ background: `${DEEP_GREEN}12` }}>
             <span className="text-[13px] font-bold" style={{ color: DEEP_GREEN }}>✓</span>
           </div>
           <div className="text-left">
-            <p className="text-[13px] font-semibold" style={{ color: "#5C4F4A" }}>
+            <p className="text-[13px] font-semibold" style={{ color: TEXT_TITLE }}>
               {t("routineChecklist.title", "오늘 사용한 화장품")}
             </p>
-            <p className="text-[11px]" style={{ color: TEXT_TERTIARY }}>
+            <p className="text-[12px]" style={{ color: TEXT_TERTIARY }}>
               {checkedCount}/{total} {t("routineChecklist.completed", "완료")}
             </p>
           </div>
@@ -507,9 +539,9 @@ function HomeRoutineWidget({ onOpenRoutine }: { onOpenRoutine?: () => void }) {
       {/* 효과 보드 (가장 효과 좋은 제품) */}
       {topSignal && (
         <div className="flex items-center gap-3 mt-2 px-4 py-3"
-          style={{ borderRadius: RADIUS_CARD, background: "#FFFFFF", boxShadow: SHADOW_CARD }}>
+          style={{ borderRadius: RADIUS_CARD, background: BG_BASE, boxShadow: SHADOW_CARD }}>
           <div className="flex-1 min-w-0">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.14em] mb-1" style={{ color: SCAN_TO, fontFamily: FONT_DISPLAY }}>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.14em] mb-1" style={{ color: SCAN_TO }}>
               {t("idle.effectBoard", "효과 추적")}
             </p>
             <p className="text-[13px] font-bold text-[#5C4F4A] truncate">{topSignal.itemName}</p>
@@ -517,7 +549,7 @@ function HomeRoutineWidget({ onOpenRoutine }: { onOpenRoutine?: () => void }) {
           </div>
           {topSignal.topScoreDelta != null && (
             <span className="rounded-full px-2.5 py-1 text-xs font-bold shrink-0"
-              style={{ background: topSignal.topScoreDelta >= 0 ? "#E8F5EC" : "#FFF7ED", color: topSignal.topScoreDelta >= 0 ? "#2D7D46" : "#C2410C" }}>
+              style={{ background: topSignal.topScoreDelta >= 0 ? "#E8F5EC" : "#FFF7ED", color: topSignal.topScoreDelta >= 0 ? COLOR_SUCCESS : COLOR_DANGER }}>
               {topSignal.topScoreDelta >= 0 ? "+" : ""}{topSignal.topScoreDelta}
             </span>
           )}

@@ -2,7 +2,16 @@ import { AnimatePresence, motion, useDragControls } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import { AlertCircle, Moon, Sun, Utensils, X } from "lucide-react";
 
-import { BG_MUTED, BORDER_COLOR, FONT_DISPLAY, NUTRIENT_COLORS, NUTRIENT_ICONS, TEXT_TERTIARY } from "./constants";
+import {
+  BG_MUTED,
+  BORDER_COLOR,
+  FONT_DISPLAY,
+  NUTRIENT_COLORS,
+  NUTRIENT_ICONS,
+  TEXT_TERTIARY,
+  BG_BASE,
+  COLOR_WARNING,
+} from "./constants";
 
 export function ResultNutrientsSheet({
   open,
@@ -49,7 +58,7 @@ export function ResultNutrientsSheet({
                     <Utensils className="w-4 h-4 text-white" />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-base" style={{ color: "#D97706" }}>{t("nutrients.sectionTitle")}</h3>
+                    <h3 className="font-semibold text-base" style={{ color: COLOR_WARNING }}>{t("nutrients.sectionTitle")}</h3>
                     <p className="text-xs" style={{ fontFamily: FONT_DISPLAY, color: TEXT_TERTIARY }}>{t("nutrients.sectionSub")}</p>
                   </div>
                 </div>
@@ -76,7 +85,7 @@ export function ResultNutrientsSheet({
                       style={{ background: BG_MUTED, borderColor: BORDER_COLOR }}
                     >
                       <div className="shrink-0">
-                        <div className="w-8 h-8 rounded-full flex items-center justify-center text-base border" style={{ background: "#FFFFFF", borderColor: BORDER_COLOR }}>
+                        <div className="w-8 h-8 rounded-full flex items-center justify-center text-base border" style={{ background: BG_BASE, borderColor: BORDER_COLOR }}>
                           {NUTRIENT_ICONS[letter]}
                         </div>
                         <p className="text-xs font-normal text-center mt-0.5" style={{ fontFamily: FONT_DISPLAY, color }}>{letter}</p>
@@ -96,7 +105,7 @@ export function ResultNutrientsSheet({
                 <div className="pt-1">
                   <div className="flex items-center gap-2 mb-3 pt-2 border-t border-stone-100">
                     <AlertCircle className="w-4 h-4 text-amber-500 shrink-0" />
-                    <p className="text-sm font-semibold" style={{ color: "#D97706" }}>{t("nutrients.avoidTitle")}</p>
+                    <p className="text-sm font-semibold" style={{ color: COLOR_WARNING }}>{t("nutrients.avoidTitle")}</p>
                   </div>
 
                   <div className="rounded-2xl p-4 mb-2.5 border" style={{ background: BG_MUTED, borderColor: BORDER_COLOR }}>

@@ -1,7 +1,12 @@
 import { Crown, Share2, Trophy, ChevronRight } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
-import { DEEP_GREEN, SCAN_TO, BORDER_COLOR } from "./constants";
+import {
+  DEEP_GREEN,
+  SCAN_TO,
+  BORDER_COLOR,
+  TEXT_TERTIARY,
+} from "./constants";
 
 export function ResultActionBar({
   shareLoading,
@@ -58,7 +63,7 @@ export function ResultActionBar({
           style={
             currentShareToken
               ? { background: "rgba(201,112,98,0.06)", color: SCAN_TO, border: "1.5px solid rgba(201,112,98,0.18)" }
-              : { background: "rgba(0,0,0,0.02)", color: "#B0A898", border: "1.5px solid rgba(0,0,0,0.06)" }
+              : { background: "rgba(0,0,0,0.02)", color: TEXT_TERTIARY, border: "1.5px solid rgba(0,0,0,0.06)" }
           }
           disabled={!currentShareToken}
           onClick={onCreateChallenge}

@@ -2,7 +2,17 @@ import { useTranslation } from "react-i18next";
 import { Bot, CheckCircle2 } from "lucide-react";
 
 import type { PredictionScenario } from "./types";
-import { DEEP_GREEN, SCAN_TO, FONT_DISPLAY, TEXT_TERTIARY, RADIUS_CARD, RADIUS_SUB } from "./constants";
+import {
+  DEEP_GREEN,
+  SCAN_TO,
+  FONT_DISPLAY,
+  TEXT_TERTIARY,
+  RADIUS_CARD,
+  RADIUS_SUB,
+  TEXT_TITLE,
+  TEXT_SECONDARY,
+  COLOR_INFO,
+} from "./constants";
 
 export function SkinPredictionCard({
   prediction,
@@ -24,11 +34,11 @@ export function SkinPredictionCard({
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-center gap-2 min-w-0">
           <div className="w-9 h-9 rounded-full flex items-center justify-center shrink-0" style={{ background: "#F6F4FB" }}>
-            <Bot className="w-4.5 h-4.5" style={{ color: "#7C3AED" }} />
+            <Bot className="w-4.5 h-4.5" style={{ color: COLOR_INFO }} />
           </div>
           <div className="min-w-0">
-            <p className="text-[14px] font-bold" style={{ color: "#5C4F4A" }}>{t("result.prediction.title")}</p>
-            <p className="text-xs" style={{ color: "#8C8078" }}>{t("result.prediction.currentScore", { score: currentScore })}</p>
+            <p className="text-[14px] font-bold" style={{ color: TEXT_TITLE }}>{t("result.prediction.title")}</p>
+            <p className="text-xs" style={{ color: TEXT_SECONDARY }}>{t("result.prediction.currentScore", { score: currentScore })}</p>
           </div>
         </div>
         <div className="px-3 py-2 text-right shrink-0" style={{ borderRadius: RADIUS_SUB, background: "#F5F3FF" }}>
@@ -39,14 +49,14 @@ export function SkinPredictionCard({
       </div>
 
       <div className="flex items-center justify-between gap-3">
-        <p className="text-xs font-bold text-kr-pretty" style={{ color: "#5C4F4A" }}>
+        <p className="text-xs font-bold text-kr-pretty" style={{ color: TEXT_TITLE }}>
           {t("result.prediction.missionTitle")}
         </p>
         <div className="flex items-center gap-1.5 shrink-0">
           <span className="rounded-full px-2.5 py-1 text-[11px] font-bold text-violet-600" style={{ background: "rgba(124,58,237,0.06)" }}>
             {t("result.prediction.daysAfter", { days: good.days })}
           </span>
-          <span className="rounded-full px-2.5 py-1 text-[11px] font-bold" style={{ color: "#8C8078", background: "rgba(0,0,0,0.03)" }}>
+          <span className="rounded-full px-2.5 py-1 text-[11px] font-bold" style={{ color: TEXT_SECONDARY, background: "rgba(0,0,0,0.03)" }}>
             {t("result.prediction.disclaimer")}
           </span>
         </div>
@@ -58,7 +68,7 @@ export function SkinPredictionCard({
           <div className="min-w-0">
             <p className="text-xs font-bold text-emerald-600">{t("result.prediction.bestRoute")}</p>
             <p className="text-[13px] font-bold text-emerald-700 text-kr-pretty mt-0.5">{good.scenario}</p>
-            <p className="text-xs mt-0.5" style={{ color: "#8C8078" }}>{t("result.prediction.goodCaption")}</p>
+            <p className="text-xs mt-0.5" style={{ color: TEXT_SECONDARY }}>{t("result.prediction.goodCaption")}</p>
           </div>
           <div className="text-right shrink-0">
             <p className="text-[28px] font-bold leading-none text-emerald-600">{good.score}</p>
@@ -82,7 +92,7 @@ export function SkinPredictionCard({
           <div className="min-w-0">
             <p className="text-xs font-bold text-orange-500">{t("result.prediction.riskRoute")}</p>
             <p className="text-[13px] font-bold text-orange-700 text-kr-pretty mt-0.5">{bad.scenario}</p>
-            <p className="text-xs mt-0.5" style={{ color: "#8C8078" }}>{t("result.prediction.badCaption")}</p>
+            <p className="text-xs mt-0.5" style={{ color: TEXT_SECONDARY }}>{t("result.prediction.badCaption")}</p>
           </div>
           <div className="text-right shrink-0">
             <p className="text-[28px] font-bold leading-none text-orange-500">{bad.score}</p>

@@ -41,6 +41,9 @@ import {
   FONT_DISPLAY,
   TEXT_TERTIARY,
   BG_MUTED,
+  BG_BASE,
+  COLOR_DANGER,
+  COLOR_INFO,
 } from "./constants";
 
 type DiaryReportTabProps = {
@@ -210,7 +213,7 @@ export function DiaryReportTab({
 
           {/* Weekly Grade — large */}
           <div className="flex flex-col items-center mt-4">
-            <p className="text-xs font-semibold text-stone-400">
+            <p className="text-xs font-semibold" style={{ color: TEXT_TERTIARY }}>
               {t("diaryReport.weeklyGradeLabel")}
             </p>
             <div
@@ -241,7 +244,7 @@ export function DiaryReportTab({
           <div className="mt-3 flex justify-center">
             <span
               className="rounded-full px-3 py-1 text-xs font-semibold"
-              style={{ background: "#FFFFFF", color: SCAN_TO }}
+              style={{ background: BG_BASE, color: SCAN_TO }}
             >
               {reportStatusLabel}
             </span>
@@ -263,9 +266,9 @@ export function DiaryReportTab({
           <div className="grid grid-cols-3 gap-2 mt-4">
             <div
               className="rounded-2xl p-3 text-center"
-              style={{ background: "#FFFFFF" }}
+              style={{ background: BG_BASE }}
             >
-              <p className="text-xs font-semibold text-stone-400">
+              <p className="text-xs font-semibold" style={{ color: TEXT_TERTIARY }}>
                 {diaryReport.copy.scans}
               </p>
               <p
@@ -277,9 +280,9 @@ export function DiaryReportTab({
             </div>
             <div
               className="rounded-2xl p-3 text-center"
-              style={{ background: "#FFFFFF" }}
+              style={{ background: BG_BASE }}
             >
-              <p className="text-xs font-semibold text-stone-400">
+              <p className="text-xs font-semibold" style={{ color: TEXT_TERTIARY }}>
                 {diaryReport.copy.diary}
               </p>
               <p
@@ -291,9 +294,9 @@ export function DiaryReportTab({
             </div>
             <div
               className="rounded-2xl p-3 text-center"
-              style={{ background: "#FFFFFF" }}
+              style={{ background: BG_BASE }}
             >
-              <p className="text-xs font-semibold text-stone-400">
+              <p className="text-xs font-semibold" style={{ color: TEXT_TERTIARY }}>
                 {diaryReport.copy.adherence}
               </p>
               <p
@@ -314,7 +317,7 @@ export function DiaryReportTab({
         <Card
           className="border-none rounded-3xl overflow-hidden"
           style={{
-            background: "#FFFFFF",
+            background: BG_BASE,
             boxShadow: "0 1px 6px rgba(0,0,0,0.04)",
           }}
         >
@@ -335,7 +338,7 @@ export function DiaryReportTab({
                 {trendDelta > 0 ? "+" : ""}
                 {trendDelta}
               </span>
-              <span className="text-xs text-stone-400">
+              <span className="text-xs" style={{ color: TEXT_TERTIARY }}>
                 {t("diaryReport.vsLastWeek")}
               </span>
             </div>
@@ -415,7 +418,7 @@ export function DiaryReportTab({
         <Card
           className="border-none rounded-3xl overflow-hidden"
           style={{
-            background: "#FFFFFF",
+            background: BG_BASE,
             boxShadow: "0 1px 6px rgba(0,0,0,0.04)",
           }}
         >
@@ -466,7 +469,7 @@ export function DiaryReportTab({
       ═══════════════════════════════════════════════════════════════════════ */}
       <Card
         className="border-none rounded-3xl overflow-hidden"
-        style={{ background: "#FFFFFF", boxShadow: "0 1px 6px rgba(0,0,0,0.04)" }}
+        style={{ background: BG_BASE, boxShadow: "0 1px 6px rgba(0,0,0,0.04)" }}
       >
         <CardContent className="p-5">
           <div className="flex items-start gap-3">
@@ -509,7 +512,7 @@ export function DiaryReportTab({
       {/* ─── Cause Estimates ───────────────────────────────────────────────── */}
       <Card
         className="border-none rounded-3xl overflow-hidden"
-        style={{ background: "#FFFFFF", boxShadow: "0 1px 6px rgba(0,0,0,0.04)" }}
+        style={{ background: BG_BASE, boxShadow: "0 1px 6px rgba(0,0,0,0.04)" }}
       >
         <CardContent className="p-4">
           <SectionLabel>{t("diaryReport.causes")}</SectionLabel>
@@ -524,7 +527,7 @@ export function DiaryReportTab({
                   className="w-7 h-7 rounded-xl flex items-center justify-center shrink-0 text-xs font-normal"
                   style={{
                     fontFamily: FONT_DISPLAY,
-                    background: "#FFFFFF",
+                    background: BG_BASE,
                     color: SCAN_TO,
                   }}
                 >
@@ -542,7 +545,7 @@ export function DiaryReportTab({
       {/* ─── Priorities ────────────────────────────────────────────────────── */}
       <Card
         className="border-none rounded-3xl overflow-hidden"
-        style={{ background: "#FFFFFF", boxShadow: "0 1px 6px rgba(0,0,0,0.04)" }}
+        style={{ background: BG_BASE, boxShadow: "0 1px 6px rgba(0,0,0,0.04)" }}
       >
         <CardContent className="p-4">
           <SectionLabel>{t("diaryReport.priorities")}</SectionLabel>
@@ -564,13 +567,13 @@ export function DiaryReportTab({
                   className="w-7 h-7 rounded-xl flex items-center justify-center shrink-0 text-xs font-normal"
                   style={{
                     fontFamily: FONT_DISPLAY,
-                    background: "#FFFFFF",
+                    background: BG_BASE,
                     color:
                       index === 0
                         ? SCAN_TO
                         : index === 1
                           ? DEEP_GREEN
-                          : "#7C3AED",
+                          : COLOR_INFO,
                   }}
                 >
                   {index + 1}
@@ -589,7 +592,7 @@ export function DiaryReportTab({
       ═══════════════════════════════════════════════════════════════════════ */}
       <Card
         className="border-none rounded-3xl overflow-hidden"
-        style={{ background: "#FFFFFF", boxShadow: "0 1px 6px rgba(0,0,0,0.04)" }}
+        style={{ background: BG_BASE, boxShadow: "0 1px 6px rgba(0,0,0,0.04)" }}
       >
         <CardContent className="p-4">
           <SectionLabel>{t("diaryReport.radarTitle")}</SectionLabel>
@@ -659,7 +662,7 @@ export function DiaryReportTab({
             key={concern.key}
             className="border-none rounded-3xl overflow-hidden"
             style={{
-              background: "#FFFFFF",
+              background: BG_BASE,
               boxShadow: "0 1px 6px rgba(0,0,0,0.04)",
             }}
           >
@@ -732,7 +735,7 @@ export function DiaryReportTab({
             <div className="flex items-center gap-2.5">
               <div
                 className="w-10 h-10 rounded-2xl flex items-center justify-center shrink-0"
-                style={{ background: "#FFFFFF" }}
+                style={{ background: BG_BASE }}
               >
                 <Leaf className="w-4 h-4" style={{ color: DEEP_GREEN }} />
               </div>
@@ -779,7 +782,7 @@ export function DiaryReportTab({
         <Card
           className="border-none rounded-3xl overflow-hidden"
           style={{
-            background: "#FFFFFF",
+            background: BG_BASE,
             boxShadow: "0 1px 6px rgba(0,0,0,0.04)",
           }}
         >
@@ -852,7 +855,7 @@ export function DiaryReportTab({
         <Card
           className="border-none rounded-3xl overflow-hidden"
           style={{
-            background: "#FFFFFF",
+            background: BG_BASE,
             boxShadow: "0 1px 6px rgba(0,0,0,0.04)",
           }}
         >
@@ -891,7 +894,7 @@ export function DiaryReportTab({
         <Card
           className="border-none rounded-3xl overflow-hidden"
           style={{
-            background: "#FFFFFF",
+            background: BG_BASE,
             boxShadow: "0 1px 6px rgba(0,0,0,0.04)",
           }}
         >
@@ -907,7 +910,7 @@ export function DiaryReportTab({
                   className="rounded-2xl p-3 border"
                   style={{
                     borderColor: `${item.accent}20`,
-                    background: "#FFFFFF",
+                    background: BG_BASE,
                   }}
                 >
                   <div className="flex items-center justify-between gap-2">
@@ -947,7 +950,7 @@ export function DiaryReportTab({
         <Card
           className="border-none rounded-3xl overflow-hidden"
           style={{
-            background: "#FFFFFF",
+            background: BG_BASE,
             boxShadow: "0 1px 6px rgba(0,0,0,0.04)",
           }}
         >
@@ -1027,7 +1030,7 @@ export function DiaryReportTab({
                   </div>
                 </>
               ) : (
-                <p className="text-[12px] text-stone-400 py-8 text-center">
+                <p className="text-[12px] py-8 text-center" style={{ color: TEXT_TERTIARY }}>
                   {diaryReport.copy.notEnough}
                 </p>
               )}
@@ -1040,7 +1043,7 @@ export function DiaryReportTab({
           <Card
             className="border-none rounded-3xl overflow-hidden"
             style={{
-              background: "#FFFFFF",
+              background: BG_BASE,
               boxShadow: "0 1px 6px rgba(0,0,0,0.04)",
             }}
           >
@@ -1068,7 +1071,7 @@ export function DiaryReportTab({
           <Card
             className="border-none rounded-3xl overflow-hidden"
             style={{
-              background: "#FFFFFF",
+              background: BG_BASE,
               boxShadow: "0 1px 6px rgba(0,0,0,0.04)",
             }}
           >
@@ -1097,7 +1100,7 @@ export function DiaryReportTab({
       ═══════════════════════════════════════════════════════════════════════ */}
       <Card
         className="border-none rounded-3xl overflow-hidden"
-        style={{ background: "#FFFFFF", boxShadow: "0 1px 6px rgba(0,0,0,0.04)" }}
+        style={{ background: BG_BASE, boxShadow: "0 1px 6px rgba(0,0,0,0.04)" }}
       >
         <CardContent className="p-4">
           <SectionLabel>{t("diaryReport.routineAdjust")}</SectionLabel>
@@ -1119,7 +1122,7 @@ export function DiaryReportTab({
                   <span
                     key={item}
                     className="px-2.5 py-1 rounded-full text-xs font-semibold"
-                    style={{ background: "#FFFFFF", color: SCAN_TO }}
+                    style={{ background: BG_BASE, color: SCAN_TO }}
                   >
                     {item}
                   </span>
@@ -1138,7 +1141,7 @@ export function DiaryReportTab({
                   <span
                     key={item}
                     className="px-2.5 py-1 rounded-full text-xs font-semibold"
-                    style={{ background: "#FFFFFF", color: "#7C3AED" }}
+                    style={{ background: BG_BASE, color: COLOR_INFO }}
                   >
                     {item}
                   </span>
@@ -1185,7 +1188,7 @@ export function DiaryReportTab({
       ═══════════════════════════════════════════════════════════════════════ */}
       <Card
         className="border-none rounded-3xl overflow-hidden"
-        style={{ background: "#FFFFFF", boxShadow: "0 1px 6px rgba(0,0,0,0.04)" }}
+        style={{ background: BG_BASE, boxShadow: "0 1px 6px rgba(0,0,0,0.04)" }}
       >
         <CardContent className="p-4">
           <SectionLabel>{t("diaryReport.lifestyle")}</SectionLabel>
@@ -1246,7 +1249,7 @@ export function DiaryReportTab({
                   </div>
                 ))
               ) : (
-                <p className="text-[12px] text-stone-400 py-4 text-center">
+                <p className="text-[12px] py-4 text-center" style={{ color: TEXT_TERTIARY }}>
                   {diaryReport.copy.notEnough}
                 </p>
               )}
@@ -1257,7 +1260,7 @@ export function DiaryReportTab({
           <div className="mt-4">
             <p
               className="text-xs font-semibold uppercase tracking-[0.12em]"
-              style={{ color: "#C2410C" }}
+              style={{ color: COLOR_DANGER }}
             >
               {t("diaryReport.avoidThisWeek")}
             </p>
@@ -1270,7 +1273,7 @@ export function DiaryReportTab({
                 >
                   <AlertTriangle
                     className="w-4 h-4 mt-0.5 shrink-0"
-                    style={{ color: "#C2410C" }}
+                    style={{ color: COLOR_DANGER }}
                   />
                   <p className="text-[12px] text-[#6B5D55] leading-relaxed text-kr-pretty">
                     {item}
@@ -1301,8 +1304,8 @@ export function DiaryReportTab({
             {diaryReport.forecast.note}
           </p>
           <div className="grid grid-cols-2 gap-3 mt-4">
-            <div className="rounded-2xl p-4" style={{ background: "#FFFFFF" }}>
-              <p className="text-xs font-semibold text-stone-400">WEEK 1</p>
+            <div className="rounded-2xl p-4" style={{ background: BG_BASE }}>
+              <p className="text-xs font-semibold" style={{ color: TEXT_TERTIARY }}>WEEK 1</p>
               <p
                 className="text-[28px] font-normal mt-1"
                 style={{ fontFamily: FONT_DISPLAY, color: SCAN_TO }}
@@ -1322,8 +1325,8 @@ export function DiaryReportTab({
                 />
               </div>
             </div>
-            <div className="rounded-2xl p-4" style={{ background: "#FFFFFF" }}>
-              <p className="text-xs font-semibold text-stone-400">WEEK 2</p>
+            <div className="rounded-2xl p-4" style={{ background: BG_BASE }}>
+              <p className="text-xs font-semibold" style={{ color: TEXT_TERTIARY }}>WEEK 2</p>
               <p
                 className="text-[28px] font-normal mt-1"
                 style={{ fontFamily: FONT_DISPLAY, color: DEEP_GREEN }}
@@ -1388,7 +1391,7 @@ export function DiaryReportTab({
       ═══════════════════════════════════════════════════════════════════════ */}
       <Card
         className="border-none rounded-3xl overflow-hidden"
-        style={{ background: "#FFFFFF", boxShadow: "0 1px 6px rgba(0,0,0,0.04)" }}
+        style={{ background: BG_BASE, boxShadow: "0 1px 6px rgba(0,0,0,0.04)" }}
       >
         <CardContent className="p-5">
           <SectionLabel>
@@ -1398,7 +1401,7 @@ export function DiaryReportTab({
             {closingComment}
           </p>
           <div className="mt-4 pt-3 border-t" style={{ borderColor: BORDER_COLOR }}>
-            <p className="text-[11px] text-stone-400 text-center">
+            <p className="text-[11px] text-center" style={{ color: TEXT_TERTIARY }}>
               {t("diaryReport.fondayAdvisorReport")}{" "}
               — {diaryReport.periodLabel}
             </p>

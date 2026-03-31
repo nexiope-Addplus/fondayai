@@ -45,9 +45,9 @@ export function ScanningScreen({ imageSrc }: { imageSrc: string | null }) {
           <Camera className="w-16 h-16 opacity-10" />
         )}
         <motion.div
-          className="absolute left-0 right-0 h-1 shadow-lg"
-          style={{ background: `linear-gradient(90deg, transparent, ${SCAN_FROM}, ${SCAN_TO}, ${SCAN_FROM}, transparent)` }}
-          animate={reducedMotion ? { top: "50%" } : { top: ["5%", "95%", "5%"] }}
+          className="absolute inset-x-0 h-1 shadow-lg"
+          style={{ background: `linear-gradient(90deg, transparent, ${SCAN_FROM}, ${SCAN_TO}, ${SCAN_FROM}, transparent)`, top: 0, willChange: "transform" }}
+          animate={reducedMotion ? {} : { top: ["5%", "95%", "5%"] }}
           transition={reducedMotion ? {} : { duration: 2, repeat: Infinity, ease: "easeInOut" }}
         />
         <div className="absolute inset-0 bg-black/15" />
@@ -61,7 +61,7 @@ export function ScanningScreen({ imageSrc }: { imageSrc: string | null }) {
       <div className="mt-8 text-center space-y-3">
         <AnimatePresence mode="wait">
           <motion.p key={textIdx} className="font-semibold text-xl text-[#5C4F4A]"
-            initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.3 }}>
+            initial={reducedMotion ? {} : { opacity: 0, y: 8 }} animate={reducedMotion ? {} : { opacity: 1, y: 0 }} exit={reducedMotion ? {} : { opacity: 0, y: -8 }} transition={reducedMotion ? { duration: 0 } : { duration: 0.3 }}>
             {texts[textIdx]}
           </motion.p>
         </AnimatePresence>

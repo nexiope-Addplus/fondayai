@@ -11,12 +11,28 @@ import {
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
-  BG_BASE, BG_MUTED, BORDER_COLOR, FONT_DISPLAY,
-  DEEP_GREEN, DEEP_GREEN_LIGHT, SCAN_FROM, SCAN_TO,
+  BG_BASE,
+  BG_MUTED,
+  BORDER_COLOR,
+  FONT_DISPLAY,
+  DEEP_GREEN,
+  DEEP_GREEN_LIGHT,
+  SCAN_FROM,
+  SCAN_TO,
   TEXT_TERTIARY,
-  TINT_WARM, TINT_GREEN, TINT_NEUTRAL, SCORE_LABEL_MAP, NUTRIENT_COLORS,
-  SCORE_COLORS, fadeChild, stagger, MISSION_POINTS,
+  TINT_WARM,
+  TINT_GREEN,
+  TINT_NEUTRAL,
+  SCORE_LABEL_MAP,
+  NUTRIENT_COLORS,
+  SCORE_COLORS,
+  fadeChild,
+  stagger,
+  MISSION_POINTS,
   PAGE_GRADIENT,
+  TEXT_TITLE,
+  TEXT_SECONDARY,
+  COLOR_INFO,
 } from "./constants";
 import type { CosmeticItem, StreakData, RankingData, MissionState, TodoItem } from "./types";
 import {
@@ -610,7 +626,7 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
       label: t("result.actionCard.questMemo"),
       reward: todayHasMemo ? t("result.actionCard.questDone") : t("result.actionCard.questPending"),
       detail: t("result.actionCard.questMemoDetail"),
-      accent: "#7C3AED",
+      accent: COLOR_INFO,
     },
     {
       id: "improve",
@@ -626,7 +642,7 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
       label: t("result.actionCard.questChallenge"),
       reward: `+${MISSION_POINTS.daily_challenge}pt`,
       detail: t("result.actionCard.questChallengeDetail"),
-      accent: "#7C3AED",
+      accent: COLOR_INFO,
     },
   ];
   const essentialQuestIds = new Set(["scan", "routine", "memo"]);
@@ -827,7 +843,7 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
           </button>
           <div className="flex items-center gap-2">
             <img src="/fonday-logo.svg" alt="Fonday" className="h-5" style={{ objectFit: "contain" }} />
-            <span className="text-[14px] font-bold" style={{ color: "#5C4F4A" }}>{t("result.reportLabel", "피부 리포트")}</span>
+            <span className="text-[14px] font-bold" style={{ color: TEXT_TITLE }}>{t("result.reportLabel", "피부 리포트")}</span>
           </div>
         </div>
 
@@ -854,20 +870,20 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
           <div className="flex items-start gap-3 px-4 py-3.5"
             style={{ borderRadius: 16, background: TINT_GREEN }}>
             <div className="w-8 h-8 rounded-full flex items-center justify-center shrink-0 mt-0.5"
-              style={{ background: "#FFFFFF" }}>
+              style={{ background: BG_BASE }}>
               <Sparkles className="w-4 h-4" style={{ color: DEEP_GREEN }} />
             </div>
             <div className="min-w-0 flex-1">
               <p className="text-[11px] font-semibold uppercase tracking-[0.1em]" style={{ color: DEEP_GREEN }}>
                 {t("result.todayFocus")}
               </p>
-              <p className="text-[14px] font-bold mt-0.5" style={{ color: "#5C4F4A" }}>
+              <p className="text-[14px] font-bold mt-0.5" style={{ color: TEXT_TITLE }}>
                 {analysisResult.improvements[0].title}
               </p>
-              <p className="text-[12px] mt-1 text-kr-pretty" style={{ color: "#8C8078" }}>
+              <p className="text-[12px] mt-1 text-kr-pretty" style={{ color: TEXT_SECONDARY }}>
                 {t("result.actionCard.phaseMorning")}: {morningTask}
               </p>
-              <p className="text-[12px] mt-0.5 text-kr-pretty" style={{ color: "#8C8078" }}>
+              <p className="text-[12px] mt-0.5 text-kr-pretty" style={{ color: TEXT_SECONDARY }}>
                 {t("result.actionCard.phaseEvening")}: {eveningTask}
               </p>
             </div>
@@ -882,7 +898,7 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
             {([
               { id: "routine" as const,   label: t("result.tab.routine"),   icon: <CheckCircle2 className="w-4 h-4" />, activeBg: "#F7FBF8", activeText: DEEP_GREEN },
               { id: "solution" as const,  label: t("result.tab.solution"),  icon: <Leaf className="w-4 h-4" />,         activeBg: "#FFF8F4", activeText: SCAN_TO },
-              { id: "nutrition" as const, label: t("result.tab.nutrition"), icon: <Utensils className="w-4 h-4" />,     activeBg: "#FCF8FF", activeText: "#7C3AED" },
+              { id: "nutrition" as const, label: t("result.tab.nutrition"), icon: <Utensils className="w-4 h-4" />,     activeBg: "#FCF8FF", activeText: COLOR_INFO },
             ]).map(({ id, label, icon, activeBg, activeText }) => {
               const isActive = activeTab === id;
               return (
@@ -977,6 +993,9 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
             onGoRoutineTab={onGoRoutine}
             onGoDiscoverTab={onGoMagazine}
             onGoMyTab={onGoMy}
+            loginPromptRef={loginPromptRef}
+            socialLoginButton={socialLoginButton}
+            handleGoogleLogin={handleGoogleLogin}
           />
           </motion.div>
         )}

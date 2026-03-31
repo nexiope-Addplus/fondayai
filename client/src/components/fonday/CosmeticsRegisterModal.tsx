@@ -10,6 +10,9 @@ import {
   DEEP_GREEN_LIGHT,
   SCAN_FROM,
   SCAN_TO,
+  TEXT_LABEL,
+  TEXT_SECONDARY,
+  TEXT_TERTIARY,
 } from "./constants";
 import { compressThumbnail, inferCosmeticTimeOfDay } from "./utils";
 
@@ -121,7 +124,7 @@ export function CosmeticsRegisterModal({ onClose, onSuccess }: { onClose: () => 
             <p className="text-base font-semibold" style={{ color: DEEP_GREEN }}>
               {step === 1 ? t("cosmetics.scanPhoto") : t("cosmetics.confirm")}
             </p>
-            <button onClick={onClose} className="w-8 h-8 rounded-full bg-stone-100 flex items-center justify-center text-stone-400 text-sm">✕</button>
+            <button onClick={onClose} className="w-8 h-8 rounded-full bg-stone-100 flex items-center justify-center text-sm" style={{ color: TEXT_TERTIARY }}>✕</button>
           </div>
           <div className="flex gap-1.5 mt-3">
             {[1, 2].map(s => (
@@ -153,8 +156,8 @@ export function CosmeticsRegisterModal({ onClose, onSuccess }: { onClose: () => 
                 <div className="rounded-3xl bg-stone-50 border-2 border-dashed border-stone-200 flex flex-col items-center justify-center gap-3"
                   style={{ height: 220 }}>
                   <span className="text-5xl">🧴</span>
-                  <p className="text-[13px] font-bold text-stone-400">{t("cosmetics.scanPhoto")}</p>
-                  <p className="text-xs text-stone-300">제품 전면이 잘 보이게 찍어주세요</p>
+                  <p className="text-[13px] font-bold" style={{ color: TEXT_TERTIARY }}>{t("cosmetics.scanPhoto")}</p>
+                  <p className="text-xs" style={{ color: TEXT_TERTIARY }}>제품 전면이 잘 보이게 찍어주세요</p>
                 </div>
               )}
 
@@ -188,12 +191,12 @@ export function CosmeticsRegisterModal({ onClose, onSuccess }: { onClose: () => 
                 )}
                 <div className="flex-1 min-w-0 space-y-3">
                   <div>
-                    <label className="text-xs font-semibold text-stone-400 uppercase tracking-wider mb-1 block">제품명</label>
+                    <label className="text-xs font-semibold uppercase tracking-wider mb-1 block" style={{ color: TEXT_TERTIARY }}>제품명</label>
                     <input value={name} onChange={e => setName(e.target.value)}
                       className="w-full px-3 py-2.5 rounded-xl text-[13px] font-medium text-[#5C4F4A] outline-none focus:border-[#4A7C6E] bg-stone-50" />
                   </div>
                   <div>
-                    <label className="text-xs font-semibold text-stone-400 uppercase tracking-wider mb-1 block">브랜드</label>
+                    <label className="text-xs font-semibold uppercase tracking-wider mb-1 block" style={{ color: TEXT_TERTIARY }}>브랜드</label>
                     <input value={brand} onChange={e => setBrand(e.target.value)}
                       className="w-full px-3 py-2.5 rounded-xl text-[13px] font-medium text-[#5C4F4A] outline-none focus:border-[#4A7C6E] bg-stone-50" />
                   </div>
@@ -210,7 +213,7 @@ export function CosmeticsRegisterModal({ onClose, onSuccess }: { onClose: () => 
               </div>
 
               <div>
-                <label className="text-xs font-semibold text-stone-400 uppercase tracking-wider mb-2 block">{t("cosmetics.categoryLabel")}</label>
+                <label className="text-xs font-semibold uppercase tracking-wider mb-2 block" style={{ color: TEXT_TERTIARY }}>{t("cosmetics.categoryLabel")}</label>
                 <div className="grid grid-cols-3 gap-2">
                   {COSMETIC_CATEGORIES.map(cat => (
                     <button key={cat} onClick={() => setCategory(cat)}
@@ -226,13 +229,13 @@ export function CosmeticsRegisterModal({ onClose, onSuccess }: { onClose: () => 
 
               {/* 개봉일 */}
               <div>
-                <label className="text-xs font-semibold text-stone-400 uppercase tracking-wider mb-2 block">{t("cosmetics.openedLabel")}</label>
+                <label className="text-xs font-semibold uppercase tracking-wider mb-2 block" style={{ color: TEXT_TERTIARY }}>{t("cosmetics.openedLabel")}</label>
                 <input type="date" value={openedAt} onChange={e => setOpenedAt(e.target.value)}
                   className="w-full px-4 py-3.5 rounded-2xl text-[14px] font-medium text-[#5C4F4A] outline-none focus:border-[#4A7C6E] bg-stone-50" />
               </div>
 
               <div>
-                <label className="text-xs font-semibold text-stone-400 uppercase tracking-wider mb-2 block">{t("cosmetics.ingredientsLabel")}</label>
+                <label className="text-xs font-semibold uppercase tracking-wider mb-2 block" style={{ color: TEXT_TERTIARY }}>{t("cosmetics.ingredientsLabel")}</label>
                 <textarea
                   value={ingredients}
                   onChange={e => setIngredients(e.target.value)}
@@ -244,7 +247,7 @@ export function CosmeticsRegisterModal({ onClose, onSuccess }: { onClose: () => 
 
               <div className="flex gap-2">
                 <button onClick={() => setStep(1)}
-                  className="flex-1 py-4 rounded-2xl font-bold text-[13px] text-stone-600 bg-stone-50">
+                  className="flex-1 py-4 rounded-2xl font-bold text-[13px] bg-stone-50" style={{ color: TEXT_LABEL }}>
                   {t("cosmetics.retake")}
                 </button>
                 <button onClick={handleRegister} disabled={!category || registering}
@@ -269,14 +272,14 @@ export function CosmeticsRegisterModal({ onClose, onSuccess }: { onClose: () => 
             <motion.div className="relative bg-white rounded-t-[28px] w-full max-w-md p-6 pb-8"
               initial={{ y: 80 }} animate={{ y: 0 }} exit={{ y: 80 }}>
               <div className="w-10 h-1 rounded-full bg-stone-200 mx-auto mb-5" />
-              <div className="flex justify-center mb-3"><Ban className="w-10 h-10 text-stone-300" /></div>
+              <div className="flex justify-center mb-3" style={{ color: TEXT_TERTIARY }}><Ban className="w-10 h-10" /></div>
               <p className="text-base font-semibold text-[#5C4F4A] text-center mb-2">{t("cosmetics.notSkincareTitle")}</p>
-              <p className="text-[13px] text-stone-500 text-center leading-relaxed whitespace-pre-line mb-5">
+              <p className="text-[13px] text-center leading-relaxed whitespace-pre-line mb-5" style={{ color: TEXT_SECONDARY }}>
                 {t("cosmetics.notSkincareDesc", { type: nonSkincareType })}
               </p>
               <div className="space-y-3.5">
                 <button onClick={() => { setShowNonSkincareAlert(false); setStep(2); }}
-                  className="w-full py-3.5 rounded-2xl text-[13px] font-bold text-stone-600 bg-stone-50">
+                  className="w-full py-3.5 rounded-2xl text-[13px] font-bold bg-stone-50" style={{ color: TEXT_LABEL }}>
                   {t("cosmetics.notSkincareKeep")}
                 </button>
                 <button onClick={() => { setShowNonSkincareAlert(false); onClose(); }}

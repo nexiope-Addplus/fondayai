@@ -66,6 +66,12 @@ export const TEXT_HEADING = "#4A403A";
 export const TEXT_TITLE = "#5C4F4A";
 export const TEXT_LABEL = "#6B5D55";
 
+// Semantic accent colors
+export const COLOR_SUCCESS = "#2D7D46";
+export const COLOR_WARNING = "#D97706";
+export const COLOR_DANGER = "#C2410C";
+export const COLOR_INFO = "#7C3AED";
+
 // ─── z-index 스케일 ──────────────────────────────────────────────────────────
 export const Z = {
   actionBar: 50,   // ResultActionBar / BottomNav

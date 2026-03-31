@@ -1,0 +1,36 @@
+{
+  "name": "Figma basics",
+  "lastModified": "2026-03-25T10:01:05Z",
+  "thumbnailUrl": "https://s3-alpha.figma.com/thumbnails/81d4f3b3-4ec8-46b0-9991-b750754259a6?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAQ4GOSFWC6RGVDPLF%2F20260322%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20260322T120000Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=cf7c8c4d3ab6fb72ed7baa0b20f6c769011c737d0f6809b16b23702fea93184a",
+  "version": "2334832011778103026",
+  "role": "owner",
+  "editorType": "figma",
+  "linkAccess": "view",
+  "nodes": {
+    "625:2": {
+      "document": {
+        "id": "625:2",
+        "name": "Page 2",
+        "type": "CANVAS",
+        "scrollBehavior": "SCROLLS",
+        "children": [],
+        "backgroundColor": {
+          "r": 0.8980392217636108,
+          "g": 0.8980392217636108,
+          "b": 0.8980392217636108,
+          "a": 1
+        },
+        "prototypeStartNodeID": null,
+        "flowStartingPoints": [],
+        "prototypeDevice": {
+          "type": "NONE",
+          "rotation": "NONE"
+        }
+      },
+      "components": {},
+      "componentSets": {},
+      "schemaVersion": 0,
+      "styles": {}
+    }
+  }
+}

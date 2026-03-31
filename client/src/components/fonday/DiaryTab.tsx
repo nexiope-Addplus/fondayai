@@ -43,6 +43,12 @@ import {
   RADIUS_CARD,
   RADIUS_SUB,
   PAGE_GRADIENT,
+  TEXT_HEADING,
+  TEXT_TITLE,
+  TEXT_LABEL,
+  TEXT_SECONDARY,
+  COLOR_DANGER,
+  COLOR_INFO,
 } from "./constants";
 import {
   buildDiaryReportModel,
@@ -250,36 +256,36 @@ export function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: AppU
   if (!user) {
     return (
       <div className="flex flex-col" style={{ background: PAGE_GRADIENT, minHeight: "calc(100dvh - 64px)" }}>
-        <div className="px-4 pt-6 pb-28">
+        <div className="px-4 pt-5 pb-28">
           <div className="mb-8">
             <div className="flex items-center gap-2.5 mb-1">
               <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ background: TINT_WARM }}>
                 <NotebookPen className="w-4 h-4" style={{ color: SCAN_TO }} />
               </div>
-              <h1 className="text-[22px] font-extrabold" style={{ color: "#4A403A", fontFamily: FONT_HEADING }}>{t("modal.diary.title")}</h1>
+              <h1 className="text-[22px] font-extrabold" style={{ color: TEXT_HEADING, fontFamily: FONT_HEADING }}>{t("modal.diary.title")}</h1>
             </div>
-            <p className="text-[13px] text-kr-pretty" style={{ color: "#8C8078", marginLeft: 42 }}>{t("diary.loginDesc", "로그인으로 내 피부 일기를 시작하세요.")}</p>
+            <p className="text-[13px] text-kr-pretty" style={{ color: TEXT_SECONDARY, marginLeft: 42 }}>{t("diary.loginDesc", "로그인으로 내 피부 일기를 시작하세요.")}</p>
           </div>
 
           <div className="mb-8">
-            <p className="text-[14px] font-bold mb-3" style={{ color: "#5C4F4A" }}>{t("diary.loginValueTitle", "피부 일기를 쓰면")}</p>
+            <p className="text-[14px] font-bold mb-3" style={{ color: TEXT_TITLE }}>{t("diary.loginValueTitle", "피부 일기를 쓰면")}</p>
             <div className="space-y-2.5">
               <div className="flex items-center gap-2.5">
                 <Camera className="w-4 h-4 shrink-0" style={{ color: DEEP_GREEN }} />
-                <p className="text-[13px]" style={{ color: "#6B5D55" }}>{t("diary.loginValue1", "매일 피부 점수 변화를 기록해요")}</p>
+                <p className="text-[13px]" style={{ color: TEXT_LABEL }}>{t("diary.loginValue1", "매일 피부 점수 변화를 기록해요")}</p>
               </div>
               <div className="flex items-center gap-2.5">
                 <ClipboardList className="w-4 h-4 shrink-0" style={{ color: SCAN_TO }} />
-                <p className="text-[13px]" style={{ color: "#6B5D55" }}>{t("diary.loginValue2", "7일 평균으로 피부 트렌드를 확인해요")}</p>
+                <p className="text-[13px]" style={{ color: TEXT_LABEL }}>{t("diary.loginValue2", "7일 평균으로 피부 트렌드를 확인해요")}</p>
               </div>
               <div className="flex items-center gap-2.5">
-                <NotebookPen className="w-4 h-4 shrink-0" style={{ color: "#7C3AED" }} />
-                <p className="text-[13px]" style={{ color: "#6B5D55" }}>{t("diary.loginValue3", "캘린더에서 한눈에 관리해요")}</p>
+                <NotebookPen className="w-4 h-4 shrink-0" style={{ color: COLOR_INFO }} />
+                <p className="text-[13px]" style={{ color: TEXT_LABEL }}>{t("diary.loginValue3", "캘린더에서 한눈에 관리해요")}</p>
               </div>
             </div>
           </div>
 
-          <div className="p-5" style={{ borderRadius: RADIUS_CARD, background: "#FFFFFF", boxShadow: SHADOW_CARD }}>
+          <div className="p-5" style={{ borderRadius: RADIUS_CARD, background: BG_BASE, boxShadow: SHADOW_CARD }}>
             <div className="space-y-2.5">
               {i18n.language === "ko" ? (
                 <button onClick={() => onLogin ? onLogin("kakao", "diary") : (localStorage.setItem("fonday_return_tab", "diary"), window.location.href = "/auth/kakao")}
@@ -318,22 +324,22 @@ export function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: AppU
             <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ background: TINT_WARM }}>
               <NotebookPen className="w-4 h-4" style={{ color: SCAN_TO }} />
             </div>
-            <h1 className="text-[22px] font-extrabold" style={{ color: "#4A403A", fontFamily: FONT_HEADING }}>{t("modal.diary.title")}</h1>
+            <h1 className="text-[22px] font-extrabold" style={{ color: TEXT_HEADING, fontFamily: FONT_HEADING }}>{t("modal.diary.title")}</h1>
           </div>
-          <p className="text-[13px] text-kr-pretty" style={{ color: "#8C8078", marginLeft: 42 }}>
+          <p className="text-[13px] text-kr-pretty" style={{ color: TEXT_SECONDARY, marginLeft: 42 }}>
             {finalType ? `${finalType} · ` : ""}{totalRecords > 0 ? `${t("modal.diary.countLabel", { count: totalRecords })}` : t("result.diary.firstRecord")}
           </p>
           <div className="grid grid-cols-3 gap-2 mt-4">
             <div className="p-3 text-center" style={{ borderRadius: RADIUS_SUB, background: BG_MUTED }}>
-              <p className="text-[11px] font-semibold whitespace-nowrap" style={{ color: "#8C8078" }}>{t("result.overall")}</p>
+              <p className="text-[11px] font-medium whitespace-nowrap" style={{ color: TEXT_SECONDARY }}>{t("result.overall")}</p>
               <p className="text-[24px] font-normal mt-1" style={{ color: SCAN_TO, fontFamily: FONT_DISPLAY }}>{overallScore || "—"}</p>
             </div>
             <div className="p-3 text-center" style={{ borderRadius: RADIUS_SUB, background: BG_MUTED }}>
-              <p className="text-[11px] font-semibold whitespace-nowrap" style={{ color: "#8C8078" }}>{t("result.diary.avg7d")}</p>
-              <p className="text-[24px] font-normal mt-1" style={{ color: "#7C3AED", fontFamily: FONT_DISPLAY }}>{avgScore || "—"}</p>
+              <p className="text-[11px] font-medium whitespace-nowrap" style={{ color: TEXT_SECONDARY }}>{t("result.diary.avg7d")}</p>
+              <p className="text-[24px] font-normal mt-1" style={{ color: COLOR_INFO, fontFamily: FONT_DISPLAY }}>{avgScore || "—"}</p>
             </div>
             <div className="p-3 text-center" style={{ borderRadius: RADIUS_SUB, background: BG_MUTED }}>
-              <p className="text-[11px] font-semibold whitespace-nowrap" style={{ color: "#8C8078" }}>{t("diary.routineTitle")}</p>
+              <p className="text-[11px] font-medium whitespace-nowrap" style={{ color: TEXT_SECONDARY }}>{t("diary.routineTitle")}</p>
               <p className="text-[24px] font-normal mt-1" style={{ color: DEEP_GREEN, fontFamily: FONT_DISPLAY }}>{diaryTodoProgress.total > 0 ? `${diaryTodoProgress.done}/${diaryTodoProgress.total}` : (diaryMemoReady ? "1/1" : "0/1")}</p>
             </div>
           </div>
@@ -341,7 +347,7 @@ export function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: AppU
       </div>
 
       {/* 콘텐츠 */}
-      <div ref={diaryScrollRef} className="flex-1 overflow-y-auto overscroll-contain pb-24">
+      <div ref={diaryScrollRef} className="flex-1 overflow-y-auto overscroll-contain pb-28">
         {overallScore === 0 && (
           <div className="mx-4 mt-3 mb-0">
             <button
@@ -369,7 +375,7 @@ export function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: AppU
             {tabs.map(({ id, label }) => (
               <button key={id} onClick={() => goToDiaryTab(id)}
                 className={`flex-1 py-2.5 text-[12px] font-semibold transition-all rounded-full ${
-                  tab === id ? "shadow-sm" : "text-stone-400"
+                  tab === id ? "shadow-sm" : ""
                 }`}
                 style={tab === id
                   ? id === "calendar"
@@ -377,8 +383,8 @@ export function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: AppU
                     : id === "timeline"
                     ? { background: TINT_WARM, color: SCAN_TO }
                     : id === "report"
-                    ? { background: "#F6F4FB", color: "#7C3AED" }
-                    : { background: "#FFF7ED", color: "#C2410C" }
+                    ? { background: "#F6F4FB", color: COLOR_INFO }
+                    : { background: "#FFF7ED", color: COLOR_DANGER }
                   : { background: "transparent" }}>
                 {label}
               </button>
@@ -415,8 +421,8 @@ export function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: AppU
                     <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0">
                         <p className="text-[11px] font-bold tracking-[0.08em]" style={{ color: SCAN_TO }}>{t("modal.diary.reminderTitle")}</p>
-                        <p className="text-[15px] font-bold mt-1 text-kr-pretty" style={{ color: "#5C4F4A" }}>{t("modal.diary.reminderHeadline")}</p>
-                        <p className="text-xs text-stone-500 mt-1 leading-relaxed text-kr-pretty">
+                        <p className="text-[15px] font-bold mt-1 text-kr-pretty" style={{ color: TEXT_TITLE }}>{t("modal.diary.reminderHeadline")}</p>
+                        <p className="text-xs mt-1 leading-relaxed text-kr-pretty" style={{ color: TEXT_SECONDARY }}>
                           {t("modal.diary.reminderDesc")} {aiCareSettings.enabled ? "" : t("modal.diary.aiCareWarn")}
                         </p>
                       </div>
@@ -501,7 +507,7 @@ export function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: AppU
                     <div className="flex items-center justify-between gap-3">
                       <div className="min-w-0">
                         <p className="text-[11px] font-bold tracking-[0.08em]" style={{ color: SCAN_TO }}>{aiCareLabels.title}</p>
-                        <p className="text-xs text-stone-500 mt-1 leading-relaxed text-kr-pretty">{aiCareLabels.desc}</p>
+                        <p className="text-xs mt-1 leading-relaxed text-kr-pretty" style={{ color: TEXT_SECONDARY }}>{aiCareLabels.desc}</p>
                       </div>
                       <button onClick={() => handlePushToggle()} disabled={pushLoading}
                         className="shrink-0 rounded-full px-3 py-1.5 text-xs font-semibold"
@@ -554,7 +560,7 @@ export function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: AppU
               className="min-h-full"
             >
               {loading ? (
-                <div className="py-20 text-center"><p className="text-[12px] text-stone-400">...</p></div>
+                <div className="py-20 text-center" style={{ color: TEXT_TERTIARY }}><p className="text-[12px]">...</p></div>
               ) : (
                 <DiaryTimeline history={history} analysisResult={analysisResult}
                   overallScore={overallScore} finalType={finalType} currentScanId={null} />

@@ -2,7 +2,14 @@ import { AnimatePresence, motion } from "framer-motion";
 import { CheckCircle2, Star, X } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
-import { BORDER_COLOR, DEEP_GREEN, FONT_DISPLAY, SCAN_TO, TEXT_TERTIARY } from "./constants";
+import {
+  BORDER_COLOR,
+  DEEP_GREEN,
+  FONT_DISPLAY,
+  SCAN_TO,
+  TEXT_TERTIARY,
+  COLOR_WARNING,
+} from "./constants";
 
 type QuestItem = {
   id: string;
@@ -63,7 +70,7 @@ export function ResultQuestSheet({
               <div className="flex items-center gap-2">
                 <span
                   className="rounded-full px-3 py-1 text-xs font-normal"
-                  style={{ fontFamily: FONT_DISPLAY, background: "#FFF7ED", color: "#D97706" }}
+                  style={{ fontFamily: FONT_DISPLAY, background: "#FFF7ED", color: COLOR_WARNING }}
                 >
                   {totalPoints}pt
                 </span>

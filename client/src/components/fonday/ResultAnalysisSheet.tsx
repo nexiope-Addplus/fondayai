@@ -15,6 +15,7 @@ import {
   SCORE_ICONS,
   TEXT_TERTIARY,
   TINT_NEUTRAL,
+  BG_BASE,
 } from "./constants";
 
 type ScoreItem = {
@@ -104,7 +105,7 @@ export function ResultAnalysisSheet({
                 {aiComment && (
                   <div className="p-4 rounded-2xl border" style={{ background: BG_MUTED, borderColor: BORDER_COLOR }}>
                     <div className="flex items-center gap-2 mb-2">
-                      <div className="w-7 h-7 rounded-xl flex items-center justify-center" style={{ background: "#FFFFFF" }}>
+                      <div className="w-7 h-7 rounded-xl flex items-center justify-center" style={{ background: BG_BASE }}>
                         <Sparkles className="w-3.5 h-3.5" style={{ color: SCAN_TO }} />
                       </div>
                       <p className="text-sm font-semibold" style={{ color: DEEP_GREEN }}>
