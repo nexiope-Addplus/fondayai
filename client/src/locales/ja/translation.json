@@ -11,10 +11,10 @@
     "login": "ログインして始める",
     "tracking": "追跡中",
     "tapToCheck": "タップして今日使った化粧品をチェック",
-    "unchecked": "未チェック",
+    "unchecked": "まだ未使用",
     "more": "個追加",
     "completed": "完了",
-    "goCheck": "チェック ›",
+    "goCheck": "ルーティンチェック ›",
     "doneBtn": "チェック完了",
     "doneStatus": "今日のチェック完了 · また明日",
     "doneSummary": "{{count}}製品チェック済み"
@@ -142,7 +142,7 @@
     "quickScan": "今すぐ肌をスキャン",
     "quickScanSub": "30秒で完了 · 完全無料",
     "rescan": "今日の肌をスキャン",
-    "effectBoard": "効果トラッカー"
+    "effectBoard": "スコア変化トラッカー"
   },
   "camera": {
     "noCamera": "カメラが使えません。写真を選んでください。",
@@ -296,8 +296,8 @@
       "streak": "連続記録",
       "deltaPoint": "{{n}}点",
       "improved": "前回より改善！🎉",
-      "worse": "前回より低下",
-      "noChange": "変化なし",
+      "worse": "少し下がりました。日記で原因を確認してみてください",
+      "noChange": "変化なし。今のルーティンを続けてみましょう",
       "firstScan": "✨ 今日初めての肌記録です！"
     },
     "baumannExpand": "詳細",
@@ -1170,7 +1170,7 @@
     "signalTopTitle": "スキャンと最も一緒に動いた製品",
     "signalSectionTitle": "ルーティン効果分析",
     "signalSectionDesc": "製品登録の前後14日間のスキャン変化を分析した個人データです。",
-    "signalWindow": "14日基準",
+    "signalWindow": "直近14日のスキャン基準",
     "dashboardEyebrow": "ルーティンダッシュボード",
     "dashboardTitle": "今日の管理フローを一画面にまとめました",
     "dashboardDesc": "登録製品、連動スキャン、観測シグナルをまとめて確認できます。",
