@@ -105,7 +105,7 @@ export function BottomNav({ active, onChange, scanState }: {
                 onTouchStart={(e) => handleTouchStart(e, id)}
                 aria-current={isActive ? "page" : undefined}
                 className="relative flex flex-col items-center justify-center gap-0.5"
-                style={{ color: isActive ? SCAN_TO : "#8C8078" }}
+                style={{ color: isActive ? SCAN_TO : "#6B5D55" }}
                 // 탭 누르면 위로 톡 튀어오르는 애니메이션
                 animate={
                   reducedMotion ? {} :
@@ -129,7 +129,7 @@ export function BottomNav({ active, onChange, scanState }: {
                       />
                     )}
                   </AnimatePresence>
-                  <Icon className="w-5 h-5 relative z-10" strokeWidth={isActive ? 2.5 : 2} />
+                  <Icon className="w-5 h-5 relative z-10" strokeWidth={isActive ? 2.5 : 2.2} />
                 </div>
                 <span className={`text-[10px] leading-none ${isActive ? "font-bold" : "font-medium"}`}>
                   {t(labelKey)}
