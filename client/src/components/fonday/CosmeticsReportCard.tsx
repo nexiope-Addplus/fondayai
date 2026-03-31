@@ -220,8 +220,9 @@ export function CosmeticsReportCard({
     setProgress(0);
     progressTimer.current = setInterval(() => {
       setProgress((p) => {
-        if (p >= 88) { clearInterval(progressTimer.current!); return 88; }
-        return p + (88 - p) * 0.06;
+        if (p >= 95) return 95; // 95%까지만, 멈추지 않고 느리게 계속
+        if (p >= 88) return p + 0.3; // 88% 이후 아주 느리게
+        return p + (88 - p) * 0.06; // 88%까지 빠르게
       });
     }, 120);
   };

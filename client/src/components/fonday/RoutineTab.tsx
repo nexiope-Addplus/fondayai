@@ -527,8 +527,31 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
                 </div>
                 <div className="space-y-2.5">
                   {(() => {
+                    // 전체보기: 개별 표시, 축소: 그룹화
+                    if (showAllSignals) {
+                      return productSignals.map((signal) => {
+                        const deltaValue = signal.topScoreDelta ?? signal.overallDelta ?? 0;
+                        const positive = deltaValue >= 0;
+                        return (
+                          <div key={signal.itemId} className="p-3" style={{ borderRadius: RADIUS_ITEM, background: BG_MUTED }}>
+                            <div className="flex items-center justify-between gap-2">
+                              <p className="text-[12px] font-semibold truncate min-w-0" style={{ color: TEXT_TITLE }}>{signal.itemName}</p>
+                              <div className="flex items-center gap-1.5 shrink-0">
+                                <span className="rounded-full px-2 py-0.5 text-xs font-bold" style={{ background: positive ? `${DEEP_GREEN}12` : `${SCAN_TO}12`, color: positive ? DEEP_GREEN : SCAN_TO }}>
+                                  {positive ? "+" : ""}{deltaValue}
+                                </span>
+                                <span className="rounded-full px-2 py-0.5 text-xs font-bold" style={{ background: `${DEEP_GREEN}12`, color: DEEP_GREEN }}>
+                                  {t(`cosmetics.signalConfidence.${signal.confidence}`)}
+                                </span>
+                              </div>
+                            </div>
+                            <p className="text-xs mt-1 text-kr-pretty" style={{ color: SCAN_TO }}>{signal.note}</p>
+                          </div>
+                        );
+                      });
+                    }
                     const grouped: { key: string; signals: typeof productSignals; delta: number; note: string; confidence: string }[] = [];
-                    const source = showAllSignals ? productSignals : productSignals.slice(0, 3);
+                    const source = productSignals.slice(0, 3);
                     for (const signal of source) {
                       const delta = signal.topScoreDelta ?? signal.overallDelta ?? 0;
                       const key = `${delta}_${signal.note}`;
