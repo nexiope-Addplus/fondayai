@@ -138,7 +138,8 @@ export function ScanIdleScreen({
   };
   const handleTouchMove = (e: React.TouchEvent) => {
     const dy = e.touches[0].clientY - touchStartY.current;
-    if (dy > 0 && window.scrollY === 0) setPullY(Math.min(dy, 80));
+    // 스크롤이 맨 위이고 아래로 당길 때만 pull-to-refresh (스크롤 중 간섭 방지)
+    if (dy > 20 && window.scrollY <= 0) setPullY(Math.min(dy - 20, 80));
   };
   const handleTouchEnd = () => {
     if (pullY >= 70) { haptic("medium"); window.location.reload(); }
@@ -378,6 +379,16 @@ export function ScanIdleScreen({
                 </>
               )}
             </div>
+
+            {/* 재스캔 버튼 — 점수 바로 아래 */}
+            <button
+              onClick={() => { haptic("medium"); onScan(); }}
+              className="w-full flex items-center justify-center gap-2 text-[14px] font-semibold active:opacity-80 transition-opacity mt-4"
+              style={{ background: `${DEEP_GREEN}10`, color: DEEP_GREEN, height: 48, borderRadius: 24 }}
+            >
+              <Camera className="w-4 h-4" />
+              {t("idle.rescan", "오늘의 피부 스캔하기")}
+            </button>
           </div>
         )}
 
@@ -449,19 +460,7 @@ export function ScanIdleScreen({
         </motion.div>
       )}
 
-      {/* ── 리턴 유저: 간결한 재스캔 버튼 ── */}
-      {latestScan && (
-        <motion.div variants={fadeChild} className="relative" style={{ zIndex: 1 }}>
-          <button
-            onClick={() => { haptic("medium"); onScan(); }}
-            className="w-full flex items-center justify-center gap-2 text-[14px] font-semibold active:opacity-80 transition-opacity"
-            style={{ background: `${DEEP_GREEN}10`, color: DEEP_GREEN, height: 48, borderRadius: 24 }}
-          >
-            <Camera className="w-4 h-4" />
-            {t("idle.rescan", "오늘의 피부 스캔하기")}
-          </button>
-        </motion.div>
-      )}
+      {/* 재스캔 버튼은 점수 바로 아래로 이동됨 */}
 
       <div className="text-center pt-4 pb-4 relative" style={{ zIndex: 1 }}>
         <a href="/privacy.html" className="text-xs underline inline-flex items-center min-h-[44px] px-2" style={{ color: TEXT_SECONDARY }}>
