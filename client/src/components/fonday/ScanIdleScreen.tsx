@@ -329,6 +329,9 @@ export function ScanIdleScreen({
           <p className="text-center text-[12px] mt-4" style={{ color: TEXT_TERTIARY }}>
             {t("idle.ctaHint")}
           </p>
+          <p className="text-center text-[11px] mt-2" style={{ color: TEXT_TERTIARY }}>
+            {t("idle.socialCount", { n: (1247 + Math.floor((Date.now() - new Date("2026-01-01").getTime()) / 86400000) * 3).toLocaleString() })}
+          </p>
         </motion.div>
       )}
 

@@ -23,7 +23,8 @@ export function SurveyScreen({ onSubmit, onBack }: {
 }) {
   const { t } = useTranslation();
   const [genderIdx, setGenderIdx] = useState(0); // 0=female, 1=male
-  const [ageIdx, setAgeIdx] = useState(2);
+  const [ageIdx, setAgeIdx] = useState(-1);
+  const [ageError, setAgeError] = useState(false);
   const ageGroups = t("survey.ageGroups", { returnObjects: true }) as string[];
   const skinConcerns = t("survey.skinConcerns", { returnObjects: true }) as string[];
   const [concernIdxs, setConcernIdxs] = useState<number[]>([]);
@@ -62,11 +63,11 @@ export function SurveyScreen({ onSubmit, onBack }: {
             <label className="text-[12px] font-bold ml-1 uppercase tracking-wider" style={{ color: TEXT_TERTIARY }}>{t("survey.age")}</label>
             <div className="grid grid-cols-2 gap-2">
               {ageGroups.map((item, idx) => (
-                <button key={idx} onClick={() => setAgeIdx(idx)}
+                <button key={idx} onClick={() => { setAgeIdx(idx); setAgeError(false); }}
                   className="h-12 text-[13px] font-semibold transition-all"
                   style={ageIdx === idx
                     ? { background: "#C97062", color: "#FFFFFF", borderRadius: 20 }
-                    : { background: BG_BASE, color: TEXT_LABEL, borderRadius: 20, boxShadow: "0 1px 4px rgba(0,0,0,0.05)" }}>
+                    : { background: BG_BASE, color: TEXT_LABEL, borderRadius: 20, boxShadow: "0 1px 4px rgba(0,0,0,0.05)", border: ageError ? "2px solid #C97062" : "2px solid transparent" }}>
                   {item}
                 </button>
               ))}
@@ -91,15 +92,18 @@ export function SurveyScreen({ onSubmit, onBack }: {
       </div>
 
       <motion.div variants={fadeChild} className="px-5 py-4 shrink-0" style={{ zIndex: 10 }}>
-        <button onClick={() => onSubmit({
-          gender: genderIdx === 0 ? t("survey.female") : t("survey.male"),
-          age: ageGroups[ageIdx],
-          genderIdx,
-          ageIdx,
-          skinType: "복합성",
-          concerns: concernIdxs.map(i => skinConcerns[i]),
-          condition: "맨얼굴"
-        })}
+        <button onClick={() => {
+          if (ageIdx < 0) { setAgeError(true); return; }
+          onSubmit({
+            gender: genderIdx === 0 ? t("survey.female") : t("survey.male"),
+            age: ageGroups[ageIdx],
+            genderIdx,
+            ageIdx,
+            skinType: "복합성",
+            concerns: concernIdxs.map(i => skinConcerns[i]),
+            condition: "맨얼굴"
+          });
+        }}
           className="w-full text-white font-semibold text-[16px]"
           style={{ background: "#C97062", boxShadow: "0 4px 16px rgba(201,112,98,0.25)", height: 56, borderRadius: 28 }}>
           {t("survey.startBtn")}

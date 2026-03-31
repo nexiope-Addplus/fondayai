@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import i18n from "../../i18n";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import {
   Activity,
   CheckCircle2,
@@ -300,6 +300,7 @@ export function DiaryRoutinePreviewCard({ routineGuide, dateStr }: { routineGuid
 // ─── 다이어리 달력 뷰 ────────────────────────────────────────────
 export function DiaryCalendarView({ allEntries }: { allEntries: { dateStr: string; score: number }[] }) {
   const { t, i18n } = useTranslation();
+  const reducedMotion = useReducedMotion();
   const [viewDate, setViewDate] = useState(new Date());
   const [selectedEntry, setSelectedEntry] = useState<{ dateStr: string; score: number } | null>(() => {
     const todayEntry = allEntries.find((entry) => entry.dateStr === todayStr());
@@ -402,7 +403,7 @@ export function DiaryCalendarView({ allEntries }: { allEntries: { dateStr: strin
       </div>
 
       {selectedEntry && (
-        <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
+        <motion.div initial={reducedMotion ? {} : { opacity: 0, y: 8 }} animate={reducedMotion ? {} : { opacity: 1, y: 0 }}
           className="mt-4 p-5 rounded-3xl shadow-sm" style={{ background: BG_BASE }}>
           <div className="flex items-center justify-between mb-3">
             <span className="text-xs font-medium tracking-wide" style={{ color: TEXT_TERTIARY }}>{selectedEntry.dateStr}</span>
@@ -446,6 +447,7 @@ export function DiaryTimeline({ history, analysisResult, overallScore, finalType
   history: any[]; analysisResult: any; overallScore: number; finalType: string; currentScanId: string | null;
 }) {
   const { t, i18n } = useTranslation();
+  const reducedMotion = useReducedMotion();
 
   const todayEntry = {
     id: currentScanId || "today",
@@ -555,8 +557,8 @@ export function DiaryTimeline({ history, analysisResult, overallScore, finalType
                   : entry.date.toLocaleDateString(locale, { month: "numeric", day: "numeric" });
                 return (
                   <motion.div key={entry.id}
-                    initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: (gi * 5 + ei) * 0.05 }}
+                    initial={reducedMotion ? {} : { opacity: 0, x: -8 }} animate={reducedMotion ? {} : { opacity: 1, x: 0 }}
+                    transition={reducedMotion ? {} : { delay: (gi * 5 + ei) * 0.05 }}
                     className="flex gap-3 items-start">
                     <div className="shrink-0 w-4 flex flex-col items-center pt-3 z-[1]">
                       <div className="w-3.5 h-3.5 rounded-full border-2 border-white"
@@ -612,6 +614,7 @@ export function DiaryFullView({ history, analysisResult, overallScore, finalType
   user: any; onClose: () => void; onLogout: () => void;
 }) {
   const { t, i18n } = useTranslation();
+  const reducedMotion = useReducedMotion();
   const [tab, setTab] = useState<"timeline" | "calendar" | "ranking">("timeline");
 
   const allEntries: { dateStr: string; score: number }[] = [
@@ -633,8 +636,8 @@ export function DiaryFullView({ history, analysisResult, overallScore, finalType
   return (
     <motion.div className="fixed inset-0 z-[200] flex flex-col max-w-md mx-auto"
       style={{ background: "#F8F5F2" }}
-      initial={{ x: "100%" }} animate={{ x: 0 }} exit={{ x: "100%" }}
-      transition={{ type: "spring", damping: 30, stiffness: 300 }}>
+      initial={reducedMotion ? {} : { x: "100%" }} animate={reducedMotion ? {} : { x: 0 }} exit={reducedMotion ? {} : { x: "100%" }}
+      transition={reducedMotion ? { duration: 0 } : { type: "spring", damping: 30, stiffness: 300 }}>
 
       {/* 헤더 */}
       <div className="shrink-0 px-5 pt-5 pb-0" style={{ borderBottom: "1px solid #F0EDE8" }}>
@@ -666,18 +669,18 @@ export function DiaryFullView({ history, analysisResult, overallScore, finalType
       <div className="flex-1 overflow-y-auto overscroll-contain">
         <AnimatePresence mode="wait">
           {tab === "timeline" && (
-            <motion.div key="tl" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+            <motion.div key="tl" initial={reducedMotion ? {} : { opacity: 0 }} animate={reducedMotion ? {} : { opacity: 1 }} exit={reducedMotion ? {} : { opacity: 0 }}>
               <DiaryTimeline history={history} analysisResult={analysisResult}
                 overallScore={overallScore} finalType={finalType} currentScanId={currentScanId} />
             </motion.div>
           )}
           {tab === "calendar" && (
-            <motion.div key="cal" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+            <motion.div key="cal" initial={reducedMotion ? {} : { opacity: 0 }} animate={reducedMotion ? {} : { opacity: 1 }} exit={reducedMotion ? {} : { opacity: 0 }}>
               <DiaryCalendarView allEntries={allEntries} />
             </motion.div>
           )}
           {tab === "ranking" && (
-            <motion.div key="rank" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+            <motion.div key="rank" initial={reducedMotion ? {} : { opacity: 0 }} animate={reducedMotion ? {} : { opacity: 1 }} exit={reducedMotion ? {} : { opacity: 0 }}>
               <div className="px-5 pb-8 space-y-4 pt-4">
                 {!rankingData ? (
                   <div className="py-12 text-center" style={{ color: TEXT_TERTIARY }}><p className="text-[12px]">...</p></div>

@@ -1,5 +1,6 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
+import { motion } from "framer-motion";
 import { House, History, NotebookPen, Compass, User } from "lucide-react";
 import { SCAN_TO, BORDER_COLOR, TINT_WARM } from "./constants";
 import { haptic } from "./utils";
@@ -13,14 +14,15 @@ export function LangSwitcher() {
   return (
     <div className="flex items-center gap-0">
       {langs.map((lang) => (
-        <button
+        <motion.button
           key={lang}
           onClick={() => i18nHook.changeLanguage(lang.toLowerCase())}
           className="text-[11px] font-semibold px-2 py-1.5 rounded-full transition-all min-h-[44px] min-w-[44px] flex items-center justify-center"
           style={current === lang ? { color: SCAN_TO } : { color: "#C4BBB2" }}
+          whileTap={{ scale: 0.9 }}
         >
           {lang}
-        </button>
+        </motion.button>
       ))}
     </div>
   );

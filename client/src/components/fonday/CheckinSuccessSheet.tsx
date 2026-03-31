@@ -1,8 +1,8 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { motion, useReducedMotion } from "framer-motion";
-import { CheckCircle2, CalendarDays } from "lucide-react";
-import { BORDER_COLOR, DEEP_GREEN, SCAN_FROM, SCAN_TO, TEXT_TERTIARY } from "./constants";
+import { Flame, CalendarDays } from "lucide-react";
+import { BORDER_COLOR, DEEP_GREEN, SCAN_FROM, SCAN_TO, TEXT_TERTIARY, TINT_GREEN } from "./constants";
 import type { AppUser } from "./types";
 import { getAttendance, todayStr } from "./utils";
 
@@ -31,8 +31,8 @@ export function CheckinSuccessSheet({ onKakao, onLine, onGoogle, onDismiss, user
         {/* 타이틀 */}
         <div className="text-center mb-5">
           <div className="w-14 h-14 rounded-full mx-auto mb-3 flex items-center justify-center"
-            style={{ background: "linear-gradient(135deg, #E09882, #C97062)" }}>
-            <CheckCircle2 className="w-7 h-7 text-white" />
+            style={{ background: TINT_GREEN }}>
+            <Flame className="w-7 h-7" style={{ color: DEEP_GREEN }} />
           </div>
           <h2 className="text-lg font-semibold text-[#5C4F4A] mb-1">{t("attendance.title")}</h2>
         </div>

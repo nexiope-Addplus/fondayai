@@ -16,7 +16,7 @@
     "completed": "done",
     "goCheck": "Check ›",
     "doneBtn": "Done",
-    "doneStatus": "Today's check done ✓",
+    "doneStatus": "Done for today · See you tomorrow",
     "doneSummary": "{{count}} products checked"
   },
   "nav": {
@@ -77,7 +77,7 @@
     "privacy": "Photo deleted after analysis · Never stored",
     "ctaBtn": "Get My Free Skin MBTI →",
     "ctaHint": "~30 sec · Completely Free",
-    "socialCount": "{{n}} people scanned their skin today",
+    "socialCount": "{{n}} people have analyzed their skin so far",
     "baumannSectionTitle": "What is Skin MBTI?",
     "baumannSectionDesc": "Based on the Baumann Skin Type classification (Dr. Leslie Baumann), used by dermatologists worldwide, your skin is analyzed across 4 axes: Oily/Dry (O/D), Sensitive/Resistant (S/R), Pigmented/Non-pigmented (P/N), and Wrinkle-prone/Tight (W/T). Just like MBTI, 4 letters reveal your unique skin identity.",
     "baumannAxes": [
@@ -193,7 +193,7 @@
       "Analyzing moisture & sebum levels...",
       "Generating report summary..."
     ],
-    "progress": "Analysis in progress",
+    "progress": "Analyzing",
     "subtitle": "Creating your personalized skin report."
   },
   "result": {
@@ -512,7 +512,7 @@
     }
   },
   "attendance": {
-    "title": "+3 pts Check-in Earned! 🎉",
+    "title": "Today's marked ✓",
     "stored": "Right now, it's only saved on this device.",
     "loginDesc": "Log in to keep your points permanently\nand access them anywhere.",
     "kakao": "Save with Kakao",

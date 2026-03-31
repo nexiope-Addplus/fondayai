@@ -185,7 +185,7 @@ export function ResultHeaderCard({
               <Microscope className="w-4 h-4 shrink-0" style={{ color: SCAN_TO }} />
               <p className="text-[12px] font-bold" style={{ color: TEXT_LABEL }}>{finalType}</p>
               <button onClick={() => setShowBaumannInfo(v => !v)}
-                className="text-[11px] font-medium px-2 py-0.5 rounded-full"
+                className="text-[11px] font-medium px-2 py-0.5 rounded-full active:opacity-70 transition-opacity"
                 style={{ background: TINT_WARM, color: SCAN_TO }}>
                 {showBaumannInfo ? t("result.baumannFold") : t("result.baumannExpand")}
               </button>
@@ -200,10 +200,13 @@ export function ResultHeaderCard({
               const color = BAUMANN_COLORS[letter];
               if (!color) return null;
               return (
-                <span key={i} className="text-xs font-bold px-2.5 py-1 rounded-full border"
-                  style={{ color, background: `${color}12`, borderColor: `${color}22` }}>
+                <motion.span key={i} className="text-xs font-bold px-2.5 py-1 rounded-full border"
+                  style={{ color, background: `${color}12`, borderColor: `${color}22` }}
+                  initial={reducedMotion ? {} : { opacity: 0, y: 6 }}
+                  animate={reducedMotion ? {} : { opacity: 1, y: 0 }}
+                  transition={reducedMotion ? {} : { delay: i * 0.1 }}>
                   {t(`baumann.${letter}.name`)}
-                </span>
+                </motion.span>
               );
             })}
           </div>

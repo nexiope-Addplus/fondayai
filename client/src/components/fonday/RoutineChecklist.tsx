@@ -313,6 +313,7 @@ function ChecklistRow({
   onToggle: (id: string) => void;
   gradeInfo: { grade: string; score: number; summary: string; bg: string; color: string } | null;
 }) {
+  const reducedMotion = useReducedMotion();
   return (
     <button
       type="button"
@@ -327,7 +328,15 @@ function ChecklistRow({
           borderColor: checked ? DEEP_GREEN : "#D1CBC3",
         }}
       >
-        {checked && <Check className="w-3 h-3 text-white" strokeWidth={3} />}
+        {checked && (
+          <motion.div
+            initial={reducedMotion ? {} : { scale: 0, rotate: -45 }}
+            animate={reducedMotion ? {} : { scale: 1, rotate: 0 }}
+            transition={reducedMotion ? {} : { duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+          >
+            <Check className="w-3 h-3 text-white" strokeWidth={3} />
+          </motion.div>
+        )}
       </div>
 
       <span className="text-[13px] font-medium truncate flex-1 min-w-0"
