@@ -83,13 +83,19 @@ export function BottomNav({ active, onChange, scanState }: {
   return (
     <nav
       ref={navRef}
-      className="fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-2xl"
-      style={{ borderTop: `1px solid ${BORDER_COLOR}`, paddingBottom: "env(safe-area-inset-bottom)" }}
+      className="fixed bottom-0 left-0 right-0 z-50"
+      style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
     >
-      <div className="max-w-md mx-auto px-2">
-        <div className="grid grid-cols-4 h-[64px]">
+      <div className="max-w-md mx-auto px-3 pb-1">
+        <div
+          className="grid grid-cols-4 h-[60px] bg-white/95 backdrop-blur-2xl"
+          style={{
+            borderRadius: 20,
+            boxShadow: "0 -2px 20px rgba(0,0,0,0.08), 0 0 0 1px rgba(0,0,0,0.04)",
+          }}
+        >
           {TAB_CONFIG.map(({ id, icon: Icon, labelKey }) => {
             const isActive = active === id;
             return (
@@ -100,14 +106,14 @@ export function BottomNav({ active, onChange, scanState }: {
                 aria-current={isActive ? "page" : undefined}
                 className="relative flex flex-col items-center justify-center gap-0.5"
                 style={{ color: isActive ? SCAN_TO : "#8C8078" }}
-                // 튀어오르는 애니메이션
+                // 탭 누르면 위로 톡 튀어오르는 애니메이션
                 animate={
                   reducedMotion ? {} :
-                  isActive && pressedTab !== id
-                    ? { scale: [0.9, 1.08, 1], transition: { duration: 0.35, ease: [0.22, 1, 0.36, 1] } }
-                    : { scale: 1 }
+                  isActive
+                    ? { y: [4, -6, 0], scale: [0.95, 1.05, 1], transition: { duration: 0.4, ease: [0.22, 1, 0.36, 1] } }
+                    : { y: 0, scale: 1 }
                 }
-                whileTap={reducedMotion ? {} : { scale: 0.85 }}
+                whileTap={reducedMotion ? {} : { y: 2, scale: 0.9 }}
               >
                 {/* 활성 배경 pill */}
                 <div className="relative w-12 h-8 flex items-center justify-center">
