@@ -1,7 +1,23 @@
 import React, { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { motion, useReducedMotion } from "framer-motion";
-import { Sun } from "lucide-react";
+import { Sun, Cloud, CloudRain, Snowflake, Droplets, Wind, CloudSnow, CloudFog, SunDim, Thermometer } from "lucide-react";
+import type { WeatherTipKey } from "./types";
+import { getWeatherTipKey as _getKey } from "./utils";
+
+// 날씨 타입별 lucide 아이콘 매핑
+const WEATHER_ICON_MAP: Record<string, { icon: React.ComponentType<any>; color: string }> = {
+  sunny: { icon: Sun, color: "#D97706" },
+  sunny_hot: { icon: SunDim, color: "#EA580C" },
+  cloudy: { icon: Cloud, color: "#8C8078" },
+  rainy: { icon: CloudRain, color: "#3B82F6" },
+  snowy: { icon: CloudSnow, color: "#6366F1" },
+  cold: { icon: Thermometer, color: "#3B82F6" },
+  humid: { icon: Droplets, color: "#0EA5E9" },
+  dry: { icon: Sun, color: "#D97706" },
+  polluted: { icon: Wind, color: "#C2410C" },
+  foggy: { icon: CloudFog, color: "#8C8078" },
+};
 import {
   DEEP_GREEN,
   TINT_GREEN,
@@ -49,6 +65,8 @@ export function WeatherTipCard({ compact, weather, weakMetric }: {
   const rawTip = tipArr[dayIdx];
   const fallbackTip = { emoji: "🌤️", title: "오늘의 피부 케어", body: "날씨에 맞춘 스킨케어로 하루를 시작하세요." };
   const tip = (rawTip && typeof rawTip === 'object' && 'emoji' in rawTip) ? rawTip as { emoji: string; title: string; body: string } : fallbackTip;
+  const weatherIcon = WEATHER_ICON_MAP[tipKey] || WEATHER_ICON_MAP.sunny;
+  const WeatherIcon = weatherIcon.icon;
   const aqiLabel = weather.aqi ? t(`weather.aqi${weather.aqi}`) : null;
   // 미세먼지 등급 (PM2.5 기준: 0-15 좋음, 15-35 보통, 35-75 나쁨, 75+ 매우나쁨)
   const pm25Level = weather.pm25 != null
@@ -64,7 +82,9 @@ export function WeatherTipCard({ compact, weather, weakMetric }: {
         {/* 상단: 팁 내용 */}
         <div className="px-4 pt-3.5 pb-3">
           <div className="flex items-start gap-2.5">
-            <span className="text-lg leading-none flex-shrink-0 mt-0.5">{tip.emoji}</span>
+            <div className="w-8 h-8 rounded-full flex items-center justify-center shrink-0" style={{ background: `${weatherIcon.color}15` }}>
+              <WeatherIcon className="w-4 h-4" style={{ color: weatherIcon.color }} />
+            </div>
             <div className="flex-1 min-w-0">
               <p className="text-[13px] font-bold text-[#5C4F4A] leading-snug">{tip.title}</p>
               <p className="text-[12px] text-stone-500 leading-relaxed mt-1">{tip.body}</p>
@@ -130,7 +150,9 @@ export function WeatherTipCard({ compact, weather, weakMetric }: {
         </div>
 
         <div className="flex items-start gap-3">
-          <span className="text-3xl leading-none flex-shrink-0">{tip.emoji}</span>
+          <div className="w-10 h-10 rounded-full flex items-center justify-center shrink-0" style={{ background: `${weatherIcon.color}15` }}>
+            <WeatherIcon className="w-5 h-5" style={{ color: weatherIcon.color }} />
+          </div>
           <div className="flex-1 min-w-0">
             <p className="text-sm font-semibold text-[#5C4F4A] mb-1 leading-tight">{tip.title}</p>
             <p className="text-[11.5px] text-stone-500 leading-relaxed">{tip.body}</p>
