@@ -67,8 +67,8 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
     setLoading(true);
     try {
       const [cosmeticsRes, scansRes] = await Promise.all([
-        fetch("/api/cosmetics"),
-        fetch("/api/scans"),
+        fetch("/api/cosmetics", { credentials: "include" }),
+        fetch("/api/scans", { credentials: "include" }),
       ]);
       const [cosmeticsData, scansData] = await Promise.all([
         cosmeticsRes.json().catch(() => []),
@@ -78,7 +78,7 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
       setList(items);
       setScans(Array.isArray(scansData) ? scansData : []);
 
-      fetch("/api/routine-log")
+      fetch("/api/routine-log", { credentials: "include" })
         .then(r => r.ok ? r.json() : [])
         .then(data => setRoutineLogs(Array.isArray(data) ? data : []))
         .catch(() => {});
@@ -87,6 +87,7 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
         setOptimizing(true);
         fetch("/api/cosmetics/optimize-routine", {
           method: "POST",
+          credentials: "include",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ cosmetics: items }),
         })
@@ -125,6 +126,7 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
       const next = prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id];
       fetch("/api/routine-log", {
         method: "POST",
+        credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ date: todayStr(), cosmetic_ids: next }),
       }).catch(() => {});
