@@ -103,7 +103,11 @@
       "Bash(curl -s \"https://fondayai.com/api/admin/stats\" -H \"Cookie: \")",
       "Bash(curl -s \"https://fondayai.com/api/vapid-public-key\")",
       "Bash(curl -sI \"https://fondayai.com/og-image.png\")",
-      "Bash(curl -sI \"https://fondayai.com/og-image-v2.png\")"
+      "Bash(curl -sI \"https://fondayai.com/og-image-v2.png\")",
+      "Bash(curl -s \"https://fondayai.com/\")",
+      "Bash(grep -n \"analyze-skin\\\\|/api/analyze\" /Users/sangwan/fondayai/client/src/components/fonday/*.tsx)",
+      "Bash(curl -s -X POST \"https://fondayai.com/api/analyze-skin\" -H \"Content-Type: application/json\" -d '{\"\"\"\"image\"\"\"\":\"\"\"\"test\"\"\"\",\"\"\"\"surveyData\"\"\"\":{\"\"\"\"age\"\"\"\":\"\"\"\"20s_late\"\"\"\",\"\"\"\"concerns\"\"\"\":[\"\"\"\"dry\"\"\"\"],\"\"\"\"sensitivity\"\"\"\":\"\"\"\"normal\"\"\"\"},\"\"\"\"lang\"\"\"\":\"\"\"\"ko\"\"\"\"}')",
+      "Bash(node -e \":*)"
     ],
     "additionalDirectories": [
       "/Users/sangwan/fondayai/s/\"aiComment\": \"FondayAI 의 피부 총평\"/\"aiComment\": \"Fonday 피부 총평\"",

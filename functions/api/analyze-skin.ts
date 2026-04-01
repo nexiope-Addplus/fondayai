@@ -29,12 +29,16 @@ function parseGeminiJson(text: string) {
   throw new Error("AI 응답 JSON 파싱에 실패했습니다.");
 }
 
-function buildPrompt(surveyData: any, lang: string): string {
+function buildPrompt(surveyData: any, lang: string, previousScores?: number[]): string {
   const surveyJson = JSON.stringify(surveyData);
+
+  const anchorInstruction = previousScores?.length === 10
+    ? `\n\nSCORE ANCHORING: This user's previous scan scores were [${previousScores.join(", ")}] (in the same 10-item order). If the skin condition appears similar to before, keep scores within ±5 of the previous values. Only give larger changes when you observe clear visible differences in the photo.\n`
+    : "";
 
   if (lang === "en") {
     return `You are a dermatology specialist. Analyze the attached face photo and survey info (${surveyJson}) and respond ONLY in JSON format. Do not output any text other than JSON. All descriptive text fields (comment, aiComment, finding, desc, reason) must be written in English.
-IMPORTANT: Base your analysis primarily on what you observe in the photo. Use survey info (especially age) only as supplementary reference — if the photo shows different skin condition than the survey suggests, trust the photo.
+IMPORTANT: Base your analysis primarily on what you observe in the photo. Use survey info (especially age) only as supplementary reference — if the photo shows different skin condition than the survey suggests, trust the photo.${anchorInstruction}
 
 CRITICAL SCORING RULE: All scores are 0-100 where 100 = best condition. Specifically:
 - 붉은기 수준: 100 = no redness at all (clear skin), 0 = severe redness/rosacea
@@ -75,7 +79,7 @@ Output format (follow this exact structure):
 
   if (lang === "ja") {
     return `あなたは皮膚科専門医です。添付の顔写真と調査情報(${surveyJson})を分析し、以下のJSON形式のみで回答してください。JSON以外のテキストは絶対に出力しないでください。すべての説明テキスト（comment、aiComment、finding、desc、reason）は日本語で記述してください。
-重要：分析は主に写真から観察できる内容を基準にしてください。調査情報（特に年齢）は補助的な参考情報としてのみ使用し、写真の状態と調査内容が異なる場合は写真を優先してください。
+重要：分析は主に写真から観察できる内容を基準にしてください。調査情報（特に年齢）は補助的な参考情報としてのみ使用し、写真の状態と調査内容が異なる場合は写真を優先してください。${anchorInstruction}
 
 重要なスコアルール：すべてのスコアは0〜100で、100が最良の状態です。具体的に：
 - 붉은기 수준（赤み）：100 = 赤みが全くない清潔な肌、0 = 重度の赤み/酒さ
@@ -116,7 +120,7 @@ nutritionTips: スキャンで最もスコアが低い項目に基づくパー�
 
   // Korean (default)
   return `당신은 피부과 전문의입니다. 첨부된 얼굴 사진과 설문 정보(${surveyJson})를 분석하여 아래 JSON 형식으로만 답하세요. JSON 외 다른 텍스트는 절대 출력하지 마세요.
-중요: 분석은 사진에서 실제로 관찰되는 내용을 최우선으로 하세요. 설문 정보(특히 나이)는 참고용으로만 활용하고, 사진 상태와 설문 내용이 다를 경우 사진을 기준으로 판단하세요.
+중요: 분석은 사진에서 실제로 관찰되는 내용을 최우선으로 하세요. 설문 정보(특히 나이)는 참고용으로만 활용하고, 사진 상태와 설문 내용이 다를 경우 사진을 기준으로 판단하세요.${anchorInstruction}
 
 중요 점수 규칙: 모든 점수는 0~100이며 100이 가장 좋은 상태입니다. 구체적으로:
 - 붉은기 수준: 100 = 붉은기가 전혀 없는 깨끗한 피부, 0 = 심한 홍조/발적
@@ -177,6 +181,9 @@ export const onRequest = async (context: any) => {
       const ALLOWED_LANGS = ["ko", "en", "ja"] as const;
       const rawLang = body.lang ?? "ko";
       const lang = ALLOWED_LANGS.includes(rawLang) ? rawLang : "ko";
+      const previousScores: number[] | undefined = Array.isArray(body.previousScores) && body.previousScores.length === 10
+        ? body.previousScores.map((v: unknown) => Math.max(0, Math.min(100, Math.round(Number(v) || 50))))
+        : undefined;
 
       if (!env.GCP_SERVICE_ACCOUNT) {
         return new Response(JSON.stringify({ error: "GCP_SERVICE_ACCOUNT is missing in environment variables." }), {
@@ -185,7 +192,7 @@ export const onRequest = async (context: any) => {
         });
       }
 
-      const prompt = buildPrompt(surveyData, lang);
+      const prompt = buildPrompt(surveyData, lang, previousScores);
 
       const base64Data = image.split(",")[1] || image;
       const mimeType = image.startsWith("data:image/png") ? "image/png" : "image/jpeg";

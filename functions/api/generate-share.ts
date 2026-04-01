@@ -280,6 +280,13 @@ function buildSvgSlide1(d: SlideData): string {
     y += cH + 16;
   }
 
+  // CTA: 비교 유도 문구
+  const ctaText = d.lang === "ja" ? "あなたは何点？チャレンジしてみて！"
+    : d.lang === "en" ? "What's YOUR score? Take the challenge!"
+    : "너는 몇 점? 도전해봐!";
+  s += `<rect x="${PAD}" y="${y}" width="${W - PAD * 2}" height="72" fill="${SCAN_TO}18" rx="20"/>`;
+  s += tx(W / 2, y + 48, ctaText, 30, SCAN_TO, { weight: 800, anchor: "middle", ff });
+
   s += footer(i18nTexts.footerText, ff);
   return slide(s);
 }
