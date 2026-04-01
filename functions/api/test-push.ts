@@ -113,6 +113,7 @@ export const onRequest = async (context: any) => {
 
     let sent = 0;
     let failed = 0;
+    const details: any[] = [];
 
     for (const id of allIds) {
       try {
@@ -139,15 +140,23 @@ export const onRequest = async (context: any) => {
         }
 
         const res = await sendPush(subscription, { title, body: pushBody, url: "/" }, env);
-        if (res.status >= 200 && res.status < 300) sent++;
-        else failed++;
+        const statusCode = res.status;
+        if (statusCode >= 200 && statusCode < 300) {
+          sent++;
+          details.push({ id: id.slice(0, 8), status: statusCode, ok: true });
+        } else {
+          failed++;
+          const errText = await res.text().catch(() => "");
+          details.push({ id: id.slice(0, 8), status: statusCode, error: errText.slice(0, 200) });
+        }
       } catch (e: any) {
         console.error(`[test-push] id=${id}:`, e.message);
         failed++;
+        details.push({ id: id.slice(0, 8), status: 0, error: e.message });
       }
     }
 
-    return new Response(JSON.stringify({ success: true, sent, failed, total: allIds.length }), { headers: CORS });
+    return new Response(JSON.stringify({ success: true, sent, failed, total: allIds.length, details }), { headers: CORS });
   } catch (e: any) {
     return new Response(JSON.stringify({ error: e.message }), { status: 500, headers: CORS });
   }
