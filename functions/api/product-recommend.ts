@@ -38,35 +38,41 @@ export const onRequest = async (context: any) => {
       });
     }
 
-    // 매칭 점수 계산
+    // 매칭 점수 계산 (0~100, 분산되도록 설계)
     const scored = results.map((p: any) => {
-      let score = 50; // base score
+      let score = 0;
 
       const bestTypes: string[] = JSON.parse(p.best_baumann || "[]");
       const avoidTypes: string[] = JSON.parse(p.avoid_baumann || "[]");
 
-      // 정확히 매칭되는 바우만 타입
-      if (bestTypes.includes(baumann)) score += 40;
+      // 회피 타입 체크 (먼저)
+      if (avoidTypes.includes(baumann)) return { ...p, matchScore: 0, key_ingredients: JSON.parse(p.key_ingredients || "[]") };
+      const avoidPartial = avoidTypes.some((at: string) =>
+        baumann.split("").filter((c, i) => at.length > i && at[i] === c).length >= 3
+      );
+      if (avoidPartial) return { ...p, matchScore: 5, key_ingredients: JSON.parse(p.key_ingredients || "[]") };
 
-      // 부분 매칭 (4글자 중 3개 이상 일치)
-      const matchCount = bestTypes.reduce((max: number, bt: string) => {
-        const matches = baumann.split("").filter((c, i) => bt[i] === c).length;
+      // best_baumann 리스트에서 가장 높은 매칭도 찾기
+      const bestMatchLetters = bestTypes.reduce((max: number, bt: string) => {
+        const matches = baumann.split("").filter((c, i) => bt.length > i && bt[i] === c).length;
         return Math.max(max, matches);
       }, 0);
-      if (matchCount >= 3) score += 20;
-      else if (matchCount >= 2) score += 10;
 
-      // 회피 타입이면 패널티
-      if (avoidTypes.includes(baumann)) score -= 60;
-      const avoidPartial = avoidTypes.some((at: string) =>
-        baumann.split("").filter((c, i) => at[i] === c).length >= 3
-      );
-      if (avoidPartial) score -= 30;
+      // best_baumann 리스트 내 순서 보너스 (1번째=최적, 3번째=괜찮음)
+      const exactIdx = bestTypes.indexOf(baumann);
+      if (exactIdx === 0) score = 95;        // 1순위 정확 매칭
+      else if (exactIdx === 1) score = 88;   // 2순위 정확 매칭
+      else if (exactIdx >= 2) score = 80;    // 3순위 이하 정확 매칭
+      else if (bestMatchLetters === 4) score = 75;  // 정확 매칭이지만 리스트에 없음 (불가능하지만 방어)
+      else if (bestMatchLetters === 3) score = 60;  // 4글자 중 3개 일치
+      else if (bestMatchLetters === 2) score = 40;  // 4글자 중 2개 일치
+      else if (bestMatchLetters === 1) score = 25;  // 1개만 일치
+      else score = 15;                               // 전혀 안 맞음
 
       // 고민(concern) 매칭 보너스
-      if (concern && p.target_concern === concern) score += 15;
+      if (concern && p.target_concern === concern) score = Math.min(100, score + 5);
 
-      return { ...p, matchScore: Math.max(0, Math.min(100, score)), key_ingredients: JSON.parse(p.key_ingredients || "[]") };
+      return { ...p, matchScore: score, key_ingredients: JSON.parse(p.key_ingredients || "[]") };
     });
 
     // 점수 높은 순 정렬, 회피 타입 제외, 상위 N개
