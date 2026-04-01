@@ -107,7 +107,11 @@
       "Bash(curl -s \"https://fondayai.com/\")",
       "Bash(grep -n \"analyze-skin\\\\|/api/analyze\" /Users/sangwan/fondayai/client/src/components/fonday/*.tsx)",
       "Bash(curl -s -X POST \"https://fondayai.com/api/analyze-skin\" -H \"Content-Type: application/json\" -d '{\"\"\"\"image\"\"\"\":\"\"\"\"test\"\"\"\",\"\"\"\"surveyData\"\"\"\":{\"\"\"\"age\"\"\"\":\"\"\"\"20s_late\"\"\"\",\"\"\"\"concerns\"\"\"\":[\"\"\"\"dry\"\"\"\"],\"\"\"\"sensitivity\"\"\"\":\"\"\"\"normal\"\"\"\"},\"\"\"\"lang\"\"\"\":\"\"\"\"ko\"\"\"\"}')",
-      "Bash(node -e \":*)"
+      "Bash(node -e \":*)",
+      "WebFetch(domain:www.oliveyoung.co.kr)",
+      "WebFetch(domain:www.hwahae.com)",
+      "WebFetch(domain:www.glowpick.com)",
+      "WebFetch(domain:koreaexperience.com)"
     ],
     "additionalDirectories": [
       "/Users/sangwan/fondayai/s/\"aiComment\": \"FondayAI 의 피부 총평\"/\"aiComment\": \"Fonday 피부 총평\"",

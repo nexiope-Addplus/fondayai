@@ -291,15 +291,10 @@ export default function SkinScanPage() {
     }
 
     try {
-      let previousScores: number[] | undefined;
-      try {
-        const raw = localStorage.getItem("fonday_prev_scores");
-        if (raw) { const arr = JSON.parse(raw); if (Array.isArray(arr) && arr.length === 10) previousScores = arr; }
-      } catch {}
       const response = await fetch("/api/analyze-skin", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ image: b64, surveyData: data, lang: i18n.language || "en", previousScores }),
+        body: JSON.stringify({ image: b64, surveyData: data, lang: i18n.language || "en" }),
       });
       const rawText = await response.text();
       console.log("[API 응답]", response.status, rawText.slice(0, 300));

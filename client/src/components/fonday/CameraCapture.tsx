@@ -1,29 +1,9 @@
-import React, { useState, useRef, useEffect, useCallback } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { motion, AnimatePresence } from "framer-motion";
-import { X, Sun, Moon } from "lucide-react";
+import { motion } from "framer-motion";
+import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SCAN_FROM } from "./constants";
-
-type BrightnessLevel = "ok" | "too_dark" | "too_bright";
-
-function measureBrightness(video: HTMLVideoElement): { avg: number; level: BrightnessLevel } {
-  const c = document.createElement("canvas");
-  const size = 64;
-  c.width = size; c.height = size;
-  const ctx = c.getContext("2d");
-  if (!ctx) return { avg: 128, level: "ok" };
-  ctx.drawImage(video, 0, 0, size, size);
-  const data = ctx.getImageData(0, 0, size, size).data;
-  let sum = 0;
-  for (let i = 0; i < data.length; i += 4) {
-    sum += data[i] * 0.299 + data[i + 1] * 0.587 + data[i + 2] * 0.114;
-  }
-  const avg = sum / (size * size);
-  if (avg < 50) return { avg, level: "too_dark" };
-  if (avg > 210) return { avg, level: "too_bright" };
-  return { avg, level: "ok" };
-}
 
 // ─── 얼굴 가이드 카메라 ──────────────────────────────────────────
 export function CameraCapture({ onCapture, onClose }: {
@@ -37,20 +17,6 @@ export function CameraCapture({ onCapture, onClose }: {
   const fileRef = useRef<HTMLInputElement>(null);
   const [ready, setReady] = useState(false);
   const [useFile, setUseFile] = useState(false);
-  const [brightnessLevel, setBrightnessLevel] = useState<BrightnessLevel>("ok");
-  const brightnessTimer = useRef<ReturnType<typeof setInterval> | null>(null);
-
-  // 주기적 밝기 체크 (1초마다)
-  useEffect(() => {
-    if (!ready) return;
-    brightnessTimer.current = setInterval(() => {
-      if (videoRef.current) {
-        const { level } = measureBrightness(videoRef.current);
-        setBrightnessLevel(level);
-      }
-    }, 1000);
-    return () => { if (brightnessTimer.current) clearInterval(brightnessTimer.current); };
-  }, [ready]);
 
   useEffect(() => {
     if (!navigator.mediaDevices?.getUserMedia) { setUseFile(true); return; }
@@ -95,17 +61,6 @@ export function CameraCapture({ onCapture, onClose }: {
     ctx.scale(-1, 1);
     ctx.drawImage(video, cropX, cropY, cropW, cropH, 0, 0, canvas.width, canvas.height);
     ctx.restore();
-
-    // 촬영 환경 메타데이터 저장
-    try {
-      const brightness = measureBrightness(video);
-      localStorage.setItem("fonday_scan_meta", JSON.stringify({
-        brightness: Math.round(brightness.avg),
-        brightnessLevel: brightness.level,
-        timestamp: new Date().toISOString(),
-        device: navigator.userAgent.slice(0, 80),
-      }));
-    } catch {}
 
     canvas.toBlob(blob => {
       if (!blob) return;
@@ -174,24 +129,6 @@ export function CameraCapture({ onCapture, onClose }: {
           <p className="text-white text-sm font-semibold drop-shadow-lg">{t("camera.guide1")}</p>
           <p className="text-white/60 text-xs mt-1">{t("camera.guide2")}</p>
         </div>
-
-        {/* 밝기 경고 */}
-        <AnimatePresence>
-          {brightnessLevel !== "ok" && (
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 10 }}
-              className="absolute bottom-[18%] left-4 right-4 flex items-center justify-center gap-2 bg-black/70 backdrop-blur rounded-xl py-2.5 px-4 pointer-events-none"
-            >
-              {brightnessLevel === "too_dark" ? (
-                <><Moon className="w-4 h-4 text-yellow-400 shrink-0" /><span className="text-yellow-300 text-xs font-medium">{t("camera.tooDark", "조명이 부족합니다. 밝은 곳에서 촬영해주세요")}</span></>
-              ) : (
-                <><Sun className="w-4 h-4 text-orange-400 shrink-0" /><span className="text-orange-300 text-xs font-medium">{t("camera.tooBright", "빛이 너무 강합니다. 직사광선을 피해주세요")}</span></>
-              )}
-            </motion.div>
-          )}
-        </AnimatePresence>
 
         {/* 닫기 버튼 */}
         <button onClick={onClose} aria-label={t("common.close")} className="absolute top-4 right-4 w-10 h-10 rounded-full bg-black/40 backdrop-blur flex items-center justify-center">
