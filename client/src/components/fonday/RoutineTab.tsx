@@ -56,6 +56,7 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
   const [showReportCard, setShowReportCard] = useState(false);
   const [showAllSignals, setShowAllSignals] = useState(false);
   const [showAllCollection, setShowAllCollection] = useState(false);
+  const [collectionCat, setCollectionCat] = useState<string>("all");
   const [routineLogs, setRoutineLogs] = useState<{ date_str: string; cosmetic_ids: string[] }[]>([]);
   const [checkedIds, setCheckedIds] = useState<string[]>([]);
 
@@ -642,60 +643,82 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
               </div>
             )}
 
+            {/* ── 제품 컬렉션 (카테고리별 그룹) ── */}
             <div className="pt-8 mt-8" style={{ borderTop: `1px solid ${BORDER_COLOR}` }}>
               <div className="mb-4">
                 <p className="text-[15px] font-bold" style={{ color: DEEP_GREEN }}>{t("cosmetics.collectionTitle")}</p>
                 <p className="text-xs mt-0.5" style={{ color: TEXT_TERTIARY }}>{t("cosmetics.collectionSub")}</p>
               </div>
-              <div className="grid grid-cols-2 gap-2.5">
-                {(showAllCollection ? list : list.slice(0, 4)).map((item) => {
-                  const signal = productSignals.find((entry) => entry.itemId === item.id) || null;
-                  return (
-                    <button
-                      key={item.id}
-                      onClick={() => setSelectedItem(item)}
-                      className="p-3 text-left"
-                      style={{ borderRadius: RADIUS_CARD, background: BG_BASE, boxShadow: SHADOW_CARD }}
-                    >
-                      {item.image_thumbnail ? (
-                        <img src={item.image_thumbnail} alt={item.name ?? ""} className="w-full h-28 rounded-2xl object-cover bg-stone-200" loading="lazy" />
-                      ) : (
-                        <div className="w-full h-28 rounded-2xl bg-stone-100 flex items-center justify-center">
-                          <Droplets className="w-7 h-7" style={{ color: TEXT_TERTIARY }} />
-                        </div>
-                      )}
-                      <div className="mt-3">
-                        <p className="text-xs font-semibold text-[#5C4F4A] truncate">{item.name}</p>
-                        <p className="text-xs truncate" style={{ color: TEXT_TERTIARY }}>{item.brand || t("cosmetics.noBrand")}</p>
-                        {signal && <p className="text-xs mt-2 line-clamp-2 text-kr-pretty" style={{ color: SCAN_TO }}>{signal.note}</p>}
-                        <div className="flex flex-wrap gap-1.5 mt-2">
-                          <span className="px-2 py-1 rounded-full text-xs font-bold" style={{ background: `${DEEP_GREEN}12`, color: DEEP_GREEN }}>
-                            {t(`cosmetics.categories.${item.category}`)}
-                          </span>
-                          <span className="px-2 py-1 rounded-full text-xs font-bold" style={{ background: `${SCAN_FROM}14`, color: SCAN_TO }}>
-                            {item.time_of_day === "am"
-                              ? t("cosmetics.amBtn")
-                              : item.time_of_day === "pm"
-                              ? t("cosmetics.pmBtn")
-                              : inferCosmeticTimeOfDay(item.category) === "am"
-                              ? t("cosmetics.amBtn")
-                              : t("cosmetics.pmBtn")}
-                          </span>
-                        </div>
-                      </div>
-                    </button>
-                  );
-                })}
-              </div>
-              {list.length > 4 && (
-                <button
-                  onClick={() => setShowAllCollection(v => !v)}
-                  className="w-full mt-3 text-center text-[13px] font-semibold py-2"
-                  style={{ color: DEEP_GREEN }}
-                >
-                  {showAllCollection ? t("common.collapse", "접기") : t("common.viewAll", { count: list.length, defaultValue: `전체 ${list.length}개 보기` })}
-                </button>
-              )}
+
+              {/* 카테고리 필터 */}
+              {(() => {
+                const cats = Array.from(new Set(list.map(i => i.category)));
+                const CAT_ICONS: Record<string, string> = { toner: "💧", serum: "✨", cream: "🧴", sunscreen: "☀️", cleanser: "🫧", "토너": "💧", "세럼": "✨", "크림": "🧴", "선크림": "☀️", "클렌저": "🫧" };
+                const filteredList = collectionCat === "all" ? list : list.filter(i => i.category === collectionCat);
+                return (
+                  <>
+                    <div className="flex gap-2 mb-4 overflow-x-auto no-scrollbar">
+                      <button
+                        onClick={() => setCollectionCat("all")}
+                        className="shrink-0 px-3 py-1.5 rounded-full text-[12px] font-semibold transition-colors"
+                        style={collectionCat === "all" ? { background: DEEP_GREEN, color: "#fff" } : { background: BG_MUTED, color: TEXT_TERTIARY }}
+                      >
+                        {t("common.all", "전체")} {list.length}
+                      </button>
+                      {cats.map(cat => (
+                        <button
+                          key={cat}
+                          onClick={() => setCollectionCat(cat)}
+                          className="shrink-0 px-3 py-1.5 rounded-full text-[12px] font-semibold transition-colors"
+                          style={collectionCat === cat ? { background: DEEP_GREEN, color: "#fff" } : { background: BG_MUTED, color: TEXT_TERTIARY }}
+                        >
+                          {CAT_ICONS[cat] || "📦"} {t(`cosmetics.categories.${cat}`)} {list.filter(i => i.category === cat).length}
+                        </button>
+                      ))}
+                    </div>
+
+                    <div className="flex flex-col gap-2.5">
+                      {filteredList.map((item) => {
+                        const signal = productSignals.find((entry) => entry.itemId === item.id) || null;
+                        return (
+                          <button
+                            key={item.id}
+                            onClick={() => setSelectedItem(item)}
+                            className="flex items-center gap-3 p-3 text-left"
+                            style={{ borderRadius: RADIUS_SUB, background: BG_BASE, boxShadow: "0 1px 4px rgba(0,0,0,0.05)", border: `1px solid ${BORDER_COLOR}` }}
+                          >
+                            {/* 썸네일 or 아이콘 */}
+                            {item.image_thumbnail ? (
+                              <img src={item.image_thumbnail} alt={item.name ?? ""} className="w-14 h-14 rounded-xl object-cover bg-stone-100 shrink-0" loading="lazy" />
+                            ) : (
+                              <div className="w-14 h-14 rounded-xl flex items-center justify-center shrink-0" style={{ background: BG_MUTED }}>
+                                <span className="text-xl">{CAT_ICONS[item.category] || "📦"}</span>
+                              </div>
+                            )}
+                            {/* 정보 */}
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-1.5">
+                                <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full" style={{ background: `${DEEP_GREEN}10`, color: DEEP_GREEN }}>
+                                  {t(`cosmetics.categories.${item.category}`)}
+                                </span>
+                                <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full" style={{ background: `${SCAN_FROM}10`, color: SCAN_TO }}>
+                                  {item.time_of_day === "am" ? t("cosmetics.amBtn")
+                                    : item.time_of_day === "pm" ? t("cosmetics.pmBtn")
+                                    : inferCosmeticTimeOfDay(item.category) === "am" ? t("cosmetics.amBtn") : t("cosmetics.pmBtn")}
+                                </span>
+                              </div>
+                              <p className="text-[13px] font-bold truncate mt-1" style={{ color: "#5C4F4A" }}>{item.name}</p>
+                              <p className="text-[11px] truncate" style={{ color: TEXT_TERTIARY }}>{item.brand || t("cosmetics.noBrand")}</p>
+                              {signal && <p className="text-[11px] mt-1 line-clamp-1" style={{ color: SCAN_TO }}>{signal.note}</p>}
+                            </div>
+                            <ChevronRight className="w-4 h-4 shrink-0" style={{ color: TEXT_TERTIARY }} />
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </>
+                );
+              })()}
             </div>
           </>
         )}
