@@ -86,10 +86,17 @@ export const onRequest = async (context: any) => {
         ? (p.target_concern === concern ? 7 : relatedConcerns[concern]?.includes(p.target_concern) ? 3 : 0)
         : 0;
 
-      // ⑥ 제품 ID 기반 미세 변동 (같은 점수 내 순서 차별화, ±2)
-      const micro = ((p.id * 7 + 13) % 5) - 2; // -2 ~ +2
+      // ⑥ 가격대 보정 (중간 가격대가 가장 높음, 너무 비싸거나 싸면 약간 감점)
+      const price = p.price || 15000;
+      const priceScore = price >= 10000 && price <= 25000 ? 3
+        : price > 25000 && price <= 35000 ? 1
+        : price < 10000 ? 2  // 가성비
+        : 0;  // 35000+
 
-      const raw = axisScore + exactBonus + partialBonus + ingredientBonus + concernBonus + micro;
+      // ⑦ 제품 고유 해시 (같은 카테고리 내 순서 차별화, 0~6)
+      const hash = ((p.id * 17 + p.name.length * 7 + p.price) % 7);
+
+      const raw = axisScore + exactBonus + partialBonus + ingredientBonus + concernBonus + priceScore + hash;
       return { ...p, matchScore: Math.max(1, Math.min(99, raw)), key_ingredients: ingredients };
     });
 
