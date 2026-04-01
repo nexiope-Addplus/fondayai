@@ -45,7 +45,7 @@ import {
   getDiaryTodos, saveDiaryTodos, getDiaryTodoProgress, initDiaryTodosFromRoutine,
   buildCosmeticsInsights, buildRoutineGuide, buildCosmeticCorrelationSignals, haptic,
   pickFoodOption, dedupeFoods,
-  isIOS, isPWA, buildStableBaumannType,
+  isIOS, isPWA, buildStableBaumannType, autoRegisterCosmetic,
 } from "./utils";
 import { SkinPredictionCard } from "./SkinPredictionCard";
 import { ResultDiaryCard } from "./ResultDiaryCard";
@@ -899,17 +899,7 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
           <ProductRecommendPreview
             baumannType={finalType}
             onViewAll={() => onGoRecommend?.()}
-            onBuyClick={(p) => {
-              // 구매 클릭 시 자동 화장품 등록
-              if (user) {
-                fetch("/api/cosmetics", {
-                  method: "POST",
-                  credentials: "include",
-                  headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify({ name: p.name, brand: p.brand, category: p.category, startDate: new Date().toISOString().slice(0, 10) }),
-                }).catch(() => {});
-              }
-            }}
+            onBuyClick={(p) => { if (user) autoRegisterCosmetic(p); }}
           />
         </div>
 

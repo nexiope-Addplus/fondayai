@@ -130,7 +130,7 @@ export function ProductRecommendPreview({
             {/* 가격 + 구매 */}
             <div className="flex items-center justify-between mt-2 pt-2" style={{ borderTop: `1px solid ${BORDER_COLOR}` }}>
               <span className="text-[12px] font-bold" style={{ color: "#5C4F4A" }}>
-                {p.price > 0 ? `${(p.price / 1000).toFixed(1)}만` : ""}
+                {p.price > 0 ? `${p.price.toLocaleString()}원` : ""}
               </span>
               {p.buyUrl ? (
                 <a

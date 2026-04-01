@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { ShoppingBag, ExternalLink, Sparkles, ScanLine } from "lucide-react";
+import { autoRegisterCosmetic } from "./utils";
 import { motion, useReducedMotion } from "framer-motion";
 import {
   DEEP_GREEN,
@@ -71,14 +72,7 @@ export function RecommendTab({ user, baumannType, onLogin }: {
 
   const handleBuy = (p: Product) => {
     fireEvent("product_recommend_click", { productId: p.id, brand: p.brand, name: p.name, from: "tab" });
-    // 자동 화장품 등록
-    if (user) {
-      fetch("/api/cosmetics", {
-        method: "POST", credentials: "include",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: p.name, brand: p.brand, category: p.category, startDate: new Date().toISOString().slice(0, 10) }),
-      }).catch(() => {});
-    }
+    autoRegisterCosmetic(p);
   };
 
   // 스캔 안 한 유저

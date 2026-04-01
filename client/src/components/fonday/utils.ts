@@ -84,6 +84,30 @@ export function buildStableBaumannType(
   return { type, borderline, averages: { pore: poreAvg, redness: redAvg, pigment: pigAvg, wrinkle: wrinkAvg } };
 }
 
+// ─── 자동 화장품 등록 헬퍼 ──────────────────────────────────────────────────
+
+const CAT_KO: Record<string, string> = {
+  toner: "토너", serum: "세럼", cream: "크림", sunscreen: "선크림", cleanser: "클렌저",
+};
+
+/** 추천 제품 구매 클릭 시 자동 화장품 등록 (fire-and-forget) */
+export function autoRegisterCosmetic(product: {
+  name: string; brand: string; category: string; keyIngredients?: string[];
+}) {
+  fetch("/api/cosmetics", {
+    method: "POST",
+    credentials: "include",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      name: product.name,
+      brand: product.brand,
+      category: CAT_KO[product.category] || product.category,
+      ingredients: product.keyIngredients?.join(", ") || "",
+      startDate: new Date().toISOString().slice(0, 10),
+    }),
+  }).catch(() => {});
+}
+
 // ─── 날짜 유틸 ───────────────────────────────────────────────────────────────
 
 export function todayStr(): string {

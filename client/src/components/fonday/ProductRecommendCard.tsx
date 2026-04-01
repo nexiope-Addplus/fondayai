@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { ShoppingBag, ExternalLink, Sparkles } from "lucide-react";
 import { motion, useReducedMotion } from "framer-motion";
+import { autoRegisterCosmetic } from "./utils";
 import {
   DEEP_GREEN,
   SCAN_TO,
@@ -176,11 +177,7 @@ export function ProductRecommendCard({ baumannType }: { baumannType: string }) {
                   rel="noopener noreferrer"
                   onClick={() => {
                     fireEvent("product_recommend_click", { productId: product.id, brand: product.brand, name: product.name });
-                    fetch("/api/cosmetics", {
-                      method: "POST", credentials: "include",
-                      headers: { "Content-Type": "application/json" },
-                      body: JSON.stringify({ name: product.name, brand: product.brand, category: product.category, startDate: new Date().toISOString().slice(0, 10) }),
-                    }).catch(() => {});
+                    autoRegisterCosmetic(product);
                   }}
                   className="flex items-center gap-0.5 mt-1 text-[11px] font-semibold"
                   style={{ color: SCAN_TO }}

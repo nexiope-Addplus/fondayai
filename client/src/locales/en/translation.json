@@ -1113,6 +1113,11 @@
     }
   },
   "cosmetics": {
+    "categories": {
+      "toner": "Toner", "serum": "Serum", "cream": "Cream", "sunscreen": "Sunscreen", "cleanser": "Cleanser",
+      "토너": "Toner", "세럼": "Serum", "크림": "Cream", "선크림": "Sunscreen", "클렌저": "Cleanser",
+      "mask": "Mask", "oil": "Oil", "mist": "Mist", "other": "Other"
+    },
     "boardStepSuffix": "",
     "ctaTitle": "Register with a Product Photo",
     "ctaDesc": "Register your products to connect them with your skin changes",
