@@ -102,7 +102,8 @@
       "Bash(curl -s -X POST \"https://fondayai.com/api/test-push\" -H \"Content-Type: application/json\" -d @- -v)",
       "Bash(curl -s \"https://fondayai.com/api/admin/stats\" -H \"Cookie: \")",
       "Bash(curl -s \"https://fondayai.com/api/vapid-public-key\")",
-      "Bash(curl -sI \"https://fondayai.com/og-image.png\")"
+      "Bash(curl -sI \"https://fondayai.com/og-image.png\")",
+      "Bash(curl -sI \"https://fondayai.com/og-image-v2.png\")"
     ],
     "additionalDirectories": [
       "/Users/sangwan/fondayai/s/\"aiComment\": \"FondayAI 의 피부 총평\"/\"aiComment\": \"Fonday 피부 총평\"",
