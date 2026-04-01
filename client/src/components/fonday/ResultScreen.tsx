@@ -64,7 +64,7 @@ import { CosmeticsReportCard } from "./CosmeticsReportCard";
 import { RoutineChecklist } from "./RoutineChecklist";
 
 // ─── 피부 예측 카드 ────────────────────────────────────────────────
-export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, imageBase64, onBack, onGoMagazine, onOpenDiary, onGoRoutine, onGoMy, user, deferredPrompt, onShowInstallGuide }: any) {
+export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCroppedSrc, imageBase64, onBack, onGoMagazine, onOpenDiary, onGoRoutine, onGoRecommend, onGoMy, user, deferredPrompt, onShowInstallGuide }: any) {
   const { t } = useTranslation();
   const [history, setHistory] = useState<any[]>([]);
   const [isSaved, setIsSaved] = useState(false);
@@ -898,7 +898,7 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
         <div className="px-4">
           <ProductRecommendPreview
             baumannType={finalType}
-            onViewAll={() => goTo("recommend")}
+            onViewAll={() => onGoRecommend?.()}
             onBuyClick={(p) => {
               // 구매 클릭 시 자동 화장품 등록
               if (user) {
@@ -906,7 +906,7 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
                   method: "POST",
                   credentials: "include",
                   headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify({ name: `${p.brand} ${p.name}`, category: p.category, startDate: new Date().toISOString().slice(0, 10) }),
+                  body: JSON.stringify({ name: p.name, brand: p.brand, category: p.category, startDate: new Date().toISOString().slice(0, 10) }),
                 }).catch(() => {});
               }
             }}

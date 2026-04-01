@@ -76,7 +76,7 @@ export function RecommendTab({ user, baumannType, onLogin }: {
       fetch("/api/cosmetics", {
         method: "POST", credentials: "include",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: `${p.brand} ${p.name}`, category: p.category, startDate: new Date().toISOString().slice(0, 10) }),
+        body: JSON.stringify({ name: p.name, brand: p.brand, category: p.category, startDate: new Date().toISOString().slice(0, 10) }),
       }).catch(() => {});
     }
   };

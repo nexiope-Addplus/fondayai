@@ -98,7 +98,7 @@ export function ProductRecommendPreview({
             initial={reducedMotion ? {} : { opacity: 0, y: 6 }}
             animate={reducedMotion ? {} : { opacity: 1, y: 0 }}
             transition={{ delay: idx * 0.08 }}
-            className="shrink-0 w-[156px] rounded-2xl p-3 flex flex-col"
+            className="shrink-0 w-[140px] rounded-2xl p-2.5 flex flex-col"
             style={{ background: "#fff", border: `1px solid ${BORDER_COLOR}`, boxShadow: "0 1px 4px rgba(0,0,0,0.04)" }}
           >
             {/* 매칭도 뱃지 */}

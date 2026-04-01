@@ -174,7 +174,14 @@ export function ProductRecommendCard({ baumannType }: { baumannType: string }) {
                   href={product.buyUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  onClick={() => fireEvent("product_recommend_click", { productId: product.id, brand: product.brand, name: product.name })}
+                  onClick={() => {
+                    fireEvent("product_recommend_click", { productId: product.id, brand: product.brand, name: product.name });
+                    fetch("/api/cosmetics", {
+                      method: "POST", credentials: "include",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ name: product.name, brand: product.brand, category: product.category, startDate: new Date().toISOString().slice(0, 10) }),
+                    }).catch(() => {});
+                  }}
                   className="flex items-center gap-0.5 mt-1 text-[11px] font-semibold"
                   style={{ color: SCAN_TO }}
                 >

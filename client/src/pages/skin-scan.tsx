@@ -387,6 +387,7 @@ export default function SkinScanPage() {
                   imageBase64={imageBase64}
                   onBack={() => setScanState("idle")}
                   onGoRoutine={() => handleTabChange("routine")}
+                  onGoRecommend={() => handleTabChange("recommend")}
                   onGoMagazine={() => handleTabChange("scan")}
                   onOpenDiary={() => handleTabChange("diary")}
                   onGoMy={() => handleTabChange("my")}
