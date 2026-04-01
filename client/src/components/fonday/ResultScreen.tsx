@@ -45,7 +45,7 @@ import {
   getDiaryTodos, saveDiaryTodos, getDiaryTodoProgress, initDiaryTodosFromRoutine,
   buildCosmeticsInsights, buildRoutineGuide, buildCosmeticCorrelationSignals, haptic,
   pickFoodOption, dedupeFoods,
-  isIOS, isPWA, buildStableBaumannType,
+  isIOS, isPWA,
 } from "./utils";
 import { SkinPredictionCard } from "./SkinPredictionCard";
 import { ResultDiaryCard } from "./ResultDiaryCard";
@@ -59,7 +59,6 @@ import { ResultHeaderCard } from "./ResultHeaderCard";
 import { ResultOverlayPopups } from "./ResultOverlayPopups";
 import { ResultModals } from "./ResultModals";
 import { CosmeticsReportCard } from "./CosmeticsReportCard";
-import { ProductRecommendCard } from "./ProductRecommendCard";
 import { RoutineChecklist } from "./RoutineChecklist";
 
 // ─── 피부 예측 카드 ────────────────────────────────────────────────
@@ -533,8 +532,11 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
   const scores = analysisResult?.scores || [];
   // Labels from server are always Korean (REQUIRED_LABELS), so we match by Korean label OR by index
   const overallScore = scores[0]?.score || 0;
-  const stableBaumann = buildStableBaumannType(scores, history);
-  const finalType = stableBaumann.type;
+  const isOily  = (scores[3]?.score ?? 100) < 50;
+  const isSens  = (scores[2]?.score ?? 0) > 50;
+  const isPig   = (scores[5]?.score ?? 0) > 50;
+  const isWrink = (scores[4]?.score ?? 100) < 60;
+  const finalType = `${isOily ? "O" : "D"}${isSens ? "S" : "R"}${isPig ? "P" : "N"}${isWrink ? "W" : "T"}`;
   // 다음 스캔을 위해 현재 점수를 localStorage에 저장 (점수 앵커링용)
   try { localStorage.setItem("fonday_prev_scores", JSON.stringify(scores.map((s: any) => s.score))); } catch {}
   const previousScore = history.length > 0 ? parseInt(history[0]?.overallScore || "0", 10) || null : null;
