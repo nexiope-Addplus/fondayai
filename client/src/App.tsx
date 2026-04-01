@@ -6,12 +6,14 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import SkinScanPage from "@/pages/skin-scan";
 import BattlePage from "@/pages/battle";
+import LegalPage from "@/pages/legal";
 
 function Router() {
   return (
     <Switch>
       <Route path="/" component={SkinScanPage} />
       <Route path="/battle/:token" component={BattlePage} />
+      <Route path="/legal/:type" component={LegalPage} />
     </Switch>
   );
 }

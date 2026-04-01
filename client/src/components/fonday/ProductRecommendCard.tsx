@@ -43,12 +43,23 @@ export function ProductRecommendCard({ baumannType }: { baumannType: string }) {
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const lang = i18n.language?.slice(0, 2) || "ko";
 
+  const fireEvent = (type: string, data?: Record<string, unknown>) => {
+    fetch("/api/events", {
+      method: "POST", credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ event_type: type, event_data: data ?? {}, lang, is_guest: true }),
+    }).catch(() => {});
+  };
+
   useEffect(() => {
     if (!baumannType) return;
     setLoading(true);
     fetch(`/api/product-recommend?baumann=${baumannType}&limit=12`)
       .then(r => r.json())
-      .then(data => setProducts(data.products || []))
+      .then(data => {
+        setProducts(data.products || []);
+        if (data.products?.length) fireEvent("product_recommend_view", { baumann: baumannType, count: data.products.length });
+      })
       .catch(() => setProducts([]))
       .finally(() => setLoading(false));
   }, [baumannType]);
@@ -159,6 +170,7 @@ export function ProductRecommendCard({ baumannType }: { baumannType: string }) {
                   href={product.buyUrl}
                   target="_blank"
                   rel="noopener noreferrer"
+                  onClick={() => fireEvent("product_recommend_click", { productId: product.id, brand: product.brand, name: product.name })}
                   className="flex items-center gap-0.5 mt-1 text-[11px] font-semibold"
                   style={{ color: SCAN_TO }}
                 >

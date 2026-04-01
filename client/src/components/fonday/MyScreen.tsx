@@ -438,6 +438,15 @@ export function MyScreen({
         )}
       </AnimatePresence>
 
+      {/* 법적 고지 링크 */}
+      <div className="px-4 mt-8 mb-24 flex flex-wrap items-center gap-x-3 gap-y-1">
+        <a href="/legal/privacy" className="text-[11px]" style={{ color: TEXT_TERTIARY }}>{t("legal.privacy", "개인정보처리방침")}</a>
+        <span className="text-[11px]" style={{ color: BORDER_COLOR }}>|</span>
+        <a href="/legal/terms" className="text-[11px]" style={{ color: TEXT_TERTIARY }}>{t("legal.terms", "이용약관")}</a>
+        <span className="text-[11px]" style={{ color: BORDER_COLOR }}>|</span>
+        <a href="/legal/disclaimer" className="text-[11px]" style={{ color: TEXT_TERTIARY }}>{t("legal.disclaimer", "AI 면책 고지")}</a>
+      </div>
+
       {/* 디바이스 문의 모달 */}
       <WaitlistModal
         open={showDeviceInquiry}

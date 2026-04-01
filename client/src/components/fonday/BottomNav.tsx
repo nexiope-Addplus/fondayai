@@ -1,7 +1,7 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
-import { House, History, NotebookPen, Compass, User } from "lucide-react";
+import { House, History, NotebookPen, User } from "lucide-react";
 import { SCAN_TO, BORDER_COLOR, TINT_WARM } from "./constants";
 import { haptic } from "./utils";
 import type { TabId, ScanState } from "./types";
@@ -28,7 +28,7 @@ export function LangSwitcher() {
   );
 }
 
-// ─── 하단 네비게이션 ──────────────────────────────────────────────
+// ─── 하단 네비게이션 (배민 스타일 — CSS transition only) ──────────
 export function BottomNav({ active, onChange, scanState }: {
   active: TabId;
   onChange: (t: TabId) => void;
@@ -36,36 +36,52 @@ export function BottomNav({ active, onChange, scanState }: {
 }) {
   const { t } = useTranslation();
   if (scanState === "survey" || scanState === "scanning") return null;
-  const btn = (tab: TabId, icon: React.ReactNode, label: string) => {
-    const isActive = active === tab;
-    return (
-      <button
-        key={tab}
-        onClick={() => { haptic("light"); onChange(tab); }}
-        aria-current={isActive ? "page" : undefined}
-        className="relative flex flex-col items-center justify-center gap-1 transition-colors"
-        style={{ color: isActive ? SCAN_TO : "#8C8078" }}
-      >
-        <div className="w-10 h-7 flex items-center justify-center rounded-full transition-colors"
-          style={isActive ? { background: TINT_WARM } : undefined}>
-          {icon}
-        </div>
-        <span className={`text-[11px] leading-none ${isActive ? "font-bold" : "font-medium"}`}>{label}</span>
-      </button>
-    );
-  };
+
+  const tabs: { id: TabId; Icon: typeof House; labelKey: string }[] = [
+    { id: "scan", Icon: House, labelKey: "nav.scan" },
+    { id: "routine", Icon: History, labelKey: "nav.routine" },
+    { id: "diary", Icon: NotebookPen, labelKey: "nav.diary" },
+    { id: "my", Icon: User, labelKey: "nav.my" },
+  ];
+
   return (
     <nav
-      className="fixed bottom-0 left-0 right-0 z-50 bg-white/92 backdrop-blur-2xl"
-      style={{ borderTop: `1px solid ${BORDER_COLOR}` }}
-      style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
+      className="fixed left-3 right-3 z-50 bg-white/95 backdrop-blur-2xl"
+      style={{
+        bottom: "calc(8px + env(safe-area-inset-bottom))",
+        borderRadius: 24,
+        boxShadow: "0 2px 16px rgba(0,0,0,0.10), 0 0 0 1px rgba(0,0,0,0.04)",
+      }}
     >
       <div className="max-w-md mx-auto px-2">
-        <div className="grid grid-cols-4 h-[64px]">
-          {btn("scan", <House className="w-5 h-5" />, t("nav.scan"))}
-          {btn("routine", <History className="w-5 h-5" />, t("nav.routine"))}
-          {btn("diary", <NotebookPen className="w-5 h-5" />, t("nav.diary"))}
-          {btn("my", <User className="w-5 h-5" />, t("nav.my"))}
+        <div className="grid grid-cols-4 h-[60px]">
+          {tabs.map(({ id, Icon, labelKey }) => {
+            const isActive = active === id;
+            return (
+              <button
+                key={id}
+                onClick={() => { haptic("light"); onChange(id); }}
+                aria-current={isActive ? "page" : undefined}
+                className="relative flex flex-col items-center justify-center gap-0.5 transition-all duration-200 active:scale-90"
+                style={{ color: isActive ? SCAN_TO : "#6B5D55" }}
+              >
+                {/* 활성 배경 pill — CSS transition */}
+                <div
+                  className="w-12 h-8 flex items-center justify-center rounded-full transition-all duration-250"
+                  style={{
+                    background: isActive ? TINT_WARM : "transparent",
+                    transform: isActive ? "scale(1)" : "scale(0.85)",
+                    opacity: isActive ? 1 : 0.8,
+                  }}
+                >
+                  <Icon className="w-5 h-5" strokeWidth={isActive ? 2.5 : 2.2} />
+                </div>
+                <span className={`text-[10px] leading-none transition-all duration-200 ${isActive ? "font-bold" : "font-medium"}`}>
+                  {t(labelKey)}
+                </span>
+              </button>
+            );
+          })}
         </div>
       </div>
     </nav>

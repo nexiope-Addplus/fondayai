@@ -28,11 +28,16 @@ export type AnalyticsEventType =
   | "pwa_prompt_dismissed"
   | "feature_use"
   | "share_created"
+  | "challenge_created"
+  | "challenge_opened"
+  | "product_recommend_view"
+  | "product_recommend_click"
   | "care_briefing_requested"
   | "cosmetics_classified"
   | "diary_written"
   | "routine_checked"
   | "magazine_viewed"
+  | "referral_share"
   | "app_open";
 
 export function useAnalytics(lang?: string, isGuest?: boolean) {
