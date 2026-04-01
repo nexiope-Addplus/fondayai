@@ -99,8 +99,22 @@ export const onRequest = async (context: any) => {
       // 이름 길이 + 가격 + ID 조합으로 각 제품마다 고유한 소수점 생성
       const seed = ((p.id * 2654435761) >>> 0) / 4294967296; // 0~1 사이 고유값
 
-      // rawTotal을 0~99 범위로 정규화, 시드로 ±8 분산
-      const normalized = Math.min(99, Math.max(1, Math.round(rawTotal * 0.85 + seed * 16 - 4)));
+      // rawTotal 기반으로 등급 결정, 등급 내에서 시드로 세분화
+      // 등급: 정확1순위(90~99), 정확2순위(82~91), 정확3순위(75~84), 부분3글자(60~72), 부분2글자(40~55), 기타(20~38)
+      let lo: number, hi: number;
+      if (exactIdx === 0) { lo = 90; hi = 99; }
+      else if (exactIdx === 1) { lo = 82; hi = 91; }
+      else if (exactIdx >= 2) { lo = 75; hi = 84; }
+      else {
+        const bestPartial = bestTypes.reduce((mx: number, bt: string) =>
+          Math.max(mx, bl.filter((c, i) => bt.length > i && bt[i] === c).length), 0);
+        if (bestPartial >= 3) { lo = 60; hi = 72; }
+        else if (bestPartial >= 2) { lo = 40; hi = 55; }
+        else { lo = 20; hi = 38; }
+      }
+      // 등급 범위 내에서 세부 점수 = 보너스에 따라 분산
+      const bonusRatio = Math.min(1, (ingredientBonus + concernBonus + priceScore) / 19);
+      const normalized = Math.min(99, Math.max(1, Math.round(lo + (hi - lo) * (bonusRatio * 0.6 + seed * 0.4))));
       return { ...p, matchScore: normalized, key_ingredients: ingredients };
     });
 
