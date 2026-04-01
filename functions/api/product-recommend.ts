@@ -99,8 +99,8 @@ export const onRequest = async (context: any) => {
       // 이름 길이 + 가격 + ID 조합으로 각 제품마다 고유한 소수점 생성
       const seed = ((p.id * 2654435761) >>> 0) / 4294967296; // 0~1 사이 고유값
 
-      // rawTotal을 0~99 범위로 정규화 후 소수점 추가, 최종 정수 변환
-      const normalized = Math.min(99, Math.max(1, Math.round(rawTotal * 0.95 + seed * 5)));
+      // rawTotal을 0~99 범위로 정규화, 시드로 ±8 분산
+      const normalized = Math.min(99, Math.max(1, Math.round(rawTotal * 0.85 + seed * 16 - 4)));
       return { ...p, matchScore: normalized, key_ingredients: ingredients };
     });
 
