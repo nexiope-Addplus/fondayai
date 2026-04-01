@@ -38,46 +38,64 @@ export const onRequest = async (context: any) => {
       });
     }
 
-    // 매칭 점수 계산 (0~100, 분산되도록 설계)
-    const scored = results.map((p: any) => {
-      let score = 0;
+    // 바우만 4축
+    const bl = baumann.split(""); // e.g. ["D","S","P","T"]
 
+    // 매칭 점수 계산 (1~99, 1점 단위 분산)
+    const scored = results.map((p: any) => {
       const bestTypes: string[] = JSON.parse(p.best_baumann || "[]");
       const avoidTypes: string[] = JSON.parse(p.avoid_baumann || "[]");
+      const ingredients: string[] = JSON.parse(p.key_ingredients || "[]");
 
-      // 회피 타입 체크 (먼저)
-      if (avoidTypes.includes(baumann)) return { ...p, matchScore: 0, key_ingredients: JSON.parse(p.key_ingredients || "[]") };
-      const avoidPartial = avoidTypes.some((at: string) =>
-        baumann.split("").filter((c, i) => at.length > i && at[i] === c).length >= 3
-      );
-      if (avoidPartial) return { ...p, matchScore: 5, key_ingredients: JSON.parse(p.key_ingredients || "[]") };
+      // 회피 타입 체크
+      if (avoidTypes.includes(baumann)) return { ...p, matchScore: 0, key_ingredients: ingredients };
+      const avoidMax = avoidTypes.reduce((mx: number, at: string) =>
+        Math.max(mx, bl.filter((c, i) => at.length > i && at[i] === c).length), 0);
+      if (avoidMax >= 3) return { ...p, matchScore: Math.max(3, 15 - avoidMax * 3), key_ingredients: ingredients };
 
-      // best_baumann 리스트에서 가장 높은 매칭도 찾기
-      const bestMatchLetters = bestTypes.reduce((max: number, bt: string) => {
-        const matches = baumann.split("").filter((c, i) => bt.length > i && bt[i] === c).length;
-        return Math.max(max, matches);
-      }, 0);
+      // ① 축별 매칭 (각 축 0~15, 총 최대 60)
+      let axisScore = 0;
+      for (let i = 0; i < 4; i++) {
+        const matched = bestTypes.filter(bt => bt.length > i && bt[i] === bl[i]).length;
+        if (matched > 0) axisScore += 8 + Math.round((matched / Math.max(1, bestTypes.length)) * 7);
+      }
 
-      // best_baumann 리스트 내 순서 보너스 (1번째=최적, 3번째=괜찮음)
+      // ② 정확 매칭 보너스 (최대 25)
       const exactIdx = bestTypes.indexOf(baumann);
-      if (exactIdx === 0) score = 95;        // 1순위 정확 매칭
-      else if (exactIdx === 1) score = 88;   // 2순위 정확 매칭
-      else if (exactIdx >= 2) score = 80;    // 3순위 이하 정확 매칭
-      else if (bestMatchLetters === 4) score = 75;  // 정확 매칭이지만 리스트에 없음 (불가능하지만 방어)
-      else if (bestMatchLetters === 3) score = 60;  // 4글자 중 3개 일치
-      else if (bestMatchLetters === 2) score = 40;  // 4글자 중 2개 일치
-      else if (bestMatchLetters === 1) score = 25;  // 1개만 일치
-      else score = 15;                               // 전혀 안 맞음
+      const exactBonus = exactIdx === 0 ? 25 : exactIdx === 1 ? 20 : exactIdx === 2 ? 16 : exactIdx >= 3 ? 12 : 0;
 
-      // 고민(concern) 매칭 보너스
-      if (concern && p.target_concern === concern) score = Math.min(100, score + 5);
+      // ③ 부분 매칭 (정확 매칭 없을 때만, 최대 12)
+      let partialBonus = 0;
+      if (exactIdx === -1) {
+        const bestPartial = bestTypes.reduce((mx: number, bt: string) =>
+          Math.max(mx, bl.filter((c, i) => bt.length > i && bt[i] === c).length), 0);
+        partialBonus = bestPartial === 3 ? 12 : bestPartial === 2 ? 6 : bestPartial === 1 ? 2 : 0;
+      }
 
-      return { ...p, matchScore: score, key_ingredients: JSON.parse(p.key_ingredients || "[]") };
+      // ④ 성분 보너스 (최대 8)
+      const ingredientBonus = Math.min(8, ingredients.length * 2);
+
+      // ⑤ 고민 매칭 (최대 7)
+      const relatedConcerns: Record<string, string[]> = {
+        hydration: ["barrier", "nourish"], soothing: ["barrier", "repair"],
+        brightening: ["nourish"], acne: ["pore", "soothing"], pore: ["acne"],
+        wrinkle: ["elasticity"], elasticity: ["wrinkle", "nourish"],
+        repair: ["soothing", "barrier"], barrier: ["hydration", "soothing"],
+      };
+      const concernBonus = concern
+        ? (p.target_concern === concern ? 7 : relatedConcerns[concern]?.includes(p.target_concern) ? 3 : 0)
+        : 0;
+
+      // ⑥ 제품 ID 기반 미세 변동 (같은 점수 내 순서 차별화, ±2)
+      const micro = ((p.id * 7 + 13) % 5) - 2; // -2 ~ +2
+
+      const raw = axisScore + exactBonus + partialBonus + ingredientBonus + concernBonus + micro;
+      return { ...p, matchScore: Math.max(1, Math.min(99, raw)), key_ingredients: ingredients };
     });
 
     // 점수 높은 순 정렬, 회피 타입 제외, 상위 N개
     const filtered = scored
-      .filter((p: any) => p.matchScore > 20)
+      .filter((p: any) => p.matchScore > 10)
       .sort((a: any, b: any) => b.matchScore - a.matchScore)
       .slice(0, limit)
       .map((p: any) => ({
