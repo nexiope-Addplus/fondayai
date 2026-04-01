@@ -1,4 +1,14 @@
-import { callGemini, extractText, SAFETY_SETTINGS_NONE } from "./functions/lib/vertex-ai";
+// Dynamic import to prevent cron handler from failing if vertex-ai has issues
+let _callGemini, _extractText, _SAFETY_SETTINGS_NONE;
+async function getVertexAI() {
+  if (!_callGemini) {
+    const mod = await import("./functions/lib/vertex-ai");
+    _callGemini = mod.callGemini;
+    _extractText = mod.extractText;
+    _SAFETY_SETTINGS_NONE = mod.SAFETY_SETTINGS_NONE;
+  }
+  return { callGemini: _callGemini, extractText: _extractText, SAFETY_SETTINGS_NONE: _SAFETY_SETTINGS_NONE };
+}
 
 function buildPrompt(surveyData, lang) {
   const surveyJson = JSON.stringify(surveyData);
@@ -193,6 +203,7 @@ export default {
         const base64Data = image.split(",")[1] || image;
         const mimeType = image.startsWith("data:image/png") ? "image/png" : "image/jpeg";
 
+        const { callGemini, SAFETY_SETTINGS_NONE } = await getVertexAI();
         const geminiResponse = await callGemini({
           gcpServiceAccount: env.GCP_SERVICE_ACCOUNT,
           model: "gemini-2.5-flash",
@@ -208,6 +219,7 @@ export default {
           safetySettings: SAFETY_SETTINGS_NONE,
         });
 
+        const { extractText } = await getVertexAI();
         const text = extractText(geminiResponse);
         const jsonStart = text.indexOf("{");
         const jsonEnd = text.lastIndexOf("}");
