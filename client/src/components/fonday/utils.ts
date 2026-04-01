@@ -50,6 +50,40 @@ export function buildBaumannTypeFromResult(result: AnalysisResult | null) {
   return `${isOily ? "O" : "D"}${isSens ? "S" : "R"}${isPig ? "P" : "N"}${isWrink ? "W" : "T"}`;
 }
 
+/**
+ * 누적 평균 기반 안정적 바우만 타입 판정.
+ * 현재 스캔 + 최근 히스토리(최대 4개)의 평균 점수로 판정.
+ * 경계값(45~55 / 55~65 for 주름) 구간은 borderline 정보도 반환.
+ */
+export function buildStableBaumannType(
+  currentScores: { label: string; score: number }[],
+  history: { scores?: { label: string; score: number }[] }[],
+) {
+  const recentHistory = history.slice(0, 4);
+  const allScoreSets = [currentScores, ...recentHistory.map(h => h.scores || [])].filter(s => s.length >= 6);
+
+  const avg = (index: number): number => {
+    const values = allScoreSets.map(s => s[index]?.score).filter((v): v is number => v != null);
+    if (values.length === 0) return currentScores[index]?.score ?? 50;
+    return values.reduce((a, b) => a + b, 0) / values.length;
+  };
+
+  const poreAvg = avg(3);
+  const redAvg = avg(2);
+  const pigAvg = avg(5);
+  const wrinkAvg = avg(4);
+
+  const type = `${poreAvg < 50 ? "O" : "D"}${redAvg > 50 ? "S" : "R"}${pigAvg > 50 ? "P" : "N"}${wrinkAvg < 60 ? "W" : "T"}`;
+
+  const borderline: string[] = [];
+  if (poreAvg >= 45 && poreAvg <= 55) borderline.push("O/D");
+  if (redAvg >= 45 && redAvg <= 55) borderline.push("S/R");
+  if (pigAvg >= 45 && pigAvg <= 55) borderline.push("P/N");
+  if (wrinkAvg >= 55 && wrinkAvg <= 65) borderline.push("W/T");
+
+  return { type, borderline, averages: { pore: poreAvg, redness: redAvg, pigment: pigAvg, wrinkle: wrinkAvg } };
+}
+
 // ─── 날짜 유틸 ───────────────────────────────────────────────────────────────
 
 export function todayStr(): string {

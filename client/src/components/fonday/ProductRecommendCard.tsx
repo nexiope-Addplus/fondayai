@@ -55,10 +55,14 @@ export function ProductRecommendCard({ baumannType }: { baumannType: string }) {
     if (!baumannType) return;
     setLoading(true);
     fetch(`/api/product-recommend?baumann=${baumannType}&limit=12`)
-      .then(r => r.json())
+      .then(r => {
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+        return r.json();
+      })
       .then(data => {
-        setProducts(data.products || []);
-        if (data.products?.length) fireEvent("product_recommend_view", { baumann: baumannType, count: data.products.length });
+        const items = Array.isArray(data?.products) ? data.products : [];
+        setProducts(items);
+        if (items.length) fireEvent("product_recommend_view", { baumann: baumannType, count: items.length });
       })
       .catch(() => setProducts([]))
       .finally(() => setLoading(false));
