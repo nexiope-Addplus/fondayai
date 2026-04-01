@@ -456,7 +456,7 @@ export function MyCosmeticsModal({ onClose, onAddNew, scans = [] }: { onClose: (
                   className="flex-1 py-3.5 rounded-2xl font-bold text-sm text-white"
                   style={{ background: DEEP_GREEN }}
                 >
-                  {t("cosmetics.confirm")}
+                  {t("common.close", "닫기")}
                 </button>
               </div>
             </motion.div>
