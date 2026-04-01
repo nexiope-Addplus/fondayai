@@ -92,7 +92,16 @@
       "Bash(cd /Users/sangwan/fondayai for f in client/src/components/fonday/*.tsx)",
       "Bash(do needs=\"\" for const in COLOR_SUCCESS COLOR_WARNING COLOR_DANGER COLOR_INFO)",
       "Bash(do if:*)",
-      "Bash(! grep:*)"
+      "Bash(! grep:*)",
+      "Bash(curl -s -X POST \"https://fonday-push-worker.nexiope.workers.dev/test-push\" -H \"Content-Type: application/json\" -d '{\"\"\"\"key\"\"\"\":\"\"\"\"kimseo8318!@\"\"\"\"}')",
+      "Bash(curl -s -X POST \"https://fondayai.com/api/test-push\" -H \"Content-Type: application/json\" -d '{\"\"key\"\":\"\"kimseo8318!@\"\"}')",
+      "Bash(curl -s -X POST \"https://fondayai.com/api/test-push\" -H \"Content-Type: application/json\" -d @-)",
+      "Bash(printf '{\"\"\"\"adminKey\"\"\"\":\"\"\"\"kimseo8318!@\"\"\"\"}')",
+      "Bash(printf '{\"\"\"\"adminKey\"\"\"\":\"\"\"\"kimseo8318!@\"\"\"\",\"\"\"\"type\"\"\"\":\"\"\"\"test\"\"\"\",\"\"\"\"debug\"\"\"\":true}')",
+      "Bash(printf '{\"\"\"\"adminKey\"\"\"\":\"\"\"\"kimseo8318!@\"\"\"\",\"\"\"\"type\"\"\"\":\"\"\"\"test\"\"\"\"}')",
+      "Bash(curl -s -X POST \"https://fondayai.com/api/test-push\" -H \"Content-Type: application/json\" -d @- -v)",
+      "Bash(curl -s \"https://fondayai.com/api/admin/stats\" -H \"Cookie: \")",
+      "Bash(curl -s \"https://fondayai.com/api/vapid-public-key\")"
     ],
     "additionalDirectories": [
       "/Users/sangwan/fondayai/s/\"aiComment\": \"FondayAI 의 피부 총평\"/\"aiComment\": \"Fonday 피부 총평\"",
