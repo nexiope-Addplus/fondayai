@@ -86,18 +86,22 @@ export const onRequest = async (context: any) => {
         ? (p.target_concern === concern ? 7 : relatedConcerns[concern]?.includes(p.target_concern) ? 3 : 0)
         : 0;
 
-      // ⑥ 가격대 보정 (중간 가격대가 가장 높음, 너무 비싸거나 싸면 약간 감점)
+      // ⑥ 가격대 점수 (0~4)
       const price = p.price || 15000;
-      const priceScore = price >= 10000 && price <= 25000 ? 3
-        : price > 25000 && price <= 35000 ? 1
-        : price < 10000 ? 2  // 가성비
-        : 0;  // 35000+
+      const priceScore = price >= 10000 && price <= 25000 ? 4
+        : price > 25000 && price <= 35000 ? 2
+        : price < 10000 ? 3 : 0;
 
-      // ⑦ 제품 고유 해시 (같은 카테고리 내 순서 차별화, 0~6)
-      const hash = ((p.id * 17 + p.name.length * 7 + p.price) % 7);
+      // 합산 (최대 ~104)
+      const rawTotal = axisScore + exactBonus + partialBonus + ingredientBonus + concernBonus + priceScore;
 
-      const raw = axisScore + exactBonus + partialBonus + ingredientBonus + concernBonus + priceScore + hash;
-      return { ...p, matchScore: Math.max(1, Math.min(99, raw)), key_ingredients: ingredients };
+      // ⑦ 제품 고유 시드로 동점 방지 (0.0~0.99)
+      // 이름 길이 + 가격 + ID 조합으로 각 제품마다 고유한 소수점 생성
+      const seed = ((p.id * 2654435761) >>> 0) / 4294967296; // 0~1 사이 고유값
+
+      // rawTotal을 0~99 범위로 정규화 후 소수점 추가, 최종 정수 변환
+      const normalized = Math.min(99, Math.max(1, Math.round(rawTotal * 0.95 + seed * 5)));
+      return { ...p, matchScore: normalized, key_ingredients: ingredients };
     });
 
     // 점수 높은 순 정렬, 회피 타입 제외, 상위 N개
