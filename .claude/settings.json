@@ -111,7 +111,16 @@
       "WebFetch(domain:www.oliveyoung.co.kr)",
       "WebFetch(domain:www.hwahae.com)",
       "WebFetch(domain:www.glowpick.com)",
-      "WebFetch(domain:koreaexperience.com)"
+      "WebFetch(domain:koreaexperience.com)",
+      "Bash(curl -s -X POST https://dev.fondayai.com/api/admin/d1-migrate5 -H \"Content-Type: application/json\" -d '{\"\"key\"\":\"\"'\"$FONDAY_ADMIN_KEY\"'\"\"}')",
+      "Bash(ls /Users/sangwan/fondayai/.env*)",
+      "Bash(curl -s \"https://dev.fondayai.com/api/product-recommend?baumann=DSPT&limit=3\")",
+      "Bash(curl -s \"https://dev.fondayai.com/api/product-recommend?baumann=DSPT&limit=12\")",
+      "Bash(curl -s \"https://dev.fondayai.com/api/product-recommend?baumann=ORPW&limit=8\")",
+      "Bash(curl -s \"https://dev.fondayai.com/api/product-recommend?baumann=DSPT&limit=2\")",
+      "Bash(curl -s \"https://dev.fondayai.com/api/product-recommend?baumann=DSPT&limit=15\")",
+      "Bash(curl -s \"https://dev.fondayai.com/api/product-recommend?baumann=ORPW&limit=10\")",
+      "Bash(curl -s \"https://dev.fondayai.com/api/product-recommend?baumann=OSNT&limit=10\")"
     ],
     "additionalDirectories": [
       "/Users/sangwan/fondayai/s/\"aiComment\": \"FondayAI 의 피부 총평\"/\"aiComment\": \"Fonday 피부 총평\"",

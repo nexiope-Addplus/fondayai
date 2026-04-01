@@ -52,6 +52,7 @@ import { ResultDiaryCard } from "./ResultDiaryCard";
 import { ResultLoginCard } from "./ResultLoginCard";
 import { ResultActionBar } from "./ResultActionBar";
 import { ProductRecommendCard } from "./ProductRecommendCard";
+import { ProductRecommendPreview } from "./ProductRecommendPreview";
 import { ResultRoutineTab } from "./ResultRoutineTab";
 import { ResultSolutionTab } from "./ResultSolutionTab";
 import { ResultNutritionTab } from "./ResultNutritionTab";
@@ -536,7 +537,10 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
   const stableBaumann = buildStableBaumannType(scores, history);
   const finalType = stableBaumann.type;
   // 다음 스캔을 위해 현재 점수를 localStorage에 저장 (점수 앵커링용)
-  try { localStorage.setItem("fonday_prev_scores", JSON.stringify(scores.map((s: any) => s.score))); } catch {}
+  try {
+    localStorage.setItem("fonday_prev_scores", JSON.stringify(scores.map((s: any) => s.score)));
+    localStorage.setItem("fonday_baumann_type", finalType);
+  } catch {}
   const previousScore = history.length > 0 ? parseInt(history[0]?.overallScore || "0", 10) || null : null;
   const cosmeticsInsights = buildCosmeticsInsights(myCosmetics, overallScore, previousScore, t);
   const routineGuide = buildRoutineGuide(myCosmetics, t);
@@ -890,7 +894,24 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
           </div>
         )}
 
-        {/* 루틴 체크는 루틴 탭에서 — 결과 화면은 분석에 집중 */}
+        {/* 맞춤 추천 TOP 3 미리보기 */}
+        <div className="px-4">
+          <ProductRecommendPreview
+            baumannType={finalType}
+            onViewAll={() => goTo("recommend")}
+            onBuyClick={(p) => {
+              // 구매 클릭 시 자동 화장품 등록
+              if (user) {
+                fetch("/api/cosmetics", {
+                  method: "POST",
+                  credentials: "include",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ name: `${p.brand} ${p.name}`, category: p.category, startDate: new Date().toISOString().slice(0, 10) }),
+                }).catch(() => {});
+              }
+            }}
+          />
+        </div>
 
         <div ref={tabNavRef} className="rounded-full p-1.5 sticky top-0 z-20"
           style={{ background: BG_MUTED }}>

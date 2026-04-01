@@ -23,6 +23,7 @@ const DiaryTab = lazy(() => import("../components/fonday/DiaryTab").then(m => ({
 // const MagazineTab = lazy(() => import("../components/fonday/MagazineTab").then(m => ({ default: m.MagazineTab })));
 const MyScreen = lazy(() => import("../components/fonday/MyScreen").then(m => ({ default: m.MyScreen })));
 const RoutineTab = lazy(() => import("../components/fonday/RoutineTab").then(m => ({ default: m.RoutineTab })));
+const RecommendTab = lazy(() => import("../components/fonday/RecommendTab").then(m => ({ default: m.RecommendTab })));
 
 // Ultra-MVP: FeedErrorBoundary 숨김 — 매거진 탭 복원 시 함께 복원
 // class FeedErrorBoundary extends React.Component<...> { ... }
@@ -400,6 +401,13 @@ export default function SkinScanPage() {
             <motion.div key="diary" custom={tabDirection} initial={{ opacity: 0, x: tabDirection * 24 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: tabDirection * -24 }} transition={{ duration: 0.18, ease: "easeOut" }}>
               <Suspense fallback={<div className="min-h-[calc(100dvh-64px)]" />}>
                 <DiaryTab user={user} analysisResult={analysisResult} onBack={() => handleTabChange("scan")} onLogin={openLoginPopup} />
+              </Suspense>
+            </motion.div>
+          )}
+          {activeTab === "recommend" && (
+            <motion.div key="recommend" custom={tabDirection} initial={{ opacity: 0, x: tabDirection * 24 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: tabDirection * -24 }} transition={{ duration: 0.18, ease: "easeOut" }}>
+              <Suspense fallback={<div className="min-h-[calc(100dvh-64px)]" />}>
+                <RecommendTab user={user} baumannType={analysisResult ? undefined : undefined} onLogin={openLoginPopup} />
               </Suspense>
             </motion.div>
           )}

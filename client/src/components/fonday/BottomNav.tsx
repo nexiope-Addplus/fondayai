@@ -1,7 +1,7 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
-import { House, History, NotebookPen, User } from "lucide-react";
+import { House, History, NotebookPen, User, ShoppingBag } from "lucide-react";
 import { SCAN_TO, BORDER_COLOR, TINT_WARM } from "./constants";
 import { haptic } from "./utils";
 import type { TabId, ScanState } from "./types";
@@ -39,6 +39,7 @@ export function BottomNav({ active, onChange, scanState }: {
 
   const tabs: { id: TabId; Icon: typeof House; labelKey: string }[] = [
     { id: "scan", Icon: House, labelKey: "nav.scan" },
+    { id: "recommend", Icon: ShoppingBag, labelKey: "nav.recommend" },
     { id: "routine", Icon: History, labelKey: "nav.routine" },
     { id: "diary", Icon: NotebookPen, labelKey: "nav.diary" },
     { id: "my", Icon: User, labelKey: "nav.my" },
@@ -54,7 +55,7 @@ export function BottomNav({ active, onChange, scanState }: {
       }}
     >
       <div className="max-w-md mx-auto px-2">
-        <div className="grid grid-cols-4 h-[60px]">
+        <div className="grid grid-cols-5 h-[60px]">
           {tabs.map(({ id, Icon, labelKey }) => {
             const isActive = active === id;
             return (
