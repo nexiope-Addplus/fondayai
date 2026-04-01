@@ -270,8 +270,8 @@ export function ScanIdleScreen({
       {!latestScan && !scanLoading && (
         <motion.div variants={fadeChild} className="mb-8 relative" style={{ zIndex: 1 }}>
           {/* 헤드라인 */}
-          <h1 className="text-[26px] font-extrabold leading-[1.3] mt-1 mb-2" style={{ color: TEXT_HEADING, fontFamily: FONT_HEADING }}>
-            {t("idle.subtitle1")}<br />{t("idle.subtitle3")}
+          <h1 className="text-[24px] font-extrabold leading-[1.35] mt-1 mb-2 whitespace-pre-line" style={{ color: TEXT_HEADING, fontFamily: FONT_HEADING }}>
+            {t("idle.title")}
           </h1>
           <p className="text-[14px] leading-[1.7] mb-4" style={{ color: TEXT_SECONDARY }}>
             {t("idle.subtitle4")}
