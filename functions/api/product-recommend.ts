@@ -123,10 +123,12 @@ export const onRequest = async (context: any) => {
       .filter((p: any) => p.matchScore > 10)
       .sort((a: any, b: any) => b.matchScore - a.matchScore);
 
-    // 제휴 링크가 있는 제품을 상위에 우선 배치 (스크린샷 + 수익화)
-    const withAffiliate = sorted.filter((p: any) => p.buy_url && (p.buy_url.includes("coupa.ng") || p.buy_url.includes("coupang.com/a/") || p.buy_url.includes("amazon")));
-    const withoutAffiliate = sorted.filter((p: any) => !withAffiliate.includes(p));
-    const prioritized = [...withAffiliate, ...withoutAffiliate].slice(0, limit);
+    // [임시] 제휴 링크 제품은 매칭 점수 무관하게 무조건 포함
+    const affiliateProducts = scored
+      .filter((p: any) => p.buy_url && (p.buy_url.includes("coupa.ng") || p.buy_url.includes("link.coupang") || p.buy_url.includes("amazon")))
+      .map((p: any) => ({ ...p, matchScore: Math.max(p.matchScore, 92) }));
+    const rest = sorted.filter((p: any) => !affiliateProducts.find((a: any) => a.id === p.id));
+    const prioritized = [...affiliateProducts, ...rest].slice(0, limit);
 
     const filtered = prioritized.map((p: any) => ({
         id: p.id,
