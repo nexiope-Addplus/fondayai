@@ -70,6 +70,13 @@ export function ProductRecommendPreview({
 
   return (
     <div className="mt-4 mb-2">
+      {/* 제휴 공시 문구 */}
+      <p className="text-[11px] font-bold mb-2" style={{ color: "#5C4F4A" }}>
+        {lang === "ja" ? "この投稿はアフィリエイト活動の一環であり、これにより一定額の手数料を受け取っています。"
+          : lang === "en" ? "This post is part of the Coupang Partners affiliate program, and we receive a commission from qualifying purchases."
+          : "이 포스팅은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다."}
+      </p>
+
       {/* 헤더 */}
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-1.5">
@@ -169,11 +176,6 @@ export function ProductRecommendPreview({
           );
         })}
       </div>
-      <p className="text-[8px] mt-2 leading-relaxed" style={{ color: TEXT_TERTIARY }}>
-        {lang === "ja" ? "この投稿はアフィリエイト活動の一環であり、これにより一定額の手数料を受け取っています。"
-          : lang === "en" ? "This post is part of the Coupang Partners affiliate program, and we receive a commission from qualifying purchases."
-          : "이 포스팅은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다."}
-      </p>
     </div>
   );
 }

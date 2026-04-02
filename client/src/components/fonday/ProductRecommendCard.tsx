@@ -91,6 +91,10 @@ export function ProductRecommendCard({ baumannType }: { baumannType: string }) {
 
   return (
     <div className="mt-5 pt-5" style={{ borderTop: `1px solid ${BORDER_COLOR}` }}>
+      {/* 제휴 공시 문구 */}
+      <p className="px-4 text-[11px] font-bold mb-2" style={{ color: "#5C4F4A" }}>
+        {t("product.affiliateDisclosure", "이 포스팅은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.")}
+      </p>
       {/* 섹션 제목 */}
       <div className="px-4 flex items-center gap-2 mb-1">
         <Sparkles className="w-4 h-4" style={{ color: DEEP_GREEN }} />
@@ -194,9 +198,6 @@ export function ProductRecommendCard({ baumannType }: { baumannType: string }) {
           </motion.div>
         ))}
       </div>
-      <p className="text-[9px] mt-3 px-1 leading-relaxed" style={{ color: TEXT_TERTIARY }}>
-        {t("product.affiliateDisclosure", "이 포스팅은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.")}
-      </p>
     </div>
   );
 }
