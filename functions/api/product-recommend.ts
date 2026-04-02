@@ -119,11 +119,16 @@ export const onRequest = async (context: any) => {
     });
 
     // 점수 높은 순 정렬, 회피 타입 제외, 상위 N개
-    const filtered = scored
+    const sorted = scored
       .filter((p: any) => p.matchScore > 10)
-      .sort((a: any, b: any) => b.matchScore - a.matchScore)
-      .slice(0, limit)
-      .map((p: any) => ({
+      .sort((a: any, b: any) => b.matchScore - a.matchScore);
+
+    // 제휴 링크가 있는 제품을 상위에 우선 배치 (스크린샷 + 수익화)
+    const withAffiliate = sorted.filter((p: any) => p.buy_url && (p.buy_url.includes("coupa.ng") || p.buy_url.includes("coupang.com/a/") || p.buy_url.includes("amazon")));
+    const withoutAffiliate = sorted.filter((p: any) => !withAffiliate.includes(p));
+    const prioritized = [...withAffiliate, ...withoutAffiliate].slice(0, limit);
+
+    const filtered = prioritized.map((p: any) => ({
         id: p.id,
         name: p.name,
         brand: p.brand,

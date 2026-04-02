@@ -120,7 +120,8 @@
       "Bash(curl -s \"https://dev.fondayai.com/api/product-recommend?baumann=DSPT&limit=2\")",
       "Bash(curl -s \"https://dev.fondayai.com/api/product-recommend?baumann=DSPT&limit=15\")",
       "Bash(curl -s \"https://dev.fondayai.com/api/product-recommend?baumann=ORPW&limit=10\")",
-      "Bash(curl -s \"https://dev.fondayai.com/api/product-recommend?baumann=OSNT&limit=10\")"
+      "Bash(curl -s \"https://dev.fondayai.com/api/product-recommend?baumann=OSNT&limit=10\")",
+      "WebFetch(domain:link.coupang.com)"
     ],
     "additionalDirectories": [
       "/Users/sangwan/fondayai/s/\"aiComment\": \"FondayAI 의 피부 총평\"/\"aiComment\": \"Fonday 피부 총평\"",
