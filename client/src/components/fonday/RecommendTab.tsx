@@ -207,6 +207,14 @@ export function RecommendTab({ user, baumannType, onLogin }: {
           )}
         </div>
       )}
+
+      {products.length > 0 && (
+        <p className="px-4 text-[9px] mt-4 leading-relaxed" style={{ color: TEXT_TERTIARY }}>
+          {lang === "ja" ? "この投稿にはアフィリエイトリンクが含まれており、購入時に手数料が発生する場合があります。"
+            : lang === "en" ? "This page contains affiliate links. We may earn a commission on purchases."
+            : "이 포스팅은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다."}
+        </p>
+      )}
     </div>
   );
 }

@@ -153,6 +153,11 @@ export function ProductRecommendPreview({
           </motion.div>
         ))}
       </div>
+      <p className="text-[8px] mt-2 leading-relaxed" style={{ color: TEXT_TERTIARY }}>
+        {lang === "ja" ? "アフィリエイトリンクを含みます"
+          : lang === "en" ? "Contains affiliate links"
+          : "쿠팡 파트너스 활동으로 수수료를 제공받습니다"}
+      </p>
     </div>
   );
 }

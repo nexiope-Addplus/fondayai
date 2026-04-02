@@ -194,6 +194,9 @@ export function ProductRecommendCard({ baumannType }: { baumannType: string }) {
           </motion.div>
         ))}
       </div>
+      <p className="text-[9px] mt-3 px-1 leading-relaxed" style={{ color: TEXT_TERTIARY }}>
+        {t("product.affiliateDisclosure", "이 포스팅은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.")}
+      </p>
     </div>
   );
 }
