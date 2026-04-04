@@ -100,10 +100,6 @@ export function ProductRecommendPreview({
       {/* TOP 3 가로 스크롤 */}
       <div className="flex gap-2.5 overflow-x-auto no-scrollbar pb-1">
         {products.map((p, idx) => {
-          const isCoupang = p.buyUrl && (p.buyUrl.includes("coupa.ng") || p.buyUrl.includes("link.coupang"));
-          // 쿠팡 제휴 링크에서 iframe src 추출 (coupa.ng/XXXX 형식)
-          const coupangIframeSrc = isCoupang ? p.buyUrl.replace("https://link.coupang.com/a/", "https://coupa.ng/") : "";
-
           return (
           <motion.div
             key={p.id}
@@ -119,59 +115,39 @@ export function ProductRecommendPreview({
                 className="text-[10px] font-bold px-2 py-0.5 rounded-full"
                 style={{ background: p.matchScore >= 90 ? `${DEEP_GREEN}15` : `${SCAN_TO}12`, color: p.matchScore >= 90 ? DEEP_GREEN : SCAN_TO }}
               >
-                {lang === "ja" ? "適合" : lang === "en" ? "Match" : "매칭"} {p.matchScore}%
+                {lang === "ja" ? "適合" : lang === "en" ? "Match" : "매칭"} {Math.round(p.matchScore)}%
               </span>
               <span className="text-[10px]" style={{ color: TEXT_TERTIARY }}>
                 {cats[p.category] || p.category}
               </span>
             </div>
 
-            {/* 쿠팡 제휴 제품: iframe 배너 */}
-            {isCoupang ? (
-              <div className="flex-1 flex flex-col">
-                <div className="w-full overflow-hidden rounded-xl mb-1.5" style={{ height: 140 }}>
-                  <iframe
-                    src={p.buyUrl}
-                    width="100%" height="140"
-                    frameBorder="0" scrolling="no"
-                    referrerPolicy="unsafe-url"
-                    style={{ border: "none", borderRadius: 12 }}
-                  />
-                </div>
-                <p className="text-[10px] font-semibold" style={{ color: TEXT_TERTIARY }}>{p.brand}</p>
-                <p className="text-[11px] font-bold mt-0.5 line-clamp-2 leading-tight" style={{ color: "#5C4F4A" }}>{p.name}</p>
-              </div>
-            ) : (
-              <>
-                {/* 일반 제품: 기존 디자인 */}
-                <p className="text-[10px] font-semibold" style={{ color: TEXT_TERTIARY }}>{p.brand}</p>
-                <p className="text-[12px] font-bold mt-0.5 line-clamp-2 leading-tight" style={{ color: "#5C4F4A" }}>{p.name}</p>
-                <div className="flex flex-wrap gap-1 mt-1.5 mb-auto">
-                  {p.keyIngredients.slice(0, 2).map(ing => (
-                    <span key={ing} className="text-[9px] px-1.5 py-0.5 rounded-full" style={{ background: `${DEEP_GREEN}0A`, color: DEEP_GREEN }}>
-                      {ing}
-                    </span>
-                  ))}
-                </div>
-                <div className="flex items-center justify-between mt-2 pt-2" style={{ borderTop: `1px solid ${BORDER_COLOR}` }}>
-                  <span className="text-[12px] font-bold" style={{ color: "#5C4F4A" }}>
-                    {p.price > 0 ? `${p.price.toLocaleString()}원` : ""}
-                  </span>
-                  {p.buyUrl ? (
-                    <a href={p.buyUrl} target="_blank" rel="noopener noreferrer" onClick={() => handleBuy(p)}
-                      className="flex items-center gap-0.5 text-[10px] font-bold px-2 py-1 rounded-full"
-                      style={{ background: SCAN_TO, color: "#fff" }}>
-                      {lang === "ja" ? "購入" : lang === "en" ? "Buy" : "구매"}
-                      <ExternalLink className="w-2.5 h-2.5" />
-                    </a>
-                  ) : (
-                    <span className="text-[10px]" style={{ color: TEXT_TERTIARY }}>
-                      {lang === "ja" ? "準備中" : lang === "en" ? "Soon" : "준비중"}
-                    </span>
-                  )}
-                </div>
-              </>
-            )}
+            <p className="text-[10px] font-semibold" style={{ color: TEXT_TERTIARY }}>{p.brand}</p>
+            <p className="text-[12px] font-bold mt-0.5 line-clamp-2 leading-tight" style={{ color: "#5C4F4A" }}>{p.name}</p>
+            <div className="flex flex-wrap gap-1 mt-1.5 mb-auto">
+              {p.keyIngredients.slice(0, 2).map(ing => (
+                <span key={ing} className="text-[9px] px-1.5 py-0.5 rounded-full" style={{ background: `${DEEP_GREEN}0A`, color: DEEP_GREEN }}>
+                  {ing}
+                </span>
+              ))}
+            </div>
+            <div className="flex items-center justify-between mt-2 pt-2" style={{ borderTop: `1px solid ${BORDER_COLOR}` }}>
+              <span className="text-[12px] font-bold" style={{ color: "#5C4F4A" }}>
+                {p.price > 0 ? `${p.price.toLocaleString()}원` : ""}
+              </span>
+              {p.buyUrl ? (
+                <a href={p.buyUrl} target="_blank" rel="noopener noreferrer" onClick={() => handleBuy(p)}
+                  className="flex items-center gap-0.5 text-[10px] font-bold px-2 py-1 rounded-full"
+                  style={{ background: SCAN_TO, color: "#fff" }}>
+                  {lang === "ja" ? "購入" : lang === "en" ? "Buy" : "구매"}
+                  <ExternalLink className="w-2.5 h-2.5" />
+                </a>
+              ) : (
+                <span className="text-[10px]" style={{ color: TEXT_TERTIARY }}>
+                  {lang === "ja" ? "準備中" : lang === "en" ? "Soon" : "준비중"}
+                </span>
+              )}
+            </div>
           </motion.div>
           );
         })}
