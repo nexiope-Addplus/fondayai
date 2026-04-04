@@ -27,9 +27,9 @@ export const onRequest = async (context: any) => {
       });
     }
 
-    // 전체 활성 제품 가져오기
+    // 제휴 링크가 있는 활성 제품만 가져오기
     const { results } = await env.FONDAY_DB.prepare(
-      "SELECT * FROM products WHERE is_active = 1"
+      "SELECT * FROM products WHERE is_active = 1 AND buy_url != '' AND buy_url IS NOT NULL"
     ).all();
 
     if (!results || results.length === 0) {
@@ -41,7 +41,7 @@ export const onRequest = async (context: any) => {
     // 바우만 4축
     const bl = baumann.split(""); // e.g. ["D","S","P","T"]
 
-    // 매칭 점수 계산 (1~99, 1점 단위 분산)
+    // 매칭 점수 계산 (0.00~99.99, 소수점 2자리 세분화)
     const scored = results.map((p: any) => {
       const bestTypes: string[] = JSON.parse(p.best_baumann || "[]");
       const avoidTypes: string[] = JSON.parse(p.avoid_baumann || "[]");
@@ -51,86 +51,79 @@ export const onRequest = async (context: any) => {
       if (avoidTypes.includes(baumann)) return { ...p, matchScore: 0, key_ingredients: ingredients };
       const avoidMax = avoidTypes.reduce((mx: number, at: string) =>
         Math.max(mx, bl.filter((c, i) => at.length > i && at[i] === c).length), 0);
-      if (avoidMax >= 3) return { ...p, matchScore: Math.max(3, 15 - avoidMax * 3), key_ingredients: ingredients };
+      if (avoidMax >= 3) return { ...p, matchScore: Math.max(1.5, 12 - avoidMax * 2.5), key_ingredients: ingredients };
 
-      // ① 축별 매칭 (각 축 0~15, 총 최대 60)
-      let axisScore = 0;
-      for (let i = 0; i < 4; i++) {
-        const matched = bestTypes.filter(bt => bt.length > i && bt[i] === bl[i]).length;
-        if (matched > 0) axisScore += 8 + Math.round((matched / Math.max(1, bestTypes.length)) * 7);
-      }
-
-      // ② 정확 매칭 보너스 (최대 25)
       const exactIdx = bestTypes.indexOf(baumann);
-      const exactBonus = exactIdx === 0 ? 25 : exactIdx === 1 ? 20 : exactIdx === 2 ? 16 : exactIdx >= 3 ? 12 : 0;
 
-      // ③ 부분 매칭 (정확 매칭 없을 때만, 최대 12)
-      let partialBonus = 0;
+      // ① 정확 매칭 (최대 40점)
+      // 1순위=40, 2순위=34, 3순위+=28
+      const exactScore = exactIdx === 0 ? 40 : exactIdx === 1 ? 34 : exactIdx >= 2 ? 28 : 0;
+
+      // ② 축별 부분 매칭 (정확 매칭 없을 때만, 각 축 0~6점, 최대 24점)
+      let axisScore = 0;
       if (exactIdx === -1) {
-        const bestPartial = bestTypes.reduce((mx: number, bt: string) =>
-          Math.max(mx, bl.filter((c, i) => bt.length > i && bt[i] === c).length), 0);
-        partialBonus = bestPartial === 3 ? 12 : bestPartial === 2 ? 6 : bestPartial === 1 ? 2 : 0;
+        for (let i = 0; i < 4; i++) {
+          const matchCount = bestTypes.filter(bt => bt.length > i && bt[i] === bl[i]).length;
+          const ratio = matchCount / Math.max(1, bestTypes.length);
+          if (matchCount > 0) axisScore += 3 + ratio * 3; // 3~6점
+        }
       }
 
-      // ④ 성분 보너스 (최대 8)
-      const ingredientBonus = Math.min(8, ingredients.length * 2);
+      // ③ 성분 풍부도 (최대 12점) — 성분 수 × 2.4, 최대 5개까지
+      const ingredientScore = Math.min(12, ingredients.length * 2.4);
 
-      // ⑤ 고민 매칭 (최대 7)
+      // ④ 고민 매칭 (최대 10점)
       const relatedConcerns: Record<string, string[]> = {
-        hydration: ["barrier", "nourish"], soothing: ["barrier", "repair"],
-        brightening: ["nourish"], acne: ["pore", "soothing"], pore: ["acne"],
-        wrinkle: ["elasticity"], elasticity: ["wrinkle", "nourish"],
+        hydration: ["barrier", "nourishing"], soothing: ["barrier", "repair"],
+        brightening: ["nourishing"], acne: ["pore", "soothing"], pore: ["acne"],
+        "anti-aging": ["elasticity"], elasticity: ["anti-aging", "nourishing"],
         repair: ["soothing", "barrier"], barrier: ["hydration", "soothing"],
+        nourishing: ["hydration", "brightening"], absorption: ["hydration"],
+        "uv-protection": [],
       };
-      const concernBonus = concern
-        ? (p.target_concern === concern ? 7 : relatedConcerns[concern]?.includes(p.target_concern) ? 3 : 0)
+      const concernScore = concern
+        ? (p.target_concern === concern ? 10
+          : relatedConcerns[concern]?.includes(p.target_concern) ? 5
+          : 0)
         : 0;
 
-      // ⑥ 가격대 점수 (0~4)
+      // ⑤ 가격대 (최대 5점) — 1~3.5만원대 선호
       const price = p.price || 15000;
-      const priceScore = price >= 10000 && price <= 25000 ? 4
-        : price > 25000 && price <= 35000 ? 2
-        : price < 10000 ? 3 : 0;
+      const priceScore = price >= 10000 && price <= 25000 ? 5
+        : price > 25000 && price <= 35000 ? 3
+        : price < 10000 ? 3.5 : 1;
 
-      // 합산 (최대 ~104)
-      const rawTotal = axisScore + exactBonus + partialBonus + ingredientBonus + concernBonus + priceScore;
+      // ⑥ 성분 다양성 보너스 (최대 3점)
+      // 3종 이상 서로 다른 성분이면 보너스
+      const diversityBonus = ingredients.length >= 3 ? 3 : ingredients.length >= 2 ? 1.5 : 0;
 
-      // ⑦ 제품 고유 시드로 동점 방지 (0.0~0.99)
-      // 이름 길이 + 가격 + ID 조합으로 각 제품마다 고유한 소수점 생성
-      const seed = ((p.id * 2654435761) >>> 0) / 4294967296; // 0~1 사이 고유값
+      // 합산 (최대 ~70점)
+      const rawTotal = exactScore + axisScore + ingredientScore + concernScore + priceScore + diversityBonus;
 
-      // rawTotal 기반으로 등급 결정, 등급 내에서 시드로 세분화
-      // 등급: 정확1순위(90~99), 정확2순위(82~91), 정확3순위(75~84), 부분3글자(60~72), 부분2글자(40~55), 기타(20~38)
-      let lo: number, hi: number;
-      if (exactIdx === 0) { lo = 90; hi = 99; }
-      else if (exactIdx === 1) { lo = 82; hi = 91; }
-      else if (exactIdx >= 2) { lo = 75; hi = 84; }
-      else {
-        const bestPartial = bestTypes.reduce((mx: number, bt: string) =>
-          Math.max(mx, bl.filter((c, i) => bt.length > i && bt[i] === c).length), 0);
-        if (bestPartial >= 3) { lo = 60; hi = 72; }
-        else if (bestPartial >= 2) { lo = 40; hi = 55; }
-        else { lo = 20; hi = 38; }
-      }
-      // 등급 범위 내에서 세부 점수 = 보너스에 따라 분산
-      const bonusRatio = Math.min(1, (ingredientBonus + concernBonus + priceScore) / 19);
-      const normalized = Math.min(99, Math.max(1, Math.round(lo + (hi - lo) * (bonusRatio * 0.6 + seed * 0.4))));
-      return { ...p, matchScore: normalized, key_ingredients: ingredients };
+      // 70점 스케일 → 99.99 스케일로 정규화 + 제품별 고유 시드로 동점 방지
+      const seed = ((p.id * 2654435761) >>> 0) / 4294967296; // 0~1 고유값
+      const base = Math.min(99, (rawTotal / 70) * 95); // 0~95 범위
+      const jitter = seed * 4.99; // 0~4.99 범위로 소수점 세분화
+      const matchScore = Math.round(Math.min(99.99, Math.max(0.5, base + jitter)) * 100) / 100;
+
+      return { ...p, matchScore, key_ingredients: ingredients };
     });
 
     // 점수 높은 순 정렬, 회피 타입 제외, 상위 N개
+    // 동일 점수 내에서 제휴 링크 있는 제품 우선
     const sorted = scored
       .filter((p: any) => p.matchScore > 10)
-      .sort((a: any, b: any) => b.matchScore - a.matchScore);
+      .sort((a: any, b: any) => {
+        const diff = b.matchScore - a.matchScore;
+        if (Math.abs(diff) > 0.01) return diff;
+        // 동일 점수: 제휴 링크 있는 제품 우선
+        const aHas = a.buy_url && a.buy_url.startsWith("http") ? 1 : 0;
+        const bHas = b.buy_url && b.buy_url.startsWith("http") ? 1 : 0;
+        return bHas - aHas;
+      })
+      .slice(0, limit);
 
-    // [임시] 제휴 링크 제품은 매칭 점수 무관하게 무조건 포함
-    const affiliateProducts = scored
-      .filter((p: any) => p.buy_url && (p.buy_url.includes("coupa.ng") || p.buy_url.includes("link.coupang") || p.buy_url.includes("amazon")))
-      .map((p: any) => ({ ...p, matchScore: Math.max(p.matchScore, 92) }));
-    const rest = sorted.filter((p: any) => !affiliateProducts.find((a: any) => a.id === p.id));
-    const prioritized = [...affiliateProducts, ...rest].slice(0, limit);
-
-    const filtered = prioritized.map((p: any) => ({
+    const filtered = sorted.map((p: any) => ({
         id: p.id,
         name: p.name,
         brand: p.brand,

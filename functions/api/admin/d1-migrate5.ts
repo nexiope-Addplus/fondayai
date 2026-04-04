@@ -69,19 +69,17 @@ export const onRequest = async (context: any) => {
     ).run();
     results.push("idx_products_active ok");
 
-    // 기존 데이터 있으면 스킵
-    const count = await env.FONDAY_DB.prepare("SELECT COUNT(*) as cnt FROM products").first();
-    if (count?.cnt === 0) {
-      for (const p of PRODUCT_SEED) {
-        await env.FONDAY_DB.prepare(`
-          INSERT INTO products (name, brand, category, key_ingredients, best_baumann, avoid_baumann, target_concern, price)
-          VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-        `).bind(p.name, p.brand, p.category, p.key_ingredients, p.best_baumann, p.avoid_baumann, p.target_concern, p.price).run();
-      }
-      results.push(`seeded ${PRODUCT_SEED.length} products`);
-    } else {
-      results.push(`products already has ${count?.cnt} rows, skip seed`);
+    // 기존 데이터 삭제 후 새로 시드 (제품 목록 갱신)
+    await env.FONDAY_DB.prepare("DELETE FROM products").run();
+    results.push("cleared existing products");
+
+    for (const p of PRODUCT_SEED) {
+      await env.FONDAY_DB.prepare(`
+        INSERT INTO products (name, brand, category, key_ingredients, best_baumann, avoid_baumann, target_concern, price, buy_url)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `).bind(p.name, p.brand, p.category, p.key_ingredients, p.best_baumann, p.avoid_baumann, p.target_concern, p.price, p.buy_url || "").run();
     }
+    results.push(`seeded ${PRODUCT_SEED.length} products (${PRODUCT_SEED.filter(p => p.buy_url).length} with coupang links)`);
 
     return new Response(JSON.stringify({ ok: true, results }), {
       headers: { "Content-Type": "application/json" },
