@@ -51,7 +51,7 @@ import { SkinPredictionCard } from "./SkinPredictionCard";
 import { ResultDiaryCard } from "./ResultDiaryCard";
 import { ResultLoginCard } from "./ResultLoginCard";
 import { ResultActionBar } from "./ResultActionBar";
-import { ProductRecommendPreview } from "./ProductRecommendPreview";
+import { ProductRecommendCard } from "./ProductRecommendCard";
 import { ResultRoutineTab } from "./ResultRoutineTab";
 import { ResultSolutionTab } from "./ResultSolutionTab";
 import { ResultNutritionTab } from "./ResultNutritionTab";
@@ -893,14 +893,8 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
           </div>
         )}
 
-        {/* 맞춤 추천 TOP 3 미리보기 */}
-        <div className="px-4">
-          <ProductRecommendPreview
-            baumannType={finalType}
-            onViewAll={() => onGoRecommend?.()}
-            onBuyClick={(p) => { if (user) autoRegisterCosmetic(p); }}
-          />
-        </div>
+        {/* 맞춤 루틴 — 카테고리별 1위 추천 */}
+        <ProductRecommendCard baumannType={finalType} />
 
         <div ref={tabNavRef} className="rounded-full p-1.5 sticky top-0 z-20"
           style={{ background: BG_MUTED }}>
