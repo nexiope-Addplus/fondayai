@@ -109,15 +109,15 @@ export function ProductRecommendPreview({
             className="shrink-0 w-[140px] rounded-2xl p-2.5 flex flex-col"
             style={{ background: "#fff", border: `1px solid ${BORDER_COLOR}`, boxShadow: "0 1px 4px rgba(0,0,0,0.04)" }}
           >
-            {/* 배너 이미지 */}
+            {/* 배너 이미지 — 쿠팡 로고 + 제품 이미지 표시, 하단 버튼 숨김 */}
             {p.bannerUrl && (
-              <div className="w-full overflow-hidden rounded-xl mb-2" style={{ height: 120 }}>
+              <div className="w-full overflow-hidden rounded-xl mb-2 flex justify-center" style={{ height: 160 }}>
                 <iframe
                   src={p.bannerUrl}
                   width="120" height="240"
                   frameBorder="0" scrolling="no"
                   referrerPolicy="unsafe-url"
-                  style={{ border: "none", borderRadius: 12, transform: "scale(1)", transformOrigin: "top center" }}
+                  style={{ border: "none", pointerEvents: "none" }}
                 />
               </div>
             )}

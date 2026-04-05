@@ -162,15 +162,15 @@ export function RecommendTab({ user, baumannType, onLogin }: {
               style={{ background: "#fff", border: `1px solid ${BORDER_COLOR}`, boxShadow: "0 1px 4px rgba(0,0,0,0.04)" }}
             >
               <div className="p-3.5">
-                {/* 배너 이미지 */}
+                {/* 배너 이미지 — 쿠팡 로고 + 제품 이미지, 하단 버튼 숨김 */}
                 {p.bannerUrl && (
-                  <div className="w-full overflow-hidden rounded-xl mb-3 flex justify-center" style={{ height: 240, background: "#FAFAFA" }}>
+                  <div className="w-full overflow-hidden rounded-xl mb-3 flex justify-center" style={{ height: 170, background: "#FAFAFA" }}>
                     <iframe
                       src={p.bannerUrl}
                       width="120" height="240"
                       frameBorder="0" scrolling="no"
                       referrerPolicy="unsafe-url"
-                      style={{ border: "none" }}
+                      style={{ border: "none", pointerEvents: "none" }}
                     />
                   </div>
                 )}
