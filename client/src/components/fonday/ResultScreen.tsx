@@ -51,7 +51,6 @@ import { SkinPredictionCard } from "./SkinPredictionCard";
 import { ResultDiaryCard } from "./ResultDiaryCard";
 import { ResultLoginCard } from "./ResultLoginCard";
 import { ResultActionBar } from "./ResultActionBar";
-import { ProductRecommendCard } from "./ProductRecommendCard";
 import { ProductRecommendPreview } from "./ProductRecommendPreview";
 import { ResultRoutineTab } from "./ResultRoutineTab";
 import { ResultSolutionTab } from "./ResultSolutionTab";
@@ -979,7 +978,6 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
             onGoMyTab={onGoMy}
             setShowCosmeticsReport={setShowCosmeticsReport}
           />
-          <ProductRecommendCard baumannType={finalType} />
           </motion.div>
         )}
 
