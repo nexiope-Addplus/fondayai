@@ -100,11 +100,13 @@ export const onRequest = async (context: any) => {
       // 합산 (최대 ~70점)
       const rawTotal = exactScore + axisScore + ingredientScore + concernScore + priceScore + diversityBonus;
 
-      // 70점 스케일 → 99.99 스케일로 정규화 + 제품별 고유 시드로 동점 방지
+      // 70점 스케일 → 65~99 범위로 정규화 (회피 제외)
+      // 사용자에게 "매칭 47%"는 불안감 유발 → 최소 65%로 바닥 설정
       const seed = ((p.id * 2654435761) >>> 0) / 4294967296; // 0~1 고유값
-      const base = Math.min(99, (rawTotal / 70) * 95); // 0~95 범위
-      const jitter = seed * 4.99; // 0~4.99 범위로 소수점 세분화
-      const matchScore = Math.round(Math.min(99.99, Math.max(0.5, base + jitter)) * 100) / 100;
+      const ratio = Math.min(1, rawTotal / 70); // 0~1
+      const base = 65 + ratio * 32; // 65~97 범위
+      const jitter = seed * 2.99; // 0~2.99 범위로 소수점 세분화
+      const matchScore = Math.round(Math.min(99.99, Math.max(65, base + jitter)) * 100) / 100;
 
       return { ...p, matchScore, key_ingredients: ingredients };
     });

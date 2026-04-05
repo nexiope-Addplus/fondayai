@@ -140,22 +140,23 @@ export function ProductRecommendCard({ baumannType }: { baumannType: string }) {
       </p>
 
       {/* 카테고리별 1위 제품 — 가로 스크롤 */}
-      <div className="pl-4 flex gap-3 overflow-x-auto no-scrollbar pb-2">
+      <div className="pl-4 flex gap-2.5 overflow-x-auto no-scrollbar pb-2">
         {products.map((product, idx) => {
           const score = Math.round(product.matchScore);
           const step = stepLabels[product.category];
+          const scoreColor = score >= 90 ? DEEP_GREEN : score >= 80 ? "#5C8A6E" : SCAN_TO;
           return (
             <motion.div
               key={product.id}
               initial={reducedMotion ? {} : { opacity: 0, x: 12 }}
               animate={reducedMotion ? {} : { opacity: 1, x: 0 }}
               transition={{ delay: idx * 0.06 }}
-              className="shrink-0 w-[155px] rounded-2xl flex flex-col overflow-hidden"
+              className="shrink-0 w-[140px] rounded-2xl flex flex-col overflow-hidden"
               style={{ background: "#fff", boxShadow: "0 2px 8px rgba(0,0,0,0.06)", border: `1px solid ${BORDER_COLOR}` }}
             >
               {/* 스텝 라벨 */}
-              <div className="flex items-center gap-1.5 px-3 pt-2.5 pb-1">
-                <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full" style={{ background: `${DEEP_GREEN}12`, color: DEEP_GREEN }}>
+              <div className="flex items-center gap-1.5 px-2.5 pt-2 pb-0.5">
+                <span className="text-[8px] font-bold px-1.5 py-0.5 rounded-full" style={{ background: `${DEEP_GREEN}12`, color: DEEP_GREEN }}>
                   {step?.[0]}
                 </span>
                 <span className="text-[11px] font-bold" style={{ color: "#5C4F4A" }}>
@@ -163,9 +164,9 @@ export function ProductRecommendCard({ baumannType }: { baumannType: string }) {
                 </span>
               </div>
 
-              {/* 배너 이미지 — 쿠팡 로고 + 제품 이미지, 하단 버튼 숨김 */}
+              {/* 배너 이미지 — 컴팩트 */}
               {product.bannerUrl && (
-                <div className="w-full overflow-hidden flex justify-center" style={{ height: 160 }}>
+                <div className="w-full overflow-hidden flex justify-center" style={{ height: 130 }}>
                   <iframe
                     src={product.bannerUrl}
                     width="120" height="240"
@@ -176,25 +177,25 @@ export function ProductRecommendCard({ baumannType }: { baumannType: string }) {
                 </div>
               )}
 
-              {/* 매칭도 + 제품 정보 */}
-              <div className="px-3 pb-1 flex-1 flex flex-col">
-                <span className="self-start text-[9px] font-bold px-1.5 py-0.5 rounded-full mb-1"
-                  style={{ background: score >= 85 ? `${DEEP_GREEN}15` : `${SCAN_TO}12`, color: score >= 85 ? DEEP_GREEN : SCAN_TO }}>
-                  {lang === "ja" ? "適合" : lang === "en" ? "Match" : "매칭"} {score}%
+              {/* 매칭 점수 — 눈에 띄게 */}
+              <div className="mx-2.5 mt-1 mb-1 px-2 py-1.5 rounded-lg flex items-center justify-center gap-1"
+                style={{ background: `${scoreColor}12` }}>
+                <span className="text-[14px] font-extrabold" style={{ color: scoreColor }}>
+                  {score}%
                 </span>
+                <span className="text-[10px] font-bold" style={{ color: scoreColor }}>
+                  {lang === "ja" ? "適合" : lang === "en" ? "match" : "매칭"}
+                </span>
+              </div>
+
+              {/* 제품 정보 */}
+              <div className="px-2.5 pb-1 flex-1 flex flex-col">
                 <p className="text-[10px] font-semibold" style={{ color: TEXT_TERTIARY }}>{product.brand}</p>
                 <p className="text-[11px] font-bold mt-0.5 line-clamp-2 leading-snug" style={{ color: "#5C4F4A" }}>{product.name}</p>
-                <div className="flex flex-wrap gap-0.5 mt-1">
-                  {product.keyIngredients.slice(0, 2).map(ing => (
-                    <span key={ing} className="text-[9px] px-1.5 py-0.5 rounded-full" style={{ background: `${DEEP_GREEN}0A`, color: DEEP_GREEN }}>
-                      {ing}
-                    </span>
-                  ))}
-                </div>
               </div>
 
               {/* 가격 + 구매 */}
-              <div className="flex items-center justify-between px-3 pb-2.5 pt-1.5" style={{ borderTop: `1px solid ${BORDER_COLOR}` }}>
+              <div className="flex items-center justify-between px-2.5 pb-2 pt-1.5" style={{ borderTop: `1px solid ${BORDER_COLOR}` }}>
                 <span className="text-[11px] font-bold" style={{ color: "#5C4F4A" }}>
                   {product.price > 0 ? `${product.price.toLocaleString()}원` : ""}
                 </span>
@@ -218,7 +219,6 @@ export function ProductRecommendCard({ baumannType }: { baumannType: string }) {
             </motion.div>
           );
         })}
-        {/* 오른쪽 여백 */}
         <div className="shrink-0 w-2" />
       </div>
     </div>
