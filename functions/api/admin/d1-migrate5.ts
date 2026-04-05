@@ -38,7 +38,10 @@ export const onRequest = async (context: any) => {
 
     const results: string[] = [];
 
-    // 화장품 추천 제품 테이블
+    // 기존 테이블 드롭 후 재생성 (스키마 변경 반영)
+    await env.FONDAY_DB.prepare("DROP TABLE IF EXISTS products").run();
+    results.push("dropped old products table");
+
     await env.FONDAY_DB.prepare(`
       CREATE TABLE IF NOT EXISTS products (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -52,6 +55,7 @@ export const onRequest = async (context: any) => {
         price INTEGER DEFAULT 0,
         price_currency TEXT DEFAULT 'KRW',
         buy_url TEXT DEFAULT '',
+        banner_url TEXT DEFAULT '',
         image_url TEXT DEFAULT '',
         is_active INTEGER DEFAULT 1,
         created_at TEXT DEFAULT (datetime('now'))
@@ -75,11 +79,11 @@ export const onRequest = async (context: any) => {
 
     for (const p of PRODUCT_SEED) {
       await env.FONDAY_DB.prepare(`
-        INSERT INTO products (name, brand, category, key_ingredients, best_baumann, avoid_baumann, target_concern, price, buy_url)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-      `).bind(p.name, p.brand, p.category, p.key_ingredients, p.best_baumann, p.avoid_baumann, p.target_concern, p.price, p.buy_url || "").run();
+        INSERT INTO products (name, brand, category, key_ingredients, best_baumann, avoid_baumann, target_concern, price, buy_url, banner_url)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `).bind(p.name, p.brand, p.category, p.key_ingredients, p.best_baumann, p.avoid_baumann, p.target_concern, p.price, p.buy_url || "", p.banner_url || "").run();
     }
-    results.push(`seeded ${PRODUCT_SEED.length} products (${PRODUCT_SEED.filter(p => p.buy_url).length} with coupang links)`);
+    results.push(`seeded ${PRODUCT_SEED.length} products (${PRODUCT_SEED.filter(p => p.buy_url).length} links, ${PRODUCT_SEED.filter(p => p.banner_url).length} banners)`);
 
     return new Response(JSON.stringify({ ok: true, results }), {
       headers: { "Content-Type": "application/json" },

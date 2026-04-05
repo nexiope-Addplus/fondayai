@@ -133,6 +133,7 @@ export const onRequest = async (context: any) => {
         price: p.price,
         priceCurrency: p.price_currency,
         buyUrl: p.buy_url,
+        bannerUrl: p.banner_url,
         imageUrl: p.image_url,
         matchScore: p.matchScore,
       }));

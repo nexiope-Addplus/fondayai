@@ -161,39 +161,53 @@ export function RecommendTab({ user, baumannType, onLogin }: {
               className="rounded-2xl overflow-hidden"
               style={{ background: "#fff", border: `1px solid ${BORDER_COLOR}`, boxShadow: "0 1px 4px rgba(0,0,0,0.04)" }}
             >
-              <div className="flex items-center gap-3 p-3.5">
-                <div className="w-12 h-12 rounded-xl flex flex-col items-center justify-center shrink-0"
-                  style={{ background: score >= 90 ? TINT_GREEN : score >= 70 ? BG_MUTED : `${SCAN_TO}08` }}>
-                  <span className="text-[15px] font-extrabold leading-none" style={{ color: score >= 90 ? DEEP_GREEN : score >= 70 ? "#5C4F4A" : TEXT_SECONDARY }}>
-                    {score}
-                  </span>
-                  <span className="text-[8px] mt-0.5 font-medium" style={{ color: TEXT_TERTIARY }}>match</span>
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-[11px] font-semibold" style={{ color: TEXT_TERTIARY }}>
-                    {p.brand} · {cats[p.category] || p.category}
-                  </p>
-                  <p className="text-[13px] font-bold truncate mt-0.5" style={{ color: "#5C4F4A" }}>{p.name}</p>
-                  <div className="flex flex-wrap gap-1 mt-1">
-                    {p.keyIngredients.slice(0, 3).map(ing => (
-                      <span key={ing} className="text-[9px] px-1.5 py-0.5 rounded-full" style={{ background: `${DEEP_GREEN}0A`, color: DEEP_GREEN }}>
-                        {ing}
-                      </span>
-                    ))}
+              <div className="p-3.5">
+                {/* 배너 이미지 */}
+                {p.bannerUrl && (
+                  <div className="w-full overflow-hidden rounded-xl mb-3 flex justify-center" style={{ height: 240, background: "#FAFAFA" }}>
+                    <iframe
+                      src={p.bannerUrl}
+                      width="120" height="240"
+                      frameBorder="0" scrolling="no"
+                      referrerPolicy="unsafe-url"
+                      style={{ border: "none" }}
+                    />
                   </div>
-                </div>
-                <div className="flex flex-col items-end shrink-0 gap-1">
-                  <span className="text-[13px] font-bold" style={{ color: "#5C4F4A" }}>
-                    {p.price > 0 ? `${p.price.toLocaleString()}원` : ""}
-                  </span>
-                  {p.buyUrl ? (
-                    <a href={p.buyUrl} target="_blank" rel="noopener noreferrer" onClick={() => handleBuy(p)}
-                      className="flex items-center gap-0.5 text-[10px] font-bold px-2.5 py-1 rounded-full"
-                      style={{ background: SCAN_TO, color: "#fff" }}>
-                      {lang === "ja" ? "購入" : lang === "en" ? "Buy" : "구매"}
-                      <ExternalLink className="w-2.5 h-2.5" />
-                    </a>
-                  ) : null}
+                )}
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 rounded-xl flex flex-col items-center justify-center shrink-0"
+                    style={{ background: score >= 90 ? TINT_GREEN : score >= 70 ? BG_MUTED : `${SCAN_TO}08` }}>
+                    <span className="text-[15px] font-extrabold leading-none" style={{ color: score >= 90 ? DEEP_GREEN : score >= 70 ? "#5C4F4A" : TEXT_SECONDARY }}>
+                      {score}
+                    </span>
+                    <span className="text-[8px] mt-0.5 font-medium" style={{ color: TEXT_TERTIARY }}>match</span>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[11px] font-semibold" style={{ color: TEXT_TERTIARY }}>
+                      {p.brand} · {cats[p.category] || p.category}
+                    </p>
+                    <p className="text-[13px] font-bold truncate mt-0.5" style={{ color: "#5C4F4A" }}>{p.name}</p>
+                    <div className="flex flex-wrap gap-1 mt-1">
+                      {p.keyIngredients.slice(0, 3).map(ing => (
+                        <span key={ing} className="text-[9px] px-1.5 py-0.5 rounded-full" style={{ background: `${DEEP_GREEN}0A`, color: DEEP_GREEN }}>
+                          {ing}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="flex flex-col items-end shrink-0 gap-1">
+                    <span className="text-[13px] font-bold" style={{ color: "#5C4F4A" }}>
+                      {p.price > 0 ? `${p.price.toLocaleString()}원` : ""}
+                    </span>
+                    {p.buyUrl ? (
+                      <a href={p.buyUrl} target="_blank" rel="noopener noreferrer" onClick={() => handleBuy(p)}
+                        className="flex items-center gap-0.5 text-[10px] font-bold px-2.5 py-1 rounded-full"
+                        style={{ background: SCAN_TO, color: "#fff" }}>
+                        {lang === "ja" ? "購入" : lang === "en" ? "Buy" : "구매"}
+                        <ExternalLink className="w-2.5 h-2.5" />
+                      </a>
+                    ) : null}
+                  </div>
                 </div>
               </div>
             </motion.div>
