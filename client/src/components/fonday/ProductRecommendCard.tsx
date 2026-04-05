@@ -130,7 +130,7 @@ export function ProductRecommendCard({ baumannType }: { baumannType: string }) {
       <div className="px-4 flex items-center gap-2 mb-1">
         <Sparkles className="w-4.5 h-4.5" style={{ color: DEEP_GREEN }} />
         <span className="font-extrabold text-[16px]" style={{ color: "#4A403A" }}>
-          {lang === "ja" ? `${baumannType}の処方箋` : lang === "en" ? `${baumannType} Routine` : `${baumannType} 맞춤 루틴`}
+          {lang === "ja" ? `${baumannType}タイプ おすすめ化粧品` : lang === "en" ? `${baumannType} Recommended Products` : `${baumannType} 타입 추천 화장품`}
         </span>
       </div>
       <p className="px-4 text-[12px] mb-5" style={{ color: TEXT_TERTIARY }}>
