@@ -297,7 +297,7 @@ export const onRequest = async (context: any) => {
 
     const slides: Array<{ title: string; body: string; tip?: string }> = JSON.parse(content.slides as string);
     const hook = content.hook as string;
-    const hookSub = (content as any).hookSub || slides[0]?.body || "";
+    const hookSub = (content.hook_sub as string) || slides[0]?.body || "";
     const cta = content.cta as string;
     const ingredientFocus = (content.ingredient_focus as string) || "";
 

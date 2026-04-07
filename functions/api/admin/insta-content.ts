@@ -27,6 +27,7 @@ interface GeneratedContent {
   pillar: ContentPillar;
   format: ContentFormat;
   hook: string;          // 첫 문장 (후킹)
+  hookSub: string;       // 서브 텍스트
   slides: ContentSlide[];  // 캐러셀 5장 or 릴스 씬 5개
   caption: string;       // 인스타 캡션
   hashtags: string[];
@@ -278,6 +279,7 @@ async function ensureTable(db: D1Database) {
       pillar TEXT NOT NULL,
       format TEXT NOT NULL,
       hook TEXT NOT NULL,
+      hook_sub TEXT DEFAULT '',
       slides TEXT NOT NULL,
       caption TEXT NOT NULL,
       hashtags TEXT NOT NULL,
@@ -289,6 +291,10 @@ async function ensureTable(db: D1Database) {
       created_at TEXT DEFAULT (datetime('now'))
     )
   `).run();
+  // 기존 테이블에 hook_sub 컬럼 없으면 추가
+  try {
+    await db.prepare("ALTER TABLE insta_content ADD COLUMN hook_sub TEXT DEFAULT ''").run();
+  } catch { /* already exists */ }
 }
 
 // ── 콘텐츠 생성 ─────────────────────────────────────────────────────────────
@@ -328,14 +334,62 @@ async function generateContent(
 
   const parts = result.candidates?.[0]?.content?.parts || [];
   const textParts = parts.filter((p: any) => !p.thought && p.text);
-  const text = textParts.map((p: any) => p.text).join("").trim();
+  let text = textParts.map((p: any) => p.text).join("").trim();
 
-  const parsed = JSON.parse(text);
+  // Gemini가 코드 펜스로 감쌀 때 제거
+  text = text.replace(/^```json\s*/i, "").replace(/```\s*$/i, "").trim();
+
+  // JSON이 잘린 경우 복구 시도
+  let parsed: any;
+  try {
+    parsed = JSON.parse(text);
+  } catch {
+    // 끝이 잘린 경우: 마지막 완전한 } 또는 ] 까지 자르기
+    const lastBrace = text.lastIndexOf("}");
+    const lastBracket = text.lastIndexOf("]");
+    const cutAt = Math.max(lastBrace, lastBracket);
+    if (cutAt > 0) {
+      const trimmed = text.slice(0, cutAt + 1);
+      // 닫히지 않은 중괄호/대괄호 카운트 후 보정
+      let opens = 0, closes = 0;
+      for (const ch of trimmed) { if (ch === "{") opens++; if (ch === "}") closes++; }
+      let fixed = trimmed;
+      for (let i = 0; i < opens - closes; i++) fixed += "}";
+      let aOpens = 0, aCloses = 0;
+      for (const ch of fixed) { if (ch === "[") aOpens++; if (ch === "]") aCloses++; }
+      for (let i = 0; i < aOpens - aCloses; i++) fixed += "]";
+      // 닫히지 않은 문자열 처리
+      fixed = fixed.replace(/,\s*[}\]]/, (m) => m.replace(",", ""));
+      try {
+        parsed = JSON.parse(fixed);
+      } catch {
+        // 최후 수단: 기본 구조 반환
+        parsed = {
+          hook: "피부 성분, 제대로 알고 있나요?",
+          hookSub: "오늘의 성분 이야기",
+          slides: [
+            { title: "성분 교육", body: "피부에 맞는 성분을 찾아보세요", tip: "타입별로 다릅니다" },
+            { title: "핵심 포인트", body: "성분 하나가 피부를 바꿀 수 있어요", tip: "꾸준함이 핵심" },
+            { title: "실전 팁", body: "아침저녁 루틴을 다르게 해보세요", tip: "밤에는 활성 성분" },
+            { title: "주의사항", body: "과하면 오히려 역효과예요", tip: "소량부터 시작" },
+            { title: "정리", body: "내 피부 타입부터 알아야 해요", tip: "AI 분석으로 확인" },
+          ],
+          caption: "피부 성분, 제대로 알아보기\n\n내 피부 타입에 맞는 성분을 찾는 게 첫걸음이에요.",
+          hashtags: ["#스킨케어", "#피부타입", "#성분분석", "#피부관리", "#뷰티팁"],
+          cta: "내 피부 타입 무료 분석",
+          ingredientFocus: format === "carousel" ? "성분 가이드" : "",
+        };
+      }
+    } else {
+      throw new Error("Gemini JSON parse failed: " + text.slice(0, 200));
+    }
+  }
 
   return {
     pillar,
     format,
     hook: parsed.hook || "",
+    hookSub: parsed.hookSub || "",
     slides: parsed.slides || [],
     caption: parsed.caption || "",
     hashtags: parsed.hashtags || [],
@@ -424,10 +478,10 @@ export const onRequest = async (context: any) => {
       if (count >= 1) {
         const morning = await generateContent(env, schedule.morning, "carousel", dateStr, "07:00");
         await env.FONDAY_DB.prepare(`
-          INSERT INTO insta_content (pillar, format, hook, slides, caption, hashtags, cta, ingredient_focus, scheduled_date, scheduled_time)
-          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+          INSERT INTO insta_content (pillar, format, hook, hook_sub, slides, caption, hashtags, cta, ingredient_focus, scheduled_date, scheduled_time)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `).bind(
-          morning.pillar, morning.format, morning.hook,
+          morning.pillar, morning.format, morning.hook, morning.hookSub || "",
           JSON.stringify(morning.slides), morning.caption,
           JSON.stringify(morning.hashtags), morning.cta,
           morning.ingredientFocus || "", dateStr, "07:00",
@@ -439,10 +493,10 @@ export const onRequest = async (context: any) => {
       if (count >= 2) {
         const evening = await generateContent(env, schedule.evening, "reels-script", dateStr, "20:00");
         await env.FONDAY_DB.prepare(`
-          INSERT INTO insta_content (pillar, format, hook, slides, caption, hashtags, cta, ingredient_focus, scheduled_date, scheduled_time)
-          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+          INSERT INTO insta_content (pillar, format, hook, hook_sub, slides, caption, hashtags, cta, ingredient_focus, scheduled_date, scheduled_time)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `).bind(
-          evening.pillar, evening.format, evening.hook,
+          evening.pillar, evening.format, evening.hook, evening.hookSub || "",
           JSON.stringify(evening.slides), evening.caption,
           JSON.stringify(evening.hashtags), evening.cta,
           evening.ingredientFocus || "", dateStr, "20:00",
