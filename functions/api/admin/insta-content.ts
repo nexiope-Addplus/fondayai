@@ -109,7 +109,7 @@ Fonday AI는 AI 피부 분석 앱으로, 사진 한 장으로 피부 상태를 �
 - 친구한테 알려주듯 편하지만, 데이터와 근거가 있는 말투
 - "~거든요", "~인데요" 같은 자연스러운 구어체
 - 전문 용어 쓸 때는 바로 풀어서 설명
-- 이모지는 슬라이드당 1~2개만 (과하면 신뢰도 떨어짐)
+- 이모지 절대 사용 금지 (슬라이드 title, body, tip, hook, cta 모두 이모지 없이 텍스트만)
 - "~해보세요", "~어떠세요?" 같은 AI 느낌 마무리 금지
 
 ## 콘텐츠 구조 (캐러셀 5장) — 중요: 텍스트를 짧게!
@@ -171,12 +171,12 @@ slides 배열은 반드시 5개. title은 키워드만, body는 한 줄, tip도 
 ## imagePrompts 작성 규칙 (가장 중요!)
 imagePrompts 배열은 반드시 5개. 각 슬라이드의 배경 사진을 위한 **영문** 프롬프트.
 
-### 공통 규칙
-- 스타일: Photorealistic, soft natural lighting, bright and clean tone, editorial beauty photography
-- 모든 이미지에 반드시 포함: "young Korean woman in her 20s"
-- 얼굴 규칙: NEVER show face directly. Only show: back of head, hands, neck, shoulders, collarbones, back view, side silhouette
-- 밝기: 밝고 따뜻한 자연광 (절대 어둡지 않게)
-- 금지: macro close-up of skin texture, pores visible, dark/moody lighting, male person, front face, eyes visible
+### 공통 규칙 (반드시 지킬 것!)
+- 스타일: Photorealistic, soft natural lighting, bright and clean aesthetic, editorial beauty photography
+- 인물: MUST be "young East Asian woman in her 20s with long dark hair". NEVER male. NEVER Caucasian/Western.
+- 얼굴: ABSOLUTELY NO face visible. NO eyes, NO nose, NO mouth shown. Camera angle MUST be: back of head, over-the-shoulder from behind, hands only, neck/collarbone from side, silhouette only.
+- 밝기: Bright, warm, clean. NEVER dark or moody. White/cream/pastel background preferred.
+- 금지 (NEVER): macro skin texture, pores, male person, front face, eyes visible, dark lighting, Western/Caucasian person, emoji or text in image
 
 ### 슬라이드별 이미지 가이드
 - Slide 1 (후킹): 20대 한국 여성의 뒷모습 또는 옆모습 + 스킨케어 분위기. 예: "Back view of young Korean woman sitting at vanity table, soft morning light, skincare bottles on table, wearing white bathrobe"

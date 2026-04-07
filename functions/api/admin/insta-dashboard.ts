@@ -334,16 +334,24 @@ export const onRequest = async (context: any) => {
       if (prompts.length > 0) {
         for (let i = 0; i < Math.min(prompts.length, 5); i++) {
           row.innerHTML = "<span style='font-size:12px;color:#a8a29e'>배경 이미지 생성 중... ("+(i+1)+"/"+Math.min(prompts.length,5)+")</span>";
-          try {
-            const res = await fetch("/api/admin/insta-gen-image", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ key: ADMIN_KEY, prompt: prompts[i] }),
-            });
-            const d = await res.json();
-            imgs.push(d.ok ? d.image : "");
-            if (!d.ok) console.warn("Imagen slide "+i+" failed:", d.error, d.detail);
-          } catch(e) { console.warn("Imagen slide "+i+" error:", e); imgs.push(""); }
+          // 429 방지: 요청 간 3초 딜레이
+          if (i > 0) await new Promise(r => setTimeout(r, 3000));
+          // 실패 시 1회 재시도 (5초 후)
+          let success = false;
+          for (let attempt = 0; attempt < 2 && !success; attempt++) {
+            try {
+              if (attempt > 0) await new Promise(r => setTimeout(r, 5000));
+              const res = await fetch("/api/admin/insta-gen-image", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ key: ADMIN_KEY, prompt: prompts[i] }),
+              });
+              const d = await res.json();
+              if (d.ok && d.image) { imgs.push(d.image); success = true; }
+              else { console.warn("Imagen slide "+i+" attempt "+attempt+" failed:", d.error, d.detail); }
+            } catch(e) { console.warn("Imagen slide "+i+" attempt "+attempt+" error:", e); }
+          }
+          if (!success) imgs.push("");
         }
       }
       // 5개 미만이면 빈 문자열로 패딩
