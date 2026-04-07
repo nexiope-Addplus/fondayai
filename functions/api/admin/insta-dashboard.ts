@@ -214,7 +214,7 @@ export const onRequest = async (context: any) => {
           alert("생성 완료! " + data.generated.length + "개 콘텐츠");
           location.reload();
         } else {
-          alert("오류: " + (data.error || "Unknown"));
+          alert("오류: " + (data.error || "Unknown") + "\\n" + (data.detail || "") + "\\n" + (data.stack || ""));
         }
       } catch (e) {
         alert("생성 실패: " + e.message);

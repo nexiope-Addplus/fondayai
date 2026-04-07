@@ -359,10 +359,11 @@ export const onRequest = async (context: any) => {
   const keyParam = url.searchParams.get("key");
   let bodyKey: string | null = null;
 
+  let parsedBody: any = {};
   if (request.method === "POST") {
     try {
-      const body = await request.clone().json();
-      bodyKey = body.key || null;
+      parsedBody = await request.json();
+      bodyKey = parsedBody.key || null;
     } catch { /* ignore */ }
   }
 
@@ -399,7 +400,7 @@ export const onRequest = async (context: any) => {
   // POST — 콘텐츠 생성
   if (request.method === "POST") {
     try {
-      const body = await request.json() as {
+      const body = parsedBody as {
         key?: string;
         date?: string;    // "2026-04-08" (기본: 오늘)
         count?: number;   // 생성할 개수 (기본: 2)
@@ -454,7 +455,9 @@ export const onRequest = async (context: any) => {
       });
     } catch (err: any) {
       console.error("insta-content generation error:", err);
-      return new Response(JSON.stringify({ error: "Generation failed", detail: err?.message ?? "" }), {
+      const detail = err?.message ?? String(err);
+      const stack = err?.stack?.split("\n").slice(0, 3).join(" | ") ?? "";
+      return new Response(JSON.stringify({ error: "Generation failed", detail, stack }), {
         status: 500, headers: { "Content-Type": "application/json" },
       });
     }
