@@ -329,11 +329,11 @@ export const onRequest = async (context: any) => {
       const slides = data.slides || [];
       const prompts = data.imagePrompts || [];
 
-      // Imagen 4로 배경 이미지 생성 (프롬프트가 있을 때만)
+      // Imagen 4로 배경 이미지 생성 (5장 전부)
       const imgs = [];
       if (prompts.length > 0) {
-        row.innerHTML = "<span style='font-size:12px;color:#a8a29e'>배경 이미지 생성 중... (1~2분)</span>";
         for (let i = 0; i < Math.min(prompts.length, 5); i++) {
+          row.innerHTML = "<span style='font-size:12px;color:#a8a29e'>배경 이미지 생성 중... ("+(i+1)+"/"+Math.min(prompts.length,5)+")</span>";
           try {
             const res = await fetch("/api/admin/insta-gen-image", {
               method: "POST",
@@ -342,9 +342,12 @@ export const onRequest = async (context: any) => {
             });
             const d = await res.json();
             imgs.push(d.ok ? d.image : "");
-          } catch { imgs.push(""); }
+            if (!d.ok) console.warn("Imagen slide "+i+" failed:", d.error, d.detail);
+          } catch(e) { console.warn("Imagen slide "+i+" error:", e); imgs.push(""); }
         }
       }
+      // 5개 미만이면 빈 문자열로 패딩
+      while (imgs.length < 5) imgs.push("");
 
       const configs = [
         { html: slideHook({ title: data.hook, sub: data.hookSub || slides[0]?.body || "", badge: data.ingredientFocus }, imgs[0]) },
