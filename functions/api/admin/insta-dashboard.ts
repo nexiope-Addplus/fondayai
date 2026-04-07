@@ -181,8 +181,9 @@ export const onRequest = async (context: any) => {
   <div class="subtitle">Fonday AI × Gemini — 매일 2개 자동 생성</div>
 
   <div class="actions">
-    <button class="btn btn-primary" onclick="generateToday()">🚀 오늘 콘텐츠 생성</button>
-    <button class="btn btn-secondary" onclick="generateTomorrow()">📅 내일 콘텐츠 생성</button>
+    <button class="btn btn-primary" onclick="generateToday()">오늘 콘텐츠 생성</button>
+    <button class="btn btn-secondary" onclick="generateTomorrow()">내일 콘텐츠 생성</button>
+    <button class="btn btn-sm" style="background:#dc2626;color:white" onclick="clearAll()">전체 삭제</button>
   </div>
   <div id="loading">⏳ 생성 중... (20~30초 소요)</div>
 
@@ -200,6 +201,13 @@ export const onRequest = async (context: any) => {
       imagePrompts: JSON.parse((c.image_prompts as string) || "[]"),
     })};`).join("\n    ")}
 
+    async function clearAll() {
+      if (!confirm("모든 콘텐츠를 삭제합니다. 계속?")) return;
+      try {
+        await fetch("/api/admin/insta-content?key="+ADMIN_KEY, { method:"DELETE" });
+        location.reload();
+      } catch(e) { alert("삭제 실패: "+e.message); }
+    }
     async function generateToday() { await generateForDate(); }
     async function generateTomorrow() {
       const t = new Date(); t.setDate(t.getDate()+1);
@@ -286,7 +294,7 @@ export const onRequest = async (context: any) => {
         // 하단 정보 영역 (풀 카드, 여백 줄임)
         +'<div style="position:absolute;bottom:80px;left:28px;right:28px;top:42%">'
           +'<div style="font-size:24px;font-weight:800;color:'+C.text+';line-height:1.35;margin-bottom:12px">'+cut(d.title,20)+'</div>'
-          +'<div style="font-size:15px;color:'+C.sub+';line-height:1.7">'+cut(d.body,80)+'</div>'
+          +'<div style="font-size:15px;color:'+C.sub+';line-height:1.7">'+cut(d.body,150)+'</div>'
           +(d.tip?'<div style="margin-top:20px;padding-top:14px;border-top:1px solid '+C.border+';display:flex;align-items:center;gap:8px">'
             +'<div style="width:6px;height:6px;border-radius:50%;background:'+nc+';flex-shrink:0"></div>'
             +'<span style="font-size:13px;font-weight:600;color:'+nc+'">'+cut(d.tip,30)+'</span></div>':'')

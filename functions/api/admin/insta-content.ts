@@ -112,16 +112,19 @@ Fonday AI는 AI 피부 분석 앱으로, 사진 한 장으로 피부 상태를 �
 - 이모지 절대 사용 금지 (슬라이드 title, body, tip, hook, cta 모두 이모지 없이 텍스트만)
 - "~해보세요", "~어떠세요?" 같은 AI 느낌 마무리 금지
 
-## 콘텐츠 구조 (캐러셀 5장) — 중요: 텍스트를 짧게!
-1장: 후킹 — 굵은 한 줄 질문/반전 (15자 이내) + 서브 한 줄 (20자 이내)
-2장: 핵심 포인트 1 — 키워드 (10자 이내) + 설명 2~3줄 (총 60자 이내) + 팁 한 줄 (25자 이내)
+## 콘텐츠 구조 (캐러셀 5장)
+1장: 후킹 — 호기심 자극하는 질문 또는 반전 (15~20자) + 서브 설명 (15~25자)
+2장: 핵심 포인트 1 — 소제목 (10자 이내) + 본문 설명 3~4문장 (80~120자) + 실전 팁 (25자 이내)
 3장: 핵심 포인트 2 — 같은 구조
 4장: 핵심 포인트 3 — 같은 구조
-5장: CTA — 행동 유도 한 줄 (20자 이내)
+5장: CTA — 행동 유도 메시지 (20자 이내)
 
-각 슬라이드의 body는 2~3문장으로 설명 (총 60자 이내). 너무 짧으면 허전하니까 적당히 채워야 함.
-각 슬라이드의 title은 핵심 키워드 (10자 이내).
-각 슬라이드에 tip 필드를 추가 (실전 팁 한 줄, 25자 이내).
+### 본문 작성 규칙 (중요!)
+- body는 3~4문장으로 구체적으로 설명. "왜 그런지", "어떻게 작용하는지"를 포함해야 함.
+- 예시: "세라마이드는 피부 장벽의 약 50%를 차지하는 핵심 지질이에요. 외부 자극으로부터 피부를 보호하는 방어막 역할을 하는데, 이게 부족하면 수분이 빠져나가고 민감해지거든요. 건성이나 민감성 피부라면 세라마이드가 들어간 제품을 꼭 챙겨 바르는 게 좋아요."
+- 절대 "~해요." 한 줄로 끝내지 말 것. 반드시 3문장 이상.
+- 바우만 타입 코드(DSPT 등)를 쓸 때는 괄호로 쉬운 설명을 붙일 것. 예: "DSPT(건성+민감+색소+탄력)"
+- tip은 구체적 행동 지침. 예: "밤 루틴에서 세럼 다음 단계에 바르세요"
 
 ## 콘텐츠 구조 (릴스 스크립트 5씬)
 1씬: 후킹 — 3초 안에 관심 끌기 (title: 키워드, body: 대사 1문장)
@@ -147,11 +150,11 @@ Fonday AI는 AI 피부 분석 앱으로, 사진 한 장으로 피부 상태를 �
   "hook": "후킹 타이틀 (15자 이내)",
   "hookSub": "서브 텍스트 (20자 이내)",
   "slides": [
-    { "title": "키워드 (10자 이내)", "body": "설명 2~3문장 (총 60자 이내)", "tip": "팁 한 줄 (25자 이내)" },
-    { "title": "키워드", "body": "설명 2~3문장", "tip": "팁 한 줄" },
-    { "title": "키워드", "body": "설명 2~3문장", "tip": "팁 한 줄" },
-    { "title": "키워드", "body": "설명 2~3문장", "tip": "팁 한 줄" },
-    { "title": "키워드", "body": "설명 2~3문장", "tip": "팁 한 줄" }
+    { "title": "소제목 (10자 이내)", "body": "본문 3~4문장 (80~120자, 구체적 설명)", "tip": "실전 팁 (25자 이내)" },
+    { "title": "소제목", "body": "본문 3~4문장", "tip": "실전 팁" },
+    { "title": "소제목", "body": "본문 3~4문장", "tip": "실전 팁" },
+    { "title": "소제목", "body": "본문 3~4문장", "tip": "실전 팁" },
+    { "title": "소제목", "body": "본문 3~4문장", "tip": "실전 팁" }
   ],
   "caption": "인스타 캡션 (100~200자, 줄바꿈 포함)",
   "hashtags": ["#스킨케어", "#피부타입", ...8~12개],
@@ -542,6 +545,18 @@ export const onRequest = async (context: any) => {
       return new Response(JSON.stringify({ error: "Generation failed", detail, stack }), {
         status: 500, headers: { "Content-Type": "application/json" },
       });
+    }
+  }
+
+  // DELETE — 전체 삭제
+  if (request.method === "DELETE") {
+    try {
+      await env.FONDAY_DB.prepare("DELETE FROM insta_content").run();
+      return new Response(JSON.stringify({ ok: true, message: "All content deleted" }), {
+        headers: { "Content-Type": "application/json" },
+      });
+    } catch (err: any) {
+      return new Response(JSON.stringify({ error: err?.message }), { status: 500, headers: { "Content-Type": "application/json" } });
     }
   }
 
