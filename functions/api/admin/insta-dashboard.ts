@@ -302,21 +302,11 @@ export const onRequest = async (context: any) => {
         +dots(idx,false)+footer(false)+'</div>';
     }
 
-    function slideCta(d, bgImg) {
-      const hasBg = bgImg && bgImg.length > 50;
-      const bgStyle = hasBg
-        ? 'background:url('+bgImg+') center/cover no-repeat'
-        : 'background:linear-gradient(135deg,#FF6B81,#FF8E9E)';
-      const overlay = hasBg
-        ? '<div style="position:absolute;inset:0;background:rgba(0,0,0,0.45)"></div>'
-        : '';
-      return '<div style="width:'+S+'px;height:'+S+'px;position:relative;'+bgStyle+';display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:Pretendard Variable,sans-serif;overflow:hidden">'
-        +overlay
-        +'<div style="position:relative;z-index:1;color:rgba(255,255,255,0.7);font-size:12px;font-weight:600;letter-spacing:2px;margin-bottom:16px">MY SKIN TYPE</div>'
-        +'<div style="position:relative;z-index:1;color:white;font-size:26px;font-weight:900;text-align:center;line-height:1.4;padding:0 50px;overflow:hidden;max-height:110px;text-shadow:0 2px 8px rgba(0,0,0,0.3)">'+cut(d.title,30)+'</div>'
-        +'<div style="position:relative;z-index:1;background:white;color:#FF6B81;font-weight:800;font-size:15px;padding:14px 40px;border-radius:32px;margin-top:28px;box-shadow:0 4px 16px rgba(0,0,0,0.15)">무료 피부 분석 받기</div>'
-        +'<div style="position:relative;z-index:1;color:rgba(255,255,255,0.55);font-size:11px;margin-top:16px">프로필 링크에서 바로 시작</div>'
-        +dots(4,true)+footer(true)+'</div>';
+    function slideCta() {
+      // OG 이미지를 고정 CTA 슬라이드로 사용
+      return '<div style="width:'+S+'px;height:'+S+'px;position:relative;overflow:hidden">'
+        +'<img src="/og-image-v3.png" style="width:100%;height:100%;object-fit:cover" crossorigin="anonymous"/>'
+        +dots(4,false)+footer(false)+'</div>';
     }
 
     async function generateImages(contentId) {
@@ -340,8 +330,8 @@ export const onRequest = async (context: any) => {
       // Imagen 4로 배경 이미지 생성 (5장 전부)
       const imgs = [];
       if (prompts.length > 0) {
-        for (let i = 0; i < Math.min(prompts.length, 5); i++) {
-          row.innerHTML = "<span style='font-size:12px;color:#a8a29e'>배경 이미지 생성 중... ("+(i+1)+"/"+Math.min(prompts.length,5)+")</span>";
+        for (let i = 0; i < Math.min(prompts.length, 4); i++) {
+          row.innerHTML = "<span style='font-size:12px;color:#a8a29e'>배경 이미지 생성 중... ("+(i+1)+"/"+Math.min(prompts.length,4)+")</span>";
           // 429 방지: 요청 간 3초 딜레이
           if (i > 0) await new Promise(r => setTimeout(r, 3000));
           // 실패 시 1회 재시도 (5초 후)
@@ -370,7 +360,7 @@ export const onRequest = async (context: any) => {
         { html: slideInfo(slides[1]||slides[0]||{title:"",body:"",tip:""}, 1, 1, imgs[1]) },
         { html: slideInfo(slides[2]||{title:"",body:"",tip:""}, 2, 2, imgs[2]) },
         { html: slideInfo(slides[3]||{title:"",body:"",tip:""}, 3, 3, imgs[3]) },
-        { html: slideCta({ title: data.cta || "내 피부 타입 무료 분석" }, imgs[4]) },
+        { html: slideCta() },
       ];
 
       row.innerHTML = "";

@@ -112,12 +112,12 @@ Fonday AI는 AI 피부 분석 앱으로, 사진 한 장으로 피부 상태를 �
 - 이모지 절대 사용 금지 (슬라이드 title, body, tip, hook, cta 모두 이모지 없이 텍스트만)
 - "~해보세요", "~어떠세요?" 같은 AI 느낌 마무리 금지
 
-## 콘텐츠 구조 (캐러셀 5장)
+## 콘텐츠 구조 (캐러셀 4장 — CTA 5장은 자동 추가되므로 생성하지 마세요)
 1장: 후킹 — 호기심 자극하는 질문 또는 반전 (15~20자) + 서브 설명 (15~25자)
 2장: 핵심 포인트 1 — 소제목 (10자 이내) + 본문 설명 3~4문장 (80~120자) + 실전 팁 (25자 이내)
 3장: 핵심 포인트 2 — 같은 구조
 4장: 핵심 포인트 3 — 같은 구조
-5장: CTA — 행동 유도 메시지 (20자 이내)
+(5장은 CTA 이미지가 자동 추가됩니다. 생성하지 마세요.)
 
 ### 본문 작성 규칙 (중요!)
 - body는 3~4문장으로 구체적으로 설명. "왜 그런지", "어떻게 작용하는지"를 포함해야 함.
@@ -153,7 +153,6 @@ Fonday AI는 AI 피부 분석 앱으로, 사진 한 장으로 피부 상태를 �
     { "title": "소제목 (10자 이내)", "body": "본문 3~4문장 (80~120자, 구체적 설명)", "tip": "실전 팁 (25자 이내)" },
     { "title": "소제목", "body": "본문 3~4문장", "tip": "실전 팁" },
     { "title": "소제목", "body": "본문 3~4문장", "tip": "실전 팁" },
-    { "title": "소제목", "body": "본문 3~4문장", "tip": "실전 팁" },
     { "title": "소제목", "body": "본문 3~4문장", "tip": "실전 팁" }
   ],
   "caption": "인스타 캡션 (100~200자, 줄바꿈 포함)",
@@ -164,8 +163,7 @@ Fonday AI는 AI 피부 분석 앱으로, 사진 한 장으로 피부 상태를 �
     "Slide 1 영문 이미지 프롬프트 (포토리얼, 얼굴X)",
     "Slide 2 영문 이미지 프롬프트",
     "Slide 3 영문 이미지 프롬프트",
-    "Slide 4 영문 이미지 프롬프트",
-    "Slide 5 영문 이미지 프롬프트"
+    "Slide 4 영문 이미지 프롬프트"
   ]
 }
 
@@ -186,7 +184,7 @@ imagePrompts 배열은 반드시 5개. 각 슬라이드의 배경 사진을 위�
 - Slide 2 (정보1): 해당 성분/주제와 관련된 제품 + 여성의 손. 예: "Young Korean woman's hands holding serum bottle, soft focus background, bright bathroom, natural light"
 - Slide 3 (정보2): 스킨케어 루틴 장면 + 제품 배치. 예: "Skincare products arranged on marble tray, young Korean woman's hand reaching for moisturizer, bright natural light"
 - Slide 4 (정보3): 스킨케어 적용 장면 (목/어깨/손). 예: "Young Korean woman applying cream on her neck and collarbone area, side view, soft bathroom light"
-- Slide 5 (CTA): 밝고 깨끗한 뷰티 분위기, 여성 뒷모습 + 거울. 예: "Back view of young Korean woman looking at mirror in bright bathroom, skincare routine completed, glowing soft light"
+(Slide 5는 CTA 고정 이미지이므로 프롬프트 생성 불필요)
 
 JSON 외 텍스트 출력 금지. 코드 펜스 사용 금지.`.trim();
 }
@@ -353,7 +351,7 @@ async function generateContent(
     systemInstruction: { parts: [{ text: systemPrompt }] },
     contents: [{ role: "user", parts: [{ text: userPrompt }] }],
     generationConfig: {
-      maxOutputTokens: 4096,
+      maxOutputTokens: 8192,
       temperature: 0.8,
       responseMimeType: "application/json",
     },
