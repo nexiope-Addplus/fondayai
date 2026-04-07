@@ -273,36 +273,22 @@ export const onRequest = async (context: any) => {
     function slideInfo(d, num, idx, bgImg) {
       const nc = NC[(num-1)%3];
       const hasBg = bgImg && bgImg.length > 50;
-      // 상단 60%에 이미지, 하단 40%에 정보 카드
-      if (hasBg) {
-        return '<div style="width:'+S+'px;height:'+S+'px;position:relative;background:#F8F8F8;font-family:Pretendard Variable,sans-serif;overflow:hidden">'
-          // 상단 이미지 영역
-          +'<div style="position:absolute;top:0;left:0;right:0;height:55%;background:url('+bgImg+') center/cover no-repeat"></div>'
-          +'<div style="position:absolute;top:0;left:0;right:0;height:55%;background:linear-gradient(180deg,transparent 60%,#F8F8F8 100%)"></div>'
-          // 넘버 뱃지 (이미지 위)
-          +'<div style="position:absolute;top:20px;left:28px;width:40px;height:40px;border-radius:10px;background:rgba(255,255,255,0.9);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;color:'+nc+';font-weight:900;font-size:18px;z-index:1">'+num+'</div>'
-          // 하단 정보 영역
-          +'<div style="position:absolute;bottom:90px;left:28px;right:28px;top:48%">'
-            +'<div style="font-size:22px;font-weight:800;color:'+C.text+';line-height:1.4;margin-bottom:10px">'+cut(d.title,20)+'</div>'
-            +'<div style="font-size:14px;color:'+C.sub+';line-height:1.7">'+cut(d.body,80)+'</div>'
-            +(d.tip?'<div style="margin-top:16px;padding-top:12px;border-top:1px solid '+C.border+';display:flex;align-items:center;gap:8px">'
-              +'<div style="width:6px;height:6px;border-radius:50%;background:'+nc+';flex-shrink:0"></div>'
-              +'<span style="font-size:12px;font-weight:600;color:'+nc+'">'+cut(d.tip,30)+'</span></div>':'')
-          +'</div>'
-          +dots(idx,false)+footer(false)+'</div>';
-      }
-      // 이미지 없을 때 — 기존 카드 스타일
-      const bgs = [C.bg1, C.bg3, C.bg4];
-      const bg = bgs[(num-1)%3];
-      return '<div style="width:'+S+'px;height:'+S+'px;position:relative;background:'+bg+';font-family:Pretendard Variable,sans-serif;overflow:hidden">'
-        +'<div style="position:absolute;top:44px;left:32px;right:32px;bottom:100px;background:'+C.white+';border-radius:20px;padding:36px;display:flex;flex-direction:column;box-shadow:0 4px 24px rgba(0,0,0,0.04)">'
-          +'<div style="display:flex;align-items:center;gap:12px;margin-bottom:20px">'
-            +'<div style="width:44px;height:44px;border-radius:12px;background:'+nc+';display:flex;align-items:center;justify-content:center;color:white;font-weight:900;font-size:20px">'+num+'</div>'
-          +'</div>'
-          +'<div style="font-size:22px;font-weight:800;color:'+C.text+';line-height:1.4;margin-bottom:14px">'+cut(d.title,20)+'</div>'
-          +'<div style="font-size:15px;color:'+C.sub+';line-height:1.7;flex:1;overflow:hidden">'+cut(d.body,80)+'</div>'
-          +(d.tip?'<div style="margin-top:auto;padding-top:16px;border-top:1px solid '+C.border+';display:flex;align-items:center;gap:10px">'
-            +'<div style="width:6px;height:6px;border-radius:50%;background:'+nc+'"></div>'
+      const topBg = hasBg
+        ? 'background:url('+bgImg+') center/cover no-repeat'
+        : 'background:linear-gradient(135deg,'+['#FFE5EC','#E8DEF8','#D1FAE5'][(num-1)%3]+','+['#FFF0F3','#F3EEFF','#ECFDF5'][(num-1)%3]+')';
+      // 상단 50% 이미지/그라데이션 + 하단 50% 정보 카드
+      return '<div style="width:'+S+'px;height:'+S+'px;position:relative;background:'+C.white+';font-family:Pretendard Variable,sans-serif;overflow:hidden">'
+        // 상단 비주얼 영역
+        +'<div style="position:absolute;top:0;left:0;right:0;height:50%;'+topBg+'"></div>'
+        +'<div style="position:absolute;top:0;left:0;right:0;height:50%;background:linear-gradient(180deg,transparent 50%,'+C.white+' 100%)"></div>'
+        // 넘버 뱃지 (상단 좌측)
+        +'<div style="position:absolute;top:20px;left:24px;width:40px;height:40px;border-radius:12px;background:rgba(255,255,255,0.9);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;color:'+nc+';font-weight:900;font-size:18px;z-index:1">'+num+'</div>'
+        // 하단 정보 영역 (풀 카드, 여백 줄임)
+        +'<div style="position:absolute;bottom:80px;left:28px;right:28px;top:42%">'
+          +'<div style="font-size:24px;font-weight:800;color:'+C.text+';line-height:1.35;margin-bottom:12px">'+cut(d.title,20)+'</div>'
+          +'<div style="font-size:15px;color:'+C.sub+';line-height:1.7">'+cut(d.body,80)+'</div>'
+          +(d.tip?'<div style="margin-top:20px;padding-top:14px;border-top:1px solid '+C.border+';display:flex;align-items:center;gap:8px">'
+            +'<div style="width:6px;height:6px;border-radius:50%;background:'+nc+';flex-shrink:0"></div>'
             +'<span style="font-size:13px;font-weight:600;color:'+nc+'">'+cut(d.tip,30)+'</span></div>':'')
         +'</div>'
         +dots(idx,false)+footer(false)+'</div>';

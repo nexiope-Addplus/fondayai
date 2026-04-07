@@ -168,12 +168,22 @@ Fonday AI는 AI 피부 분석 앱으로, 사진 한 장으로 피부 상태를 �
 
 slides 배열은 반드시 5개. title은 키워드만, body는 한 줄, tip도 한 줄.
 
-imagePrompts 배열은 반드시 5개. 각 슬라이드의 배경 사진을 위한 영문 프롬프트.
-스타일: 포토리얼리스틱, 소프트 자연광, 스킨케어/뷰티 분위기.
-인물: 20대 한국 여성, 얼굴은 절대 보이지 않게 (뒷모습, 손, 목 뒤, 어깨 등만).
-장면 예시: 크림 바르는 손, 세럼 떨어뜨리는 장면, 깨끗한 피부 클로즈업(얼굴X), 화장대 위 제품들, 욕실 거울 앞 뒷모습 등.
-배경: 밝고 깨끗한 욕실, 화장대, 자연광이 드는 공간. 전체적으로 밝은 톤.
-절대 금지: 정면 얼굴, 눈 노출, AI 느낌 나는 완벽한 피부(자연스럽게).
+## imagePrompts 작성 규칙 (가장 중요!)
+imagePrompts 배열은 반드시 5개. 각 슬라이드의 배경 사진을 위한 **영문** 프롬프트.
+
+### 공통 규칙
+- 스타일: Photorealistic, soft natural lighting, bright and clean tone, editorial beauty photography
+- 모든 이미지에 반드시 포함: "young Korean woman in her 20s"
+- 얼굴 규칙: NEVER show face directly. Only show: back of head, hands, neck, shoulders, collarbones, back view, side silhouette
+- 밝기: 밝고 따뜻한 자연광 (절대 어둡지 않게)
+- 금지: macro close-up of skin texture, pores visible, dark/moody lighting, male person, front face, eyes visible
+
+### 슬라이드별 이미지 가이드
+- Slide 1 (후킹): 20대 한국 여성의 뒷모습 또는 옆모습 + 스킨케어 분위기. 예: "Back view of young Korean woman sitting at vanity table, soft morning light, skincare bottles on table, wearing white bathrobe"
+- Slide 2 (정보1): 해당 성분/주제와 관련된 제품 + 여성의 손. 예: "Young Korean woman's hands holding serum bottle, soft focus background, bright bathroom, natural light"
+- Slide 3 (정보2): 스킨케어 루틴 장면 + 제품 배치. 예: "Skincare products arranged on marble tray, young Korean woman's hand reaching for moisturizer, bright natural light"
+- Slide 4 (정보3): 스킨케어 적용 장면 (목/어깨/손). 예: "Young Korean woman applying cream on her neck and collarbone area, side view, soft bathroom light"
+- Slide 5 (CTA): 밝고 깨끗한 뷰티 분위기, 여성 뒷모습 + 거울. 예: "Back view of young Korean woman looking at mirror in bright bathroom, skincare routine completed, glowing soft light"
 
 JSON 외 텍스트 출력 금지. 코드 펜스 사용 금지.`.trim();
 }
