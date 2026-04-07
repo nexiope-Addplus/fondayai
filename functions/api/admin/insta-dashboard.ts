@@ -172,6 +172,8 @@ export const onRequest = async (context: any) => {
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <title>Fonday 인스타 콘텐츠</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pretendard@1.3.9/dist/web/variable/pretendardvariable.min.css"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"><\/script>
   <style>${CSS}</style>
 </head>
 <body>
@@ -221,60 +223,123 @@ export const onRequest = async (context: any) => {
       }
       document.getElementById("loading").style.display = "none";
     }
+    // 슬라이드 디자인 (클라이언트 렌더링)
+    const SC = { dark:"#0F172A", accent:"#E94560", cream:"#FAFAF9", white:"#FFFFFF", text:"#1E293B", sub:"#64748B", muted:"#94A3B8", border:"#E2E8F0" };
+    const numColors = ["#E94560","#6366F1","#F59E0B"];
+
+    function makeSlideHTML(type, data, idx) {
+      const dots = Array.from({length:5},(_,i)=>'<span style="display:inline-block;width:'+(i===idx?'10px':'6px')+';height:'+(i===idx?'10px':'6px')+';border-radius:50%;background:'+(i===idx?(type==='dark'||type==='cta'?SC.white:SC.accent):(type==='dark'||type==='cta'?'rgba(255,255,255,0.25)':SC.border))+'"></span>').join('');
+      const footer = '<div style="position:absolute;bottom:20px;left:40px;right:40px;display:flex;justify-content:space-between;align-items:center;opacity:0.4"><span style="font-weight:700;letter-spacing:3px;font-size:11px;color:'+(type==='dark'||type==='cta'?SC.white:SC.muted)+'">FONDAY</span><span style="font-size:9px;color:'+(type==='dark'||type==='cta'?SC.white:SC.muted)+'">AI 피부 분석</span></div>';
+      const dotsBar = '<div style="position:absolute;bottom:45px;left:0;right:0;text-align:center;display:flex;gap:6px;justify-content:center;align-items:center">'+dots+'</div>';
+
+      if (type === 'hook') {
+        return '<div style="width:540px;height:540px;position:relative;background:linear-gradient(160deg,#0F172A,#1E293B);display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:Pretendard Variable,sans-serif;overflow:hidden">'
+          +'<div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-55%);width:380px;height:280px;border-radius:50%;background:'+SC.accent+';opacity:0.06"></div>'
+          +(data.badge?'<div style="background:rgba(233,69,96,0.15);color:'+SC.accent+';font-size:10px;font-weight:600;padding:4px 12px;border-radius:20px;margin-bottom:16px">'+data.badge+'</div>':'')
+          +'<div style="color:white;font-size:28px;font-weight:900;text-align:center;letter-spacing:-0.5px;line-height:1.3;padding:0 40px">'+data.title+'</div>'
+          +'<div style="color:'+SC.muted+';font-size:13px;margin-top:10px">'+data.sub+'</div>'
+          +'<div style="color:'+SC.muted+';font-size:9px;opacity:0.5;margin-top:24px">밀어서 확인하기 →</div>'
+          +dotsBar+footer+'</div>';
+      }
+      if (type === 'info') {
+        const nc = numColors[(data.num-1)%3];
+        return '<div style="width:540px;height:540px;position:relative;background:linear-gradient(180deg,#FAFAF9,#F5F5F4);font-family:Pretendard Variable,sans-serif;overflow:hidden">'
+          +'<div style="position:absolute;top:0;right:0;width:180px;height:180px;border-radius:50%;background:'+nc+';opacity:0.04"></div>'
+          +'<div style="position:absolute;top:50px;left:36px;right:36px;bottom:140px;background:white;border-radius:14px;border:1px solid '+SC.border+';padding:28px">'
+            +'<div style="font-size:40px;font-weight:900;color:'+nc+';opacity:0.12;position:absolute;top:20px;left:28px">'+String(data.num).padStart(2,'0')+'</div>'
+            +'<div style="font-size:24px;font-weight:900;color:'+nc+'">'+String(data.num).padStart(2,'0')+'</div>'
+            +'<div style="width:20px;height:2px;background:'+nc+';margin:8px 0 12px;border-radius:1px"></div>'
+            +'<div style="font-size:22px;font-weight:800;color:'+SC.text+';letter-spacing:-0.3px;line-height:1.3">'+data.title+'</div>'
+            +'<div style="font-size:14px;color:'+SC.sub+';margin-top:8px;line-height:1.5">'+data.body+'</div>'
+            +'<div style="position:absolute;bottom:28px;left:28px;right:28px;border-top:1px solid '+SC.border+';padding-top:12px;display:flex;align-items:center;gap:6px">'
+              +(data.tip?'<span style="width:4px;height:4px;border-radius:50%;background:'+nc+'"></span><span style="font-size:12px;font-weight:500;color:'+nc+'">'+data.tip+'</span>':'')
+            +'</div>'
+          +'</div>'
+          +dotsBar+footer+'</div>';
+      }
+      if (type === 'cta') {
+        return '<div style="width:540px;height:540px;position:relative;background:linear-gradient(135deg,#E94560,#BE123C);display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:Pretendard Variable,sans-serif;overflow:hidden">'
+          +'<div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:400px;height:350px;border-radius:50%;background:white;opacity:0.05"></div>'
+          +'<div style="color:white;font-size:24px;font-weight:800;text-align:center;letter-spacing:-0.3px;line-height:1.3;padding:0 40px">'+data.title+'</div>'
+          +'<div style="background:white;color:'+SC.accent+';font-weight:700;font-size:13px;padding:10px 32px;border-radius:32px;margin-top:16px">무료 AI 피부 분석 →</div>'
+          +'<div style="color:white;opacity:0.5;font-size:10px;margin-top:12px">프로필 링크를 확인하세요</div>'
+          +dotsBar+footer+'</div>';
+      }
+      return '';
+    }
+
     async function generateImages(contentId) {
       const row = document.getElementById("images-" + contentId);
-      row.innerHTML = "<span style='font-size:12px;color:#a8a29e;'>🖼️ 슬라이드 정보 로딩 중...</span>";
-      try {
-        // 1단계: 메타데이터 (슬라이드 개수 확인)
-        const metaRes = await fetch("/api/admin/insta-image", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ key: ADMIN_KEY, contentId, slideIndex: -1 }),
-        });
-        const meta = await metaRes.json();
-        if (!meta.ok) {
-          row.innerHTML = "<span style='color:#dc2626;font-size:12px;'>오류: " + (meta.error || "") + "</span>";
-          return;
-        }
-        const total = meta.totalSlides || 5;
-        row.innerHTML = "";
+      const card = document.getElementById("card-" + contentId);
+      if (!card) return;
 
-        // 2단계: 한 장씩 순차 생성
-        for (let i = 0; i < total; i++) {
-          const placeholder = document.createElement("span");
-          placeholder.style.cssText = "display:inline-block;width:150px;height:150px;border-radius:8px;background:#f5f5f4;line-height:150px;text-align:center;font-size:11px;color:#a8a29e;";
-          placeholder.textContent = (i+1) + "번 생성 중...";
-          placeholder.id = "ph-" + contentId + "-" + i;
-          row.appendChild(placeholder);
-        }
+      // 카드에서 데이터 추출
+      const hookEl = card.querySelector(".hook");
+      const slideEls = card.querySelectorAll(".slide");
+      const hook = hookEl ? hookEl.textContent : "";
 
-        for (let i = 0; i < total; i++) {
-          try {
-            const slideRes = await fetch("/api/admin/insta-image", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ key: ADMIN_KEY, contentId, slideIndex: i }),
-            });
-            const slideData = await slideRes.json();
-            const ph = document.getElementById("ph-" + contentId + "-" + i);
-            if (slideData.ok && slideData.image) {
-              const img = document.createElement("img");
-              img.src = slideData.image;
-              img.alt = "slide " + (i+1);
-              img.style.cssText = "width:150px;height:150px;border-radius:8px;object-fit:cover;cursor:pointer;";
-              img.onclick = function() { showPreview(slideData.image, contentId, i+1); };
-              ph.replaceWith(img);
-            } else {
-              ph.textContent = "실패: " + (slideData.error || "") + " " + (slideData.detail || "");
-              ph.style.cssText += "color:#dc2626;font-size:9px;overflow:hidden;word-break:break-all;";
-            }
-          } catch (e) {
-            const ph = document.getElementById("ph-" + contentId + "-" + i);
-            if (ph) { ph.textContent = "오류"; ph.style.color = "#dc2626"; }
-          }
+      const slides = [];
+      slideEls.forEach(el => {
+        const titleEl = el.querySelector(".slide-title");
+        const text = el.textContent || "";
+        const title = titleEl ? titleEl.textContent.replace(/^\\d+\\.\\s*/, "") : "";
+        const body = text.replace(titleEl ? titleEl.textContent : "", "").trim();
+        slides.push({ title, body });
+      });
+
+      row.innerHTML = "<span style='font-size:12px;color:#a8a29e;'>🖼️ 이미지 생성 중...</span>";
+
+      // 숨겨진 렌더링 영역
+      let renderArea = document.getElementById("render-area");
+      if (!renderArea) {
+        renderArea = document.createElement("div");
+        renderArea.id = "render-area";
+        renderArea.style.cssText = "position:fixed;top:-9999px;left:-9999px;";
+        document.body.appendChild(renderArea);
+      }
+
+      const images = [];
+
+      // 5장 생성
+      const slideConfigs = [
+        { type: 'hook', data: { title: hook, sub: slides[0]?.body || "", badge: slides[0]?.title || "" } },
+        { type: 'info', data: { num: 1, title: slides[1]?.title || slides[0]?.title || "", body: slides[1]?.body || slides[0]?.body || "", tip: "" } },
+        { type: 'info', data: { num: 2, title: slides[2]?.title || "", body: slides[2]?.body || "", tip: "" } },
+        { type: 'info', data: { num: 3, title: slides[3]?.title || "", body: slides[3]?.body || "", tip: "" } },
+        { type: 'cta', data: { title: slides[4]?.title || "내 피부 타입에 맞는 성분 찾기" } },
+      ];
+
+      row.innerHTML = "";
+
+      for (let i = 0; i < 5; i++) {
+        const ph = document.createElement("span");
+        ph.style.cssText = "display:inline-block;width:150px;height:150px;border-radius:8px;background:#f5f5f4;line-height:150px;text-align:center;font-size:11px;color:#a8a29e;";
+        ph.textContent = (i+1) + "번...";
+        ph.id = "ph-" + contentId + "-" + i;
+        row.appendChild(ph);
+      }
+
+      for (let i = 0; i < 5; i++) {
+        const cfg = slideConfigs[i];
+        const wrapper = document.createElement("div");
+        wrapper.innerHTML = makeSlideHTML(cfg.type, cfg.data, i);
+        renderArea.appendChild(wrapper);
+
+        try {
+          const canvas = await html2canvas(wrapper.firstChild, { scale: 2, useCORS: true, backgroundColor: null, width: 540, height: 540 });
+          const dataUrl = canvas.toDataURL("image/png");
+          const ph = document.getElementById("ph-" + contentId + "-" + i);
+          const img = document.createElement("img");
+          img.src = dataUrl;
+          img.style.cssText = "width:150px;height:150px;border-radius:8px;object-fit:cover;cursor:pointer;";
+          img.onclick = function() { showPreview(dataUrl, contentId, i+1); };
+          if (ph) ph.replaceWith(img);
+          images.push(dataUrl);
+        } catch (e) {
+          const ph = document.getElementById("ph-" + contentId + "-" + i);
+          if (ph) { ph.textContent = "오류"; ph.style.color = "#dc2626"; }
         }
-      } catch (e) {
-        row.innerHTML = "<span style='color:#dc2626;font-size:12px;'>실패: " + e.message + "</span>";
+        renderArea.removeChild(wrapper);
       }
     }
 
