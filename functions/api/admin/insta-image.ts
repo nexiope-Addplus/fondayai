@@ -290,7 +290,7 @@ export const onRequest = async (context: any) => {
   if (!adminKey) return new Response(JSON.stringify({ error: "No admin key" }), { status: 500, headers: { "Content-Type": "application/json" } });
 
   try {
-    const body = await request.json() as { key?: string; contentId?: number };
+    const body = await request.json() as { key?: string; contentId?: number; slideIndex?: number };
     if (body.key !== adminKey) {
       return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: { "Content-Type": "application/json" } });
     }
@@ -298,6 +298,8 @@ export const onRequest = async (context: any) => {
     if (!body.contentId) {
       return new Response(JSON.stringify({ error: "contentId required" }), { status: 400, headers: { "Content-Type": "application/json" } });
     }
+
+    const slideIndex = body.slideIndex ?? -1; // -1 = 메타데이터만, 0~4 = 해당 슬라이드
 
     const content = await env.FONDAY_DB.prepare(
       "SELECT * FROM insta_content WHERE id = ?"
@@ -312,28 +314,39 @@ export const onRequest = async (context: any) => {
     const cta = content.cta as string;
     const ingredientFocus = (content.ingredient_focus as string) || "";
 
-    await ensureResvg();
-
-    const images: string[] = [];
-
-    // 1장: 후킹
-    images.push(await svgToPng(buildSlide1_Hook(hook, ingredientFocus)));
-
-    // 2~4장: 정보 카드
-    for (let i = 1; i <= 3 && i < slides.length; i++) {
-      images.push(await svgToPng(buildSlideInfo(slides[i].title, slides[i].body, i + 1)));
+    // 메타데이터만 요청 (슬라이드 개수 확인용)
+    if (slideIndex === -1) {
+      const totalSlides = Math.min(slides.length, 5);
+      return new Response(JSON.stringify({
+        ok: true,
+        contentId: body.contentId,
+        totalSlides,
+        caption: content.caption,
+        hashtags: JSON.parse(content.hashtags as string),
+      }), {
+        headers: { "Content-Type": "application/json" },
+      });
     }
 
-    // 5장: CTA
-    images.push(await svgToPng(buildSlide5_CTA(cta)));
+    await ensureResvg();
+
+    // 한 장씩 생성
+    let svgStr: string;
+    if (slideIndex === 0) {
+      svgStr = buildSlide1_Hook(hook, ingredientFocus);
+    } else if (slideIndex >= 1 && slideIndex <= 3 && slideIndex < slides.length) {
+      svgStr = buildSlideInfo(slides[slideIndex].title, slides[slideIndex].body, slideIndex + 1);
+    } else {
+      svgStr = buildSlide5_CTA(cta);
+    }
+
+    const image = await svgToPng(svgStr);
 
     return new Response(JSON.stringify({
       ok: true,
       contentId: body.contentId,
-      slideCount: images.length,
-      images,
-      caption: content.caption,
-      hashtags: JSON.parse(content.hashtags as string),
+      slideIndex,
+      image,
     }), {
       headers: { "Content-Type": "application/json" },
     });

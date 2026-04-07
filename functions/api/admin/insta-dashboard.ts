@@ -219,20 +219,58 @@ export const onRequest = async (context: any) => {
     }
     async function generateImages(contentId) {
       const row = document.getElementById("images-" + contentId);
-      row.innerHTML = "<span style='font-size:12px;color:#a8a29e;'>🖼️ 이미지 생성 중...</span>";
+      row.innerHTML = "<span style='font-size:12px;color:#a8a29e;'>🖼️ 슬라이드 정보 로딩 중...</span>";
       try {
-        const res = await fetch("/api/admin/insta-image", {
+        // 1단계: 메타데이터 (슬라이드 개수 확인)
+        const metaRes = await fetch("/api/admin/insta-image", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ key: ADMIN_KEY, contentId }),
+          body: JSON.stringify({ key: ADMIN_KEY, contentId, slideIndex: -1 }),
         });
-        const data = await res.json();
-        if (data.ok && data.images) {
-          row.innerHTML = data.images.map((src, i) =>
-            '<a href="' + src + '" download="slide-' + contentId + '-' + (i+1) + '.png"><img src="' + src + '" alt="slide ' + (i+1) + '"/></a>'
-          ).join("");
-        } else {
-          row.innerHTML = "<span style='color:#dc2626;font-size:12px;'>오류: " + (data.error || "") + "</span>";
+        const meta = await metaRes.json();
+        if (!meta.ok) {
+          row.innerHTML = "<span style='color:#dc2626;font-size:12px;'>오류: " + (meta.error || "") + "</span>";
+          return;
+        }
+        const total = meta.totalSlides || 5;
+        row.innerHTML = "";
+
+        // 2단계: 한 장씩 순차 생성
+        for (let i = 0; i < total; i++) {
+          const placeholder = document.createElement("span");
+          placeholder.style.cssText = "display:inline-block;width:150px;height:150px;border-radius:8px;background:#f5f5f4;line-height:150px;text-align:center;font-size:11px;color:#a8a29e;";
+          placeholder.textContent = (i+1) + "번 생성 중...";
+          placeholder.id = "ph-" + contentId + "-" + i;
+          row.appendChild(placeholder);
+        }
+
+        for (let i = 0; i < total; i++) {
+          try {
+            const slideRes = await fetch("/api/admin/insta-image", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ key: ADMIN_KEY, contentId, slideIndex: i }),
+            });
+            const slideData = await slideRes.json();
+            const ph = document.getElementById("ph-" + contentId + "-" + i);
+            if (slideData.ok && slideData.image) {
+              const link = document.createElement("a");
+              link.href = slideData.image;
+              link.download = "slide-" + contentId + "-" + (i+1) + ".png";
+              const img = document.createElement("img");
+              img.src = slideData.image;
+              img.alt = "slide " + (i+1);
+              img.style.cssText = "width:150px;height:150px;border-radius:8px;object-fit:cover;cursor:pointer;";
+              link.appendChild(img);
+              ph.replaceWith(link);
+            } else {
+              ph.textContent = "실패";
+              ph.style.color = "#dc2626";
+            }
+          } catch (e) {
+            const ph = document.getElementById("ph-" + contentId + "-" + i);
+            if (ph) { ph.textContent = "오류"; ph.style.color = "#dc2626"; }
+          }
         }
       } catch (e) {
         row.innerHTML = "<span style='color:#dc2626;font-size:12px;'>실패: " + e.message + "</span>";
