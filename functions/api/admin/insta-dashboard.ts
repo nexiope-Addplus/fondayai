@@ -197,6 +197,7 @@ export const onRequest = async (context: any) => {
       hook: c.hook, hookSub: c.hook_sub || "", slides: JSON.parse(c.slides as string),
       caption: c.caption, hashtags: JSON.parse(c.hashtags as string), cta: c.cta,
       ingredientFocus: c.ingredient_focus || "",
+      imageUrls: JSON.parse((c.image_urls as string) || "[]"),
     })};`).join("\n    ")}
 
     async function generateToday() { await generateForDate(); }
@@ -243,61 +244,84 @@ export const onRequest = async (context: any) => {
         +'<span style="font-size:10px;color:'+c+'">AI Skin Analysis</span></div>';
     }
 
-    function slideHook(d) {
-      return '<div style="width:'+S+'px;height:'+S+'px;position:relative;background:linear-gradient(135deg,'+C.bg1+','+C.bg2+');display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:Pretendard Variable,sans-serif;overflow:hidden">'
-        // 배경 장식 (소프트 원)
-        +'<div style="position:absolute;top:-60px;right:-60px;width:240px;height:240px;border-radius:50%;background:'+C.accent+';opacity:0.07"></div>'
-        +'<div style="position:absolute;bottom:-40px;left:-40px;width:180px;height:180px;border-radius:50%;background:'+C.accent2+';opacity:0.06"></div>'
+    // bgImg: base64 data URI or empty
+    function slideHook(d, bgImg) {
+      const hasBg = bgImg && bgImg.length > 50;
+      const bgStyle = hasBg
+        ? 'background:url('+bgImg+') center/cover no-repeat'
+        : 'background:linear-gradient(135deg,'+C.bg1+','+C.bg2+')';
+      // 이미지 배경 위에 텍스트 가독성을 위한 오버레이
+      const overlay = hasBg
+        ? '<div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,0.1) 0%,rgba(0,0,0,0.55) 50%,rgba(0,0,0,0.7) 100%)"></div>'
+        : '';
+      const txtColor = hasBg ? '#FFFFFF' : C.text;
+      const subColor = hasBg ? 'rgba(255,255,255,0.7)' : C.sub;
+      const mutedColor = hasBg ? 'rgba(255,255,255,0.5)' : C.muted;
+      return '<div style="width:'+S+'px;height:'+S+'px;position:relative;'+bgStyle+';display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:Pretendard Variable,sans-serif;overflow:hidden">'
+        +overlay
         // 뱃지
-        +(d.badge?'<div style="background:'+C.white+';color:'+C.accent+';font-size:12px;font-weight:700;padding:6px 18px;border-radius:20px;margin-bottom:24px;box-shadow:0 2px 12px rgba(255,107,129,0.15)">'+cut(d.badge,15)+'</div>':'')
+        +(d.badge?'<div style="position:relative;z-index:1;background:rgba(255,255,255,0.9);color:'+C.accent+';font-size:12px;font-weight:700;padding:6px 18px;border-radius:20px;margin-bottom:24px;backdrop-filter:blur(8px)">'+cut(d.badge,15)+'</div>':'')
         // 메인 타이틀
-        +'<div style="color:'+C.text+';font-size:30px;font-weight:900;text-align:center;letter-spacing:-0.5px;line-height:1.4;padding:0 50px;overflow:hidden;max-height:130px">'+cut(d.title,30)+'</div>'
+        +'<div style="position:relative;z-index:1;color:'+txtColor+';font-size:30px;font-weight:900;text-align:center;letter-spacing:-0.5px;line-height:1.4;padding:0 50px;overflow:hidden;max-height:130px;text-shadow:'+(hasBg?'0 2px 8px rgba(0,0,0,0.3)':'none')+'">'+cut(d.title,30)+'</div>'
         // 서브
-        +'<div style="color:'+C.sub+';font-size:14px;margin-top:14px;padding:0 60px;text-align:center;overflow:hidden;max-height:44px">'+cut(d.sub,40)+'</div>'
+        +'<div style="position:relative;z-index:1;color:'+subColor+';font-size:14px;margin-top:14px;padding:0 60px;text-align:center;overflow:hidden;max-height:44px">'+cut(d.sub,40)+'</div>'
         // 스와이프
-        +'<div style="color:'+C.muted+';font-size:11px;margin-top:36px;letter-spacing:1px">SWIPE &rarr;</div>'
-        +dots(0,false)+footer(false)+'</div>';
+        +'<div style="position:relative;z-index:1;color:'+mutedColor+';font-size:11px;margin-top:36px;letter-spacing:1px">SWIPE &rarr;</div>'
+        +dots(0,hasBg)+footer(hasBg)+'</div>';
     }
 
-    function slideInfo(d, num, idx) {
+    function slideInfo(d, num, idx, bgImg) {
       const nc = NC[(num-1)%3];
+      const hasBg = bgImg && bgImg.length > 50;
+      // 상단 60%에 이미지, 하단 40%에 정보 카드
+      if (hasBg) {
+        return '<div style="width:'+S+'px;height:'+S+'px;position:relative;background:#F8F8F8;font-family:Pretendard Variable,sans-serif;overflow:hidden">'
+          // 상단 이미지 영역
+          +'<div style="position:absolute;top:0;left:0;right:0;height:55%;background:url('+bgImg+') center/cover no-repeat"></div>'
+          +'<div style="position:absolute;top:0;left:0;right:0;height:55%;background:linear-gradient(180deg,transparent 60%,#F8F8F8 100%)"></div>'
+          // 넘버 뱃지 (이미지 위)
+          +'<div style="position:absolute;top:20px;left:28px;width:40px;height:40px;border-radius:10px;background:rgba(255,255,255,0.9);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;color:'+nc+';font-weight:900;font-size:18px;z-index:1">'+num+'</div>'
+          // 하단 정보 영역
+          +'<div style="position:absolute;bottom:90px;left:28px;right:28px;top:48%">'
+            +'<div style="font-size:22px;font-weight:800;color:'+C.text+';line-height:1.4;margin-bottom:10px">'+cut(d.title,20)+'</div>'
+            +'<div style="font-size:14px;color:'+C.sub+';line-height:1.7">'+cut(d.body,80)+'</div>'
+            +(d.tip?'<div style="margin-top:16px;padding-top:12px;border-top:1px solid '+C.border+';display:flex;align-items:center;gap:8px">'
+              +'<div style="width:6px;height:6px;border-radius:50%;background:'+nc+';flex-shrink:0"></div>'
+              +'<span style="font-size:12px;font-weight:600;color:'+nc+'">'+cut(d.tip,30)+'</span></div>':'')
+          +'</div>'
+          +dots(idx,false)+footer(false)+'</div>';
+      }
+      // 이미지 없을 때 — 기존 카드 스타일
       const bgs = [C.bg1, C.bg3, C.bg4];
       const bg = bgs[(num-1)%3];
       return '<div style="width:'+S+'px;height:'+S+'px;position:relative;background:'+bg+';font-family:Pretendard Variable,sans-serif;overflow:hidden">'
-        // 배경 장식
-        +'<div style="position:absolute;top:-30px;right:-30px;width:140px;height:140px;border-radius:50%;background:'+nc+';opacity:0.07"></div>'
-        // 카드
         +'<div style="position:absolute;top:44px;left:32px;right:32px;bottom:100px;background:'+C.white+';border-radius:20px;padding:36px;display:flex;flex-direction:column;box-shadow:0 4px 24px rgba(0,0,0,0.04)">'
-          // 넘버 + 라벨 행
           +'<div style="display:flex;align-items:center;gap:12px;margin-bottom:20px">'
             +'<div style="width:44px;height:44px;border-radius:12px;background:'+nc+';display:flex;align-items:center;justify-content:center;color:white;font-weight:900;font-size:20px">'+num+'</div>'
-            +'<div style="width:32px;height:3px;border-radius:2px;background:'+nc+';opacity:0.4"></div>'
           +'</div>'
-          // 타이틀
           +'<div style="font-size:22px;font-weight:800;color:'+C.text+';line-height:1.4;margin-bottom:14px">'+cut(d.title,20)+'</div>'
-          // 본문
           +'<div style="font-size:15px;color:'+C.sub+';line-height:1.7;flex:1;overflow:hidden">'+cut(d.body,80)+'</div>'
-          // 팁 영역
           +(d.tip?'<div style="margin-top:auto;padding-top:16px;border-top:1px solid '+C.border+';display:flex;align-items:center;gap:10px">'
-            +'<div style="width:24px;height:24px;border-radius:8px;background:'+nc+';opacity:0.12;display:flex;align-items:center;justify-content:center;flex-shrink:0"><div style="width:6px;height:6px;border-radius:50%;background:'+nc+'"></div></div>'
+            +'<div style="width:6px;height:6px;border-radius:50%;background:'+nc+'"></div>'
             +'<span style="font-size:13px;font-weight:600;color:'+nc+'">'+cut(d.tip,30)+'</span></div>':'')
         +'</div>'
         +dots(idx,false)+footer(false)+'</div>';
     }
 
-    function slideCta(d) {
-      return '<div style="width:'+S+'px;height:'+S+'px;position:relative;background:linear-gradient(135deg,#FF6B81,#FF8E9E);display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:Pretendard Variable,sans-serif;overflow:hidden">'
-        // 배경 글로우
-        +'<div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:360px;height:360px;border-radius:50%;background:white;opacity:0.08"></div>'
-        +'<div style="position:absolute;top:-40px;left:-40px;width:160px;height:160px;border-radius:50%;background:white;opacity:0.06"></div>'
-        // 작은 라벨
-        +'<div style="color:rgba(255,255,255,0.7);font-size:12px;font-weight:600;letter-spacing:2px;margin-bottom:16px">MY SKIN TYPE</div>'
-        // CTA 텍스트
-        +'<div style="color:white;font-size:26px;font-weight:900;text-align:center;line-height:1.4;padding:0 50px;overflow:hidden;max-height:110px">'+cut(d.title,30)+'</div>'
-        // 버튼
-        +'<div style="background:white;color:#FF6B81;font-weight:800;font-size:15px;padding:14px 40px;border-radius:32px;margin-top:28px;box-shadow:0 4px 16px rgba(0,0,0,0.1)">무료 피부 분석 받기</div>'
-        // 보조
-        +'<div style="color:rgba(255,255,255,0.55);font-size:11px;margin-top:16px">프로필 링크에서 바로 시작</div>'
+    function slideCta(d, bgImg) {
+      const hasBg = bgImg && bgImg.length > 50;
+      const bgStyle = hasBg
+        ? 'background:url('+bgImg+') center/cover no-repeat'
+        : 'background:linear-gradient(135deg,#FF6B81,#FF8E9E)';
+      const overlay = hasBg
+        ? '<div style="position:absolute;inset:0;background:rgba(0,0,0,0.45)"></div>'
+        : '';
+      return '<div style="width:'+S+'px;height:'+S+'px;position:relative;'+bgStyle+';display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:Pretendard Variable,sans-serif;overflow:hidden">'
+        +overlay
+        +'<div style="position:relative;z-index:1;color:rgba(255,255,255,0.7);font-size:12px;font-weight:600;letter-spacing:2px;margin-bottom:16px">MY SKIN TYPE</div>'
+        +'<div style="position:relative;z-index:1;color:white;font-size:26px;font-weight:900;text-align:center;line-height:1.4;padding:0 50px;overflow:hidden;max-height:110px;text-shadow:0 2px 8px rgba(0,0,0,0.3)">'+cut(d.title,30)+'</div>'
+        +'<div style="position:relative;z-index:1;background:white;color:#FF6B81;font-weight:800;font-size:15px;padding:14px 40px;border-radius:32px;margin-top:28px;box-shadow:0 4px 16px rgba(0,0,0,0.15)">무료 피부 분석 받기</div>'
+        +'<div style="position:relative;z-index:1;color:rgba(255,255,255,0.55);font-size:11px;margin-top:16px">프로필 링크에서 바로 시작</div>'
         +dots(4,true)+footer(true)+'</div>';
     }
 
@@ -317,12 +341,13 @@ export const onRequest = async (context: any) => {
       }
 
       const slides = data.slides || [];
+      const imgs = data.imageUrls || [];
       const configs = [
-        { html: slideHook({ title: data.hook, sub: data.hookSub || slides[0]?.body || "", badge: data.ingredientFocus }) },
-        { html: slideInfo(slides[1]||slides[0]||{title:"",body:"",tip:""}, 1, 1) },
-        { html: slideInfo(slides[2]||{title:"",body:"",tip:""}, 2, 2) },
-        { html: slideInfo(slides[3]||{title:"",body:"",tip:""}, 3, 3) },
-        { html: slideCta({ title: data.cta || "내 피부 타입 무료 분석" }) },
+        { html: slideHook({ title: data.hook, sub: data.hookSub || slides[0]?.body || "", badge: data.ingredientFocus }, imgs[0]) },
+        { html: slideInfo(slides[1]||slides[0]||{title:"",body:"",tip:""}, 1, 1, imgs[1]) },
+        { html: slideInfo(slides[2]||{title:"",body:"",tip:""}, 2, 2, imgs[2]) },
+        { html: slideInfo(slides[3]||{title:"",body:"",tip:""}, 3, 3, imgs[3]) },
+        { html: slideCta({ title: data.cta || "내 피부 타입 무료 분석" }, imgs[4]) },
       ];
 
       row.innerHTML = "";

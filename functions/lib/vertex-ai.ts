@@ -225,3 +225,75 @@ export const SAFETY_SETTINGS_NONE = [
   { category: "HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold: "OFF" },
   { category: "HARM_CATEGORY_DANGEROUS_CONTENT", threshold: "OFF" },
 ];
+
+// ---------------------------------------------------------------------------
+// Imagen 4 — Image generation via Vertex AI predict endpoint
+// ---------------------------------------------------------------------------
+
+export interface GenerateImageOptions {
+  /** JSON string of the GCP service account key */
+  gcpServiceAccount: string;
+  /** Image generation prompt */
+  prompt: string;
+  /** Number of images (1-4, default 1) */
+  numberOfImages?: number;
+  /** Aspect ratio: "1:1" | "3:4" | "4:3" | "9:16" | "16:9" */
+  aspectRatio?: string;
+  /** Model: imagen-4.0-fast-generate-001 (default, $0.02) | imagen-4.0-generate-001 ($0.04) */
+  model?: string;
+  /** Person generation: "dont_allow" | "allow_adult" | "allow_all" */
+  personGeneration?: string;
+}
+
+export async function generateImage(options: GenerateImageOptions): Promise<string[]> {
+  const {
+    gcpServiceAccount,
+    prompt,
+    numberOfImages = 1,
+    aspectRatio = "1:1",
+    model = "imagen-4.0-fast-generate-001",
+    personGeneration = "allow_adult",
+  } = options;
+
+  const sa = JSON.parse(gcpServiceAccount);
+  const accessToken = await getAccessToken(sa);
+
+  const url = `https://${GCP_REGION}-aiplatform.googleapis.com/v1/projects/${GCP_PROJECT_ID}/locations/${GCP_REGION}/publishers/google/models/${model}:predict`;
+
+  const body = {
+    instances: [{ prompt }],
+    parameters: {
+      sampleCount: numberOfImages,
+      aspectRatio,
+      personGeneration,
+    },
+  };
+
+  const res = await fetch(url, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(body),
+  });
+
+  if (!res.ok) {
+    const errText = await res.text();
+    throw new Error(`Imagen API error (${res.status}): ${errText}`);
+  }
+
+  const data: any = await res.json();
+
+  // predictions[].bytesBase64Encoded contains base64 PNG/JPEG
+  const images: string[] = [];
+  if (data.predictions) {
+    for (const pred of data.predictions) {
+      if (pred.bytesBase64Encoded) {
+        images.push(`data:image/png;base64,${pred.bytesBase64Encoded}`);
+      }
+    }
+  }
+
+  return images;
+}

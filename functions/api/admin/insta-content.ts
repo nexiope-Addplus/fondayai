@@ -5,7 +5,7 @@
  * 매일 2개 콘텐츠 생성: 오전(캐러셀) + 저녁(릴스 스크립트)
  * DB에 저장 → 관리자 페이지에서 확인 → 수동 업로드 (Phase 1)
  */
-import { callGemini } from "../../lib/vertex-ai";
+import { callGemini, generateImage } from "../../lib/vertex-ai";
 
 interface Env {
   FONDAY_DB: D1Database;
@@ -34,6 +34,7 @@ interface GeneratedContent {
   cta: string;           // 마지막 CTA
   productMention?: string; // 언급된 제품 (있으면)
   ingredientFocus?: string; // 핵심 성분
+  imageUrls: string[];     // 슬라이드별 배경 이미지 (base64 data URI)
 }
 
 // ── 요일별 콘텐츠 기둥 매핑 ──────────────────────────────────────────────────
@@ -155,10 +156,24 @@ Fonday AI는 AI 피부 분석 앱으로, 사진 한 장으로 피부 상태를 �
   "caption": "인스타 캡션 (100~200자, 줄바꿈 포함)",
   "hashtags": ["#스킨케어", "#피부타입", ...8~12개],
   "cta": "CTA 문구 (20자 이내)",
-  "ingredientFocus": "핵심 성분명 (1개)"
+  "ingredientFocus": "핵심 성분명 (1개)",
+  "imagePrompts": [
+    "Slide 1 영문 이미지 프롬프트 (포토리얼, 얼굴X)",
+    "Slide 2 영문 이미지 프롬프트",
+    "Slide 3 영문 이미지 프롬프트",
+    "Slide 4 영문 이미지 프롬프트",
+    "Slide 5 영문 이미지 프롬프트"
+  ]
 }
 
-중요: slides 배열은 반드시 5개. title은 키워드만, body는 한 줄, tip도 한 줄.
+slides 배열은 반드시 5개. title은 키워드만, body는 한 줄, tip도 한 줄.
+
+imagePrompts 배열은 반드시 5개. 각 슬라이드의 배경 사진을 위한 영문 프롬프트.
+스타일: 포토리얼리스틱, 소프트 자연광, 스킨케어/뷰티 분위기.
+인물: 20대 한국 여성, 얼굴은 절대 보이지 않게 (뒷모습, 손, 목 뒤, 어깨 등만).
+장면 예시: 크림 바르는 손, 세럼 떨어뜨리는 장면, 깨끗한 피부 클로즈업(얼굴X), 화장대 위 제품들, 욕실 거울 앞 뒷모습 등.
+배경: 밝고 깨끗한 욕실, 화장대, 자연광이 드는 공간. 전체적으로 밝은 톤.
+절대 금지: 정면 얼굴, 눈 노출, AI 느낌 나는 완벽한 피부(자연스럽게).
 
 JSON 외 텍스트 출력 금지. 코드 펜스 사용 금지.`.trim();
 }
@@ -291,10 +306,9 @@ async function ensureTable(db: D1Database) {
       created_at TEXT DEFAULT (datetime('now'))
     )
   `).run();
-  // 기존 테이블에 hook_sub 컬럼 없으면 추가
-  try {
-    await db.prepare("ALTER TABLE insta_content ADD COLUMN hook_sub TEXT DEFAULT ''").run();
-  } catch { /* already exists */ }
+  // 기존 테이블에 새 컬럼 없으면 추가
+  try { await db.prepare("ALTER TABLE insta_content ADD COLUMN hook_sub TEXT DEFAULT ''").run(); } catch { /* exists */ }
+  try { await db.prepare("ALTER TABLE insta_content ADD COLUMN image_urls TEXT DEFAULT '[]'").run(); } catch { /* exists */ }
 }
 
 // ── 콘텐츠 생성 ─────────────────────────────────────────────────────────────
@@ -385,6 +399,27 @@ async function generateContent(
     }
   }
 
+  // Imagen 4로 슬라이드 배경 이미지 생성
+  const imagePrompts: string[] = parsed.imagePrompts || [];
+  const imageUrls: string[] = [];
+
+  for (let i = 0; i < Math.min(imagePrompts.length, 5); i++) {
+    try {
+      const imgs = await generateImage({
+        gcpServiceAccount: env.GCP_SERVICE_ACCOUNT,
+        prompt: imagePrompts[i],
+        numberOfImages: 1,
+        aspectRatio: "1:1",
+        model: "imagen-4.0-fast-generate-001",
+        personGeneration: "allow_adult",
+      });
+      imageUrls.push(imgs[0] || "");
+    } catch (err) {
+      console.error(`Imagen slide ${i} error:`, err);
+      imageUrls.push("");
+    }
+  }
+
   return {
     pillar,
     format,
@@ -395,6 +430,7 @@ async function generateContent(
     hashtags: parsed.hashtags || [],
     cta: parsed.cta || "",
     ingredientFocus: parsed.ingredientFocus || "",
+    imageUrls,
   };
 }
 
@@ -478,13 +514,13 @@ export const onRequest = async (context: any) => {
       if (count >= 1) {
         const morning = await generateContent(env, schedule.morning, "carousel", dateStr, "07:00");
         await env.FONDAY_DB.prepare(`
-          INSERT INTO insta_content (pillar, format, hook, hook_sub, slides, caption, hashtags, cta, ingredient_focus, scheduled_date, scheduled_time)
-          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+          INSERT INTO insta_content (pillar, format, hook, hook_sub, slides, caption, hashtags, cta, ingredient_focus, image_urls, scheduled_date, scheduled_time)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `).bind(
           morning.pillar, morning.format, morning.hook, morning.hookSub || "",
           JSON.stringify(morning.slides), morning.caption,
           JSON.stringify(morning.hashtags), morning.cta,
-          morning.ingredientFocus || "", dateStr, "07:00",
+          morning.ingredientFocus || "", JSON.stringify(morning.imageUrls || []), dateStr, "07:00",
         ).run();
         generated.push({ time: "07:00", pillar: morning.pillar, format: morning.format, hook: morning.hook, ingredientFocus: morning.ingredientFocus });
       }
@@ -493,13 +529,13 @@ export const onRequest = async (context: any) => {
       if (count >= 2) {
         const evening = await generateContent(env, schedule.evening, "reels-script", dateStr, "20:00");
         await env.FONDAY_DB.prepare(`
-          INSERT INTO insta_content (pillar, format, hook, hook_sub, slides, caption, hashtags, cta, ingredient_focus, scheduled_date, scheduled_time)
-          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+          INSERT INTO insta_content (pillar, format, hook, hook_sub, slides, caption, hashtags, cta, ingredient_focus, image_urls, scheduled_date, scheduled_time)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `).bind(
           evening.pillar, evening.format, evening.hook, evening.hookSub || "",
           JSON.stringify(evening.slides), evening.caption,
           JSON.stringify(evening.hashtags), evening.cta,
-          evening.ingredientFocus || "", dateStr, "20:00",
+          evening.ingredientFocus || "", JSON.stringify(evening.imageUrls || []), dateStr, "20:00",
         ).run();
         generated.push({ time: "20:00", pillar: evening.pillar, format: evening.format, hook: evening.hook, ingredientFocus: evening.ingredientFocus });
       }
