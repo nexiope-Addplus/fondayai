@@ -27,12 +27,9 @@ async function ensureResvg() {
 
 async function getFonts(): Promise<Uint8Array[]> {
   if (fontBufs) return fontBufs;
-  const [r, b, bk] = await Promise.all([
-    fetch(`${PRETENDARD}/Pretendard-Regular.otf`).then(x => x.arrayBuffer()),
-    fetch(`${PRETENDARD}/Pretendard-Bold.otf`).then(x => x.arrayBuffer()),
-    fetch(`${PRETENDARD}/Pretendard-Black.otf`).then(x => x.arrayBuffer()),
-  ]);
-  fontBufs = [r, b, bk].map(b => new Uint8Array(b));
+  // Bold 1개만 로드 (메모리 절약 — Pages Functions 제한 대응)
+  const b = await fetch(`${PRETENDARD}/Pretendard-Bold.otf`).then(x => x.arrayBuffer());
+  fontBufs = [new Uint8Array(b)];
   return fontBufs;
 }
 
@@ -97,9 +94,6 @@ const SHARED_DEFS = `<defs>
     <stop offset="0%" stop-color="#E94560"/>
     <stop offset="100%" stop-color="#BE123C"/>
   </linearGradient>
-  <filter id="cardShadow">
-    <feDropShadow dx="0" dy="8" stdDeviation="24" flood-color="#0F172A" flood-opacity="0.06"/>
-  </filter>
 </defs>`;
 
 function brandFooter(light: boolean): string {
@@ -143,9 +137,8 @@ function buildSlide1(hook: string, hookSub: string, ingredientFocus: string): st
   ${SHARED_DEFS}
   <rect width="${W}" height="${H}" fill="url(#bgDark)"/>
 
-  <!-- 배경 장식: 부드러운 글로우 -->
+  <!-- 배경 글로우 -->
   <ellipse cx="${W / 2}" cy="${H / 2 - 40}" rx="380" ry="280" fill="${C.accent}" opacity="0.06"/>
-  <ellipse cx="200" cy="200" rx="200" ry="200" fill="${C.accent}" opacity="0.03"/>
 
   <!-- 성분 뱃지 -->
   ${ingredientFocus ? `
@@ -192,10 +185,9 @@ function buildSlideInfo(
 
   <!-- 배경 장식 -->
   <circle cx="920" cy="140" r="180" fill="${numColor}" opacity="0.04"/>
-  <circle cx="160" cy="860" r="120" fill="${numColor}" opacity="0.03"/>
 
   <!-- 메인 카드 -->
-  <rect x="${cardX}" y="${cardY}" width="${cardW}" height="${cardH}" rx="28" fill="${C.cardBg}" filter="url(#cardShadow)"/>
+  <rect x="${cardX}" y="${cardY}" width="${cardW}" height="${cardH}" rx="28" fill="${C.cardBg}" stroke="${C.border}" stroke-width="1"/>
 
   <!-- 넘버 + 라벨 -->
   <text x="${innerX}" y="${cardY + 76}" font-family="${FF}" font-weight="900" font-size="80" fill="${numColor}" opacity="0.12">${String(slideNum).padStart(2, "0")}</text>
@@ -243,7 +235,6 @@ function buildSlide5(cta: string): string {
 
   <!-- 배경 글로우 -->
   <ellipse cx="${W / 2}" cy="${H / 2}" rx="400" ry="350" fill="#FFFFFF" opacity="0.05"/>
-  <circle cx="180" cy="200" r="150" fill="#FFFFFF" opacity="0.03"/>
 
   <!-- 상단 장식 -->
   <rect x="${W / 2 - 24}" y="100" width="48" height="4" rx="2" fill="${C.white}" opacity="0.3"/>
