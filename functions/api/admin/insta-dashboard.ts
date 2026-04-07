@@ -265,8 +265,8 @@ export const onRequest = async (context: any) => {
               img.onclick = function() { showPreview(slideData.image, contentId, i+1); };
               ph.replaceWith(img);
             } else {
-              ph.textContent = "실패";
-              ph.style.color = "#dc2626";
+              ph.textContent = "실패: " + (slideData.error || "") + " " + (slideData.detail || "");
+              ph.style.cssText += "color:#dc2626;font-size:9px;overflow:hidden;word-break:break-all;";
             }
           } catch (e) {
             const ph = document.getElementById("ph-" + contentId + "-" + i);

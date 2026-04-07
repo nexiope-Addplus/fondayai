@@ -334,7 +334,7 @@ export const onRequest = async (context: any) => {
     }), { headers: { "Content-Type": "application/json" } });
   } catch (err: any) {
     console.error("insta-image error:", err);
-    return new Response(JSON.stringify({ error: "Image generation failed", detail: err?.message ?? "" }), {
+    return new Response(JSON.stringify({ error: "Image generation failed", detail: err?.message ?? String(err), stack: err?.stack?.split("\n").slice(0, 3).join(" | ") ?? "" }), {
       status: 500, headers: { "Content-Type": "application/json" },
     });
   }
