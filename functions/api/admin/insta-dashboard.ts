@@ -46,7 +46,11 @@ h2 { font-size: 11px; font-weight: 700; color: #a8a29e; margin: 28px 0 10px; tex
 .caption-box { background: #f5f5f4; border-radius: 8px; padding: 12px; font-size: 12px; color: #44403c; margin-top: 10px; white-space: pre-wrap; }
 .hashtags { font-size: 11px; color: #4F46E5; margin-top: 6px; }
 .images-row { display: flex; gap: 8px; margin-top: 12px; overflow-x: auto; }
-.images-row img { width: 150px; height: 150px; border-radius: 8px; object-fit: cover; cursor: pointer; }
+.images-row img { width: 150px; height: 150px; border-radius: 8px; object-fit: cover; cursor: pointer; border: 1px solid #e5e5e5; }
+.preview-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 999; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 16px; }
+.preview-overlay img { max-width: 90vw; max-height: 75vh; border-radius: 12px; }
+.preview-actions { display: flex; gap: 12px; }
+.preview-close { position: absolute; top: 20px; right: 20px; background: none; border: none; color: white; font-size: 32px; cursor: pointer; }
 .status-draft { color: #a8a29e; }
 .status-published { color: #16a34a; }
 .date-group { font-size: 14px; font-weight: 700; color: #E94560; margin: 24px 0 8px; padding-bottom: 6px; border-bottom: 2px solid #E94560; }
@@ -254,15 +258,12 @@ export const onRequest = async (context: any) => {
             const slideData = await slideRes.json();
             const ph = document.getElementById("ph-" + contentId + "-" + i);
             if (slideData.ok && slideData.image) {
-              const link = document.createElement("a");
-              link.href = slideData.image;
-              link.download = "slide-" + contentId + "-" + (i+1) + ".png";
               const img = document.createElement("img");
               img.src = slideData.image;
               img.alt = "slide " + (i+1);
               img.style.cssText = "width:150px;height:150px;border-radius:8px;object-fit:cover;cursor:pointer;";
-              link.appendChild(img);
-              ph.replaceWith(link);
+              img.onclick = function() { showPreview(slideData.image, contentId, i+1); };
+              ph.replaceWith(img);
             } else {
               ph.textContent = "실패";
               ph.style.color = "#dc2626";
@@ -275,6 +276,44 @@ export const onRequest = async (context: any) => {
       } catch (e) {
         row.innerHTML = "<span style='color:#dc2626;font-size:12px;'>실패: " + e.message + "</span>";
       }
+    }
+
+    function showPreview(imageSrc, contentId, slideNum) {
+      // 기존 오버레이 제거
+      const existing = document.getElementById("preview-overlay");
+      if (existing) existing.remove();
+
+      const overlay = document.createElement("div");
+      overlay.id = "preview-overlay";
+      overlay.className = "preview-overlay";
+      overlay.onclick = function(e) { if (e.target === overlay) overlay.remove(); };
+
+      const closeBtn = document.createElement("button");
+      closeBtn.className = "preview-close";
+      closeBtn.textContent = "×";
+      closeBtn.onclick = function() { overlay.remove(); };
+
+      const img = document.createElement("img");
+      img.src = imageSrc;
+
+      const actions = document.createElement("div");
+      actions.className = "preview-actions";
+
+      const dlBtn = document.createElement("button");
+      dlBtn.className = "btn btn-primary";
+      dlBtn.textContent = "📥 다운로드";
+      dlBtn.onclick = function() {
+        const a = document.createElement("a");
+        a.href = imageSrc;
+        a.download = "fonday-slide-" + contentId + "-" + slideNum + ".png";
+        a.click();
+      };
+
+      actions.appendChild(dlBtn);
+      overlay.appendChild(closeBtn);
+      overlay.appendChild(img);
+      overlay.appendChild(actions);
+      document.body.appendChild(overlay);
     }
   </script>
 </body>

@@ -1,7 +1,9 @@
 /**
- * POST /api/admin/insta-image — 캐러셀 슬라이드를 이미지(PNG)로 변환
- * Body: { key, contentId } — insta_content 테이블의 ID
- * Response: { slides: ["data:image/png;base64,...", ...] }
+ * POST /api/admin/insta-image — 캐러셀 슬라이드 PNG 생성 (한 장씩)
+ * Body: { key, contentId, slideIndex }
+ *   slideIndex: -1 = 메타데이터만, 0~4 = 해당 슬라이드
+ *
+ * 2026 인스타 트렌드: Bold 타이포 + 미니멀 + 통일된 톤앤매너
  */
 import { initWasm, Resvg } from "@resvg/resvg-wasm";
 // @ts-ignore
@@ -12,10 +14,9 @@ interface Env {
   ADMIN_KEY?: string;
 }
 
-// ── WASM + font cache ─────────────────────────────────────────────────────────
+// ── WASM + font ──────────────────────────────────────────────────────────────
 let resvgReady = false;
 let fontBufs: Uint8Array[] | null = null;
-
 const PRETENDARD = "https://cdn.jsdelivr.net/npm/pretendard@1.3.9/dist/public/static";
 
 async function ensureResvg() {
@@ -48,232 +49,219 @@ async function svgToPng(svgStr: string): Promise<string> {
   return "data:image/png;base64," + btoa(bin);
 }
 
-// ── SVG 헬퍼 ─────────────────────────────────────────────────────────────────
+// ── 디자인 시스템 ────────────────────────────────────────────────────────────
 const W = 1080, H = 1080;
 const FF = "Pretendard";
+
+// 브랜드 컬러 (전 슬라이드 통일)
+const C = {
+  dark: "#0F172A",       // 메인 다크 (슬레이트 900)
+  accent: "#E94560",     // 코랄 레드
+  accentSoft: "#FEE2E2", // 코랄 라이트
+  cream: "#FAFAF9",      // 배경 크림
+  white: "#FFFFFF",
+  text: "#1E293B",       // 본문 (슬레이트 800)
+  sub: "#64748B",        // 서브 텍스트 (슬레이트 500)
+  muted: "#94A3B8",      // 뮤트 (슬레이트 400)
+  border: "#E2E8F0",     // 보더 (슬레이트 200)
+  cardBg: "#FFFFFF",
+};
 
 function esc(s: string | number): string {
   return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 }
 
-function wrapText(str: string, maxCh: number): string[] {
+function wrapKo(str: string, maxCh: number): string[] {
   const out: string[] = [];
-  const words = str.split(" ");
   let line = "";
-  for (const w of words) {
-    // 한글은 글자 단위로 잘라야 함
-    const candidate = line ? line + " " + w : w;
-    if (candidate.length > maxCh) {
-      if (line) out.push(line);
-      // 긴 단어 자체를 잘라야 할 때
-      let rem = w;
-      while (rem.length > maxCh) { out.push(rem.slice(0, maxCh)); rem = rem.slice(maxCh); }
-      line = rem;
-    } else {
-      line = candidate;
-    }
+  for (const ch of str) {
+    if (line.length >= maxCh) { out.push(line); line = ""; }
+    line += ch;
   }
   if (line) out.push(line);
   return out.length ? out : [""];
 }
 
-// ── 공통 SVG 요소 ────────────────────────────────────────────────────────────
+// ── 공통 요소 ────────────────────────────────────────────────────────────────
 
-function defs(extraDefs = ""): string {
-  return `<defs>
-    <linearGradient id="grad1" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#1A1A2E"/>
-      <stop offset="100%" stop-color="#16213E"/>
-    </linearGradient>
-    <linearGradient id="grad2" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#F8F4F0"/>
-      <stop offset="100%" stop-color="#EDE8E2"/>
-    </linearGradient>
-    <linearGradient id="grad3" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#EEF2FF"/>
-      <stop offset="100%" stop-color="#E0E7FF"/>
-    </linearGradient>
-    <linearGradient id="grad4" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#FFF7ED"/>
-      <stop offset="100%" stop-color="#FFEDD5"/>
-    </linearGradient>
-    <linearGradient id="grad5" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#E94560"/>
-      <stop offset="100%" stop-color="#C23152"/>
-    </linearGradient>
-    <linearGradient id="accentGlow" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#E94560" stop-opacity="0.15"/>
-      <stop offset="100%" stop-color="#E94560" stop-opacity="0"/>
-    </linearGradient>
-    <filter id="shadow">
-      <feDropShadow dx="0" dy="4" stdDeviation="12" flood-color="#000" flood-opacity="0.08"/>
-    </filter>
-    <filter id="glow">
-      <feGaussianBlur stdDeviation="20" result="blur"/>
-      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
-    </filter>
-    ${extraDefs}
-  </defs>`;
-}
+const SHARED_DEFS = `<defs>
+  <linearGradient id="bgDark" x1="0" y1="0" x2="0.3" y2="1">
+    <stop offset="0%" stop-color="#0F172A"/>
+    <stop offset="100%" stop-color="#1E293B"/>
+  </linearGradient>
+  <linearGradient id="bgCream" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%" stop-color="#FAFAF9"/>
+    <stop offset="100%" stop-color="#F5F5F4"/>
+  </linearGradient>
+  <linearGradient id="bgCta" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0%" stop-color="#E94560"/>
+    <stop offset="100%" stop-color="#BE123C"/>
+  </linearGradient>
+  <filter id="cardShadow">
+    <feDropShadow dx="0" dy="8" stdDeviation="24" flood-color="#0F172A" flood-opacity="0.06"/>
+  </filter>
+</defs>`;
 
-/** 장식 원 (배경에 가볍게) */
-function decoCircles(color: string, opacity = 0.06): string {
+function brandFooter(light: boolean): string {
+  const color = light ? C.white : C.muted;
+  const opacity = light ? "0.4" : "0.5";
   return `
-    <circle cx="920" cy="120" r="200" fill="${color}" opacity="${opacity}"/>
-    <circle cx="160" cy="900" r="150" fill="${color}" opacity="${opacity * 0.7}"/>
-    <circle cx="800" cy="800" r="80" fill="${color}" opacity="${opacity * 0.5}"/>
+    <line x1="80" y1="${H - 70}" x2="${W - 80}" y2="${H - 70}" stroke="${color}" stroke-width="1" opacity="0.15"/>
+    <text x="80" y="${H - 36}" font-family="${FF}" font-weight="700" font-size="22" fill="${color}" opacity="${opacity}" letter-spacing="3">FONDAY</text>
+    <text x="${W - 80}" y="${H - 36}" text-anchor="end" font-family="${FF}" font-weight="400" font-size="18" fill="${color}" opacity="${String(Number(opacity) * 0.7)}">AI 피부 분석</text>
   `;
 }
 
-/** 브랜드 바 (하단) */
-function brandBar(textColor: string, opacity = 0.4): string {
-  return `
-    <line x1="80" y1="${H - 60}" x2="${W - 80}" y2="${H - 60}" stroke="${textColor}" stroke-width="1" opacity="0.1"/>
-    <text x="80" y="${H - 30}" font-family="${FF}" font-weight="600" font-size="20" fill="${textColor}" opacity="${opacity}">FONDAY</text>
-    <text x="${W - 80}" y="${H - 30}" text-anchor="end" font-family="${FF}" font-weight="400" font-size="18" fill="${textColor}" opacity="${opacity * 0.7}">@fonday.skincare</text>
-  `;
+/** 슬라이드 넘버 인디케이터 (하단 도트) */
+function slideIndicator(current: number, total: number, light: boolean): string {
+  const dotY = H - 90;
+  const dotGap = 18;
+  const startX = W / 2 - ((total - 1) * dotGap) / 2;
+  const activeColor = light ? C.white : C.accent;
+  const inactiveColor = light ? "rgba(255,255,255,0.25)" : C.border;
+
+  return Array.from({ length: total }, (_, i) => {
+    const cx = startX + i * dotGap;
+    const r = i === current ? 5 : 3;
+    const fill = i === current ? activeColor : inactiveColor;
+    return `<circle cx="${cx}" cy="${dotY}" r="${r}" fill="${fill}"/>`;
+  }).join("\n");
 }
 
-/** 상단 키워드 뱃지 */
-function topBadge(label: string, bgColor: string, textColor: string, x = W / 2): string {
-  const bw = label.length * 18 + 40;
-  return `
-    <rect x="${x - bw / 2}" y="60" width="${bw}" height="42" rx="21" fill="${bgColor}" opacity="0.9"/>
-    <text x="${x}" y="87" text-anchor="middle" font-family="${FF}" font-weight="600" font-size="20" fill="${textColor}">${esc(label)}</text>
-  `;
-}
+// ── 슬라이드 1: 후킹 ────────────────────────────────────────────────────────
 
-// ── 슬라이드 1: 후킹 (다크 그라데이션 + 글로우) ────────────────────────────────
+function buildSlide1(hook: string, hookSub: string, ingredientFocus: string): string {
+  const hookLines = wrapKo(hook, 12);
+  const totalH = hookLines.length * 68;
+  const startY = H / 2 - totalH / 2 - 20;
 
-function buildSlide1_Hook(hook: string, ingredientFocus: string): string {
-  const lines = wrapText(hook, 14);
-  const totalHeight = lines.length * 64;
-  const startY = (H / 2) - (totalHeight / 2) + 20;
-
-  const linesSvg = lines.map((line, i) =>
-    `<text x="${W / 2}" y="${startY + i * 64}" text-anchor="middle" font-family="${FF}" font-weight="800" font-size="52" fill="#FFFFFF">${esc(line)}</text>`
+  const hookSvg = hookLines.map((line, i) =>
+    `<text x="${W / 2}" y="${startY + i * 68}" text-anchor="middle" font-family="${FF}" font-weight="900" font-size="56" fill="${C.white}" letter-spacing="-1">${esc(line)}</text>`
   ).join("\n");
 
-  // 장식 라인들
-  const accentLines = `
-    <rect x="80" y="${startY - 80}" width="60" height="4" rx="2" fill="#E94560" opacity="0.8"/>
-    <rect x="${W - 140}" y="${startY + totalHeight + 40}" width="60" height="4" rx="2" fill="#E94560" opacity="0.8"/>
-  `;
-
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">
-  ${defs()}
-  <rect width="${W}" height="${H}" fill="url(#grad1)"/>
-  ${decoCircles("#E94560", 0.08)}
-  <!-- 중앙 글로우 -->
-  <ellipse cx="${W / 2}" cy="${H / 2}" rx="400" ry="300" fill="url(#accentGlow)"/>
-  ${ingredientFocus ? topBadge(ingredientFocus, "rgba(233,69,96,0.2)", "#FF8A9E") : ""}
-  ${accentLines}
-  ${linesSvg}
+  ${SHARED_DEFS}
+  <rect width="${W}" height="${H}" fill="url(#bgDark)"/>
+
+  <!-- 배경 장식: 부드러운 글로우 -->
+  <ellipse cx="${W / 2}" cy="${H / 2 - 40}" rx="380" ry="280" fill="${C.accent}" opacity="0.06"/>
+  <ellipse cx="200" cy="200" rx="200" ry="200" fill="${C.accent}" opacity="0.03"/>
+
+  <!-- 성분 뱃지 -->
+  ${ingredientFocus ? `
+    <rect x="${W / 2 - (ingredientFocus.length * 11 + 24)}" y="120" width="${ingredientFocus.length * 22 + 48}" height="40" rx="20" fill="${C.accent}" opacity="0.15"/>
+    <text x="${W / 2}" y="147" text-anchor="middle" font-family="${FF}" font-weight="600" font-size="20" fill="${C.accent}">${esc(ingredientFocus)}</text>
+  ` : ""}
+
+  <!-- 후킹 타이틀 -->
+  ${hookSvg}
+
+  <!-- 서브 텍스트 -->
+  <text x="${W / 2}" y="${startY + totalH + 40}" text-anchor="middle" font-family="${FF}" font-weight="400" font-size="26" fill="${C.muted}">${esc(hookSub || "")}</text>
+
   <!-- 스와이프 힌트 -->
-  <text x="${W / 2}" y="${H - 100}" text-anchor="middle" font-family="${FF}" font-weight="400" font-size="22" fill="#FFFFFF" opacity="0.35">밀어서 더 보기 →</text>
-  ${brandBar("#FFFFFF", 0.3)}
+  <text x="${W / 2}" y="${H - 120}" text-anchor="middle" font-family="${FF}" font-weight="400" font-size="18" fill="${C.muted}" opacity="0.5">밀어서 확인하기 →</text>
+
+  ${slideIndicator(0, 5, true)}
+  ${brandFooter(true)}
 </svg>`;
 }
 
 // ── 슬라이드 2~4: 정보 카드 ─────────────────────────────────────────────────
 
-interface InfoPalette {
-  gradId: string;
-  accent: string;
-  text: string;
-  sub: string;
-  cardBg: string;
-  cardBorder: string;
-  numBg: string;
-  numText: string;
-  decoColor: string;
-}
+const NUM_COLORS = [C.accent, "#6366F1", "#F59E0B"]; // 코랄, 인디고, 앰버
 
-const INFO_PALETTES: InfoPalette[] = [
-  { gradId: "grad2", accent: "#2D5A3D", text: "#1A1814", sub: "#6B6860", cardBg: "#FFFFFF", cardBorder: "rgba(45,90,61,0.12)", numBg: "#2D5A3D", numText: "#FFFFFF", decoColor: "#2D5A3D" },
-  { gradId: "grad3", accent: "#4F46E5", text: "#1E1B4B", sub: "#4338CA", cardBg: "#FFFFFF", cardBorder: "rgba(79,70,229,0.12)", numBg: "#4F46E5", numText: "#FFFFFF", decoColor: "#4F46E5" },
-  { gradId: "grad4", accent: "#EA580C", text: "#431407", sub: "#9A3412", cardBg: "#FFFFFF", cardBorder: "rgba(234,88,12,0.12)", numBg: "#EA580C", numText: "#FFFFFF", decoColor: "#EA580C" },
-];
+function buildSlideInfo(
+  title: string, body: string, tip: string,
+  slideNum: number, // 1,2,3
+  slideIdx: number, // 0-indexed: 1,2,3
+): string {
+  const numColor = NUM_COLORS[(slideNum - 1) % NUM_COLORS.length];
 
-function buildSlideInfo(title: string, body: string, slideIdx: number): string {
-  const pIdx = (slideIdx - 2) % INFO_PALETTES.length; // 0, 1, 2
-  const p = INFO_PALETTES[pIdx];
-  const num = slideIdx - 1; // 1, 2, 3
+  const cardX = 72, cardY = 100;
+  const cardW = W - 144, cardH = H - 280;
+  const innerX = cardX + 56, innerW = cardW - 112;
 
-  const titleLines = wrapText(title, 18);
-  const bodyLines = wrapText(body, 22);
-
-  // 카드 영역 계산
-  const cardX = 60, cardY = 150;
-  const cardW = W - 120, cardH = H - 260;
-  const cardPad = 48;
-
-  let ty = cardY + cardPad + 70; // 넘버 뱃지 아래
-  const titleSvg = titleLines.map((line) => {
-    const svg = `<text x="${cardX + cardPad}" y="${ty}" font-family="${FF}" font-weight="700" font-size="42" fill="${p.text}">${esc(line)}</text>`;
-    ty += 54;
-    return svg;
-  }).join("\n");
-
-  // 구분선
-  ty += 12;
-  const divider = `<rect x="${cardX + cardPad}" y="${ty}" width="60" height="4" rx="2" fill="${p.accent}" opacity="0.6"/>`;
-  ty += 36;
-
-  const bodySvg = bodyLines.map((line) => {
-    const svg = `<text x="${cardX + cardPad}" y="${ty}" font-family="${FF}" font-weight="400" font-size="32" fill="${p.sub}">${esc(line)}</text>`;
-    ty += 46;
-    return svg;
-  }).join("\n");
+  const titleLines = wrapKo(title, 10);
+  const bodyLines = wrapKo(body, 16);
+  const tipLines = wrapKo(tip || "", 18);
 
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">
-  ${defs()}
-  <rect width="${W}" height="${H}" fill="url(#${p.gradId})"/>
-  ${decoCircles(p.decoColor, 0.05)}
-  <!-- 카드 -->
-  <rect x="${cardX}" y="${cardY}" width="${cardW}" height="${cardH}" rx="24" fill="${p.cardBg}" filter="url(#shadow)" stroke="${p.cardBorder}" stroke-width="1"/>
-  <!-- 넘버 뱃지 -->
-  <rect x="${cardX + cardPad}" y="${cardY + cardPad}" width="48" height="48" rx="12" fill="${p.numBg}"/>
-  <text x="${cardX + cardPad + 24}" y="${cardY + cardPad + 34}" text-anchor="middle" font-family="${FF}" font-weight="700" font-size="26" fill="${p.numText}">${num}</text>
+  ${SHARED_DEFS}
+  <rect width="${W}" height="${H}" fill="url(#bgCream)"/>
+
+  <!-- 배경 장식 -->
+  <circle cx="920" cy="140" r="180" fill="${numColor}" opacity="0.04"/>
+  <circle cx="160" cy="860" r="120" fill="${numColor}" opacity="0.03"/>
+
+  <!-- 메인 카드 -->
+  <rect x="${cardX}" y="${cardY}" width="${cardW}" height="${cardH}" rx="28" fill="${C.cardBg}" filter="url(#cardShadow)"/>
+
+  <!-- 넘버 + 라벨 -->
+  <text x="${innerX}" y="${cardY + 76}" font-family="${FF}" font-weight="900" font-size="80" fill="${numColor}" opacity="0.12">${String(slideNum).padStart(2, "0")}</text>
+  <text x="${innerX}" y="${cardY + 76}" font-family="${FF}" font-weight="900" font-size="48" fill="${numColor}">${String(slideNum).padStart(2, "0")}</text>
+
+  <!-- 액센트 바 -->
+  <rect x="${innerX}" y="${cardY + 96}" width="40" height="4" rx="2" fill="${numColor}"/>
+
   <!-- 타이틀 -->
-  ${titleSvg}
-  ${divider}
+  ${titleLines.map((line, i) =>
+    `<text x="${innerX}" y="${cardY + 156 + i * 54}" font-family="${FF}" font-weight="800" font-size="44" fill="${C.text}" letter-spacing="-0.5">${esc(line)}</text>`
+  ).join("\n")}
+
   <!-- 본문 -->
-  ${bodySvg}
-  <!-- 사이드 액센트 바 -->
-  <rect x="${cardX}" y="${cardY + 60}" width="4" height="100" fill="${p.accent}" opacity="0.3" rx="2"/>
-  ${brandBar(p.text, 0.3)}
+  ${bodyLines.map((line, i) =>
+    `<text x="${innerX}" y="${cardY + 156 + titleLines.length * 54 + 36 + i * 40}" font-family="${FF}" font-weight="400" font-size="28" fill="${C.sub}">${esc(line)}</text>`
+  ).join("\n")}
+
+  <!-- 구분선 -->
+  <line x1="${innerX}" y1="${cardY + cardH - 140}" x2="${innerX + innerW}" y2="${cardY + cardH - 140}" stroke="${C.border}" stroke-width="1"/>
+
+  <!-- 팁 -->
+  ${tip ? `
+    <rect x="${innerX}" y="${cardY + cardH - 120}" width="8" height="8" rx="4" fill="${numColor}"/>
+    ${tipLines.map((line, i) =>
+      `<text x="${innerX + 20}" y="${cardY + cardH - 112 + i * 34}" font-family="${FF}" font-weight="500" font-size="24" fill="${numColor}">${esc(line)}</text>`
+    ).join("\n")}
+  ` : ""}
+
+  ${slideIndicator(slideIdx, 5, false)}
+  ${brandFooter(false)}
 </svg>`;
 }
 
 // ── 슬라이드 5: CTA ─────────────────────────────────────────────────────────
 
-function buildSlide5_CTA(cta: string): string {
-  const lines = wrapText(cta, 16);
-  const totalHeight = lines.length * 56;
-  const startY = (H / 2) - (totalHeight / 2) - 30;
-
-  const linesSvg = lines.map((line, i) =>
-    `<text x="${W / 2}" y="${startY + i * 56}" text-anchor="middle" font-family="${FF}" font-weight="700" font-size="44" fill="#FFFFFF">${esc(line)}</text>`
-  ).join("\n");
-
-  // 버튼 Y 위치
-  const btnY = startY + totalHeight + 40;
+function buildSlide5(cta: string): string {
+  const ctaLines = wrapKo(cta, 12);
+  const totalH = ctaLines.length * 60;
+  const startY = H / 2 - totalH / 2 - 50;
 
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">
-  ${defs()}
-  <rect width="${W}" height="${H}" fill="url(#grad5)"/>
-  ${decoCircles("#FFFFFF", 0.06)}
+  ${SHARED_DEFS}
+  <rect width="${W}" height="${H}" fill="url(#bgCta)"/>
+
+  <!-- 배경 글로우 -->
+  <ellipse cx="${W / 2}" cy="${H / 2}" rx="400" ry="350" fill="#FFFFFF" opacity="0.05"/>
+  <circle cx="180" cy="200" r="150" fill="#FFFFFF" opacity="0.03"/>
+
   <!-- 상단 장식 -->
-  <rect x="${W / 2 - 30}" y="80" width="60" height="4" rx="2" fill="#FFFFFF" opacity="0.4"/>
-  <!-- 텍스트 -->
-  ${linesSvg}
+  <rect x="${W / 2 - 24}" y="100" width="48" height="4" rx="2" fill="${C.white}" opacity="0.3"/>
+
+  <!-- CTA 텍스트 -->
+  ${ctaLines.map((line, i) =>
+    `<text x="${W / 2}" y="${startY + i * 60}" text-anchor="middle" font-family="${FF}" font-weight="800" font-size="48" fill="${C.white}" letter-spacing="-0.5">${esc(line)}</text>`
+  ).join("\n")}
+
   <!-- 버튼 -->
-  <rect x="${W / 2 - 220}" y="${btnY}" width="440" height="68" rx="34" fill="#FFFFFF"/>
-  <text x="${W / 2}" y="${btnY + 44}" text-anchor="middle" font-family="${FF}" font-weight="700" font-size="28" fill="#E94560">무료 AI 피부 분석 받기 →</text>
-  <!-- 보조 텍스트 -->
-  <text x="${W / 2}" y="${btnY + 110}" text-anchor="middle" font-family="${FF}" font-weight="400" font-size="22" fill="#FFFFFF" opacity="0.6">프로필 링크를 확인하세요</text>
-  ${brandBar("#FFFFFF", 0.25)}
+  <rect x="${W / 2 - 200}" y="${startY + totalH + 30}" width="400" height="64" rx="32" fill="${C.white}"/>
+  <text x="${W / 2}" y="${startY + totalH + 71}" text-anchor="middle" font-family="${FF}" font-weight="700" font-size="26" fill="${C.accent}">무료 AI 피부 분석 →</text>
+
+  <!-- 보조 -->
+  <text x="${W / 2}" y="${startY + totalH + 130}" text-anchor="middle" font-family="${FF}" font-weight="400" font-size="20" fill="${C.white}" opacity="0.5">프로필 링크를 확인하세요</text>
+
+  ${slideIndicator(4, 5, true)}
+  ${brandFooter(true)}
 </svg>`;
 }
 
@@ -282,9 +270,7 @@ function buildSlide5_CTA(cta: string): string {
 export const onRequest = async (context: any) => {
   const { request, env } = context as { request: Request; env: Env };
 
-  if (request.method !== "POST") {
-    return new Response("Method Not Allowed", { status: 405 });
-  }
+  if (request.method !== "POST") return new Response("Method Not Allowed", { status: 405 });
 
   const adminKey = env.ADMIN_KEY;
   if (!adminKey) return new Response(JSON.stringify({ error: "No admin key" }), { status: 500, headers: { "Content-Type": "application/json" } });
@@ -299,7 +285,7 @@ export const onRequest = async (context: any) => {
       return new Response(JSON.stringify({ error: "contentId required" }), { status: 400, headers: { "Content-Type": "application/json" } });
     }
 
-    const slideIndex = body.slideIndex ?? -1; // -1 = 메타데이터만, 0~4 = 해당 슬라이드
+    const slideIndex = body.slideIndex ?? -1;
 
     const content = await env.FONDAY_DB.prepare(
       "SELECT * FROM insta_content WHERE id = ?"
@@ -309,35 +295,33 @@ export const onRequest = async (context: any) => {
       return new Response(JSON.stringify({ error: "Content not found" }), { status: 404, headers: { "Content-Type": "application/json" } });
     }
 
-    const slides: Array<{ title: string; body: string }> = JSON.parse(content.slides as string);
+    const slides: Array<{ title: string; body: string; tip?: string }> = JSON.parse(content.slides as string);
     const hook = content.hook as string;
+    const hookSub = (content as any).hookSub || slides[0]?.body || "";
     const cta = content.cta as string;
     const ingredientFocus = (content.ingredient_focus as string) || "";
 
-    // 메타데이터만 요청 (슬라이드 개수 확인용)
+    // 메타데이터만
     if (slideIndex === -1) {
-      const totalSlides = Math.min(slides.length, 5);
       return new Response(JSON.stringify({
         ok: true,
         contentId: body.contentId,
-        totalSlides,
+        totalSlides: 5,
         caption: content.caption,
         hashtags: JSON.parse(content.hashtags as string),
-      }), {
-        headers: { "Content-Type": "application/json" },
-      });
+      }), { headers: { "Content-Type": "application/json" } });
     }
 
     await ensureResvg();
 
-    // 한 장씩 생성
     let svgStr: string;
     if (slideIndex === 0) {
-      svgStr = buildSlide1_Hook(hook, ingredientFocus);
-    } else if (slideIndex >= 1 && slideIndex <= 3 && slideIndex < slides.length) {
-      svgStr = buildSlideInfo(slides[slideIndex].title, slides[slideIndex].body, slideIndex + 1);
+      svgStr = buildSlide1(hook, hookSub, ingredientFocus);
+    } else if (slideIndex >= 1 && slideIndex <= 3) {
+      const s = slides[slideIndex] || slides[Math.min(slideIndex, slides.length - 1)];
+      svgStr = buildSlideInfo(s.title, s.body, s.tip || "", slideIndex, slideIndex);
     } else {
-      svgStr = buildSlide5_CTA(cta);
+      svgStr = buildSlide5(cta);
     }
 
     const image = await svgToPng(svgStr);
@@ -347,9 +331,7 @@ export const onRequest = async (context: any) => {
       contentId: body.contentId,
       slideIndex,
       image,
-    }), {
-      headers: { "Content-Type": "application/json" },
-    });
+    }), { headers: { "Content-Type": "application/json" } });
   } catch (err: any) {
     console.error("insta-image error:", err);
     return new Response(JSON.stringify({ error: "Image generation failed", detail: err?.message ?? "" }), {
