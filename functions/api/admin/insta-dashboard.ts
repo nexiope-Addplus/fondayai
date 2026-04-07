@@ -197,7 +197,7 @@ export const onRequest = async (context: any) => {
       hook: c.hook, hookSub: c.hook_sub || "", slides: JSON.parse(c.slides as string),
       caption: c.caption, hashtags: JSON.parse(c.hashtags as string), cta: c.cta,
       ingredientFocus: c.ingredient_focus || "",
-      imageUrls: JSON.parse((c.image_urls as string) || "[]"),
+      imagePrompts: JSON.parse((c.image_prompts as string) || "[]"),
     })};`).join("\n    ")}
 
     async function generateToday() { await generateForDate(); }
@@ -341,7 +341,25 @@ export const onRequest = async (context: any) => {
       }
 
       const slides = data.slides || [];
-      const imgs = data.imageUrls || [];
+      const prompts = data.imagePrompts || [];
+
+      // Imagen 4로 배경 이미지 생성 (프롬프트가 있을 때만)
+      const imgs = [];
+      if (prompts.length > 0) {
+        row.innerHTML = "<span style='font-size:12px;color:#a8a29e'>배경 이미지 생성 중... (1~2분)</span>";
+        for (let i = 0; i < Math.min(prompts.length, 5); i++) {
+          try {
+            const res = await fetch("/api/admin/insta-gen-image", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ key: ADMIN_KEY, prompt: prompts[i] }),
+            });
+            const d = await res.json();
+            imgs.push(d.ok ? d.image : "");
+          } catch { imgs.push(""); }
+        }
+      }
+
       const configs = [
         { html: slideHook({ title: data.hook, sub: data.hookSub || slides[0]?.body || "", badge: data.ingredientFocus }, imgs[0]) },
         { html: slideInfo(slides[1]||slides[0]||{title:"",body:"",tip:""}, 1, 1, imgs[1]) },

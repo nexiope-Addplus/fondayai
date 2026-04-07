@@ -34,7 +34,7 @@ interface GeneratedContent {
   cta: string;           // 마지막 CTA
   productMention?: string; // 언급된 제품 (있으면)
   ingredientFocus?: string; // 핵심 성분
-  imageUrls: string[];     // 슬라이드별 배경 이미지 (base64 data URI)
+  imagePrompts: string[];  // 슬라이드별 Imagen 프롬프트
 }
 
 // ── 요일별 콘텐츠 기둥 매핑 ──────────────────────────────────────────────────
@@ -308,7 +308,7 @@ async function ensureTable(db: D1Database) {
   `).run();
   // 기존 테이블에 새 컬럼 없으면 추가
   try { await db.prepare("ALTER TABLE insta_content ADD COLUMN hook_sub TEXT DEFAULT ''").run(); } catch { /* exists */ }
-  try { await db.prepare("ALTER TABLE insta_content ADD COLUMN image_urls TEXT DEFAULT '[]'").run(); } catch { /* exists */ }
+  try { await db.prepare("ALTER TABLE insta_content ADD COLUMN image_prompts TEXT DEFAULT '[]'").run(); } catch { /* exists */ }
 }
 
 // ── 콘텐츠 생성 ─────────────────────────────────────────────────────────────
@@ -399,26 +399,8 @@ async function generateContent(
     }
   }
 
-  // Imagen 4로 슬라이드 배경 이미지 생성
+  // 이미지 프롬프트는 저장만 (실제 생성은 대시보드에서 온디맨드)
   const imagePrompts: string[] = parsed.imagePrompts || [];
-  const imageUrls: string[] = [];
-
-  for (let i = 0; i < Math.min(imagePrompts.length, 5); i++) {
-    try {
-      const imgs = await generateImage({
-        gcpServiceAccount: env.GCP_SERVICE_ACCOUNT,
-        prompt: imagePrompts[i],
-        numberOfImages: 1,
-        aspectRatio: "1:1",
-        model: "imagen-4.0-fast-generate-001",
-        personGeneration: "allow_adult",
-      });
-      imageUrls.push(imgs[0] || "");
-    } catch (err) {
-      console.error(`Imagen slide ${i} error:`, err);
-      imageUrls.push("");
-    }
-  }
 
   return {
     pillar,
@@ -430,7 +412,7 @@ async function generateContent(
     hashtags: parsed.hashtags || [],
     cta: parsed.cta || "",
     ingredientFocus: parsed.ingredientFocus || "",
-    imageUrls,
+    imagePrompts,
   };
 }
 
@@ -514,13 +496,13 @@ export const onRequest = async (context: any) => {
       if (count >= 1) {
         const morning = await generateContent(env, schedule.morning, "carousel", dateStr, "07:00");
         await env.FONDAY_DB.prepare(`
-          INSERT INTO insta_content (pillar, format, hook, hook_sub, slides, caption, hashtags, cta, ingredient_focus, image_urls, scheduled_date, scheduled_time)
+          INSERT INTO insta_content (pillar, format, hook, hook_sub, slides, caption, hashtags, cta, ingredient_focus, image_prompts, scheduled_date, scheduled_time)
           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `).bind(
           morning.pillar, morning.format, morning.hook, morning.hookSub || "",
           JSON.stringify(morning.slides), morning.caption,
           JSON.stringify(morning.hashtags), morning.cta,
-          morning.ingredientFocus || "", JSON.stringify(morning.imageUrls || []), dateStr, "07:00",
+          morning.ingredientFocus || "", JSON.stringify(morning.imagePrompts || []), dateStr, "07:00",
         ).run();
         generated.push({ time: "07:00", pillar: morning.pillar, format: morning.format, hook: morning.hook, ingredientFocus: morning.ingredientFocus });
       }
@@ -529,13 +511,13 @@ export const onRequest = async (context: any) => {
       if (count >= 2) {
         const evening = await generateContent(env, schedule.evening, "reels-script", dateStr, "20:00");
         await env.FONDAY_DB.prepare(`
-          INSERT INTO insta_content (pillar, format, hook, hook_sub, slides, caption, hashtags, cta, ingredient_focus, image_urls, scheduled_date, scheduled_time)
+          INSERT INTO insta_content (pillar, format, hook, hook_sub, slides, caption, hashtags, cta, ingredient_focus, image_prompts, scheduled_date, scheduled_time)
           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `).bind(
           evening.pillar, evening.format, evening.hook, evening.hookSub || "",
           JSON.stringify(evening.slides), evening.caption,
           JSON.stringify(evening.hashtags), evening.cta,
-          evening.ingredientFocus || "", JSON.stringify(evening.imageUrls || []), dateStr, "20:00",
+          evening.ingredientFocus || "", JSON.stringify(evening.imagePrompts || []), dateStr, "20:00",
         ).run();
         generated.push({ time: "20:00", pillar: evening.pillar, format: evening.format, hook: evening.hook, ingredientFocus: evening.ingredientFocus });
       }
