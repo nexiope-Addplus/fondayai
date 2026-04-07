@@ -273,6 +273,7 @@ export default {
   },
 
   // ── Cron 스케줄러 ──────────────────────────────────────────────
+  // KST 05:00 (UTC 20:00) 인스타 콘텐츠 자동 생성 (당일 2개)
   // KST 07:30 (UTC 22:30) 스캔 리마인더
   // KST 12:00 (UTC 03:00) 점심 식단 알림
   // KST 15:00 (UTC 06:00) 수분 리마인더
@@ -284,7 +285,10 @@ export default {
     const now = new Date();
     const hour = now.getUTCHours();
 
-    if (hour === 0) {
+    if (hour === 20) {
+      // KST 05:00 — 인스타 콘텐츠 자동 생성 (오전 7시 + 저녁 8시용)
+      ctx.waitUntil(generateDailyInstaContent(env));
+    } else if (hour === 0) {
       // KST 09:00 — 화장품 효과 리마인더
       ctx.waitUntil(sendCosmeticEffectReminders(env));
     } else if (hour === 22) {
@@ -314,6 +318,37 @@ export default {
     }
   }
 };
+
+// ─── 인스타 콘텐츠 자동 생성 (크론용) ───────────────────────────────────────────
+async function generateDailyInstaContent(env) {
+  try {
+    // KST 오늘 날짜 계산
+    const now = new Date();
+    const kst = new Date(now.getTime() + 9 * 60 * 60 * 1000);
+    const dateStr = kst.toISOString().split("T")[0];
+
+    // 이미 오늘 생성된 게 있으면 스킵
+    const existing = await env.FONDAY_DB.prepare(
+      "SELECT COUNT(*) as count FROM insta_content WHERE scheduled_date = ?"
+    ).bind(dateStr).first();
+    if (existing && existing.count >= 2) {
+      console.log(`[insta-cron] ${dateStr} already has ${existing.count} contents, skipping`);
+      return;
+    }
+
+    // insta-content API를 내부 호출
+    const apiUrl = "https://fondayai.com/api/admin/insta-content";
+    const res = await fetch(apiUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ key: env.ADMIN_KEY, date: dateStr, count: 2 }),
+    });
+    const data = await res.json();
+    console.log(`[insta-cron] ${dateStr} generated:`, JSON.stringify(data));
+  } catch (err) {
+    console.error("[insta-cron] error:", err);
+  }
+}
 
 // ─── 식단 푸시 데이터 (피부 타입 × 언어 × 식사) — 배열로 다양화 ─────────────────
 const MEAL_TIPS = {
