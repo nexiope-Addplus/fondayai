@@ -217,60 +217,87 @@ export const onRequest = async (context: any) => {
       document.getElementById("loading").style.display = "none";
     }
 
-    // ── 슬라이드 HTML 빌더 (이모지 없음, 텍스트 짧게) ──
-    const S = 540; // 렌더 사이즈 (2x로 캡처하면 1080)
-    const C = {dark:"#0F172A",accent:"#E94560",white:"#FFF",text:"#1E293B",sub:"#64748B",muted:"#94A3B8",border:"#E2E8F0"};
-    const NC = ["#E94560","#6366F1","#F59E0B"];
+    // ── 슬라이드 HTML 빌더 — 스킨케어 소프트 파스텔 톤 ──
+    const S = 540;
+    const C = {
+      bg1:"#FFF5F5", bg2:"#FFF0F6", bg3:"#F5F0FF", bg4:"#F0FFF4", bgCta:"#FF6B81",
+      accent:"#FF6B81", accent2:"#A78BFA", accent3:"#34D399",
+      white:"#FFFFFF", text:"#2D3436", sub:"#636E72", muted:"#B2BEC3", border:"#F0E6E6",
+    };
+    const NC = ["#FF6B81","#A78BFA","#34D399"];
 
     function cut(s,max) { return s && s.length > max ? s.slice(0,max)+"..." : (s||""); }
 
     function dots(idx, light) {
-      return '<div style="position:absolute;bottom:50px;left:0;right:0;display:flex;gap:6px;justify-content:center">'
+      return '<div style="position:absolute;bottom:44px;left:0;right:0;display:flex;gap:8px;justify-content:center">'
         +Array.from({length:5},(_,i)=>{
-          const active = i===idx;
-          const bg = active ? (light?C.white:C.accent) : (light?"rgba(255,255,255,0.2)":C.border);
-          return '<div style="width:'+(active?10:6)+'px;height:'+(active?10:6)+'px;border-radius:50%;background:'+bg+'"></div>';
+          const a = i===idx;
+          const bg = a ? (light?"#FFFFFF":C.accent) : (light?"rgba(255,255,255,0.3)":"#DFD6D6");
+          return '<div style="width:'+(a?20:8)+'px;height:8px;border-radius:4px;background:'+bg+';transition:all .2s"></div>';
         }).join("")+'</div>';
     }
     function footer(light) {
-      const c = light?C.white:C.muted;
-      return '<div style="position:absolute;bottom:16px;left:36px;right:36px;display:flex;justify-content:space-between;opacity:0.35">'
-        +'<span style="font-weight:700;letter-spacing:3px;font-size:11px;color:'+c+'">FONDAY</span>'
-        +'<span style="font-size:10px;color:'+c+'">AI 피부 분석</span></div>';
+      const c = light?"rgba(255,255,255,0.5)":"#B2BEC3";
+      return '<div style="position:absolute;bottom:14px;left:36px;right:36px;display:flex;justify-content:space-between">'
+        +'<span style="font-weight:700;letter-spacing:2px;font-size:11px;color:'+c+'">FONDAY</span>'
+        +'<span style="font-size:10px;color:'+c+'">AI Skin Analysis</span></div>';
     }
 
     function slideHook(d) {
-      return '<div style="width:'+S+'px;height:'+S+'px;position:relative;background:linear-gradient(160deg,#0F172A,#1E293B);display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:Pretendard Variable,sans-serif;overflow:hidden">'
-        +'<div style="position:absolute;top:45%;left:50%;transform:translate(-50%,-50%);width:360px;height:260px;border-radius:50%;background:'+C.accent+';opacity:0.06"></div>'
-        +(d.badge?'<div style="background:rgba(233,69,96,0.15);color:'+C.accent+';font-size:11px;font-weight:600;padding:5px 14px;border-radius:20px;margin-bottom:20px">'+cut(d.badge,20)+'</div>':'')
-        +'<div style="color:white;font-size:28px;font-weight:900;text-align:center;letter-spacing:-0.5px;line-height:1.35;padding:0 50px;overflow:hidden;max-height:120px">'+cut(d.title,30)+'</div>'
-        +'<div style="color:'+C.muted+';font-size:13px;margin-top:12px;padding:0 60px;text-align:center;overflow:hidden;max-height:40px">'+cut(d.sub,40)+'</div>'
-        +'<div style="color:'+C.muted+';font-size:10px;opacity:0.4;margin-top:30px">밀어서 확인하기 &rarr;</div>'
-        +dots(0,true)+footer(true)+'</div>';
+      return '<div style="width:'+S+'px;height:'+S+'px;position:relative;background:linear-gradient(135deg,'+C.bg1+','+C.bg2+');display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:Pretendard Variable,sans-serif;overflow:hidden">'
+        // 배경 장식 (소프트 원)
+        +'<div style="position:absolute;top:-60px;right:-60px;width:240px;height:240px;border-radius:50%;background:'+C.accent+';opacity:0.07"></div>'
+        +'<div style="position:absolute;bottom:-40px;left:-40px;width:180px;height:180px;border-radius:50%;background:'+C.accent2+';opacity:0.06"></div>'
+        // 뱃지
+        +(d.badge?'<div style="background:'+C.white+';color:'+C.accent+';font-size:12px;font-weight:700;padding:6px 18px;border-radius:20px;margin-bottom:24px;box-shadow:0 2px 12px rgba(255,107,129,0.15)">'+cut(d.badge,15)+'</div>':'')
+        // 메인 타이틀
+        +'<div style="color:'+C.text+';font-size:30px;font-weight:900;text-align:center;letter-spacing:-0.5px;line-height:1.4;padding:0 50px;overflow:hidden;max-height:130px">'+cut(d.title,30)+'</div>'
+        // 서브
+        +'<div style="color:'+C.sub+';font-size:14px;margin-top:14px;padding:0 60px;text-align:center;overflow:hidden;max-height:44px">'+cut(d.sub,40)+'</div>'
+        // 스와이프
+        +'<div style="color:'+C.muted+';font-size:11px;margin-top:36px;letter-spacing:1px">SWIPE &rarr;</div>'
+        +dots(0,false)+footer(false)+'</div>';
     }
 
     function slideInfo(d, num, idx) {
       const nc = NC[(num-1)%3];
-      return '<div style="width:'+S+'px;height:'+S+'px;position:relative;background:linear-gradient(180deg,#FAFAF9,#F5F5F4);font-family:Pretendard Variable,sans-serif;overflow:hidden">'
-        +'<div style="position:absolute;top:-20px;right:-20px;width:160px;height:160px;border-radius:50%;background:'+nc+';opacity:0.04"></div>'
-        +'<div style="position:absolute;top:50px;left:36px;right:36px;bottom:130px;background:white;border-radius:16px;border:1px solid '+C.border+';padding:32px;overflow:hidden">'
-          +'<div style="font-size:24px;font-weight:900;color:'+nc+'">'+String(num).padStart(2,'0')+'</div>'
-          +'<div style="width:24px;height:3px;background:'+nc+';margin:10px 0 16px;border-radius:2px"></div>'
-          +'<div style="font-size:20px;font-weight:800;color:'+C.text+';line-height:1.35;overflow:hidden;max-height:56px">'+cut(d.title,20)+'</div>'
-          +'<div style="font-size:14px;color:'+C.sub+';margin-top:12px;line-height:1.6;overflow:hidden;max-height:90px">'+cut(d.body,60)+'</div>'
-          +(d.tip?'<div style="position:absolute;bottom:24px;left:32px;right:32px;border-top:1px solid '+C.border+';padding-top:14px;display:flex;align-items:center;gap:8px">'
-            +'<div style="width:6px;height:6px;border-radius:50%;background:'+nc+';flex-shrink:0"></div>'
-            +'<span style="font-size:12px;font-weight:500;color:'+nc+';overflow:hidden;white-space:nowrap;text-overflow:ellipsis">'+cut(d.tip,30)+'</span></div>':'')
+      const bgs = [C.bg1, C.bg3, C.bg4];
+      const bg = bgs[(num-1)%3];
+      return '<div style="width:'+S+'px;height:'+S+'px;position:relative;background:'+bg+';font-family:Pretendard Variable,sans-serif;overflow:hidden">'
+        // 배경 장식
+        +'<div style="position:absolute;top:-30px;right:-30px;width:140px;height:140px;border-radius:50%;background:'+nc+';opacity:0.07"></div>'
+        // 카드
+        +'<div style="position:absolute;top:44px;left:32px;right:32px;bottom:100px;background:'+C.white+';border-radius:20px;padding:36px;display:flex;flex-direction:column;box-shadow:0 4px 24px rgba(0,0,0,0.04)">'
+          // 넘버 + 라벨 행
+          +'<div style="display:flex;align-items:center;gap:12px;margin-bottom:20px">'
+            +'<div style="width:44px;height:44px;border-radius:12px;background:'+nc+';display:flex;align-items:center;justify-content:center;color:white;font-weight:900;font-size:20px">'+num+'</div>'
+            +'<div style="width:32px;height:3px;border-radius:2px;background:'+nc+';opacity:0.4"></div>'
+          +'</div>'
+          // 타이틀
+          +'<div style="font-size:22px;font-weight:800;color:'+C.text+';line-height:1.4;margin-bottom:14px">'+cut(d.title,20)+'</div>'
+          // 본문
+          +'<div style="font-size:15px;color:'+C.sub+';line-height:1.7;flex:1;overflow:hidden">'+cut(d.body,80)+'</div>'
+          // 팁 영역
+          +(d.tip?'<div style="margin-top:auto;padding-top:16px;border-top:1px solid '+C.border+';display:flex;align-items:center;gap:10px">'
+            +'<div style="width:24px;height:24px;border-radius:8px;background:'+nc+';opacity:0.12;display:flex;align-items:center;justify-content:center;flex-shrink:0"><div style="width:6px;height:6px;border-radius:50%;background:'+nc+'"></div></div>'
+            +'<span style="font-size:13px;font-weight:600;color:'+nc+'">'+cut(d.tip,30)+'</span></div>':'')
         +'</div>'
         +dots(idx,false)+footer(false)+'</div>';
     }
 
     function slideCta(d) {
-      return '<div style="width:'+S+'px;height:'+S+'px;position:relative;background:linear-gradient(135deg,#E94560,#BE123C);display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:Pretendard Variable,sans-serif;overflow:hidden">'
-        +'<div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:380px;height:320px;border-radius:50%;background:white;opacity:0.05"></div>'
-        +'<div style="color:white;font-size:24px;font-weight:800;text-align:center;line-height:1.35;padding:0 50px;overflow:hidden;max-height:100px">'+cut(d.title,30)+'</div>'
-        +'<div style="background:white;color:'+C.accent+';font-weight:700;font-size:14px;padding:12px 36px;border-radius:32px;margin-top:20px">무료 AI 피부 분석 &rarr;</div>'
-        +'<div style="color:white;opacity:0.45;font-size:11px;margin-top:14px">프로필 링크를 확인하세요</div>'
+      return '<div style="width:'+S+'px;height:'+S+'px;position:relative;background:linear-gradient(135deg,#FF6B81,#FF8E9E);display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:Pretendard Variable,sans-serif;overflow:hidden">'
+        // 배경 글로우
+        +'<div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:360px;height:360px;border-radius:50%;background:white;opacity:0.08"></div>'
+        +'<div style="position:absolute;top:-40px;left:-40px;width:160px;height:160px;border-radius:50%;background:white;opacity:0.06"></div>'
+        // 작은 라벨
+        +'<div style="color:rgba(255,255,255,0.7);font-size:12px;font-weight:600;letter-spacing:2px;margin-bottom:16px">MY SKIN TYPE</div>'
+        // CTA 텍스트
+        +'<div style="color:white;font-size:26px;font-weight:900;text-align:center;line-height:1.4;padding:0 50px;overflow:hidden;max-height:110px">'+cut(d.title,30)+'</div>'
+        // 버튼
+        +'<div style="background:white;color:#FF6B81;font-weight:800;font-size:15px;padding:14px 40px;border-radius:32px;margin-top:28px;box-shadow:0 4px 16px rgba(0,0,0,0.1)">무료 피부 분석 받기</div>'
+        // 보조
+        +'<div style="color:rgba(255,255,255,0.55);font-size:11px;margin-top:16px">프로필 링크에서 바로 시작</div>'
         +dots(4,true)+footer(true)+'</div>';
     }
 
