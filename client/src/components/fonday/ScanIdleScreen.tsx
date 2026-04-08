@@ -200,8 +200,9 @@ export function ScanIdleScreen({
             style={{ animation: pullY >= 70 ? "spin 0.6s linear infinite" : "none" }} />
         </div>
       )}
-      {/* 날씨 기반 그리팅 + 날씨 팁 통합 카드 */}
+      {/* 날씨 기반 그리팅 — 날씨 로딩 후에만 표시 (깜빡임 방지) */}
       {(() => {
+        if (!idleWeather) return null; // 날씨 로딩 전에는 숨김
         const hour = new Date().getHours();
         const weatherIconMap: Record<WeatherTipKey, { icon: React.ComponentType<any>; color: string }> = {
           polluted: { icon: Wind, color: TEXT_SECONDARY },
@@ -237,12 +238,12 @@ export function ScanIdleScreen({
         const fallback = timeBasedVariants.find(({ range }) => hour >= range[0] && hour < range[1]);
         if (!fallback) return null;
 
-        // 아이콘: 날씨 데이터 있으면 날씨 아이콘, 없으면 시간대 아이콘
-        const wKey = (idleWeather && hour >= 6 && hour < 20) ? getWeatherTipKey(idleWeather!) : null;
+        // 날씨 아이콘 + 날씨 문구 사용 (낮 시간대), 밤에는 시간대 기반
+        const wKey = (hour >= 6 && hour < 20) ? getWeatherTipKey(idleWeather!) : null;
         const iconInfo = wKey ? weatherIconMap[wKey] : { icon: fallback.icon, color: fallback.color };
         const GreetingIcon = iconInfo.icon;
-        // 문구: 항상 시간대 기반 (날씨 로딩 전/후 문구 깜빡임 방지)
-        const greetingKey = fallback.keys[greetingVariantIdx % fallback.keys.length];
+        const variants = wKey ? weatherVariantMap[wKey] : fallback.keys;
+        const greetingKey = variants[greetingVariantIdx % variants.length];
 
         return (
           <motion.div variants={fadeChild} className="mb-2 relative" style={{ zIndex: 1 }}>
