@@ -61,12 +61,9 @@ export function WeatherTipCard({ compact, weather, weakMetric }: {
   const tipKey = getWeatherTipKey(weather);
   const tipRaw = t(`weather.tips.${tipKey}`, { returnObjects: true });
   const tipArr = Array.isArray(tipRaw) ? tipRaw : [tipRaw];
-  // 날짜 + 4시간 단위로 팁 변경 (하루 6번 로테이션)
-  const now = new Date();
-  const daySeed = now.getFullYear() * 10000 + (now.getMonth() + 1) * 100 + now.getDate();
-  const timeslot = Math.floor(now.getHours() / 4);
-  const dayIdx = (daySeed + timeslot) % Math.max(1, tipArr.length);
-  const rawTip = tipArr[dayIdx];
+  // 접속마다 랜덤 팁 선택
+  const [tipIdx] = useState(() => Math.floor(Math.random() * 100));
+  const rawTip = tipArr[tipIdx % Math.max(1, tipArr.length)];
   const fallbackTip = { emoji: "🌤️", title: "오늘의 피부 케어", body: "날씨에 맞춘 스킨케어로 하루를 시작하세요." };
   const tip = (rawTip && typeof rawTip === 'object' && 'emoji' in rawTip) ? rawTip as { emoji: string; title: string; body: string } : fallbackTip;
   const weatherIcon = WEATHER_ICON_MAP[tipKey] || WEATHER_ICON_MAP.sunny;
