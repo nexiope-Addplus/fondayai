@@ -164,13 +164,8 @@ export function ScanIdleScreen({
   const latestScoreDelta = latestScan && previousScan
     ? Number(latestScan.overallScore || 0) - Number(previousScan.overallScore || 0)
     : null;
-  // 날짜+시간대 기반 변형 인덱스 — 같은 날 같은 시간대에는 동일, 날짜/시간대 바뀌면 변경
-  const greetingVariantIdx = useMemo(() => {
-    const now = new Date();
-    const seed = now.getFullYear() * 10000 + (now.getMonth() + 1) * 100 + now.getDate();
-    const timeslot = Math.floor(now.getHours() / 4); // 4시간 단위로 변경 (0~5)
-    return (seed + timeslot) % 3;
-  }, []);
+  // 접속할 때마다 랜덤 문구 (페이지 새로고침 시 변경)
+  const greetingVariantIdx = useMemo(() => Math.floor(Math.random() * 100), []);
 
   const latestWeakMetric = useMemo(() => {
     if (!Array.isArray(latestScan?.scores) || latestScan.scores.length <= 1) return null;
@@ -217,14 +212,14 @@ export function ScanIdleScreen({
           cloudy:   { icon: Cloud, color: TEXT_SECONDARY },
         };
         const weatherVariantMap: Record<WeatherTipKey, string[]> = {
-          polluted: ["idle.greetingWeatherPolluted"],
-          snowy:    ["idle.greetingWeatherSnowy"],
+          polluted: ["idle.greetingWeatherPolluted", "idle.greetingWeatherPolluted2", "idle.greetingWeatherPolluted3"],
+          snowy:    ["idle.greetingWeatherSnowy", "idle.greetingWeatherSnowy2", "idle.greetingWeatherSnowy3"],
           rainy:    ["idle.greetingWeatherRainy", "idle.greetingWeatherRainy2", "idle.greetingWeatherRainy3"],
-          foggy:    ["idle.greetingWeatherFoggy"],
+          foggy:    ["idle.greetingWeatherFoggy", "idle.greetingWeatherFoggy2", "idle.greetingWeatherFoggy3"],
           cold:     ["idle.greetingWeatherCold", "idle.greetingWeatherCold2", "idle.greetingWeatherCold3"],
-          sunny_hot:["idle.greetingWeatherSunnyHot"],
+          sunny_hot:["idle.greetingWeatherSunnyHot", "idle.greetingWeatherSunnyHot2", "idle.greetingWeatherSunnyHot3"],
           sunny:    ["idle.greetingWeatherSunny", "idle.greetingWeatherSunny2", "idle.greetingWeatherSunny3"],
-          dry:      ["idle.greetingWeatherDry"],
+          dry:      ["idle.greetingWeatherDry", "idle.greetingWeatherDry2", "idle.greetingWeatherDry3"],
           humid:    ["idle.greetingWeatherHumid", "idle.greetingWeatherHumid2", "idle.greetingWeatherHumid3"],
           cloudy:   ["idle.greetingWeatherCloudy", "idle.greetingWeatherCloudy2", "idle.greetingWeatherCloudy3"],
         };
