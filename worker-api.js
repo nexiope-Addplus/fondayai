@@ -313,8 +313,11 @@ export default {
       // KST 08:00 — 스레드 아침
       ctx.waitUntil(publishScheduledThreads(env, "08:00"));
     } else if (hour === 0) {
-      // KST 09:00 — 화장품 효과 리마인더
-      ctx.waitUntil(sendCosmeticEffectReminders(env));
+      // KST 09:00 — 화장품 효과 리마인더 + 대댓글 체크
+      ctx.waitUntil(Promise.all([
+        sendCosmeticEffectReminders(env),
+        replyToFirstComment(env),
+      ]));
     } else if (hour === 1) {
       // KST 10:00 — UV 케어
       ctx.waitUntil(sendUVCarePushToAll(env));
@@ -330,8 +333,11 @@ export default {
       // KST 14:00 — 스레드 무드카드(이미지)
       ctx.waitUntil(publishScheduledThreads(env, "14:00"));
     } else if (hour === 6) {
-      // KST 15:00 — 수분 리마인더
-      ctx.waitUntil(sendHydrationPushToAll(env));
+      // KST 15:00 — 수분 리마인더 + 대댓글 체크
+      ctx.waitUntil(Promise.all([
+        sendHydrationPushToAll(env),
+        replyToFirstComment(env),
+      ]));
     } else if (hour === 9) {
       // KST 18:00 — 저녁 + 스레드
       ctx.waitUntil(Promise.all([
@@ -346,10 +352,11 @@ export default {
         sendRoutineReminderToAll(env, 20),
       ]));
     } else if (hour === 12) {
-      // KST 21:00 — 스레드 + 루틴 리마인더
+      // KST 21:00 — 스레드 + 루틴 리마인더 + 대댓글 체크
       ctx.waitUntil(Promise.all([
         publishScheduledThreads(env, "21:00"),
         sendRoutineReminderToAll(env, 21),
+        replyToFirstComment(env),
       ]));
     } else if (hour === 13) {
       // KST 22시 — 루틴 리마인더
@@ -389,6 +396,67 @@ async function generateDailyInstaContent(env) {
     console.log(`[insta-cron] ${dateStr} generated:`, JSON.stringify(data));
   } catch (err) {
     console.error("[insta-cron] error:", err);
+  }
+}
+
+// ─── 대댓글 자동 달기 (크론에서 호출) ────────────────────────────────────────────
+async function replyToFirstComment(env) {
+  const accounts = [
+    { token: env.IG_ACCESS_TOKEN, userId: env.IG_USER_ID, table: "insta_content", lang: "ko" },
+    { token: env.IG_ACCESS_TOKEN_JA, userId: env.IG_USER_ID_JA, table: "insta_content_ja", lang: "ja" },
+  ];
+
+  const replies = {
+    ko: "댓글 감사해요! 내 피부 타입이 궁금하다면 프로필 링크에서 무료 AI 피부 분석 받아보세요 🤍",
+    ja: "コメントありがとうございます！自分の肌タイプが気になる方は、プロフィールリンクから無料AI肌診断をお試しください 🤍",
+  };
+
+  for (const acc of accounts) {
+    if (!acc.token || !acc.userId) continue;
+    try {
+      // 최근 published 게시물 조회 (최근 5개)
+      const rows = await env.FONDAY_DB.prepare(
+        `SELECT id, ig_media_id FROM ${acc.table} WHERE status = 'published' AND ig_media_id IS NOT NULL ORDER BY id DESC LIMIT 5`
+      ).all();
+
+      for (const row of (rows.results || [])) {
+        try {
+          // 댓글 목록 조회
+          const commentsRes = await fetch(
+            `https://graph.instagram.com/v21.0/${row.ig_media_id}/comments?fields=id,text,username,replies{id}&access_token=${acc.token}`
+          );
+          const commentsData = await commentsRes.json();
+          const comments = commentsData.data || [];
+
+          // 내 첫 댓글(봇 댓글) 제외, 유저 댓글 중 첫 번째에 대댓글이 없으면 달기
+          for (const comment of comments) {
+            // replies가 있으면 이미 대댓글 달린 것
+            if (comment.replies?.data?.length > 0) continue;
+            // 내 댓글이면 스킵 (첫 댓글로 달은 것)
+            if (comment.username === (acc.lang === "ja" ? "rin_fonday" : "beauty_jisoo23")) continue;
+
+            // 유저 댓글 발견 — 대댓글 달기
+            await fetch(
+              `https://graph.instagram.com/v21.0/${row.ig_media_id}/comments`,
+              {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  message: replies[acc.lang],
+                  access_token: acc.token,
+                }),
+              }
+            );
+            console.log(`[reply-${acc.lang}] 대댓글 완료: media=${row.ig_media_id}, comment=${comment.id}`);
+            break; // 첫 번째 유저 댓글에만 대댓글
+          }
+        } catch (e) {
+          // 개별 게시물 에러는 무시하고 다음으로
+        }
+      }
+    } catch (err) {
+      console.error(`[reply-${acc.lang}] error:`, err.message);
+    }
   }
 }
 
