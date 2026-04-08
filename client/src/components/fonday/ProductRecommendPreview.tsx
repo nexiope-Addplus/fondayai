@@ -43,7 +43,7 @@ export function ProductRecommendPreview({
 
   useEffect(() => {
     if (!baumannType) return;
-    fetch(`/api/product-recommend?baumann=${baumannType}&limit=3`)
+    fetch(`/api/product-recommend?baumann=${baumannType}&limit=3&lang=${lang}`)
       .then(r => { if (!r.ok) throw new Error(); return r.json(); })
       .then(data => setProducts(Array.isArray(data?.products) ? data.products : []))
       .catch(() => setProducts([]));

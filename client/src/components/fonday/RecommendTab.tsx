@@ -52,7 +52,7 @@ export function RecommendTab({ user, baumannType, onLogin }: {
   useEffect(() => {
     if (!type) { setLoading(false); return; }
     setLoading(true);
-    fetch(`/api/product-recommend?baumann=${type}&limit=50`)
+    fetch(`/api/product-recommend?baumann=${type}&limit=50&lang=${lang}`)
       .then(r => { if (!r.ok) throw new Error(); return r.json(); })
       .then(data => setProducts(Array.isArray(data?.products) ? data.products : []))
       .catch(() => setProducts([]))

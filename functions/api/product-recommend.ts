@@ -19,7 +19,11 @@ export const onRequest = async (context: any) => {
     const url = new URL(request.url);
     const baumann = (url.searchParams.get("baumann") || "DSPT").toUpperCase();
     const concern = url.searchParams.get("concern") || "";
+    const lang = url.searchParams.get("lang") || "ko";
     const limit = Math.min(parseInt(url.searchParams.get("limit") || "6"), 20);
+
+    // 언어 → 지역 매핑 (ko=한국 쿠팡, ja=일본 Amazon, en=일본 Amazon)
+    const region = lang === "ko" ? "kr" : "jp";
 
     if (!env.FONDAY_DB) {
       return new Response(JSON.stringify({ products: [] }), {
@@ -27,10 +31,10 @@ export const onRequest = async (context: any) => {
       });
     }
 
-    // 제휴 링크가 있는 활성 제품만 가져오기
+    // 해당 지역의 제휴 링크가 있는 활성 제품만 가져오기
     const { results } = await env.FONDAY_DB.prepare(
-      "SELECT * FROM products WHERE is_active = 1 AND buy_url != '' AND buy_url IS NOT NULL"
-    ).all();
+      "SELECT * FROM products WHERE is_active = 1 AND buy_url != '' AND buy_url IS NOT NULL AND region = ?"
+    ).bind(region).all();
 
     if (!results || results.length === 0) {
       return new Response(JSON.stringify({ products: [] }), {

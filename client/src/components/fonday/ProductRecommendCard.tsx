@@ -78,7 +78,7 @@ export function ProductRecommendCard({ baumannType }: { baumannType: string }) {
   useEffect(() => {
     if (!baumannType) return;
     setLoading(true);
-    fetch(`/api/product-recommend?baumann=${baumannType}&limit=20`)
+    fetch(`/api/product-recommend?baumann=${baumannType}&limit=20&lang=${lang}`)
       .then(r => {
         if (!r.ok) throw new Error(`HTTP ${r.status}`);
         return r.json();

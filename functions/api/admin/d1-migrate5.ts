@@ -54,6 +54,7 @@ export const onRequest = async (context: any) => {
         target_concern TEXT DEFAULT '',
         price INTEGER DEFAULT 0,
         price_currency TEXT DEFAULT 'KRW',
+        region TEXT DEFAULT 'kr',
         buy_url TEXT DEFAULT '',
         banner_url TEXT DEFAULT '',
         image_url TEXT DEFAULT '',
@@ -69,6 +70,11 @@ export const onRequest = async (context: any) => {
     results.push("idx_products_category ok");
 
     await env.FONDAY_DB.prepare(
+      "CREATE INDEX IF NOT EXISTS idx_products_region ON products(region)"
+    ).run();
+    results.push("idx_products_region ok");
+
+    await env.FONDAY_DB.prepare(
       "CREATE INDEX IF NOT EXISTS idx_products_active ON products(is_active)"
     ).run();
     results.push("idx_products_active ok");
@@ -79,11 +85,13 @@ export const onRequest = async (context: any) => {
 
     for (const p of PRODUCT_SEED) {
       await env.FONDAY_DB.prepare(`
-        INSERT INTO products (name, brand, category, key_ingredients, best_baumann, avoid_baumann, target_concern, price, buy_url, banner_url)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-      `).bind(p.name, p.brand, p.category, p.key_ingredients, p.best_baumann, p.avoid_baumann, p.target_concern, p.price, p.buy_url || "", p.banner_url || "").run();
+        INSERT INTO products (name, brand, category, key_ingredients, best_baumann, avoid_baumann, target_concern, price, region, buy_url, banner_url)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `).bind(p.name, p.brand, p.category, p.key_ingredients, p.best_baumann, p.avoid_baumann, p.target_concern, p.price, p.region, p.buy_url || "", p.banner_url || "").run();
     }
-    results.push(`seeded ${PRODUCT_SEED.length} products (${PRODUCT_SEED.filter(p => p.buy_url).length} links, ${PRODUCT_SEED.filter(p => p.banner_url).length} banners)`);
+    const krCount = PRODUCT_SEED.filter(p => p.region === "kr").length;
+    const jpCount = PRODUCT_SEED.filter(p => p.region === "jp").length;
+    results.push(`seeded ${PRODUCT_SEED.length} products (kr:${krCount}, jp:${jpCount}, ${PRODUCT_SEED.filter(p => p.buy_url).length} links, ${PRODUCT_SEED.filter(p => p.banner_url).length} banners)`);
 
     return new Response(JSON.stringify({ ok: true, results }), {
       headers: { "Content-Type": "application/json" },
