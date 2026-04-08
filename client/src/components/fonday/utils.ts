@@ -297,7 +297,8 @@ export function dismissPushPrompt() {
 // ─── 날씨 팁 키 ───────────────────────────────────────────────────────────────
 
 export function getWeatherTipKey(d: WeatherData): WeatherTipKey {
-  if (d.aqi !== null && d.aqi >= 3) return "polluted";
+  // PM2.5 기준 (날씨카드와 동일): 35 이상이면 미세먼지 나쁨
+  if (d.pm25 != null && d.pm25 >= 35) return "polluted";
   const id = d.weatherId;
   if (id >= 600 && id < 700) return "snowy";
   if ((id >= 200 && id < 400) || (id >= 500 && id < 600)) return "rainy";
