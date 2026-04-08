@@ -237,13 +237,12 @@ export function ScanIdleScreen({
         const fallback = timeBasedVariants.find(({ range }) => hour >= range[0] && hour < range[1]);
         if (!fallback) return null;
 
-        // 낮 시간대(6~20)에 날씨 데이터가 있으면 날씨 기반 그리팅 사용
-        const useWeatherGreeting = idleWeather && hour >= 6 && hour < 20;
-        const wKey = useWeatherGreeting ? getWeatherTipKey(idleWeather!) : null;
+        // 아이콘: 날씨 데이터 있으면 날씨 아이콘, 없으면 시간대 아이콘
+        const wKey = (idleWeather && hour >= 6 && hour < 20) ? getWeatherTipKey(idleWeather!) : null;
         const iconInfo = wKey ? weatherIconMap[wKey] : { icon: fallback.icon, color: fallback.color };
         const GreetingIcon = iconInfo.icon;
-        const variants = wKey ? weatherVariantMap[wKey] : fallback.keys;
-        const greetingKey = variants[greetingVariantIdx % variants.length];
+        // 문구: 항상 시간대 기반 (날씨 로딩 전/후 문구 깜빡임 방지)
+        const greetingKey = fallback.keys[greetingVariantIdx % fallback.keys.length];
 
         return (
           <motion.div variants={fadeChild} className="mb-2 relative" style={{ zIndex: 1 }}>
