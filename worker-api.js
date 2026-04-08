@@ -392,6 +392,24 @@ async function generateDailyInstaContent(env) {
   }
 }
 
+// ─── 첫 댓글 (포맷별 × 언어별) ──────────────────────────────────────────────
+function getFirstComment(format, lang) {
+  const comments = {
+    ko: {
+      carousel: "나중에 다시 보려면 저장해두세요! 궁금한 점은 댓글로 남겨주세요 🔖",
+      single: "공감되면 친구에게 공유해주세요 💌",
+      newsletter: "오늘 하루 피부 관리 참고하려면 저장해두세요 📌",
+    },
+    ja: {
+      carousel: "あとで見返したい方は保存がおすすめです。気になることがあればコメントで教えてください 🔖",
+      single: "共感したら、お友達にもシェアしてみてください 💌",
+      newsletter: "今日のスキンケアの参考に、保存しておくと便利ですよ 📌",
+    },
+  };
+  const langComments = comments[lang] || comments.ko;
+  return langComments[format] || langComments.carousel;
+}
+
 // ─── 인스타 자동 게시 (한국/일본 공용) ──────────────────────────────────────────
 async function publishScheduledInsta(env, scheduledTime, lang) {
   const prefix = lang === "ja" ? "[insta-ja]" : "[insta-ko]";
@@ -478,6 +496,21 @@ async function publishScheduledInsta(env, scheduledTime, lang) {
           `UPDATE ${table} SET status = 'published', published_at = datetime('now'), ig_media_id = ? WHERE id = ?`
         ).bind(publishId, row.id).run();
         console.log(`${prefix} ✅ id=${row.id} 게시 완료! ig_media_id=${publishId}`);
+
+        // 첫 댓글 자동 달기
+        try {
+          const format = row.format || "carousel";
+          const firstComment = getFirstComment(format, lang);
+          if (firstComment) {
+            await fetch(`https://graph.instagram.com/v21.0/${publishId}/comments`, {
+              method: "POST", headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ message: firstComment, access_token: token }),
+            });
+            console.log(`${prefix} 💬 첫 댓글: "${firstComment.slice(0, 30)}..."`);
+          }
+        } catch (commentErr) {
+          console.warn(`${prefix} 첫 댓글 실패:`, commentErr.message);
+        }
       } catch (err) {
         console.error(`${prefix} id=${row.id} 실패:`, err.message);
         await env.FONDAY_DB.prepare(`UPDATE ${table} SET status = 'failed' WHERE id = ?`).bind(row.id).run();
