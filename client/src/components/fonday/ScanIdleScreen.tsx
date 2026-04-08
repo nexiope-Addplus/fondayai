@@ -164,8 +164,8 @@ export function ScanIdleScreen({
   const latestScoreDelta = latestScan && previousScan
     ? Number(latestScan.overallScore || 0) - Number(previousScan.overallScore || 0)
     : null;
-  // 접속할 때마다 랜덤 문구 (페이지 새로고침 시 변경)
-  const greetingVariantIdx = useMemo(() => Math.floor(Math.random() * 100), []);
+  // 접속/새로고침마다 다른 문구 (컴포넌트 마운트 시 랜덤)
+  const [greetingVariantIdx] = useState(() => Math.floor(Math.random() * 100));
 
   const latestWeakMetric = useMemo(() => {
     if (!Array.isArray(latestScan?.scores) || latestScan.scores.length <= 1) return null;
