@@ -164,8 +164,13 @@ export function ScanIdleScreen({
   const latestScoreDelta = latestScan && previousScan
     ? Number(latestScan.overallScore || 0) - Number(previousScan.overallScore || 0)
     : null;
-  // 마운트 시 한 번만 랜덤 인덱스 결정 (리렌더 시 변경 안 됨)
-  const greetingVariantIdx = useMemo(() => Math.floor(Math.random() * 3), []);
+  // 날짜+시간대 기반 변형 인덱스 — 같은 날 같은 시간대에는 동일, 날짜/시간대 바뀌면 변경
+  const greetingVariantIdx = useMemo(() => {
+    const now = new Date();
+    const seed = now.getFullYear() * 10000 + (now.getMonth() + 1) * 100 + now.getDate();
+    const timeslot = Math.floor(now.getHours() / 4); // 4시간 단위로 변경 (0~5)
+    return (seed + timeslot) % 3;
+  }, []);
 
   const latestWeakMetric = useMemo(() => {
     if (!Array.isArray(latestScan?.scores) || latestScan.scores.length <= 1) return null;
