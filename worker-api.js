@@ -1,3 +1,21 @@
+// Dynamic import for newsletter auto-generation
+let _generateMorningNewsletter, _generateMorningNewsletterJA;
+async function getNewsletter() {
+  if (!_generateMorningNewsletter) {
+    const mod = await import("./worker-newsletter.js");
+    _generateMorningNewsletter = mod.generateMorningNewsletter;
+    _generateMorningNewsletterJA = mod.generateMorningNewsletterJA;
+  }
+  return _generateMorningNewsletter;
+}
+async function getNewsletterJA() {
+  if (!_generateMorningNewsletterJA) {
+    const mod = await import("./worker-newsletter.js");
+    _generateMorningNewsletterJA = mod.generateMorningNewsletterJA;
+  }
+  return _generateMorningNewsletterJA;
+}
+
 // Dynamic import to prevent cron handler from failing if vertex-ai has issues
 let _callGemini, _extractText, _SAFETY_SETTINGS_NONE;
 async function getVertexAI() {
@@ -167,6 +185,55 @@ export default {
       return new Response(JSON.stringify(info, null, 2), { headers: corsHeaders });
     }
 
+    // 테스트 엔드포인트: GET /test-newsletter?key=ADMIN_KEY&date=2026-04-10&lang=ko|ja (ADMIN_KEY 인증 필수)
+    if (request.method === "GET" && new URL(request.url).pathname === "/test-newsletter") {
+      const adminKey = new URL(request.url).searchParams.get("key");
+      if (!env.ADMIN_KEY || adminKey !== env.ADMIN_KEY) return new Response("Unauthorized", { status: 401, headers: corsHeaders });
+      const date = new URL(request.url).searchParams.get("date");
+      const lang = new URL(request.url).searchParams.get("lang") || "ko";
+      if (!date || !/^\d{4}-\d{2}-\d{2}$/.test(date)) return new Response("date param required (YYYY-MM-DD)", { status: 400, headers: corsHeaders });
+      try {
+        if (lang === "ja") {
+          const genJA = await getNewsletterJA();
+          await genJA(env, date);
+        } else {
+          const gen = await getNewsletter();
+          await gen(env, date);
+        }
+        return new Response(JSON.stringify({ ok: true, date, lang }), { headers: corsHeaders });
+      } catch (err) {
+        return new Response(JSON.stringify({ ok: false, error: err.message }), { status: 500, headers: corsHeaders });
+      }
+    }
+
+    // R2 업로드: POST /r2-upload?key=ADMIN_KEY&path=magazine-pool/cover/cover-rainy.png (body = binary)
+    if (request.method === "POST" && new URL(request.url).pathname === "/r2-upload") {
+      const adminKey = new URL(request.url).searchParams.get("key");
+      if (!env.ADMIN_KEY || adminKey !== env.ADMIN_KEY) return new Response("Unauthorized", { status: 401, headers: corsHeaders });
+      const r2Path = new URL(request.url).searchParams.get("path");
+      if (!r2Path) return new Response("path required", { status: 400, headers: corsHeaders });
+      const body = await request.arrayBuffer();
+      await env.INSTA_IMAGES.put(r2Path, body, { httpMetadata: { contentType: "image/png" } });
+      return new Response(JSON.stringify({ ok: true, path: r2Path, size: body.byteLength }), { headers: corsHeaders });
+    }
+
+    // 수동 게시: GET /publish-now?key=ADMIN_KEY&type=threads&time=14:00 (또는 type=insta&lang=ko)
+    if (request.method === "GET" && new URL(request.url).pathname === "/publish-now") {
+      const adminKey = new URL(request.url).searchParams.get("key");
+      if (!env.ADMIN_KEY || adminKey !== env.ADMIN_KEY) return new Response("Unauthorized", { status: 401, headers: corsHeaders });
+      const type = new URL(request.url).searchParams.get("type");
+      const time = new URL(request.url).searchParams.get("time");
+      const lang = new URL(request.url).searchParams.get("lang") || "ko";
+      if (!type || !time) return new Response("type & time required", { status: 400, headers: corsHeaders });
+      try {
+        if (type === "threads") { await publishScheduledThreads(env, time); }
+        else if (type === "insta") { await publishScheduledInsta(env, time, lang); }
+        return new Response(JSON.stringify({ ok: true, type, time }), { headers: corsHeaders });
+      } catch (err) {
+        return new Response(JSON.stringify({ ok: false, error: err.message }), { status: 500, headers: corsHeaders });
+      }
+    }
+
     // 테스트 엔드포인트: GET /test-push (ADMIN_KEY 인증 필수)
     if (request.method === "GET" && new URL(request.url).pathname === "/test-push") {
       const adminKey = new URL(request.url).searchParams.get("key");
@@ -301,7 +368,15 @@ export default {
     const now = new Date();
     const hour = now.getUTCHours();
 
-    if (hour === 22) {
+    if (hour === 21) {
+      // KST 06:00 — 모닝 뉴스레터 자동 생성 (한국+일본 별도 HTTP 요청으로 CPU 분리)
+      const kst = new Date(now.getTime() + 9 * 60 * 60 * 1000);
+      const dateStr = kst.toISOString().split("T")[0];
+      const baseUrl = "https://fonday-push-worker.nexiope.workers.dev/test-newsletter";
+      const key = encodeURIComponent(env.ADMIN_KEY || "");
+      ctx.waitUntil(fetch(`${baseUrl}?key=${key}&date=${dateStr}&lang=ko`).catch(e => console.error("[newsletter-ko-cron]", e.message)));
+      ctx.waitUntil(fetch(`${baseUrl}?key=${key}&date=${dateStr}&lang=ja`).catch(e => console.error("[newsletter-ja-cron]", e.message)));
+    } else if (hour === 22) {
       // KST 07:00 — 스캔/날씨 + 인스타 오전(한국+일본)
       ctx.waitUntil(Promise.all([
         sendScanReminderToAll(env),
