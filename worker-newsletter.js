@@ -97,84 +97,31 @@ function generateTips(w, lang) {
     else routine = "세안 > 토너 > 보습 > 선크림";
   } else {
     // 일본어
-    if (tempDiff >= 10) points.push(`寒暖差${tempDiff}° — 肌バリアが崩れやすい時期、セラミド保湿を強化`);
+    if (tempDiff >= 10) points.push(`寒暖差${tempDiff}° — 肌バリアが揺らぐ時期、セラミドで強化`);
     else if (tempDiff >= 7) points.push(`寒暖差${tempDiff}° — 朝晩の保湿をしっかりと`);
 
-    if (w.uv_index >= 8) { points.push(`UV ${w.uv_index}（非常に高い）— SPF50+必須、2時間ごとに塗り直し`); headline = "紫外線注意報、日焼け止めをしっかり"; }
-    else if (w.uv_index >= 6) { points.push(`UV ${w.uv_index}（高い）— SPF50の日焼け止め必須`); headline = "紫外線が高い日、日焼け止めを忘れずに"; }
-    else if (w.uv_index >= 3) points.push(`UV ${w.uv_index}（普通）— 基本的な日焼け止めを`);
-    else points.push(`UV ${w.uv_index}（低い）— ベーシックな日焼け止めで十分`);
+    if (w.uv_index >= 8) { points.push(`UV ${w.uv_index}（非常に高い）— SPF50+必須、2時間ごとに塗り直しを`); headline = "紫外線注意報！日焼け止めをしっかりと"; }
+    else if (w.uv_index >= 6) { points.push(`UV ${w.uv_index}（高い）— SPF50の日焼け止め必須`); headline = "紫外線が強い日、日焼け止めを忘れずに"; }
+    else if (w.uv_index >= 3) points.push(`UV ${w.uv_index}（普通）— 基本の日焼け止めを`);
+    else points.push(`UV ${w.uv_index}（低い）— 基本の日焼け止めでOK`);
 
-    if (w.humidity < 40) { points.push(`湿度${w.humidity}%（乾燥）— ミストをこまめに、保湿レイヤリング`); if (!headline) headline = "乾燥した日、うるおいチャージ"; }
-    else if (w.humidity > 70) { points.push(`湿度${w.humidity}%（高い）— 軽いテクスチャーの保湿を`); if (!headline) headline = "湿度の高い日、軽めケアで"; }
-    else points.push(`湿度${w.humidity}% — ちょうどいい天気、基本ルーティンで`);
+    if (w.humidity < 40) { points.push(`湿度${w.humidity}%（乾燥）— ミストをこまめに、重ね保湿を`); if (!headline) headline = "乾燥した日、うるおいチャージ"; }
+    else if (w.humidity > 70) { points.push(`湿度${w.humidity}%（高い）— さっぱりタイプの保湿を`); if (!headline) headline = "湿度の高い日、軽めケアで"; }
+    else points.push(`湿度${w.humidity}% — 肌にちょうどいい日、基本ケアでOK`);
 
-    if (w.precipitation > 5) points.push("雨予報 — 傘を忘れずに、夜のクレンジングは丁寧に");
-    if (w.temp_max >= 25) points.push(`最高${w.temp_max}° — 皮脂分泌が増加、クレンジングを丁寧に`);
-    else if (w.temp_max <= 10) points.push(`最高${w.temp_max}° — 冷たい風で肌バリアダメージ注意、クリーム厚めに`);
-    if (points.length < 4) points.push("洗顔後3分以内に保湿 — 水分蒸発前にキャッチ");
+    if (w.precipitation > 5) points.push("雨の日も紫外線あり、夜のクレンジングは丁寧に");
+    if (w.temp_max >= 25) points.push(`最高${w.temp_max}° — 皮脂が出やすい日、クレンジングは丁寧に`);
+    else if (w.temp_max <= 10) points.push(`最高${w.temp_max}° — 冷たい風で肌が揺らぎやすい、クリーム厚めに`);
+    if (points.length < 4) points.push("洗顔後3分以内に保湿 — 水分が逃げる前にフタを");
     if (!headline) headline = "今日のスキンケアポイント";
 
     if (w.uv_index >= 6 && w.humidity < 40) routine = "優しい洗顔 > ヒアルロン酸セラム > セラミドクリーム > SPF50日焼け止め";
-    else if (w.uv_index >= 6) routine = "洗顔 > 化粧水 > 軽い保湿 > SPF50日焼け止め";
-    else if (w.humidity < 40) routine = "優しい洗顔 > 化粧水パッティング > 保湿セラム > クリーム > 日焼け止め";
+    else if (w.uv_index >= 6) routine = "洗顔 > 化粧水 > 軽めの乳液 > SPF50日焼け止め";
+    else if (w.humidity < 40) routine = "優しい洗顔 > 化粧水 > 保湿セラム > クリーム > 日焼け止め";
     else routine = "洗顔 > 化粧水 > 保湿 > 日焼け止め";
   }
 
   return { headline, points: points.slice(0, 4), routine };
-}
-
-// ── Satori JSX → SVG ─────────────────────────────────────────────
-
-function buildCardJSX(date, weather, tips, lang) {
-  const d = new Date(date + "T00:00:00+09:00");
-  const month = d.getMonth() + 1;
-  const day = d.getDate();
-  const weekday = lang === "ja" ? WEEKDAYS_JA[d.getDay()] : WEEKDAYS_KO[d.getDay()];
-  const year = d.getFullYear();
-
-  const dateStr = lang === "ja"
-    ? `${year}年${month}月${day}日 ${weekday}曜日`
-    : `${year}년 ${month}월 ${day}일 ${weekday}요일`;
-
-  const cityName = lang === "ja" ? "東京" : "서울";
-  const humidityLabel = lang === "ja" ? "湿度" : "습도";
-  const weatherSummary = `${cityName} ${weather.temp_min}° / ${weather.temp_max}°  |  ${humidityLabel} ${weather.humidity}%  |  UV ${weather.uv_index}`;
-
-  const routineLabel = "TODAY'S ROUTINE";
-
-  return {
-    type: "div",
-    props: {
-      style: { width: SIZE, height: SIZE, background: "#FAFAF9", display: "flex", flexDirection: "column", padding: "60px 64px 40px 64px" },
-      children: [
-        { type: "div", props: { style: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px" }, children: [
-          { type: "span", props: { style: { fontSize: "13px", fontWeight: 700, letterSpacing: "3px", color: "#A8A29E" }, children: "FONDAY DAILY" } },
-          { type: "span", props: { style: { fontSize: "13px", color: "#A8A29E" }, children: dateStr } },
-        ]}},
-        { type: "div", props: { style: { width: "100%", height: "2px", background: "#1C1917", display: "flex" } } },
-        { type: "div", props: { style: { width: "100%", height: "1px", background: "#1C1917", marginTop: "2px", display: "flex" } } },
-        { type: "div", props: { style: { display: "flex", marginTop: "36px", marginBottom: "16px" }, children: [
-          { type: "span", props: { style: { fontSize: "22px", color: "#78716C", letterSpacing: "0.5px" }, children: weatherSummary } },
-        ]}},
-        { type: "div", props: { style: { fontSize: "56px", fontWeight: 900, color: "#1C1917", lineHeight: "1.3", marginTop: "20px", marginBottom: "40px", display: "flex" }, children: tips.headline } },
-        ...tips.points.map((point) => ({
-          type: "div", props: { style: { display: "flex", alignItems: "flex-start", gap: "14px", marginBottom: "24px" }, children: [
-            { type: "div", props: { style: { width: "7px", height: "7px", borderRadius: "50%", background: "#E11D48", marginTop: "14px", flexShrink: 0, display: "flex" } } },
-            { type: "span", props: { style: { fontSize: "28px", color: "#44403C", lineHeight: "1.6" }, children: point } },
-          ]},
-        })),
-        { type: "div", props: { style: { background: "#FFFFFF", border: "1px solid #E7E5E4", borderRadius: "12px", padding: "28px 32px", marginTop: "auto", display: "flex", flexDirection: "column" }, children: [
-          { type: "div", props: { style: { fontSize: "14px", fontWeight: 700, letterSpacing: "2px", color: "#E11D48", marginBottom: "14px", display: "flex" }, children: routineLabel } },
-          { type: "div", props: { style: { fontSize: "24px", fontWeight: 700, color: "#1C1917", lineHeight: "1.5", display: "flex" }, children: tips.routine } },
-        ]}},
-        { type: "div", props: { style: { display: "flex", justifyContent: "space-between", marginTop: "24px" }, children: [
-          { type: "span", props: { style: { fontWeight: 700, letterSpacing: "2px", fontSize: "13px", color: "#D4D4D8" }, children: "FONDAY" } },
-          { type: "span", props: { style: { fontSize: "12px", color: "#D4D4D8" }, children: "AI Skin Analysis" } },
-        ]}},
-      ],
-    },
-  };
 }
 
 // ── 캡션 생성 ────────────────────────────────────────────────────
@@ -184,7 +131,7 @@ function buildCaption(date, weather, tips, lang) {
   if (lang === "ko") {
     return `오늘의 피부 날씨 · 서울 기준\n${date}\n\n${icon} ${weather.temp_min}° → ${weather.temp_max}° | 습도 ${weather.humidity}% | UV ${weather.uv_index}\n\n${tips.points.join("\n")}\n\n오늘의 루틴: ${tips.routine}\n\n내 피부 타입에 맞는 루틴이 궁금하다면\n프로필 링크에서 무료 AI 피부 분석 받아보세요.\n\n#오늘의스킨케어 #데일리스킨케어 #피부관리 #스킨케어루틴 #AI피부분석`;
   }
-  return `今日の肌天気 · 東京基準\n${date}\n\n${icon} ${weather.temp_min}° → ${weather.temp_max}° | 湿度 ${weather.humidity}% | UV ${weather.uv_index}\n\n${tips.points.join("\n")}\n\n今日のルーティン: ${tips.routine}\n\nプロフィールリンクから無料AI肌診断をお試しください\n\n#スキンケア #デイリースキンケア #肌ケア #美肌 #AI肌診断`;
+  return `今日の肌天気 · 東京基準\n${date}\n\n${icon} ${weather.temp_min}° → ${weather.temp_max}° | 湿度 ${weather.humidity}% | UV ${weather.uv_index}\n\n${tips.points.join("\n")}\n\n今日のルーティン: ${tips.routine}\n\n無料AI肌診断はプロフィールリンクから✨\n\n#スキンケア #デイリースキンケア #肌ケア #美肌 #AI肌診断`;
 }
 
 // ── 메인 함수 ────────────────────────────────────────────────────
@@ -210,13 +157,8 @@ export async function generateMorningNewsletter(env, overrideDate) {
     // @cf-wasm/satori + @cf-wasm/resvg (CF Workers 전용, WASM 자동 처리)
     const { satori } = await import("@cf-wasm/satori");
     const { Resvg } = await import("@cf-wasm/resvg/workerd");
-    console.log("[init] cf-wasm satori + resvg 로드 완료");
-
-    // 한국만 생성 (CPU 제한 대비 — 일본은 별도 크론에서)
-    const koResult = await generateForLang(satori, Resvg, env, dateStr, "ko", 37.5665, 126.978);
-    const results = [koResult];
-
-    console.log(`[newsletter] ${dateStr} 완료: KO=${results[0]}, JA=${results[1]}`);
+    await generateForLang(satori, Resvg, env, dateStr, "ko", 37.5665, 126.978);
+    console.log(`[newsletter] ${dateStr} KO 완료`);
   } catch (err) {
     console.error(`[newsletter] ${dateStr} 에러:`, err);
   }
@@ -241,10 +183,8 @@ export async function generateMorningNewsletterJA(env, overrideDate) {
   try {
     const { satori } = await import("@cf-wasm/satori");
     const { Resvg } = await import("@cf-wasm/resvg/workerd");
-    console.log("[init] cf-wasm satori + resvg 로드 완료");
-
-    const jaResult = await generateForLang(satori, Resvg, env, dateStr, "ja", 35.6762, 139.6503);
-    console.log(`[newsletter-ja-cron] ${dateStr} 완료: JA=${jaResult}`);
+    await generateForLang(satori, Resvg, env, dateStr, "ja", 35.6762, 139.6503);
+    console.log(`[newsletter-ja-cron] ${dateStr} JA 완료`);
   } catch (err) {
     console.error(`[newsletter-ja-cron] ${dateStr} 에러:`, err);
   }
@@ -288,24 +228,24 @@ function buildSlideJSX(bgDataUri, textContent, meta) {
   const textAlign = align;
 
   // bg 이미지에 이미 좌우 50px 회색 여백 포함됨
-  // 텍스트는 여백 안쪽(50+40 = 90px)에 배치
+  // 텍스트는 여백 안쪽에 배치 (padding 100px)
   return {
     type: "div",
     props: {
       style: {
         width: SIZE, height: SIZE, display: "flex", flexDirection: "column",
         justifyContent, alignItems,
-        backgroundImage: `url(${bgDataUri})`, backgroundSize: "100% 100%",
-        padding: "50px 90px",
+        backgroundImage: `url(${bgDataUri})`, backgroundSize: "cover", backgroundPosition: "center",
+        padding: "60px 100px",
       },
       children: [
-        // 그라데이션 오버레이 (중앙 이미지 영역에만)
+        // 그라데이션 오버레이 (전체 캔버스)
         { type: "div", props: { style: {
-          position: "absolute", top: 0, left: 50, width: SIZE - 100, height: SIZE, display: "flex",
+          position: "absolute", top: 0, left: 0, width: SIZE, height: SIZE, display: "flex",
           background: vertical === "bottom"
-            ? "linear-gradient(to bottom, rgba(0,0,0,0) 50%, rgba(0,0,0,0.55) 100%)"
+            ? "linear-gradient(to bottom, rgba(0,0,0,0) 40%, rgba(0,0,0,0.6) 100%)"
             : vertical === "top"
-            ? "linear-gradient(to top, rgba(0,0,0,0) 50%, rgba(0,0,0,0.55) 100%)"
+            ? "linear-gradient(to top, rgba(0,0,0,0) 40%, rgba(0,0,0,0.6) 100%)"
             : "linear-gradient(to bottom, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.1) 100%)",
         }}},
         // 텍스트
@@ -329,24 +269,25 @@ function buildCoverContent(dateStr, weather, tips, lang) {
   const weatherLine = `${cityName} ${weather.temp_min}° / ${weather.temp_max}° | ${humidityLabel} ${weather.humidity}% | UV ${weather.uv_index}`;
 
   return [
-    { type: "span", props: { style: { fontSize: "14px", fontWeight: 700, letterSpacing: "3px", color: "#FFFFFF", opacity: 0.8, marginBottom: "16px" }, children: "BEAUTY MAGAZINE" } },
-    { type: "span", props: { style: { fontSize: "52px", fontWeight: 900, color: "#FFFFFF", lineHeight: "1.3", marginBottom: "20px" }, children: tips.headline } },
-    { type: "span", props: { style: { fontSize: "22px", color: "#FFFFFF", opacity: 0.8, marginBottom: "12px" }, children: weatherLine } },
+    { type: "span", props: { style: { fontSize: "20px", fontWeight: 700, letterSpacing: "3px", color: "#FFFFFF", opacity: 0.8, marginBottom: "16px" }, children: "BEAUTY MAGAZINE" } },
+    { type: "span", props: { style: { fontSize: "80px", fontWeight: 900, color: "#FFFFFF", lineHeight: "1.2", marginBottom: "20px" }, children: tips.headline } },
+    { type: "span", props: { style: { fontSize: "30px", color: "#FFFFFF", opacity: 0.8, marginBottom: "12px" }, children: weatherLine } },
     { type: "div", props: { style: { display: "flex", justifyContent: "space-between", width: "100%", marginTop: "24px" }, children: [
-      { type: "span", props: { style: { fontSize: "14px", fontWeight: 700, letterSpacing: "2px", color: "#FFFFFF", opacity: 0.5 }, children: "FONDAY" } },
-      { type: "span", props: { style: { fontSize: "13px", color: "#FFFFFF", opacity: 0.5 }, children: "AI Skin Analysis" } },
+      { type: "span", props: { style: { fontSize: "20px", fontWeight: 700, letterSpacing: "2px", color: "#FFFFFF", opacity: 0.5 }, children: "FONDAY" } },
+      { type: "span", props: { style: { fontSize: "18px", color: "#FFFFFF", opacity: 0.5 }, children: "AI Skin Analysis" } },
     ]}},
   ];
 }
 
 // ── 포인트 슬라이드 (2장) ────────────────────────────────────────
 function buildPointContent(tips, lang) {
+  const pointSize = lang === "ja" ? "32px" : "40px";
   return [
-    { type: "span", props: { style: { fontSize: "14px", fontWeight: 700, letterSpacing: "3px", color: "#FFFFFF", opacity: 0.7, marginBottom: "24px" }, children: lang === "ja" ? "ポイント" : "TODAY'S POINT" } },
+    { type: "span", props: { style: { fontSize: "20px", fontWeight: 700, letterSpacing: "3px", color: "#FFFFFF", opacity: 0.7, marginBottom: "24px" }, children: lang === "ja" ? "ポイント" : "TODAY'S POINT" } },
     ...tips.points.slice(0, 3).map((point) => ({
       type: "div", props: { style: { display: "flex", alignItems: "flex-start", gap: "14px", marginBottom: "24px" }, children: [
-        { type: "div", props: { style: { width: "8px", height: "8px", borderRadius: "50%", background: "#E11D48", marginTop: "16px", flexShrink: 0, display: "flex" } } },
-        { type: "span", props: { style: { fontSize: "32px", color: "#FFFFFF", lineHeight: "1.5" }, children: point } },
+        { type: "div", props: { style: { width: "9px", height: "9px", borderRadius: "50%", background: "#E11D48", marginTop: "14px", flexShrink: 0, display: "flex" } } },
+        { type: "span", props: { style: { fontSize: pointSize, color: "#FFFFFF", lineHeight: "1.5" }, children: point } },
       ]},
     })),
   ];
@@ -354,9 +295,10 @@ function buildPointContent(tips, lang) {
 
 // ── 루틴 슬라이드 (3장) ─────────────────────────────────────────
 function buildRoutineContent(tips, lang) {
+  const routineSize = lang === "ja" ? "38px" : "46px";
   return [
-    { type: "span", props: { style: { fontSize: "14px", fontWeight: 700, letterSpacing: "3px", color: "#E11D48", marginBottom: "24px" }, children: "TODAY'S ROUTINE" } },
-    { type: "span", props: { style: { fontSize: "36px", fontWeight: 700, color: "#FFFFFF", lineHeight: "1.6" }, children: tips.routine } },
+    { type: "span", props: { style: { fontSize: "28px", fontWeight: 700, letterSpacing: "3px", color: "#E11D48", marginBottom: "20px" }, children: "TODAY'S ROUTINE" } },
+    { type: "span", props: { style: { fontSize: routineSize, fontWeight: 700, color: "#FFFFFF", lineHeight: "1.5" }, children: tips.routine } },
   ];
 }
 
@@ -379,15 +321,11 @@ async function generateForLang(satori, Resvg, env, dateStr, lang, lat, lon) {
 
   console.log(`${prefix} 조건: ${condition}, 포인트: ${pointIdx}, 루틴: ${routineIdx}`);
 
-  // 4. R2에서 bg 이미지 + 메타데이터 로드 (순차적으로 — R2 동시 접근 이슈 방지)
-  console.log(`${prefix} bg 로드: cover/cover-${condition}${langSuffix}.jpg`);
+  // 4. R2에서 bg 이미지 + 메타데이터 로드
   const coverBg = await loadBgFromR2(env, `cover/cover-${condition}${langSuffix}.jpg`);
-  console.log(`${prefix} bg 로드: point/point-${pointIdx}.jpg`);
   const pointBg = await loadBgFromR2(env, `point/point-${pointIdx}.jpg`);
-  console.log(`${prefix} bg 로드: routine/routine-${routineIdx}.jpg`);
   const routineBg = await loadBgFromR2(env, `routine/routine-${routineIdx}.jpg`);
   const metadata = await loadMetadata(env);
-  console.log(`${prefix} bg 이미지 3장 + 메타데이터 로드 완료`);
 
   // 5. 폰트 로드
   const fonts = await loadFonts(lang);
@@ -416,7 +354,6 @@ async function generateForLang(satori, Resvg, env, dateStr, lang, lat, lon) {
     const r2Key = `${r2Prefix}/slide-${i + 1}.png`;
     await env.INSTA_IMAGES.put(r2Key, pngBuffer, { httpMetadata: { contentType: "image/png" } });
     imageUrls.push(`https://fonday-push-worker.nexiope.workers.dev/insta-images/${r2Key}`);
-    console.log(`${prefix} slide-${i + 1} 업로드 (${pngBuffer.length} bytes)`);
   }
 
   // CTA 슬라이드 (기존 이미지 참조)
