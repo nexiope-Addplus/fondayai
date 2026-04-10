@@ -2,14 +2,14 @@
 @tailwind components;
 @tailwind utilities;
 
-/* iOS 네이티브 앱: pull-to-refresh 방지 + safe area */
+/* iOS 네이티브 앱: pull-to-refresh + 오버스크롤 바운스 방지 */
 html, body {
   overscroll-behavior-y: none;
+  -webkit-overflow-scrolling: touch;
 }
 /* Capacitor 앱: 상단 노치/다이나믹 아일랜드 여백 */
 html {
   padding-top: env(safe-area-inset-top);
-  padding-bottom: env(safe-area-inset-bottom);
 }
 
 .no-scrollbar::-webkit-scrollbar { display: none; }

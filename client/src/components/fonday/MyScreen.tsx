@@ -130,7 +130,7 @@ export function MyScreen({
   };
 
   return (
-    <div className="min-h-[calc(100dvh-64px)] pb-28" style={{ background: PAGE_GRADIENT }}>
+    <div className="h-[calc(100dvh-64px)] overflow-hidden" style={{ background: PAGE_GRADIENT }}>
       {/* 헤더 */}
       <div className="px-4 pt-5 pb-0">
         <div className="mb-4">
