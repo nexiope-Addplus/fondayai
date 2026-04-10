@@ -175,8 +175,8 @@ export function ScanIdleScreen({
   return (
     <>
     <motion.div
-      className="flex flex-col px-4 pt-5 pb-28 relative overflow-hidden"
-      style={{ minHeight: "calc(100dvh - 60px)", background: PAGE_GRADIENT }}
+      className="flex flex-col px-4 pt-5 relative overflow-hidden"
+      style={{ paddingBottom: "calc(120px + env(safe-area-inset-bottom))", minHeight: "calc(100dvh - 60px)", background: PAGE_GRADIENT }}
       variants={stagger} initial="initial" animate="animate"
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
