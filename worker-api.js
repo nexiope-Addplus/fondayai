@@ -369,13 +369,9 @@ export default {
     const hour = now.getUTCHours();
 
     if (hour === 21) {
-      // KST 06:00 — 모닝 뉴스레터 자동 생성 (한국+일본 별도 HTTP 요청으로 CPU 분리)
-      const kst = new Date(now.getTime() + 9 * 60 * 60 * 1000);
-      const dateStr = kst.toISOString().split("T")[0];
-      const baseUrl = "https://fonday-push-worker.nexiope.workers.dev/test-newsletter";
-      const key = encodeURIComponent(env.ADMIN_KEY || "");
-      ctx.waitUntil(fetch(`${baseUrl}?key=${key}&date=${dateStr}&lang=ko`).catch(e => console.error("[newsletter-ko-cron]", e.message)));
-      ctx.waitUntil(fetch(`${baseUrl}?key=${key}&date=${dateStr}&lang=ja`).catch(e => console.error("[newsletter-ja-cron]", e.message)));
+      // KST 06:00 — 매거진 자동 생성은 GitHub Actions가 담당 (Worker는 비활성화)
+      // GitHub Actions: .github/workflows/morning-magazine.yml (UTC 21:00 크론)
+      console.log("[cron] KST 06:00 — 매거진 생성은 GitHub Actions에서 실행");
     } else if (hour === 22) {
       // KST 07:00 — 스캔/날씨 + 인스타 오전(한국+일본)
       ctx.waitUntil(Promise.all([
