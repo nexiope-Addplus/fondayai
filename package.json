@@ -12,6 +12,8 @@
     "db:push": "drizzle-kit push"
   },
   "dependencies": {
+    "@capacitor/app": "^8.1.0",
+    "@capacitor/browser": "^8.0.3",
     "@capacitor/core": "^8.3.0",
     "@cf-wasm/resvg": "^0.3.3",
     "@cf-wasm/satori": "^0.3.5",

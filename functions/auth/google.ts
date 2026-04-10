@@ -3,6 +3,10 @@ export const onRequest = (context: any) => {
   const url = new URL(request.url);
   const origin = url.origin;
   const lang = url.searchParams.get("lang") || "ko";
+  const source = url.searchParams.get("source") || "";
+
+  // state에 lang과 source를 함께 전달
+  const stateObj = source === "app" ? `${lang}|app` : lang;
 
   const params = new URLSearchParams({
     client_id: env.GOOGLE_CLIENT_ID,
@@ -11,7 +15,7 @@ export const onRequest = (context: any) => {
     scope: "openid email profile",
     access_type: "offline",
     prompt: "select_account",
-    state: lang,
+    state: stateObj,
   });
 
   return Response.redirect(

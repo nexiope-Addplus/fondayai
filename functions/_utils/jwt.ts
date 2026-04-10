@@ -82,6 +82,15 @@ export async function getUserFromCookie(
   request: Request,
   secret: string
 ): Promise<Record<string, unknown> | null> {
+  // 1) Bearer 토큰 (네이티브 앱)
+  const auth = request.headers.get("Authorization") || "";
+  if (auth.startsWith("Bearer ")) {
+    const token = auth.slice(7);
+    const user = await verifyJWT(token, secret);
+    if (user) return user;
+  }
+
+  // 2) 쿠키 (웹)
   const cookie = request.headers.get("Cookie") || "";
   const match = cookie.split(";").find((c) => c.trim().startsWith("fonday_session="));
   if (!match) return null;

@@ -4,6 +4,7 @@ import i18n from "../i18n";
 import { motion, AnimatePresence } from "framer-motion";
 import { AlertCircle, SmartphoneNfc } from "lucide-react";
 import { Capacitor } from "@capacitor/core";
+import { Browser } from "@capacitor/browser";
 import type { TabId, ScanState, SurveyData, AnalysisResult } from "../components/fonday/types";
 import {
   todayStr, getStreak, getAttendance,
@@ -166,14 +167,38 @@ export default function SkinScanPage() {
     };
   }, []);
 
+  // 네이티브 앱: 딥링크(fondayapp://login?token=...)로 돌아올 때 처리
+  useEffect(() => {
+    if (!Capacitor.isNativePlatform()) return;
+    const handleAppUrl = async (event: any) => {
+      const url = new URL(event.url);
+      if (url.pathname === "/login" || url.host === "login") {
+        const token = url.searchParams.get("token");
+        if (token) {
+          localStorage.setItem("fonday_app_token", token);
+          try { await Browser.close(); } catch {}
+          // 토큰으로 유저 정보 가져오기
+          fetch("/api/user", {
+            headers: { "Authorization": `Bearer ${token}` },
+          })
+            .then(r => r.ok ? r.json() : null)
+            .then(u => { if (u) setUser(u); });
+        }
+      }
+    };
+    import("@capacitor/app").then(({ App }) => {
+      App.addListener("appUrlOpen", handleAppUrl);
+    });
+  }, []);
+
   // 팝업 로그인 (DiaryTab·MyScreen 등에서 사용)
   const openLoginPopup = useCallback((provider: "kakao" | "line" | "google", returnTab?: string) => {
     if (returnTab) localStorage.setItem("fonday_return_tab", returnTab);
     const lang = localStorage.getItem("fonday_lang") || "ko";
     if (Capacitor.isNativePlatform()) {
-      // 네이티브 앱: 현재 서버 기준으로 절대 URL 사용
+      // 네이티브 앱: 시스템 브라우저(SFSafariViewController)로 OAuth
       const baseUrl = "https://dev.fondayai.com";
-      window.location.href = `${baseUrl}/auth/${provider}?lang=${lang}`;
+      Browser.open({ url: `${baseUrl}/auth/${provider}?lang=${lang}&source=app` });
     } else {
       window.location.href = `/auth/${provider}?lang=${lang}`;
     }

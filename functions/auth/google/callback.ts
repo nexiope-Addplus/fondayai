@@ -7,7 +7,9 @@ export const onRequest = async (context: any) => {
   const errorRedirect = (stage: string) =>
     Response.redirect(`${homeUrl}?login_error=${encodeURIComponent(stage)}`, 302);
   const code = url.searchParams.get("code");
-  const lang = url.searchParams.get("state") || "ko";
+  const rawState = url.searchParams.get("state") || "ko";
+  const [lang, source] = rawState.includes("|") ? rawState.split("|") : [rawState, ""];
+  const isApp = source === "app";
 
   if (!code) {
     return errorRedirect("google_missing_code");
@@ -56,6 +58,11 @@ export const onRequest = async (context: any) => {
 
     const jwt = await createJWT(user, env.JWT_SECRET!);
     const maxAge = 60 * 60 * 24 * 30; // 30일
+
+    // 네이티브 앱: 딥링크로 JWT 전달
+    if (isApp) {
+      return Response.redirect(`fondayapp://login?token=${jwt}`, 302);
+    }
 
     const headers = new Headers();
     headers.append("Location", `${homeUrl}?login=success&lang=${lang}`);
