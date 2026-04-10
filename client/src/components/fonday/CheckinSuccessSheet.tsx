@@ -24,8 +24,8 @@ export function CheckinSuccessSheet({ onKakao, onLine, onGoogle, onDismiss, user
         className="fixed inset-0 z-[980] bg-black/40" onClick={onDismiss} />
       <motion.div key="ci-sheet" initial={{ y: "100%" }} animate={{ y: 0 }} exit={{ y: "100%" }}
         transition={reducedMotion ? { duration: 0 } : { type: "spring", damping: 30, stiffness: 300 }}
-        className="fixed bottom-0 left-0 right-0 z-[990] bg-white rounded-t-3xl max-w-md mx-auto px-5 pb-10 pt-6"
-        style={{ borderTop: `1px solid ${BORDER_COLOR}` }}>
+        className="fixed bottom-0 left-0 right-0 z-[990] bg-white rounded-t-3xl max-w-md mx-auto px-5 pt-6"
+        style={{ paddingBottom: "calc(40px + env(safe-area-inset-bottom))", borderTop: `1px solid ${BORDER_COLOR}` }}>
         <div className="w-10 h-1 rounded-full bg-stone-200 mx-auto mb-5" />
 
         {/* 타이틀 */}
