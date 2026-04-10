@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { AnimatePresence, motion } from "framer-motion";
+import { Capacitor } from "@capacitor/core";
 import {
   Sparkles,
   Zap,
@@ -275,17 +276,19 @@ export function MyScreen({
           {/* 구분선 */}
           <div className="my-4" style={{ borderTop: `1px solid ${BORDER_COLOR}` }} />
 
-          {/* 앱 설치 */}
-          <button onClick={onInstall}
-            className="w-full flex items-center justify-between active:opacity-70">
-            <div className="flex items-center gap-3 min-w-0">
-              <div className="w-9 h-9 rounded-full flex items-center justify-center shrink-0" style={{ background: "#FFF7ED" }}>
-                <SmartphoneNfc className="w-5 h-5" style={{ color: COLOR_DANGER }} />
+          {/* 앱 설치 — 네이티브 앱에서는 숨김 */}
+          {!Capacitor.isNativePlatform() && (
+            <button onClick={onInstall}
+              className="w-full flex items-center justify-between active:opacity-70">
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="w-9 h-9 rounded-full flex items-center justify-center shrink-0" style={{ background: "#FFF7ED" }}>
+                  <SmartphoneNfc className="w-5 h-5" style={{ color: COLOR_DANGER }} />
+                </div>
+                <p className="text-[14px] font-bold text-[#5C4F4A] truncate">{t("nav.install")}</p>
               </div>
-              <p className="text-[14px] font-bold text-[#5C4F4A] truncate">{t("nav.install")}</p>
-            </div>
-            <ChevronRight className="w-4 h-4 shrink-0" style={{ color: TEXT_TERTIARY }} />
-          </button>
+              <ChevronRight className="w-4 h-4 shrink-0" style={{ color: TEXT_TERTIARY }} />
+            </button>
+          )}
 
           {/* 구분선 */}
           <div className="my-4" style={{ borderTop: `1px solid ${BORDER_COLOR}` }} />
