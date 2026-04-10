@@ -2,6 +2,7 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence } from "framer-motion";
 import { Target } from "lucide-react";
+import { Capacitor } from "@capacitor/core";
 import { PwaInstallPopup } from "./PwaInstallPopup";
 import { CheckinSuccessSheet } from "./CheckinSuccessSheet";
 import { PushPromptSheet } from "./PushPromptSheet";
@@ -96,13 +97,15 @@ export function ResultOverlayPopups({
         )}
       </AnimatePresence>
 
-      {/* PWA 설치 팝업 */}
-      <PwaInstallPopup
-        open={showPwaPopup}
-        onDismiss={() => { setShowPwaPopup(false); localStorage.setItem("fonday_pwa_dismissed", "1"); }}
-        deferredPrompt={deferredPrompt}
-        onShowInstallGuide={onShowInstallGuide}
-      />
+      {/* PWA 설치 팝업 — 네이티브 앱에서는 표시 안 함 */}
+      {!Capacitor.isNativePlatform() && (
+        <PwaInstallPopup
+          open={showPwaPopup}
+          onDismiss={() => { setShowPwaPopup(false); localStorage.setItem("fonday_pwa_dismissed", "1"); }}
+          deferredPrompt={deferredPrompt}
+          onShowInstallGuide={onShowInstallGuide}
+        />
+      )}
 
       {/* 출석 체크인 팝업 */}
       <AnimatePresence>

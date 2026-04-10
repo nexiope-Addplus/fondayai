@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import i18n from "../i18n";
 import { motion, AnimatePresence } from "framer-motion";
 import { AlertCircle, SmartphoneNfc } from "lucide-react";
+import { Capacitor } from "@capacitor/core";
 import type { TabId, ScanState, SurveyData, AnalysisResult } from "../components/fonday/types";
 import {
   todayStr, getStreak, getAttendance,
@@ -169,7 +170,13 @@ export default function SkinScanPage() {
   const openLoginPopup = useCallback((provider: "kakao" | "line" | "google", returnTab?: string) => {
     if (returnTab) localStorage.setItem("fonday_return_tab", returnTab);
     const lang = localStorage.getItem("fonday_lang") || "ko";
-    window.location.href = `/auth/${provider}?lang=${lang}`;
+    if (Capacitor.isNativePlatform()) {
+      // 네이티브 앱: 현재 서버 기준으로 절대 URL 사용
+      const baseUrl = "https://dev.fondayai.com";
+      window.location.href = `${baseUrl}/auth/${provider}?lang=${lang}`;
+    } else {
+      window.location.href = `/auth/${provider}?lang=${lang}`;
+    }
   }, []);
 
   // 로그인 후 게스트 스캔 연결
