@@ -359,7 +359,7 @@ export default function SkinScanPage() {
   }, [imageFile, imageBase64, trackEvent]);
 
   return (
-    <div className="min-h-[100dvh] bg-[#FAF9F6] text-stone-900" style={{ paddingTop: "env(safe-area-inset-top)" }}>
+    <div className="min-h-[100dvh] bg-[#FAF9F6] text-stone-900">
       <div className="max-w-md mx-auto relative min-h-[100dvh] overflow-x-hidden">
 
         {/* 얼굴 가이드 카메라 */}
