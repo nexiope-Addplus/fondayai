@@ -12,6 +12,7 @@
     "db:push": "drizzle-kit push"
   },
   "dependencies": {
+    "@capacitor/core": "^8.3.0",
     "@cf-wasm/resvg": "^0.3.3",
     "@cf-wasm/satori": "^0.3.5",
     "@google/generative-ai": "^0.24.1",
