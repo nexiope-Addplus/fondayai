@@ -100,8 +100,8 @@ function generateTips(w, lang) {
     if (tempDiff >= 10) points.push(`寒暖差${tempDiff}° — 肌バリアが揺らぐ時期、セラミドで強化`);
     else if (tempDiff >= 7) points.push(`寒暖差${tempDiff}° — 朝晩の保湿をしっかりと`);
 
-    if (w.uv_index >= 8) { points.push(`UV ${w.uv_index}（非常に高い）— SPF50+必須、2時間ごとに塗り直しを`); headline = "紫外線注意報！日焼け止めをしっかりと"; }
-    else if (w.uv_index >= 6) { points.push(`UV ${w.uv_index}（高い）— SPF50の日焼け止め必須`); headline = "紫外線が強い日、日焼け止めを忘れずに"; }
+    if (w.uv_index >= 8) { points.push(`UV ${w.uv_index}（非常に高い）— SPF50+必須、2時間ごとに塗り直しを`); headline = "紫外線注意報！\nUVケアをしっかり"; }
+    else if (w.uv_index >= 6) { points.push(`UV ${w.uv_index}（高い）— SPF50の日焼け止め必須`); headline = "紫外線が強い日、\nUVケアを忘れずに"; }
     else if (w.uv_index >= 3) points.push(`UV ${w.uv_index}（普通）— 基本の日焼け止めを`);
     else points.push(`UV ${w.uv_index}（低い）— 基本の日焼け止めでOK`);
 
@@ -270,7 +270,7 @@ function buildCoverContent(dateStr, weather, tips, lang) {
 
   return [
     { type: "span", props: { style: { fontSize: "20px", fontWeight: 700, letterSpacing: "3px", color: "#FFFFFF", opacity: 0.8, marginBottom: "16px" }, children: "BEAUTY MAGAZINE" } },
-    { type: "span", props: { style: { fontSize: "80px", fontWeight: 900, color: "#FFFFFF", lineHeight: "1.2", marginBottom: "20px" }, children: tips.headline } },
+    { type: "span", props: { style: { fontSize: lang === "ja" ? "56px" : "80px", fontWeight: 900, color: "#FFFFFF", lineHeight: "1.3", marginBottom: "20px" }, children: tips.headline } },
     { type: "span", props: { style: { fontSize: "30px", color: "#FFFFFF", opacity: 0.8, marginBottom: "12px" }, children: weatherLine } },
     { type: "div", props: { style: { display: "flex", justifyContent: "space-between", width: "100%", marginTop: "24px" }, children: [
       { type: "span", props: { style: { fontSize: "20px", fontWeight: 700, letterSpacing: "2px", color: "#FFFFFF", opacity: 0.5 }, children: "FONDAY" } },
