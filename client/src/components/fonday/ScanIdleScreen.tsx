@@ -462,15 +462,6 @@ export function ScanIdleScreen({
 
       {/* 재스캔 버튼은 점수 바로 아래로 이동됨 */}
 
-      <div className="text-center pt-4 pb-4 relative" style={{ zIndex: 1 }}>
-        <a href="/legal/privacy" className="text-xs underline inline-flex items-center min-h-[44px] px-2" style={{ color: TEXT_SECONDARY }}>
-          {t("idle.privacyLink")}
-        </a>
-        <span className="text-xs text-stone-200 mx-1">·</span>
-        <a href="/legal/terms" className="text-xs underline inline-flex items-center min-h-[44px] px-2" style={{ color: TEXT_SECONDARY }}>
-          {t("idle.termsLink")}
-        </a>
-      </div>
     </motion.div>
     </>
   );
