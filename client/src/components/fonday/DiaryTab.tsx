@@ -256,7 +256,7 @@ export function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: AppU
   if (!user) {
     return (
       <div className="flex flex-col" style={{ background: PAGE_GRADIENT, minHeight: "calc(100dvh - 64px)" }}>
-        <div className="px-4 pt-5 pb-28">
+        <div className="px-4 pt-5 tab-bottom-pad">
           <div className="mb-8">
             <div className="flex items-center gap-2.5 mb-1">
               <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ background: TINT_WARM }}>
@@ -347,7 +347,7 @@ export function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: AppU
       </div>
 
       {/* 콘텐츠 */}
-      <div ref={diaryScrollRef} className="flex-1 overflow-y-auto overscroll-contain pb-28">
+      <div ref={diaryScrollRef} className="flex-1 overflow-y-auto overscroll-contain tab-bottom-pad">
         {overallScore === 0 && (
           <div className="mx-4 mt-3 mb-0">
             <button

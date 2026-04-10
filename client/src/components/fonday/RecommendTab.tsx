@@ -95,7 +95,7 @@ export function RecommendTab({ user, baumannType, onLogin }: {
   }
 
   return (
-    <div className="pb-28">
+    <div className="tab-bottom-pad">
       {/* 제휴 공시 문구 */}
       <p className="px-4 pt-4 text-[11px] font-bold" style={{ color: "#5C4F4A" }}>
         {lang === "ja" ? "この投稿はアフィリエイト活動の一環であり、これにより一定額の手数料を受け取っています。"

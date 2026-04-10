@@ -208,7 +208,7 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
 
   if (!user) {
     return (
-      <div className="min-h-[calc(100dvh-64px)] px-4 pt-5 pb-28" style={{ background: PAGE_GRADIENT }}>
+      <div className="min-h-[calc(100dvh-64px)] px-4 pt-5 tab-bottom-pad" style={{ background: PAGE_GRADIENT }}>
         <div className="mb-8">
           <div className="flex items-center gap-2.5 mb-1">
             <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ background: TINT_GREEN }}>
@@ -346,7 +346,7 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
   }
 
   return (
-    <div className="min-h-[calc(100dvh-64px)] px-4 pt-5 pb-28" style={{ background: PAGE_GRADIENT }}>
+    <div className="min-h-[calc(100dvh-64px)] px-4 pt-5 tab-bottom-pad" style={{ background: PAGE_GRADIENT }}>
       <div className="mb-6">
         <div className="flex items-center gap-2.5 mb-1">
           <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ background: TINT_GREEN }}>
