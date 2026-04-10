@@ -2,6 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
+/* iOS 네이티브 앱: pull-to-refresh 방지 */
+html, body {
+  overscroll-behavior-y: none;
+}
 
 .no-scrollbar::-webkit-scrollbar { display: none; }
 .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }

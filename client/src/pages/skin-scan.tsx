@@ -130,7 +130,9 @@ export default function SkinScanPage() {
     justLoggedInRef.current = justLoggedIn;
     if (justLoggedIn) window.history.replaceState({}, "", "/");
 
-    fetch("/api/user")
+    const appToken = localStorage.getItem("fonday_app_token");
+    const authHeaders: Record<string, string> = appToken ? { "Authorization": `Bearer ${appToken}` } : {};
+    fetch("/api/user", { credentials: "include", headers: authHeaders })
       .then(res => res.ok ? res.json() : null)
       .then(data => {
         setUser(data ?? null);
@@ -152,7 +154,9 @@ export default function SkinScanPage() {
     const onVisible = () => {
       if (document.visibilityState !== "visible") return;
       if (!localStorage.getItem("fonday_login_pending")) return;
-      fetch("/api/user").then(r => r.ok ? r.json() : null).then(u => {
+      const t = localStorage.getItem("fonday_app_token");
+      const h: Record<string, string> = t ? { "Authorization": `Bearer ${t}` } : {};
+      fetch("/api/user", { credentials: "include", headers: h }).then(r => r.ok ? r.json() : null).then(u => {
         if (u) {
           localStorage.removeItem("fonday_login_pending");
           setUser(u);
