@@ -8,7 +8,7 @@ export const onRequest = async (context: any) => {
     Response.redirect(`${homeUrl}?login_error=${encodeURIComponent(stage)}`, 302);
   const code = url.searchParams.get("code");
   const rawState = url.searchParams.get("state") || "ko";
-  const [lang, source] = rawState.includes("|") ? rawState.split("|") : [rawState, ""];
+  const [lang, source] = rawState.includes("__") ? rawState.split("__") : [rawState, ""];
   const isApp = source === "app";
 
   if (!code) {

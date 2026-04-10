@@ -6,7 +6,7 @@ export const onRequest = (context: any) => {
   const source = url.searchParams.get("source") || "";
 
   // state에 lang과 source를 함께 전달
-  const stateObj = source === "app" ? `${lang}|app` : lang;
+  const stateObj = source === "app" ? `${lang}__app` : lang;
 
   const params = new URLSearchParams({
     client_id: env.GOOGLE_CLIENT_ID,
