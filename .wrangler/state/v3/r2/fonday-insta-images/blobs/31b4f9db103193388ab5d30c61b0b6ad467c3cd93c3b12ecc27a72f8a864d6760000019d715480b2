@@ -1,0 +1,48 @@
+{
+  "cover": {
+    "sunny-dry": {
+      "ko": { "textAlign": "left", "textVertical": "bottom" },
+      "ja": { "textAlign": "left", "textVertical": "bottom" }
+    },
+    "sunny-humid": {
+      "ko": { "textAlign": "center", "textVertical": "bottom" },
+      "ja": { "textAlign": "center", "textVertical": "bottom" }
+    },
+    "cloudy": {
+      "ko": { "textAlign": "left", "textVertical": "bottom" },
+      "ja": { "textAlign": "left", "textVertical": "bottom" }
+    },
+    "rainy": {
+      "ko": { "textAlign": "left", "textVertical": "bottom" },
+      "ja": { "textAlign": "left", "textVertical": "bottom" }
+    },
+    "uv-high": {
+      "ko": { "textAlign": "center", "textVertical": "bottom" },
+      "ja": { "textAlign": "center", "textVertical": "bottom" }
+    }
+  },
+  "point": {
+    "01": { "textAlign": "left", "textVertical": "bottom" },
+    "02": { "textAlign": "left", "textVertical": "bottom" },
+    "03": { "textAlign": "center", "textVertical": "bottom" },
+    "04": { "textAlign": "center", "textVertical": "top" },
+    "05": { "textAlign": "right", "textVertical": "center" },
+    "06": { "textAlign": "center", "textVertical": "top" },
+    "07": { "textAlign": "left", "textVertical": "bottom" },
+    "08": { "textAlign": "right", "textVertical": "center" },
+    "09": { "textAlign": "center", "textVertical": "bottom" },
+    "10": { "textAlign": "center", "textVertical": "bottom" }
+  },
+  "routine": {
+    "01": { "textAlign": "center", "textVertical": "bottom" },
+    "02": { "textAlign": "center", "textVertical": "bottom" },
+    "03": { "textAlign": "right", "textVertical": "center" },
+    "04": { "textAlign": "center", "textVertical": "bottom" },
+    "05": { "textAlign": "center", "textVertical": "top" },
+    "06": { "textAlign": "left", "textVertical": "center" },
+    "07": { "textAlign": "center", "textVertical": "bottom" },
+    "08": { "textAlign": "center", "textVertical": "bottom" },
+    "09": { "textAlign": "center", "textVertical": "bottom" },
+    "10": { "textAlign": "center", "textVertical": "bottom" }
+  }
+}
