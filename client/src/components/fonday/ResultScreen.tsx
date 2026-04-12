@@ -1027,20 +1027,42 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
           sessionStorage.removeItem("battleChallengeToken");
           window.location.href = `/battle/${pendingChallengeToken}`;
         }}
-        onCreateChallenge={() => {
+        onCreateChallenge={async () => {
           if (!currentShareToken) return;
           markChallengeUsed();
           const shareUrl = `${window.location.origin}/battle/${currentShareToken}`;
+          // 1차: Web Share API 시도
           if (navigator.share) {
-            navigator
-              .share({
+            try {
+              await navigator.share({
                 title: "Fonday° 피부 챌린지",
                 text: t("result.challengeText", { score: overallScore, type: finalType }),
                 url: shareUrl,
-              })
-              .catch(console.error);
-          } else {
-            navigator.clipboard.writeText(shareUrl).then(() => alert(t("result.challengeLinkCopied")));
+              });
+              return;
+            } catch (e) {
+              // share 취소 또는 미지원 — fallback으로
+            }
+          }
+          // 2차: clipboard 시도
+          try {
+            await navigator.clipboard.writeText(shareUrl);
+            alert(t("result.challengeLinkCopied"));
+            return;
+          } catch {}
+          // 3차: execCommand fallback (토스 웹뷰 등)
+          try {
+            const ta = document.createElement("textarea");
+            ta.value = shareUrl;
+            ta.style.cssText = "position:fixed;opacity:0";
+            document.body.appendChild(ta);
+            ta.select();
+            document.execCommand("copy");
+            document.body.removeChild(ta);
+            alert(t("result.challengeLinkCopied"));
+          } catch {
+            // 최종 fallback: URL 직접 표시
+            prompt(t("result.challengeLinkCopied"), shareUrl);
           }
         }}
       />
