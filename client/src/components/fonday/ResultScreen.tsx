@@ -51,6 +51,7 @@ import { share as tossShare, getTossShareLink } from "@apps-in-toss/web-framewor
 import { SkinPredictionCard } from "./SkinPredictionCard";
 import { ResultDiaryCard } from "./ResultDiaryCard";
 import { ResultActionBar } from "./ResultActionBar";
+import { useRewardedAd, useInterstitialAd } from "./TossAd";
 import { ResultRoutineTab } from "./ResultRoutineTab";
 import { ResultSolutionTab } from "./ResultSolutionTab";
 import { ResultNutritionTab } from "./ResultNutritionTab";
@@ -107,6 +108,20 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
     }
   }, []);
   const [showCheckinSheet, setShowCheckinSheet] = useState(false);
+
+  // 토스 인앱 광고
+  const rewardedAd = useRewardedAd();
+  const interstitialAd = useInterstitialAd();
+
+  // 전면 광고: 2회차 스캔부터 로드 (첫 스캔은 광고 없이)
+  useEffect(() => {
+    if (!isTossMiniApp()) return;
+    const scanCount = parseInt(localStorage.getItem("fonday_total_scans") ?? "0", 10);
+    if (scanCount >= 2) interstitialAd.load();
+    rewardedAd.load();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const [activeTab, setActiveTab] = useState<"routine" | "solution" | "nutrition">("routine");
   const tabDirectionRef = useRef<1 | -1>(1);
   const [currentStreak, setCurrentStreak] = useState<StreakData>(() => getStreak());
@@ -1034,6 +1049,20 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
         </div>
 
       </motion.div>
+
+      {/* 토스 보상형 광고 — "자세한 리포트 보기" */}
+      {isTossMiniApp() && rewardedAd.loaded && !rewardedAd.rewarded && (
+        <div className="px-5 pb-4">
+          <button
+            onClick={rewardedAd.show}
+            disabled={rewardedAd.showing}
+            className="w-full py-3.5 rounded-2xl text-[13px] font-bold text-center active:opacity-70"
+            style={{ background: "rgba(74,124,110,0.06)", color: DEEP_GREEN, border: "1.5px solid rgba(74,124,110,0.18)" }}
+          >
+            {rewardedAd.showing ? "광고 시청 중..." : "🎁 더 자세한 피부 리포트 보기"}
+          </button>
+        </div>
+      )}
 
       <ResultActionBar
         shareLoading={shareLoading}

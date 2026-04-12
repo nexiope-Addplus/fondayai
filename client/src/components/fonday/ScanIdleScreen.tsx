@@ -37,6 +37,7 @@ import type { WeatherData, WeatherTipKey } from "./types";
 import { getStreak, getDaysSinceLastScan, getWeatherTipKey, buildCosmeticCorrelationSignals, todayStr, haptic, isTossMiniApp } from "./utils";
 // AttendanceCalendarModal은 MY탭에서만 사용
 import { WeatherTipCard } from "./WeatherTipCard";
+import { TossBannerAd } from "./TossAd";
 import { LangSwitcher } from "./BottomNav";
 
 // ─── 메인 스캔 화면 ───────────────────────────────────────────────
@@ -452,6 +453,9 @@ export function ScanIdleScreen({
           </AnimatePresence>
         </div>
       </motion.div>
+
+      {/* ── 토스 배너 광고 ── */}
+      <TossBannerAd className="mb-8 mx-1" />
 
       {/* ── 신규 유저: 프라이버시 안내 (CTA 아래) ── */}
       {!latestScan && !scanLoading && (
