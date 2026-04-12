@@ -134,15 +134,19 @@ export default function SkinScanPage() {
   }, []);
 
   // 토스 미니앱: getAnonymousKey로 자동 로그인
-  useEffect(() => {
+  const [tossAuthError, setTossAuthError] = useState(false);
+  const tossLogin = useCallback(() => {
     if (!isTossMiniApp()) return;
+    setTossAuthError(false);
     import("@apps-in-toss/web-framework").then(({ getAnonymousKey }) => {
       getAnonymousKey().then((result) => {
-        if (!result || typeof result === "string") return;
+        if (!result || typeof result === "string") {
+          setTossAuthError(true);
+          return;
+        }
         if (result.type === "HASH") {
           const tossUserId = `toss_${result.hash}`;
           localStorage.setItem("fonday_toss_user_hash", result.hash);
-          // 토스 유저를 간이 유저 객체로 설정
           setUser({
             id: tossUserId,
             username: "토스 사용자",
@@ -151,9 +155,10 @@ export default function SkinScanPage() {
             email: null,
           });
         }
-      });
-    });
+      }).catch(() => setTossAuthError(true));
+    }).catch(() => setTossAuthError(true));
   }, []);
+  useEffect(() => { tossLogin(); }, [tossLogin]);
 
   // 토스 미니앱: 로그인은 getAnonymousKey로 자동 처리됨 — no-op
   const openLoginPopup = useCallback((_provider: string, _returnTab?: string) => {}, []);
@@ -311,6 +316,30 @@ export default function SkinScanPage() {
       trackEvent("scan_fail", { error: "network" });
     }
   }, [imageFile, imageBase64, trackEvent]);
+
+  // 토스 미니앱: 인증 실패 시 재시도 화면
+  if (tossAuthError && isTossMiniApp()) {
+    return (
+      <div className="min-h-[100dvh] bg-[#FAF9F6] flex items-center justify-center px-6">
+        <div className="text-center space-y-4">
+          <div className="w-14 h-14 mx-auto rounded-2xl flex items-center justify-center" style={{ background: "#FDF4F1" }}>
+            <AlertCircle className="w-7 h-7" style={{ color: "#C97062" }} />
+          </div>
+          <div>
+            <p className="text-[16px] font-bold text-[#4A403A]">연결에 실패했어요</p>
+            <p className="text-[13px] text-[#8C8078] mt-1">잠시 후 다시 시도해 주세요</p>
+          </div>
+          <button
+            onClick={tossLogin}
+            className="px-6 py-3 rounded-2xl text-[14px] font-semibold text-white"
+            style={{ background: "#4A7C6E" }}
+          >
+            다시 시도
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-[100dvh] bg-[#FAF9F6] text-stone-900">
