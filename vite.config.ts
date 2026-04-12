@@ -6,7 +6,7 @@ import runtimeErrorOverlay from "@replit/vite-plugin-runtime-error-modal";
 export default defineConfig({
   plugins: [
     react(),
-    runtimeErrorOverlay(),
+    // runtimeErrorOverlay(), // 토스 샌드박스에서 오버레이 충돌 방지
     ...(process.env.NODE_ENV !== "production" &&
     process.env.REPL_ID !== undefined
       ? [
@@ -35,6 +35,18 @@ export default defineConfig({
     fs: {
       strict: true,
       deny: ["**/.*"],
+    },
+    proxy: {
+      "/api": {
+        target: "https://dev.fondayai.com",
+        changeOrigin: true,
+        secure: true,
+      },
+      "/auth": {
+        target: "https://dev.fondayai.com",
+        changeOrigin: true,
+        secure: true,
+      },
     },
   },
 });

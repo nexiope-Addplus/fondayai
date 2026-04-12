@@ -34,18 +34,26 @@ if (isTossMiniApp) {
   document.documentElement.classList.add("toss-miniapp");
 }
 
-// 네이티브 앱: 모든 fetch에 Bearer 토큰 자동 첨부
+// fetch 인터셉터: 토스 미니앱은 X-Toss-User 헤더, 네이티브 앱은 Bearer 토큰
 const _fetch = window.fetch.bind(window);
 window.fetch = (input, init) => {
-  const token = localStorage.getItem("fonday_app_token");
-  if (token) {
-    const headers = new Headers(init?.headers);
-    if (!headers.has("Authorization")) {
+  const headers = new Headers(init?.headers);
+
+  if (isTossMiniApp) {
+    // 토스 미니앱: 쿠키 불가 → 토스 유저 hash를 헤더로 전달
+    const tossHash = localStorage.getItem("fonday_toss_user_hash");
+    if (tossHash && !headers.has("X-Toss-User")) {
+      headers.set("X-Toss-User", tossHash);
+    }
+  } else {
+    // 네이티브 앱: Bearer 토큰
+    const token = localStorage.getItem("fonday_app_token");
+    if (token && !headers.has("Authorization")) {
       headers.set("Authorization", `Bearer ${token}`);
     }
-    return _fetch(input, { ...init, headers });
   }
-  return _fetch(input, init);
+
+  return _fetch(input, { ...init, headers });
 };
 
 createRoot(document.getElementById("root")!).render(

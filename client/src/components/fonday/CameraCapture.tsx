@@ -122,22 +122,14 @@ export function CameraCapture({ onCapture, onClose }: {
   };
 
   if (useFile) {
+    const captureRef = React.createRef<HTMLInputElement>();
     return (
       <div className="fixed inset-0 z-[200] bg-black flex flex-col items-center justify-center gap-6">
         <p className="text-white text-sm">{isTossMiniApp() ? t("camera.selectMethod", "촬영 방법을 선택해 주세요") : t("camera.noCamera")}</p>
-        <Button onClick={() => {
-          const input = document.createElement("input");
-          input.type = "file";
-          input.accept = "image/*";
-          input.capture = "user";
-          input.onchange = (e) => {
-            const file = (e.target as HTMLInputElement).files?.[0];
-            if (file) onCapture(file);
-          };
-          input.click();
-        }} className="bg-white text-black font-bold px-8 h-14 rounded-2xl">
+        <Button onClick={() => captureRef.current?.click()} className="bg-white text-black font-bold px-8 h-14 rounded-2xl">
           {t("camera.capture", "셀카 촬영하기")}
         </Button>
+        <input ref={captureRef} type="file" accept="image/*" capture="user" className="hidden" onChange={handleFileChange} />
         <Button onClick={() => fileRef.current?.click()} className="bg-white/20 text-white font-bold px-8 h-14 rounded-2xl">
           {t("camera.selectPhoto", "앨범에서 선택")}
         </Button>
