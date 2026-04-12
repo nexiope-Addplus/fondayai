@@ -47,6 +47,7 @@ import {
   pickFoodOption, dedupeFoods,
   isIOS, isPWA, isTossMiniApp, buildStableBaumannType, autoRegisterCosmetic,
 } from "./utils";
+import { share as tossShare, getTossShareLink } from "@apps-in-toss/web-framework";
 import { SkinPredictionCard } from "./SkinPredictionCard";
 import { ResultDiaryCard } from "./ResultDiaryCard";
 import { ResultActionBar } from "./ResultActionBar";
@@ -709,6 +710,21 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
     if (shareLoading) return;
     markShareUsed();
     setShareLoading(true);
+
+    // 토스 미니앱: 이미지 공유 불가 → 텍스트 링크 공유
+    if (isTossMiniApp()) {
+      try {
+        const shareText = t("result.shareText", { score: overallScore, type: finalType });
+        const tossLink = await getTossShareLink("intoss://fonday");
+        await tossShare({ message: `${shareText}\n${tossLink}` });
+      } catch (e) {
+        console.warn("[share:toss]", e);
+      } finally {
+        setShareLoading(false);
+      }
+      return;
+    }
+
     try {
       // i18n 문자열 미리 resolve
       const scoreLabels = Array.from({ length: 10 }, (_, i) => t(`scores.${i}`));
@@ -1029,39 +1045,35 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
         }}
         onCreateChallenge={() => {
           if (!currentShareToken) return;
-          const shareUrl = `${window.location.origin}/battle/${currentShareToken}`;
-          const shareData = {
-            title: "Fonday° 피부 챌린지",
-            text: t("result.challengeText", { score: overallScore, type: finalType }),
-            url: shareUrl,
-          };
-          // navigator.share는 동기 user gesture 내에서 즉시 호출해야 함
-          if (navigator.share && navigator.canShare?.(shareData)) {
-            navigator.share(shareData)
-              .then(() => { markChallengeUsed(); })
-              .catch((e) => {
-                // AbortError = 사용자 취소, 무시
-                if (e?.name !== "AbortError") {
-                  console.warn("[Challenge] share failed:", e);
-                  copyToClipboard(shareUrl);
-                }
+          markChallengeUsed();
+          const battlePath = `/battle/${currentShareToken}`;
+          const shareText = t("result.challengeText", { score: overallScore, type: finalType });
+
+          if (isTossMiniApp()) {
+            // 토스 미니앱: SDK 공유 (네이티브 공유 시트 — 카톡 포함)
+            getTossShareLink(`intoss://fonday${battlePath}`)
+              .then(tossLink => tossShare({ message: `${shareText}\n${tossLink}` }))
+              .catch(() => {
+                // SDK 실패 시 웹 공유 URL로 fallback
+                const webUrl = `${window.location.origin}${battlePath}`;
+                tossShare({ message: `${shareText}\n${webUrl}` }).catch(() => {});
               });
           } else {
-            markChallengeUsed();
-            copyToClipboard(shareUrl);
-          }
-
-          function copyToClipboard(url: string) {
-            // textarea + execCommand가 가장 호환성 높음
-            const ta = document.createElement("textarea");
-            ta.value = url;
-            ta.style.cssText = "position:fixed;left:-9999px;opacity:0";
-            document.body.appendChild(ta);
-            ta.focus();
-            ta.select();
-            try { document.execCommand("copy"); } catch {}
-            document.body.removeChild(ta);
-            alert(t("result.challengeLinkCopied"));
+            // 일반 웹: Web Share API
+            const shareUrl = `${window.location.origin}${battlePath}`;
+            if (navigator.share) {
+              navigator.share({ title: "Fonday° 피부 챌린지", text: shareText, url: shareUrl })
+                .catch(() => {});
+            } else {
+              const ta = document.createElement("textarea");
+              ta.value = shareUrl;
+              ta.style.cssText = "position:fixed;left:-9999px;opacity:0";
+              document.body.appendChild(ta);
+              ta.focus(); ta.select();
+              try { document.execCommand("copy"); } catch {}
+              document.body.removeChild(ta);
+              alert(t("result.challengeLinkCopied"));
+            }
           }
         }}
       />
