@@ -135,9 +135,19 @@ export default function SkinScanPage() {
 
   // 토스 미니앱: getAnonymousKey로 자동 로그인
   const [tossAuthError, setTossAuthError] = useState(false);
+  const isSimulated = !!(localStorage.getItem("fonday_toss_mode") === "1" && !(window as any).__AIT__);
   const tossLogin = useCallback(() => {
     if (!isTossMiniApp()) return;
     setTossAuthError(false);
+
+    // 시뮬레이션 모드 (?toss=1): mock 유저로 바로 설정
+    if (isSimulated) {
+      const mockHash = "sim_" + Date.now();
+      localStorage.setItem("fonday_toss_user_hash", mockHash);
+      setUser({ id: `toss_${mockHash}`, username: "토스 테스트", provider: "toss", avatar: null, email: null });
+      return;
+    }
+
     import("@apps-in-toss/web-framework").then(({ getAnonymousKey }) => {
       getAnonymousKey().then((result) => {
         if (!result || typeof result === "string") {
@@ -157,7 +167,7 @@ export default function SkinScanPage() {
         }
       }).catch(() => setTossAuthError(true));
     }).catch(() => setTossAuthError(true));
-  }, []);
+  }, [isSimulated]);
   useEffect(() => { tossLogin(); }, [tossLogin]);
 
   // 토스 미니앱: 로그인은 getAnonymousKey로 자동 처리됨 — no-op

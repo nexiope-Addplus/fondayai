@@ -4,11 +4,17 @@ import App from "./App";
 import "./index.css";
 import "./i18n";
 
-// 토스 미니앱 환경 감지
+// 토스 미니앱 환경 감지 (?toss=1 파라미터로 시뮬레이션 가능)
 const isTossMiniApp = !!(
   (window as any).__AIT__ ||
-  navigator.userAgent.includes("TossApp")
+  navigator.userAgent.includes("TossApp") ||
+  new URLSearchParams(window.location.search).get("toss") === "1" ||
+  localStorage.getItem("fonday_toss_mode") === "1"
 );
+// URL 파라미터로 진입 시 localStorage에 저장 (새로고침해도 유지)
+if (new URLSearchParams(window.location.search).get("toss") === "1") {
+  localStorage.setItem("fonday_toss_mode", "1");
+}
 
 // Capacitor 앱 감지 (토스 미니앱이 아닌 경우만)
 if (!isTossMiniApp) {

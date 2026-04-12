@@ -277,12 +277,14 @@ export function isPWA(): boolean {
   return window.matchMedia("(display-mode: standalone)").matches || !!(navigator as any).standalone;
 }
 
-/** 토스 미니앱 환경 감지 */
+/** 토스 미니앱 환경 감지 (?toss=1 파라미터로 시뮬레이션 가능) */
 export function isTossMiniApp(): boolean {
   return !!(
     (window as any).__AIT__ ||
     navigator.userAgent.includes("TossApp") ||
-    document.documentElement.classList.contains("toss-miniapp")
+    document.documentElement.classList.contains("toss-miniapp") ||
+    new URLSearchParams(window.location.search).get("toss") === "1" ||
+    localStorage.getItem("fonday_toss_mode") === "1"
   );
 }
 export function shouldShowPushPrompt(): boolean {
