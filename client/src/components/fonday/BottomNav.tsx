@@ -52,7 +52,7 @@ export function BottomNav({ active, onChange, scanState }: {
     <nav
       className="fixed left-3 right-3 z-50 bg-white/95 backdrop-blur-2xl"
       style={{
-        bottom: "calc(8px + env(safe-area-inset-bottom))",
+        bottom: isTossMiniApp() ? "calc(16px + env(safe-area-inset-bottom))" : "calc(8px + env(safe-area-inset-bottom))",
         borderRadius: 24,
         boxShadow: "0 2px 16px rgba(0,0,0,0.10), 0 0 0 1px rgba(0,0,0,0.04)",
       }}

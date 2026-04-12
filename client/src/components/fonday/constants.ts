@@ -45,8 +45,8 @@ export const TINT_NEUTRAL = "#F0F0F1";
 export const BG_BASE = "#FFFFFF";
 export const BG_MUTED = "#F5F8F6";
 export const BORDER_COLOR = "#EBEBEB";
-export const FONT_DISPLAY = "'LINESeedKR', Pretendard, sans-serif";
-export const FONT_HEADING = "'LINESeedKR', Pretendard, sans-serif";
+export const FONT_DISPLAY = "'Toss Product Sans', 'LINESeedKR', Pretendard, sans-serif";
+export const FONT_HEADING = "'Toss Product Sans', 'LINESeedKR', Pretendard, sans-serif";
 
 // Shadow 토큰
 export const SHADOW_CARD = "0 0 0 1px rgba(0,0,0,0.10), 0 2px 6px rgba(0,0,0,0.05)";

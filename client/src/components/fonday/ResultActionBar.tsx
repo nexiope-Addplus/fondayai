@@ -1,5 +1,6 @@
 import { Crown, Share2, Trophy, Swords } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { isTossMiniApp } from "./utils";
 
 import {
   DEEP_GREEN,
@@ -30,7 +31,7 @@ export function ResultActionBar({
   return (
     <div
       className="fixed left-0 right-0 z-[50] flex items-center gap-2 px-4 py-3 bg-white/95 backdrop-blur-md"
-      style={{ bottom: "calc(60px + env(safe-area-inset-bottom))" }}
+      style={{ bottom: isTossMiniApp() ? "calc(68px + env(safe-area-inset-bottom))" : "calc(60px + env(safe-area-inset-bottom))" }}
     >
       {/* 공유 버튼 — 보조 (아이콘만) */}
       <button
