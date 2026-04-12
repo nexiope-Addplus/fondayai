@@ -37,47 +37,11 @@ export function CheckinSuccessSheet({ onKakao, onLine, onGoogle, onDismiss, user
           <h2 className="text-lg font-semibold text-[#5C4F4A] mb-1">{t("attendance.title")}</h2>
         </div>
 
-        {!user && (
-          <div className="bg-stone-50 rounded-2xl p-4 mb-4 text-center">
-            <p className="text-[13px] font-semibold text-stone-600 mb-0.5">{t("attendance.stored")}</p>
-            <p className="text-[12px] text-stone-400 whitespace-pre-line">{t("attendance.loginDesc")}</p>
-          </div>
-        )}
-
-        {!user ? (
-          <div className="flex flex-col gap-2.5">
-            {i18n.language === "ko" ? (
-              <button onClick={onKakao}
-                className="w-full py-3.5 rounded-2xl text-sm font-bold text-[#3C1E1E] flex items-center justify-center gap-2"
-                style={{ background: "#FEE500" }}>
-                <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path fillRule="evenodd" clipRule="evenodd" d="M9 1C4.582 1 1 3.79 1 7.222c0 2.154 1.386 4.045 3.484 5.14L3.62 15.5a.25.25 0 0 0 .368.274L7.9 13.39A9.63 9.63 0 0 0 9 13.444c4.418 0 8-2.791 8-6.222C17 3.79 13.418 1 9 1Z" fill="#3C1E1E"/></svg>
-                {t("attendance.kakao")}
-              </button>
-            ) : (
-              <button onClick={onLine}
-                className="w-full py-3.5 rounded-2xl text-sm font-bold text-white flex items-center justify-center gap-2"
-                style={{ background: "#06C755" }}>
-                <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M15 7.56c0-3.16-3.13-5.73-6.98-5.73S1.04 4.4 1.04 7.56c0 2.83 2.47 5.2 5.82 5.65.23.05.53.15.61.35.07.18.05.46.02.64l-.1.58c-.03.18-.14.69.6.38.74-.32 3.98-2.38 5.43-4.07C14.54 9.88 15 8.78 15 7.56Z" fill="white"/></svg>
-                {t("attendance.line")}
-              </button>
-            )}
-            <button onClick={onGoogle}
-              className="w-full py-3.5 rounded-2xl text-sm font-bold text-[#6B5D55] flex items-center justify-center gap-2 bg-white">
-              <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="w-4 h-4" />
-              {t("attendance.google")}
-            </button>
-            <button onClick={onDismiss}
-              className="w-full py-2.5 text-[13px] font-semibold text-stone-400">
-              {t("attendance.later")}
-            </button>
-          </div>
-        ) : (
-          <button onClick={onDismiss}
-            className="w-full py-3.5 rounded-2xl text-[14px] font-semibold text-white"
-            style={{ background: `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})` }}>
-            {t("attendance.close")}
-          </button>
-        )}
+        <button onClick={onDismiss}
+          className="w-full py-3.5 rounded-2xl text-[14px] font-semibold text-white"
+          style={{ background: `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})` }}>
+          {t("attendance.close")}
+        </button>
       </motion.div>
     </>
   );

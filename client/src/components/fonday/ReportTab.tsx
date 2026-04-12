@@ -25,45 +25,6 @@ export function ReportTab({ user }: { user: any }) {
       .finally(() => setLoading(false));
   }, [user]);
 
-  if (!user) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-[calc(100dvh-64px)] px-6 text-center gap-5">
-        <div className="w-16 h-16 rounded-2xl flex items-center justify-center"
-          style={{ background: `linear-gradient(135deg, ${SCAN_FROM}, ${SCAN_TO})` }}>
-          <FileText className="w-8 h-8 text-white" />
-        </div>
-        <div>
-          <h2 className="text-xl font-black mb-1" style={{ color: DEEP_GREEN }}>{t("report.title")}</h2>
-          <p className="text-sm text-stone-400">{t("report.loginRequired")}</p>
-        </div>
-        <div className="w-full space-y-3">
-          {i18n.language === "ko" ? (
-            <Button onClick={() => { window.location.href = "/auth/kakao"; }}
-              className="w-full h-12 rounded-xl font-bold gap-2 border-0 text-[#3C1E1E]" style={{ background: "#FEE500" }}>
-              <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-                <path fillRule="evenodd" clipRule="evenodd" d="M9 1C4.582 1 1 3.79 1 7.222c0 2.154 1.386 4.045 3.484 5.14L3.62 15.5a.25.25 0 0 0 .368.274L7.9 13.39A9.63 9.63 0 0 0 9 13.444c4.418 0 8-2.791 8-6.222C17 3.79 13.418 1 9 1Z" fill="#3C1E1E"/>
-              </svg>
-              {t("report.kakaoLogin")}
-            </Button>
-          ) : (
-            <Button onClick={() => { window.location.href = "/auth/line"; }}
-              className="w-full h-12 rounded-xl font-bold gap-2 border-0 text-white" style={{ background: "#06C755" }}>
-              <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-                <path d="M15 7.56c0-3.16-3.13-5.73-6.98-5.73S1.04 4.4 1.04 7.56c0 2.83 2.47 5.2 5.82 5.65.23.05.53.15.61.35.07.18.05.46.02.64l-.1.58c-.03.18-.14.69.6.38.74-.32 3.98-2.38 5.43-4.07C14.54 9.88 15 8.78 15 7.56Z" fill="white"/>
-              </svg>
-              {t("report.lineLogin")}
-            </Button>
-          )}
-          <Button onClick={() => { window.location.href = "/auth/google"; }}
-            className="w-full h-12 rounded-xl bg-white hover:bg-stone-50 font-bold text-zinc-700 gap-2 shadow-sm">
-            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="w-4 h-4" />
-            {t("report.googleLogin")}
-          </Button>
-        </div>
-      </div>
-    );
-  }
-
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[calc(100dvh-64px)]">
