@@ -1013,8 +1013,7 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
 
       </motion.div>
 
-      {/* 공유/챌린지 바 — 토스 미니앱에서는 Web Share API 미지원이므로 숨김 */}
-      {!isTossMiniApp() && <ResultActionBar
+      <ResultActionBar
         shareLoading={shareLoading}
         pendingChallengeToken={pendingChallengeToken}
         currentShareToken={currentShareToken}
@@ -1040,7 +1039,7 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
             navigator.clipboard.writeText(shareUrl).then(() => alert(t("result.challengeLinkCopied")));
           }
         }}
-      />}
+      />
 
       <ResultModals
         showAnalysis={showAnalysis}
