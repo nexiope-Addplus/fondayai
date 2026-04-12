@@ -45,7 +45,7 @@ import {
   getDiaryTodos, saveDiaryTodos, getDiaryTodoProgress, initDiaryTodosFromRoutine,
   buildCosmeticsInsights, buildRoutineGuide, buildCosmeticCorrelationSignals, haptic,
   pickFoodOption, dedupeFoods,
-  isIOS, isPWA, buildStableBaumannType, autoRegisterCosmetic,
+  isIOS, isPWA, isTossMiniApp, buildStableBaumannType, autoRegisterCosmetic,
 } from "./utils";
 import { SkinPredictionCard } from "./SkinPredictionCard";
 import { ResultDiaryCard } from "./ResultDiaryCard";
@@ -133,7 +133,7 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
   const pwaTriggeredRef = useRef(false); // deferredPrompt 재실행 시 중복 방지
   useEffect(() => {
     const isDismissed = localStorage.getItem("fonday_pwa_dismissed") === "1";
-    if (isPWA() || isDismissed || pwaTriggeredRef.current) return;
+    if (isPWA() || isDismissed || pwaTriggeredRef.current || isTossMiniApp()) return;
     if (!isIOS() && !deferredPrompt) return;
 
     const el = resultScrollRef.current;

@@ -207,7 +207,11 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
   };
 
   if (!user) {
-    return null;
+    return (
+      <div className="flex items-center justify-center min-h-[calc(100dvh-64px)]">
+        <div className="w-8 h-8 rounded-full border-2 border-stone-200 border-t-[#4A7C6E] animate-spin" />
+      </div>
+    );
   }
 
   return (

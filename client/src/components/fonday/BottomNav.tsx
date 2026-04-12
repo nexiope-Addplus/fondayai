@@ -38,13 +38,15 @@ export function BottomNav({ active, onChange, scanState }: {
   const { t } = useTranslation();
   if (scanState === "survey" || scanState === "scanning") return null;
 
-  const tabs: { id: TabId; Icon: typeof House; labelKey: string }[] = [
+  const allTabs: { id: TabId; Icon: typeof House; labelKey: string }[] = [
     { id: "scan", Icon: House, labelKey: "nav.scan" },
     { id: "recommend", Icon: ShoppingBag, labelKey: "nav.recommend" },
     { id: "routine", Icon: History, labelKey: "nav.routine" },
     { id: "diary", Icon: NotebookPen, labelKey: "nav.diary" },
     { id: "my", Icon: User, labelKey: "nav.my" },
   ];
+  // 토스 미니앱: 추천탭(쿠팡 제휴) 제거 → 4탭 구성
+  const tabs = isTossMiniApp() ? allTabs.filter(t => t.id !== "recommend") : allTabs;
 
   return (
     <nav
@@ -56,7 +58,7 @@ export function BottomNav({ active, onChange, scanState }: {
       }}
     >
       <div className="max-w-md mx-auto px-2">
-        <div className="grid grid-cols-5 h-[60px]">
+        <div className={`grid h-[60px] ${isTossMiniApp() ? "grid-cols-4" : "grid-cols-5"}`}>
           {tabs.map(({ id, Icon, labelKey }) => {
             const isActive = active === id;
             return (

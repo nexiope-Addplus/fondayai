@@ -444,9 +444,9 @@ export default function SkinScanPage() {
           )}
         </AnimatePresence>
 
-        {/* 앱 추가 안내 모달 (iOS) */}
+        {/* 앱 추가 안내 모달 (iOS) — 토스 미니앱에서는 표시 안 함 */}
         <AnimatePresence>
-          {showInstallGuide && (
+          {showInstallGuide && !isTossMiniApp() && (
             <motion.div className="fixed inset-0 z-[200] flex items-end justify-center"
               initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
               <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setShowInstallGuide(false)} />
