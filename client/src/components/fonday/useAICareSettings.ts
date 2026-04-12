@@ -11,6 +11,7 @@ import {
   saveReminderSettings,
   shouldShowPushPrompt,
   syncReminderToServer,
+  isTossMiniApp,
 } from "./utils";
 
 export function useAICareSettings(analysisResult: AnalysisResult | null) {
@@ -91,6 +92,8 @@ export function useAICareSettings(analysisResult: AnalysisResult | null) {
 
   useEffect(() => {
     if (!analysisResult) return;
+    // 토스 미니앱: 웹푸시 미지원 + 바텀시트 자동 열림 금지
+    if (isTossMiniApp()) return;
     const timer = setTimeout(() => {
       if (!pushSubscribed && shouldShowPushPrompt()) {
         setShowPushPrompt(true);

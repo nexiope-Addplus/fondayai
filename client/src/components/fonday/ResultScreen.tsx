@@ -201,9 +201,9 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
       setMissionPops(newMissions);
       timers.push(setTimeout(() => setMissionPops([]), 3500));
     }
-    // 출석 체크인 (오늘 첫 스캔이면 팝업)
+    // 출석 체크인 (오늘 첫 스캔이면 팝업) — 토스에서는 바텀시트 자동 열림 금지
     const isNew = checkinToday();
-    if (isNew) {
+    if (isNew && !isTossMiniApp()) {
       timers.push(setTimeout(() => { haptic("success"); setShowCheckinSheet(true); }, 1200));
     }
     // 예측 루틴 → 오늘 Todo로 자동 저장 (오늘 처음이면)
@@ -855,14 +855,16 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
       transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
     >
       <motion.div className="px-5 pt-6 pb-40 space-y-6" variants={stagger} initial="initial" animate="animate">
-        {/* 헤더 */}
+        {/* 헤더 — 토스 미니앱에서는 내비바에 뒤로가기(<)가 있으므로 자체 버튼 숨김 */}
         <div className="flex justify-between items-center">
-          <button onClick={onBack}
-            className="flex items-center gap-1.5 px-3 py-2 rounded-full text-[13px] font-semibold active:opacity-70"
-            style={{ background: TINT_WARM, color: SCAN_TO }}>
-            <Camera className="w-4 h-4" /> {t("result.back")}
-          </button>
-          <div className="flex items-center gap-2">
+          {!isTossMiniApp() && (
+            <button onClick={onBack}
+              className="flex items-center gap-1.5 px-3 py-2 rounded-full text-[13px] font-semibold active:opacity-70"
+              style={{ background: TINT_WARM, color: SCAN_TO }}>
+              <Camera className="w-4 h-4" /> {t("result.back")}
+            </button>
+          )}
+          <div className={`flex items-center gap-2${isTossMiniApp() ? " mx-auto" : ""}`}>
             <img src="/fonday-logo.svg" alt="Fonday" className="h-5" style={{ objectFit: "contain" }} />
             <span className="text-[14px] font-bold" style={{ color: TEXT_TITLE }}>{t("result.reportLabel", "피부 리포트")}</span>
           </div>
