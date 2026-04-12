@@ -22,7 +22,7 @@ import {
   COLOR_INFO,
 } from "./constants";
 import { SkinPredictionCard } from "./SkinPredictionCard";
-import { ResultLoginCard } from "./ResultLoginCard";
+
 
 export function ResultSolutionTab(props: any) {
   const { t } = useTranslation();
@@ -131,16 +131,6 @@ export function ResultSolutionTab(props: any) {
                 onOpenDiary={handleDiaryEntry}
               />
               </div>
-            )}
-
-            {/* ── 로그인 카드 (비로그인 유저) ── */}
-            {!user && user !== undefined && (
-              <ResultLoginCard
-                loginPromptRef={loginPromptRef}
-                socialLoginButton={socialLoginButton}
-                onGoogleLogin={handleGoogleLogin}
-                onGoSolution={() => {}}
-              />
             )}
 
             <button

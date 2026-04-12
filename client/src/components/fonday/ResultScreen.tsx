@@ -49,7 +49,6 @@ import {
 } from "./utils";
 import { SkinPredictionCard } from "./SkinPredictionCard";
 import { ResultDiaryCard } from "./ResultDiaryCard";
-import { ResultLoginCard } from "./ResultLoginCard";
 import { ResultActionBar } from "./ResultActionBar";
 import { ProductRecommendCard } from "./ProductRecommendCard";
 import { ResultRoutineTab } from "./ResultRoutineTab";

@@ -123,47 +123,14 @@ export default function SkinScanPage() {
     setScanState("idle");
   };
 
+  // 토스 미니앱: user 상태는 getAnonymousKey useEffect에서 자동 설정됨
+  // 비-토스 환경에서는 쿠키 기반 세션 확인
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const justLoggedIn = params.get("login") === "success";
-    justLoggedInRef.current = justLoggedIn;
-    if (justLoggedIn) window.history.replaceState({}, "", "/");
-
+    if (isTossMiniApp()) return; // 토스는 getAnonymousKey에서 처리
     fetch("/api/user", { credentials: "include" })
       .then(res => res.ok ? res.json() : null)
-      .then(data => {
-        setUser(data ?? null);
-        if (data && justLoggedIn) {
-          // 팝업 모드: 부모에 알리고 닫기
-          if (window.opener && !window.opener.closed) {
-            try { window.opener.postMessage("fonday:login:success", window.location.origin); window.close(); } catch {}
-          }
-          // iOS PWA LINE 로그인: 새 Safari 탭 → BroadcastChannel로 원래 PWA 탭에 알림
-          try { const bc = new BroadcastChannel("fonday-auth"); bc.postMessage({ type: "login_complete" }); bc.close(); } catch {}
-        }
-      })
+      .then(data => setUser(data ?? null))
       .catch(() => setUser(null));
-  }, []);
-
-  // visibilitychange: LINE 로그인 후 PWA로 돌아올 때 자동 로그인 감지
-  // (iOS에서 LINE 앱 경유 → Safari 새탭 콜백 → PWA로 복귀 시 쿠키 공유로 자동 로그인)
-  useEffect(() => {
-    const onVisible = () => {
-      if (document.visibilityState !== "visible") return;
-      if (!localStorage.getItem("fonday_login_pending")) return;
-      fetch("/api/user", { credentials: "include" }).then(r => r.ok ? r.json() : null).then(u => {
-        if (u) {
-          localStorage.removeItem("fonday_login_pending");
-          setUser(u);
-        }
-      });
-    };
-    document.addEventListener("visibilitychange", onVisible);
-    window.addEventListener("focus", onVisible);
-    return () => {
-      document.removeEventListener("visibilitychange", onVisible);
-      window.removeEventListener("focus", onVisible);
-    };
   }, []);
 
   // 토스 미니앱: getAnonymousKey로 자동 로그인
@@ -188,13 +155,8 @@ export default function SkinScanPage() {
     });
   }, []);
 
-  // 팝업 로그인 (DiaryTab·MyScreen 등에서 사용)
-  const openLoginPopup = useCallback((provider: "kakao" | "line" | "google", returnTab?: string) => {
-    if (isTossMiniApp()) return; // 토스 미니앱에서는 getAnonymousKey로 자동 로그인
-    if (returnTab) localStorage.setItem("fonday_return_tab", returnTab);
-    const lang = localStorage.getItem("fonday_lang") || "ko";
-    window.location.href = `/auth/${provider}?lang=${lang}`;
-  }, []);
+  // 토스 미니앱: 로그인은 getAnonymousKey로 자동 처리됨 — no-op
+  const openLoginPopup = useCallback((_provider: string, _returnTab?: string) => {}, []);
 
   // 로그인 후 게스트 스캔 연결
   useEffect(() => {
