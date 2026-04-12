@@ -34,7 +34,7 @@ import {
   COLOR_SUCCESS,
 } from "./constants";
 import type { WeatherData, WeatherTipKey } from "./types";
-import { getStreak, getDaysSinceLastScan, getWeatherTipKey, buildCosmeticCorrelationSignals, todayStr, haptic } from "./utils";
+import { getStreak, getDaysSinceLastScan, getWeatherTipKey, buildCosmeticCorrelationSignals, todayStr, haptic, isTossMiniApp } from "./utils";
 // AttendanceCalendarModal은 MY탭에서만 사용
 import { WeatherTipCard } from "./WeatherTipCard";
 import { LangSwitcher } from "./BottomNav";
@@ -330,9 +330,12 @@ export function ScanIdleScreen({
           <p className="text-center text-[12px] mt-4" style={{ color: TEXT_TERTIARY }}>
             {t("idle.ctaHint")}
           </p>
-          <p className="text-center text-[11px] mt-2" style={{ color: TEXT_TERTIARY }}>
-            {t("idle.socialCount", { n: (1247 + Math.floor((Date.now() - new Date("2026-01-01").getTime()) / 86400000) * 3).toLocaleString() })}
-          </p>
+          {/* 소셜 프루프 — 토스 미니앱에서는 숨김 (가짜 카운터 = 다크패턴) */}
+          {!isTossMiniApp() && (
+            <p className="text-center text-[11px] mt-2" style={{ color: TEXT_TERTIARY }}>
+              {t("idle.socialCount", { n: (1247 + Math.floor((Date.now() - new Date("2026-01-01").getTime()) / 86400000) * 3).toLocaleString() })}
+            </p>
+          )}
         </motion.div>
       )}
 
