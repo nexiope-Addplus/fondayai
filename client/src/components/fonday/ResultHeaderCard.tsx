@@ -30,6 +30,7 @@ function CountUp({ value, className, style }: { value: number; className?: strin
   return <span className={className} style={style}>{displayed}</span>;
 }
 import { Flame, Microscope } from "lucide-react";
+import { FaceMeshOverlay } from "./FaceMeshOverlay";
 import { Card, CardContent } from "@/components/ui/card";
 import type { AnalysisResult, RankingData, StreakData } from "./types";
 import {
@@ -95,6 +96,7 @@ export function ResultHeaderCard({
         <div className="flex items-stretch gap-3">
           <div className="relative rounded-2xl overflow-hidden bg-stone-100 shrink-0" style={{ width: 100, minHeight: 120 }}>
             <img src={faceCroppedSrc || imageSrc} alt="" aria-hidden="true" className="w-full h-full object-cover" style={{ objectPosition: "center 50%" }} />
+            <FaceMeshOverlay imageSrc={faceCroppedSrc || imageSrc} />
             <div className="absolute top-2 left-2 w-5 h-5 border-t-2 border-l-2 rounded-tl-lg" style={{ borderColor: SCAN_TO }} />
             <div className="absolute top-2 right-2 w-5 h-5 border-t-2 border-r-2 rounded-tr-lg" style={{ borderColor: SCAN_TO }} />
             <div className="absolute bottom-2 left-2 w-5 h-5 border-b-2 border-l-2 rounded-bl-lg" style={{ borderColor: SCAN_TO }} />

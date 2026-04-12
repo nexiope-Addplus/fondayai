@@ -567,10 +567,10 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
                             {/* 정보 */}
                             <div className="flex-1 min-w-0">
                               <div className="flex items-center gap-1.5">
-                                <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full" style={{ background: `${DEEP_GREEN}10`, color: DEEP_GREEN }}>
+                                <span className="text-[11px] font-bold px-1.5 py-0.5 rounded-full" style={{ background: `${DEEP_GREEN}10`, color: DEEP_GREEN }}>
                                   {t(`cosmetics.categories.${item.category}`)}
                                 </span>
-                                <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full" style={{ background: `${SCAN_FROM}10`, color: SCAN_TO }}>
+                                <span className="text-[11px] font-medium px-1.5 py-0.5 rounded-full" style={{ background: `${SCAN_FROM}10`, color: SCAN_TO }}>
                                   {item.time_of_day === "am" ? t("cosmetics.amBtn")
                                     : item.time_of_day === "pm" ? t("cosmetics.pmBtn")
                                     : inferCosmeticTimeOfDay(item.category) === "am" ? t("cosmetics.amBtn") : t("cosmetics.pmBtn")}

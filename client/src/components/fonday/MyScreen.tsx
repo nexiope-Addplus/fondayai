@@ -184,29 +184,31 @@ export function MyScreen({
             <ChevronRight className="w-4 h-4 shrink-0" style={{ color: TEXT_TERTIARY }} />
           </button>
 
-          {/* 구분선 */}
-          <div className="my-4" style={{ borderTop: `1px solid ${BORDER_COLOR}` }} />
-
-          {/* 언어 설정 */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: "#F6F4FB" }}>
-                <Sparkles className="w-4.5 h-4.5" style={{ color: COLOR_INFO }} />
+          {/* 언어 설정 — 토스 미니앱에서는 한글 고정이므로 숨김 */}
+          {!isTossMiniApp() && (
+            <>
+              <div className="my-4" style={{ borderTop: `1px solid ${BORDER_COLOR}` }} />
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: "#F6F4FB" }}>
+                    <Sparkles className="w-4.5 h-4.5" style={{ color: COLOR_INFO }} />
+                  </div>
+                  <p className="text-[14px] font-bold text-[#5C4F4A]">{t("nav.language")}</p>
+                </div>
+                <div className="flex gap-1">
+                  {(["en", "ko", "ja"] as const).map(lang => (
+                    <button key={lang} onClick={() => i18n.changeLanguage(lang)}
+                      className={`px-3 py-2.5 rounded-lg text-xs font-bold transition-all min-h-[44px] min-w-[44px] flex items-center justify-center ${
+                        i18n.language === lang ? "" : "bg-stone-100"
+                      }`}
+                      style={i18n.language === lang ? { background: TINT_WARM, color: SCAN_TO } : {}}>
+                      {lang.toUpperCase()}
+                    </button>
+                  ))}
+                </div>
               </div>
-              <p className="text-[14px] font-bold text-[#5C4F4A]">{t("nav.language")}</p>
-            </div>
-            <div className="flex gap-1">
-              {(["en", "ko", "ja"] as const).map(lang => (
-                <button key={lang} onClick={() => i18n.changeLanguage(lang)}
-                  className={`px-3 py-2.5 rounded-lg text-xs font-bold transition-all min-h-[44px] min-w-[44px] flex items-center justify-center ${
-                    i18n.language === lang ? "" : "bg-stone-100"
-                  }`}
-                  style={i18n.language === lang ? { background: TINT_WARM, color: SCAN_TO } : {}}>
-                  {lang.toUpperCase()}
-                </button>
-              ))}
-            </div>
-          </div>
+            </>
+          )}
 
           {/* 구분선 */}
           <div className="my-4" style={{ borderTop: `1px solid ${BORDER_COLOR}` }} />
@@ -225,10 +227,10 @@ export function MyScreen({
             </button>
           )}
 
-          {/* 구분선 */}
+          {/* Fonday 디바이스 — 토스 미니앱에서는 숨김 */}
+          {!isTossMiniApp() && (
+            <>
           <div className="my-4" style={{ borderTop: `1px solid ${BORDER_COLOR}` }} />
-
-          {/* Fonday 디바이스 — 확장 가능 */}
           <button
             onClick={() => setDeviceExpanded((v) => !v)}
             className="w-full flex items-center justify-between active:opacity-70"
@@ -311,15 +313,19 @@ export function MyScreen({
               </motion.div>
             )}
           </AnimatePresence>
+            </>
+          )}
         </div>
 
-        {/* 제휴 문의 */}
-        <div className="pt-4 pb-2 text-center">
-          <button onClick={() => setShowPartnership(true)}
-            className="text-xs underline underline-offset-2 hover:transition-colors" style={{ color: TEXT_TERTIARY }}>
-            {t("result.partnershipLink")}
-          </button>
-        </div>
+        {/* 제휴 문의 — 토스 미니앱에서는 숨김 */}
+        {!isTossMiniApp() && (
+          <div className="pt-4 pb-2 text-center">
+            <button onClick={() => setShowPartnership(true)}
+              className="text-xs underline underline-offset-2 hover:transition-colors" style={{ color: TEXT_TERTIARY }}>
+              {t("result.partnershipLink")}
+            </button>
+          </div>
+        )}
       </div>
 
       {/* 출석 달력 모달 */}

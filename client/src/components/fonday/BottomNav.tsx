@@ -80,7 +80,7 @@ export function BottomNav({ active, onChange, scanState }: {
                 >
                   <Icon className="w-5 h-5" strokeWidth={isActive ? 2.5 : 2.2} />
                 </div>
-                <span className={`text-[10px] leading-none transition-all duration-200 ${isActive ? "font-bold" : "font-medium"}`}>
+                <span className={`text-[11px] leading-none transition-all duration-200 ${isActive ? "font-bold" : "font-medium"}`}>
                   {t(labelKey)}
                 </span>
               </button>

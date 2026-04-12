@@ -183,14 +183,14 @@ export function ProductRecommendCard({ baumannType }: { baumannType: string }) {
                 <span className="text-[14px] font-extrabold" style={{ color: scoreColor }}>
                   {score}%
                 </span>
-                <span className="text-[10px] font-bold" style={{ color: scoreColor }}>
+                <span className="text-[11px] font-bold" style={{ color: scoreColor }}>
                   {lang === "ja" ? "適合" : lang === "en" ? "match" : "매칭"}
                 </span>
               </div>
 
               {/* 제품 정보 */}
               <div className="px-2.5 pb-1 flex-1 flex flex-col">
-                <p className="text-[10px] font-semibold" style={{ color: TEXT_TERTIARY }}>{product.brand}</p>
+                <p className="text-[11px] font-semibold" style={{ color: TEXT_TERTIARY }}>{product.brand}</p>
                 <p className="text-[11px] font-bold mt-0.5 line-clamp-2 leading-snug" style={{ color: "#5C4F4A" }}>{product.name}</p>
               </div>
 
@@ -208,7 +208,7 @@ export function ProductRecommendCard({ baumannType }: { baumannType: string }) {
                       fireEvent("product_recommend_click", { productId: product.id, brand: product.brand, name: product.name });
                       autoRegisterCosmetic(product);
                     }}
-                    className="flex items-center gap-0.5 text-[10px] font-bold px-2 py-1 rounded-full"
+                    className="flex items-center gap-0.5 text-[11px] font-bold px-2 py-1 rounded-full"
                     style={{ background: SCAN_TO, color: "#fff" }}
                   >
                     {lang === "ja" ? "購入" : lang === "en" ? "Buy" : "구매"}

@@ -60,6 +60,7 @@ import {
   getReportLang,
   getStreak,
   getWeeklyReport,
+  isTossMiniApp,
   saveAICareSettings,
   saveReminderSettings,
   syncReminderToServer,
@@ -354,6 +355,8 @@ export function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: AppU
             >
               <DiaryCalendarView allEntries={allEntries} />
               <div className="px-5 pt-3">
+                {/* 알림/리마인더 섹션 — 토스 미니앱은 웹푸시 미지원이므로 숨김 */}
+                {!isTossMiniApp() && (
                 <div className="pt-5 mt-5" style={{ borderTop: `1px solid ${BORDER_COLOR}` }}>
                   <div>
                     <div className="flex items-start justify-between gap-3">
@@ -482,6 +485,7 @@ export function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: AppU
                     )}
                   </div>
                 </div>
+                )}
               </div>
               <DiaryRoutinePreviewCard routineGuide={routineGuide} dateStr={todayStr()} />
             </motion.div>
