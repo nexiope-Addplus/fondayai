@@ -1027,42 +1027,41 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
           sessionStorage.removeItem("battleChallengeToken");
           window.location.href = `/battle/${pendingChallengeToken}`;
         }}
-        onCreateChallenge={async () => {
+        onCreateChallenge={() => {
           if (!currentShareToken) return;
-          markChallengeUsed();
           const shareUrl = `${window.location.origin}/battle/${currentShareToken}`;
-          // 1차: Web Share API 시도
-          if (navigator.share) {
-            try {
-              await navigator.share({
-                title: "Fonday° 피부 챌린지",
-                text: t("result.challengeText", { score: overallScore, type: finalType }),
-                url: shareUrl,
+          const shareData = {
+            title: "Fonday° 피부 챌린지",
+            text: t("result.challengeText", { score: overallScore, type: finalType }),
+            url: shareUrl,
+          };
+          // navigator.share는 동기 user gesture 내에서 즉시 호출해야 함
+          if (navigator.share && navigator.canShare?.(shareData)) {
+            navigator.share(shareData)
+              .then(() => { markChallengeUsed(); })
+              .catch((e) => {
+                // AbortError = 사용자 취소, 무시
+                if (e?.name !== "AbortError") {
+                  console.warn("[Challenge] share failed:", e);
+                  copyToClipboard(shareUrl);
+                }
               });
-              return;
-            } catch (e) {
-              // share 취소 또는 미지원 — fallback으로
-            }
+          } else {
+            markChallengeUsed();
+            copyToClipboard(shareUrl);
           }
-          // 2차: clipboard 시도
-          try {
-            await navigator.clipboard.writeText(shareUrl);
-            alert(t("result.challengeLinkCopied"));
-            return;
-          } catch {}
-          // 3차: execCommand fallback (토스 웹뷰 등)
-          try {
+
+          function copyToClipboard(url: string) {
+            // textarea + execCommand가 가장 호환성 높음
             const ta = document.createElement("textarea");
-            ta.value = shareUrl;
-            ta.style.cssText = "position:fixed;opacity:0";
+            ta.value = url;
+            ta.style.cssText = "position:fixed;left:-9999px;opacity:0";
             document.body.appendChild(ta);
+            ta.focus();
             ta.select();
-            document.execCommand("copy");
+            try { document.execCommand("copy"); } catch {}
             document.body.removeChild(ta);
             alert(t("result.challengeLinkCopied"));
-          } catch {
-            // 최종 fallback: URL 직접 표시
-            prompt(t("result.challengeLinkCopied"), shareUrl);
           }
         }}
       />
