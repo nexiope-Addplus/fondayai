@@ -50,7 +50,6 @@ import {
 import { SkinPredictionCard } from "./SkinPredictionCard";
 import { ResultDiaryCard } from "./ResultDiaryCard";
 import { ResultActionBar } from "./ResultActionBar";
-import { ProductRecommendCard } from "./ProductRecommendCard";
 import { ResultRoutineTab } from "./ResultRoutineTab";
 import { ResultSolutionTab } from "./ResultSolutionTab";
 import { ResultNutritionTab } from "./ResultNutritionTab";
@@ -892,8 +891,6 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
           </div>
         )}
 
-        {/* 맞춤 루틴 — 카테고리별 1위 추천 */}
-        <ProductRecommendCard baumannType={finalType} />
 
         <div ref={tabNavRef} className="rounded-full p-1.5 sticky top-0 z-20"
           style={{ background: BG_MUTED }}>
@@ -1012,14 +1009,6 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
         )}
 
         </AnimatePresence>
-        </div>
-
-        {/* ── 제휴 텍스트 링크 ── */}
-        <div className="pt-2 pb-1 text-center">
-          <button onClick={() => setShowPartnership(true)}
-            className="text-xs text-stone-400 underline underline-offset-2 hover:text-stone-600 transition-colors">
-            {t("result.partnershipLink")}
-          </button>
         </div>
 
       </motion.div>
