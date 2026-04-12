@@ -337,8 +337,11 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
 
   // 비로그인 챌린지 토큰 생성 (로그인 여부 확정 후 즉시)
   const [guestTokenFetched, setGuestTokenFetched] = useState(false);
+  // shareToken이 없으면 challenge-token API로 가져옴 (토스 mock 유저, 스캔 저장 실패 등)
   useEffect(() => {
-    if (!analysisResult || user !== null || guestTokenFetched) return;
+    if (!analysisResult || currentShareToken || guestTokenFetched) return;
+    // 로그인 유저는 스캔 저장 완료 후에 체크 (isSaved 대기)
+    if (user !== null && !isSaved) return;
     setGuestTokenFetched(true);
     const KO_AGE_GROUPS = ["10대","20대 초반","20대 후반","30대 초반","30대 후반","40대 초반","40대 후반","50대+"];
     fetch("/api/challenge-token", {
@@ -357,12 +360,11 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
     }).then(res => res.json()).then(data => {
       if (data?.shareToken) {
         setCurrentShareToken(data.shareToken);
-        // 로그인 후 연결을 위해 localStorage에도 보관
         try { localStorage.setItem("fonday_guest_token", data.shareToken); } catch {}
       }
     }).catch(() => {});
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user, analysisResult]);
+  }, [user, analysisResult, isSaved, currentShareToken]);
 
   // 날씨 정보 가져오기 (Care Manager 저장용)
   useEffect(() => {
@@ -433,6 +435,8 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
           gender: (surveyData?.genderIdx ?? 0) === 0 ? "female" : "male",
           ageGroup: KO_AGE_GROUPS2[surveyData?.ageIdx ?? 2] ?? "",
         }),
+      }).then(res => res.json()).then(d => {
+        if (d?.shareToken && !currentShareToken) setCurrentShareToken(d.shareToken);
       }).catch(() => {});
     }).catch(err => console.error("[Scan Save Error]", err));
   }, [user, analysisResult, internalWeather]);
