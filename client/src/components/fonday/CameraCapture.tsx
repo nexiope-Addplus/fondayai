@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { X, Sun, Moon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SCAN_FROM } from "./constants";
-import { Capacitor } from "@capacitor/core";
+import { isTossMiniApp } from "./utils";
 
 type BrightnessLevel = "ok" | "too_dark" | "too_bright";
 
@@ -119,11 +119,11 @@ export function CameraCapture({ onCapture, onClose }: {
   };
 
   if (useFile) {
-    const isNative = Capacitor.isNativePlatform();
+    const isToss = isTossMiniApp();
     return (
       <div className="fixed inset-0 z-[200] bg-black flex flex-col items-center justify-center gap-6">
         <p className="text-white text-sm">{t("camera.noCamera")}</p>
-        {isNative && (
+        {isToss && (
           <Button onClick={() => {
             const input = document.createElement("input");
             input.type = "file";

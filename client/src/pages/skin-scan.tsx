@@ -3,8 +3,7 @@ import { useTranslation } from "react-i18next";
 import i18n from "../i18n";
 import { motion, AnimatePresence } from "framer-motion";
 import { AlertCircle, SmartphoneNfc } from "lucide-react";
-import { Capacitor } from "@capacitor/core";
-import { Browser } from "@capacitor/browser";
+import { isTossMiniApp } from "../components/fonday/utils";
 import type { TabId, ScanState, SurveyData, AnalysisResult } from "../components/fonday/types";
 import {
   todayStr, getStreak, getAttendance,
@@ -167,41 +166,34 @@ export default function SkinScanPage() {
     };
   }, []);
 
-  // 네이티브 앱: 딥링크(fondayapp://login?token=...)로 돌아올 때 처리
+  // 토스 미니앱: getAnonymousKey로 자동 로그인
   useEffect(() => {
-    if (!Capacitor.isNativePlatform()) return;
-    const handleAppUrl = async (event: any) => {
-      const url = new URL(event.url);
-      if (url.pathname === "/login" || url.host === "login") {
-        const token = url.searchParams.get("token");
-        if (token) {
-          localStorage.setItem("fonday_app_token", token);
-          try { await Browser.close(); } catch {}
-          // 토큰으로 유저 정보 가져오기
-          fetch("/api/user", {
-            headers: { "Authorization": `Bearer ${token}` },
-          })
-            .then(r => r.ok ? r.json() : null)
-            .then(u => { if (u) setUser(u); });
+    if (!isTossMiniApp()) return;
+    import("@apps-in-toss/web-framework").then(({ getAnonymousKey }) => {
+      getAnonymousKey().then((result) => {
+        if (!result || typeof result === "string") return;
+        if (result.type === "HASH") {
+          const tossUserId = `toss_${result.hash}`;
+          localStorage.setItem("fonday_toss_user_hash", result.hash);
+          // 토스 유저를 간이 유저 객체로 설정
+          setUser({
+            id: tossUserId,
+            username: "토스 사용자",
+            provider: "toss",
+            avatar: null,
+            email: null,
+          });
         }
-      }
-    };
-    import("@capacitor/app").then(({ App }) => {
-      App.addListener("appUrlOpen", handleAppUrl);
+      });
     });
   }, []);
 
   // 팝업 로그인 (DiaryTab·MyScreen 등에서 사용)
   const openLoginPopup = useCallback((provider: "kakao" | "line" | "google", returnTab?: string) => {
+    if (isTossMiniApp()) return; // 토스 미니앱에서는 getAnonymousKey로 자동 로그인
     if (returnTab) localStorage.setItem("fonday_return_tab", returnTab);
     const lang = localStorage.getItem("fonday_lang") || "ko";
-    if (Capacitor.isNativePlatform()) {
-      // 네이티브 앱: 시스템 브라우저(SFSafariViewController)로 OAuth
-      const baseUrl = "https://dev.fondayai.com";
-      Browser.open({ url: `${baseUrl}/auth/${provider}?lang=${lang}&source=app` });
-    } else {
-      window.location.href = `/auth/${provider}?lang=${lang}`;
-    }
+    window.location.href = `/auth/${provider}?lang=${lang}`;
   }, []);
 
   // 로그인 후 게스트 스캔 연결

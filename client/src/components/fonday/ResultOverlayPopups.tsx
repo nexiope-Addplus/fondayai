@@ -2,7 +2,7 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence } from "framer-motion";
 import { Target } from "lucide-react";
-import { Capacitor } from "@capacitor/core";
+import { isTossMiniApp } from "./utils";
 import { PwaInstallPopup } from "./PwaInstallPopup";
 import { CheckinSuccessSheet } from "./CheckinSuccessSheet";
 import { PushPromptSheet } from "./PushPromptSheet";
@@ -97,8 +97,8 @@ export function ResultOverlayPopups({
         )}
       </AnimatePresence>
 
-      {/* PWA 설치 팝업 — 네이티브 앱에서는 표시 안 함 */}
-      {!Capacitor.isNativePlatform() && (
+      {/* PWA 설치 팝업 — 토스 미니앱/네이티브 앱에서는 표시 안 함 */}
+      {!isTossMiniApp() && (
         <PwaInstallPopup
           open={showPwaPopup}
           onDismiss={() => { setShowPwaPopup(false); localStorage.setItem("fonday_pwa_dismissed", "1"); }}

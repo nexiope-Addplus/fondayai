@@ -12,11 +12,13 @@
     "db:push": "drizzle-kit push"
   },
   "dependencies": {
+    "@apps-in-toss/web-framework": "^2.4.5",
     "@capacitor/app": "^8.1.0",
     "@capacitor/browser": "^8.0.3",
     "@capacitor/core": "^8.3.0",
     "@cf-wasm/resvg": "^0.3.3",
     "@cf-wasm/satori": "^0.3.5",
+    "@emotion/react": "^11.14.0",
     "@google/generative-ai": "^0.24.1",
     "@hookform/resolvers": "^3.10.0",
     "@jridgewell/trace-mapping": "^0.3.25",
@@ -50,6 +52,8 @@
     "@radix-ui/react-tooltip": "^1.2.0",
     "@resvg/resvg-wasm": "^2.6.2",
     "@tanstack/react-query": "^5.60.5",
+    "@toss/tds-mobile": "^2.3.0",
+    "@toss/tds-mobile-ait": "^2.3.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",

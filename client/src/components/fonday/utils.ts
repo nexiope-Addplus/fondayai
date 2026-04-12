@@ -276,6 +276,15 @@ export function haptic(style: "light" | "medium" | "success" = "light") {
 export function isPWA(): boolean {
   return window.matchMedia("(display-mode: standalone)").matches || !!(navigator as any).standalone;
 }
+
+/** 토스 미니앱 환경 감지 */
+export function isTossMiniApp(): boolean {
+  return !!(
+    (window as any).__AIT__ ||
+    navigator.userAgent.includes("TossApp") ||
+    document.documentElement.classList.contains("toss-miniapp")
+  );
+}
 export function shouldShowPushPrompt(): boolean {
   if (!("serviceWorker" in navigator) || !("PushManager" in window)) return false;
   if (typeof Notification !== "undefined" && Notification.permission === "denied") return false;

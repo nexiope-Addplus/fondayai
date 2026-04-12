@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { AnimatePresence, motion } from "framer-motion";
-import { Capacitor } from "@capacitor/core";
+import { isTossMiniApp } from "./utils";
 import {
   Sparkles,
   Zap,
@@ -276,8 +276,8 @@ export function MyScreen({
           {/* 구분선 */}
           <div className="my-4" style={{ borderTop: `1px solid ${BORDER_COLOR}` }} />
 
-          {/* 앱 설치 — 네이티브 앱에서는 숨김 */}
-          {!Capacitor.isNativePlatform() && (
+          {/* 앱 설치 — 토스 미니앱/네이티브 앱에서는 숨김 */}
+          {!isTossMiniApp() && (
             <button onClick={onInstall}
               className="w-full flex items-center justify-between active:opacity-70">
               <div className="flex items-center gap-3 min-w-0">
