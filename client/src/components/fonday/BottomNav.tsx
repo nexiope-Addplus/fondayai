@@ -3,12 +3,13 @@ import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 import { House, History, NotebookPen, User, ShoppingBag } from "lucide-react";
 import { SCAN_TO, BORDER_COLOR, TINT_WARM } from "./constants";
-import { haptic } from "./utils";
+import { haptic, isTossMiniApp } from "./utils";
 import type { TabId, ScanState } from "./types";
 
-// ─── 언어 선택 버튼 ──────────────────────────────────────────────
+// ─── 언어 선택 버튼 (토스 미니앱에서는 숨김 — 한글 고정) ─────────
 export function LangSwitcher() {
   const { i18n: i18nHook } = useTranslation();
+  if (isTossMiniApp()) return null;
   const langs = ["EN", "KO", "JA"];
   const current = (i18nHook.language || "en").toUpperCase();
   return (

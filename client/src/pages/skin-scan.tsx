@@ -92,7 +92,9 @@ export default function SkinScanPage() {
     trackEvent("tab_view", { tab });
   };
 
+  // PWA 설치 프롬프트 — 토스 미니앱에서는 비활성화
   useEffect(() => {
+    if (isTossMiniApp()) return;
     const handler = (e: any) => { e.preventDefault(); setDeferredPrompt(e); };
     const installed = () => { trackEvent("pwa_prompt_accepted"); setDeferredPrompt(null); };
     window.addEventListener("beforeinstallprompt", handler);
@@ -101,7 +103,7 @@ export default function SkinScanPage() {
   }, []);
 
   const handleInstall = async () => {
-    // 이미 PWA로 실행 중이면 무시
+    if (isTossMiniApp()) return;
     if (window.matchMedia("(display-mode: standalone)").matches) return;
     if (deferredPrompt) {
       trackEvent("pwa_prompt_shown");
@@ -110,10 +112,8 @@ export default function SkinScanPage() {
       trackEvent(choice.outcome === "accepted" ? "pwa_prompt_accepted" : "pwa_prompt_dismissed");
       setDeferredPrompt(null);
     } else if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) {
-      // iOS만 수동 가이드 표시
       setShowInstallGuide(true);
     } else {
-      // 안드로이드 Chrome: 메뉴 → 홈 화면에 추가 안내
       alert(t("install.androidHint", "브라우저 메뉴(⋮) → '홈 화면에 추가'를 눌러주세요"));
     }
   };

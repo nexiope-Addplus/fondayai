@@ -14,7 +14,9 @@ function detectBrowserLang(): string {
   if (nav.startsWith("ja")) return "ja";
   return "en";
 }
-const savedLang = urlLang || localStorage.getItem("fonday_lang") || cookieLang || detectBrowserLang();
+// 토스 미니앱: 한글 강제
+const isToss = !!((window as any).__AIT__ || navigator.userAgent.includes("TossApp"));
+const savedLang = isToss ? "ko" : (urlLang || localStorage.getItem("fonday_lang") || cookieLang || detectBrowserLang());
 if (urlLang) localStorage.setItem("fonday_lang", urlLang);
 
 i18n
