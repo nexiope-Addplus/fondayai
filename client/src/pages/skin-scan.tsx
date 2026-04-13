@@ -298,19 +298,23 @@ export default function SkinScanPage() {
         const raw = localStorage.getItem("fonday_prev_scores");
         if (raw) { const arr = JSON.parse(raw); if (Array.isArray(arr) && arr.length === 10) previousScores = arr; }
       } catch {}
-      const response = await fetch(`${apiBase()}/api/analyze-skin`, {
+      const apiUrl = `${apiBase()}/api/analyze-skin`;
+      console.log("[API 요청]", apiUrl, "isToss:", isTossMiniApp(), "origin:", window.location.origin);
+      const response = await fetch(apiUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ image: b64, surveyData: data, lang: i18n.language || "en", previousScores }),
       });
       const rawText = await response.text();
-      console.log("[API 응답]", response.status, rawText.slice(0, 300));
+      console.log("[API 응답]", response.status, response.url, rawText.slice(0, 300));
       if (!response.ok) {
         let msg = `HTTP ${response.status}`;
         try {
           const errJson = JSON.parse(rawText);
           msg = errJson.detail || errJson.message || errJson.error || JSON.stringify(errJson);
         } catch { msg += ": " + rawText.slice(0, 100); }
+        // 디버그: 실제 요청 URL 표시
+        msg = `[${apiUrl}] ${msg}`;
         setScanError(msg);
         setScanState("error");
         trackEvent("scan_fail", { status: response.status });
