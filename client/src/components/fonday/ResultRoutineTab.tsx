@@ -4,6 +4,7 @@ import { motion, useReducedMotion } from "framer-motion";
 import { Sun, Moon, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { SkinPredictionCard } from "./SkinPredictionCard";
 import {
   DEEP_GREEN,
   SCAN_FROM,
@@ -33,7 +34,7 @@ export function ResultRoutineTab(props: any) {
     setRoutinePeriodCompletion, handleDiaryEntry,
     routineGuide, cosmeticsInsights, cosmeticCount,
     user, setShowCosmeticsRegister, setShowCosmeticsGate, myCosmetics,
-    overallScore, previousScore, currentStreak, onOpenDiary,
+    overallScore, previousScore, currentStreak, onOpenDiary, prediction,
     loginPromptRef, socialLoginButton, handleGoogleLogin, goTo,
     setShowCosmeticsReport,
   } = props;
@@ -196,6 +197,16 @@ export function ResultRoutineTab(props: any) {
                 onOpenDiary={onOpenDiary}
               />
             ) : null}
+
+        {prediction && (
+          <div className="pt-5 mt-5" style={{ borderTop: `1px solid ${BORDER_COLOR}` }}>
+            <SkinPredictionCard
+              prediction={prediction}
+              currentScore={overallScore}
+              onOpenDiary={handleDiaryEntry}
+            />
+          </div>
+        )}
 
         {/* 퀘스트 / 미션 — 루틴 아래 (게이미피케이션) */}
         <div className="pt-5 mt-5" style={{ borderTop: `1px solid ${BORDER_COLOR}` }}>

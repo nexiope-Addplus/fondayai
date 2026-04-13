@@ -22,7 +22,6 @@ import {
   COLOR_WARNING,
   COLOR_INFO,
 } from "./constants";
-import { SkinPredictionCard } from "./SkinPredictionCard";
 
 
 export function ResultSolutionTab(props: any) {
@@ -122,17 +121,6 @@ export function ResultSolutionTab(props: any) {
               </>
             )}
             </div>
-
-            {/* ── AI 피부 예측 ── */}
-            {analysisResult?.prediction && (
-              <div className="pt-5 mt-5" style={{ borderTop: `1px solid ${BORDER_COLOR}` }}>
-              <SkinPredictionCard
-                prediction={analysisResult.prediction}
-                currentScore={analysisResult.scores[0]?.score ?? 0}
-                onOpenDiary={handleDiaryEntry}
-              />
-              </div>
-            )}
 
             <button
               onClick={() => goTo("nutrition")}

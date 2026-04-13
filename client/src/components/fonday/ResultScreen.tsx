@@ -48,7 +48,6 @@ import {
   isIOS, isPWA, isTossMiniApp, buildStableBaumannType, autoRegisterCosmetic, apiBase, appFetch,
 } from "./utils";
 import { share as tossShare, getTossShareLink } from "@apps-in-toss/web-framework";
-import { SkinPredictionCard } from "./SkinPredictionCard";
 import { ResultDiaryCard } from "./ResultDiaryCard";
 import { ResultActionBar } from "./ResultActionBar";
 // import { useRewardedAd, useInterstitialAd } from "./TossAd"; // 광고 — 사업자 등록 후 활성화
@@ -984,6 +983,7 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
             overallScore={overallScore}
             previousScore={previousScore}
             currentStreak={currentStreak}
+            prediction={analysisResult?.prediction}
             onOpenDiary={onOpenDiary}
             loginPromptRef={loginPromptRef}
             socialLoginButton={socialLoginButton}
