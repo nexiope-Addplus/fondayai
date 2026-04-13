@@ -9,7 +9,7 @@ var global = typeof globalThis !== 'undefined' ? globalThis : typeof global !== 
     host: ''
   };
   global.__appsInToss = {
-    deploymentId: "019d851d-479c-7677-b322-5d05dd5d6d44",
+    deploymentId: "019d8527-e9d6-7185-9c30-f83c1bd85c22",
     brandDisplayName: "\uD3F0\uB370\uC774",
     brandPrimaryColor: "#4A7C6E",
     brandIcon: "https://fondayai.com/fonday-toss-logo.png",
@@ -132,7 +132,7 @@ if (global.__MICRO_FRONTEND__ == null) {
     host: ''
   };
   global.__appsInToss = {
-    deploymentId: "019d851d-479c-7677-b322-5d05dd5d6d44",
+    deploymentId: "019d8527-e9d6-7185-9c30-f83c1bd85c22",
     brandDisplayName: "\uD3F0\uB370\uC774",
     brandPrimaryColor: "#4A7C6E",
     brandIcon: "https://fondayai.com/fonday-toss-logo.png",
