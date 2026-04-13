@@ -56,6 +56,7 @@ export function ScanIdleScreen({
 }) {
   const { t, i18n } = useTranslation();
   const reducedMotion = useReducedMotion();
+  const isToss = isTossMiniApp();
   const streak = getStreak();
   const daysSince = getDaysSinceLastScan();
   const [showBaumannExp, setShowBaumannExp] = useState(false);
@@ -279,8 +280,8 @@ export function ScanIdleScreen({
           </p>
 
           {/* 얼굴 이미지 — 16:9 가로, 스크롤 없이 CTA까지 보이도록 */}
-          <div className="relative overflow-hidden mb-6 bg-stone-100"
-            style={{ aspectRatio: "16/9", borderRadius: 20, boxShadow: SHADOW_ELEVATED }}>
+          <div className="relative overflow-hidden mb-5 bg-stone-100"
+            style={{ aspectRatio: isToss ? "16/8.6" : "16/9", borderRadius: 20, boxShadow: isToss ? SHADOW_CARD : SHADOW_ELEVATED }}>
             <img
               src="/face-model.png"
               alt="skin analysis preview"
@@ -289,8 +290,8 @@ export function ScanIdleScreen({
             />
             <motion.div className="absolute inset-x-0 h-[2px] z-10"
               style={{ background: `linear-gradient(90deg, transparent 0%, ${DEEP_GREEN}CC 40%, ${DEEP_GREEN} 50%, ${DEEP_GREEN}CC 60%, transparent 100%)`, top: 0, willChange: "transform" }}
-              animate={reducedMotion ? {} : { top: ["8%", "88%", "8%"] }}
-              transition={reducedMotion ? {} : { duration: 3.5, repeat: Infinity, ease: "easeInOut" }} />
+              animate={reducedMotion || isToss ? {} : { top: ["8%", "88%", "8%"] }}
+              transition={reducedMotion || isToss ? {} : { duration: 3.5, repeat: Infinity, ease: "easeInOut" }} />
             <div className="absolute inset-x-0 bottom-0 h-16"
               style={{ background: "linear-gradient(to top, rgba(20,20,20,0.45), transparent)" }} />
             <div className="absolute top-3 left-3 w-6 h-6 border-t-2 border-l-2 rounded-tl-lg" style={{ borderColor: `${DEEP_GREEN}88` }} />
@@ -300,18 +301,26 @@ export function ScanIdleScreen({
             </div>
           </div>
 
-          {/* 3단계 compact — 한 줄로 */}
-          <div className="flex items-center justify-center gap-2 mb-4">
-            {STEPS.map((step, i) => (
-              <React.Fragment key={i}>
-                <div className="flex items-center gap-1.5">
-                  <step.Icon className="w-3.5 h-3.5" style={{ color: step.active ? SCAN_TO : "#A9998E" }} />
-                  <span className="text-[12px] font-medium" style={{ color: TEXT_LABEL }}>{step.title}</span>
-                </div>
-                {i < 2 && <span className="text-[11px]" style={{ color: TEXT_TERTIARY }}>›</span>}
-              </React.Fragment>
-            ))}
-          </div>
+          {!isToss ? (
+            <div className="flex items-center justify-center gap-2 mb-4">
+              {STEPS.map((step, i) => (
+                <React.Fragment key={i}>
+                  <div className="flex items-center gap-1.5">
+                    <step.Icon className="w-3.5 h-3.5" style={{ color: step.active ? SCAN_TO : "#A9998E" }} />
+                    <span className="text-[12px] font-medium" style={{ color: TEXT_LABEL }}>{step.title}</span>
+                  </div>
+                  {i < 2 && <span className="text-[11px]" style={{ color: TEXT_TERTIARY }}>›</span>}
+                </React.Fragment>
+              ))}
+            </div>
+          ) : (
+            <div className="mb-4 flex items-center gap-2 rounded-2xl px-3.5 py-3" style={{ background: BG_MUTED }}>
+              <ClipboardList className="w-4 h-4 shrink-0" style={{ color: DEEP_GREEN }} />
+              <p className="text-[12px] leading-relaxed" style={{ color: TEXT_SECONDARY }}>
+                {t("idle.ctaHint")}
+              </p>
+            </div>
+          )}
 
           {/* CTA — pill 형태, 부드러운 Salmon */}
           <motion.button
@@ -374,7 +383,7 @@ export function ScanIdleScreen({
               <span className="text-[14px]" style={{ color: TEXT_SECONDARY }}>
                 {t("result.skinAge")} {latestScan.skinAge ?? "—"}
               </span>
-              {latestWeakMetric?.label && (
+              {!isToss && latestWeakMetric?.label && (
                 <>
                   <span className="w-1 h-1 rounded-full" style={{ background: BORDER_COLOR }} />
                   <span className="text-[13px]" style={{ color: TEXT_SECONDARY }}>
@@ -406,13 +415,14 @@ export function ScanIdleScreen({
       </motion.div>
 
       {/* 날씨 상세 — 리턴 유저에게만 (신규 유저에겐 그리팅으로 충분) */}
-      {idleWeather && latestScan && (
+      {!isToss && idleWeather && latestScan && (
         <motion.div variants={fadeChild} className="mb-8 relative" style={{ zIndex: 1 }}>
           <WeatherTipCard compact weather={idleWeather} weakMetric={latestWeakMetric?.label} />
         </motion.div>
       )}
 
       {/* 바우만 설명 더보기 accordion */}
+      {!isToss && (
       <motion.div variants={fadeChild} className="mb-8 relative" style={{ zIndex: 1 }}>
         <div style={{ background: BG_BASE, boxShadow: SHADOW_CARD, borderRadius: RADIUS_CARD }}>
           <button onClick={() => setShowBaumannExp(v => !v)}
@@ -453,6 +463,7 @@ export function ScanIdleScreen({
           </AnimatePresence>
         </div>
       </motion.div>
+      )}
 
       {/* ── 신규 유저: 프라이버시 안내 (CTA 아래) ── */}
       {!latestScan && !scanLoading && (

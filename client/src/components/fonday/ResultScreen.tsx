@@ -852,11 +852,11 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
       ref={resultScrollRef}
       className="h-[calc(100dvh-60px)] overflow-y-auto"
       style={{ background: PAGE_GRADIENT }}
-      initial={{ opacity: 0, y: 28 }}
+      initial={{ opacity: 0, y: isTossMiniApp() ? 12 : 28 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+      transition={{ duration: isTossMiniApp() ? 0.28 : 0.5, ease: [0.22, 1, 0.36, 1] }}
     >
-      <motion.div className="px-5 pt-6 pb-40 space-y-6" variants={stagger} initial="initial" animate="animate">
+      <motion.div className={`px-5 pb-40 space-y-6 ${isTossMiniApp() ? "pt-4" : "pt-6"}`} variants={stagger} initial="initial" animate="animate">
         {/* 헤더 — 토스 미니앱에서는 내비바에 뒤로가기(<)가 있으므로 자체 버튼 숨김 */}
         <div className="flex justify-between items-center">
           {!isTossMiniApp() && (
@@ -867,8 +867,10 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
             </button>
           )}
           <div className={`flex items-center gap-2${isTossMiniApp() ? " mx-auto" : ""}`}>
-            <img src="/fonday-logo.svg" alt="Fonday" className="h-5" style={{ objectFit: "contain" }} />
-            <span className="text-[14px] font-bold" style={{ color: TEXT_TITLE }}>{t("result.reportLabel", "피부 리포트")}</span>
+            {!isTossMiniApp() && <img src="/fonday-logo.svg" alt="Fonday" className="h-5" style={{ objectFit: "contain" }} />}
+            <span className={`${isTossMiniApp() ? "text-[13px]" : "text-[14px]"} font-bold`} style={{ color: TEXT_TITLE }}>
+              {isTossMiniApp() ? t("result.reportLabel", "피부 리포트") : t("result.reportLabel", "피부 리포트")}
+            </span>
           </div>
         </div>
 
