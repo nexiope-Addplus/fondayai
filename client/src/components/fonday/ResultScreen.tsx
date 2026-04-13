@@ -712,12 +712,13 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
     markShareUsed();
     setShareLoading(true);
 
-    // 토스 미니앱: 이미지 공유 불가 → 텍스트 링크 공유
+    // 토스 미니앱: OG 미리보기가 포함된 /share/:token 웹 URL 공유
     if (isTossMiniApp()) {
       try {
         const shareText = t("result.shareText", { score: overallScore, type: finalType });
-        const tossLink = await getTossShareLink("intoss://fonday");
-        await tossShare({ message: `${shareText}\n${tossLink}` });
+        const token = currentShareToken;
+        const shareUrl = token ? `https://fondayai.com/share/${token}` : "https://fondayai.com";
+        await tossShare({ message: `${shareText}\n${shareUrl}` });
       } catch (e) {
         console.warn("[share:toss]", e);
       } finally {
@@ -1056,14 +1057,9 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
           const shareText = t("result.challengeText", { score: overallScore, type: finalType });
 
           if (isTossMiniApp()) {
-            // 토스 미니앱: SDK 공유 (네이티브 공유 시트 — 카톡 포함)
-            getTossShareLink(`intoss://fonday${battlePath}`)
-              .then(tossLink => tossShare({ message: `${shareText}\n${tossLink}` }))
-              .catch(() => {
-                // SDK 실패 시 웹 공유 URL로 fallback
-                const webUrl = `${window.location.origin}${battlePath}`;
-                tossShare({ message: `${shareText}\n${webUrl}` }).catch(() => {});
-              });
+            // 토스 미니앱: OG 미리보기가 포함된 웹 URL 공유
+            const battleUrl = `https://fondayai.com${battlePath}`;
+            tossShare({ message: `${shareText}\n${battleUrl}` }).catch(() => {});
           } else {
             // 일반 웹: Web Share API
             const shareUrl = `${window.location.origin}${battlePath}`;

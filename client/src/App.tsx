@@ -6,6 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import SkinScanPage from "@/pages/skin-scan";
 import BattlePage from "@/pages/battle";
+import SharedResultPage from "@/pages/shared-result";
 import LegalPage from "@/pages/legal";
 
 
@@ -16,6 +17,7 @@ function Router() {
       <Route path="/" component={SkinScanPage} />
       <Route path="/skinReport" component={SkinScanPage} />
       <Route path="/battle/:token" component={BattlePage} />
+      <Route path="/share/:token" component={SharedResultPage} />
       <Route path="/legal/:type" component={LegalPage} />
     </Switch>
   );
