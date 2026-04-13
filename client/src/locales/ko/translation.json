@@ -48,7 +48,7 @@
     "heroMbtiLabel": "피부 MBTI",
     "heroBenefitsTitle": "스캔하면 바로 받는 결과",
     "heroBenefit1": "16가지 피부 MBTI 진단",
-    "heroBenefit2": "내 타입에 맞는 화장품 추천",
+    "heroBenefit2": "내 타입에 맞는 관리와 성분 가이드",
     "heroBenefit3": "매일 찍으면 효과까지 추적",
     "stepsTitle": "이렇게 진행돼요",
     "step1": "설문 30초",
@@ -56,13 +56,13 @@
     "step2": "셀카 촬영",
     "step2Sub": "전면 카메라 사용",
     "step3": "AI 분석",
-    "step3Sub": "맞춤 화장품 추천",
+    "step3Sub": "맞춤 관리 가이드",
     "flowEyebrow": "오늘의 흐름",
     "flowTitle": "스캔 후 다음 행동까지 한 번에 이어가세요",
     "flowStep1Title": "홈에서 오늘 상태 확인",
     "flowStep1Desc": "날씨 팁과 최근 결과를 보고 지금 스캔이 필요한지 먼저 판단해요.",
     "flowStep2Title": "스캔 후 루틴으로 연결",
-    "flowStep2Desc": "결과를 본 뒤 바로 루틴 탭으로 넘어가 제품 조합과 관리 포인트를 정리해요.",
+    "flowStep2Desc": "결과를 본 뒤 바로 루틴 탭으로 넘어가 관리 포인트를 정리해요.",
     "flowStep3Title": "일기로 반응 기록",
     "flowStep3Desc": "피부 컨디션, 수면, 식단을 적어두면 다음 스캔 변화와 같이 읽기 쉬워져요.",
     "latestEyebrow": "최근 스캔",
@@ -108,7 +108,7 @@
       "셀카 사진의 피부 색조, 모공, 광채, 잡티를 멀티스펙트럼 분석",
       "AI가 10가지 피부 지표를 0~100점으로 정량화",
       "바우만 4가지 축 점수 기반으로 개인 피부 타입 결정",
-      "바우만 타입에 맞춘 성분·루틴·제품 유형 맞춤 추천"
+      "바우만 타입에 맞춘 성분·루틴·관리 방향 맞춤 가이드"
     ],
     "privacyLink": "개인정보처리방침",
     "termsLink": "이용약관",
@@ -269,7 +269,7 @@
       "nutrition": "영양",
       "tossRoutine": "오늘 관리",
       "tossSolution": "맞춤 관리",
-      "tossNutrition": "성분"
+      "tossNutrition": "영양"
     },
     "onboarding": {
       "title": "첫 스캔 완료!",
@@ -299,11 +299,11 @@
       "routineDesc": "AM/PM 루틴을 체크하고, 일기와 MY 탭에서 오늘 변화를 연결하면 흐름이 자연스러워집니다.",
       "tossRoutineDesc": "오늘 피부 상태를 기준으로 바로 실천할 관리만 정리했어요.",
       "solutionTitle": "개선 솔루션을 실제 탭에서 이어보세요",
-      "tossSolutionTitle": "내 피부에 맞는 성분",
-      "solutionDesc": "추천 화장품, 발견 콘텐츠, 개인 리포트를 각각의 탭에서 더 길게 확인할 수 있어요.",
-      "tossSolutionDesc": "오늘 피부 상태를 기준으로 잘 맞는 성분 방향을 정리했어요.",
+      "tossSolutionTitle": "내 피부에 맞는 관리 방향",
+      "solutionDesc": "관리 가이드, 발견 콘텐츠, 개인 리포트를 각각의 탭에서 더 길게 확인할 수 있어요.",
+      "tossSolutionDesc": "오늘 피부 상태를 기준으로 바로 실천할 관리 방향을 정리했어요.",
       "nutritionCta": "영양 가이드 계속 보기 →",
-      "tossNutritionCta": "추천 성분 보기 →"
+      "tossNutritionCta": "영양 가이드 보기 →"
     },
     "deviceTeaser": {
       "title": "Fonday 디바이스",

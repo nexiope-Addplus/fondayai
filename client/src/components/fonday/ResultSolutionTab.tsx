@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 import { ScanLine, Lightbulb, Sparkles, Star, Utensils } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { isTossMiniApp } from "./utils";
 import {
   DEEP_GREEN,
   SCAN_TO,
@@ -138,7 +139,7 @@ export function ResultSolutionTab(props: any) {
               className="w-full flex items-center justify-center gap-2 py-3 rounded-2xl text-[12px] font-semibold transition-all active:scale-95"
               style={{ background: "#FAF8F5", color: COLOR_INFO }}>
               <Utensils className="w-4 h-4" />
-              <span>{t("result.tab.nutrition")}</span>
+              <span>{isTossMiniApp() ? t("result.tab.tossNutrition") : t("result.tab.nutrition")}</span>
             </button>
           </div>
   );
