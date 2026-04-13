@@ -299,11 +299,12 @@ export default function SkinScanPage() {
         if (raw) { const arr = JSON.parse(raw); if (Array.isArray(arr) && arr.length === 10) previousScores = arr; }
       } catch {}
       const apiUrl = `${apiBase()}/api/analyze-skin`;
-      console.log("[API 요청]", apiUrl, "isToss:", isTossMiniApp(), "origin:", window.location.origin);
       const response = await fetch(apiUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ image: b64, surveyData: data, lang: i18n.language || "en", previousScores }),
+        credentials: isTossMiniApp() ? "omit" : "include",
+        mode: isTossMiniApp() ? "cors" : "same-origin",
       });
       const rawText = await response.text();
       console.log("[API 응답]", response.status, response.url, rawText.slice(0, 300));
@@ -325,7 +326,8 @@ export default function SkinScanPage() {
       setScanState("result");
       trackEvent("scan_complete", { score: result.overallScore, baumannType: result.baumannType });
     } catch (err: any) {
-      setScanError(err.message || "네트워크 오류");
+      const debugInfo = `${err.message || "네트워크 오류"} | origin:${window.location.origin} | api:${apiBase()} | toss:${isTossMiniApp()}`;
+      setScanError(debugInfo);
       setScanState("error");
       trackEvent("scan_fail", { error: "network" });
     }
