@@ -53,6 +53,16 @@ export function FaceMeshOverlay({ imageSrc }: { imageSrc: string }) {
       }
     };
 
+    const drawInitialFallback = async () => {
+      const canvas = canvasRef.current;
+      if (!canvas) return;
+      await new Promise<void>(r => requestAnimationFrame(() => r()));
+      drawFallbackMesh(canvas);
+      if (!cancelled) setVisible(true);
+    };
+
+    drawInitialFallback();
+
     (async () => {
       try {
         const mp = await import('@mediapipe/face_mesh');

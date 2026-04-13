@@ -287,6 +287,15 @@ export function isTossMiniApp(): boolean {
     localStorage.getItem("fonday_toss_mode") === "1"
   );
 }
+
+export function isTossMiniAppSimulation(): boolean {
+  return !!(
+    (new URLSearchParams(window.location.search).get("toss") === "1" ||
+      localStorage.getItem("fonday_toss_mode") === "1") &&
+    !(window as any).__AIT__ &&
+    !navigator.userAgent.includes("TossApp")
+  );
+}
 export function shouldShowPushPrompt(): boolean {
   if (!("serviceWorker" in navigator) || !("PushManager" in window)) return false;
   if (typeof Notification !== "undefined" && Notification.permission === "denied") return false;
