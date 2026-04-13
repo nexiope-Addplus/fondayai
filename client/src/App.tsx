@@ -14,6 +14,7 @@ function Router() {
   return (
     <Switch>
       <Route path="/" component={SkinScanPage} />
+      <Route path="/skinReport" component={SkinScanPage} />
       <Route path="/battle/:token" component={BattlePage} />
       <Route path="/legal/:type" component={LegalPage} />
     </Switch>
