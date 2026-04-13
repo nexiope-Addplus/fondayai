@@ -277,9 +277,9 @@ export function isPWA(): boolean {
   return window.matchMedia("(display-mode: standalone)").matches || !!(navigator as any).standalone;
 }
 
-/** API base URL — 토스 미니앱은 자체 프록시로 API 전달, 상대 경로 유지 */
+/** API base URL — 토스 미니앱에서는 절대 URL 필수 (.ait 번들은 로컬 서빙) */
 export function apiBase(): string {
-  return "";
+  return isTossMiniApp() ? "https://fondayai.com" : "";
 }
 
 /** 토스 미니앱 환경 감지 (?toss=1 파라미터로 시뮬레이션 가능) */
