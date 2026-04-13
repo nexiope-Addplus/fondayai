@@ -4,6 +4,7 @@ import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { Camera } from "lucide-react";
 import { SCAN_FROM, SCAN_TO, BG_BASE, FONT_DISPLAY } from "./constants";
 import { FaceMeshOverlay } from "./FaceMeshOverlay";
+import { isTossMiniApp } from "./utils";
 
 // ─── 분석 중 화면 ─────────────────────────────────────────────────
 export function ScanningScreen({ imageSrc }: { imageSrc: string | null }) {
@@ -11,7 +12,8 @@ export function ScanningScreen({ imageSrc }: { imageSrc: string | null }) {
   const reducedMotion = useReducedMotion();
   const [textIdx, setTextIdx] = useState(0);
   const [progress, setProgress] = useState(0);
-  const texts = t("scanning.texts", { returnObjects: true }) as string[];
+  const isToss = isTossMiniApp();
+  const texts = t(isToss ? "scanning.tossTexts" : "scanning.texts", { returnObjects: true }) as string[];
 
   // 텍스트 사이클 — 언어 변경 시 재시작
   useEffect(() => {
@@ -54,7 +56,7 @@ export function ScanningScreen({ imageSrc }: { imageSrc: string | null }) {
         <div className="absolute bottom-4 left-0 right-0 flex justify-center">
           <div className="bg-black/50 backdrop-blur-md px-3 py-1.5 rounded-full flex items-center gap-2">
             <div className="w-2 h-2 rounded-full animate-pulse" style={{ background: SCAN_FROM }} />
-            <span className="text-xs font-semibold text-white uppercase tracking-wider" style={{ fontFamily: FONT_DISPLAY }}>{t("scanning.progress")}</span>
+            <span className="text-xs font-semibold text-white uppercase tracking-wider" style={{ fontFamily: FONT_DISPLAY }}>{isToss ? t("scanning.tossProgress") : t("scanning.progress")}</span>
           </div>
         </div>
       </div>
@@ -65,12 +67,12 @@ export function ScanningScreen({ imageSrc }: { imageSrc: string | null }) {
             {texts[textIdx]}
           </motion.p>
         </AnimatePresence>
-        <p className="text-sm text-stone-400 italic">{t("scanning.subtitle")}</p>
+        <p className="text-sm text-stone-400 italic">{isToss ? t("scanning.tossSubtitle") : t("scanning.subtitle")}</p>
       </div>
       {/* 진행 바 */}
       <div className="mt-8 w-full max-w-xs">
         <div className="flex justify-between text-xs text-stone-400 mb-1.5">
-          <span>{t("scanning.progress")}</span>
+          <span>{isToss ? t("scanning.tossProgress") : t("scanning.progress")}</span>
           <span>{Math.round(progress)}%</span>
         </div>
         <div className="h-1.5 bg-stone-200 rounded-full overflow-hidden">

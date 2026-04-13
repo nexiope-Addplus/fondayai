@@ -132,8 +132,8 @@ export function CameraCapture({ onCapture, onClose }: {
 
           <div className="w-full max-w-[340px]">
             <div className="text-center mb-6">
-              <p className="text-white text-sm font-semibold drop-shadow-lg">{t("camera.guide1")}</p>
-              <p className="text-white/60 text-xs mt-1">{t("camera.guide2")}</p>
+              <p className="text-white text-sm font-semibold drop-shadow-lg">{isTossMiniApp() ? t("camera.tossGuide1") : t("camera.guide1")}</p>
+              <p className="text-white/60 text-xs mt-1">{isTossMiniApp() ? t("camera.tossGuide2") : t("camera.guide2")}</p>
             </div>
 
             <div className="relative mx-auto aspect-[3/4] max-h-[58vh] overflow-hidden rounded-[32px] bg-neutral-900 border border-white/10">
@@ -157,10 +157,10 @@ export function CameraCapture({ onCapture, onClose }: {
               <div className="absolute left-5 right-5 bottom-6">
                 <div className="rounded-2xl bg-black/45 backdrop-blur px-4 py-3">
                   <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-white/80">
-                    {t("scanning.progress", "Analyzing")}
+                    {isTossMiniApp() ? t("camera.tossSelectTitle") : t("scanning.progress", "Analyzing")}
                   </p>
                   <p className="text-[12px] text-white/65 mt-1">
-                    {t("camera.selectMethod", "촬영 방법을 선택해 주세요")}
+                    {isTossMiniApp() ? t("camera.tossSelectDesc") : t("camera.selectMethod", "촬영 방법을 선택해 주세요")}
                   </p>
                 </div>
               </div>

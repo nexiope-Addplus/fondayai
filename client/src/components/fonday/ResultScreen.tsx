@@ -869,7 +869,7 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
           <div className={`flex items-center gap-2${isTossMiniApp() ? " mx-auto" : ""}`}>
             {!isTossMiniApp() && <img src="/fonday-logo.svg" alt="Fonday" className="h-5" style={{ objectFit: "contain" }} />}
             <span className={`${isTossMiniApp() ? "text-[13px]" : "text-[14px]"} font-bold`} style={{ color: TEXT_TITLE }}>
-              {isTossMiniApp() ? t("result.reportLabel", "피부 리포트") : t("result.reportLabel", "피부 리포트")}
+              {isTossMiniApp() ? t("result.tossReportLabel") : t("result.reportLabel")}
             </span>
           </div>
         </div>
@@ -902,7 +902,7 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
             </div>
             <div className="min-w-0 flex-1">
               <p className="text-[11px] font-semibold uppercase tracking-[0.1em]" style={{ color: DEEP_GREEN }}>
-                {t("result.todayFocus")}
+                {isTossMiniApp() ? t("result.tossTodayAction") : t("result.todayFocus")}
               </p>
               <p className="text-[14px] font-bold mt-0.5" style={{ color: TEXT_TITLE }}>
                 {analysisResult.improvements[0].title}
@@ -922,9 +922,9 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
           style={{ background: BG_MUTED }}>
           <div className="flex gap-2">
             {([
-              { id: "routine" as const,   label: t("result.tab.routine"),   icon: <CheckCircle2 className="w-4 h-4" />, activeBg: "#F7FBF8", activeText: DEEP_GREEN },
-              { id: "solution" as const,  label: t("result.tab.solution"),  icon: <Leaf className="w-4 h-4" />,         activeBg: "#FFF8F4", activeText: SCAN_TO },
-              { id: "nutrition" as const, label: t("result.tab.nutrition"), icon: <Utensils className="w-4 h-4" />,     activeBg: "#FCF8FF", activeText: COLOR_INFO },
+              { id: "routine" as const,   label: isTossMiniApp() ? t("result.tab.tossRoutine") : t("result.tab.routine"),   icon: <CheckCircle2 className="w-4 h-4" />, activeBg: "#F7FBF8", activeText: DEEP_GREEN },
+              { id: "solution" as const,  label: isTossMiniApp() ? t("result.tab.tossSolution") : t("result.tab.solution"),  icon: <Leaf className="w-4 h-4" />,         activeBg: "#FFF8F4", activeText: SCAN_TO },
+              { id: "nutrition" as const, label: isTossMiniApp() ? t("result.tab.tossNutrition") : t("result.tab.nutrition"), icon: <Utensils className="w-4 h-4" />,     activeBg: "#FCF8FF", activeText: COLOR_INFO },
             ]).map(({ id, label, icon, activeBg, activeText }) => {
               const isActive = activeTab === id;
               return (

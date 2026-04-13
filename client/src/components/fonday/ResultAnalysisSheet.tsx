@@ -1,6 +1,7 @@
 import { AnimatePresence, motion, useDragControls } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import { Activity, LayoutGrid, Shield, Sparkles, X, Zap } from "lucide-react";
+import { isTossMiniApp } from "./utils";
 
 import {
   BAUMANN_COLORS,
@@ -109,7 +110,7 @@ export function ResultAnalysisSheet({
                         <Sparkles className="w-3.5 h-3.5" style={{ color: SCAN_TO }} />
                       </div>
                       <p className="text-sm font-semibold" style={{ color: DEEP_GREEN }}>
-                        {t("result.aiComment")}
+                        {isTossMiniApp() ? t("result.tossAiComment") : t("result.aiComment")}
                       </p>
                     </div>
                     <p className="text-[13px] text-stone-600 leading-relaxed text-kr-pretty">{aiComment}</p>

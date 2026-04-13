@@ -33,10 +33,12 @@
   "idle": {
     "badge": "AI Skin Scanner",
     "title": "내 피부에 맞는 것만 쓰세요",
+    "tossTitle": "오늘 피부, 지금 체크",
     "subtitle1": "",
     "subtitle2": "",
     "subtitle3": "",
     "subtitle4": "30초 스캔으로 내 피부에 맞는 제품만 추천받으세요.",
+    "tossSubtitle": "셀카 한 장으로 내 피부 상태를 분석하고, 내 피부에 맞는 관리와 성분까지 바로 받아보세요.",
     "scanBtn": "30초 무료 스캔 시작",
     "hint": "카메라로 셀카를 찍으면 분석 준비가 시작돼요",
     "previewTitle": "AI 분석 결과 예시",
@@ -77,7 +79,9 @@
     "shortcutMy": "리포트와 기록",
     "privacy": "사진은 분석 후 즉시 삭제돼요 · 저장되지 않아요",
     "ctaBtn": "내 피부 분석하고 맞춤 케어 받기 →",
+    "tossCtaBtn": "내 피부 리포트 받기",
     "ctaHint": "약 30초 소요 · 완전 무료",
+    "tossCtaHint": "약 30초 소요 · 무료",
     "socialCount": "지금까지 {{n}}명이 피부를 분석했어요",
     "baumannSectionTitle": "피부 MBTI란?",
     "baumannSectionDesc": "전 세계 피부과에서 사용하는 Baumann 피부 타입 분류법(Dr. Leslie Baumann)을 기반으로, 당신의 피부를 4가지 축으로 분석해요. 유수분 균형(O/D), 민감도(S/R), 색소침착(P/N), 노화 경향(W/T) — 각 축의 조합으로 16가지 피부 타입이 결정돼요. 마치 MBTI처럼, 단 4글자로 나만의 피부 정체성을 알 수 있어요.",
@@ -160,13 +164,19 @@
     "selectPhoto": "사진 선택하기",
     "cancel": "닫기",
     "guide1": "얼굴을 타원 안에 맞춰주세요",
+    "tossGuide1": "정확한 리포트를 위해 얼굴을 맞춰주세요",
     "guide2": "정면을 바라보고 자연광에서 촬영하면 좋아요",
+    "tossGuide2": "정면을 바라보고 자연광에서 촬영하면 더 정확해요",
+    "tossSelectTitle": "촬영 방법을 선택해 주세요",
+    "tossSelectDesc": "정확한 분석을 위해 정면 셀카를 준비해 주세요",
     "preview": "카메라 미리보기",
     "capture": "사진 촬영"
   },
   "survey": {
     "title": "피부 분석 기초 정보",
+    "tossTitle": "더 정확한 리포트를 위한 정보",
     "subtitle": "정확한 분석을 위해 현재 상태를 선택해 주세요.",
+    "tossSubtitle": "현재 피부 상태를 반영해 내 피부에 맞는 관리와 성분을 더 정확하게 정리해드려요.",
     "gender": "성별",
     "female": "여성",
     "male": "남성",
@@ -190,7 +200,8 @@
       "다크서클",
       "건조함"
     ],
-    "startBtn": "AI 분석 시작"
+    "startBtn": "AI 분석 시작",
+    "tossStartBtn": "내 피부 리포트 받기"
   },
   "scan": {
     "errorTitle": "분석을 완료하지 못했어요",
@@ -204,21 +215,35 @@
       "수분 및 유분 정밀 분석 중...",
       "리포트 결과 요약 중..."
     ],
+    "tossTexts": [
+      "피부 상태를 읽는 중...",
+      "주요 피부 지표를 분석하는 중...",
+      "내 피부에 맞는 관리 포인트를 정리하는 중...",
+      "맞는 성분 방향을 정리하는 중...",
+      "오늘의 리포트를 마무리하는 중..."
+    ],
     "progress": "분석 중",
-    "subtitle": "전문적인 피부 분석 리포트를 생성하고 있어요."
+    "tossProgress": "리포트 준비 중",
+    "subtitle": "전문적인 피부 분석 리포트를 생성하고 있어요.",
+    "tossSubtitle": "내 피부 리포트를 준비하고 있어요"
   },
   "result": {
     "back": "다시 촬영",
     "title": "Fonday 피부 리포트",
     "reportLabel": "피부 리포트",
+    "tossReportLabel": "내 피부 리포트",
     "todayFocus": "오늘의 핵심",
     "overall": "종합점수",
+    "tossOverall": "오늘 피부 점수",
     "skinAge": "피부나이",
     "baumannLabel": "나의 피부 MBTI",
+    "tossBaumannLabel": "내 피부 타입",
     "baumannSuffix": "",
     "mbtiSub": "Baumann Skin Type 기반",
     "aiComment": "Fonday 피부 총평",
+    "tossAiComment": "오늘 피부 총평",
     "scores": "10가지 항목별 점수",
+    "tossScores": "피부 상태 자세히 보기",
     "scoreSuffix": "점",
     "locked": {
       "title": "피부 속 진피층 수분 장벽 측정 불가",
@@ -231,14 +256,20 @@
       "barrier": "피부 장벽"
     },
     "analysis": "주요 분석결과",
+    "tossAnalysis": "세부 리포트",
     "analysisSub": "10가지 항목 상세 분석",
     "solutions": "맞춤솔루션",
+    "tossSolutions": "내 피부에 맞는 오늘 관리",
     "solutionsSub": "AI가 분석 결과를 바탕으로 제안해요",
+    "tossSolutionsSub": "오늘 피부 상태를 기준으로 바로 실천할 관리만 정리했어요.",
     "tab": {
       "routine": "루틴",
       "analysis": "분석",
       "solution": "솔루션",
-      "nutrition": "영양"
+      "nutrition": "영양",
+      "tossRoutine": "오늘 관리",
+      "tossSolution": "맞춤 관리",
+      "tossNutrition": "성분"
     },
     "onboarding": {
       "title": "첫 스캔 완료!",
@@ -246,23 +277,33 @@
       "dismiss": "시작하기 →"
     },
     "todayAction": "오늘의 핵심 케어",
+    "tossTodayAction": "오늘 받은 관리 포인트",
     "hub": {
       "eyebrow": "NEXT STEP",
       "title": "다음 관리로 이어가기",
+      "tossTitle": "매일 기록하고 변화 확인",
       "desc": "오늘 결과를 필요한 탭에서 바로 이어가세요.",
+      "tossDesc": "기록할수록 내 피부 변화와 관리 흐름을 더 정확하게 볼 수 있어요.",
       "today": "today",
       "summary1": "바로 정리",
       "summary2": "반응 기록",
       "summary3": "히스토리 저장",
       "routineButton": "루틴 정리",
+      "tossRoutineButton": "맞춤 루틴 보기",
       "diaryButton": "기록 남기기",
+      "tossDiaryButton": "오늘 기록 남기기",
       "discoverButton": "랭킹과 가이드 보기",
       "myButton": "리포트 확인",
       "routineTitle": "루틴과 기록으로 오늘 결과를 이어가세요",
+      "tossRoutineTitle": "내 피부에 맞는 오늘 관리",
       "routineDesc": "AM/PM 루틴을 체크하고, 일기와 MY 탭에서 오늘 변화를 연결하면 흐름이 자연스러워집니다.",
+      "tossRoutineDesc": "오늘 피부 상태를 기준으로 바로 실천할 관리만 정리했어요.",
       "solutionTitle": "개선 솔루션을 실제 탭에서 이어보세요",
+      "tossSolutionTitle": "내 피부에 맞는 성분",
       "solutionDesc": "추천 화장품, 발견 콘텐츠, 개인 리포트를 각각의 탭에서 더 길게 확인할 수 있어요.",
-      "nutritionCta": "영양 가이드 계속 보기 →"
+      "tossSolutionDesc": "오늘 피부 상태를 기준으로 잘 맞는 성분 방향을 정리했어요.",
+      "nutritionCta": "영양 가이드 계속 보기 →",
+      "tossNutritionCta": "추천 성분 보기 →"
     },
     "deviceTeaser": {
       "title": "Fonday 디바이스",

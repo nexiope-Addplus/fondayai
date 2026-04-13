@@ -273,10 +273,10 @@ export function ScanIdleScreen({
         <motion.div variants={fadeChild} className="mb-8 relative" style={{ zIndex: 1 }}>
           {/* 헤드라인 */}
           <h1 className="text-[24px] font-extrabold leading-[1.35] mt-1 mb-2 whitespace-pre-line" style={{ color: TEXT_HEADING, fontFamily: FONT_HEADING }}>
-            {t("idle.title")}
+            {isToss ? t("idle.tossTitle") : t("idle.title")}
           </h1>
           <p className="text-[14px] leading-[1.7] mb-4" style={{ color: TEXT_SECONDARY }}>
-            {t("idle.subtitle4")}
+            {isToss ? t("idle.tossSubtitle") : t("idle.subtitle4")}
           </p>
 
           {/* 얼굴 이미지 — 16:9 가로, 스크롤 없이 CTA까지 보이도록 */}
@@ -317,7 +317,7 @@ export function ScanIdleScreen({
             <div className="mb-4 flex items-center gap-2 rounded-2xl px-3.5 py-3" style={{ background: BG_MUTED }}>
               <ClipboardList className="w-4 h-4 shrink-0" style={{ color: DEEP_GREEN }} />
               <p className="text-[12px] leading-relaxed" style={{ color: TEXT_SECONDARY }}>
-                {t("idle.ctaHint")}
+                {isToss ? t("idle.tossCtaHint") : t("idle.ctaHint")}
               </p>
             </div>
           )}
@@ -335,10 +335,10 @@ export function ScanIdleScreen({
             whileHover={{ scale: reducedMotion ? 1 : 1.02 }}
             whileTap={{ scale: reducedMotion ? 1 : 0.96, y: reducedMotion ? 0 : 2 }}
           >
-            {t("idle.ctaBtn")}
+            {isToss ? t("idle.tossCtaBtn") : t("idle.ctaBtn")}
           </motion.button>
           <p className="text-center text-[12px] mt-4" style={{ color: TEXT_TERTIARY }}>
-            {t("idle.ctaHint")}
+            {isToss ? t("idle.tossCtaHint") : t("idle.ctaHint")}
           </p>
           {/* 소셜 프루프 — 토스 미니앱에서는 숨김 (가짜 카운터 = 다크패턴) */}
           {!isTossMiniApp() && (
