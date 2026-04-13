@@ -11,7 +11,7 @@ export const onRequest: PagesFunction[] = [
         headers: {
           "Access-Control-Allow-Origin": origin,
           "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
-          "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Requested-With",
+          "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Requested-With, X-Toss-User",
           "Access-Control-Allow-Credentials": "true",
           "Access-Control-Max-Age": "86400",
         },
