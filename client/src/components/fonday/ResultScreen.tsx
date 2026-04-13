@@ -45,7 +45,7 @@ import {
   getDiaryTodos, saveDiaryTodos, getDiaryTodoProgress, initDiaryTodosFromRoutine,
   buildCosmeticsInsights, buildRoutineGuide, buildCosmeticCorrelationSignals, haptic,
   pickFoodOption, dedupeFoods,
-  isIOS, isPWA, isTossMiniApp, buildStableBaumannType, autoRegisterCosmetic, apiBase,
+  isIOS, isPWA, isTossMiniApp, buildStableBaumannType, autoRegisterCosmetic, apiBase, appFetch,
 } from "./utils";
 import { share as tossShare, getTossShareLink } from "@apps-in-toss/web-framework";
 import { SkinPredictionCard } from "./SkinPredictionCard";
@@ -95,7 +95,7 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
 
   const refreshCosmetics = useCallback(async (options?: { openRoutineUpdate?: boolean }) => {
     try {
-      const response = await fetch(`${apiBase()}/api/cosmetics`);
+      const response = await appFetch(`${apiBase()}/api/cosmetics`);
       const data = response.ok ? await response.json() : [];
       const next = Array.isArray(data) ? data : [];
       setMyCosmetics(next);
@@ -217,7 +217,7 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
     setTodayHasMemo(Boolean(getDiaryMemo(todayStr()).trim()));
     // 로그인 사용자 → 스트릭/출석 서버 동기화
     if (user) {
-      fetch(`${apiBase()}/api/user-stats`, {
+      appFetch(`${apiBase()}/api/user-stats`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -308,7 +308,7 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
   // 히스토리 로드 (로그인 시)
   useEffect(() => {
     if (!user) return;
-    fetch(`${apiBase()}/api/scans`)
+    appFetch(`${apiBase()}/api/scans`)
       .then(res => res.json())
       .then(data => {
         if (Array.isArray(data)) {
@@ -332,7 +332,7 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
   // 랭킹 데이터 로드 (Bug 2 fix: analysisResult 의존성 추가)
   useEffect(() => {
     const score = analysisResult?.scores?.[0]?.score || 0;
-    fetch(`${apiBase()}/api/ranking?myScore=${score}`)
+    appFetch(`${apiBase()}/api/ranking?myScore=${score}`)
       .then(res => res.json())
       .then(data => setRankingData(data))
       .catch(() => {});
@@ -347,7 +347,7 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
     if (user !== null && !isSaved) return;
     setGuestTokenFetched(true);
     const KO_AGE_GROUPS = ["10대","20대 초반","20대 후반","30대 초반","30대 후반","40대 초반","40대 후반","50대+"];
-    fetch(`${apiBase()}/api/challenge-token`, {
+    appFetch(`${apiBase()}/api/challenge-token`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -376,7 +376,7 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
     navigator.geolocation.getCurrentPosition(
       (pos) => {
         const { latitude: lat, longitude: lon } = pos.coords;
-        fetch(`${apiBase()}/api/weather?lat=${lat}&lon=${lon}`, { signal: controller.signal })
+        appFetch(`${apiBase()}/api/weather?lat=${lat}&lon=${lon}`, { signal: controller.signal })
           .then(res => res.ok ? res.json() : null)
           .then(data => { if (data && !data.error) setInternalWeather(data); })
           .catch(() => {});
@@ -394,7 +394,7 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
     savingRef.current = true;
     const overallScore = analysisResult.scores?.[0]?.score || 0;
     
-    fetch(`${apiBase()}/api/scans`, {
+    appFetch(`${apiBase()}/api/scans`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -423,7 +423,7 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
       
       // D1 챌린지 데이터 동기화
       const KO_AGE_GROUPS2 = ["10대","20대 초반","20대 후반","30대 초반","30대 후반","40대 초반","40대 후반","50대+"];
-      fetch(`${apiBase()}/api/challenge-token`, {
+      appFetch(`${apiBase()}/api/challenge-token`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -475,7 +475,7 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
   // 화장품 등급 로드
   useEffect(() => {
     if (!user || !analysisResult || myCosmetics.length === 0) return;
-    fetch(`${apiBase()}/api/cosmetics/grade`, {
+    appFetch(`${apiBase()}/api/cosmetics/grade`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -491,7 +491,7 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
 
   useEffect(() => {
     if (!user) return;
-    fetch(`${apiBase()}/api/routine-log?date=${todayStr()}`)
+    appFetch(`${apiBase()}/api/routine-log?date=${todayStr()}`)
       .then(r => r.ok ? r.json() : { cosmetic_ids: [] })
       .then(data => {
         const ids = Array.isArray(data.cosmetic_ids) ? data.cosmetic_ids : [];
@@ -778,7 +778,7 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
 
       const shareController = new AbortController();
       const shareTimeout = setTimeout(() => shareController.abort(), 20000);
-      const res = await fetch(`${apiBase()}/api/generate-share`, {
+      const res = await appFetch(`${apiBase()}/api/generate-share`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),

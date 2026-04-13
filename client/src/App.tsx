@@ -7,6 +7,8 @@ import { ThemeProvider } from "@/components/ThemeProvider";
 import SkinScanPage from "@/pages/skin-scan";
 import BattlePage from "@/pages/battle";
 import LegalPage from "@/pages/legal";
+import { isTossMiniApp } from "@/components/fonday/utils";
+import { TDSMobileAITProvider } from "@toss/tds-mobile-ait";
 
 function Router() {
   return (
@@ -38,7 +40,7 @@ if (!sessionStorage.getItem("fonday_ref")) {
   localStorage.setItem("fonday_referrer", channel);
 }
 
-function App() {
+function AppContent() {
   return (
     <ThemeProvider attribute="class" defaultTheme="light">
       <QueryClientProvider client={queryClient}>
@@ -49,6 +51,17 @@ function App() {
       </QueryClientProvider>
     </ThemeProvider>
   );
+}
+
+function App() {
+  if (isTossMiniApp()) {
+    return (
+      <TDSMobileAITProvider>
+        <AppContent />
+      </TDSMobileAITProvider>
+    );
+  }
+  return <AppContent />;
 }
 
 export default App;

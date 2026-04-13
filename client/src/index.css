@@ -107,6 +107,14 @@ html.capacitor-app {
   --destructive-border: hsl(from hsl(var(--destructive)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
 }
 
+/* 토스 미니앱: TDS 폰트 스택 강제 적용 */
+html.toss-miniapp {
+  --font-sans: 'Toss Product Sans', 'Tossface', 'SF Pro KR', 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+html.toss-miniapp, html.toss-miniapp * {
+  font-family: 'Toss Product Sans', 'Tossface', 'SF Pro KR', 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif !important;
+}
+
 .dark {
   --button-outline: rgba(255,255,255, .10);
   --badge-outline: rgba(255,255,255, .05);

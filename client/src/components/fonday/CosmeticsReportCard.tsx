@@ -16,7 +16,7 @@ import {
   COLOR_WARNING,
 } from "./constants";
 import type { AnalysisResult, CosmeticItem, CosmeticGrade } from "./types";
-import { apiBase } from "./utils";
+import { apiBase, appFetch } from "./utils";
 
 // ─── 세션 레벨 캐시 (컴포넌트 재마운트 시에도 유지) ─────────────────
 const _gradeCache: Record<string, CosmeticGrade[]> = {};
@@ -237,7 +237,7 @@ export function CosmeticsReportCard({
     setLoading(true);
     setError(false);
     startProgress();
-    fetch(`${apiBase()}/api/cosmetics/grade`, {
+    appFetch(`${apiBase()}/api/cosmetics/grade`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({

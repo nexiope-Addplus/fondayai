@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { ExternalLink, Sparkles, CheckCircle } from "lucide-react";
 import { motion, useReducedMotion } from "framer-motion";
-import { autoRegisterCosmetic, apiBase } from "./utils";
+import { autoRegisterCosmetic, apiBase, appFetch } from "./utils";
 import {
   DEEP_GREEN,
   SCAN_TO,
@@ -68,7 +68,7 @@ export function ProductRecommendCard({ baumannType }: { baumannType: string }) {
   const lang = i18n.language?.slice(0, 2) || "ko";
 
   const fireEvent = (type: string, data?: Record<string, unknown>) => {
-    fetch(`${apiBase()}/api/events`, {
+    appFetch(`${apiBase()}/api/events`, {
       method: "POST", credentials: "include",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ event_type: type, event_data: data ?? {}, lang, is_guest: true }),
@@ -78,7 +78,7 @@ export function ProductRecommendCard({ baumannType }: { baumannType: string }) {
   useEffect(() => {
     if (!baumannType) return;
     setLoading(true);
-    fetch(`${apiBase()}/api/product-recommend?baumann=${baumannType}&limit=20&lang=${lang}`)
+    appFetch(`${apiBase()}/api/product-recommend?baumann=${baumannType}&limit=20&lang=${lang}`)
       .then(r => {
         if (!r.ok) throw new Error(`HTTP ${r.status}`);
         return r.json();

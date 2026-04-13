@@ -34,7 +34,7 @@ import {
   COLOR_SUCCESS,
 } from "./constants";
 import type { WeatherData, WeatherTipKey } from "./types";
-import { getStreak, getDaysSinceLastScan, getWeatherTipKey, buildCosmeticCorrelationSignals, todayStr, haptic, isTossMiniApp, apiBase } from "./utils";
+import { getStreak, getDaysSinceLastScan, getWeatherTipKey, buildCosmeticCorrelationSignals, todayStr, haptic, isTossMiniApp, apiBase, appFetch } from "./utils";
 // AttendanceCalendarModal은 MY탭에서만 사용
 import { WeatherTipCard } from "./WeatherTipCard";
 // import { TossBannerAd } from "./TossAd"; // 광고 — 사업자 등록 후 활성화
@@ -69,7 +69,7 @@ export function ScanIdleScreen({
   const touchStartY = useRef(0);
 
   useEffect(() => {
-    fetch(`${apiBase()}/api/scans`)
+    appFetch(`${apiBase()}/api/scans`)
       .then((res) => (res.ok ? res.json() : []))
       .then((data) => {
         if (Array.isArray(data)) {
@@ -88,7 +88,7 @@ export function ScanIdleScreen({
     const SEOUL = { lat: 37.5665, lon: 126.9780 };
 
     const fetchWeather = (lat: number, lon: number, isRetry = false) => {
-      fetch(`${apiBase()}/api/weather?lat=${lat}&lon=${lon}`, { signal })
+      appFetch(`${apiBase()}/api/weather?lat=${lat}&lon=${lon}`, { signal })
         .then((r) => r.ok ? r.json() : null)
         .then((data) => {
           if (signal.aborted) return;
@@ -129,7 +129,7 @@ export function ScanIdleScreen({
     const uv = idleWeather.uvIndex ?? "";
     const lang = i18n.language || "ko";
 
-    fetch(`${apiBase()}/api/care-briefing?temp=${temp}&humidity=${humidity}&aqi=${aqi}&pm25=${pm25}&uv=${uv}&lang=${lang}`, { credentials: "include" })
+    appFetch(`${apiBase()}/api/care-briefing?temp=${temp}&humidity=${humidity}&aqi=${aqi}&pm25=${pm25}&uv=${uv}&lang=${lang}`, { credentials: "include" })
       .then(res => res.ok ? res.json() : null)
       .then(data => { if (data && data.briefing) setCareBriefing(data); })
       .catch(() => {});
@@ -492,9 +492,9 @@ function HomeRoutineWidget({ onOpenRoutine }: { onOpenRoutine?: () => void }) {
 
   useEffect(() => {
     Promise.all([
-      fetch(`${apiBase()}/api/cosmetics`).then(r => r.ok ? r.json() : []),
-      fetch(`${apiBase()}/api/routine-log?date=${todayStr()}`).then(r => r.ok ? r.json() : { cosmetic_ids: [] }),
-      fetch(`${apiBase()}/api/scans`).then(r => r.ok ? r.json() : []),
+      appFetch(`${apiBase()}/api/cosmetics`).then(r => r.ok ? r.json() : []),
+      appFetch(`${apiBase()}/api/routine-log?date=${todayStr()}`).then(r => r.ok ? r.json() : { cosmetic_ids: [] }),
+      appFetch(`${apiBase()}/api/scans`).then(r => r.ok ? r.json() : []),
     ])
       .then(([items, log, scans]) => {
         const cosmeticItems = Array.isArray(items) ? items : [];

@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import i18n from "../i18n";
 import { motion, AnimatePresence } from "framer-motion";
 import { AlertCircle, SmartphoneNfc } from "lucide-react";
-import { isTossMiniApp, apiBase } from "../components/fonday/utils";
+import { isTossMiniApp, apiBase, appFetch } from "../components/fonday/utils";
 import type { TabId, ScanState, SurveyData, AnalysisResult } from "../components/fonday/types";
 import {
   todayStr, getStreak, getAttendance,
@@ -123,6 +123,11 @@ export default function SkinScanPage() {
     setScanState("idle");
   };
 
+  // 토스 미니앱: toss-miniapp 클래스 추가 (폰트 오버라이드용)
+  useEffect(() => {
+    if (isTossMiniApp()) document.documentElement.classList.add("toss-miniapp");
+  }, []);
+
   // 토스 미니앱: user 상태는 getAnonymousKey useEffect에서 자동 설정됨
   // 비-토스 환경에서는 쿠키 기반 세션 확인
   useEffect(() => {
@@ -178,7 +183,7 @@ export default function SkinScanPage() {
     if (!user) return;
     const guestToken = (() => { try { return localStorage.getItem("fonday_guest_token"); } catch { return null; } })();
     if (!guestToken) return;
-    fetch(`${apiBase()}/api/link-guest-scan`, {
+    appFetch(`${apiBase()}/api/link-guest-scan`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ shareToken: guestToken }),
@@ -190,7 +195,7 @@ export default function SkinScanPage() {
   // 로그인 후 스트릭/출석 서버 데이터 복원
   useEffect(() => {
     if (!user) return;
-    fetch(`${apiBase()}/api/user-stats`)
+    appFetch(`${apiBase()}/api/user-stats`)
       .then(r => r.ok ? r.json() : null)
       .then(data => {
         if (!data) return;
@@ -220,7 +225,7 @@ export default function SkinScanPage() {
       const memo = getDiaryMemo(dateStr);
       const todos = getDiaryTodos(dateStr);
       const causeTags = getDiaryCauseTags(dateStr);
-      fetch(`${apiBase()}/api/diary`, {
+      appFetch(`${apiBase()}/api/diary`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ dateStr, memo, todos, causeTags }),
@@ -299,7 +304,7 @@ export default function SkinScanPage() {
         if (raw) { const arr = JSON.parse(raw); if (Array.isArray(arr) && arr.length === 10) previousScores = arr; }
       } catch {}
       const apiUrl = `${apiBase()}/api/analyze-skin`;
-      const response = await fetch(apiUrl, {
+      const response = await appFetch(apiUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ image: b64, surveyData: data, lang: i18n.language || "en", previousScores }),
@@ -324,7 +329,15 @@ export default function SkinScanPage() {
       setScanState("result");
       trackEvent("scan_complete", { score: result.overallScore, baumannType: result.baumannType });
     } catch (err: any) {
-      const debugInfo = `${err.message || "네트워크 오류"} | origin:${window.location.origin} | api:${apiBase()} | toss:${isTossMiniApp()}`;
+      // 디버그: 토스에서 간단 GET 테스트로 네트워크 자체 확인
+      let netTest = "untested";
+      if (isTossMiniApp()) {
+        try {
+          const t = await fetch(`${apiBase()}/api/health`, { mode: "cors", credentials: "omit" });
+          netTest = `GET:${t.status}`;
+        } catch (e: any) { netTest = `GET-fail:${e.message}`; }
+      }
+      const debugInfo = `${err.message || "네트워크 오류"} | origin:${window.location.origin} | api:${apiBase()} | toss:${isTossMiniApp()} | net:${netTest}`;
       setScanError(debugInfo);
       setScanState("error");
       trackEvent("scan_fail", { error: "network" });

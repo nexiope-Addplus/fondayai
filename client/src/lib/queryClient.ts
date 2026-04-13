@@ -1,4 +1,5 @@
 import { QueryClient, QueryFunction } from "@tanstack/react-query";
+import { appFetch } from "../components/fonday/utils";
 
 function getAuthHeaders(): Record<string, string> {
   const token = typeof localStorage !== "undefined" ? localStorage.getItem("fonday_app_token") : null;
@@ -20,7 +21,7 @@ export async function apiRequest(
   const headers: Record<string, string> = { ...getAuthHeaders() };
   if (data) headers["Content-Type"] = "application/json";
 
-  const res = await fetch(url, {
+  const res = await appFetch(url, {
     method,
     headers,
     body: data ? JSON.stringify(data) : undefined,
@@ -37,7 +38,7 @@ export const getQueryFn: <T>(options: {
 }) => QueryFunction<T> =
   ({ on401: unauthorizedBehavior }) =>
   async ({ queryKey }) => {
-    const res = await fetch(queryKey.join("/") as string, {
+    const res = await appFetch(queryKey.join("/") as string, {
       credentials: "include",
       headers: getAuthHeaders(),
     });

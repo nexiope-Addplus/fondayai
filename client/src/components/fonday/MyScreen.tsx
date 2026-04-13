@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { AnimatePresence, motion } from "framer-motion";
-import { isTossMiniApp, apiBase } from "./utils";
+import { isTossMiniApp, apiBase, appFetch } from "./utils";
 import {
   Sparkles,
   Zap,
@@ -83,7 +83,7 @@ export function MyScreen({
   useEffect(() => {
     if (!user) return;
     setLoadingScans(true);
-    fetch(`${apiBase()}/api/scans`)
+    appFetch(`${apiBase()}/api/scans`)
       .then((res) => (res.ok ? res.json() : []))
       .then((data) => setScans(Array.isArray(data) ? data : []))
       .catch(() => setScans([]))

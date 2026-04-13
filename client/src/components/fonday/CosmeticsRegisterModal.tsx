@@ -14,7 +14,7 @@ import {
   TEXT_SECONDARY,
   TEXT_TERTIARY,
 } from "./constants";
-import { compressThumbnail, inferCosmeticTimeOfDay, apiBase } from "./utils";
+import { compressThumbnail, inferCosmeticTimeOfDay, apiBase, appFetch } from "./utils";
 
 export function CosmeticsRegisterModal({ onClose, onSuccess }: { onClose: () => void; onSuccess: () => void }) {
   const { t } = useTranslation();
@@ -50,7 +50,7 @@ export function CosmeticsRegisterModal({ onClose, onSuccess }: { onClose: () => 
     setAnalyzing(true);
     try {
       const compressed = await compressThumbnail(capturedImage, 600);
-      const res = await fetch(`${apiBase()}/api/cosmetics/classify`, {
+      const res = await appFetch(`${apiBase()}/api/cosmetics/classify`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ imageBase64: compressed }),
@@ -84,7 +84,7 @@ export function CosmeticsRegisterModal({ onClose, onSuccess }: { onClose: () => 
     setRegistering(true);
     try {
       const thumbnail = capturedImage ? await compressThumbnail(capturedImage, 300) : "";
-      const res = await fetch(`${apiBase()}/api/cosmetics`, {
+      const res = await appFetch(`${apiBase()}/api/cosmetics`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
