@@ -24,15 +24,11 @@ export function MissionCard() {
   const today = todayStr();
   const isDailyCompleted = missions.dailyDate === today && missions.dailyCompleted;
 
-  const ALL_MISSION_IDS = ["daily_scan", "daily_improve", "daily_challenge", "first_scan", "streak_3", "streak_7", "streak_30", "score_70", "score_80", "challenge", "share"];
-  const isDailyImproved = missions.dailyDate === today && missions.dailyImproved;
-  const isDailyChallenged = missions.dailyDate === today && missions.dailyChallenged;
+  const ALL_MISSION_IDS = ["daily_scan", "first_scan", "streak_3", "streak_7", "streak_30", "score_70", "score_80", "share"];
 
   const missionItems = ALL_MISSION_IDS.map(id => {
     let done: boolean;
     if (id === "daily_scan") done = isDailyCompleted;
-    else if (id === "daily_improve") done = isDailyImproved;
-    else if (id === "daily_challenge") done = isDailyChallenged;
     else done = missions.completed.includes(id);
     return { id, done, points: MISSION_POINTS[id] || 0 };
   });
@@ -68,7 +64,7 @@ export function MissionCard() {
                   {t(`mission.${id}`)}
                 </span>
               </div>
-              <span className="text-xs font-semibold shrink-0 text-amber-600">+{points}pt</span>
+              <span className="text-xs font-semibold shrink-0 text-amber-600">+{points}원</span>
             </div>
           ))}
         </div>

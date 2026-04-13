@@ -154,9 +154,8 @@ export const tabSlideVariants = {
 // ─── 미션 포인트 ──────────────────────────────────────────────────────────────
 
 export const MISSION_POINTS: Record<string, number> = {
-  first_scan: 50, daily_scan: 10, streak_3: 100, streak_7: 200,
-  streak_30: 500, score_70: 150, score_80: 300, challenge: 100, share: 50,
-  daily_improve: 20, daily_challenge: 50,
+  first_scan: 1, daily_scan: 1, streak_3: 3, streak_7: 10,
+  streak_30: 50, score_70: 5, score_80: 10, share: 1,
 };
 
 // ─── 다이어리 원인 태그 ───────────────────────────────────────────────────────

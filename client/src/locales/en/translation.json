@@ -357,7 +357,7 @@
       "questImprove": "Better than yesterday",
       "questImproveDetail": "Score higher than your last scan to claim this reward. Consistency pays off!",
       "questChallenge": "Share a skin challenge",
-      "questChallengeDetail": "Send a skin challenge to a friend and earn +50pt bonus!",
+      "questChallengeDetail": "Send a skin challenge to a friend and earn +1 won bonus!",
       "scoreLabel": "Today's score",
       "routineLabel": "Routine",
       "routineSub": "Checklist progress",
@@ -1072,7 +1072,7 @@
   },
   "mission": {
     "title": "🎯 Care Goals",
-    "points": "{{n}}pt",
+    "points": "{{n}}won",
     "showAll": "Show All",
     "hide": "Collapse",
     "newAchieve": "Care Goal Complete!",
