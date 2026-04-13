@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { X, Sun, Moon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SCAN_FROM } from "./constants";
-import { isTossMiniApp, isTossMiniAppSimulation } from "./utils";
+import { isTossMiniApp } from "./utils";
 
 type BrightnessLevel = "ok" | "too_dark" | "too_bright";
 
@@ -40,7 +40,6 @@ export function CameraCapture({ onCapture, onClose }: {
   const [useFile, setUseFile] = useState(false);
   const [brightnessLevel, setBrightnessLevel] = useState<BrightnessLevel>("ok");
   const brightnessTimer = useRef<ReturnType<typeof setInterval> | null>(null);
-  const useSimulatedTossCamera = isTossMiniAppSimulation();
 
   useEffect(() => {
     if (!ready) return;
@@ -54,8 +53,8 @@ export function CameraCapture({ onCapture, onClose }: {
   }, [ready]);
 
   useEffect(() => {
-    // 실제 토스 앱 셸에서는 파일 선택 경로를 쓰고, 브라우저 시뮬레이션에서는 가이드 카메라를 유지한다.
-    if (isTossMiniApp() && !useSimulatedTossCamera) { setUseFile(true); return; }
+    // 토스 미니앱은 getUserMedia 대신 파일 선택(카메라 캡처) 방식 사용
+    if (isTossMiniApp()) { setUseFile(true); return; }
 
     if (!navigator.mediaDevices?.getUserMedia) { setUseFile(true); return; }
 
@@ -70,7 +69,7 @@ export function CameraCapture({ onCapture, onClose }: {
       .catch(() => setUseFile(true));
 
     return () => streamRef.current?.getTracks().forEach(t => t.stop());
-  }, [useSimulatedTossCamera]);
+  }, []);
 
   const capture = () => {
     const video = videoRef.current;
