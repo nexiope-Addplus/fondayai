@@ -7,8 +7,8 @@ import { ThemeProvider } from "@/components/ThemeProvider";
 import SkinScanPage from "@/pages/skin-scan";
 import BattlePage from "@/pages/battle";
 import LegalPage from "@/pages/legal";
-import { isTossMiniApp } from "@/components/fonday/utils";
-import { TDSMobileAITProvider } from "@toss/tds-mobile-ait";
+
+
 
 function Router() {
   return (
@@ -54,13 +54,6 @@ function AppContent() {
 }
 
 function App() {
-  if (isTossMiniApp()) {
-    return (
-      <TDSMobileAITProvider>
-        <AppContent />
-      </TDSMobileAITProvider>
-    );
-  }
   return <AppContent />;
 }
 
