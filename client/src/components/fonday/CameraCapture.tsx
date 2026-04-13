@@ -124,16 +124,60 @@ export function CameraCapture({ onCapture, onClose }: {
   if (useFile) {
     const captureRef = React.createRef<HTMLInputElement>();
     return (
-      <div className="fixed inset-0 z-[200] bg-black flex flex-col items-center justify-center gap-6">
-        <p className="text-white text-sm">{isTossMiniApp() ? t("camera.selectMethod", "촬영 방법을 선택해 주세요") : t("camera.noCamera")}</p>
-        <Button onClick={() => captureRef.current?.click()} className="bg-white text-black font-bold px-8 h-14 rounded-2xl">
-          {t("camera.capture", "셀카 촬영하기")}
-        </Button>
-        <input ref={captureRef} type="file" accept="image/*" capture="user" className="hidden" onChange={handleFileChange} />
-        <Button onClick={() => fileRef.current?.click()} className="bg-white/20 text-white font-bold px-8 h-14 rounded-2xl">
-          {t("camera.selectPhoto", "앨범에서 선택")}
-        </Button>
-        <Button variant="ghost" onClick={onClose} className="text-white/60">{t("camera.cancel")}</Button>
+      <div className="fixed inset-0 z-[200] bg-black flex flex-col">
+        <div className="relative flex-1 overflow-hidden px-6 pt-14 pb-8 flex flex-col items-center justify-center">
+          <button onClick={onClose} aria-label={t("common.close")} className="absolute top-4 right-4 w-10 h-10 rounded-full bg-black/40 backdrop-blur flex items-center justify-center">
+            <X className="w-5 h-5 text-white" />
+          </button>
+
+          <div className="w-full max-w-[340px]">
+            <div className="text-center mb-6">
+              <p className="text-white text-sm font-semibold drop-shadow-lg">{t("camera.guide1")}</p>
+              <p className="text-white/60 text-xs mt-1">{t("camera.guide2")}</p>
+            </div>
+
+            <div className="relative mx-auto aspect-[3/4] max-h-[58vh] overflow-hidden rounded-[32px] bg-neutral-900 border border-white/10">
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(255,255,255,0.12),_transparent_52%)]" />
+              <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-black/45 to-transparent" />
+              <svg className="absolute inset-0 w-full h-full pointer-events-none">
+                <defs>
+                  <mask id="faceGuideCutout">
+                    <rect width="100%" height="100%" fill="white" />
+                    <ellipse cx="50%" cy="42%" rx="29%" ry="34%" fill="black" />
+                  </mask>
+                </defs>
+                <rect width="100%" height="100%" fill="rgba(0,0,0,0.54)" mask="url(#faceGuideCutout)" />
+                <ellipse cx="50%" cy="42%" rx="29%" ry="34%"
+                  fill="none" stroke="rgba(255,255,255,0.95)" strokeWidth="2.5" />
+                <ellipse cx="50%" cy="42%" rx="29%" ry="34%"
+                  fill="none" stroke={SCAN_FROM} strokeWidth="1.5" strokeDasharray="10 6" opacity="0.72" />
+                <line x1="21%" y1="42%" x2="79%" y2="42%" stroke="rgba(255,255,255,0.26)" strokeWidth="1" strokeDasharray="4 5" />
+                <line x1="50%" y1="11%" x2="50%" y2="74%" stroke="rgba(255,255,255,0.18)" strokeWidth="1" strokeDasharray="4 5" />
+              </svg>
+              <div className="absolute left-5 right-5 bottom-6">
+                <div className="rounded-2xl bg-black/45 backdrop-blur px-4 py-3">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-white/80">
+                    {t("scanning.progress", "Analyzing")}
+                  </p>
+                  <p className="text-[12px] text-white/65 mt-1">
+                    {t("camera.selectMethod", "촬영 방법을 선택해 주세요")}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-black px-6 pb-8 pt-2 flex flex-col gap-3">
+          <Button onClick={() => captureRef.current?.click()} className="bg-white text-black font-bold px-8 h-14 rounded-2xl">
+            {t("camera.capture", "셀카 촬영하기")}
+          </Button>
+          <input ref={captureRef} type="file" accept="image/*" capture="user" className="hidden" onChange={handleFileChange} />
+          <Button onClick={() => fileRef.current?.click()} className="bg-white/20 text-white font-bold px-8 h-14 rounded-2xl">
+            {t("camera.selectPhoto", "앨범에서 선택")}
+          </Button>
+          <Button variant="ghost" onClick={onClose} className="text-white/60">{t("camera.cancel")}</Button>
+        </div>
         <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleFileChange} />
       </div>
     );
