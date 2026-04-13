@@ -17,6 +17,7 @@ import {
   FONT_DISPLAY,
   TEXT_TERTIARY,
 } from "./constants";
+import { apiBase } from "./utils";
 
 // 로컬 색상 상수 (임포트 이슈 방지)
 const SCAN_FROM = "#E09882";
@@ -170,13 +171,13 @@ export function MagazineTab() {
   const [latestScan, setLatestScan] = useState<any | null>(null);
 
   useEffect(() => {
-    fetch("/api/scans")
+    fetch(`${apiBase()}/api/scans`)
       .then((res) => (res.ok ? res.json() : []))
       .then((data) => {
         const scan = Array.isArray(data) && data.length > 0 ? data[0] : null;
         if (scan) setLatestScan(scan);
         const score = scan?.overallScore ? Number(scan.overallScore) : null;
-        return fetch(`/api/ranking${score ? `?myScore=${score}` : ""}`);
+        return fetch(`${apiBase()}/api/ranking${score ? `?myScore=${score}` : ""}`);
       })
       .then((res) => (res.ok ? res.json() : null))
       .then((data) => setRankingData(normalizeRankingData(data)))

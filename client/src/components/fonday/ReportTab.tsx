@@ -9,6 +9,7 @@ import {
   BAUMANN_COLORS, DEEP_GREEN, SCAN_FROM, SCAN_TO,
   SCORE_ICONS, SCORE_COLORS, stagger, fadeChild,
 } from "./constants";
+import { apiBase } from "./utils";
 
 // ─── 리포트 탭 ────────────────────────────────────────────────────
 export function ReportTab({ user }: { user: any }) {
@@ -18,7 +19,7 @@ export function ReportTab({ user }: { user: any }) {
 
   useEffect(() => {
     if (!user) { setLoading(false); return; }
-    fetch("/api/scans")
+    fetch(`${apiBase()}/api/scans`)
       .then(res => res.json())
       .then(data => { if (Array.isArray(data) && data.length > 0) setLastScan(data[0]); })
       .catch(() => {})

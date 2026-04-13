@@ -31,6 +31,7 @@ import {
   inferCosmeticTimeOfDay,
   buildRepresentativeRoutine,
   buildCosmeticCorrelationSignals,
+  apiBase,
 } from "./utils";
 import { CosmeticsRegisterModal } from "./CosmeticsRegisterModal";
 import { CosmeticsReportCard } from "./CosmeticsReportCard";
@@ -68,8 +69,8 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
     setLoading(true);
     try {
       const [cosmeticsRes, scansRes] = await Promise.all([
-        fetch("/api/cosmetics", { credentials: "include" }),
-        fetch("/api/scans", { credentials: "include" }),
+        fetch(`${apiBase()}/api/cosmetics`, { credentials: "include" }),
+        fetch(`${apiBase()}/api/scans`, { credentials: "include" }),
       ]);
       const [cosmeticsData, scansData] = await Promise.all([
         cosmeticsRes.json().catch(() => []),
@@ -79,14 +80,14 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
       setList(items);
       setScans(Array.isArray(scansData) ? scansData : []);
 
-      fetch("/api/routine-log", { credentials: "include" })
+      fetch(`${apiBase()}/api/routine-log`, { credentials: "include" })
         .then(r => r.ok ? r.json() : [])
         .then(data => setRoutineLogs(Array.isArray(data) ? data : []))
         .catch(() => {});
 
       if (items.length > 0) {
         setOptimizing(true);
-        fetch("/api/cosmetics/optimize-routine", {
+        fetch(`${apiBase()}/api/cosmetics/optimize-routine`, {
           method: "POST",
           credentials: "include",
           headers: { "Content-Type": "application/json" },
@@ -113,7 +114,7 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
   // 오늘 체크한 화장품 로드
   useEffect(() => {
     if (!user) return;
-    fetch(`/api/routine-log?date=${todayStr()}`)
+    fetch(`${apiBase()}/api/routine-log?date=${todayStr()}`)
       .then((r) => (r.ok ? r.json() : { cosmetic_ids: [] }))
       .then((data) => {
         const ids = Array.isArray(data.cosmetic_ids) ? data.cosmetic_ids : [];
@@ -125,7 +126,7 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
   const handleCosmeticToggle = (id: string) => {
     setCheckedIds((prev) => {
       const next = prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id];
-      fetch("/api/routine-log", {
+      fetch(`${apiBase()}/api/routine-log`, {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
@@ -200,7 +201,7 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
 
   const handleDelete = async (id: string) => {
     setDeletingId(id);
-    await fetch(`/api/cosmetics/${id}`, { method: "DELETE" }).catch(() => {});
+    await fetch(`${apiBase()}/api/cosmetics/${id}`, { method: "DELETE" }).catch(() => {});
     setList((prev) => prev.filter((item) => item.id !== id));
     setSelectedItem((prev) => (prev?.id === id ? null : prev));
     setDeletingId(null);

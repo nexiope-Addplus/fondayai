@@ -65,6 +65,7 @@ import {
   saveReminderSettings,
   syncReminderToServer,
   todayStr,
+  apiBase,
 } from "./utils";
 
 import { DiaryRoutinePreviewCard, DiaryCalendarView, DiaryTimeline } from "./DiaryHelpers";
@@ -102,9 +103,9 @@ export function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: AppU
       setLoading(true);
       if (user) {
         const [scansRes, diaryRes, cosmeticsRes] = await Promise.allSettled([
-          fetch("/api/scans"),
-          fetch("/api/diary"),
-          fetch("/api/cosmetics"),
+          fetch(`${apiBase()}/api/scans`),
+          fetch(`${apiBase()}/api/diary`),
+          fetch(`${apiBase()}/api/cosmetics`),
         ]);
         if (scansRes.status === "fulfilled" && scansRes.value.ok) {
           try { const d = await scansRes.value.json(); if (Array.isArray(d)) setHistory(d); } catch {}

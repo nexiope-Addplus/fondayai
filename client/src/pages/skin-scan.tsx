@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import i18n from "../i18n";
 import { motion, AnimatePresence } from "framer-motion";
 import { AlertCircle, SmartphoneNfc } from "lucide-react";
-import { isTossMiniApp } from "../components/fonday/utils";
+import { isTossMiniApp, apiBase } from "../components/fonday/utils";
 import type { TabId, ScanState, SurveyData, AnalysisResult } from "../components/fonday/types";
 import {
   todayStr, getStreak, getAttendance,
@@ -127,7 +127,7 @@ export default function SkinScanPage() {
   // 비-토스 환경에서는 쿠키 기반 세션 확인
   useEffect(() => {
     if (isTossMiniApp()) return; // 토스는 getAnonymousKey에서 처리
-    fetch("/api/user", { credentials: "include" })
+    fetch(`${apiBase()}/api/user`, { credentials: "include" })
       .then(res => res.ok ? res.json() : null)
       .then(data => setUser(data ?? null))
       .catch(() => setUser(null));
@@ -178,7 +178,7 @@ export default function SkinScanPage() {
     if (!user) return;
     const guestToken = (() => { try { return localStorage.getItem("fonday_guest_token"); } catch { return null; } })();
     if (!guestToken) return;
-    fetch("/api/link-guest-scan", {
+    fetch(`${apiBase()}/api/link-guest-scan`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ shareToken: guestToken }),
@@ -190,7 +190,7 @@ export default function SkinScanPage() {
   // 로그인 후 스트릭/출석 서버 데이터 복원
   useEffect(() => {
     if (!user) return;
-    fetch("/api/user-stats")
+    fetch(`${apiBase()}/api/user-stats`)
       .then(r => r.ok ? r.json() : null)
       .then(data => {
         if (!data) return;
@@ -220,7 +220,7 @@ export default function SkinScanPage() {
       const memo = getDiaryMemo(dateStr);
       const todos = getDiaryTodos(dateStr);
       const causeTags = getDiaryCauseTags(dateStr);
-      fetch("/api/diary", {
+      fetch(`${apiBase()}/api/diary`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ dateStr, memo, todos, causeTags }),
@@ -298,7 +298,7 @@ export default function SkinScanPage() {
         const raw = localStorage.getItem("fonday_prev_scores");
         if (raw) { const arr = JSON.parse(raw); if (Array.isArray(arr) && arr.length === 10) previousScores = arr; }
       } catch {}
-      const response = await fetch("/api/analyze-skin", {
+      const response = await fetch(`${apiBase()}/api/analyze-skin`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ image: b64, surveyData: data, lang: i18n.language || "en", previousScores }),

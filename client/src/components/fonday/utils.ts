@@ -94,7 +94,7 @@ const CAT_KO: Record<string, string> = {
 export function autoRegisterCosmetic(product: {
   name: string; brand: string; category: string; keyIngredients?: string[];
 }) {
-  fetch("/api/cosmetics", {
+  fetch(`${apiBase()}/api/cosmetics`, {
     method: "POST",
     credentials: "include",
     headers: { "Content-Type": "application/json" },
@@ -275,6 +275,11 @@ export function haptic(style: "light" | "medium" | "success" = "light") {
 
 export function isPWA(): boolean {
   return window.matchMedia("(display-mode: standalone)").matches || !!(navigator as any).standalone;
+}
+
+/** API base URL — 토스 미니앱에서는 절대 URL 사용 (상대 경로는 토스 도메인으로 요청됨) */
+export function apiBase(): string {
+  return isTossMiniApp() ? "https://fondayai.com" : "";
 }
 
 /** 토스 미니앱 환경 감지 (?toss=1 파라미터로 시뮬레이션 가능) */
@@ -1270,7 +1275,7 @@ export async function syncReminderToServer(settings: ReminderSettings, lang = "k
     if (!sub?.endpoint) return;
 
     if (settings.enabled) {
-      await fetch("/api/diary-reminder", {
+      await fetch(`${apiBase()}/api/diary-reminder`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -1282,7 +1287,7 @@ export async function syncReminderToServer(settings: ReminderSettings, lang = "k
       return;
     }
 
-    await fetch("/api/diary-reminder", {
+    await fetch(`${apiBase()}/api/diary-reminder`, {
       method: "DELETE",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ endpoint: sub.endpoint }),

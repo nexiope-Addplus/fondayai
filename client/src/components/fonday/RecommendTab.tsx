@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { ShoppingBag, ExternalLink, Sparkles, ScanLine } from "lucide-react";
-import { autoRegisterCosmetic } from "./utils";
+import { autoRegisterCosmetic, apiBase } from "./utils";
 import { motion, useReducedMotion } from "framer-motion";
 import {
   DEEP_GREEN,
@@ -52,7 +52,7 @@ export function RecommendTab({ user, baumannType, onLogin }: {
   useEffect(() => {
     if (!type) { setLoading(false); return; }
     setLoading(true);
-    fetch(`/api/product-recommend?baumann=${type}&limit=50&lang=${lang}`)
+    fetch(`${apiBase()}/api/product-recommend?baumann=${type}&limit=50&lang=${lang}`)
       .then(r => { if (!r.ok) throw new Error(); return r.json(); })
       .then(data => setProducts(Array.isArray(data?.products) ? data.products : []))
       .catch(() => setProducts([]))
@@ -63,7 +63,7 @@ export function RecommendTab({ user, baumannType, onLogin }: {
   const categories = ["all", "toner", "serum", "cream", "sunscreen", "cleanser"];
 
   const fireEvent = (eventType: string, data?: Record<string, unknown>) => {
-    fetch("/api/events", {
+    fetch(`${apiBase()}/api/events`, {
       method: "POST", credentials: "include",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ event_type: eventType, event_data: data ?? {}, lang, is_guest: !user }),
