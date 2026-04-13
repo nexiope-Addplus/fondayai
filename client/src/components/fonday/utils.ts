@@ -180,12 +180,6 @@ export function checkAndCompleteMissions(streakCount: number, overallScore: numb
     newlyCompleted.push("daily_scan");
   }
 
-  if (scoreDelta != null && scoreDelta > 0 && !state.dailyImproved) {
-    state.dailyImproved = true;
-    state.totalPoints += MISSION_POINTS.daily_improve;
-    newlyCompleted.push("daily_improve");
-  }
-
   const checks = [
     { id: "first_scan", cond: true },
     { id: "streak_3", cond: streakCount >= 3 },
@@ -232,13 +226,9 @@ export function checkinToday(): boolean {
 export function markChallengeUsed() {
   const state = getMissions();
   const today = todayStr();
-  if (!state.completed.includes("challenge")) {
-    state.completed.push("challenge");
-    state.totalPoints += MISSION_POINTS.challenge;
-  }
   if (state.dailyDate === today && !state.dailyChallenged) {
     state.dailyChallenged = true;
-    state.totalPoints += MISSION_POINTS.daily_challenge;
+    state.totalPoints += MISSION_POINTS.share;
   }
   try { localStorage.setItem("fonday_missions", JSON.stringify(state)); } catch {}
 }
