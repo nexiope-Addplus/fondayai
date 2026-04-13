@@ -2,6 +2,22 @@
 @tailwind components;
 @tailwind utilities;
 
+/* iOS 네이티브 앱: pull-to-refresh + 오버스크롤 바운스 방지 */
+html, body {
+  overscroll-behavior-y: none;
+}
+/* 상단 safe area — 웹에서는 0, 앱에서만 노치 높이만큼 적용 */
+html {
+  padding-top: env(safe-area-inset-top, 0px);
+}
+/* 탭 콘텐츠 하단 여백 — BottomNav(floating ~80px) + safe area */
+.tab-bottom-pad {
+  padding-bottom: calc(100px + env(safe-area-inset-bottom, 0px));
+}
+/* Capacitor 앱 전용 강제 패딩 (env가 안 먹는 경우 대비) */
+html.capacitor-app {
+  padding-top: max(env(safe-area-inset-top, 0px), 54px);
+}
 
 .no-scrollbar::-webkit-scrollbar { display: none; }
 .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
@@ -89,6 +105,14 @@
   /* Fallback for older browsers */
   --destructive-border: hsl(var(--destructive));
   --destructive-border: hsl(from hsl(var(--destructive)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
+}
+
+/* 토스 미니앱: TDS 폰트 스택 강제 적용 */
+html.toss-miniapp {
+  --font-sans: 'Toss Product Sans', 'Tossface', 'SF Pro KR', 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+html.toss-miniapp, html.toss-miniapp * {
+  font-family: 'Toss Product Sans', 'Tossface', 'SF Pro KR', 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif !important;
 }
 
 .dark {

@@ -5,6 +5,7 @@ export const onRequest = async (context: any) => {
   const url = new URL(request.url);
   const code = url.searchParams.get("code");
   const stateRaw = url.searchParams.get("state") || "ko";
+  const isApp = stateRaw.includes("|app");
   const lang = stateRaw.split("_")[0] || "ko";
 
   if (!code) {
@@ -55,6 +56,10 @@ export const onRequest = async (context: any) => {
 
     const jwt = await createJWT(user, env.JWT_SECRET!);
     const maxAge = 60 * 60 * 24 * 30; // 30일
+
+    if (isApp) {
+      return Response.redirect(`fondayapp://login?token=${jwt}`, 302);
+    }
 
     const headers = new Headers();
     headers.append("Location", `/?login=success&lang=${lang}`);

@@ -1,15 +1,18 @@
 name = "fonday-push-worker"
 main = "worker-api.js"
 compatibility_date = "2024-01-01"
+compatibility_flags = ["nodejs_compat"]
+usage_model = "unbound"
 
-# ── Cron Triggers (Free plan 5개 제한) ────────────────────────────
-# UTC 0,20,22 = KST 09:00 화장품효과 + KST 05:00 인스타생성 + KST 07:00 스캔/날씨
+# ── Cron Triggers ────────────────────────────────────────────────
+# UTC 21 = KST 06:00 → 모닝 뉴스레터 자동 생성
+# UTC 0,22,23 = KST 09:00 화장품효과 + KST 07:00 스캔/날씨/인스타 + KST 08:00 스레드
 # UTC 01 = KST 10:00 → UV 케어
-# UTC 03 = KST 12:00 → 점심 식단
-# UTC 06,09 = KST 15,18시 → 수분 리마인더 + 저녁 식단
-# UTC 11-14 = KST 20-23시 → 루틴 리마인더(11/12/13) + 취침 케어(14)
+# UTC 03-5 = KST 12:00 점심/인스타무드/스레드 + KST 13:00 비움 + KST 14:00 스레드이미지
+# UTC 06,09 = KST 15,18시 → 수분 리마인더 + 저녁 식단 + 스레드
+# UTC 11-14 = KST 20-23시 → 인스타(20시) + 스레드(21시) + 루틴 + 취침
 [triggers]
-crons = ["0 0,20,22 * * *", "0 1 * * *", "0 3 * * *", "0 6,9 * * *", "0 11-14 * * *"]
+crons = ["0 0,21,22,23 * * *", "0 1 * * *", "0 3-5 * * *", "0 6,9 * * *", "0 11-14 * * *"]
 
 # ── KV Namespaces ─────────────────────────────────────────────────
 # PUSH_KV: Cloudflare 대시보드에서 KV 네임스페이스 생성 후 아래 id를 교체하세요.
@@ -24,8 +27,16 @@ binding = "FONDAY_DB"
 database_name = "fonday-db"
 database_id = "125366b1-198e-4cef-a3d7-167befda2c77"
 
+# ── R2 Buckets ────────────────────────────────────────────────────
+[[r2_buckets]]
+binding = "INSTA_IMAGES"
+bucket_name = "fonday-insta-images"
+
 # ── Secrets (wrangler secret put 명령으로 등록) ───────────────────
 # wrangler secret put VAPID_PUBLIC_KEY
 # wrangler secret put VAPID_PRIVATE_KEY
 # wrangler secret put VAPID_SUBJECT   → "mailto:nexiope@gmail.com"
 # wrangler secret put GEMINI_API_KEY
+# wrangler secret put IG_ACCESS_TOKEN / IG_USER_ID (한국 인스타)
+# wrangler secret put IG_ACCESS_TOKEN_JA / IG_USER_ID_JA (일본 인스타)
+# wrangler secret put THREADS_ACCESS_TOKEN / THREADS_USER_ID (스레드)

@@ -31,6 +31,7 @@ import {
   inferCosmeticTimeOfDay,
   buildRepresentativeRoutine,
   buildCosmeticCorrelationSignals,
+  apiBase, appFetch,
 } from "./utils";
 import { CosmeticsRegisterModal } from "./CosmeticsRegisterModal";
 import { CosmeticsReportCard } from "./CosmeticsReportCard";
@@ -68,8 +69,8 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
     setLoading(true);
     try {
       const [cosmeticsRes, scansRes] = await Promise.all([
-        fetch("/api/cosmetics", { credentials: "include" }),
-        fetch("/api/scans", { credentials: "include" }),
+        appFetch(`${apiBase()}/api/cosmetics`, { credentials: "include" }),
+        appFetch(`${apiBase()}/api/scans`, { credentials: "include" }),
       ]);
       const [cosmeticsData, scansData] = await Promise.all([
         cosmeticsRes.json().catch(() => []),
@@ -79,14 +80,14 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
       setList(items);
       setScans(Array.isArray(scansData) ? scansData : []);
 
-      fetch("/api/routine-log", { credentials: "include" })
+      appFetch(`${apiBase()}/api/routine-log`, { credentials: "include" })
         .then(r => r.ok ? r.json() : [])
         .then(data => setRoutineLogs(Array.isArray(data) ? data : []))
         .catch(() => {});
 
       if (items.length > 0) {
         setOptimizing(true);
-        fetch("/api/cosmetics/optimize-routine", {
+        appFetch(`${apiBase()}/api/cosmetics/optimize-routine`, {
           method: "POST",
           credentials: "include",
           headers: { "Content-Type": "application/json" },
@@ -113,7 +114,7 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
   // 오늘 체크한 화장품 로드
   useEffect(() => {
     if (!user) return;
-    fetch(`/api/routine-log?date=${todayStr()}`)
+    appFetch(`${apiBase()}/api/routine-log?date=${todayStr()}`)
       .then((r) => (r.ok ? r.json() : { cosmetic_ids: [] }))
       .then((data) => {
         const ids = Array.isArray(data.cosmetic_ids) ? data.cosmetic_ids : [];
@@ -125,7 +126,7 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
   const handleCosmeticToggle = (id: string) => {
     setCheckedIds((prev) => {
       const next = prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id];
-      fetch("/api/routine-log", {
+      appFetch(`${apiBase()}/api/routine-log`, {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
@@ -200,7 +201,7 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
 
   const handleDelete = async (id: string) => {
     setDeletingId(id);
-    await fetch(`/api/cosmetics/${id}`, { method: "DELETE" }).catch(() => {});
+    await appFetch(`${apiBase()}/api/cosmetics/${id}`, { method: "DELETE" }).catch(() => {});
     setList((prev) => prev.filter((item) => item.id !== id));
     setSelectedItem((prev) => (prev?.id === id ? null : prev));
     setDeletingId(null);
@@ -208,145 +209,14 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
 
   if (!user) {
     return (
-      <div className="min-h-[calc(100dvh-64px)] px-4 pt-5 pb-28" style={{ background: PAGE_GRADIENT }}>
-        <div className="mb-8">
-          <div className="flex items-center gap-2.5 mb-1">
-            <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ background: TINT_GREEN }}>
-              <Droplets className="w-4 h-4" style={{ color: DEEP_GREEN }} />
-            </div>
-            <h2 className="text-[22px] font-extrabold" style={{ color: TEXT_HEADING, fontFamily: FONT_HEADING }}>{t("cosmetics.myTitle")}</h2>
-          </div>
-          <p className="text-[14px] leading-relaxed text-kr-pretty" style={{ color: TEXT_SECONDARY, marginLeft: 42 }}>
-            {t("cosmetics.loginDesc")}
-          </p>
-        </div>
-
-        <div className="p-5 mb-6" style={{ borderRadius: RADIUS_CARD, background: BG_BASE, boxShadow: SHADOW_CARD }}>
-          <div className="mb-4">
-            <p className="text-[14px] font-bold mb-3" style={{ color: TEXT_TITLE }}>{t("cosmetics.loginValueTitle", "로그인하면 이런 걸 할 수 있어요")}</p>
-            <div className="space-y-2.5">
-              <div className="flex items-center gap-2.5">
-                <Sun className="w-4 h-4 shrink-0" style={{ color: DEEP_GREEN }} />
-                <p className="text-[13px]" style={{ color: TEXT_LABEL }}>{t("cosmetics.loginValue1", "AM/PM 루틴을 자동으로 정리해줘요")}</p>
-              </div>
-              <div className="flex items-center gap-2.5">
-                <Sparkles className="w-4 h-4 shrink-0" style={{ color: SCAN_TO }} />
-                <p className="text-[13px]" style={{ color: TEXT_LABEL }}>{t("cosmetics.loginValue2", "화장품별 피부 변화를 추적해요")}</p>
-              </div>
-              <div className="flex items-center gap-2.5">
-                <AlertTriangle className="w-4 h-4 shrink-0" style={{ color: COLOR_WARNING }} />
-                <p className="text-[13px]" style={{ color: TEXT_LABEL }}>{t("cosmetics.loginValue3", "성분 충돌을 미리 알려줘요")}</p>
-              </div>
-            </div>
-          </div>
-          <div className="space-y-2.5">
-            {i18n.language === "ko" ? (
-              <button
-                onClick={() => onLogin ? onLogin("kakao", "routine") : (localStorage.setItem("fonday_return_tab", "routine"), window.location.href = "/auth/kakao")}
-                className="w-full font-bold text-[13px] flex items-center justify-center gap-2 border-0 text-[#3C1E1E]"
-                style={{ background: "#FEE500", height: 48, borderRadius: 24 }}
-              >
-                <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path fillRule="evenodd" clipRule="evenodd" d="M9 1C4.582 1 1 3.79 1 7.222c0 2.154 1.386 4.045 3.484 5.14L3.62 15.5a.25.25 0 0 0 .368.274L7.9 13.39A9.63 9.63 0 0 0 9 13.444c4.418 0 8-2.791 8-6.222C17 3.79 13.418 1 9 1Z" fill="#3C1E1E"/></svg>
-                {t("attendance.kakao")}
-              </button>
-            ) : (
-              <button
-                onClick={() => onLogin ? onLogin("line", "routine") : (localStorage.setItem("fonday_return_tab", "routine"), window.location.href = "/auth/line")}
-                className="w-full font-bold text-[13px] flex items-center justify-center gap-2 border-0 text-white"
-                style={{ background: "#06C755", height: 48, borderRadius: 24 }}
-              >
-                <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M15 7.56c0-3.16-3.13-5.73-6.98-5.73S1.04 4.4 1.04 7.56c0 2.83 2.47 5.2 5.82 5.65.23.05.53.15.61.35.07.18.05.46.02.64l-.1.58c-.03.18-.14.69.6.38.74-.32 3.98-2.38 5.43-4.07C14.54 9.88 15 8.78 15 7.56Z" fill="white"/></svg>
-                {t("attendance.line")}
-              </button>
-            )}
-            <button
-              onClick={() => onLogin ? onLogin("google", "routine") : (localStorage.setItem("fonday_return_tab", "routine"), window.location.href = "/auth/google")}
-              className="w-full font-bold text-[13px] text-[#6B5D55] flex items-center justify-center gap-2"
-              style={{ height: 48, borderRadius: 24, background: BG_MUTED }}
-            >
-              <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="w-4 h-4" />
-              {t("attendance.google")}
-            </button>
-          </div>
-        </div>
-
-        {productSignals.length > 0 && (
-          <div className="pt-5 mt-5" style={{ borderTop: `1px solid ${BORDER_COLOR}` }}>
-            <div className="flex items-start justify-between gap-3 mb-3">
-              <div>
-                <p className="text-xs font-bold tracking-[0.14em] uppercase" style={{ color: SCAN_TO }}>
-                  {t("cosmetics.effectBoardEyebrow")}
-                </p>
-                <p className="text-[15px] font-bold mt-1" style={{ color: DEEP_GREEN }}>
-                  {t("cosmetics.effectBoardTitle")}
-                </p>
-                <p className="text-xs mt-1 text-kr-pretty" style={{ color: TEXT_SECONDARY }}>
-                  {t("cosmetics.effectBoardDesc")}
-                </p>
-              </div>
-            </div>
-            <div className="space-y-2.5">
-              {(() => {
-                // 동일 점수+설명 시그널 묶기
-                const grouped: { key: string; signals: typeof productSignals; delta: number; note: string; topScoreIndex: number | null; daysTracked: number; afterCount: number }[] = [];
-                for (const signal of productSignals) {
-                  const delta = signal.topScoreDelta ?? signal.overallDelta ?? 0;
-                  const key = `${delta}_${signal.note}`;
-                  const existing = grouped.find(g => g.key === key);
-                  if (existing) {
-                    existing.signals.push(signal);
-                  } else {
-                    grouped.push({ key, signals: [signal], delta, note: signal.note, topScoreIndex: signal.topScoreIndex, daysTracked: signal.daysTracked, afterCount: signal.afterCount });
-                  }
-                }
-                return grouped.slice(0, 3).map((group) => {
-                  const mainMetric = group.topScoreIndex !== null ? t(`scores.${group.topScoreIndex}`) : t("cosmetics.signalMetricFallback");
-                  const positive = group.delta >= 0;
-                  const names = group.signals.map(s => s.itemName);
-                  const displayName = names.length <= 2 ? names.join(", ") : `${names[0]} ${t("cosmetics.effectGroupSuffix", { count: names.length - 1 })}`;
-                  return (
-                    <div key={group.key} className="rounded-2xl p-3" style={{ background: "#FAF8F5" }}>
-                      <div className="flex items-start justify-between gap-3">
-                        <div className="min-w-0">
-                          <p className="text-[12px] font-bold text-[#5C4F4A]">{displayName}</p>
-                          <p className="text-xs mt-1 text-kr-pretty" style={{ color: TEXT_SECONDARY }}>{group.note}</p>
-                          {names.length > 2 && (
-                            <p className="text-xs mt-1.5" style={{ color: SCAN_TO }}>
-                              {t("cosmetics.effectGroupHint", "동시에 사용 중이라 개별 효과를 구분하기 어려워요")}
-                            </p>
-                          )}
-                        </div>
-                        <span className="rounded-full px-2 py-0.5 text-xs font-bold shrink-0" style={{ background: `${positive ? DEEP_GREEN : SCAN_TO}12`, color: positive ? DEEP_GREEN : SCAN_TO }}>
-                          {positive ? "+" : ""}{group.delta}
-                        </span>
-                      </div>
-                      <div className="grid grid-cols-3 gap-2 mt-3">
-                        <div className="rounded-2xl p-2.5 bg-white">
-                          <p className="text-xs" style={{ color: TEXT_TERTIARY }}>{t("cosmetics.effectMetricLabel")}</p>
-                          <p className="text-xs font-bold mt-1 text-[#5C4F4A]">{mainMetric}</p>
-                        </div>
-                        <div className="rounded-2xl p-2.5 bg-white">
-                          <p className="text-xs" style={{ color: TEXT_TERTIARY }}>{t("cosmetics.effectTrackedLabel")}</p>
-                          <p className="text-xs font-bold mt-1 text-[#5C4F4A]">{t("cosmetics.effectTrackedValue", { days: group.daysTracked })}</p>
-                        </div>
-                        <div className="rounded-2xl p-2.5 bg-white">
-                          <p className="text-xs" style={{ color: TEXT_TERTIARY }}>{t("cosmetics.effectScanLabel")}</p>
-                          <p className="text-xs font-bold mt-1 text-[#5C4F4A]">{t("cosmetics.effectScanValue", { count: group.afterCount })}</p>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                });
-              })()}
-            </div>
-          </div>
-        )}
+      <div className="flex items-center justify-center min-h-[calc(100dvh-64px)]">
+        <div className="w-8 h-8 rounded-full border-2 border-stone-200 border-t-[#4A7C6E] animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-[calc(100dvh-64px)] px-4 pt-5 pb-28" style={{ background: PAGE_GRADIENT }}>
+    <div className="min-h-[calc(100dvh-64px)] px-4 pt-5 tab-bottom-pad" style={{ background: PAGE_GRADIENT }}>
       <div className="mb-6">
         <div className="flex items-center gap-2.5 mb-1">
           <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ background: TINT_GREEN }}>
@@ -698,10 +568,10 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
                             {/* 정보 */}
                             <div className="flex-1 min-w-0">
                               <div className="flex items-center gap-1.5">
-                                <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full" style={{ background: `${DEEP_GREEN}10`, color: DEEP_GREEN }}>
+                                <span className="text-[11px] font-bold px-1.5 py-0.5 rounded-full" style={{ background: `${DEEP_GREEN}10`, color: DEEP_GREEN }}>
                                   {t(`cosmetics.categories.${item.category}`)}
                                 </span>
-                                <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full" style={{ background: `${SCAN_FROM}10`, color: SCAN_TO }}>
+                                <span className="text-[11px] font-medium px-1.5 py-0.5 rounded-full" style={{ background: `${SCAN_FROM}10`, color: SCAN_TO }}>
                                   {item.time_of_day === "am" ? t("cosmetics.amBtn")
                                     : item.time_of_day === "pm" ? t("cosmetics.pmBtn")
                                     : inferCosmeticTimeOfDay(item.category) === "am" ? t("cosmetics.amBtn") : t("cosmetics.pmBtn")}

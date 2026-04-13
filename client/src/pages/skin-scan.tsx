@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import i18n from "../i18n";
 import { motion, AnimatePresence } from "framer-motion";
 import { AlertCircle, SmartphoneNfc } from "lucide-react";
+import { isTossMiniApp, apiBase, appFetch } from "../components/fonday/utils";
 import type { TabId, ScanState, SurveyData, AnalysisResult } from "../components/fonday/types";
 import {
   todayStr, getStreak, getAttendance,
@@ -91,7 +92,9 @@ export default function SkinScanPage() {
     trackEvent("tab_view", { tab });
   };
 
+  // PWA 설치 프롬프트 — 토스 미니앱에서는 비활성화
   useEffect(() => {
+    if (isTossMiniApp()) return;
     const handler = (e: any) => { e.preventDefault(); setDeferredPrompt(e); };
     const installed = () => { trackEvent("pwa_prompt_accepted"); setDeferredPrompt(null); };
     window.addEventListener("beforeinstallprompt", handler);
@@ -100,7 +103,7 @@ export default function SkinScanPage() {
   }, []);
 
   const handleInstall = async () => {
-    // 이미 PWA로 실행 중이면 무시
+    if (isTossMiniApp()) return;
     if (window.matchMedia("(display-mode: standalone)").matches) return;
     if (deferredPrompt) {
       trackEvent("pwa_prompt_shown");
@@ -109,10 +112,8 @@ export default function SkinScanPage() {
       trackEvent(choice.outcome === "accepted" ? "pwa_prompt_accepted" : "pwa_prompt_dismissed");
       setDeferredPrompt(null);
     } else if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) {
-      // iOS만 수동 가이드 표시
       setShowInstallGuide(true);
     } else {
-      // 안드로이드 Chrome: 메뉴 → 홈 화면에 추가 안내
       alert(t("install.androidHint", "브라우저 메뉴(⋮) → '홈 화면에 추가'를 눌러주세요"));
     }
   };
@@ -122,62 +123,67 @@ export default function SkinScanPage() {
     setScanState("idle");
   };
 
+  // 토스 미니앱: toss-miniapp 클래스 추가 (폰트 오버라이드용)
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const justLoggedIn = params.get("login") === "success";
-    justLoggedInRef.current = justLoggedIn;
-    if (justLoggedIn) window.history.replaceState({}, "", "/");
+    if (isTossMiniApp()) document.documentElement.classList.add("toss-miniapp");
+  }, []);
 
-    fetch("/api/user")
+  // 토스 미니앱: user 상태는 getAnonymousKey useEffect에서 자동 설정됨
+  // 비-토스 환경에서는 쿠키 기반 세션 확인
+  useEffect(() => {
+    if (isTossMiniApp()) return; // 토스는 getAnonymousKey에서 처리
+    fetch(`${apiBase()}/api/user`, { credentials: "include" })
       .then(res => res.ok ? res.json() : null)
-      .then(data => {
-        setUser(data ?? null);
-        if (data && justLoggedIn) {
-          // 팝업 모드: 부모에 알리고 닫기
-          if (window.opener && !window.opener.closed) {
-            try { window.opener.postMessage("fonday:login:success", window.location.origin); window.close(); } catch {}
-          }
-          // iOS PWA LINE 로그인: 새 Safari 탭 → BroadcastChannel로 원래 PWA 탭에 알림
-          try { const bc = new BroadcastChannel("fonday-auth"); bc.postMessage({ type: "login_complete" }); bc.close(); } catch {}
-        }
-      })
+      .then(data => setUser(data ?? null))
       .catch(() => setUser(null));
   }, []);
 
-  // visibilitychange: LINE 로그인 후 PWA로 돌아올 때 자동 로그인 감지
-  // (iOS에서 LINE 앱 경유 → Safari 새탭 콜백 → PWA로 복귀 시 쿠키 공유로 자동 로그인)
-  useEffect(() => {
-    const onVisible = () => {
-      if (document.visibilityState !== "visible") return;
-      if (!localStorage.getItem("fonday_login_pending")) return;
-      fetch("/api/user").then(r => r.ok ? r.json() : null).then(u => {
-        if (u) {
-          localStorage.removeItem("fonday_login_pending");
-          setUser(u);
-        }
-      });
-    };
-    document.addEventListener("visibilitychange", onVisible);
-    window.addEventListener("focus", onVisible);
-    return () => {
-      document.removeEventListener("visibilitychange", onVisible);
-      window.removeEventListener("focus", onVisible);
-    };
-  }, []);
+  // 토스 미니앱: getAnonymousKey로 자동 로그인
+  const [tossAuthError, setTossAuthError] = useState(false);
+  const isSimulated = !!(localStorage.getItem("fonday_toss_mode") === "1" && !(window as any).__AIT__);
+  const tossLogin = useCallback(() => {
+    if (!isTossMiniApp()) return;
+    setTossAuthError(false);
 
-  // 팝업 로그인 (DiaryTab·MyScreen 등에서 사용)
-  const openLoginPopup = useCallback((provider: "kakao" | "line" | "google", returnTab?: string) => {
-    if (returnTab) localStorage.setItem("fonday_return_tab", returnTab);
-    const lang = localStorage.getItem("fonday_lang") || "ko";
-    window.location.href = `/auth/${provider}?lang=${lang}`;
-  }, []);
+    // 시뮬레이션 모드 (?toss=1): mock 유저로 바로 설정
+    if (isSimulated) {
+      const mockHash = "sim_" + Date.now();
+      localStorage.setItem("fonday_toss_user_hash", mockHash);
+      setUser({ id: `toss_${mockHash}`, username: "토스 테스트", provider: "toss", avatar: null, email: null });
+      return;
+    }
+
+    import("@apps-in-toss/web-framework").then(({ getAnonymousKey }) => {
+      getAnonymousKey().then((result) => {
+        if (!result || typeof result === "string") {
+          setTossAuthError(true);
+          return;
+        }
+        if (result.type === "HASH") {
+          const tossUserId = `toss_${result.hash}`;
+          localStorage.setItem("fonday_toss_user_hash", result.hash);
+          setUser({
+            id: tossUserId,
+            username: "토스 사용자",
+            provider: "toss",
+            avatar: null,
+            email: null,
+          });
+        }
+      }).catch(() => setTossAuthError(true));
+    }).catch(() => setTossAuthError(true));
+  }, [isSimulated]);
+  useEffect(() => { tossLogin(); }, [tossLogin]);
+
+  // 토스 미니앱: 로그인은 getAnonymousKey로 자동 처리됨 — no-op
+  const openLoginPopup = useCallback((_provider: string, _returnTab?: string) => {}, []);
 
   // 로그인 후 게스트 스캔 연결
   useEffect(() => {
     if (!user) return;
     const guestToken = (() => { try { return localStorage.getItem("fonday_guest_token"); } catch { return null; } })();
     if (!guestToken) return;
-    fetch("/api/link-guest-scan", {
+    appFetch(`${apiBase()}/api/link-guest-scan`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ shareToken: guestToken }),
@@ -189,7 +195,7 @@ export default function SkinScanPage() {
   // 로그인 후 스트릭/출석 서버 데이터 복원
   useEffect(() => {
     if (!user) return;
-    fetch("/api/user-stats")
+    appFetch(`${apiBase()}/api/user-stats`)
       .then(r => r.ok ? r.json() : null)
       .then(data => {
         if (!data) return;
@@ -219,7 +225,7 @@ export default function SkinScanPage() {
       const memo = getDiaryMemo(dateStr);
       const todos = getDiaryTodos(dateStr);
       const causeTags = getDiaryCauseTags(dateStr);
-      fetch("/api/diary", {
+      appFetch(`${apiBase()}/api/diary`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ dateStr, memo, todos, causeTags }),
@@ -297,19 +303,22 @@ export default function SkinScanPage() {
         const raw = localStorage.getItem("fonday_prev_scores");
         if (raw) { const arr = JSON.parse(raw); if (Array.isArray(arr) && arr.length === 10) previousScores = arr; }
       } catch {}
-      const response = await fetch("/api/analyze-skin", {
+      const apiUrl = `${apiBase()}/api/analyze-skin`;
+      const response = await appFetch(apiUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ image: b64, surveyData: data, lang: i18n.language || "en", previousScores }),
       });
       const rawText = await response.text();
-      console.log("[API 응답]", response.status, rawText.slice(0, 300));
+      console.log("[API 응답]", response.status, response.url, rawText.slice(0, 300));
       if (!response.ok) {
         let msg = `HTTP ${response.status}`;
         try {
           const errJson = JSON.parse(rawText);
           msg = errJson.detail || errJson.message || errJson.error || JSON.stringify(errJson);
         } catch { msg += ": " + rawText.slice(0, 100); }
+        // 디버그: 실제 요청 URL 표시
+        msg = `[${apiUrl}] ${msg}`;
         setScanError(msg);
         setScanState("error");
         trackEvent("scan_fail", { status: response.status });
@@ -320,11 +329,44 @@ export default function SkinScanPage() {
       setScanState("result");
       trackEvent("scan_complete", { score: result.overallScore, baumannType: result.baumannType });
     } catch (err: any) {
-      setScanError(err.message || "네트워크 오류");
+      // 디버그: 토스에서 간단 GET 테스트로 네트워크 자체 확인
+      let netTest = "untested";
+      if (isTossMiniApp()) {
+        try {
+          const t = await fetch(`${apiBase()}/api/health`, { mode: "cors", credentials: "omit" });
+          netTest = `GET:${t.status}`;
+        } catch (e: any) { netTest = `GET-fail:${e.message}`; }
+      }
+      const debugInfo = `${err.message || "네트워크 오류"} | origin:${window.location.origin} | api:${apiBase()} | toss:${isTossMiniApp()} | net:${netTest}`;
+      setScanError(debugInfo);
       setScanState("error");
       trackEvent("scan_fail", { error: "network" });
     }
   }, [imageFile, imageBase64, trackEvent]);
+
+  // 토스 미니앱: 인증 실패 시 재시도 화면
+  if (tossAuthError && isTossMiniApp()) {
+    return (
+      <div className="min-h-[100dvh] bg-[#FAF9F6] flex items-center justify-center px-6">
+        <div className="text-center space-y-4">
+          <div className="w-14 h-14 mx-auto rounded-2xl flex items-center justify-center" style={{ background: "#FDF4F1" }}>
+            <AlertCircle className="w-7 h-7" style={{ color: "#C97062" }} />
+          </div>
+          <div>
+            <p className="text-[16px] font-bold text-[#4A403A]">연결에 실패했어요</p>
+            <p className="text-[13px] text-[#8C8078] mt-1">잠시 후 다시 시도해 주세요</p>
+          </div>
+          <button
+            onClick={tossLogin}
+            className="px-6 py-3 rounded-2xl text-[14px] font-semibold text-white"
+            style={{ background: "#4A7C6E" }}
+          >
+            다시 시도
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-[100dvh] bg-[#FAF9F6] text-stone-900">
@@ -423,15 +465,15 @@ export default function SkinScanPage() {
           {activeTab === "my" && (
             <motion.div key="my" custom={tabDirection} initial={{ opacity: 0, x: tabDirection * 24 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: tabDirection * -24 }} transition={{ duration: 0.18, ease: "easeOut" }}>
               <Suspense fallback={<div className="min-h-[calc(100dvh-64px)]" />}>
-                <MyScreen user={user} analysisResult={analysisResult} onInstall={handleInstall} onBack={() => handleTabChange("scan")} onLogin={openLoginPopup} onGoMagazine={() => handleTabChange("scan")} onGoRoutine={() => handleTabChange("routine")} onOpenDiary={() => handleTabChange("diary")} />
+                <MyScreen user={user} analysisResult={analysisResult} onInstall={handleInstall} onBack={() => handleTabChange("scan")} onGoMagazine={() => handleTabChange("scan")} onGoRoutine={() => handleTabChange("routine")} onOpenDiary={() => handleTabChange("diary")} />
               </Suspense>
             </motion.div>
           )}
         </AnimatePresence>
 
-        {/* 앱 추가 안내 모달 (iOS) */}
+        {/* 앱 추가 안내 모달 (iOS) — 토스 미니앱에서는 표시 안 함 */}
         <AnimatePresence>
-          {showInstallGuide && (
+          {showInstallGuide && !isTossMiniApp() && (
             <motion.div className="fixed inset-0 z-[200] flex items-end justify-center"
               initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
               <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setShowInstallGuide(false)} />

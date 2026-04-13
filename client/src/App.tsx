@@ -6,13 +6,18 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import SkinScanPage from "@/pages/skin-scan";
 import BattlePage from "@/pages/battle";
+import SharedResultPage from "@/pages/shared-result";
 import LegalPage from "@/pages/legal";
+
+
 
 function Router() {
   return (
     <Switch>
       <Route path="/" component={SkinScanPage} />
+      <Route path="/skinReport" component={SkinScanPage} />
       <Route path="/battle/:token" component={BattlePage} />
+      <Route path="/share/:token" component={SharedResultPage} />
       <Route path="/legal/:type" component={LegalPage} />
     </Switch>
   );
@@ -38,7 +43,7 @@ if (!sessionStorage.getItem("fonday_ref")) {
   localStorage.setItem("fonday_referrer", channel);
 }
 
-function App() {
+function AppContent() {
   return (
     <ThemeProvider attribute="class" defaultTheme="light">
       <QueryClientProvider client={queryClient}>
@@ -49,6 +54,10 @@ function App() {
       </QueryClientProvider>
     </ThemeProvider>
   );
+}
+
+function App() {
+  return <AppContent />;
 }
 
 export default App;

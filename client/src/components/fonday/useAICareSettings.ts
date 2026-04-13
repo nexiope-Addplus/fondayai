@@ -11,6 +11,8 @@ import {
   saveReminderSettings,
   shouldShowPushPrompt,
   syncReminderToServer,
+  isTossMiniApp,
+  apiBase, appFetch,
 } from "./utils";
 
 export function useAICareSettings(analysisResult: AnalysisResult | null) {
@@ -68,7 +70,7 @@ export function useAICareSettings(analysisResult: AnalysisResult | null) {
         };
 
   const syncPushSubscription = async (subscription: PushSubscriptionJSON, nextCareSettings: AICareSettings) => {
-    await fetch("/api/push-subscribe", {
+    await appFetch(`${apiBase()}/api/push-subscribe`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -91,6 +93,8 @@ export function useAICareSettings(analysisResult: AnalysisResult | null) {
 
   useEffect(() => {
     if (!analysisResult) return;
+    // 토스 미니앱: 웹푸시 미지원 + 바텀시트 자동 열림 금지
+    if (isTossMiniApp()) return;
     const timer = setTimeout(() => {
       if (!pushSubscribed && shouldShowPushPrompt()) {
         setShowPushPrompt(true);
@@ -115,7 +119,7 @@ export function useAICareSettings(analysisResult: AnalysisResult | null) {
         const existing = await reg.pushManager.getSubscription();
         if (!existing || cancelled) return;
 
-        await fetch("/api/push-subscribe", {
+        await appFetch(`${apiBase()}/api/push-subscribe`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -152,7 +156,7 @@ export function useAICareSettings(analysisResult: AnalysisResult | null) {
         setAICareSettings(nextCare);
         saveAICareSettings(nextCare);
         await syncReminderToServer({ ...getReminderSettings(), enabled: false });
-        await fetch("/api/push-subscribe", { method: "DELETE", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ endpoint: existing.endpoint }) });
+        await appFetch(`${apiBase()}/api/push-subscribe`, { method: "DELETE", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ endpoint: existing.endpoint }) });
         await existing.unsubscribe();
         setPushSubscribed(false);
       } else {
@@ -162,7 +166,7 @@ export function useAICareSettings(analysisResult: AnalysisResult | null) {
         let VAPID_PUBLIC = import.meta.env.VITE_VAPID_PUBLIC_KEY || "";
         if (!VAPID_PUBLIC) {
           try {
-            const res = await fetch("/api/vapid-public-key");
+            const res = await appFetch(`${apiBase()}/api/vapid-public-key`);
             if (res.ok) { const d = await res.json(); VAPID_PUBLIC = d.key || ""; }
           } catch {}
         }

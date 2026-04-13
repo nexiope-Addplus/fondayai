@@ -8,6 +8,7 @@ import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Responsi
 import { Shield, Sparkles, ChevronLeft, Zap, ArrowRight, Activity, FileText } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { BG_BASE, BG_MUTED, BORDER_COLOR, FONT_DISPLAY, TEXT_TERTIARY } from "@/components/fonday/constants";
+import { apiBase, appFetch } from "@/components/fonday/utils";
 
 const SCAN_FROM = "#E5B9A8";
 const SCAN_TO = "#C97062";
@@ -47,11 +48,11 @@ export default function BattlePage() {
       try {
         setLoading(true);
         // 1. Fetch friend's scan using token (matching Cloudflare API route)
-        let res = await fetch(`/api/shared-scan?token=${params.token}`);
+        let res = await appFetch(`${apiBase()}/api/shared-scan?token=${params.token}`);
 
         // Fallback for local Express if needed
         if (res.status === 404) {
-           res = await fetch(`/api/scans/shared/${params.token}`);
+           res = await appFetch(`${apiBase()}/api/scans/shared/${params.token}`);
         }
 
         if (!res.ok) {
@@ -62,7 +63,7 @@ export default function BattlePage() {
 
         // 2. Fetch my latest scan (logged in) or fallback to sessionStorage (after challenge scan)
         let myFound = false;
-        const myRes = await fetch("/api/scans");
+        const myRes = await appFetch(`${apiBase()}/api/scans`);
         if (myRes.ok) {
           const myData = await myRes.json();
           if (Array.isArray(myData) && myData.length > 0) {

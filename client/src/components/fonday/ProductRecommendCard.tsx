@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { ExternalLink, Sparkles, CheckCircle } from "lucide-react";
 import { motion, useReducedMotion } from "framer-motion";
-import { autoRegisterCosmetic } from "./utils";
+import { autoRegisterCosmetic, apiBase, appFetch } from "./utils";
 import {
   DEEP_GREEN,
   SCAN_TO,
@@ -68,7 +68,7 @@ export function ProductRecommendCard({ baumannType }: { baumannType: string }) {
   const lang = i18n.language?.slice(0, 2) || "ko";
 
   const fireEvent = (type: string, data?: Record<string, unknown>) => {
-    fetch("/api/events", {
+    appFetch(`${apiBase()}/api/events`, {
       method: "POST", credentials: "include",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ event_type: type, event_data: data ?? {}, lang, is_guest: true }),
@@ -78,7 +78,7 @@ export function ProductRecommendCard({ baumannType }: { baumannType: string }) {
   useEffect(() => {
     if (!baumannType) return;
     setLoading(true);
-    fetch(`/api/product-recommend?baumann=${baumannType}&limit=20&lang=${lang}`)
+    appFetch(`${apiBase()}/api/product-recommend?baumann=${baumannType}&limit=20&lang=${lang}`)
       .then(r => {
         if (!r.ok) throw new Error(`HTTP ${r.status}`);
         return r.json();
@@ -183,14 +183,14 @@ export function ProductRecommendCard({ baumannType }: { baumannType: string }) {
                 <span className="text-[14px] font-extrabold" style={{ color: scoreColor }}>
                   {score}%
                 </span>
-                <span className="text-[10px] font-bold" style={{ color: scoreColor }}>
+                <span className="text-[11px] font-bold" style={{ color: scoreColor }}>
                   {lang === "ja" ? "適合" : lang === "en" ? "match" : "매칭"}
                 </span>
               </div>
 
               {/* 제품 정보 */}
               <div className="px-2.5 pb-1 flex-1 flex flex-col">
-                <p className="text-[10px] font-semibold" style={{ color: TEXT_TERTIARY }}>{product.brand}</p>
+                <p className="text-[11px] font-semibold" style={{ color: TEXT_TERTIARY }}>{product.brand}</p>
                 <p className="text-[11px] font-bold mt-0.5 line-clamp-2 leading-snug" style={{ color: "#5C4F4A" }}>{product.name}</p>
               </div>
 
@@ -208,7 +208,7 @@ export function ProductRecommendCard({ baumannType }: { baumannType: string }) {
                       fireEvent("product_recommend_click", { productId: product.id, brand: product.brand, name: product.name });
                       autoRegisterCosmetic(product);
                     }}
-                    className="flex items-center gap-0.5 text-[10px] font-bold px-2 py-1 rounded-full"
+                    className="flex items-center gap-0.5 text-[11px] font-bold px-2 py-1 rounded-full"
                     style={{ background: SCAN_TO, color: "#fff" }}
                   >
                     {lang === "ja" ? "購入" : lang === "en" ? "Buy" : "구매"}

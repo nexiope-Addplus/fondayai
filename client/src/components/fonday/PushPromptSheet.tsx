@@ -31,8 +31,8 @@ export function PushPromptSheet({ onAllow, onDismiss, isLoading }: {
         animate={{ y: 0 }}
         exit={{ y: "100%" }}
         transition={{ type: "spring", damping: 30, stiffness: 300 }}
-        className="fixed bottom-0 left-0 right-0 z-[990] bg-white rounded-t-3xl px-6 pt-4 pb-10 max-w-lg mx-auto"
-        style={{ borderTop: `1px solid ${BORDER_COLOR}` }}
+        className="fixed bottom-0 left-0 right-0 z-[990] bg-white rounded-t-3xl px-6 pt-4 max-w-lg mx-auto"
+        style={{ paddingBottom: "calc(40px + env(safe-area-inset-bottom))", borderTop: `1px solid ${BORDER_COLOR}` }}
       >
         <div className="w-10 h-1 bg-stone-200 rounded-full mx-auto mb-5" />
         {showIOSGuide ? (

@@ -60,10 +60,12 @@ import {
   getReportLang,
   getStreak,
   getWeeklyReport,
+  isTossMiniApp,
   saveAICareSettings,
   saveReminderSettings,
   syncReminderToServer,
   todayStr,
+  apiBase, appFetch,
 } from "./utils";
 
 import { DiaryRoutinePreviewCard, DiaryCalendarView, DiaryTimeline } from "./DiaryHelpers";
@@ -101,9 +103,9 @@ export function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: AppU
       setLoading(true);
       if (user) {
         const [scansRes, diaryRes, cosmeticsRes] = await Promise.allSettled([
-          fetch("/api/scans"),
-          fetch("/api/diary"),
-          fetch("/api/cosmetics"),
+          appFetch(`${apiBase()}/api/scans`),
+          appFetch(`${apiBase()}/api/diary`),
+          appFetch(`${apiBase()}/api/cosmetics`),
         ]);
         if (scansRes.status === "fulfilled" && scansRes.value.ok) {
           try { const d = await scansRes.value.json(); if (Array.isArray(d)) setHistory(d); } catch {}
@@ -253,68 +255,6 @@ export function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: AppU
     return () => container.removeEventListener("scroll", onScroll);
   }, [scrollRestoreKey]);
 
-  if (!user) {
-    return (
-      <div className="flex flex-col" style={{ background: PAGE_GRADIENT, minHeight: "calc(100dvh - 64px)" }}>
-        <div className="px-4 pt-5 pb-28">
-          <div className="mb-8">
-            <div className="flex items-center gap-2.5 mb-1">
-              <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ background: TINT_WARM }}>
-                <NotebookPen className="w-4 h-4" style={{ color: SCAN_TO }} />
-              </div>
-              <h1 className="text-[22px] font-extrabold" style={{ color: TEXT_HEADING, fontFamily: FONT_HEADING }}>{t("modal.diary.title")}</h1>
-            </div>
-            <p className="text-[13px] text-kr-pretty" style={{ color: TEXT_SECONDARY, marginLeft: 42 }}>{t("diary.loginDesc", "로그인으로 내 피부 일기를 시작하세요.")}</p>
-          </div>
-
-          <div className="mb-8">
-            <p className="text-[14px] font-bold mb-3" style={{ color: TEXT_TITLE }}>{t("diary.loginValueTitle", "피부 일기를 쓰면")}</p>
-            <div className="space-y-2.5">
-              <div className="flex items-center gap-2.5">
-                <Camera className="w-4 h-4 shrink-0" style={{ color: DEEP_GREEN }} />
-                <p className="text-[13px]" style={{ color: TEXT_LABEL }}>{t("diary.loginValue1", "매일 피부 점수 변화를 기록해요")}</p>
-              </div>
-              <div className="flex items-center gap-2.5">
-                <ClipboardList className="w-4 h-4 shrink-0" style={{ color: SCAN_TO }} />
-                <p className="text-[13px]" style={{ color: TEXT_LABEL }}>{t("diary.loginValue2", "7일 평균으로 피부 트렌드를 확인해요")}</p>
-              </div>
-              <div className="flex items-center gap-2.5">
-                <NotebookPen className="w-4 h-4 shrink-0" style={{ color: COLOR_INFO }} />
-                <p className="text-[13px]" style={{ color: TEXT_LABEL }}>{t("diary.loginValue3", "캘린더에서 한눈에 관리해요")}</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="p-5" style={{ borderRadius: RADIUS_CARD, background: BG_BASE, boxShadow: SHADOW_CARD }}>
-            <div className="space-y-2.5">
-              {i18n.language === "ko" ? (
-                <button onClick={() => onLogin ? onLogin("kakao", "diary") : (localStorage.setItem("fonday_return_tab", "diary"), window.location.href = "/auth/kakao")}
-                  className="w-full font-bold gap-2 border-0 text-[#3C1E1E] flex items-center justify-center"
-                  style={{ background: "#FEE500", height: 48, borderRadius: 24 }}>
-                  <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path fillRule="evenodd" clipRule="evenodd" d="M9 1C4.582 1 1 3.79 1 7.222c0 2.154 1.386 4.045 3.484 5.14L3.62 15.5a.25.25 0 0 0 .368.274L7.9 13.39A9.63 9.63 0 0 0 9 13.444c4.418 0 8-2.791 8-6.222C17 3.79 13.418 1 9 1Z" fill="#3C1E1E"/></svg>
-                  {t("result.login.kakao")}
-                </button>
-              ) : (
-                <button onClick={() => onLogin ? onLogin("line", "diary") : (localStorage.setItem("fonday_return_tab", "diary"), window.location.href = "/auth/line")}
-                  className="w-full font-bold gap-2 border-0 text-white flex items-center justify-center"
-                  style={{ background: "#06C755", height: 48, borderRadius: 24 }}>
-                  <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M15 7.56c0-3.16-3.13-5.73-6.98-5.73S1.04 4.4 1.04 7.56c0 2.83 2.47 5.2 5.82 5.65.23.05.53.15.61.35.07.18.05.46.02.64l-.1.58c-.03.18-.14.69.6.38.74-.32 3.98-2.38 5.43-4.07C14.54 9.88 15 8.78 15 7.56Z" fill="white"/></svg>
-                  {t("result.login.line")}
-                </button>
-              )}
-              <button onClick={() => onLogin ? onLogin("google", "diary") : (localStorage.setItem("fonday_return_tab", "diary"), window.location.href = "/auth/google")}
-                className="w-full font-bold text-[#6B5D55] gap-2 bg-white flex items-center justify-center"
-                style={{ height: 48, borderRadius: 24 }}>
-                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="w-4 h-4" />
-                {t("result.login.google")}
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="flex flex-col" style={{ background: PAGE_GRADIENT, minHeight: "calc(100dvh - 64px)" }}>
       {/* 헤더 */}
@@ -347,7 +287,7 @@ export function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: AppU
       </div>
 
       {/* 콘텐츠 */}
-      <div ref={diaryScrollRef} className="flex-1 overflow-y-auto overscroll-contain pb-28">
+      <div ref={diaryScrollRef} className="flex-1 overflow-y-auto overscroll-contain tab-bottom-pad">
         {overallScore === 0 && (
           <div className="mx-4 mt-3 mb-0">
             <button
@@ -416,6 +356,8 @@ export function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: AppU
             >
               <DiaryCalendarView allEntries={allEntries} />
               <div className="px-5 pt-3">
+                {/* 알림/리마인더 섹션 — 토스 미니앱은 웹푸시 미지원이므로 숨김 */}
+                {!isTossMiniApp() && (
                 <div className="pt-5 mt-5" style={{ borderTop: `1px solid ${BORDER_COLOR}` }}>
                   <div>
                     <div className="flex items-start justify-between gap-3">
@@ -544,6 +486,7 @@ export function DiaryTab({ user, analysisResult, onBack, onLogin }: { user: AppU
                     )}
                   </div>
                 </div>
+                )}
               </div>
               <DiaryRoutinePreviewCard routineGuide={routineGuide} dateStr={todayStr()} />
             </motion.div>

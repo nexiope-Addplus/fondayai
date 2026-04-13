@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 import { ScanLine, Lightbulb, Sparkles, Star, Utensils } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { isTossMiniApp } from "./utils";
 import {
   DEEP_GREEN,
   SCAN_TO,
@@ -21,8 +22,7 @@ import {
   COLOR_WARNING,
   COLOR_INFO,
 } from "./constants";
-import { SkinPredictionCard } from "./SkinPredictionCard";
-import { ResultLoginCard } from "./ResultLoginCard";
+
 
 export function ResultSolutionTab(props: any) {
   const { t } = useTranslation();
@@ -122,33 +122,12 @@ export function ResultSolutionTab(props: any) {
             )}
             </div>
 
-            {/* ── AI 피부 예측 ── */}
-            {analysisResult?.prediction && (
-              <div className="pt-5 mt-5" style={{ borderTop: `1px solid ${BORDER_COLOR}` }}>
-              <SkinPredictionCard
-                prediction={analysisResult.prediction}
-                currentScore={analysisResult.scores[0]?.score ?? 0}
-                onOpenDiary={handleDiaryEntry}
-              />
-              </div>
-            )}
-
-            {/* ── 로그인 카드 (비로그인 유저) ── */}
-            {!user && user !== undefined && (
-              <ResultLoginCard
-                loginPromptRef={loginPromptRef}
-                socialLoginButton={socialLoginButton}
-                onGoogleLogin={handleGoogleLogin}
-                onGoSolution={() => {}}
-              />
-            )}
-
             <button
               onClick={() => goTo("nutrition")}
               className="w-full flex items-center justify-center gap-2 py-3 rounded-2xl text-[12px] font-semibold transition-all active:scale-95"
               style={{ background: "#FAF8F5", color: COLOR_INFO }}>
               <Utensils className="w-4 h-4" />
-              <span>{t("result.tab.nutrition")}</span>
+              <span>{isTossMiniApp() ? t("result.tab.tossNutrition") : t("result.tab.nutrition")}</span>
             </button>
           </div>
   );

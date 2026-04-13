@@ -45,8 +45,17 @@ export const TINT_NEUTRAL = "#F0F0F1";
 export const BG_BASE = "#FFFFFF";
 export const BG_MUTED = "#F5F8F6";
 export const BORDER_COLOR = "#EBEBEB";
-export const FONT_DISPLAY = "'LINESeedKR', Pretendard, sans-serif";
-export const FONT_HEADING = "'LINESeedKR', Pretendard, sans-serif";
+// 토스 미니앱: Toss Product Sans 자동 적용 → 커스텀 폰트 제거
+const _isToss = typeof window !== "undefined" && (
+  !!(window as any).__AIT__ ||
+  navigator.userAgent.includes("TossApp") ||
+  document.documentElement.classList.contains("toss-miniapp") ||
+  new URLSearchParams(window.location.search).get("toss") === "1" ||
+  /\.tossmini\.com$/.test(window.location.hostname)
+);
+const _TOSS_FONT = "'Toss Product Sans', 'Tossface', 'SF Pro KR', 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif";
+export const FONT_DISPLAY = _isToss ? _TOSS_FONT : "'LINESeedKR', Pretendard, sans-serif";
+export const FONT_HEADING = _isToss ? _TOSS_FONT : "'LINESeedKR', Pretendard, sans-serif";
 
 // Shadow 토큰
 export const SHADOW_CARD = "0 0 0 1px rgba(0,0,0,0.10), 0 2px 6px rgba(0,0,0,0.05)";

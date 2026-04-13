@@ -94,9 +94,8 @@ const CAT_KO: Record<string, string> = {
 export function autoRegisterCosmetic(product: {
   name: string; brand: string; category: string; keyIngredients?: string[];
 }) {
-  fetch("/api/cosmetics", {
+  appFetch(`${apiBase()}/api/cosmetics`, {
     method: "POST",
-    credentials: "include",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       name: product.name,
@@ -275,6 +274,39 @@ export function haptic(style: "light" | "medium" | "success" = "light") {
 
 export function isPWA(): boolean {
   return window.matchMedia("(display-mode: standalone)").matches || !!(navigator as any).standalone;
+}
+
+/** API base URL — 토스 미니앱은 외부 도메인 직접 호출 (프록시 없음) */
+export function apiBase(): string {
+  if (isTossMiniApp()) return "https://fondayai.com";
+  return "";
+}
+
+/**
+ * 토스 미니앱 대응 fetch wrapper
+ * - 토스 WebView는 써드파티 쿠키 차단 → credentials: "include" 제거
+ * - 토스 사용자 식별을 위해 X-Toss-User 헤더 추가
+ */
+export function appFetch(input: string, init?: RequestInit): Promise<Response> {
+  if (!isTossMiniApp()) return fetch(input, init);
+
+  const headers = new Headers(init?.headers);
+  const tossHash = localStorage.getItem("fonday_toss_user_hash");
+  if (tossHash) headers.set("X-Toss-User", tossHash);
+
+  const { credentials: _, ...rest } = init || {};
+  return fetch(input, { ...rest, headers, mode: "cors", credentials: "omit" });
+}
+
+/** 토스 미니앱 환경 감지 (?toss=1 파라미터로 시뮬레이션 가능) */
+export function isTossMiniApp(): boolean {
+  return !!(
+    (window as any).__AIT__ ||
+    navigator.userAgent.includes("TossApp") ||
+    document.documentElement.classList.contains("toss-miniapp") ||
+    new URLSearchParams(window.location.search).get("toss") === "1" ||
+    localStorage.getItem("fonday_toss_mode") === "1"
+  );
 }
 export function shouldShowPushPrompt(): boolean {
   if (!("serviceWorker" in navigator) || !("PushManager" in window)) return false;
@@ -1259,7 +1291,7 @@ export async function syncReminderToServer(settings: ReminderSettings, lang = "k
     if (!sub?.endpoint) return;
 
     if (settings.enabled) {
-      await fetch("/api/diary-reminder", {
+      await appFetch(`${apiBase()}/api/diary-reminder`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -1271,7 +1303,7 @@ export async function syncReminderToServer(settings: ReminderSettings, lang = "k
       return;
     }
 
-    await fetch("/api/diary-reminder", {
+    await appFetch(`${apiBase()}/api/diary-reminder`, {
       method: "DELETE",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ endpoint: sub.endpoint }),

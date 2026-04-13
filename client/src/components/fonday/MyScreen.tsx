@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { AnimatePresence, motion } from "framer-motion";
+import { isTossMiniApp, apiBase, appFetch } from "./utils";
 import {
   Sparkles,
   Zap,
@@ -50,7 +51,6 @@ export function MyScreen({
   user,
   onInstall,
   onBack,
-  onLogin,
   onGoMagazine,
   onGoRoutine,
   onOpenDiary,
@@ -59,7 +59,6 @@ export function MyScreen({
   user: any;
   onInstall: () => void;
   onBack: () => void;
-  onLogin?: (p: "kakao"|"line"|"google", tab: string) => void;
   onGoMagazine?: () => void;
   onGoRoutine?: () => void;
   onOpenDiary?: () => void;
@@ -84,16 +83,12 @@ export function MyScreen({
   useEffect(() => {
     if (!user) return;
     setLoadingScans(true);
-    fetch("/api/scans")
+    appFetch(`${apiBase()}/api/scans`)
       .then((res) => (res.ok ? res.json() : []))
       .then((data) => setScans(Array.isArray(data) ? data : []))
       .catch(() => setScans([]))
       .finally(() => setLoadingScans(false));
   }, [user]);
-
-  const handleLogout = () => {
-    fetch('/api/logout', { method: 'POST' }).then(() => window.location.reload());
-  };
 
   const handleDeviceInquiry = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -129,7 +124,7 @@ export function MyScreen({
   };
 
   return (
-    <div className="min-h-[calc(100dvh-64px)] pb-28" style={{ background: PAGE_GRADIENT }}>
+    <div className="h-[calc(100dvh-64px)] overflow-hidden" style={{ background: PAGE_GRADIENT }}>
       {/* 헤더 */}
       <div className="px-4 pt-5 pb-0">
         <div className="mb-4">
@@ -157,76 +152,17 @@ export function MyScreen({
 
       <div className="px-4">
         {/* ── 섹션A: 프로필 ── */}
-        {user ? (
+        {user && (
           <div className="pt-5 mt-5 mb-4" style={{ borderTop: `1px solid ${BORDER_COLOR}` }}>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                {user.avatar
-                  ? <img src={user.avatar} alt={user.username || "프로필"} className="w-10 h-10 rounded-full" width={40} height={40} loading="lazy" />
-                  : <div className="w-10 h-10 rounded-full flex items-center justify-center"
-                      style={{ background: TINT_WARM }}>
-                      <User className="w-5 h-5" style={{ color: SCAN_TO }} />
-                    </div>
-                }
-                <div className="min-w-0">
-                  <p className="text-[14px] font-bold text-[#5C4F4A] truncate">{user.username || user.email || "사용자"}</p>
-                  <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
-                    {user.provider === "kakao" && (
-                      <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-xs font-bold text-[#3C1E1E]" style={{ background: "#FEE500" }}>
-                        <svg width="10" height="10" viewBox="0 0 18 18" fill="none"><path fillRule="evenodd" clipRule="evenodd" d="M9 1C4.582 1 1 3.79 1 7.222c0 2.154 1.386 4.045 3.484 5.14L3.62 15.5a.25.25 0 0 0 .368.274L7.9 13.39A9.63 9.63 0 0 0 9 13.444c4.418 0 8-2.791 8-6.222C17 3.79 13.418 1 9 1Z" fill="#3C1E1E"/></svg>
-                        카카오
-                      </span>
-                    )}
-                    {user.provider === "line" && (
-                      <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-xs font-bold text-white" style={{ background: DEEP_GREEN }}>
-                        <svg width="10" height="10" viewBox="0 0 18 18" fill="none"><path d="M9 1C4.582 1 1 3.79 1 7.222c0 2.03 1.09 3.84 2.8 5.04-.12.44-.77 2.96-.8 3.15a.2.2 0 0 0 .3.22l3.72-2.46c.6.09 1.3.14 1.98.14 4.418 0 8-2.791 8-6.222C17 3.79 13.418 1 9 1Z" fill="white"/></svg>
-                        LINE
-                      </span>
-                    )}
-                    {user.provider === "google" && (
-                      <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-xs font-bold bg-white" style={{ color: TEXT_LABEL }}>
-                        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="w-2.5 h-2.5" />
-                        Google
-                      </span>
-                    )}
-                    {user.email && <p className="text-xs truncate max-w-[160px]" style={{ color: TEXT_TERTIARY }}>{user.email}</p>}
-                  </div>
-                </div>
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full flex items-center justify-center"
+                style={{ background: TINT_WARM }}>
+                <User className="w-5 h-5" style={{ color: SCAN_TO }} />
               </div>
-              <button onClick={handleLogout}
-                className="text-[12px] font-semibold px-3 py-1.5 rounded-xl active:opacity-70"
-                style={{ background: TINT_WARM, color: SCAN_TO }}>
-                {t("modal.diary.logout")}
-              </button>
+              <div className="min-w-0">
+                <p className="text-[14px] font-bold text-[#5C4F4A] truncate">{user.username || "토스 사용자"}</p>
+              </div>
             </div>
-          </div>
-        ) : (
-          <div className="p-4 space-y-3 mb-4" style={{ borderRadius: RADIUS_CARD, background: BG_BASE, boxShadow: SHADOW_CARD }}>
-            <div className="text-center mb-2">
-              <p className="text-[14px] font-bold text-[#6B5D55] mb-1">{t("report.loginRequired")}</p>
-              <p className="text-[12px]" style={{ color: TEXT_TERTIARY }}>{t("attendance.loginDesc")}</p>
-            </div>
-            {i18n.language === "ko" ? (
-              <button onClick={() => onLogin ? onLogin("kakao", "my") : (localStorage.setItem("fonday_return_tab", "my"), window.location.href = "/auth/kakao")}
-                className="w-full font-bold text-[13px] gap-2 flex items-center justify-center border-0 text-[#3C1E1E]"
-                style={{ background: "#FEE500", height: 48, borderRadius: 24 }}>
-                <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path fillRule="evenodd" clipRule="evenodd" d="M9 1C4.582 1 1 3.79 1 7.222c0 2.154 1.386 4.045 3.484 5.14L3.62 15.5a.25.25 0 0 0 .368.274L7.9 13.39A9.63 9.63 0 0 0 9 13.444c4.418 0 8-2.791 8-6.222C17 3.79 13.418 1 9 1Z" fill="#3C1E1E"/></svg>
-                {t("attendance.kakao")}
-              </button>
-            ) : (
-              <button onClick={() => onLogin ? onLogin("line", "my") : (localStorage.setItem("fonday_return_tab", "my"), window.location.href = "/auth/line")}
-                className="w-full font-bold text-[13px] gap-2 flex items-center justify-center border-0 text-white"
-                style={{ background: "#06C755", height: 48, borderRadius: 24 }}>
-                <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M15 7.56c0-3.16-3.13-5.73-6.98-5.73S1.04 4.4 1.04 7.56c0 2.83 2.47 5.2 5.82 5.65.23.05.53.15.61.35.07.18.05.46.02.64l-.1.58c-.03.18-.14.69.6.38.74-.32 3.98-2.38 5.43-4.07C14.54 9.88 15 8.78 15 7.56Z" fill="white"/></svg>
-                {t("attendance.line")}
-              </button>
-            )}
-            <button onClick={() => onLogin ? onLogin("google", "my") : (localStorage.setItem("fonday_return_tab", "my"), window.location.href = "/auth/google")}
-              className="w-full font-bold text-[13px] gap-2 bg-white text-[#6B5D55] flex items-center justify-center"
-              style={{ height: 48, borderRadius: 24 }}>
-              <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="w-4 h-4" />
-              {t("attendance.google")}
-            </button>
           </div>
         )}
 
@@ -248,49 +184,53 @@ export function MyScreen({
             <ChevronRight className="w-4 h-4 shrink-0" style={{ color: TEXT_TERTIARY }} />
           </button>
 
-          {/* 구분선 */}
-          <div className="my-4" style={{ borderTop: `1px solid ${BORDER_COLOR}` }} />
-
-          {/* 언어 설정 */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: "#F6F4FB" }}>
-                <Sparkles className="w-4.5 h-4.5" style={{ color: COLOR_INFO }} />
+          {/* 언어 설정 — 토스 미니앱에서는 한글 고정이므로 숨김 */}
+          {!isTossMiniApp() && (
+            <>
+              <div className="my-4" style={{ borderTop: `1px solid ${BORDER_COLOR}` }} />
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: "#F6F4FB" }}>
+                    <Sparkles className="w-4.5 h-4.5" style={{ color: COLOR_INFO }} />
+                  </div>
+                  <p className="text-[14px] font-bold text-[#5C4F4A]">{t("nav.language")}</p>
+                </div>
+                <div className="flex gap-1">
+                  {(["en", "ko", "ja"] as const).map(lang => (
+                    <button key={lang} onClick={() => i18n.changeLanguage(lang)}
+                      className={`px-3 py-2.5 rounded-lg text-xs font-bold transition-all min-h-[44px] min-w-[44px] flex items-center justify-center ${
+                        i18n.language === lang ? "" : "bg-stone-100"
+                      }`}
+                      style={i18n.language === lang ? { background: TINT_WARM, color: SCAN_TO } : {}}>
+                      {lang.toUpperCase()}
+                    </button>
+                  ))}
+                </div>
               </div>
-              <p className="text-[14px] font-bold text-[#5C4F4A]">{t("nav.language")}</p>
-            </div>
-            <div className="flex gap-1">
-              {(["en", "ko", "ja"] as const).map(lang => (
-                <button key={lang} onClick={() => i18n.changeLanguage(lang)}
-                  className={`px-3 py-2.5 rounded-lg text-xs font-bold transition-all min-h-[44px] min-w-[44px] flex items-center justify-center ${
-                    i18n.language === lang ? "" : "bg-stone-100"
-                  }`}
-                  style={i18n.language === lang ? { background: TINT_WARM, color: SCAN_TO } : {}}>
-                  {lang.toUpperCase()}
-                </button>
-              ))}
-            </div>
-          </div>
+            </>
+          )}
 
           {/* 구분선 */}
           <div className="my-4" style={{ borderTop: `1px solid ${BORDER_COLOR}` }} />
 
-          {/* 앱 설치 */}
-          <button onClick={onInstall}
-            className="w-full flex items-center justify-between active:opacity-70">
-            <div className="flex items-center gap-3 min-w-0">
-              <div className="w-9 h-9 rounded-full flex items-center justify-center shrink-0" style={{ background: "#FFF7ED" }}>
-                <SmartphoneNfc className="w-5 h-5" style={{ color: COLOR_DANGER }} />
+          {/* 앱 설치 — 토스 미니앱/네이티브 앱에서는 숨김 */}
+          {!isTossMiniApp() && (
+            <button onClick={onInstall}
+              className="w-full flex items-center justify-between active:opacity-70">
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="w-9 h-9 rounded-full flex items-center justify-center shrink-0" style={{ background: "#FFF7ED" }}>
+                  <SmartphoneNfc className="w-5 h-5" style={{ color: COLOR_DANGER }} />
+                </div>
+                <p className="text-[14px] font-bold text-[#5C4F4A] truncate">{t("nav.install")}</p>
               </div>
-              <p className="text-[14px] font-bold text-[#5C4F4A] truncate">{t("nav.install")}</p>
-            </div>
-            <ChevronRight className="w-4 h-4 shrink-0" style={{ color: TEXT_TERTIARY }} />
-          </button>
+              <ChevronRight className="w-4 h-4 shrink-0" style={{ color: TEXT_TERTIARY }} />
+            </button>
+          )}
 
-          {/* 구분선 */}
+          {/* Fonday 디바이스 — 토스 미니앱에서는 숨김 */}
+          {!isTossMiniApp() && (
+            <>
           <div className="my-4" style={{ borderTop: `1px solid ${BORDER_COLOR}` }} />
-
-          {/* Fonday 디바이스 — 확장 가능 */}
           <button
             onClick={() => setDeviceExpanded((v) => !v)}
             className="w-full flex items-center justify-between active:opacity-70"
@@ -373,15 +313,19 @@ export function MyScreen({
               </motion.div>
             )}
           </AnimatePresence>
+            </>
+          )}
         </div>
 
-        {/* 제휴 문의 */}
-        <div className="pt-4 pb-2 text-center">
-          <button onClick={() => setShowPartnership(true)}
-            className="text-xs underline underline-offset-2 hover:transition-colors" style={{ color: TEXT_TERTIARY }}>
-            {t("result.partnershipLink")}
-          </button>
-        </div>
+        {/* 제휴 문의 — 토스 미니앱에서는 숨김 */}
+        {!isTossMiniApp() && (
+          <div className="pt-4 pb-2 text-center">
+            <button onClick={() => setShowPartnership(true)}
+              className="text-xs underline underline-offset-2 hover:transition-colors" style={{ color: TEXT_TERTIARY }}>
+              {t("result.partnershipLink")}
+            </button>
+          </div>
+        )}
       </div>
 
       {/* 출석 달력 모달 */}
@@ -440,11 +384,11 @@ export function MyScreen({
 
       {/* 법적 고지 링크 */}
       <div className="px-4 mt-8 mb-24 flex flex-wrap items-center gap-x-3 gap-y-1">
-        <a href="/legal/privacy" className="text-[11px]" style={{ color: TEXT_TERTIARY }}>{t("legal.privacy", "개인정보처리방침")}</a>
+        <a href="/privacy.html" target="_blank" rel="noopener noreferrer" className="text-[11px]" style={{ color: TEXT_TERTIARY }}>{t("legal.privacy", "개인정보처리방침")}</a>
         <span className="text-[11px]" style={{ color: BORDER_COLOR }}>|</span>
-        <a href="/legal/terms" className="text-[11px]" style={{ color: TEXT_TERTIARY }}>{t("legal.terms", "이용약관")}</a>
+        <a href="/terms.html" target="_blank" rel="noopener noreferrer" className="text-[11px]" style={{ color: TEXT_TERTIARY }}>{t("legal.terms", "이용약관")}</a>
         <span className="text-[11px]" style={{ color: BORDER_COLOR }}>|</span>
-        <a href="/legal/disclaimer" className="text-[11px]" style={{ color: TEXT_TERTIARY }}>{t("legal.disclaimer", "AI 면책 고지")}</a>
+        <a href="/terms.html#disclaimer" target="_blank" rel="noopener noreferrer" className="text-[11px]" style={{ color: TEXT_TERTIARY }}>{t("legal.disclaimer", "AI 면책 고지")}</a>
       </div>
 
       {/* 디바이스 문의 모달 */}

@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 import { ChevronLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { isTossMiniApp } from "./utils";
 import {
   stagger,
   fadeChild,
@@ -37,9 +38,9 @@ export function SurveyScreen({ onSubmit, onBack }: {
           <Button variant="ghost" size="icon" onClick={onBack} className="-ml-2">
             <ChevronLeft className="w-6 h-6" style={{ color: TEXT_TITLE }} />
           </Button>
-          <h2 className="text-[22px] font-extrabold" style={{ color: TEXT_HEADING, fontFamily: FONT_HEADING }}>{t("survey.title")}</h2>
+          <h2 className="text-[22px] font-extrabold" style={{ color: TEXT_HEADING, fontFamily: FONT_HEADING }}>{isTossMiniApp() ? t("survey.tossTitle") : t("survey.title")}</h2>
         </div>
-        <p className="text-[13px] ml-10" style={{ color: TEXT_SECONDARY }}>{t("survey.subtitle")}</p>
+        <p className="text-[13px] ml-10" style={{ color: TEXT_SECONDARY }}>{isTossMiniApp() ? t("survey.tossSubtitle") : t("survey.subtitle")}</p>
       </motion.div>
 
       <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain px-5">
@@ -106,7 +107,7 @@ export function SurveyScreen({ onSubmit, onBack }: {
         }}
           className="w-full text-white font-semibold text-[16px]"
           style={{ background: "#C97062", boxShadow: "0 4px 16px rgba(201,112,98,0.25)", height: 56, borderRadius: 28 }}>
-          {t("survey.startBtn")}
+          {isTossMiniApp() ? t("survey.tossStartBtn") : t("survey.startBtn")}
         </button>
       </motion.div>
     </motion.div>

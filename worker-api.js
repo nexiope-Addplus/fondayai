@@ -1,3 +1,21 @@
+// Dynamic import for newsletter auto-generation
+let _generateMorningNewsletter, _generateMorningNewsletterJA;
+async function getNewsletter() {
+  if (!_generateMorningNewsletter) {
+    const mod = await import("./worker-newsletter.js");
+    _generateMorningNewsletter = mod.generateMorningNewsletter;
+    _generateMorningNewsletterJA = mod.generateMorningNewsletterJA;
+  }
+  return _generateMorningNewsletter;
+}
+async function getNewsletterJA() {
+  if (!_generateMorningNewsletterJA) {
+    const mod = await import("./worker-newsletter.js");
+    _generateMorningNewsletterJA = mod.generateMorningNewsletterJA;
+  }
+  return _generateMorningNewsletterJA;
+}
+
 // Dynamic import to prevent cron handler from failing if vertex-ai has issues
 let _callGemini, _extractText, _SAFETY_SETTINGS_NONE;
 async function getVertexAI() {
@@ -105,6 +123,22 @@ export default {
       return new Response(null, { headers: corsHeaders });
     }
 
+    // ── R2 이미지 서빙: GET /insta-images/{key} ──
+    const url = new URL(request.url);
+    if (request.method === "GET" && url.pathname.startsWith("/insta-images/")) {
+      const key = url.pathname.replace("/insta-images/", "");
+      if (!key) return new Response("Not found", { status: 404 });
+      const obj = await env.INSTA_IMAGES.get(key);
+      if (!obj) return new Response("Not found", { status: 404 });
+      const ext = key.split(".").pop()?.toLowerCase();
+      const mimeMap = { png: "image/png", jpg: "image/jpeg", jpeg: "image/jpeg", mp4: "video/mp4" };
+      const ct = obj.httpMetadata?.contentType || mimeMap[ext] || "image/png";
+      const buf = await obj.arrayBuffer();
+      return new Response(buf, {
+        headers: { "Content-Type": ct, "Content-Length": String(buf.byteLength), "Cache-Control": "public, max-age=86400", "Access-Control-Allow-Origin": "*" },
+      });
+    }
+
     // 진단 엔드포인트: GET /debug-vapid (ADMIN_KEY 인증 필수)
     if (request.method === "GET" && new URL(request.url).pathname === "/debug-vapid") {
       const adminKey = new URL(request.url).searchParams.get("key");
@@ -149,6 +183,55 @@ export default {
         info.jwtError = e.message;
       }
       return new Response(JSON.stringify(info, null, 2), { headers: corsHeaders });
+    }
+
+    // 테스트 엔드포인트: GET /test-newsletter?key=ADMIN_KEY&date=2026-04-10&lang=ko|ja (ADMIN_KEY 인증 필수)
+    if (request.method === "GET" && new URL(request.url).pathname === "/test-newsletter") {
+      const adminKey = new URL(request.url).searchParams.get("key");
+      if (!env.ADMIN_KEY || adminKey !== env.ADMIN_KEY) return new Response("Unauthorized", { status: 401, headers: corsHeaders });
+      const date = new URL(request.url).searchParams.get("date");
+      const lang = new URL(request.url).searchParams.get("lang") || "ko";
+      if (!date || !/^\d{4}-\d{2}-\d{2}$/.test(date)) return new Response("date param required (YYYY-MM-DD)", { status: 400, headers: corsHeaders });
+      try {
+        if (lang === "ja") {
+          const genJA = await getNewsletterJA();
+          await genJA(env, date);
+        } else {
+          const gen = await getNewsletter();
+          await gen(env, date);
+        }
+        return new Response(JSON.stringify({ ok: true, date, lang }), { headers: corsHeaders });
+      } catch (err) {
+        return new Response(JSON.stringify({ ok: false, error: err.message }), { status: 500, headers: corsHeaders });
+      }
+    }
+
+    // R2 업로드: POST /r2-upload?key=ADMIN_KEY&path=magazine-pool/cover/cover-rainy.png (body = binary)
+    if (request.method === "POST" && new URL(request.url).pathname === "/r2-upload") {
+      const adminKey = new URL(request.url).searchParams.get("key");
+      if (!env.ADMIN_KEY || adminKey !== env.ADMIN_KEY) return new Response("Unauthorized", { status: 401, headers: corsHeaders });
+      const r2Path = new URL(request.url).searchParams.get("path");
+      if (!r2Path) return new Response("path required", { status: 400, headers: corsHeaders });
+      const body = await request.arrayBuffer();
+      await env.INSTA_IMAGES.put(r2Path, body, { httpMetadata: { contentType: "image/png" } });
+      return new Response(JSON.stringify({ ok: true, path: r2Path, size: body.byteLength }), { headers: corsHeaders });
+    }
+
+    // 수동 게시: GET /publish-now?key=ADMIN_KEY&type=threads&time=14:00 (또는 type=insta&lang=ko)
+    if (request.method === "GET" && new URL(request.url).pathname === "/publish-now") {
+      const adminKey = new URL(request.url).searchParams.get("key");
+      if (!env.ADMIN_KEY || adminKey !== env.ADMIN_KEY) return new Response("Unauthorized", { status: 401, headers: corsHeaders });
+      const type = new URL(request.url).searchParams.get("type");
+      const time = new URL(request.url).searchParams.get("time");
+      const lang = new URL(request.url).searchParams.get("lang") || "ko";
+      if (!type || !time) return new Response("type & time required", { status: 400, headers: corsHeaders });
+      try {
+        if (type === "threads") { await publishScheduledThreads(env, time); }
+        else if (type === "insta") { await publishScheduledInsta(env, time, lang); }
+        return new Response(JSON.stringify({ ok: true, type, time }), { headers: corsHeaders });
+      } catch (err) {
+        return new Response(JSON.stringify({ ok: false, error: err.message }), { status: 500, headers: corsHeaders });
+      }
     }
 
     // 테스트 엔드포인트: GET /test-push (ADMIN_KEY 인증 필수)
@@ -285,33 +368,70 @@ export default {
     const now = new Date();
     const hour = now.getUTCHours();
 
-    if (hour === 20) {
-      // KST 05:00 — 인스타 콘텐츠 자동 생성 (오전 7시 + 저녁 8시용)
-      ctx.waitUntil(generateDailyInstaContent(env));
-    } else if (hour === 0) {
-      // KST 09:00 — 화장품 효과 리마인더
-      ctx.waitUntil(sendCosmeticEffectReminders(env));
+    if (hour === 21) {
+      // KST 06:00 — 매거진 자동 생성은 GitHub Actions가 담당 (Worker는 비활성화)
+      // GitHub Actions: .github/workflows/morning-magazine.yml (UTC 21:00 크론)
+      console.log("[cron] KST 06:00 — 매거진 생성은 GitHub Actions에서 실행");
     } else if (hour === 22) {
-      // KST 07:00 — 스캔 리마인더 + 날씨 케어 동시 발송
+      // KST 07:00 — 스캔/날씨 + 인스타 오전(한국+일본)
       ctx.waitUntil(Promise.all([
         sendScanReminderToAll(env),
         sendWeatherCarePushToAll(env),
+        publishScheduledInsta(env, "07:00", "ko"),
+        publishScheduledInsta(env, "07:00", "ja"),
+      ]));
+    } else if (hour === 23) {
+      // KST 08:00 — 스레드 아침
+      ctx.waitUntil(publishScheduledThreads(env, "08:00"));
+    } else if (hour === 0) {
+      // KST 09:00 — 화장품 효과 리마인더 + 대댓글 체크
+      ctx.waitUntil(Promise.all([
+        sendCosmeticEffectReminders(env),
+        replyToFirstComment(env),
       ]));
     } else if (hour === 1) {
       // KST 10:00 — UV 케어
       ctx.waitUntil(sendUVCarePushToAll(env));
     } else if (hour === 3) {
-      // KST 12:00 — 점심
-      ctx.waitUntil(sendMealPushToAll(env, "lunch"));
+      // KST 12:00 — 점심 + 인스타 무드카드(한국+일본) + 스레드
+      ctx.waitUntil(Promise.all([
+        sendMealPushToAll(env, "lunch"),
+        publishScheduledInsta(env, "12:00", "ko"),
+        publishScheduledInsta(env, "12:00", "ja"),
+        publishScheduledThreads(env, "12:00"),
+      ]));
+    } else if (hour === 5) {
+      // KST 14:00 — 스레드 무드카드(이미지)
+      ctx.waitUntil(publishScheduledThreads(env, "14:00"));
     } else if (hour === 6) {
-      // KST 15:00 — 수분 리마인더
-      ctx.waitUntil(sendHydrationPushToAll(env));
+      // KST 15:00 — 수분 리마인더 + 대댓글 체크
+      ctx.waitUntil(Promise.all([
+        sendHydrationPushToAll(env),
+        replyToFirstComment(env),
+      ]));
     } else if (hour === 9) {
-      // KST 18:00 — 저녁
-      ctx.waitUntil(sendMealPushToAll(env, "dinner"));
-    } else if (hour === 11 || hour === 12 || hour === 13) {
-      // KST 20/21/22시 — 루틴 리마인더
-      ctx.waitUntil(sendRoutineReminderToAll(env, hour + 9));
+      // KST 18:00 — 저녁 + 스레드
+      ctx.waitUntil(Promise.all([
+        sendMealPushToAll(env, "dinner"),
+        publishScheduledThreads(env, "18:00"),
+      ]));
+    } else if (hour === 11) {
+      // KST 20:00 — 인스타 저녁(한국+일본) + 루틴 리마인더
+      ctx.waitUntil(Promise.all([
+        publishScheduledInsta(env, "20:00", "ko"),
+        publishScheduledInsta(env, "20:00", "ja"),
+        sendRoutineReminderToAll(env, 20),
+      ]));
+    } else if (hour === 12) {
+      // KST 21:00 — 스레드 + 루틴 리마인더 + 대댓글 체크
+      ctx.waitUntil(Promise.all([
+        publishScheduledThreads(env, "21:00"),
+        sendRoutineReminderToAll(env, 21),
+        replyToFirstComment(env),
+      ]));
+    } else if (hour === 13) {
+      // KST 22시 — 루틴 리마인더
+      ctx.waitUntil(sendRoutineReminderToAll(env, 22));
     } else if (hour === 14) {
       // KST 23:00 — 취침 케어
       ctx.waitUntil(sendBedtimeCarePushToAll(env));
@@ -348,6 +468,243 @@ async function generateDailyInstaContent(env) {
   } catch (err) {
     console.error("[insta-cron] error:", err);
   }
+}
+
+// ─── 대댓글 자동 달기 (크론에서 호출) ────────────────────────────────────────────
+async function replyToFirstComment(env) {
+  const accounts = [
+    { token: env.IG_ACCESS_TOKEN, userId: env.IG_USER_ID, table: "insta_content", lang: "ko" },
+    { token: env.IG_ACCESS_TOKEN_JA, userId: env.IG_USER_ID_JA, table: "insta_content_ja", lang: "ja" },
+  ];
+
+  const replies = {
+    ko: "댓글 감사해요! 내 피부 타입이 궁금하다면 프로필 링크에서 무료 AI 피부 분석 받아보세요 🤍",
+    ja: "コメントありがとうございます！自分の肌タイプが気になる方は、プロフィールリンクから無料AI肌診断をお試しください 🤍",
+  };
+
+  for (const acc of accounts) {
+    if (!acc.token || !acc.userId) continue;
+    try {
+      // 최근 published 게시물 조회 (최근 5개)
+      const rows = await env.FONDAY_DB.prepare(
+        `SELECT id, ig_media_id FROM ${acc.table} WHERE status = 'published' AND ig_media_id IS NOT NULL ORDER BY id DESC LIMIT 5`
+      ).all();
+
+      for (const row of (rows.results || [])) {
+        try {
+          // 댓글 목록 조회
+          const commentsRes = await fetch(
+            `https://graph.instagram.com/v21.0/${row.ig_media_id}/comments?fields=id,text,username,replies{id}&access_token=${acc.token}`
+          );
+          const commentsData = await commentsRes.json();
+          const comments = commentsData.data || [];
+
+          // 내 첫 댓글(봇 댓글) 제외, 유저 댓글 중 첫 번째에 대댓글이 없으면 달기
+          for (const comment of comments) {
+            // replies가 있으면 이미 대댓글 달린 것
+            if (comment.replies?.data?.length > 0) continue;
+            // 내 댓글이면 스킵 (첫 댓글로 달은 것)
+            if (comment.username === (acc.lang === "ja" ? "rin_fonday" : "beauty_jisoo23")) continue;
+
+            // 유저 댓글 발견 — 대댓글 달기
+            await fetch(
+              `https://graph.instagram.com/v21.0/${row.ig_media_id}/comments`,
+              {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  message: replies[acc.lang],
+                  access_token: acc.token,
+                }),
+              }
+            );
+            console.log(`[reply-${acc.lang}] 대댓글 완료: media=${row.ig_media_id}, comment=${comment.id}`);
+            break; // 첫 번째 유저 댓글에만 대댓글
+          }
+        } catch (e) {
+          // 개별 게시물 에러는 무시하고 다음으로
+        }
+      }
+    } catch (err) {
+      console.error(`[reply-${acc.lang}] error:`, err.message);
+    }
+  }
+}
+
+// ─── 첫 댓글 (포맷별 × 언어별) ──────────────────────────────────────────────
+function getFirstComment(format, lang) {
+  const comments = {
+    ko: {
+      carousel: "나중에 다시 보려면 저장해두세요! 궁금한 점은 댓글로 남겨주세요 🔖",
+      single: "공감되면 친구에게 공유해주세요 💌",
+      newsletter: "오늘 하루 피부 관리 참고하려면 저장해두세요 📌",
+    },
+    ja: {
+      carousel: "あとで見返したい方は保存がおすすめです。気になることがあればコメントで教えてください 🔖",
+      single: "共感したら、お友達にもシェアしてみてください 💌",
+      newsletter: "今日のスキンケアの参考に、保存しておくと便利ですよ 📌",
+    },
+  };
+  const langComments = comments[lang] || comments.ko;
+  return langComments[format] || langComments.carousel;
+}
+
+// ─── 인스타 자동 게시 (한국/일본 공용) ──────────────────────────────────────────
+async function publishScheduledInsta(env, scheduledTime, lang) {
+  const prefix = lang === "ja" ? "[insta-ja]" : "[insta-ko]";
+  const tokenKey = lang === "ja" ? "IG_ACCESS_TOKEN_JA" : "IG_ACCESS_TOKEN";
+  const userIdKey = lang === "ja" ? "IG_USER_ID_JA" : "IG_USER_ID";
+  const table = lang === "ja" ? "insta_content_ja" : "insta_content";
+
+  try {
+    const token = env[tokenKey];
+    const userId = env[userIdKey];
+    if (!token || !userId) { console.log(`${prefix} 토큰/ID 미설정, 스킵`); return; }
+
+    const now = new Date();
+    const kst = new Date(now.getTime() + 9 * 60 * 60 * 1000);
+    const dateStr = kst.toISOString().split("T")[0];
+
+    const rows = await env.FONDAY_DB.prepare(
+      `SELECT * FROM ${table} WHERE status = 'scheduled' AND scheduled_date = ? AND scheduled_time = ?`
+    ).bind(dateStr, scheduledTime).all();
+
+    if (!rows.results?.length) { console.log(`${prefix} ${dateStr} ${scheduledTime} 게시할 콘텐츠 없음`); return; }
+
+    for (const row of rows.results) {
+      try {
+        const imageUrls = JSON.parse(row.image_urls || "[]");
+        if (imageUrls.length === 0) { console.warn(`${prefix} id=${row.id} 이미지 없음, 스킵`); continue; }
+
+        const hashtags = JSON.parse(row.hashtags || "[]");
+        const fullCaption = `${row.caption}\n\n${hashtags.join(" ")}`;
+        let publishId;
+
+        if (imageUrls.length === 1) {
+          // 단일 이미지
+          const res = await fetch(`https://graph.instagram.com/v21.0/${userId}/media`, {
+            method: "POST", headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ image_url: imageUrls[0], caption: fullCaption, access_token: token }),
+          });
+          const data = await res.json();
+          if (data.error) throw new Error(data.error.message);
+          await new Promise(r => setTimeout(r, 5000));
+          const pubRes = await fetch(`https://graph.instagram.com/v21.0/${userId}/media_publish`, {
+            method: "POST", headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ creation_id: data.id, access_token: token }),
+          });
+          const pubData = await pubRes.json();
+          if (pubData.error) throw new Error(pubData.error.message);
+          publishId = pubData.id;
+        } else {
+          // 캐러셀
+          const containerIds = [];
+          for (const imgUrl of imageUrls) {
+            const res = await fetch(`https://graph.instagram.com/v21.0/${userId}/media`, {
+              method: "POST", headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ image_url: imgUrl, is_carousel_item: true, access_token: token }),
+            });
+            const data = await res.json();
+            if (data.error) throw new Error(data.error.message);
+            containerIds.push(data.id);
+          }
+          const carRes = await fetch(`https://graph.instagram.com/v21.0/${userId}/media`, {
+            method: "POST", headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ media_type: "CAROUSEL", children: containerIds.join(","), caption: fullCaption, access_token: token }),
+          });
+          const carData = await carRes.json();
+          if (carData.error) throw new Error(carData.error.message);
+          // 상태 확인
+          for (let i = 0; i < 10; i++) {
+            const sRes = await fetch(`https://graph.instagram.com/v21.0/${carData.id}?fields=status_code&access_token=${token}`);
+            const sData = await sRes.json();
+            if (sData.status_code === "FINISHED") break;
+            if (sData.status_code === "ERROR") throw new Error("컨테이너 에러");
+            await new Promise(r => setTimeout(r, 5000));
+          }
+          const pubRes = await fetch(`https://graph.instagram.com/v21.0/${userId}/media_publish`, {
+            method: "POST", headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ creation_id: carData.id, access_token: token }),
+          });
+          const pubData = await pubRes.json();
+          if (pubData.error) throw new Error(pubData.error.message);
+          publishId = pubData.id;
+        }
+
+        await env.FONDAY_DB.prepare(
+          `UPDATE ${table} SET status = 'published', published_at = datetime('now'), ig_media_id = ? WHERE id = ?`
+        ).bind(publishId, row.id).run();
+        console.log(`${prefix} ✅ id=${row.id} 게시 완료! ig_media_id=${publishId}`);
+
+        // 첫 댓글 자동 달기
+        try {
+          const format = row.format || "carousel";
+          const firstComment = getFirstComment(format, lang);
+          if (firstComment) {
+            await fetch(`https://graph.instagram.com/v21.0/${publishId}/comments`, {
+              method: "POST", headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ message: firstComment, access_token: token }),
+            });
+            console.log(`${prefix} 💬 첫 댓글: "${firstComment.slice(0, 30)}..."`);
+          }
+        } catch (commentErr) {
+          console.warn(`${prefix} 첫 댓글 실패:`, commentErr.message);
+        }
+      } catch (err) {
+        console.error(`${prefix} id=${row.id} 실패:`, err.message);
+        await env.FONDAY_DB.prepare(`UPDATE ${table} SET status = 'failed' WHERE id = ?`).bind(row.id).run();
+      }
+    }
+  } catch (err) { console.error(`${prefix} error:`, err); }
+}
+
+// ─── 스레드 자동 게시 ──────────────────────────────────────────────────────────
+async function publishScheduledThreads(env, scheduledTime) {
+  try {
+    if (!env.THREADS_ACCESS_TOKEN || !env.THREADS_USER_ID) { console.log("[threads] 토큰 미설정, 스킵"); return; }
+    const now = new Date();
+    const kst = new Date(now.getTime() + 9 * 60 * 60 * 1000);
+    const dateStr = kst.toISOString().split("T")[0];
+
+    const rows = await env.FONDAY_DB.prepare(
+      "SELECT * FROM threads_content WHERE status = 'scheduled' AND scheduled_date = ? AND scheduled_time = ?"
+    ).bind(dateStr, scheduledTime).all();
+
+    if (!rows.results?.length) { console.log(`[threads] ${dateStr} ${scheduledTime} 없음`); return; }
+
+    for (const row of rows.results) {
+      try {
+        const createBody = { access_token: env.THREADS_ACCESS_TOKEN };
+        if (row.image_url) {
+          createBody.media_type = "IMAGE";
+          createBody.image_url = row.image_url;
+          createBody.text = row.text;
+        } else {
+          createBody.media_type = "TEXT";
+          createBody.text = row.text;
+        }
+        const cRes = await fetch(`https://graph.threads.net/v1.0/${env.THREADS_USER_ID}/threads`, {
+          method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(createBody),
+        });
+        const cData = await cRes.json();
+        if (cData.error) throw new Error(cData.error.message);
+        await new Promise(r => setTimeout(r, 3000));
+        const pRes = await fetch(`https://graph.threads.net/v1.0/${env.THREADS_USER_ID}/threads_publish`, {
+          method: "POST", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ creation_id: cData.id, access_token: env.THREADS_ACCESS_TOKEN }),
+        });
+        const pData = await pRes.json();
+        if (pData.error) throw new Error(pData.error.message);
+        await env.FONDAY_DB.prepare(
+          "UPDATE threads_content SET status = 'published', published_at = datetime('now'), threads_media_id = ? WHERE id = ?"
+        ).bind(pData.id, row.id).run();
+        console.log(`[threads] ✅ id=${row.id} 게시 완료!`);
+      } catch (err) {
+        console.error(`[threads] id=${row.id} 실패:`, err.message);
+        await env.FONDAY_DB.prepare("UPDATE threads_content SET status = 'failed' WHERE id = ?").bind(row.id).run();
+      }
+    }
+  } catch (err) { console.error("[threads] error:", err); }
 }
 
 // ─── 식단 푸시 데이터 (피부 타입 × 언어 × 식사) — 배열로 다양화 ─────────────────

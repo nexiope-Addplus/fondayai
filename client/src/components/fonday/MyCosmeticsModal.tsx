@@ -18,7 +18,7 @@ import {
   TEXT_LABEL,
   TEXT_SECONDARY,
 } from "./constants";
-import { inferCosmeticTimeOfDay, buildRoutineGuide, buildRepresentativeRoutine, buildCosmeticCorrelationSignals } from "./utils";
+import { inferCosmeticTimeOfDay, buildRoutineGuide, buildRepresentativeRoutine, buildCosmeticCorrelationSignals, apiBase, appFetch } from "./utils";
 
 interface OptimizedRoutine {
   am: { id: string; order: number }[];
@@ -38,13 +38,13 @@ export function MyCosmeticsModal({ onClose, onAddNew, scans = [] }: { onClose: (
   const [routineLogs, setRoutineLogs] = useState<{ date_str: string; cosmetic_ids: string[] }[]>([]);
 
   useEffect(() => {
-    fetch("/api/cosmetics").then(r => r.json()).then(data => {
+    appFetch(`${apiBase()}/api/cosmetics`).then(r => r.json()).then(data => {
       const items = Array.isArray(data) ? data : [];
       setList(items);
       setLoading(false);
       if (items.length > 0) {
         setOptimizing(true);
-        fetch("/api/cosmetics/optimize-routine", {
+        appFetch(`${apiBase()}/api/cosmetics/optimize-routine`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ cosmetics: items }),
@@ -54,7 +54,7 @@ export function MyCosmeticsModal({ onClose, onAddNew, scans = [] }: { onClose: (
       }
     }).catch(() => setLoading(false));
 
-    fetch("/api/routine-log")
+    appFetch(`${apiBase()}/api/routine-log`)
       .then(r => r.ok ? r.json() : [])
       .then(data => setRoutineLogs(Array.isArray(data) ? data : []))
       .catch(() => {});
@@ -75,7 +75,7 @@ export function MyCosmeticsModal({ onClose, onAddNew, scans = [] }: { onClose: (
 
   const handleDelete = async (id: string) => {
     setDeletingId(id);
-    await fetch(`/api/cosmetics/${id}`, { method: "DELETE" }).catch(() => {});
+    await appFetch(`${apiBase()}/api/cosmetics/${id}`, { method: "DELETE" }).catch(() => {});
     setList(prev => prev.filter(i => i.id !== id));
     setSelectedItem(prev => (prev?.id === id ? null : prev));
     setDeletingId(null);

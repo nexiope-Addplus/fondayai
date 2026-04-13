@@ -1,4 +1,5 @@
 import { useCallback, useRef } from "react";
+import { apiBase, appFetch } from "./utils";
 
 /** sessionStorage key for session ID */
 const SESSION_KEY = "fonday_session_id";
@@ -49,7 +50,7 @@ export function useAnalytics(lang?: string, isGuest?: boolean) {
         sessionIdRef.current = getOrCreateSessionId();
       }
       // 논블로킹 fire-and-forget
-      fetch("/api/events", {
+      appFetch(`${apiBase()}/api/events`, {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },

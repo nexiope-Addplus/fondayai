@@ -45,13 +45,12 @@ import {
   getDiaryTodos, saveDiaryTodos, getDiaryTodoProgress, initDiaryTodosFromRoutine,
   buildCosmeticsInsights, buildRoutineGuide, buildCosmeticCorrelationSignals, haptic,
   pickFoodOption, dedupeFoods,
-  isIOS, isPWA, buildStableBaumannType, autoRegisterCosmetic,
+  isIOS, isPWA, isTossMiniApp, buildStableBaumannType, autoRegisterCosmetic, apiBase, appFetch,
 } from "./utils";
-import { SkinPredictionCard } from "./SkinPredictionCard";
+import { share as tossShare, getTossShareLink } from "@apps-in-toss/web-framework";
 import { ResultDiaryCard } from "./ResultDiaryCard";
-import { ResultLoginCard } from "./ResultLoginCard";
 import { ResultActionBar } from "./ResultActionBar";
-import { ProductRecommendCard } from "./ProductRecommendCard";
+// import { useRewardedAd, useInterstitialAd } from "./TossAd"; // 광고 — 사업자 등록 후 활성화
 import { ResultRoutineTab } from "./ResultRoutineTab";
 import { ResultSolutionTab } from "./ResultSolutionTab";
 import { ResultNutritionTab } from "./ResultNutritionTab";
@@ -95,7 +94,7 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
 
   const refreshCosmetics = useCallback(async (options?: { openRoutineUpdate?: boolean }) => {
     try {
-      const response = await fetch("/api/cosmetics");
+      const response = await appFetch(`${apiBase()}/api/cosmetics`);
       const data = response.ok ? await response.json() : [];
       const next = Array.isArray(data) ? data : [];
       setMyCosmetics(next);
@@ -108,6 +107,7 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
     }
   }, []);
   const [showCheckinSheet, setShowCheckinSheet] = useState(false);
+
   const [activeTab, setActiveTab] = useState<"routine" | "solution" | "nutrition">("routine");
   const tabDirectionRef = useRef<1 | -1>(1);
   const [currentStreak, setCurrentStreak] = useState<StreakData>(() => getStreak());
@@ -134,7 +134,7 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
   const pwaTriggeredRef = useRef(false); // deferredPrompt 재실행 시 중복 방지
   useEffect(() => {
     const isDismissed = localStorage.getItem("fonday_pwa_dismissed") === "1";
-    if (isPWA() || isDismissed || pwaTriggeredRef.current) return;
+    if (isPWA() || isDismissed || pwaTriggeredRef.current || isTossMiniApp()) return;
     if (!isIOS() && !deferredPrompt) return;
 
     const el = resultScrollRef.current;
@@ -202,9 +202,9 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
       setMissionPops(newMissions);
       timers.push(setTimeout(() => setMissionPops([]), 3500));
     }
-    // 출석 체크인 (오늘 첫 스캔이면 팝업)
+    // 출석 체크인 (오늘 첫 스캔이면 팝업) — 토스에서는 바텀시트 자동 열림 금지
     const isNew = checkinToday();
-    if (isNew) {
+    if (isNew && !isTossMiniApp()) {
       timers.push(setTimeout(() => { haptic("success"); setShowCheckinSheet(true); }, 1200));
     }
     // 예측 루틴 → 오늘 Todo로 자동 저장 (오늘 처음이면)
@@ -216,7 +216,7 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
     setTodayHasMemo(Boolean(getDiaryMemo(todayStr()).trim()));
     // 로그인 사용자 → 스트릭/출석 서버 동기화
     if (user) {
-      fetch("/api/user-stats", {
+      appFetch(`${apiBase()}/api/user-stats`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -307,7 +307,7 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
   // 히스토리 로드 (로그인 시)
   useEffect(() => {
     if (!user) return;
-    fetch("/api/scans")
+    appFetch(`${apiBase()}/api/scans`)
       .then(res => res.json())
       .then(data => {
         if (Array.isArray(data)) {
@@ -331,7 +331,7 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
   // 랭킹 데이터 로드 (Bug 2 fix: analysisResult 의존성 추가)
   useEffect(() => {
     const score = analysisResult?.scores?.[0]?.score || 0;
-    fetch(`/api/ranking?myScore=${score}`)
+    appFetch(`${apiBase()}/api/ranking?myScore=${score}`)
       .then(res => res.json())
       .then(data => setRankingData(data))
       .catch(() => {});
@@ -339,11 +339,14 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
 
   // 비로그인 챌린지 토큰 생성 (로그인 여부 확정 후 즉시)
   const [guestTokenFetched, setGuestTokenFetched] = useState(false);
+  // shareToken이 없으면 challenge-token API로 가져옴 (토스 mock 유저, 스캔 저장 실패 등)
   useEffect(() => {
-    if (!analysisResult || user !== null || guestTokenFetched) return;
+    if (!analysisResult || currentShareToken || guestTokenFetched) return;
+    // 로그인 유저는 스캔 저장 완료 후에 체크 (isSaved 대기)
+    if (user !== null && !isSaved) return;
     setGuestTokenFetched(true);
     const KO_AGE_GROUPS = ["10대","20대 초반","20대 후반","30대 초반","30대 후반","40대 초반","40대 후반","50대+"];
-    fetch("/api/challenge-token", {
+    appFetch(`${apiBase()}/api/challenge-token`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -359,12 +362,11 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
     }).then(res => res.json()).then(data => {
       if (data?.shareToken) {
         setCurrentShareToken(data.shareToken);
-        // 로그인 후 연결을 위해 localStorage에도 보관
         try { localStorage.setItem("fonday_guest_token", data.shareToken); } catch {}
       }
     }).catch(() => {});
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user, analysisResult]);
+  }, [user, analysisResult, isSaved, currentShareToken]);
 
   // 날씨 정보 가져오기 (Care Manager 저장용)
   useEffect(() => {
@@ -373,7 +375,7 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
     navigator.geolocation.getCurrentPosition(
       (pos) => {
         const { latitude: lat, longitude: lon } = pos.coords;
-        fetch(`/api/weather?lat=${lat}&lon=${lon}`, { signal: controller.signal })
+        appFetch(`${apiBase()}/api/weather?lat=${lat}&lon=${lon}`, { signal: controller.signal })
           .then(res => res.ok ? res.json() : null)
           .then(data => { if (data && !data.error) setInternalWeather(data); })
           .catch(() => {});
@@ -391,7 +393,7 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
     savingRef.current = true;
     const overallScore = analysisResult.scores?.[0]?.score || 0;
     
-    fetch("/api/scans", {
+    appFetch(`${apiBase()}/api/scans`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -420,7 +422,7 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
       
       // D1 챌린지 데이터 동기화
       const KO_AGE_GROUPS2 = ["10대","20대 초반","20대 후반","30대 초반","30대 후반","40대 초반","40대 후반","50대+"];
-      fetch("/api/challenge-token", {
+      appFetch(`${apiBase()}/api/challenge-token`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -435,6 +437,8 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
           gender: (surveyData?.genderIdx ?? 0) === 0 ? "female" : "male",
           ageGroup: KO_AGE_GROUPS2[surveyData?.ageIdx ?? 2] ?? "",
         }),
+      }).then(res => res.json()).then(d => {
+        if (d?.shareToken && !currentShareToken) setCurrentShareToken(d.shareToken);
       }).catch(() => {});
     }).catch(err => console.error("[Scan Save Error]", err));
   }, [user, analysisResult, internalWeather]);
@@ -470,7 +474,7 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
   // 화장품 등급 로드
   useEffect(() => {
     if (!user || !analysisResult || myCosmetics.length === 0) return;
-    fetch("/api/cosmetics/grade", {
+    appFetch(`${apiBase()}/api/cosmetics/grade`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -486,7 +490,7 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
 
   useEffect(() => {
     if (!user) return;
-    fetch(`/api/routine-log?date=${todayStr()}`)
+    appFetch(`${apiBase()}/api/routine-log?date=${todayStr()}`)
       .then(r => r.ok ? r.json() : { cosmetic_ids: [] })
       .then(data => {
         const ids = Array.isArray(data.cosmetic_ids) ? data.cosmetic_ids : [];
@@ -707,6 +711,22 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
     if (shareLoading) return;
     markShareUsed();
     setShareLoading(true);
+
+    // 토스 미니앱: OG 미리보기가 포함된 /share/:token 웹 URL 공유
+    if (isTossMiniApp()) {
+      try {
+        const shareText = t("result.shareText", { score: overallScore, type: finalType });
+        const token = currentShareToken;
+        const shareUrl = token ? `https://fondayai.com/share/${token}` : "https://fondayai.com";
+        await tossShare({ message: `${shareText}\n${shareUrl}` });
+      } catch (e) {
+        console.warn("[share:toss]", e);
+      } finally {
+        setShareLoading(false);
+      }
+      return;
+    }
+
     try {
       // i18n 문자열 미리 resolve
       const scoreLabels = Array.from({ length: 10 }, (_, i) => t(`scores.${i}`));
@@ -758,7 +778,7 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
 
       const shareController = new AbortController();
       const shareTimeout = setTimeout(() => shareController.abort(), 20000);
-      const res = await fetch("/api/generate-share", {
+      const res = await appFetch(`${apiBase()}/api/generate-share`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
@@ -832,21 +852,25 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
       ref={resultScrollRef}
       className="h-[calc(100dvh-60px)] overflow-y-auto"
       style={{ background: PAGE_GRADIENT }}
-      initial={{ opacity: 0, y: 28 }}
+      initial={{ opacity: 0, y: isTossMiniApp() ? 12 : 28 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+      transition={{ duration: isTossMiniApp() ? 0.28 : 0.5, ease: [0.22, 1, 0.36, 1] }}
     >
-      <motion.div className="px-5 pt-6 pb-40 space-y-6" variants={stagger} initial="initial" animate="animate">
-        {/* 헤더 */}
+      <motion.div className={`px-5 pb-40 space-y-6 ${isTossMiniApp() ? "pt-4" : "pt-6"}`} variants={stagger} initial="initial" animate="animate">
+        {/* 헤더 — 토스 미니앱에서는 내비바에 뒤로가기(<)가 있으므로 자체 버튼 숨김 */}
         <div className="flex justify-between items-center">
-          <button onClick={onBack}
-            className="flex items-center gap-1.5 px-3 py-2 rounded-full text-[13px] font-semibold active:opacity-70"
-            style={{ background: TINT_WARM, color: SCAN_TO }}>
-            <Camera className="w-4 h-4" /> {t("result.back")}
-          </button>
-          <div className="flex items-center gap-2">
-            <img src="/fonday-logo.svg" alt="Fonday" className="h-5" style={{ objectFit: "contain" }} />
-            <span className="text-[14px] font-bold" style={{ color: TEXT_TITLE }}>{t("result.reportLabel", "피부 리포트")}</span>
+          {!isTossMiniApp() && (
+            <button onClick={onBack}
+              className="flex items-center gap-1.5 px-3 py-2 rounded-full text-[13px] font-semibold active:opacity-70"
+              style={{ background: TINT_WARM, color: SCAN_TO }}>
+              <Camera className="w-4 h-4" /> {t("result.back")}
+            </button>
+          )}
+          <div className={`flex items-center gap-2${isTossMiniApp() ? " mx-auto" : ""}`}>
+            {!isTossMiniApp() && <img src="/fonday-logo.svg" alt="Fonday" className="h-5" style={{ objectFit: "contain" }} />}
+            <span className={`${isTossMiniApp() ? "text-[13px]" : "text-[14px]"} font-bold`} style={{ color: TEXT_TITLE }}>
+              {isTossMiniApp() ? t("result.tossReportLabel") : t("result.reportLabel")}
+            </span>
           </div>
         </div>
 
@@ -878,7 +902,7 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
             </div>
             <div className="min-w-0 flex-1">
               <p className="text-[11px] font-semibold uppercase tracking-[0.1em]" style={{ color: DEEP_GREEN }}>
-                {t("result.todayFocus")}
+                {isTossMiniApp() ? t("result.tossTodayAction") : t("result.todayFocus")}
               </p>
               <p className="text-[14px] font-bold mt-0.5" style={{ color: TEXT_TITLE }}>
                 {analysisResult.improvements[0].title}
@@ -893,16 +917,14 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
           </div>
         )}
 
-        {/* 맞춤 루틴 — 카테고리별 1위 추천 */}
-        <ProductRecommendCard baumannType={finalType} />
 
         <div ref={tabNavRef} className="rounded-full p-1.5 sticky top-0 z-20"
           style={{ background: BG_MUTED }}>
           <div className="flex gap-2">
             {([
-              { id: "routine" as const,   label: t("result.tab.routine"),   icon: <CheckCircle2 className="w-4 h-4" />, activeBg: "#F7FBF8", activeText: DEEP_GREEN },
-              { id: "solution" as const,  label: t("result.tab.solution"),  icon: <Leaf className="w-4 h-4" />,         activeBg: "#FFF8F4", activeText: SCAN_TO },
-              { id: "nutrition" as const, label: t("result.tab.nutrition"), icon: <Utensils className="w-4 h-4" />,     activeBg: "#FCF8FF", activeText: COLOR_INFO },
+              { id: "routine" as const,   label: isTossMiniApp() ? t("result.tab.tossRoutine") : t("result.tab.routine"),   icon: <CheckCircle2 className="w-4 h-4" />, activeBg: "#F7FBF8", activeText: DEEP_GREEN },
+              { id: "solution" as const,  label: isTossMiniApp() ? t("result.tab.tossSolution") : t("result.tab.solution"),  icon: <Leaf className="w-4 h-4" />,         activeBg: "#FFF8F4", activeText: SCAN_TO },
+              { id: "nutrition" as const, label: isTossMiniApp() ? t("result.tab.tossNutrition") : t("result.tab.nutrition"), icon: <Utensils className="w-4 h-4" />,     activeBg: "#FCF8FF", activeText: COLOR_INFO },
             ]).map(({ id, label, icon, activeBg, activeText }) => {
               const isActive = activeTab === id;
               return (
@@ -962,6 +984,7 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
             overallScore={overallScore}
             previousScore={previousScore}
             currentStreak={currentStreak}
+            prediction={analysisResult?.prediction}
             onOpenDiary={onOpenDiary}
             loginPromptRef={loginPromptRef}
             socialLoginButton={socialLoginButton}
@@ -1015,14 +1038,6 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
         </AnimatePresence>
         </div>
 
-        {/* ── 제휴 텍스트 링크 ── */}
-        <div className="pt-2 pb-1 text-center">
-          <button onClick={() => setShowPartnership(true)}
-            className="text-xs text-stone-400 underline underline-offset-2 hover:text-stone-600 transition-colors">
-            {t("result.partnershipLink")}
-          </button>
-        </div>
-
       </motion.div>
 
       <ResultActionBar
@@ -1038,17 +1053,29 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
         onCreateChallenge={() => {
           if (!currentShareToken) return;
           markChallengeUsed();
-          const shareUrl = `${window.location.origin}/battle/${currentShareToken}`;
-          if (navigator.share) {
-            navigator
-              .share({
-                title: "Fonday° 피부 챌린지",
-                text: t("result.challengeText", { score: overallScore, type: finalType }),
-                url: shareUrl,
-              })
-              .catch(console.error);
+          const battlePath = `/battle/${currentShareToken}`;
+          const shareText = t("result.challengeText", { score: overallScore, type: finalType });
+
+          if (isTossMiniApp()) {
+            // 토스 미니앱: OG 미리보기가 포함된 웹 URL 공유
+            const battleUrl = `https://fondayai.com${battlePath}`;
+            tossShare({ message: `${shareText}\n${battleUrl}` }).catch(() => {});
           } else {
-            navigator.clipboard.writeText(shareUrl).then(() => alert(t("result.challengeLinkCopied")));
+            // 일반 웹: Web Share API
+            const shareUrl = `${window.location.origin}${battlePath}`;
+            if (navigator.share) {
+              navigator.share({ title: "Fonday° 피부 챌린지", text: shareText, url: shareUrl })
+                .catch(() => {});
+            } else {
+              const ta = document.createElement("textarea");
+              ta.value = shareUrl;
+              ta.style.cssText = "position:fixed;left:-9999px;opacity:0";
+              document.body.appendChild(ta);
+              ta.focus(); ta.select();
+              try { document.execCommand("copy"); } catch {}
+              document.body.removeChild(ta);
+              alert(t("result.challengeLinkCopied"));
+            }
           }
         }}
       />

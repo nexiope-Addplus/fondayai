@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence, useMotionValue, useSpring, useTransform, useReducedMotion } from "framer-motion";
+import { isTossMiniApp } from "./utils";
 
 // ─── 카운트업 숫자 컴포넌트 ───────────────────────────────────────
 function CountUp({ value, className, style }: { value: number; className?: string; style?: React.CSSProperties }) {
@@ -30,6 +31,7 @@ function CountUp({ value, className, style }: { value: number; className?: strin
   return <span className={className} style={style}>{displayed}</span>;
 }
 import { Flame, Microscope } from "lucide-react";
+import { FaceMeshOverlay } from "./FaceMeshOverlay";
 import { Card, CardContent } from "@/components/ui/card";
 import type { AnalysisResult, RankingData, StreakData } from "./types";
 import {
@@ -95,6 +97,7 @@ export function ResultHeaderCard({
         <div className="flex items-stretch gap-3">
           <div className="relative rounded-2xl overflow-hidden bg-stone-100 shrink-0" style={{ width: 100, minHeight: 120 }}>
             <img src={faceCroppedSrc || imageSrc} alt="" aria-hidden="true" className="w-full h-full object-cover" style={{ objectPosition: "center 50%" }} />
+            <FaceMeshOverlay imageSrc={faceCroppedSrc || imageSrc} />
             <div className="absolute top-2 left-2 w-5 h-5 border-t-2 border-l-2 rounded-tl-lg" style={{ borderColor: SCAN_TO }} />
             <div className="absolute top-2 right-2 w-5 h-5 border-t-2 border-r-2 rounded-tr-lg" style={{ borderColor: SCAN_TO }} />
             <div className="absolute bottom-2 left-2 w-5 h-5 border-b-2 border-l-2 rounded-bl-lg" style={{ borderColor: SCAN_TO }} />
@@ -113,7 +116,7 @@ export function ResultHeaderCard({
             }}
             transition={reducedMotion ? {} : { duration: 2.5, delay: 1.5, times: [0, 0.01, 0.4, 1] }}
           >
-            <p className="text-[12px] font-semibold uppercase tracking-[0.12em]" style={{ color: TEXT_TERTIARY }}>{t("result.overall")}</p>
+            <p className="text-[12px] font-semibold uppercase tracking-[0.12em]" style={{ color: TEXT_TERTIARY }}>{isTossMiniApp() ? t("result.tossOverall") : t("result.overall")}</p>
             <div className="flex items-end gap-2 mt-1">
               <p className="text-[44px] font-normal leading-none" style={{ color: SCAN_TO, fontFamily: FONT_DISPLAY }}>
                 <CountUp value={overallScore} />
@@ -152,7 +155,7 @@ export function ResultHeaderCard({
             </p>
           </div>
           <div className="px-2 py-2 text-center">
-            <p className="text-[12px] font-medium uppercase tracking-[0.06em]" style={{ color: TEXT_TERTIARY }}>{t("result.baumannLabel")}</p>
+            <p className="text-[12px] font-medium uppercase tracking-[0.06em]" style={{ color: TEXT_TERTIARY }}>{isTossMiniApp() ? t("result.tossBaumannLabel") : t("result.baumannLabel")}</p>
             <p className="text-[20px] font-normal leading-none mt-1" style={{ color: DEEP_GREEN, fontFamily: FONT_DISPLAY }}>{finalType}</p>
           </div>
         </div>
@@ -160,7 +163,7 @@ export function ResultHeaderCard({
         {/* ── 3층: 점수 바 + 분석결과 보기 ── */}
         <div className="mt-4 pt-4" style={{ borderTop: `1px solid ${BORDER_COLOR}` }}>
           <div className="flex items-center justify-between mb-2.5">
-            <p className="text-[12px] font-bold" style={{ color: TEXT_LABEL }}>{t("result.scores")}</p>
+            <p className="text-[12px] font-bold" style={{ color: TEXT_LABEL }}>{isTossMiniApp() ? t("result.tossScores") : t("result.scores")}</p>
             <button
               onClick={() => setShowAnalysis(true)}
               className="rounded-full px-2.5 py-1 text-[11px] font-medium"
@@ -237,7 +240,7 @@ export function ResultHeaderCard({
             className="mt-4 pt-4 block w-full text-left"
             style={{ borderTop: `1px solid ${BORDER_COLOR}` }}
           >
-            <p className="text-xs font-bold tracking-[0.08em]" style={{ color: TEXT_LABEL }}>{t("result.aiComment")}</p>
+            <p className="text-xs font-bold tracking-[0.08em]" style={{ color: TEXT_LABEL }}>{isTossMiniApp() ? t("result.tossAiComment") : t("result.aiComment")}</p>
             <p className="text-xs text-stone-600 mt-1 leading-relaxed text-kr-pretty line-clamp-2">
               {analysisResult.aiComment}
             </p>
