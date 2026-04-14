@@ -38,9 +38,9 @@ import type { CosmeticItem, StreakData, RankingData, MissionState, TodoItem } fr
 import {
   todayStr,
   getStreak, updateStreak,
-  getMissions, checkAndCompleteMissions,
+  getMissions, checkAndCompleteMissions, checkCosmeticMissions,
   getAttendance, checkinToday,
-  markChallengeUsed, markShareUsed,
+  markChallengeUsed, markShareUsed, openContactsViral,
   getDiaryMemo,
   getDiaryTodos, saveDiaryTodos, getDiaryTodoProgress, initDiaryTodosFromRoutine,
   buildCosmeticsInsights, buildRoutineGuide, buildCosmeticCorrelationSignals, haptic,
@@ -99,6 +99,13 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
       const next = Array.isArray(data) ? data : [];
       setMyCosmetics(next);
       setCosmeticCount(next.length);
+      // 화장품 미션 체크
+      const cosmeticMissions = checkCosmeticMissions(next.length);
+      if (cosmeticMissions.length > 0) {
+        setMissionState(getMissions());
+        setMissionPops(cosmeticMissions);
+        setTimeout(() => setMissionPops([]), 3500);
+      }
       if (options?.openRoutineUpdate && next.length > 0) {
         setShowRoutineUpdateSheet(true);
       }
@@ -196,7 +203,7 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
       setStreakMilestone(streak.count);
       timers.push(setTimeout(() => setStreakMilestone(null), 3000));
     }
-    const newMissions = checkAndCompleteMissions(streak.count, overallScore, deltaScore);
+    const newMissions = checkAndCompleteMissions();
     setMissionState(getMissions());
     if (newMissions.length > 0) {
       setMissionPops(newMissions);
@@ -605,7 +612,6 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
     .filter((item: { idx: number; score: number; color: string }) => item.score > 0);
   const nextStreakGoal = [3, 7, 30].find((goal) => goal > (currentStreak.count || 0)) ?? null;
   const daysToGoal = nextStreakGoal ? Math.max(nextStreakGoal - (currentStreak.count || 0), 0) : 0;
-  const nextStreakReward = nextStreakGoal ? MISSION_POINTS[`streak_${nextStreakGoal}`] || 0 : 0;
   const attendance = getAttendance();
   const totalPoints = missionState.totalPoints + attendance.totalPoints;
   const dailyImproved = missionState.dailyDate === todayStr() && missionState.dailyImproved;
@@ -615,7 +621,7 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
       id: "scan",
       done: missionState.dailyCompleted,
       label: t("result.actionCard.questScan"),
-      reward: `+${MISSION_POINTS.daily_scan}원`,
+      reward: missionState.completed.includes("first_scan") ? t("result.actionCard.questDone") : `+${MISSION_POINTS.first_scan}P`,
       detail: t("result.actionCard.questScanDetail"),
       accent: "#C97062",
     },
@@ -637,9 +643,9 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
     },
     {
       id: "challenge_share",
-      done: dailyChallenged,
+      done: missionState.completed.includes("share"),
       label: t("result.actionCard.questChallenge"),
-      reward: `+${MISSION_POINTS.share}원`,
+      reward: missionState.completed.includes("share") ? t("result.actionCard.questDone") : `+${MISSION_POINTS.share}P`,
       detail: t("result.actionCard.questChallengeDetail"),
       accent: COLOR_INFO,
     },
@@ -701,7 +707,6 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
 
   const handleShare = async () => {
     if (shareLoading) return;
-    markShareUsed();
     setShareLoading(true);
 
     // 토스 미니앱: OG 미리보기가 포함된 /share/:token 웹 URL 공유
@@ -711,6 +716,8 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
         const token = currentShareToken;
         const shareUrl = token ? `https://fondayai.com/share/${token}` : "https://fondayai.com";
         await tossShare({ message: `${shareText}\n${shareUrl}` });
+        const pops = markShareUsed();
+        if (pops.length) { setMissionPops(pops); setMissions(getMissions()); }
       } catch (e) {
         console.warn("[share:toss]", e);
       } finally {
@@ -804,6 +811,8 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
           await new Promise(r => setTimeout(r, 200));
         }
       }
+      const pops = markShareUsed();
+      if (pops.length) { setMissionPops(pops); setMissions(getMissions()); }
     } catch (e) {
       console.error("[share]", e);
       if (e instanceof Error) {
@@ -956,7 +965,6 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
             questStatusDetail={questStatusDetail}
             nextStreakGoal={nextStreakGoal}
             daysToGoal={daysToGoal}
-            nextStreakReward={nextStreakReward}
             questProgressPct={questProgressPct}
             essentialQuests={essentialQuests}
             setShowQuestSheet={setShowQuestSheet}
@@ -1037,6 +1045,7 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
         pendingChallengeToken={pendingChallengeToken}
         currentShareToken={currentShareToken}
         onShare={handleShare}
+        onInviteFriends={() => openContactsViral()}
         baumannType={finalType}
         onOpenChallenge={() => {
           sessionStorage.removeItem("battleChallengeToken");

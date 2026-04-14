@@ -1,4 +1,4 @@
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { CheckCircle2, Star, X } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
@@ -9,6 +9,7 @@ import {
   SCAN_TO,
   TEXT_TERTIARY,
   COLOR_WARNING,
+  Z,
 } from "./constants";
 
 type QuestItem = {
@@ -36,25 +37,27 @@ export function ResultQuestSheet({
   questBoard: QuestItem[];
 }) {
   const { t } = useTranslation();
+  const reducedMotion = useReducedMotion();
 
   return (
     <AnimatePresence>
       {open && (
         <motion.div
-          className="fixed inset-0 z-[120] flex items-end justify-center"
-          initial={{ opacity: 0 }}
+          className="fixed inset-0 flex items-end justify-center"
+          style={{ zIndex: Z.questSheet }}
+          initial={reducedMotion ? undefined : { opacity: 0 }}
           animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
+          exit={reducedMotion ? undefined : { opacity: 0 }}
           onClick={onClose}
         >
           <div className="absolute inset-0 bg-black/40" />
           <motion.div
             className="relative bg-white rounded-t-[32px] w-full max-w-md px-5 pt-5 pb-8 max-h-[82vh] overflow-y-auto"
             style={{ borderTop: `1px solid ${BORDER_COLOR}` }}
-            initial={{ y: 120 }}
+            initial={reducedMotion ? undefined : { y: 120 }}
             animate={{ y: 0 }}
-            exit={{ y: 120 }}
-            transition={{ type: "spring", damping: 28, stiffness: 280 }}
+            exit={reducedMotion ? undefined : { y: 120 }}
+            transition={reducedMotion ? { duration: 0 } : { type: "spring", damping: 28, stiffness: 280 }}
             onClick={(event) => event.stopPropagation()}
           >
             <div className="w-10 h-1 rounded-full bg-stone-200 mx-auto mb-4" />
@@ -72,7 +75,7 @@ export function ResultQuestSheet({
                   className="rounded-full px-3 py-1 text-xs font-normal"
                   style={{ fontFamily: FONT_DISPLAY, background: "#FFF7ED", color: COLOR_WARNING }}
                 >
-                  {totalPoints}pt
+                  {totalPoints}P
                 </span>
                 <button
                   onClick={onClose}

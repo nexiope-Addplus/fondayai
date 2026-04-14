@@ -15,6 +15,8 @@ import {
 } from "./types";
 import {
   MISSION_POINTS,
+  TOSS_PROMOTION_CODE,
+  TOSS_VIRAL_MODULE_ID,
   DIARY_CAUSE_TAGS,
   LEGACY_DIARY_CAUSE_TAG_MAP,
   CAUSE_TAG_KEYWORDS,
@@ -162,7 +164,40 @@ export function getMissions(): MissionState {
   return { completed: [], dailyDate: "", dailyCompleted: false, dailyImproved: false, dailyChallenged: false, totalPoints: 0 };
 }
 
-export function checkAndCompleteMissions(streakCount: number, overallScore: number, scoreDelta?: number | null): string[] {
+/** 토스 프로모션 포인트 지급 (토스 미니앱일 때만) */
+async function grantTossReward(missionId: string, amount: number): Promise<void> {
+  if (!isTossMiniApp()) return;
+  try {
+    const { grantPromotionReward } = await import("@apps-in-toss/web-framework");
+    const result = await grantPromotionReward({
+      params: { promotionCode: TOSS_PROMOTION_CODE, amount },
+    });
+    if (result && typeof result === "object" && "key" in result) {
+      console.log(`[reward] ${missionId} +${amount}P 지급 성공`);
+    } else if (result && typeof result === "object" && "errorCode" in result) {
+      const err = result as { errorCode: string; message?: string };
+      console.warn(`[reward] ${missionId} 실패:`, err.errorCode, err.message);
+    }
+  } catch (e) {
+    console.warn(`[reward] ${missionId} 지급 오류:`, e);
+  }
+}
+
+function completeMission(state: MissionState, id: string): boolean {
+  if (state.completed.includes(id)) return false;
+  state.completed.push(id);
+  const pts = MISSION_POINTS[id] || 0;
+  state.totalPoints += pts;
+  grantTossReward(id, pts);
+  return true;
+}
+
+function saveMissions(state: MissionState) {
+  try { localStorage.setItem("fonday_missions", JSON.stringify(state)); } catch {}
+}
+
+/** 스캔 완료 시 호출 — first_scan 체크 */
+export function checkAndCompleteMissions(): string[] {
   const state = getMissions();
   const today = todayStr();
   const newlyCompleted: string[] = [];
@@ -174,30 +209,33 @@ export function checkAndCompleteMissions(streakCount: number, overallScore: numb
     state.dailyChallenged = false;
   }
 
-  if (!state.dailyCompleted) {
-    state.dailyCompleted = true;
-    state.totalPoints += MISSION_POINTS.daily_scan;
-    newlyCompleted.push("daily_scan");
-  }
+  state.dailyCompleted = true;
 
-  const checks = [
-    { id: "first_scan", cond: true },
-    { id: "streak_3", cond: streakCount >= 3 },
-    { id: "streak_7", cond: streakCount >= 7 },
-    { id: "streak_30", cond: streakCount >= 30 },
-    { id: "score_70", cond: overallScore >= 70 },
-    { id: "score_80", cond: overallScore >= 80 },
-  ];
+  if (completeMission(state, "first_scan")) newlyCompleted.push("first_scan");
 
-  for (const { id, cond } of checks) {
-    if (cond && !state.completed.includes(id)) {
-      state.completed.push(id);
-      state.totalPoints += MISSION_POINTS[id] || 0;
-      newlyCompleted.push(id);
-    }
-  }
+  saveMissions(state);
+  return newlyCompleted;
+}
 
-  try { localStorage.setItem("fonday_missions", JSON.stringify(state)); } catch {}
+/** 화장품 등록 시 호출 — first_cosmetic, cosmetic_10 체크 */
+export function checkCosmeticMissions(cosmeticCount: number): string[] {
+  if (cosmeticCount < 1) return [];
+  const state = getMissions();
+  const newlyCompleted: string[] = [];
+  if (completeMission(state, "first_cosmetic")) newlyCompleted.push("first_cosmetic");
+  if (cosmeticCount >= 10 && completeMission(state, "cosmetic_10")) newlyCompleted.push("cosmetic_10");
+  saveMissions(state);
+  return newlyCompleted;
+}
+
+/** 일기 작성 시 호출 — first_diary, diary_streak_10 체크 */
+export function checkDiaryMissions(consecutiveDays: number): string[] {
+  if (consecutiveDays < 1) return [];
+  const state = getMissions();
+  const newlyCompleted: string[] = [];
+  if (completeMission(state, "first_diary")) newlyCompleted.push("first_diary");
+  if (consecutiveDays >= 10 && completeMission(state, "diary_streak_10")) newlyCompleted.push("diary_streak_10");
+  saveMissions(state);
   return newlyCompleted;
 }
 
@@ -228,18 +266,40 @@ export function markChallengeUsed() {
   const today = todayStr();
   if (state.dailyDate === today && !state.dailyChallenged) {
     state.dailyChallenged = true;
-    state.totalPoints += MISSION_POINTS.share;
   }
-  try { localStorage.setItem("fonday_missions", JSON.stringify(state)); } catch {}
+  saveMissions(state);
 }
 
-export function markShareUsed() {
+/** 결과 공유 시 호출 — share 미션 완료 + 토스 포인트 지급 */
+export function markShareUsed(): string[] {
   const state = getMissions();
-  if (!state.completed.includes("share")) {
-    state.completed.push("share");
-    state.totalPoints += MISSION_POINTS.share;
-    try { localStorage.setItem("fonday_missions", JSON.stringify(state)); } catch {}
-  }
+  const newlyCompleted: string[] = [];
+  if (completeMission(state, "share")) newlyCompleted.push("share");
+  saveMissions(state);
+  return newlyCompleted;
+}
+
+/** 토스 친구초대 공유 리워드 (contactsViral) */
+export function openContactsViral(onReward?: (amount: number, unit: string) => void): void {
+  if (!isTossMiniApp()) return;
+  import("@apps-in-toss/web-framework").then(({ contactsViral }) => {
+    const cleanup = contactsViral({
+      options: { moduleId: TOSS_VIRAL_MODULE_ID },
+      onEvent: (event: { type: string; data: any }) => {
+        if (event.type === "sendViral") {
+          console.log("[viral] 리워드 지급:", event.data.rewardAmount, event.data.rewardUnit);
+          onReward?.(event.data.rewardAmount, event.data.rewardUnit);
+        } else if (event.type === "close") {
+          console.log("[viral] 종료:", event.data.closeReason);
+          cleanup?.();
+        }
+      },
+      onError: (error: unknown) => {
+        console.warn("[viral] 에러:", error);
+        cleanup?.();
+      },
+    });
+  }).catch((e) => console.warn("[viral] import 실패:", e));
 }
 
 // ─── 푸시 프롬프트 유틸 ───────────────────────────────────────────────────────
@@ -291,7 +351,7 @@ export function appFetch(input: string, init?: RequestInit): Promise<Response> {
 /** 토스 미니앱 환경 감지 (?toss=1 파라미터로 시뮬레이션 가능) */
 export function isTossMiniApp(): boolean {
   return !!(
-    (window as any).__AIT__ ||
+    (window as unknown as { __AIT__?: boolean }).__AIT__ ||
     navigator.userAgent.includes("TossApp") ||
     document.documentElement.classList.contains("toss-miniapp") ||
     new URLSearchParams(window.location.search).get("toss") === "1" ||
@@ -334,6 +394,19 @@ export function getWeatherTipKey(d: WeatherData): WeatherTipKey {
 }
 
 // ─── 다이어리 메모 유틸 ───────────────────────────────────────────────────────
+
+/** 오늘까지 연속 일기 작성 일수 계산 */
+export function getDiaryConsecutiveDays(): number {
+  let count = 0;
+  const d = new Date();
+  for (let i = 0; i < 60; i++) {
+    const ds = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+    if (!localStorage.getItem(`fonday_memo_${ds}`)) break;
+    count++;
+    d.setDate(d.getDate() - 1);
+  }
+  return count;
+}
 
 export function getDiaryMemo(dateStr: string): string {
   try { return localStorage.getItem(`fonday_memo_${dateStr}`) || ""; } catch { return ""; }

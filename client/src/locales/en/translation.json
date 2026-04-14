@@ -364,7 +364,7 @@
       "streakLabel": "Streak",
       "streakValue": "{{count}} days",
       "streakSub": "Best {{count}} days",
-      "streakGoal": "{{days}} more day(s) to {{goal}} days and +{{reward}} pts",
+      "streakGoal": "{{days}} more day(s) to reach {{goal}}-day streak!",
       "streakDone": "You hit your personal best streak!",
       "rewardScan": "Today's scan reward",
       "rewardStreak": "Streak reward",
@@ -398,6 +398,7 @@
     "shareText": "My skin score today is {{score}} pts! My Baumann type is {{type}}.\n#Fonday #AISkinAnalysis #FondayAI",
     "challengeText": "Think you can beat my {{score}} skin score? 🔥\nChallenge my {{type}} type!",
     "challengeBtn": "Challenge a Friend",
+    "challengeFriend": "Challenge a Friend",
     "challengeResult": "View Challenge Result",
     "challengeLinkCopied": "Challenge link copied! Send it to your friend to compete.",
     "viewBtn": "View",
@@ -1071,22 +1072,17 @@
     "deltaDown": "▼ {{n}} pts declined"
   },
   "mission": {
-    "title": "🎯 Care Goals",
-    "points": "{{n}}won",
+    "title": "🎯 Reward Missions",
+    "points": "{{n}}P",
     "showAll": "Show All",
     "hide": "Collapse",
-    "newAchieve": "Care Goal Complete!",
-    "daily_scan": "Complete today's scan",
-    "daily_improve": "Better than yesterday",
-    "daily_challenge": "Share a skin challenge",
+    "newAchieve": "Mission Complete!",
     "first_scan": "First skin scan",
-    "streak_3": "3-day scan streak",
-    "streak_7": "7-day scan streak",
-    "streak_30": "30-day scan streak",
-    "score_70": "Achieve skin score 70",
-    "score_80": "Achieve skin score 80",
-    "challenge": "First challenge sent",
-    "share": "First result shared"
+    "share": "Share your results",
+    "first_cosmetic": "Register first cosmetic",
+    "cosmetic_10": "Register 10 cosmetics",
+    "first_diary": "Write first diary",
+    "diary_streak_10": "10-day diary streak"
   },
   "baumann": {
     "O": {

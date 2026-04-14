@@ -364,7 +364,7 @@
       "streakLabel": "連続記録",
       "streakValue": "{{count}}日",
       "streakSub": "最高 {{count}}日",
-      "streakGoal": "あと{{days}}日で{{goal}}日報酬 +{{reward}}ウォン",
+      "streakGoal": "あと{{days}}日で{{goal}}日連続達成！",
       "streakDone": "連続記録の自己ベスト達成！",
       "rewardScan": "今日のスキャン報酬",
       "rewardStreak": "連続記録ボーナス",
@@ -398,6 +398,7 @@
     "shareText": "今日の肌スコアは{{score}}点！バウマンタイプは{{type}}でした。\n#Fonday #AI肌分析 #FondayAI",
     "challengeText": "私の肌スコア{{score}}点に勝てる？🔥\n{{type}}タイプと対決してみて！",
     "challengeBtn": "友達に肌チャレンジを送る",
+    "challengeFriend": "友達に挑戦する",
     "challengeResult": "チャレンジ結果を確認",
     "challengeLinkCopied": "チャレンジリンクをコピーしました！友達に送って競いましょう。",
     "viewBtn": "見る",
@@ -1071,22 +1072,17 @@
     "deltaDown": "▼ {{n}}点ダウン"
   },
   "mission": {
-    "title": "🎯 ケア目標",
-    "points": "{{n}}ウォン",
+    "title": "🎯 リワードミッション",
+    "points": "{{n}}P",
     "showAll": "全て表示",
     "hide": "閉じる",
-    "newAchieve": "ケア目標達成！",
-    "daily_scan": "今日のスキャン完了",
-    "daily_improve": "昨日より改善",
-    "daily_challenge": "スキンチャレンジをシェア",
-    "first_scan": "初めてのスキャン",
-    "streak_3": "3日連続スキャン",
-    "streak_7": "7日連続スキャン",
-    "streak_30": "30日連続スキャン",
-    "score_70": "肌スコア70点達成",
-    "score_80": "肌スコア80点達成",
-    "challenge": "初チャレンジ参加",
-    "share": "初めての結果シェア"
+    "newAchieve": "ミッション達成！",
+    "first_scan": "初めての肌診断",
+    "share": "結果をシェア",
+    "first_cosmetic": "コスメ初登録",
+    "cosmetic_10": "コスメ10個登録",
+    "first_diary": "日記を初めて書く",
+    "diary_streak_10": "日記10日連続記録"
   },
   "baumann": {
     "O": {

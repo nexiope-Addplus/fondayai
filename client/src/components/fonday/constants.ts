@@ -45,13 +45,13 @@ export const TINT_NEUTRAL = "#F0F0F1";
 export const BG_BASE = "#FFFFFF";
 export const BG_MUTED = "#F5F8F6";
 export const BORDER_COLOR = "#EBEBEB";
-// 토스 미니앱: Toss Product Sans 자동 적용 → 커스텀 폰트 제거
+// 토스 미니앱 감지 (폰트 결정용 — utils.ts isTossMiniApp()과 동일 조건)
 const _isToss = typeof window !== "undefined" && (
-  !!(window as any).__AIT__ ||
+  !!(window as unknown as { __AIT__?: boolean }).__AIT__ ||
   navigator.userAgent.includes("TossApp") ||
   document.documentElement.classList.contains("toss-miniapp") ||
   new URLSearchParams(window.location.search).get("toss") === "1" ||
-  /\.tossmini\.com$/.test(window.location.hostname)
+  localStorage.getItem("fonday_toss_mode") === "1"
 );
 const _TOSS_FONT = "'Toss Product Sans', 'Tossface', 'SF Pro KR', 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif";
 export const FONT_DISPLAY = _isToss ? _TOSS_FONT : "'LINESeedKR', Pretendard, sans-serif";
@@ -85,6 +85,7 @@ export const COLOR_INFO = "#7C3AED";
 export const Z = {
   actionBar: 50,   // ResultActionBar / BottomNav
   sheet: 100,      // detail sheets (RoutineTab selectedItem)
+  questSheet: 120, // ResultQuestSheet
   modal: 200,      // modals (CosmeticsRegisterModal, AttendanceCalendar)
   camera: 200,     // CameraCapture overlay
   pwa: 210,        // PWA install prompt
@@ -151,12 +152,22 @@ export const tabSlideVariants = {
   exit: (dir: number) => ({ x: dir * -30, opacity: 0 }),
 };
 
-// ─── 미션 포인트 ──────────────────────────────────────────────────────────────
+// ─── 미션 포인트 (토스 포인트 = 1P) ─────────────────────────────────────────
 
 export const MISSION_POINTS: Record<string, number> = {
-  first_scan: 1, daily_scan: 1, streak_3: 3, streak_7: 10,
-  streak_30: 50, score_70: 5, score_80: 10, share: 1,
+  first_scan: 1,       // 첫 피부 진단
+  share: 2,            // 결과 공유
+  first_cosmetic: 1,   // 화장품 최초 등록
+  cosmetic_10: 5,      // 화장품 10개 등록
+  first_diary: 1,      // 일기 최초 작성
+  diary_streak_10: 5,  // 일기 10일 연속 작성
 };
+
+// 토스 프로모션 코드 (콘솔 등록 후 실제 코드로 교체)
+export const TOSS_PROMOTION_CODE = "FONDAY_REWARD_V1";
+
+// 토스 공유 리워드 모듈 ID (콘솔 등록 후 실제 ID로 교체)
+export const TOSS_VIRAL_MODULE_ID = "FONDAY_VIRAL_V1";
 
 // ─── 다이어리 원인 태그 ───────────────────────────────────────────────────────
 

@@ -43,7 +43,9 @@ import {
 } from "./constants";
 import {
   buildRoutineGuide,
+  checkDiaryMissions,
   getCauseTagLabel,
+  getDiaryConsecutiveDays,
   getDiaryCauseTags,
   getDiaryMemo,
   getDiaryTodoProgress,
@@ -101,8 +103,14 @@ export function InlineMemo({ dateStr }: { dateStr: string }) {
   const [tags, setTags] = useState<DiaryCauseTag[]>(() => getDiaryCauseTags(dateStr));
 
   const handleSave = () => {
+    // 1) localStorage에 저장 (saveDiaryMemo가 이벤트도 dispatch)
     saveDiaryMemo(dateStr, text);
     saveDiaryCauseTags(dateStr, tags);
+    // 2) 저장 후 연속일수 계산 → 미션 체크
+    const consecutiveDays = getDiaryConsecutiveDays();
+    checkDiaryMissions(consecutiveDays);
+    // 3) 미션 상태 반영된 후 재 dispatch하여 리스너가 최신 상태 읽도록
+    window.dispatchEvent(new CustomEvent("fonday:diary-updated", { detail: { dateStr } }));
     setEditing(false);
   };
 
