@@ -1,5 +1,5 @@
 import { createRoot } from "react-dom/client";
-import { TDSMobileAITProvider } from "@toss/tds-mobile-ait";
+import { lazy, Suspense, type ReactNode } from "react";
 import App from "./App";
 import "./index.css";
 import "./i18n";
@@ -62,8 +62,23 @@ window.fetch = (input, init) => {
   return _fetch(input, { ...init, headers });
 };
 
-createRoot(document.getElementById("root")!).render(
-  <TDSMobileAITProvider>
-    <App />
-  </TDSMobileAITProvider>
+// TDS Provider is only loaded inside Toss miniapp — crashes outside Toss
+const TossWrapper = lazy(() =>
+  import("@toss/tds-mobile-ait").then((m) => ({
+    default: ({ children }: { children: ReactNode }) => (
+      <m.TDSMobileAITProvider>{children}</m.TDSMobileAITProvider>
+    ),
+  }))
 );
+
+const Root = isTossMiniApp ? (
+  <Suspense fallback={null}>
+    <TossWrapper>
+      <App />
+    </TossWrapper>
+  </Suspense>
+) : (
+  <App />
+);
+
+createRoot(document.getElementById("root")!).render(Root);

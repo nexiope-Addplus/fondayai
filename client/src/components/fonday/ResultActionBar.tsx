@@ -1,4 +1,4 @@
-import { Crown, Share2, Trophy, Swords } from "lucide-react";
+import { Crown, Share2, Trophy, Swords, Users } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { isTossMiniApp } from "./utils";
 
@@ -7,6 +7,7 @@ import {
   SCAN_TO,
   BORDER_COLOR,
   TEXT_TERTIARY,
+  Z,
 } from "./constants";
 
 export function ResultActionBar({
@@ -16,6 +17,7 @@ export function ResultActionBar({
   onShare,
   onOpenChallenge,
   onCreateChallenge,
+  onInviteFriends,
   baumannType,
 }: {
   shareLoading: boolean;
@@ -24,14 +26,15 @@ export function ResultActionBar({
   onShare: () => void;
   onOpenChallenge: () => void;
   onCreateChallenge: () => void;
+  onInviteFriends?: () => void;
   baumannType?: string;
 }) {
   const { t } = useTranslation();
 
   return (
     <div
-      className="fixed left-0 right-0 z-[50] flex items-center gap-2 px-4 py-3 bg-white/95 backdrop-blur-md"
-      style={{ bottom: isTossMiniApp() ? "calc(68px + env(safe-area-inset-bottom))" : "calc(60px + env(safe-area-inset-bottom))" }}
+      className="fixed left-0 right-0 flex items-center gap-2 px-4 py-3 bg-white/95 backdrop-blur-md"
+      style={{ zIndex: Z.actionBar, bottom: isTossMiniApp() ? "calc(68px + env(safe-area-inset-bottom))" : "calc(60px + env(safe-area-inset-bottom))" }}
     >
       {/* 공유 버튼 — 보조 (아이콘만) */}
       <button
@@ -41,11 +44,22 @@ export function ResultActionBar({
         style={{ background: "rgba(74,124,110,0.06)", color: DEEP_GREEN, border: "1.5px solid rgba(74,124,110,0.18)" }}
       >
         {shareLoading ? (
-          <div className="w-4 h-4 border-2 border-stone-300 border-t-stone-600 rounded-full animate-spin" />
+          <div className="w-4 h-4 border-2 border-stone-300 border-t-stone-600 rounded-full animate-spin motion-reduce:animate-none" />
         ) : (
           <Share2 className="w-4 h-4" />
         )}
       </button>
+
+      {/* 친구 초대 (토스 공유 리워드) — 토스 미니앱에서만 */}
+      {isTossMiniApp() && onInviteFriends && (
+        <button
+          onClick={onInviteFriends}
+          className="w-12 h-12 rounded-full font-semibold flex items-center justify-center shrink-0"
+          style={{ background: "rgba(74,124,110,0.06)", color: DEEP_GREEN, border: "1.5px solid rgba(74,124,110,0.18)" }}
+        >
+          <Users className="w-4 h-4" />
+        </button>
+      )}
 
       {/* 챌린지 버튼 — 메인 CTA */}
       {pendingChallengeToken ? (
@@ -69,7 +83,7 @@ export function ResultActionBar({
           onClick={onCreateChallenge}
         >
           <Swords className="w-4 h-4" />
-          <span className="text-[13px]">{t("result.challengeFriend", "친구한테 도전하기")}</span>
+          <span className="text-[13px]">{t("result.challengeFriend")}</span>
         </button>
       )}
     </div>

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { CheckCircle2, Lock } from "lucide-react";
 import {
   DEEP_GREEN,
@@ -8,30 +8,25 @@ import {
   MISSION_POINTS,
   fadeChild,
   BORDER_COLOR,
-  FONT_DISPLAY,
   BG_BASE,
 } from "./constants";
 import type { MissionState } from "./types";
-import { getMissions, todayStr } from "./utils";
+import { getMissions } from "./utils";
 
 // ─── 미션 카드 (idle 화면) ────────────────────────────────────────
 export function MissionCard() {
   const { t } = useTranslation();
+  const reducedMotion = useReducedMotion();
   const [missions, setMissions] = useState<MissionState>(() => getMissions());
   const [expanded, setExpanded] = useState(false);
 
-  // 오늘 날짜 기준으로 daily 미션 표시 여부 결정
-  const today = todayStr();
-  const isDailyCompleted = missions.dailyDate === today && missions.dailyCompleted;
+  const ALL_MISSION_IDS = ["first_scan", "share", "first_cosmetic", "cosmetic_10", "first_diary", "diary_streak_10"];
 
-  const ALL_MISSION_IDS = ["daily_scan", "first_scan", "streak_3", "streak_7", "streak_30", "score_70", "score_80", "share"];
-
-  const missionItems = ALL_MISSION_IDS.map(id => {
-    let done: boolean;
-    if (id === "daily_scan") done = isDailyCompleted;
-    else done = missions.completed.includes(id);
-    return { id, done, points: MISSION_POINTS[id] || 0 };
-  });
+  const missionItems = ALL_MISSION_IDS.map(id => ({
+    id,
+    done: missions.completed.includes(id),
+    points: MISSION_POINTS[id] || 0,
+  }));
 
   const incomplete = missionItems.filter(m => !m.done);
   const complete = missionItems.filter(m => m.done);
@@ -39,7 +34,7 @@ export function MissionCard() {
   const focusedItems = incomplete.length > 0 ? incomplete : complete;
 
   return (
-    <motion.div variants={fadeChild} className="mb-4">
+    <motion.div variants={reducedMotion ? undefined : fadeChild} className="mb-4">
       <div className="rounded-2xl px-4 py-3.5"
         style={{ background: BG_BASE, border: `1px solid ${BORDER_COLOR}` }}>
         <div className="flex items-start justify-between gap-3 mb-3">
@@ -64,7 +59,7 @@ export function MissionCard() {
                   {t(`mission.${id}`)}
                 </span>
               </div>
-              <span className="text-xs font-semibold shrink-0 text-amber-600">+{points}원</span>
+              <span className="text-xs font-semibold shrink-0 text-amber-600">+{points}P</span>
             </div>
           ))}
         </div>
