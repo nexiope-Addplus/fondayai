@@ -134,8 +134,12 @@ export default {
       const mimeMap = { png: "image/png", jpg: "image/jpeg", jpeg: "image/jpeg", mp4: "video/mp4" };
       const ct = obj.httpMetadata?.contentType || mimeMap[ext] || "image/png";
       const buf = await obj.arrayBuffer();
+      // Static pool assets rarely change; daily content may be replaced at the same URL
+      const cacheControl = key.startsWith("magazine-pool/")
+        ? "public, max-age=604800"
+        : "public, max-age=300";
       return new Response(buf, {
-        headers: { "Content-Type": ct, "Content-Length": String(buf.byteLength), "Cache-Control": "public, max-age=86400", "Access-Control-Allow-Origin": "*" },
+        headers: { "Content-Type": ct, "Content-Length": String(buf.byteLength), "Cache-Control": cacheControl, "Access-Control-Allow-Origin": "*" },
       });
     }
 
@@ -379,6 +383,7 @@ export default {
         sendWeatherCarePushToAll(env),
         publishScheduledInsta(env, "07:00", "ko"),
         publishScheduledInsta(env, "07:00", "ja"),
+        publishScheduledInsta(env, "07:00", "b2b"),
       ]));
     } else if (hour === 23) {
       // KST 08:00 — 스레드 아침
@@ -398,6 +403,7 @@ export default {
         sendMealPushToAll(env, "lunch"),
         publishScheduledInsta(env, "12:00", "ko"),
         publishScheduledInsta(env, "12:00", "ja"),
+        publishScheduledInsta(env, "12:00", "b2b"),
         publishScheduledThreads(env, "12:00"),
       ]));
     } else if (hour === 5) {
@@ -420,6 +426,7 @@ export default {
       ctx.waitUntil(Promise.all([
         publishScheduledInsta(env, "20:00", "ko"),
         publishScheduledInsta(env, "20:00", "ja"),
+        publishScheduledInsta(env, "20:00", "b2b"),
         sendRoutineReminderToAll(env, 20),
       ]));
     } else if (hour === 12) {
@@ -475,11 +482,13 @@ async function replyToFirstComment(env) {
   const accounts = [
     { token: env.IG_ACCESS_TOKEN, userId: env.IG_USER_ID, table: "insta_content", lang: "ko" },
     { token: env.IG_ACCESS_TOKEN_JA, userId: env.IG_USER_ID_JA, table: "insta_content_ja", lang: "ja" },
+    { token: env.IG_ACCESS_TOKEN_B2B, userId: env.IG_USER_ID_B2B, table: "insta_content_b2b", lang: "b2b" },
   ];
 
   const replies = {
     ko: "댓글 감사해요! 내 피부 타입이 궁금하다면 프로필 링크에서 무료 AI 피부 분석 받아보세요 🤍",
     ja: "コメントありがとうございます！自分の肌タイプが気になる方は、プロフィールリンクから無料AI肌診断をお試しください 🤍",
+    b2b: "댓글 감사합니다! AI 피부 분석 도입 관련 문의는 DM 주세요 🤍",
   };
 
   for (const acc of accounts) {
@@ -504,7 +513,7 @@ async function replyToFirstComment(env) {
             // replies가 있으면 이미 대댓글 달린 것
             if (comment.replies?.data?.length > 0) continue;
             // 내 댓글이면 스킵 (첫 댓글로 달은 것)
-            if (comment.username === (acc.lang === "ja" ? "rin_fonday" : "beauty_jisoo23")) continue;
+            if (comment.username === (acc.lang === "ja" ? "rin_fonday" : acc.lang === "b2b" ? "fonday_pro" : "beauty_jisoo23")) continue;
 
             // 유저 댓글 발견 — 대댓글 달기
             await fetch(
@@ -544,6 +553,11 @@ function getFirstComment(format, lang) {
       single: "共感したら、お友達にもシェアしてみてください 💌",
       newsletter: "今日のスキンケアの参考に、保存しておくと便利ですよ 📌",
     },
+    b2b: {
+      carousel: "원장님, 도움이 되셨다면 저장해두세요! 궁금한 점은 DM 주세요 📌",
+      single: "공감되면 주변 원장님에게 공유해주세요 💡",
+      newsletter: "오늘의 운영 팁, 나중에 보려면 저장해두세요 📋",
+    },
   };
   const langComments = comments[lang] || comments.ko;
   return langComments[format] || langComments.carousel;
@@ -551,10 +565,10 @@ function getFirstComment(format, lang) {
 
 // ─── 인스타 자동 게시 (한국/일본 공용) ──────────────────────────────────────────
 async function publishScheduledInsta(env, scheduledTime, lang) {
-  const prefix = lang === "ja" ? "[insta-ja]" : "[insta-ko]";
-  const tokenKey = lang === "ja" ? "IG_ACCESS_TOKEN_JA" : "IG_ACCESS_TOKEN";
-  const userIdKey = lang === "ja" ? "IG_USER_ID_JA" : "IG_USER_ID";
-  const table = lang === "ja" ? "insta_content_ja" : "insta_content";
+  const prefix = lang === "b2b" ? "[insta-b2b]" : lang === "ja" ? "[insta-ja]" : "[insta-ko]";
+  const tokenKey = lang === "b2b" ? "IG_ACCESS_TOKEN_B2B" : lang === "ja" ? "IG_ACCESS_TOKEN_JA" : "IG_ACCESS_TOKEN";
+  const userIdKey = lang === "b2b" ? "IG_USER_ID_B2B" : lang === "ja" ? "IG_USER_ID_JA" : "IG_USER_ID";
+  const table = lang === "b2b" ? "insta_content_b2b" : lang === "ja" ? "insta_content_ja" : "insta_content";
 
   try {
     const token = env[tokenKey];
