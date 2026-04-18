@@ -128,3 +128,47 @@ QA 모드에서는 DESIGN.md와 맞지 않는 코드를 플래그할 것.
 - `cd /Users/sangwan/fondayai &&` 없이 `git add functions/` 실행 시 경로 오류 → 항상 절대경로 또는 워킹 디렉토리 확인
 - `dist/` 파일은 빌드 결과물이므로 직접 편집 금지
 - `PROJECT.md` 하단 `.env` 예시의 `JWT_SECRET=fonday-secret-key`는 문서 예시일 뿐 — 실제 코드에 이 값 하드코딩 금지
+
+
+<!-- AUTOPUS:BEGIN -->
+# Autopus-ADK Harness
+
+> 이 섹션은 Autopus-ADK에 의해 자동 생성됩니다. 수동으로 편집하지 마세요.
+
+- **프로젝트**: fondayai
+- **모드**: full
+- **플랫폼**: claude-code, codex, gemini-cli
+
+## 설치된 구성 요소
+
+- Rules: .claude/rules/autopus/
+- Skills: .claude/skills/autopus/
+- Commands: .claude/skills/auto/SKILL.md
+- Agents: .claude/agents/autopus/
+
+## Language Policy
+
+IMPORTANT: Follow these language settings strictly for all work in this project.
+
+- **Code comments**: Write all code comments, docstrings, and inline documentation in English (en)
+- **Commit messages**: Write all git commit messages in Korean (ko)
+- **AI responses**: Respond to the user in Korean (ko)
+
+## Core Guidelines
+
+### Subagent Delegation
+
+IMPORTANT: Use subagents for complex tasks that modify 3+ files, span multiple domains, or exceed 200 lines of new code. Define clear scope, provide full context, review output before integrating.
+
+### File Size Limit
+
+IMPORTANT: No source code file may exceed 300 lines. Target under 200 lines. Split by type, concern, or layer when approaching the limit. Excluded: generated files (*_generated.go, *.pb.go), documentation (*.md), and config files (*.yaml, *.json).
+
+### Code Review
+
+During review, verify:
+- No file exceeds 300 lines (REQUIRED)
+- Complex changes use subagent delegation (SUGGESTED)
+- See .claude/rules/autopus/ for detailed guidelines
+
+<!-- AUTOPUS:END -->

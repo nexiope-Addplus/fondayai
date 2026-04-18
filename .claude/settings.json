@@ -1,5 +1,39 @@
 {
+  "enabledPlugins": {
+    "figma@claude-plugins-official": true,
+    "impeccable@impeccable": true
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "hooks": [
+          {
+            "command": "auto react check --quiet",
+            "timeout": 60,
+            "type": "command"
+          }
+        ],
+        "matcher": "Bash"
+      }
+    ],
+    "PreToolUse": [
+      {
+        "hooks": [
+          {
+            "command": "auto check --arch --quiet --warn-only",
+            "timeout": 30,
+            "type": "command"
+          }
+        ],
+        "matcher": "Bash"
+      }
+    ]
+  },
   "permissions": {
+    "additionalDirectories": [
+      "/Users/sangwan/fondayai/s/\"aiComment\": \"FondayAI 의 피부 총평\"/\"aiComment\": \"Fonday 피부 총평\"",
+      "/Users/sangwan/fondayai/https:/cdn.jsdelivr.net/npm/@aspect-build"
+    ],
     "allow": [
       "Bash(git merge:*)",
       "Bash(git checkout:*)",
@@ -114,22 +148,46 @@
       "WebFetch(domain:koreaexperience.com)",
       "Bash(curl -s -X POST https://dev.fondayai.com/api/admin/d1-migrate5 -H \"Content-Type: application/json\" -d '{\"\"key\"\":\"\"'\"$FONDAY_ADMIN_KEY\"'\"\"}')",
       "Bash(ls /Users/sangwan/fondayai/.env*)",
-      "Bash(curl -s \"https://dev.fondayai.com/api/product-recommend?baumann=DSPT&limit=3\")",
-      "Bash(curl -s \"https://dev.fondayai.com/api/product-recommend?baumann=DSPT&limit=12\")",
-      "Bash(curl -s \"https://dev.fondayai.com/api/product-recommend?baumann=ORPW&limit=8\")",
-      "Bash(curl -s \"https://dev.fondayai.com/api/product-recommend?baumann=DSPT&limit=2\")",
-      "Bash(curl -s \"https://dev.fondayai.com/api/product-recommend?baumann=DSPT&limit=15\")",
-      "Bash(curl -s \"https://dev.fondayai.com/api/product-recommend?baumann=ORPW&limit=10\")",
-      "Bash(curl -s \"https://dev.fondayai.com/api/product-recommend?baumann=OSNT&limit=10\")",
-      "WebFetch(domain:link.coupang.com)"
-    ],
-    "additionalDirectories": [
-      "/Users/sangwan/fondayai/s/\"aiComment\": \"FondayAI 의 피부 총평\"/\"aiComment\": \"Fonday 피부 총평\"",
-      "/Users/sangwan/fondayai/https:/cdn.jsdelivr.net/npm/@aspect-build"
+      "Bash(curl -s \"https://dev.fondayai.com/api/product-recommend?baumann=DSPT\u0026limit=3\")",
+      "Bash(curl -s \"https://dev.fondayai.com/api/product-recommend?baumann=DSPT\u0026limit=12\")",
+      "Bash(curl -s \"https://dev.fondayai.com/api/product-recommend?baumann=ORPW\u0026limit=8\")",
+      "Bash(curl -s \"https://dev.fondayai.com/api/product-recommend?baumann=DSPT\u0026limit=2\")",
+      "Bash(curl -s \"https://dev.fondayai.com/api/product-recommend?baumann=DSPT\u0026limit=15\")",
+      "Bash(curl -s \"https://dev.fondayai.com/api/product-recommend?baumann=ORPW\u0026limit=10\")",
+      "Bash(curl -s \"https://dev.fondayai.com/api/product-recommend?baumann=OSNT\u0026limit=10\")",
+      "WebFetch(domain:link.coupang.com)",
+      "Bash(auto *)",
+      "Bash(auto:*)",
+      "Bash(git *)",
+      "Bash(git:*)",
+      "Bash(make:*)",
+      "Bash(ls:*)",
+      "Bash(cat:*)",
+      "Bash(find:*)",
+      "Bash(grep:*)",
+      "Bash(wc:*)",
+      "Bash(sort:*)",
+      "Bash(mkdir:*)",
+      "Bash(echo:*)",
+      "Bash(gh:*)",
+      "mcp__sequential-thinking__sequentialthinking",
+      "Agent",
+      "AskUserQuestion",
+      "TaskCreate",
+      "TaskUpdate",
+      "TeamCreate",
+      "SendMessage",
+      "ToolSearch",
+      "Bash(npm *)",
+      "Bash(npx *)",
+      "Bash(node *)",
+      "Bash(pnpm *)",
+      "Bash(yarn *)"
     ]
   },
-  "enabledPlugins": {
-    "figma@claude-plugins-official": true,
-    "impeccable@impeccable": true
+  "statusLine": {
+    "command": ".claude/statusline.sh",
+    "padding": 1,
+    "type": "command"
   }
 }

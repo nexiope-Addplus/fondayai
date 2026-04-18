@@ -1,0 +1,25 @@
+---
+description: "Autopus 명령 라우터 — plan/go/fix/review/sync/canary/idea 서브커맨드를 해석합니다"
+---
+
+# auto — Autopus Command Router
+
+**프로젝트**: fondayai | **모드**: full
+
+사용자가 `@auto <subcommand> ...` 형태로 호출했다고 가정하고 첫 토큰을 해석합니다.
+
+가능하면 `.agents/skills/auto/SKILL.md`의 최신 라우터 규칙을 우선 따르세요. 이 프롬프트는 얇은 진입점이며, 플래그 의미(`--auto`, `--loop`, `--multi`, `--quality`, `--team`, `--solo`)를 축약해서 덮어쓰면 안 됩니다.
+
+지원 서브커맨드:
+- `plan`: SPEC 작성 워크플로우
+- `go`: SPEC 구현 워크플로우
+- `fix`: 버그 수정 워크플로우
+- `review`: 코드 리뷰 워크플로우
+- `sync`: 문서 동기화 워크플로우
+- `canary`: 배포 후 상태 점검 워크플로우
+- `idea`: 아이디어 브레인스토밍 워크플로우
+
+규칙:
+- 첫 토큰이 없는 경우, 사용자의 의도를 위 7개 중 하나로 분류해서 진행합니다.
+- 가능하면 같은 이름의 상세 스킬/프롬프트(`auto-plan`, `auto-go`, `auto-fix`, `auto-review`, `auto-sync`, `auto-canary`, `auto-idea`) 의미를 따릅니다.
+- 지원하지 않는 서브커맨드면 지원 목록을 짧게 안내하고 가장 가까운 워크플로우를 제안합니다.

@@ -1,0 +1,41 @@
+---
+description: "SPEC 구현 — SPEC 문서를 기반으로 코드를 구현합니다"
+---
+
+# auto-go — SPEC 구현
+
+**프로젝트**: fondayai | **모드**: full
+
+## 사용법
+
+SPEC-ID를 인자로 받아 구현을 실행합니다.
+
+공통 플래그 의미는 `@auto go ...` 라우터를 우선합니다:
+- `--continue`
+- `--team`
+- `--solo`
+- `--auto`
+- `--loop`
+- `--multi`
+- `--quality <mode>`
+
+## 구현 절차
+
+1. RED: 실패 테스트 작성
+2. GREEN: 최소 구현으로 통과
+3. REFACTOR: 코드 개선
+
+## 품질 기준
+
+- 테스트 커버리지: 85%+
+- LSP 에러: 0
+- 린트 에러: 0
+- 파일 크기 제한: 소스 파일 300줄 이하
+
+## 실패 시
+
+- `--continue` 플래그로 중단점에서 재개
+- 개별 이슈는 `auto-fix`로 수정
+- Codex의 기본 구현 모드는 `spawn_agent(...)` 기반 subagent pipeline입니다
+- `--team`은 future native multi-agent surface를 위한 reserved compatibility flag입니다
+- `--multi`는 reviewer/security-auditor/orchestra 기반 추가 검증을 요청하는 의미입니다

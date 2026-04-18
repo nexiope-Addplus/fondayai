@@ -93,7 +93,17 @@ export async function getUserFromCookie(
   // 2) 쿠키 (웹)
   const cookie = request.headers.get("Cookie") || "";
   const match = cookie.split(";").find((c) => c.trim().startsWith("fonday_session="));
-  if (!match) return null;
-  const token = match.split("=").slice(1).join("=").trim();
-  return verifyJWT(token, secret);
+  if (match) {
+    const token = match.split("=").slice(1).join("=").trim();
+    const user = await verifyJWT(token, secret);
+    if (user) return user;
+  }
+
+  // 3) 토스 미니앱 유저 (getAnonymousKey hash)
+  const tossHash = request.headers.get("X-Toss-User");
+  if (tossHash && tossHash.length >= 8) {
+    return { id: `toss_${tossHash}`, provider: "toss", username: "토스 사용자" };
+  }
+
+  return null;
 }

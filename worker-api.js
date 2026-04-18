@@ -377,14 +377,14 @@ export default {
       // GitHub Actions: .github/workflows/morning-magazine.yml (UTC 21:00 크론)
       console.log("[cron] KST 06:00 — 매거진 생성은 GitHub Actions에서 실행");
     } else if (hour === 22) {
-      // KST 07:00 — 스캔/날씨 + 인스타 오전(한국+일본)
-      ctx.waitUntil(Promise.all([
-        sendScanReminderToAll(env),
-        sendWeatherCarePushToAll(env),
-        publishScheduledInsta(env, "07:00", "ko"),
-        publishScheduledInsta(env, "07:00", "ja"),
-        publishScheduledInsta(env, "07:00", "b2b"),
-      ]));
+      // KST 07:00 — 스캔/날씨 + 인스타 오전(한국+일본+b2b)
+      // Insta publish runs sequentially to avoid Meta API rate limits
+      ctx.waitUntil((async () => {
+        await Promise.all([sendScanReminderToAll(env), sendWeatherCarePushToAll(env)]);
+        await publishScheduledInsta(env, "07:00", "ko");
+        await publishScheduledInsta(env, "07:00", "ja");
+        await publishScheduledInsta(env, "07:00", "b2b");
+      })());
     } else if (hour === 23) {
       // KST 08:00 — 스레드 아침
       ctx.waitUntil(publishScheduledThreads(env, "08:00"));
@@ -398,14 +398,13 @@ export default {
       // KST 10:00 — UV 케어
       ctx.waitUntil(sendUVCarePushToAll(env));
     } else if (hour === 3) {
-      // KST 12:00 — 점심 + 인스타 무드카드(한국+일본) + 스레드
-      ctx.waitUntil(Promise.all([
-        sendMealPushToAll(env, "lunch"),
-        publishScheduledInsta(env, "12:00", "ko"),
-        publishScheduledInsta(env, "12:00", "ja"),
-        publishScheduledInsta(env, "12:00", "b2b"),
-        publishScheduledThreads(env, "12:00"),
-      ]));
+      // KST 12:00 — 점심 + 인스타 무드카드(한국+일본+b2b) + 스레드
+      ctx.waitUntil((async () => {
+        await Promise.all([sendMealPushToAll(env, "lunch"), publishScheduledThreads(env, "12:00")]);
+        await publishScheduledInsta(env, "12:00", "ko");
+        await publishScheduledInsta(env, "12:00", "ja");
+        await publishScheduledInsta(env, "12:00", "b2b");
+      })());
     } else if (hour === 5) {
       // KST 14:00 — 스레드 무드카드(이미지)
       ctx.waitUntil(publishScheduledThreads(env, "14:00"));
@@ -422,13 +421,13 @@ export default {
         publishScheduledThreads(env, "18:00"),
       ]));
     } else if (hour === 11) {
-      // KST 20:00 — 인스타 저녁(한국+일본) + 루틴 리마인더
-      ctx.waitUntil(Promise.all([
-        publishScheduledInsta(env, "20:00", "ko"),
-        publishScheduledInsta(env, "20:00", "ja"),
-        publishScheduledInsta(env, "20:00", "b2b"),
-        sendRoutineReminderToAll(env, 20),
-      ]));
+      // KST 20:00 — 인스타 저녁(한국+일본+b2b) + 루틴 리마인더
+      ctx.waitUntil((async () => {
+        await sendRoutineReminderToAll(env, 20);
+        await publishScheduledInsta(env, "20:00", "ko");
+        await publishScheduledInsta(env, "20:00", "ja");
+        await publishScheduledInsta(env, "20:00", "b2b");
+      })());
     } else if (hour === 12) {
       // KST 21:00 — 스레드 + 루틴 리마인더 + 대댓글 체크
       ctx.waitUntil(Promise.all([
@@ -585,89 +584,105 @@ async function publishScheduledInsta(env, scheduledTime, lang) {
 
     if (!rows.results?.length) { console.log(`${prefix} ${dateStr} ${scheduledTime} 게시할 콘텐츠 없음`); return; }
 
-    for (const row of rows.results) {
-      try {
-        const imageUrls = JSON.parse(row.image_urls || "[]");
-        if (imageUrls.length === 0) { console.warn(`${prefix} id=${row.id} 이미지 없음, 스킵`); continue; }
+    // Publish a single row to Instagram with retries
+    async function publishOneRow(row) {
+      const imageUrls = JSON.parse(row.image_urls || "[]");
+      if (imageUrls.length === 0) { console.warn(`${prefix} id=${row.id} 이미지 없음, 스킵`); return; }
+      const hashtags = JSON.parse(row.hashtags || "[]");
+      const fullCaption = `${row.caption}\n\n${hashtags.join(" ")}`;
 
-        const hashtags = JSON.parse(row.hashtags || "[]");
-        const fullCaption = `${row.caption}\n\n${hashtags.join(" ")}`;
-        let publishId;
+      // Attempt publish with exponential backoff: 15s, 30s, 60s
+      const delays = [15000, 30000, 60000];
+      const errors = [];
 
-        if (imageUrls.length === 1) {
-          // 단일 이미지
-          const res = await fetch(`https://graph.instagram.com/v21.0/${userId}/media`, {
-            method: "POST", headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ image_url: imageUrls[0], caption: fullCaption, access_token: token }),
-          });
-          const data = await res.json();
-          if (data.error) throw new Error(data.error.message);
-          await new Promise(r => setTimeout(r, 5000));
-          const pubRes = await fetch(`https://graph.instagram.com/v21.0/${userId}/media_publish`, {
-            method: "POST", headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ creation_id: data.id, access_token: token }),
-          });
-          const pubData = await pubRes.json();
-          if (pubData.error) throw new Error(pubData.error.message);
-          publishId = pubData.id;
-        } else {
-          // 캐러셀
-          const containerIds = [];
-          for (const imgUrl of imageUrls) {
+      for (let attempt = 0; attempt <= delays.length; attempt++) {
+        try {
+          let publishId;
+          if (imageUrls.length === 1) {
             const res = await fetch(`https://graph.instagram.com/v21.0/${userId}/media`, {
               method: "POST", headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ image_url: imgUrl, is_carousel_item: true, access_token: token }),
+              body: JSON.stringify({ image_url: imageUrls[0], caption: fullCaption, access_token: token }),
             });
             const data = await res.json();
             if (data.error) throw new Error(data.error.message);
-            containerIds.push(data.id);
-          }
-          const carRes = await fetch(`https://graph.instagram.com/v21.0/${userId}/media`, {
-            method: "POST", headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ media_type: "CAROUSEL", children: containerIds.join(","), caption: fullCaption, access_token: token }),
-          });
-          const carData = await carRes.json();
-          if (carData.error) throw new Error(carData.error.message);
-          // 상태 확인
-          for (let i = 0; i < 10; i++) {
-            const sRes = await fetch(`https://graph.instagram.com/v21.0/${carData.id}?fields=status_code&access_token=${token}`);
-            const sData = await sRes.json();
-            if (sData.status_code === "FINISHED") break;
-            if (sData.status_code === "ERROR") throw new Error("컨테이너 에러");
             await new Promise(r => setTimeout(r, 5000));
-          }
-          const pubRes = await fetch(`https://graph.instagram.com/v21.0/${userId}/media_publish`, {
-            method: "POST", headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ creation_id: carData.id, access_token: token }),
-          });
-          const pubData = await pubRes.json();
-          if (pubData.error) throw new Error(pubData.error.message);
-          publishId = pubData.id;
-        }
-
-        await env.FONDAY_DB.prepare(
-          `UPDATE ${table} SET status = 'published', published_at = datetime('now'), ig_media_id = ? WHERE id = ?`
-        ).bind(publishId, row.id).run();
-        console.log(`${prefix} ✅ id=${row.id} 게시 완료! ig_media_id=${publishId}`);
-
-        // 첫 댓글 자동 달기
-        try {
-          const format = row.format || "carousel";
-          const firstComment = getFirstComment(format, lang);
-          if (firstComment) {
-            await fetch(`https://graph.instagram.com/v21.0/${publishId}/comments`, {
+            const pubRes = await fetch(`https://graph.instagram.com/v21.0/${userId}/media_publish`, {
               method: "POST", headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ message: firstComment, access_token: token }),
+              body: JSON.stringify({ creation_id: data.id, access_token: token }),
             });
-            console.log(`${prefix} 💬 첫 댓글: "${firstComment.slice(0, 30)}..."`);
+            const pubData = await pubRes.json();
+            if (pubData.error) throw new Error(pubData.error.message);
+            publishId = pubData.id;
+          } else {
+            const containerIds = [];
+            for (const imgUrl of imageUrls) {
+              const res = await fetch(`https://graph.instagram.com/v21.0/${userId}/media`, {
+                method: "POST", headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ image_url: imgUrl, is_carousel_item: true, access_token: token }),
+              });
+              const data = await res.json();
+              if (data.error) throw new Error(data.error.message);
+              containerIds.push(data.id);
+            }
+            const carRes = await fetch(`https://graph.instagram.com/v21.0/${userId}/media`, {
+              method: "POST", headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ media_type: "CAROUSEL", children: containerIds.join(","), caption: fullCaption, access_token: token }),
+            });
+            const carData = await carRes.json();
+            if (carData.error) throw new Error(carData.error.message);
+            for (let i = 0; i < 10; i++) {
+              const sRes = await fetch(`https://graph.instagram.com/v21.0/${carData.id}?fields=status_code&access_token=${token}`);
+              const sData = await sRes.json();
+              if (sData.status_code === "FINISHED") break;
+              if (sData.status_code === "ERROR") throw new Error("컨테이너 에러");
+              await new Promise(r => setTimeout(r, 5000));
+            }
+            const pubRes = await fetch(`https://graph.instagram.com/v21.0/${userId}/media_publish`, {
+              method: "POST", headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ creation_id: carData.id, access_token: token }),
+            });
+            const pubData = await pubRes.json();
+            if (pubData.error) throw new Error(pubData.error.message);
+            publishId = pubData.id;
           }
-        } catch (commentErr) {
-          console.warn(`${prefix} 첫 댓글 실패:`, commentErr.message);
+
+          await env.FONDAY_DB.prepare(
+            `UPDATE ${table} SET status = 'published', published_at = datetime('now'), ig_media_id = ? WHERE id = ?`
+          ).bind(publishId, row.id).run();
+          console.log(`${prefix} ✅ id=${row.id} 게시 완료! (시도 ${attempt + 1}) ig_media_id=${publishId}`);
+
+          // First comment
+          try {
+            const format = row.format || "carousel";
+            const firstComment = getFirstComment(format, lang);
+            if (firstComment) {
+              await fetch(`https://graph.instagram.com/v21.0/${publishId}/comments`, {
+                method: "POST", headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ message: firstComment, access_token: token }),
+              });
+              console.log(`${prefix} 💬 첫 댓글: "${firstComment.slice(0, 30)}..."`);
+            }
+          } catch (commentErr) {
+            console.warn(`${prefix} 첫 댓글 실패:`, commentErr.message);
+          }
+          return; // success
+        } catch (err) {
+          errors.push(err.message);
+          if (attempt < delays.length) {
+            const delay = delays[attempt];
+            console.warn(`${prefix} id=${row.id} 시도 ${attempt + 1} 실패: ${err.message} → ${delay / 1000}초 후 재시도`);
+            await new Promise(r => setTimeout(r, delay));
+          }
         }
-      } catch (err) {
-        console.error(`${prefix} id=${row.id} 실패:`, err.message);
-        await env.FONDAY_DB.prepare(`UPDATE ${table} SET status = 'failed' WHERE id = ?`).bind(row.id).run();
       }
+      // All retries exhausted
+      const errMsg = errors.map((e, i) => `${i + 1}: ${e}`).join(" | ");
+      console.error(`${prefix} id=${row.id} 최종 실패:`, errMsg);
+      await env.FONDAY_DB.prepare(`UPDATE ${table} SET status = 'failed', hook_sub = ? WHERE id = ?`).bind(errMsg.slice(0, 500), row.id).run();
+    }
+
+    for (const row of rows.results) {
+      await publishOneRow(row);
     }
   } catch (err) { console.error(`${prefix} error:`, err); }
 }
