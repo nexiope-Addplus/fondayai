@@ -153,7 +153,13 @@
     "quickScan": "Scan Your Skin Now",
     "quickScanSub": "Takes 30 seconds · Free",
     "rescan": "Scan Today",
-    "effectBoard": "Score Change Tracker"
+    "effectBoard": "Score Change Tracker",
+    "adPromptTitle": "You've used all free scans today",
+    "adPromptDesc": "Watch a short ad to get 1 more scan",
+    "adPromptBtn": "Watch Ad & Scan",
+    "adPromptLoading": "Loading ad...",
+    "scanRemaining": "{{n}} scans left today",
+    "shareScanBonus": "Shared! +1 scan added"
   },
   "camera": {
     "noCamera": "Camera unavailable. Please select a photo instead.",
@@ -531,10 +537,10 @@
     "line": "Save with LINE",
     "google": "Save with Google",
     "later": "Later",
-    "totalPoints": "Total {{n}}pts",
+    "totalPoints": "Total {{n}}P",
     "calendarTitle": "Attendance Calendar",
     "thisMonth": "{{n}} days this month",
-    "calendarBadge": "🗓 {{n}}pts",
+    "calendarBadge": "🗓 {{n}}P",
     "checkIn": "Check In",
     "alreadyChecked": "Checked in today ✓",
     "close": "Close"

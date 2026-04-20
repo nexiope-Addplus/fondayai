@@ -167,12 +167,17 @@ export function markChallengeUsed() {
   saveMissions(state);
 }
 
-/** 결과 공유 시 호출 — share 미션 완료 + 토스 포인트 지급 */
+/** 결과 공유 시 호출 — share 미션 완료 + 토스 포인트 지급 + 스캔 1회 추가 */
 export function markShareUsed(): string[] {
   const state = getMissions();
   const newlyCompleted: string[] = [];
   if (completeMission(state, "share")) newlyCompleted.push("share");
   saveMissions(state);
+  // 공유 시 스캔 1회 추가 (토스 미니앱)
+  try {
+    const { addScanCredit } = require("./TossAd");
+    if (isTossMiniApp()) addScanCredit();
+  } catch {}
   return newlyCompleted;
 }
 

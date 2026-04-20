@@ -4,6 +4,7 @@ import i18n from "../i18n";
 import { motion, AnimatePresence } from "framer-motion";
 import { AlertCircle, SmartphoneNfc } from "lucide-react";
 import { isTossMiniApp, apiBase, appFetch } from "../components/fonday/utils";
+import { useInterstitialAd } from "../components/fonday/TossAd";
 import type { TabId, ScanState, SurveyData, AnalysisResult } from "../components/fonday/types";
 import {
   todayStr, getStreak, getAttendance,
@@ -82,6 +83,10 @@ export default function SkinScanPage() {
   const justLoggedInRef = useRef(false);
 
   const { trackEvent } = useAnalytics(i18n.language, !user);
+
+  // Interstitial ad — preload, show during scan analysis
+  const interstitialAd = useInterstitialAd();
+  useEffect(() => { if (isTossMiniApp()) interstitialAd.load(); }, []);
 
   const TAB_ORDER: TabId[] = ["scan", "routine", "diary", "my"];
   const tabDirection = TAB_ORDER.indexOf(activeTab) >= TAB_ORDER.indexOf(prevTabRef.current) ? 1 : -1;
@@ -284,6 +289,8 @@ export default function SkinScanPage() {
     setSurveyData(data);
     setScanState("scanning");
     trackEvent("scan_start", { gender: data.gender, age: data.age });
+    // Show interstitial ad during analysis (2nd+ scan)
+    if (isTossMiniApp() && analysisResult) interstitialAd.show();
     if (!imageFile) return;
 
     // base64가 아직 준비되지 않았으면 대기

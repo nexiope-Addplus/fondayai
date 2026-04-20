@@ -153,7 +153,13 @@
     "quickScan": "今すぐ肌をスキャン",
     "quickScanSub": "30秒で完了 · 完全無料",
     "rescan": "今日の肌をスキャン",
-    "effectBoard": "スコア変化トラッカー"
+    "effectBoard": "スコア変化トラッカー",
+    "adPromptTitle": "今日の無料スキャンを全て使いました",
+    "adPromptDesc": "短い広告を見ると1回追加スキャンできます",
+    "adPromptBtn": "広告を見てスキャン",
+    "adPromptLoading": "広告準備中...",
+    "scanRemaining": "今日あと{{n}}回",
+    "shareScanBonus": "シェア完了！スキャン1回追加"
   },
   "camera": {
     "noCamera": "カメラが使えません。写真を選んでください。",
@@ -531,10 +537,10 @@
     "line": "LINEで保存する",
     "google": "Googleで保存する",
     "later": "あとで",
-    "totalPoints": "累計 {{n}}ウォン",
+    "totalPoints": "累計 {{n}}P",
     "calendarTitle": "出席カレンダー",
     "thisMonth": "今月 {{n}}日出席",
-    "calendarBadge": "🗓 {{n}}ウォン",
+    "calendarBadge": "🗓 {{n}}P",
     "checkIn": "チェックイン",
     "alreadyChecked": "今日の出席完了 ✓",
     "close": "閉じる"

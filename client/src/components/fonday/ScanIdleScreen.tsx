@@ -37,7 +37,7 @@ import type { WeatherData, WeatherTipKey } from "./types";
 import { getStreak, getDaysSinceLastScan, getWeatherTipKey, buildCosmeticCorrelationSignals, todayStr, haptic, isTossMiniApp, apiBase, appFetch } from "./utils";
 // AttendanceCalendarModal은 MY탭에서만 사용
 import { WeatherTipCard } from "./WeatherTipCard";
-// import { TossBannerAd } from "./TossAd"; // 광고 — 사업자 등록 후 활성화
+import { TossBannerAd, getRemainingScans, useScanCredit, addScanCredit, useRewardedAd } from "./TossAd";
 import { LangSwitcher } from "./BottomNav";
 
 // ─── 메인 스캔 화면 ───────────────────────────────────────────────
@@ -60,6 +60,36 @@ export function ScanIdleScreen({
   const streak = getStreak();
   const daysSince = getDaysSinceLastScan();
   const [showBaumannExp, setShowBaumannExp] = useState(false);
+  const [showAdPrompt, setShowAdPrompt] = useState(false);
+  const [remaining, setRemaining] = useState(() => getRemainingScans());
+  const rewardedAd = useRewardedAd();
+
+  // Preload rewarded ad for Toss
+  useEffect(() => { if (isToss) rewardedAd.load(); }, [isToss]);
+
+  const handleScanWithQuota = () => {
+    if (!isToss) { onScan(); return; }
+    if (useScanCredit()) {
+      setRemaining(getRemainingScans());
+      onScan();
+    } else {
+      setShowAdPrompt(true);
+    }
+  };
+
+  const handleWatchAd = () => {
+    setShowAdPrompt(false);
+    rewardedAd.show();
+  };
+
+  // Rewarded ad callback — add credit when user earns reward
+  useEffect(() => {
+    if (rewardedAd.rewarded) {
+      addScanCredit();
+      setRemaining(getRemainingScans());
+      onScan();
+    }
+  }, [rewardedAd.rewarded]);
   const [pullY, setPullY] = useState(0);
   const [idleWeather, setIdleWeather] = useState<WeatherData | null>(null);
   const [latestScan, setLatestScan] = useState<any | null>(null);
@@ -324,7 +354,7 @@ export function ScanIdleScreen({
 
           {/* CTA — pill 형태, 부드러운 Salmon */}
           <motion.button
-            onClick={() => { haptic("medium"); onScan(); }}
+            onClick={() => { haptic("medium"); handleScanWithQuota(); }}
             className="w-full text-white text-[15px] font-semibold flex items-center justify-center gap-2"
             style={{
               background: "#C97062",
@@ -335,7 +365,7 @@ export function ScanIdleScreen({
             whileHover={{ scale: reducedMotion ? 1 : 1.02 }}
             whileTap={{ scale: reducedMotion ? 1 : 0.96, y: reducedMotion ? 0 : 2 }}
           >
-            {isToss ? t("idle.tossCtaBtn") : t("idle.ctaBtn")}
+            {isToss ? `${t("idle.tossCtaBtn")} (${remaining}/3)` : t("idle.ctaBtn")}
           </motion.button>
           <p className="text-center text-[12px] mt-4" style={{ color: TEXT_TERTIARY }}>
             {isToss ? t("idle.tossCtaHint") : t("idle.ctaHint")}
@@ -395,12 +425,12 @@ export function ScanIdleScreen({
 
             {/* 재스캔 버튼 — 점수 바로 아래 */}
             <button
-              onClick={() => { haptic("medium"); onScan(); }}
+              onClick={() => { haptic("medium"); handleScanWithQuota(); }}
               className="w-full flex items-center justify-center gap-2 text-[14px] font-semibold active:opacity-80 transition-opacity mt-4"
               style={{ background: `${DEEP_GREEN}10`, color: DEEP_GREEN, height: 48, borderRadius: 24 }}
             >
               <Camera className="w-4 h-4" />
-              {t("idle.rescan", "오늘의 피부 스캔하기")}
+              {isToss ? t("idle.rescan", "오늘의 피부 스캔하기") + ` (${remaining}/3)` : t("idle.rescan", "오늘의 피부 스캔하기")}
             </button>
           </div>
         )}
@@ -477,7 +507,52 @@ export function ScanIdleScreen({
 
       {/* 재스캔 버튼은 점수 바로 아래로 이동됨 */}
 
+      {/* 배너 광고 (토스 미니앱) */}
+      {isToss && <TossBannerAd className="mb-4 rounded-2xl overflow-hidden" />}
+
     </motion.div>
+
+    {/* 광고 시청 프롬프트 (토스 — 스캔 횟수 소진 시) */}
+    <AnimatePresence>
+      {showAdPrompt && (
+        <motion.div
+          className="fixed inset-0 z-[200] flex items-center justify-center"
+          initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+          onClick={() => setShowAdPrompt(false)}
+        >
+          <div className="absolute inset-0 bg-black/40" />
+          <motion.div
+            className="relative bg-white rounded-3xl p-6 mx-6 max-w-sm w-full text-center"
+            initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }}
+            onClick={e => e.stopPropagation()}
+          >
+            <p className="text-lg font-bold mb-2" style={{ color: "#5C4F4A" }}>
+              {t("idle.adPromptTitle", "오늘의 무료 스캔을 모두 사용했어요")}
+            </p>
+            <p className="text-sm mb-5" style={{ color: TEXT_SECONDARY }}>
+              {t("idle.adPromptDesc", "짧은 광고를 보면 1회 추가 스캔할 수 있어요")}
+            </p>
+            <button
+              onClick={handleWatchAd}
+              disabled={!rewardedAd.loaded}
+              className="w-full py-3.5 rounded-2xl font-bold text-white text-[14px] disabled:opacity-50"
+              style={{ background: "#C97062" }}
+            >
+              {rewardedAd.loaded
+                ? t("idle.adPromptBtn", "광고 보고 스캔하기")
+                : t("idle.adPromptLoading", "광고 준비 중...")}
+            </button>
+            <button
+              onClick={() => setShowAdPrompt(false)}
+              className="mt-3 text-sm font-medium"
+              style={{ color: TEXT_TERTIARY }}
+            >
+              {t("common.close", "닫기")}
+            </button>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
     </>
   );
 }

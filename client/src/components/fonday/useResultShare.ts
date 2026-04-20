@@ -42,6 +42,7 @@ export function useResultShare(params: UseResultShareParams): {
         const shareUrl = token ? `https://fondayai.com/share/${token}` : "https://fondayai.com";
         await tossShare({ message: `${shareText}\n${shareUrl}` });
         const pops = markShareUsed();
+        pops.push("scan_bonus");
         if (pops.length) { setMissionPops(pops); setMissionState(getMissions()); }
       } catch (e) {
         console.warn("[share:toss]", e);

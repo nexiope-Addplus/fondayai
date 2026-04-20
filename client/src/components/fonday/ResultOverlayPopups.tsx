@@ -91,8 +91,12 @@ export function ResultOverlayPopups({
             style={{ boxShadow: "0 8px 32px rgba(0,0,0,0.18)" }}
           >
             <Target className="w-6 h-6" />
-            <p className="font-black text-[#5C4F4A] text-[14px]">{t("mission.newAchieve")}</p>
-            <p className="text-[12px] text-stone-500">{t(`mission.${missionPops[0]}`)}</p>
+            <p className="font-black text-[#5C4F4A] text-[14px]">
+              {missionPops.includes("scan_bonus") ? t("idle.shareScanBonus", "공유 완료! 스캔 1회 추가") : t("mission.newAchieve")}
+            </p>
+            <p className="text-[12px] text-stone-500">
+              {missionPops.filter(p => p !== "scan_bonus")[0] ? t(`mission.${missionPops.filter(p => p !== "scan_bonus")[0]}`) : ""}
+            </p>
           </motion.div>
         )}
       </AnimatePresence>
