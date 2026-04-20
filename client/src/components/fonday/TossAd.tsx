@@ -25,7 +25,9 @@ function getScanQuota(): ScanQuota {
     const raw = localStorage.getItem(SCAN_QUOTA_KEY);
     if (raw) {
       const data = JSON.parse(raw);
-      if (data.date === todayKey()) return data;
+      if (data.date === todayKey()) {
+        return { date: data.date, used: data.used || 0, granted: data.granted || 0 };
+      }
     }
   } catch {}
   return { date: todayKey(), used: 0, granted: 0 };
