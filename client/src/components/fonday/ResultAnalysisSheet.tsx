@@ -2,6 +2,7 @@ import { AnimatePresence, motion, useDragControls } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import { Activity, LayoutGrid, Shield, Sparkles, X, Zap } from "lucide-react";
 import { isTossMiniApp } from "./utils";
+import { TossBannerAd } from "./TossAd";
 
 import {
   BAUMANN_COLORS,
@@ -203,6 +204,12 @@ export function ResultAnalysisSheet({
                   </div>
                 </div>
               </div>
+              {/* 배너 광고 (토스) */}
+              {isTossMiniApp() && (
+                <div className="mt-4 px-4 pb-4">
+                  <TossBannerAd className="rounded-2xl overflow-hidden" />
+                </div>
+              )}
             </div>
           </motion.div>
         </motion.div>

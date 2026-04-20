@@ -1,4 +1,5 @@
-import React, { useState, useRef, useCallback } from "react";
+import React, { useState, useRef, useCallback, useEffect } from "react";
+import { useRewardedAd } from "./TossAd";
 import { useTranslation } from "react-i18next";
 import i18n from "../../i18n";
 import { motion, AnimatePresence } from "framer-motion";
@@ -47,6 +48,27 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
   const [showWaitlist, setShowWaitlist] = useState(false);
   const [showImprovements, setShowImprovements] = useState(false);
   const [showAnalysis, setShowAnalysis] = useState(false);
+  const [analysisUnlocked, setAnalysisUnlocked] = useState(false);
+  const rewardedAd = useRewardedAd();
+
+  // Preload rewarded ad for analysis unlock
+  useEffect(() => { if (isTossMiniApp()) rewardedAd.load(); }, []);
+
+  // When reward earned, unlock and open analysis
+  useEffect(() => {
+    if (rewardedAd.rewarded) {
+      setAnalysisUnlocked(true);
+      setShowAnalysis(true);
+    }
+  }, [rewardedAd.rewarded]);
+
+  // Wrap setShowAnalysis — Toss: reward ad first, then open
+  const handleOpenAnalysis = useCallback((open: boolean) => {
+    if (!open) { setShowAnalysis(false); return; }
+    if (!isTossMiniApp() || analysisUnlocked) { setShowAnalysis(true); return; }
+    // Show rewarded ad — onReward will open the sheet
+    rewardedAd.show();
+  }, [analysisUnlocked, rewardedAd]);
   const [showBaumannInfo, setShowBaumannInfo] = useState(false);
   const [showPartnership, setShowPartnership] = useState(false);
   const [partnerForm, setPartnerForm] = useState({ name: "", company: "", email: "", message: "" });
@@ -216,7 +238,7 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
           finalType={finalType} overallScore={overallScore} scoreDelta={scoreDelta}
           weakestSummary={weakestSummary} rankingData={rankingData} analysisResult={analysisResult}
           currentStreak={currentStreak} showBaumannInfo={showBaumannInfo}
-          setShowBaumannInfo={setShowBaumannInfo} setShowAnalysis={setShowAnalysis}
+          setShowBaumannInfo={setShowBaumannInfo} setShowAnalysis={handleOpenAnalysis}
           previewScoreItems={previewScoreItems}
           previousScores={history.length > 0 ? history[0]?.scores : null}
         />
@@ -351,7 +373,7 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
       />
 
       <ResultModals
-        showAnalysis={showAnalysis} setShowAnalysis={setShowAnalysis}
+        showAnalysis={showAnalysis} setShowAnalysis={handleOpenAnalysis}
         aiComment={analysisResult?.aiComment} scores={scores}
         skinReport={(analysisResult?.skinReport as { area: string; finding: string }[]) ?? []}
         finalType={finalType} showImprovements={showImprovements} setShowImprovements={setShowImprovements}
