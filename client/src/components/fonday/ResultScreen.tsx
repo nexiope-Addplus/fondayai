@@ -1,5 +1,5 @@
 import React, { useState, useRef, useCallback, useEffect } from "react";
-import { useRewardedAd } from "./TossAd";
+import { useRewardedAd, TossBannerAd } from "./TossAd";
 import { useTranslation } from "react-i18next";
 import i18n from "../../i18n";
 import { motion, AnimatePresence } from "framer-motion";
@@ -337,6 +337,13 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
           </motion.div>
         )}
         </AnimatePresence>
+
+        {/* 배너 광고 (토스 — 탭 콘텐츠 하단) */}
+        {isTossMiniApp() && (
+          <div className="px-4 py-3">
+            <TossBannerAd className="rounded-2xl overflow-hidden" />
+          </div>
+        )}
         </div>
       </motion.div>
 
