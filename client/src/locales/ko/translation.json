@@ -163,7 +163,8 @@
     "adPromptBtn": "광고 보고 스캔하기",
     "adPromptLoading": "광고 준비 중...",
     "scanRemaining": "오늘 {{n}}회 남음",
-    "shareScanBonus": "공유 완료! 스캔 1회 추가"
+    "shareScanBonus": "공유 완료! 스캔 1회 추가",
+    "adPromptMaxed": "오늘은 최대 3회까지 스캔할 수 있어요. 내일 다시 만나요!"
   },
   "camera": {
     "noCamera": "카메라를 사용할 수 없어요. 사진으로 선택해 주세요.",

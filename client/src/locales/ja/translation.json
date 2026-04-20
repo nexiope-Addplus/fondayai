@@ -159,7 +159,8 @@
     "adPromptBtn": "広告を見てスキャン",
     "adPromptLoading": "広告準備中...",
     "scanRemaining": "今日あと{{n}}回",
-    "shareScanBonus": "シェア完了！スキャン1回追加"
+    "shareScanBonus": "シェア完了！スキャン1回追加",
+    "adPromptMaxed": "今日は最大3回までスキャンできます。また明日！"
   },
   "camera": {
     "noCamera": "カメラが使えません。写真を選んでください。",

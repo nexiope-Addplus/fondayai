@@ -159,7 +159,8 @@
     "adPromptBtn": "Watch Ad & Scan",
     "adPromptLoading": "Loading ad...",
     "scanRemaining": "{{n}} scans left today",
-    "shareScanBonus": "Shared! +1 scan added"
+    "shareScanBonus": "Shared! +1 scan added",
+    "adPromptMaxed": "You can scan up to 3 times today. See you tomorrow!"
   },
   "camera": {
     "noCamera": "Camera unavailable. Please select a photo instead.",
