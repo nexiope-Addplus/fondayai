@@ -169,16 +169,22 @@ export function TossBannerAd({ className }: { className?: string }) {
     let destroyFn: (() => void) | null = null;
 
     import("@apps-in-toss/web-framework").then(({ TossAds }) => {
-      if (!TossAds.attachBanner.isSupported() || !containerRef.current) return;
-      TossAds.initialize({ appId: "fonday" });
-      const result = TossAds.attachBanner(AD_IDS.banner, containerRef.current, {
-        theme: "light",
-        tone: "grey",
-        variant: "card",
-        onSlotRender: () => setVisible(true),
-        onSlotError: () => setVisible(false),
+      if (!TossAds.initialize.isSupported() || !TossAds.attachBanner.isSupported() || !containerRef.current) return;
+      const el = containerRef.current;
+      TossAds.initialize({
+        callbacks: {
+          onInitialized: () => {
+            if (!el) return;
+            const result = TossAds.attachBanner(AD_IDS.banner, el, {
+              theme: "auto" as any,
+              tone: "grey",
+              variant: "expanded",
+            });
+            if (result) { destroyFn = result.destroy; setVisible(true); }
+          },
+          onInitializationFailed: (err: Error) => console.warn("[BannerAd] init failed:", err),
+        },
       });
-      destroyFn = result.destroy;
     }).catch(() => {});
 
     return () => { destroyFn?.(); };
