@@ -37,7 +37,7 @@ import type { WeatherData, WeatherTipKey } from "./types";
 import { getStreak, getDaysSinceLastScan, getWeatherTipKey, buildCosmeticCorrelationSignals, todayStr, haptic, isTossMiniApp, apiBase, appFetch } from "./utils";
 // AttendanceCalendarModal은 MY탭에서만 사용
 import { WeatherTipCard } from "./WeatherTipCard";
-import { TossBannerAd, getRemainingScans, useScanCredit, addScanCredit, canEarnMoreScans, useRewardedAd } from "./TossAd";
+import { TossBannerAd, getRemainingScans, useScanCredit, addScanCredit, useRewardedAd } from "./TossAd";
 import { LangSwitcher } from "./BottomNav";
 
 // ─── 메인 스캔 화면 ───────────────────────────────────────────────
@@ -72,10 +72,7 @@ export function ScanIdleScreen({
     if (useScanCredit()) {
       setRemaining(getRemainingScans());
       onScan();
-    } else if (canEarnMoreScans()) {
-      setShowAdPrompt(true);
     } else {
-      // max 3 reached — no more today
       setShowAdPrompt(true);
     }
   };
@@ -368,7 +365,7 @@ export function ScanIdleScreen({
             whileHover={{ scale: reducedMotion ? 1 : 1.02 }}
             whileTap={{ scale: reducedMotion ? 1 : 0.96, y: reducedMotion ? 0 : 2 }}
           >
-            {isToss ? `${t("idle.tossCtaBtn")} (${remaining}/3)` : t("idle.ctaBtn")}
+            {isToss ? t("idle.tossCtaBtn") : t("idle.ctaBtn")}
           </motion.button>
           <p className="text-center text-[12px] mt-4" style={{ color: TEXT_TERTIARY }}>
             {isToss ? t("idle.tossCtaHint") : t("idle.ctaHint")}
@@ -433,7 +430,7 @@ export function ScanIdleScreen({
               style={{ background: `${DEEP_GREEN}10`, color: DEEP_GREEN, height: 48, borderRadius: 24 }}
             >
               <Camera className="w-4 h-4" />
-              {isToss ? t("idle.rescan", "오늘의 피부 스캔하기") + ` (${remaining}/3)` : t("idle.rescan", "오늘의 피부 스캔하기")}
+              {t("idle.rescan", "오늘의 피부 스캔하기")}
             </button>
           </div>
         )}
@@ -532,27 +529,19 @@ export function ScanIdleScreen({
             <p className="text-lg font-bold mb-2" style={{ color: "#5C4F4A" }}>
               {t("idle.adPromptTitle", "오늘의 무료 스캔을 모두 사용했어요")}
             </p>
-            {canEarnMoreScans() ? (
-              <>
-                <p className="text-sm mb-5" style={{ color: TEXT_SECONDARY }}>
-                  {t("idle.adPromptDesc", "짧은 광고를 보면 1회 추가 스캔할 수 있어요")}
-                </p>
-                <button
-                  onClick={handleWatchAd}
-                  disabled={!rewardedAd.loaded}
-                  className="w-full py-3.5 rounded-2xl font-bold text-white text-[14px] disabled:opacity-50"
-                  style={{ background: "#C97062" }}
-                >
-                  {rewardedAd.loaded
-                    ? t("idle.adPromptBtn", "광고 보고 스캔하기")
-                    : t("idle.adPromptLoading", "광고 준비 중...")}
-                </button>
-              </>
-            ) : (
-              <p className="text-sm mb-5" style={{ color: TEXT_SECONDARY }}>
-                {t("idle.adPromptMaxed", "오늘은 최대 3회까지 스캔할 수 있어요. 내일 다시 만나요!")}
-              </p>
-            )}
+            <p className="text-sm mb-5" style={{ color: TEXT_SECONDARY }}>
+              {t("idle.adPromptDesc", "짧은 광고를 보면 1회 추가 스캔할 수 있어요")}
+            </p>
+            <button
+              onClick={handleWatchAd}
+              disabled={!rewardedAd.loaded}
+              className="w-full py-3.5 rounded-2xl font-bold text-white text-[14px] disabled:opacity-50"
+              style={{ background: "#C97062" }}
+            >
+              {rewardedAd.loaded
+                ? t("idle.adPromptBtn", "광고 보고 스캔하기")
+                : t("idle.adPromptLoading", "광고 준비 중...")}
+            </button>
             <button
               onClick={() => setShowAdPrompt(false)}
               className="mt-3 text-sm font-medium"

@@ -8,10 +8,8 @@ const AD_IDS = {
   banner: "ait.v2.live.48cb80ceb2544e3e",
 } as const;
 
-// ─── 스캔 횟수 제한 (1회 무료 + 광고/공유로 1회씩 추가, 최대 3회/일) ──
+// ─── 스캔 횟수: 1회 무료, 이후 광고 시청으로 무제한 ─────────────
 const SCAN_QUOTA_KEY = "fonday_scan_quota";
-const FREE_SCANS = 1;
-const MAX_DAILY_SCANS = 3;
 
 function todayKey(): string {
   const d = new Date();
@@ -37,36 +35,24 @@ function saveScanQuota(quota: ScanQuota) {
   try { localStorage.setItem(SCAN_QUOTA_KEY, JSON.stringify(quota)); } catch {}
 }
 
-/** Total available scans = free + granted by ads/shares */
-function totalAvailable(quota: ScanQuota): number {
-  return Math.min(FREE_SCANS + quota.granted, MAX_DAILY_SCANS);
-}
-
-/** Get remaining scans today */
+/** Get remaining scans (1 free + granted) */
 export function getRemainingScans(): number {
   const q = getScanQuota();
-  return Math.max(totalAvailable(q) - q.used, 0);
+  return Math.max(1 + q.granted - q.used, 0);
 }
 
 /** Use one scan credit. Returns false if no credits left. */
 export function useScanCredit(): boolean {
   const quota = getScanQuota();
-  if (quota.used >= totalAvailable(quota)) return false;
+  if (quota.used >= 1 + quota.granted) return false;
   quota.used += 1;
   saveScanQuota(quota);
   return true;
 }
 
-/** Can earn more scans via ad/share? */
-export function canEarnMoreScans(): boolean {
-  const q = getScanQuota();
-  return totalAvailable(q) < MAX_DAILY_SCANS;
-}
-
 /** Add one scan credit from rewarded ad or share */
 export function addScanCredit(): boolean {
   const quota = getScanQuota();
-  if (totalAvailable(quota) >= MAX_DAILY_SCANS) return false;
   quota.granted += 1;
   saveScanQuota(quota);
   return true;
