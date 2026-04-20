@@ -120,43 +120,30 @@ export function useRewardedAd() {
 
 // ─── 전면 광고 (2회차 스캔부터) ──────────────────────────────────
 export function useInterstitialAd() {
-  const [loaded, setLoaded] = useState(false);
-  const cleanupRef = useRef<(() => void) | null>(null);
-
-  const load = useCallback(() => {
-    if (!isTossMiniApp()) return;
-    import("@apps-in-toss/web-framework").then(({ loadFullScreenAd }) => {
-      if (!loadFullScreenAd.isSupported()) return;
-      cleanupRef.current = loadFullScreenAd({
-        options: { adGroupId: AD_IDS.interstitial },
-        onEvent: (e) => {
-          if (e.type === "loaded") setLoaded(true);
-        },
-        onError: (err) => console.warn("[InterstitialAd] load error:", err),
-      });
-    }).catch(() => {});
-  }, []);
-
   const show = useCallback((): Promise<void> => {
-    if (!isTossMiniApp() || !loaded) return Promise.resolve();
+    if (!isTossMiniApp()) return Promise.resolve();
     return new Promise((resolve) => {
-      import("@apps-in-toss/web-framework").then(({ showFullScreenAd }) => {
-        showFullScreenAd({
+      import("@apps-in-toss/web-framework").then(({ loadFullScreenAd, showFullScreenAd }) => {
+        if (!loadFullScreenAd.isSupported()) { resolve(); return; }
+        // load → loaded 이벤트 → show → dismissed 이벤트
+        loadFullScreenAd({
           options: { adGroupId: AD_IDS.interstitial },
           onEvent: (e) => {
-            if (e.type === "dismissed") resolve();
+            if (e.type === "loaded") {
+              showFullScreenAd({
+                options: { adGroupId: AD_IDS.interstitial },
+                onEvent: (ev) => { if (ev.type === "dismissed") resolve(); },
+                onError: () => resolve(),
+              });
+            }
           },
           onError: () => resolve(),
         });
       }).catch(() => resolve());
     });
-  }, [loaded]);
-
-  useEffect(() => {
-    return () => { cleanupRef.current?.(); };
   }, []);
 
-  return { loaded, load, show };
+  return { show };
 }
 
 // ─── 배너 광고 (홈 하단 인라인) ──────────────────────────────────

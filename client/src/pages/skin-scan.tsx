@@ -84,9 +84,8 @@ export default function SkinScanPage() {
 
   const { trackEvent } = useAnalytics(i18n.language, !user);
 
-  // Interstitial ad — preload, show during scan analysis
+  // Interstitial ad — load+show in one call during scan analysis
   const interstitialAd = useInterstitialAd();
-  useEffect(() => { if (isTossMiniApp()) interstitialAd.load(); }, []);
 
   const TAB_ORDER: TabId[] = ["scan", "routine", "diary", "my"];
   const tabDirection = TAB_ORDER.indexOf(activeTab) >= TAB_ORDER.indexOf(prevTabRef.current) ? 1 : -1;
