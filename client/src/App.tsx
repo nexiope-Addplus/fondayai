@@ -23,6 +23,18 @@ function Router() {
   );
 }
 
+// 토스 딥링크 처리: intoss://fonday/share?token=xxx → /share/:token
+(() => {
+  const params = new URLSearchParams(window.location.search);
+  const token = params.get("token");
+  const path = window.location.pathname;
+  if (token && (path === "/" || path === "/skinReport")) {
+    const type = params.get("type") || "share";
+    const target = type === "battle" ? `/battle/${token}` : `/share/${token}`;
+    window.history.replaceState(null, "", target);
+  }
+})();
+
 // 유입 경로 추적 (첫 방문 시 저장)
 if (!sessionStorage.getItem("fonday_ref")) {
   const params = new URLSearchParams(window.location.search);

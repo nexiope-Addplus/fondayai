@@ -361,7 +361,7 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
           const battlePath = `/battle/${currentShareToken}`;
           const shareText = t("result.challengeText", { score: overallScore, type: finalType });
           if (isTossMiniApp()) {
-            const battleDeepLink = `intoss://fonday/battle?token=${currentShareToken}`;
+            const battleDeepLink = `intoss://fonday?token=${currentShareToken}&type=battle`;
             tossShare({ message: `${shareText}\n${getTossShareLink(battleDeepLink)}` }).catch(() => {});
           } else {
             const shareUrl = `${window.location.origin}${battlePath}`;

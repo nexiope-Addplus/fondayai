@@ -39,7 +39,7 @@ export function useResultShare(params: UseResultShareParams): {
       try {
         const shareText = t("result.shareText", { score: overallScore, type: finalType });
         const token = currentShareToken;
-        const deepLink = token ? `intoss://fonday/share?token=${token}` : "intoss://fonday/skinReport";
+        const deepLink = token ? `intoss://fonday?token=${token}&type=share` : "intoss://fonday/skinReport";
         const shareUrl = getTossShareLink(deepLink);
         await tossShare({ message: `${shareText}\n${shareUrl}` });
         const pops = markShareUsed();
