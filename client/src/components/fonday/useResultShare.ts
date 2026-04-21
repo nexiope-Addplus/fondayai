@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import i18n from "../../i18n";
-import { share as tossShare } from "@apps-in-toss/web-framework";
+import { share as tossShare, getTossShareLink } from "@apps-in-toss/web-framework";
 import type { RankingData, MissionState } from "./types";
 import { isTossMiniApp, markShareUsed, getMissions, apiBase, appFetch } from "./utils";
 
@@ -39,8 +39,10 @@ export function useResultShare(params: UseResultShareParams): {
       try {
         const shareText = t("result.shareText", { score: overallScore, type: finalType });
         const token = currentShareToken;
-        const shareUrl = token ? `https://fondayai.com/share/${token}` : "https://fondayai.com";
-        await tossShare({ message: `${shareText}\n${shareUrl}` });
+        const deepLink = token ? `intoss://fonday/skinReport?token=${token}` : "intoss://fonday/skinReport";
+        const ogImage = `https://fondayai.com/api/og-image?score=${overallScore}&type=${finalType}`;
+        const tossLink = await getTossShareLink(deepLink, ogImage);
+        await tossShare({ message: `${shareText}\n${tossLink}` });
         const pops = markShareUsed();
         pops.push("scan_bonus");
         if (pops.length) { setMissionPops(pops); setMissionState(getMissions()); }

@@ -19,7 +19,7 @@ import {
   markChallengeUsed, openContactsViral,
   isTossMiniApp, apiBase, appFetch,
 } from "./utils";
-import { share as tossShare } from "@apps-in-toss/web-framework";
+import { share as tossShare, getTossShareLink } from "@apps-in-toss/web-framework";
 import { ResultActionBar } from "./ResultActionBar";
 import { ResultRoutineTab } from "./ResultRoutineTab";
 import { ResultSolutionTab } from "./ResultSolutionTab";
@@ -361,8 +361,10 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
           const battlePath = `/battle/${currentShareToken}`;
           const shareText = t("result.challengeText", { score: overallScore, type: finalType });
           if (isTossMiniApp()) {
-            const battleUrl = `https://fondayai.com/battle/${currentShareToken}`;
-            tossShare({ message: `${shareText}\n${battleUrl}` }).catch(() => {});
+            const battleDeepLink = `intoss://fonday/skinReport?token=${currentShareToken}&type=battle`;
+            getTossShareLink(battleDeepLink).then((tossLink) => {
+              tossShare({ message: `${shareText}\n${tossLink}` });
+            }).catch(() => {});
           } else {
             const shareUrl = `${window.location.origin}${battlePath}`;
             if (navigator.share) {
