@@ -355,16 +355,17 @@ export function ResultScreen({ surveyData, analysisResult, imageSrc, faceCropped
           sessionStorage.removeItem("battleChallengeToken");
           window.location.href = `/battle/${pendingChallengeToken}`;
         }}
-        onCreateChallenge={() => {
+        onCreateChallenge={async () => {
           if (!currentShareToken) return;
           markChallengeUsed();
           const battlePath = `/battle/${currentShareToken}`;
           const shareText = t("result.challengeText", { score: overallScore, type: finalType });
           if (isTossMiniApp()) {
-            const battleDeepLink = `intoss://fonday/skinReport?token=${currentShareToken}&type=battle`;
-            getTossShareLink(battleDeepLink).then((tossLink) => {
-              tossShare({ message: `${shareText}\n${tossLink}` });
-            }).catch(() => {});
+            try {
+              const battleDeepLink = `intoss://fonday/skinReport?token=${currentShareToken}&type=battle`;
+              const tossLink = await getTossShareLink(battleDeepLink);
+              await tossShare({ message: `${shareText}\n${tossLink}` });
+            } catch {}
           } else {
             const shareUrl = `${window.location.origin}${battlePath}`;
             if (navigator.share) {
