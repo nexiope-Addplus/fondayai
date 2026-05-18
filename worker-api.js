@@ -125,7 +125,7 @@ export default {
 
     // ── R2 이미지 서빙: GET /insta-images/{key} ──
     const url = new URL(request.url);
-    if (request.method === "GET" && url.pathname.startsWith("/insta-images/")) {
+    if ((request.method === "GET" || request.method === "HEAD") && url.pathname.startsWith("/insta-images/")) {
       const key = url.pathname.replace("/insta-images/", "");
       if (!key) return new Response("Not found", { status: 404 });
       const obj = await env.INSTA_IMAGES.get(key);
@@ -134,13 +134,17 @@ export default {
       const mimeMap = { png: "image/png", jpg: "image/jpeg", jpeg: "image/jpeg", mp4: "video/mp4" };
       const ct = obj.httpMetadata?.contentType || mimeMap[ext] || "image/png";
       const buf = await obj.arrayBuffer();
-      // Static pool assets rarely change; daily content may be replaced at the same URL
-      const cacheControl = key.startsWith("magazine-pool/")
-        ? "public, max-age=604800"
-        : "public, max-age=300";
-      return new Response(buf, {
-        headers: { "Content-Type": ct, "Content-Length": String(buf.byteLength), "Cache-Control": cacheControl, "Access-Control-Allow-Origin": "*" },
-      });
+      // 3-tier cache: covers change frequently, other pool assets are stable, daily content is ephemeral
+      let cacheControl;
+      if (key.includes("/cover/") || key.includes("/cover-sunday/") || key.includes("/cover-b2b/")) {
+        cacheControl = "public, max-age=3600"; // 1h — covers may be replaced
+      } else if (key.startsWith("magazine-pool/")) {
+        cacheControl = "public, max-age=604800"; // 7d — point/routine/cta rarely change
+      } else {
+        cacheControl = "public, max-age=300"; // 5m — daily content
+      }
+      const resHeaders = { "Content-Type": ct, "Content-Length": String(buf.byteLength), "Cache-Control": cacheControl, "Access-Control-Allow-Origin": "*" };
+      return new Response(request.method === "HEAD" ? null : buf, { headers: resHeaders });
     }
 
     // 진단 엔드포인트: GET /debug-vapid (ADMIN_KEY 인증 필수)
@@ -219,6 +223,30 @@ export default {
       const body = await request.arrayBuffer();
       await env.INSTA_IMAGES.put(r2Path, body, { httpMetadata: { contentType: "image/png" } });
       return new Response(JSON.stringify({ ok: true, path: r2Path, size: body.byteLength }), { headers: corsHeaders });
+    }
+
+    // 디버그: Instagram API 직접 테스트
+    if (request.method === "GET" && new URL(request.url).pathname === "/debug-ig") {
+      const adminKey = new URL(request.url).searchParams.get("key");
+      if (!env.ADMIN_KEY || adminKey !== env.ADMIN_KEY) return new Response("Unauthorized", { status: 401, headers: corsHeaders });
+      const imageUrl = new URL(request.url).searchParams.get("image") || "https://fonday-push-worker.nexiope.workers.dev/insta-images/magazine-pool/cta/cta-magazine.jpg";
+      const lang = new URL(request.url).searchParams.get("lang") || "ko";
+      const version = new URL(request.url).searchParams.get("v") || "v21.0";
+      const tokenKey = lang === "b2b" ? "IG_ACCESS_TOKEN_B2B" : lang === "ja" ? "IG_ACCESS_TOKEN_JA" : "IG_ACCESS_TOKEN";
+      const userIdKey = lang === "b2b" ? "IG_USER_ID_B2B" : lang === "ja" ? "IG_USER_ID_JA" : "IG_USER_ID";
+      const token = env[tokenKey];
+      const userId = env[userIdKey];
+      if (!token || !userId) return new Response(JSON.stringify({ error: "token/userId missing", tokenKey, userIdKey }), { headers: corsHeaders });
+      try {
+        const res = await fetch(`https://graph.instagram.com/${version}/${userId}/media`, {
+          method: "POST", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ image_url: imageUrl, caption: "debug test", access_token: token }),
+        });
+        const data = await res.json();
+        return new Response(JSON.stringify({ version, imageUrl, apiResponse: data, status: res.status }), { headers: corsHeaders });
+      } catch (err) {
+        return new Response(JSON.stringify({ error: err.message }), { status: 500, headers: corsHeaders });
+      }
     }
 
     // 수동 게시: GET /publish-now?key=ADMIN_KEY&type=threads&time=14:00 (또는 type=insta&lang=ko)
@@ -377,14 +405,21 @@ export default {
       // GitHub Actions: .github/workflows/morning-magazine.yml (UTC 21:00 크론)
       console.log("[cron] KST 06:00 — 매거진 생성은 GitHub Actions에서 실행");
     } else if (hour === 22) {
-      // KST 07:00 — 스캔/날씨 + 인스타 오전(한국+일본+b2b)
-      // Insta publish runs sequentially to avoid Meta API rate limits
-      ctx.waitUntil((async () => {
-        await Promise.all([sendScanReminderToAll(env), sendWeatherCarePushToAll(env)]);
-        await publishScheduledInsta(env, "07:00", "ko");
-        await publishScheduledInsta(env, "07:00", "ja");
-        await publishScheduledInsta(env, "07:00", "b2b");
-      })());
+      // KST 07:00~07:10 — 스캔/날씨 + 인스타 오전 (계정별 분리)
+      const minute = now.getUTCMinutes();
+      if (minute < 3) {
+        // :00 — ko + 푸시
+        ctx.waitUntil((async () => {
+          await Promise.all([sendScanReminderToAll(env), sendWeatherCarePushToAll(env)]);
+          await publishScheduledInsta(env, "07:00", "ko");
+        })());
+      } else if (minute < 8) {
+        // :05 — ja
+        ctx.waitUntil(publishScheduledInsta(env, "07:00", "ja"));
+      } else {
+        // :10 — b2b
+        ctx.waitUntil(publishScheduledInsta(env, "07:00", "b2b"));
+      }
     } else if (hour === 23) {
       // KST 08:00 — 스레드 아침
       ctx.waitUntil(publishScheduledThreads(env, "08:00"));
@@ -398,13 +433,21 @@ export default {
       // KST 10:00 — UV 케어
       ctx.waitUntil(sendUVCarePushToAll(env));
     } else if (hour === 3) {
-      // KST 12:00 — 점심 + 인스타 무드카드(한국+일본+b2b) + 스레드
-      ctx.waitUntil((async () => {
-        await Promise.all([sendMealPushToAll(env, "lunch"), publishScheduledThreads(env, "12:00")]);
-        await publishScheduledInsta(env, "12:00", "ko");
-        await publishScheduledInsta(env, "12:00", "ja");
-        await publishScheduledInsta(env, "12:00", "b2b");
-      })());
+      // KST 12:00~12:10 — 점심 + 인스타 무드카드 (계정별 분리)
+      const minute = now.getUTCMinutes();
+      if (minute < 3) {
+        // :00 — ko + 점심 푸시 + 스레드
+        ctx.waitUntil((async () => {
+          await Promise.all([sendMealPushToAll(env, "lunch"), publishScheduledThreads(env, "12:00")]);
+          await publishScheduledInsta(env, "12:00", "ko");
+        })());
+      } else if (minute < 8) {
+        // :05 — ja
+        ctx.waitUntil(publishScheduledInsta(env, "12:00", "ja"));
+      } else {
+        // :10 — b2b
+        ctx.waitUntil(publishScheduledInsta(env, "12:00", "b2b"));
+      }
     } else if (hour === 5) {
       // KST 14:00 — 스레드 무드카드(이미지)
       ctx.waitUntil(publishScheduledThreads(env, "14:00"));
@@ -421,13 +464,21 @@ export default {
         publishScheduledThreads(env, "18:00"),
       ]));
     } else if (hour === 11) {
-      // KST 20:00 — 인스타 저녁(한국+일본+b2b) + 루틴 리마인더
-      ctx.waitUntil((async () => {
-        await sendRoutineReminderToAll(env, 20);
-        await publishScheduledInsta(env, "20:00", "ko");
-        await publishScheduledInsta(env, "20:00", "ja");
-        await publishScheduledInsta(env, "20:00", "b2b");
-      })());
+      // KST 20:00~20:10 — 인스타 저녁 (계정별 분리)
+      const minute = now.getUTCMinutes();
+      if (minute < 3) {
+        // :00 — ko + 루틴 리마인더
+        ctx.waitUntil((async () => {
+          await sendRoutineReminderToAll(env, 20);
+          await publishScheduledInsta(env, "20:00", "ko");
+        })());
+      } else if (minute < 8) {
+        // :05 — ja
+        ctx.waitUntil(publishScheduledInsta(env, "20:00", "ja"));
+      } else {
+        // :10 — b2b
+        ctx.waitUntil(publishScheduledInsta(env, "20:00", "b2b"));
+      }
     } else if (hour === 12) {
       // KST 21:00 — 스레드 + 루틴 리마인더 + 대댓글 체크
       ctx.waitUntil(Promise.all([
@@ -586,13 +637,15 @@ async function publishScheduledInsta(env, scheduledTime, lang) {
 
     // Publish a single row to Instagram with retries
     async function publishOneRow(row) {
-      const imageUrls = JSON.parse(row.image_urls || "[]");
+      // Meta blocks .workers.dev — rewrite to fondayai.com Pages R2 proxy
+      const rawUrls = JSON.parse(row.image_urls || "[]");
+      const imageUrls = rawUrls.map(u => u.replace("https://fonday-push-worker.nexiope.workers.dev/insta-images/", "https://fondayai.com/insta-images/"));
       if (imageUrls.length === 0) { console.warn(`${prefix} id=${row.id} 이미지 없음, 스킵`); return; }
       const hashtags = JSON.parse(row.hashtags || "[]");
       const fullCaption = `${row.caption}\n\n${hashtags.join(" ")}`;
 
-      // Attempt publish with exponential backoff: 15s, 30s, 60s
-      const delays = [15000, 30000, 60000];
+      // Attempt publish with one retry after 30s (limit subrequests per Worker invocation)
+      const delays = [30000];
       const errors = [];
 
       for (let attempt = 0; attempt <= delays.length; attempt++) {

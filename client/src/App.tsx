@@ -8,6 +8,8 @@ import SkinScanPage from "@/pages/skin-scan";
 import BattlePage from "@/pages/battle";
 import SharedResultPage from "@/pages/shared-result";
 import LegalPage from "@/pages/legal";
+import ProLandingPage from "@/pages/pro-landing";
+import ProLegalPage from "@/pages/pro-legal";
 
 
 
@@ -19,6 +21,8 @@ function Router() {
       <Route path="/battle/:token" component={BattlePage} />
       <Route path="/share/:token" component={SharedResultPage} />
       <Route path="/legal/:type" component={LegalPage} />
+      <Route path="/pro" component={ProLandingPage} />
+      <Route path="/pro/legal/:type" component={ProLegalPage} />
     </Switch>
   );
 }

@@ -1,5 +1,5 @@
 // ── 크롤러 봇 감지 (카카오톡, LINE, Facebook, Twitter 등) ────────────────────
-const BOT_UA = /kakaotalk|facebookexternalhit|Facebot|Twitterbot|LinkedInBot|LINE|Slackbot|Discordbot|WhatsApp|TelegramBot/i;
+const BOT_UA = /kakaotalk|facebookexternalhit|Facebot|Twitterbot|LinkedInBot|LINE|Slackbot|Discordbot|WhatsApp|TelegramBot|Googlebot|Bingbot|Yeti|NaverBot|Daumoa|DuckDuckBot|Applebot/i;
 
 function isBot(ua: string | null): boolean {
   return !!ua && BOT_UA.test(ua);
@@ -46,6 +46,17 @@ export const onRequest: PagesFunction[] = [
     // ── 크롤러 봇에 OG 메타태그 반환 (/battle/:token, /share/:token) ──
     if (isBot(ua)) {
       const base = url.origin;
+
+      // /pro
+      if (url.pathname === "/pro") {
+        return ogHtml({
+          title: "Fonday Pro - 피부관리샵 AI 상담 리포트",
+          description:
+            "스마트폰 하나로 피부 분석, 고객 리포트, 전후 비교, 재방문 리마인더까지. 1인 피부관리샵과 에스테틱 원장님을 위한 상담 운영 도구입니다.",
+          imageUrl: `${base}/og-image-v3.png`,
+          pageUrl: `${base}/pro`,
+        });
+      }
 
       // /battle/:token
       const battleMatch = url.pathname.match(/^\/battle\/([A-Za-z0-9_-]+)$/);

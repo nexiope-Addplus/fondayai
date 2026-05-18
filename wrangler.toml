@@ -4,15 +4,17 @@ compatibility_date = "2024-01-01"
 compatibility_flags = ["nodejs_compat"]
 usage_model = "unbound"
 
+# Custom domain — .workers.dev가 Meta에 의해 차단됨
+# routes = [{ pattern = "api.fondayai.com/*", zone_name = "fondayai.com" }]
+
+
 # ── Cron Triggers ────────────────────────────────────────────────
 # UTC 21 = KST 06:00 → 모닝 뉴스레터 자동 생성
 # UTC 0,22,23 = KST 09:00 화장품효과 + KST 07:00 스캔/날씨/인스타 + KST 08:00 스레드
-# UTC 01 = KST 10:00 → UV 케어
-# UTC 03-5 = KST 12:00 점심/인스타무드/스레드 + KST 13:00 비움 + KST 14:00 스레드이미지
-# UTC 06,09 = KST 15,18시 → 수분 리마인더 + 저녁 식단 + 스레드
-# UTC 11-14 = KST 20-23시 → 인스타(20시) + 스레드(21시) + 루틴 + 취침
+# Cron triggers (max 5). Insta publish split by minute: :00 ko, :05 ja, :10 b2b
+# UTC 22 = KST 07 (매거진), UTC 3 = KST 12 (무드카드), UTC 11 = KST 20 (캐러셀)
 [triggers]
-crons = ["0 0,21,22,23 * * *", "0 1 * * *", "0 3-5 * * *", "0 6,9 * * *", "0 11-14 * * *"]
+crons = ["0 0,21,23 * * *", "0,5,10 3,11,22 * * *", "0 1 * * *", "0 4-6,9 * * *", "0 12-14 * * *"]
 
 # ── KV Namespaces ─────────────────────────────────────────────────
 # PUSH_KV: Cloudflare 대시보드에서 KV 네임스페이스 생성 후 아래 id를 교체하세요.

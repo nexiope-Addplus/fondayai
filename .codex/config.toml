@@ -1,0 +1,25 @@
+[mcp_servers.apps-in-toss]
+args = [
+    "mcp",
+    "start",
+]
+command = "ax"
+
+[mcp_servers.context7]
+args = [
+    "-l",
+    "-c",
+    "exec npx -y @upstash/context7-mcp@latest",
+]
+command = "/bin/bash"
+
+[mcp_servers.figma]
+url = "http://127.0.0.1:3999/mcp"
+
+[mcp_servers.sequential-thinking]
+args = [
+    "-l",
+    "-c",
+    "exec npx -y @modelcontextprotocol/server-sequential-thinking",
+]
+command = "/bin/bash"
