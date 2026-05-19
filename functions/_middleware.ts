@@ -50,9 +50,9 @@ export const onRequest: PagesFunction[] = [
       // /pro
       if (url.pathname === "/pro") {
         return ogHtml({
-          title: "Fonday Pro - 피부관리샵 AI 상담 리포트",
+          title: "Fonday Pro - 얼리 파트너 30곳 1년 무료",
           description:
-            "스마트폰 하나로 피부 분석, 고객 리포트, 전후 비교, 재방문 리마인더까지. 1인 피부관리샵과 에스테틱 원장님을 위한 상담 운영 도구입니다.",
+            "피부관리샵 AI 상담 리포트. 선착순 30곳은 가입 후 Fonday Pro를 1년 무료로 사용할 수 있습니다.",
           imageUrl: `${base}/og-image-v3.png`,
           pageUrl: `${base}/pro`,
         });

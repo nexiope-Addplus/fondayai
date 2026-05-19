@@ -4,25 +4,25 @@ const REGISTER_URL = "https://pro.fondayai.com/register";
 
 export default function ProFooter() {
   return (
-    <footer className="bg-[#0F1E13] text-white">
+    <footer className="bg-[#17212B] text-white">
       {/* Final CTA */}
       <div className="max-w-6xl mx-auto px-6 py-16 text-center">
         <h2
           className="text-[28px] md:text-[32px] font-bold"
           style={{ wordBreak: "keep-all" }}
         >
-          지금 무료로 시작하세요
+          얼리 파트너 30곳 한정
         </h2>
         <p className="mt-3 text-slate-400" style={{ wordBreak: "keep-all" }}>
-          상담 리포트, 전후 비교, 재방문 관리까지. 장비 없이 시작하세요.
+          지금 가입하면 Fonday Pro를 1년 무료로 사용할 수 있습니다.
         </p>
         <a
           href={REGISTER_URL}
           target="_blank"
           rel="noopener noreferrer"
-          className="mt-6 inline-flex items-center gap-2 bg-white text-[#1F5F57] font-semibold px-6 py-3 rounded-xl hover:bg-slate-100 transition-colors"
+          className="mt-6 inline-flex items-center gap-2 bg-white text-[#3F5F7A] font-semibold px-6 py-3 rounded-xl hover:bg-slate-100 transition-colors"
         >
-          무료로 시작하기
+          지금 가입하고 1년 무료 받기
           <ArrowRight size={18} />
         </a>
       </div>
@@ -32,7 +32,7 @@ export default function ProFooter() {
         <div className="max-w-6xl mx-auto px-6 py-6 flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-slate-400">
           <div className="flex items-center gap-2">
             <span className="font-bold text-white">Fonday</span>
-            <span className="text-xs bg-[#8B5CF6] text-white px-1.5 py-0.5 rounded-full">
+            <span className="text-xs bg-[#64748B] text-white px-1.5 py-0.5 rounded-full">
               Pro
             </span>
           </div>

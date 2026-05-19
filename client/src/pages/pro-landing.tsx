@@ -16,10 +16,10 @@ export default function ProLandingPage() {
     const previousTitle = document.title;
     const title = "Fonday Pro - 피부관리샵을 위한 AI 상담 리포트";
     const description =
-      "스마트폰 하나로 피부 분석, 상담 리포트, 전후 비교, 재방문 리마인더까지. 1인 피부관리샵과 에스테틱 원장님을 위한 Fonday Pro.";
+      "선착순 30곳 한정, 가입 후 1년 무료. 스마트폰 하나로 피부 분석, 상담 리포트, 전후 비교, 재방문 리마인더까지.";
     const ogTitle = "Fonday Pro - 피부관리샵 AI 상담 리포트";
     const ogDescription =
-      "장비 없이 시작하는 피부 상담 자동화. 고객 리포트와 홈케어 가이드로 상담 신뢰와 재방문을 높이세요.";
+      "얼리 파트너 30곳 한정 1년 무료. 장비 없이 고객 리포트와 홈케어 가이드를 바로 시작하세요.";
 
     const setMeta = (selector: string, attr: "content" | "href", value: string) => {
       const el = document.head.querySelector<HTMLMetaElement | HTMLLinkElement>(selector);
@@ -44,13 +44,13 @@ export default function ProLandingPage() {
     <div className="min-h-screen bg-white">
       <ProNav />
       <ProHero />
+      <ProBeta />
       <ProProblem />
       <ProSolution />
       <ProFeatures />
       <ProTrust />
       <ProPricing />
       <ProFAQ />
-      <ProBeta />
       <ProContact />
       <ProFooter />
     </div>

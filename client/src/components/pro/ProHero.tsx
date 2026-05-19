@@ -2,24 +2,27 @@ import { ArrowRight, Play } from "lucide-react";
 
 const REGISTER_URL = "https://pro.fondayai.com/register";
 
-const TRUST_ITEMS = ["장비 구매 없음", "카드 등록 없음", "고객 리포트 공유"];
+const TRUST_ITEMS = ["선착순 30곳", "카드 등록 없음", "가입 후 바로 사용"];
 
 export default function ProHero() {
   return (
-    <section className="relative overflow-hidden bg-gradient-to-br from-[#f0faf8] via-white to-[#f5f0ff]">
+    <section className="relative overflow-hidden bg-gradient-to-br from-[#F7F8FA] via-white to-[#EEF3F7]">
       <div className="max-w-6xl mx-auto px-6 py-20 md:py-28 grid md:grid-cols-2 gap-12 items-center">
         {/* Text */}
         <div>
+          <div className="inline-flex items-center rounded-full bg-[#3F5F7A]/10 px-4 py-1.5 text-sm font-bold text-[#3F5F7A]">
+            얼리 파트너 30곳 한정 · 가입 후 1년 무료
+          </div>
           <h1
-            className="text-[36px] md:text-[48px] font-bold text-slate-900 leading-tight"
+            className="mt-5 text-[36px] md:text-[48px] font-bold text-slate-900 leading-tight"
             style={{ wordBreak: "keep-all" }}
           >
-            피부 분석은 AI가,
+            피부 상담 리포트,
             <br />
-            상담은 원장님이
+            1년 무료로 먼저 쓰세요
           </h1>
           <p className="mt-5 text-lg text-slate-600 leading-relaxed max-w-md" style={{ wordBreak: "keep-all" }}>
-            스마트폰 하나로 피부 상태를 분석하고, 고객에게 남는 상담 리포트와 홈케어 가이드를 제공하세요.
+            스마트폰 하나로 피부 상태를 분석하고, 고객에게 보여줄 수 있는 상담 리포트와 홈케어 가이드를 바로 만들어보세요.
           </p>
 
           {/* CTAs */}
@@ -28,9 +31,9 @@ export default function ProHero() {
               href={REGISTER_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 bg-[#1F5F57] text-white font-semibold px-6 py-3 rounded-xl hover:bg-[#174a44] transition-colors"
+              className="inline-flex items-center gap-2 bg-[#3F5F7A] text-white font-semibold px-6 py-3 rounded-xl hover:bg-[#334D63] transition-colors"
             >
-              무료로 시작하기
+              지금 가입하고 1년 무료 받기
               <ArrowRight size={18} />
             </a>
             <a
@@ -50,7 +53,7 @@ export default function ProHero() {
           <div className="mt-6 flex flex-wrap gap-4 text-sm text-slate-500">
             {TRUST_ITEMS.map((item, i) => (
               <span key={i} className="flex items-center gap-1">
-                <span className="w-1 h-1 rounded-full bg-[#1F5F57]" />
+                <span className="w-1 h-1 rounded-full bg-[#3F5F7A]" />
                 {item}
               </span>
             ))}
@@ -59,7 +62,7 @@ export default function ProHero() {
 
         {/* Dashboard in tablet frame */}
         <div className="flex justify-center">
-          <div className="rounded-[24px] bg-[#2c2c2e] p-[10px] shadow-2xl">
+          <div className="rounded-[24px] bg-[#17212B] p-[10px] shadow-2xl">
             <div className="rounded-[14px] overflow-hidden">
               <img
                 src="/pro/dashboard.png"

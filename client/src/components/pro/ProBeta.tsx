@@ -4,42 +4,42 @@ const REGISTER_URL = "https://pro.fondayai.com/register";
 
 export default function ProBeta() {
   return (
-    <section className="py-16 bg-gradient-to-br from-[#1F5F57] to-[#143f3a] text-white">
+    <section className="py-16 bg-gradient-to-br from-[#3F5F7A] to-[#17212B] text-white">
       <div className="max-w-6xl mx-auto px-6">
         <div className="grid md:grid-cols-[1.2fr_0.8fr] gap-10 items-center">
           <div>
             <div className="inline-flex items-center gap-2 rounded-full bg-white/15 px-4 py-1.5 text-sm font-semibold backdrop-blur-sm">
               <Zap className="h-4 w-4" />
-              {"베타 테스트 모집 중"}
+              {"얼리 파트너 30곳 한정"}
             </div>
             <h2
               className="mt-5 text-[28px] md:text-[36px] font-bold leading-tight"
               style={{ wordBreak: "keep-all" }}
             >
-              {"선착순 30개 샵,"}
+              {"지금 가입하면,"}
               <br />
-              {"무료로 먼저 사용해보세요"}
+              {"Fonday Pro 1년 무료"}
             </h2>
             <p
               className="mt-4 text-lg text-white/75 leading-relaxed"
               style={{ wordBreak: "keep-all" }}
             >
-              {"정식 출시 전, 베타 파트너 샵을 모집합니다. 베타 기간 동안 Pro 플랜 전체 기능을 무료로 사용하고, 피드백으로 함께 만들어가세요."}
+              {"선착순 30곳은 별도 신청 절차 없이 회원가입 후 바로 사용할 수 있습니다. 피부 상담 리포트와 전후 비교를 실제 상담에 적용해보세요."}
             </p>
             <a
               href={REGISTER_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="mt-6 inline-flex items-center gap-2 bg-white text-[#1F5F57] font-semibold px-6 py-3 rounded-xl hover:bg-white/90 transition-colors"
+              className="mt-6 inline-flex items-center gap-2 bg-white text-[#3F5F7A] font-semibold px-6 py-3 rounded-xl hover:bg-white/90 transition-colors"
             >
-              {"베타 신청하기"}
+              {"지금 가입하기"}
               <ArrowRight size={18} />
             </a>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <BetaCard icon={<Users className="h-5 w-5" />} number="30" label="모집 샵" sub="선착순 마감" />
-            <BetaCard icon={<Zap className="h-5 w-5" />} number="0원" label="베타 기간" sub="Pro 전 기능 무료" />
+            <BetaCard icon={<Zap className="h-5 w-5" />} number="1년" label="무료 사용" sub="가입 후 바로 적용" />
             <BetaCard number="10+" label="분석 항목" sub="AI 피부 점수화" />
             <BetaCard number="QR" label="고객 리포트" sub="상담 후 바로 공유" />
           </div>

@@ -57,8 +57,8 @@ export default function ProFeatures() {
               key={feat.title}
               className="rounded-2xl border border-slate-200 shadow-sm p-6 text-left hover:shadow-md transition-shadow"
             >
-              <div className="w-11 h-11 rounded-xl bg-[#1F5F57]/10 flex items-center justify-center mb-4">
-                <feat.icon size={22} className="text-[#1F5F57]" />
+              <div className="w-11 h-11 rounded-xl bg-[#3F5F7A]/10 flex items-center justify-center mb-4">
+                <feat.icon size={22} className="text-[#3F5F7A]" />
               </div>
               <p className="font-semibold text-slate-900 text-lg">{feat.title}</p>
               <p

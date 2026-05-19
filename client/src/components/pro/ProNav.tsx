@@ -22,13 +22,20 @@ export default function ProNav() {
   return (
     <nav className="sticky top-0 z-50 bg-white/95 backdrop-blur border-b border-slate-100">
       <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-        {/* Logo */}
-        <div className="flex items-center gap-2">
-          <span className="text-xl font-bold text-[#1F5F57]">Fonday</span>
-          <span className="text-xs font-semibold bg-[#8B5CF6] text-white px-2 py-0.5 rounded-full">
+        {/* Logo — scroll to top on click */}
+        <a
+          href="/pro"
+          onClick={(e) => {
+            e.preventDefault();
+            window.scrollTo({ top: 0, behavior: "smooth" });
+          }}
+          className="flex items-center gap-2 cursor-pointer"
+        >
+          <span className="text-xl font-bold text-[#3F5F7A]">Fonday</span>
+          <span className="text-xs font-semibold bg-[#64748B] text-white px-2 py-0.5 rounded-full">
             Pro
           </span>
-        </div>
+        </a>
 
         {/* Center links — hidden on mobile */}
         <div className="hidden md:flex items-center gap-8">
@@ -37,7 +44,7 @@ export default function ProNav() {
               key={link.href}
               href={link.href}
               onClick={(e) => handleClick(e, link.href)}
-              className="text-sm text-slate-600 hover:text-[#1F5F57] transition-colors"
+              className="text-sm text-slate-600 hover:text-[#3F5F7A] transition-colors"
             >
               {link.label}
             </a>
@@ -49,9 +56,9 @@ export default function ProNav() {
           href={REGISTER_URL}
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center gap-1.5 bg-[#1F5F57] text-white text-sm font-medium px-4 py-2 rounded-lg hover:bg-[#174a44] transition-colors"
+          className="flex items-center gap-1.5 bg-[#3F5F7A] text-white text-sm font-medium px-4 py-2 rounded-lg hover:bg-[#334D63] transition-colors"
         >
-          무료 시작하기
+          1년 무료 시작
           <ExternalLink size={14} />
         </a>
       </div>

@@ -53,7 +53,7 @@ const PLANS: Plan[] = [
 
 export default function ProPricing() {
   return (
-    <section id="pricing" className="py-20 bg-[#F8F9FA]">
+    <section id="pricing" className="py-20 bg-[#F7F8FA]">
       <div className="max-w-6xl mx-auto px-6 text-center">
         <h2
           className="text-[32px] font-bold text-slate-900"
@@ -75,7 +75,7 @@ export default function ProPricing() {
               }`}
             >
               {plan.badge && (
-                <span className="absolute -top-3 left-6 bg-[#8B5CF6] text-white text-xs font-bold px-3 py-1 rounded-full">
+                <span className="absolute -top-3 left-6 bg-[#64748B] text-white text-xs font-bold px-3 py-1 rounded-full">
                   {plan.badge}
                 </span>
               )}
@@ -95,7 +95,7 @@ export default function ProPricing() {
               <ul className="mt-6 space-y-3">
                 {plan.features.map((feat) => (
                   <li key={feat} className="flex items-start gap-2 text-sm text-slate-600">
-                    <Check size={16} className="text-[#1F5F57] mt-0.5 flex-shrink-0" />
+                    <Check size={16} className="text-[#3F5F7A] mt-0.5 flex-shrink-0" />
                     {feat}
                   </li>
                 ))}
@@ -107,7 +107,7 @@ export default function ProPricing() {
                 rel="noopener noreferrer"
                 className={`mt-8 block text-center font-medium py-3 rounded-xl transition-colors ${
                   plan.highlighted
-                    ? "bg-[#1F5F57] text-white hover:bg-[#174a44]"
+                    ? "bg-[#3F5F7A] text-white hover:bg-[#334D63]"
                     : "border border-slate-300 text-slate-700 hover:bg-slate-50"
                 }`}
               >
