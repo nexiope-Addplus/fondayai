@@ -1,5 +1,5 @@
 // ── 크롤러 봇 감지 (카카오톡, LINE, Facebook, Twitter 등) ────────────────────
-const BOT_UA = /kakaotalk|facebookexternalhit|Facebot|Twitterbot|LinkedInBot|LINE|Slackbot|Discordbot|WhatsApp|TelegramBot/i;
+const BOT_UA = /kakaotalk|facebookexternalhit|Facebot|Twitterbot|LinkedInBot|LINE|Slackbot|Discordbot|WhatsApp|TelegramBot|Googlebot|Bingbot|Yeti|NaverBot|Daumoa|DuckDuckBot|Applebot/i;
 
 function isBot(ua: string | null): boolean {
   return !!ua && BOT_UA.test(ua);
@@ -46,6 +46,17 @@ export const onRequest: PagesFunction[] = [
     // ── 크롤러 봇에 OG 메타태그 반환 (/battle/:token, /share/:token) ──
     if (isBot(ua)) {
       const base = url.origin;
+
+      // /pro
+      if (url.pathname === "/pro") {
+        return ogHtml({
+          title: "Fonday Pro - 얼리 파트너 30곳 1년 무료",
+          description:
+            "피부관리샵 AI 상담 리포트. 선착순 30곳은 가입 후 Fonday Pro를 1년 무료로 사용할 수 있습니다.",
+          imageUrl: `${base}/og-image-v3.png`,
+          pageUrl: `${base}/pro`,
+        });
+      }
 
       // /battle/:token
       const battleMatch = url.pathname.match(/^\/battle\/([A-Za-z0-9_-]+)$/);
