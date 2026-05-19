@@ -17,7 +17,7 @@ export default function ProProblem() {
   return (
     <section id="problem" className="py-20 bg-white">
       <div className="max-w-6xl mx-auto px-6 text-center">
-        <p className="text-sm font-bold text-[#3F5F7A]">Problem</p>
+        <p className="text-sm font-bold text-[#315F72]">Problem</p>
         <h2
           className="mt-3 text-[32px] font-bold text-slate-900"
           style={{ wordBreak: "keep-all" }}
@@ -33,7 +33,7 @@ export default function ProProblem() {
               key={stat.value}
               className="rounded-2xl border border-slate-200 shadow-sm p-8"
             >
-              <p className="text-[28px] font-bold text-[#3F5F7A]">{stat.value}</p>
+              <p className="text-[28px] font-bold text-[#315F72]">{stat.value}</p>
               <p
                 className="mt-3 text-base text-slate-600 leading-relaxed"
                 style={{ wordBreak: "keep-all" }}

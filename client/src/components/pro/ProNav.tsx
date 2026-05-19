@@ -31,8 +31,8 @@ export default function ProNav() {
           }}
           className="flex items-center gap-2 cursor-pointer"
         >
-          <span className="text-xl font-bold text-[#3F5F7A]">Fonday</span>
-          <span className="text-xs font-semibold bg-[#64748B] text-white px-2 py-0.5 rounded-full">
+          <span className="text-xl font-bold text-[#315F72]">Fonday</span>
+          <span className="text-xs font-semibold bg-[#C9815E] text-white px-2 py-0.5 rounded-full">
             Pro
           </span>
         </a>
@@ -44,7 +44,7 @@ export default function ProNav() {
               key={link.href}
               href={link.href}
               onClick={(e) => handleClick(e, link.href)}
-              className="text-sm text-slate-600 hover:text-[#3F5F7A] transition-colors"
+              className="text-sm text-slate-600 hover:text-[#315F72] transition-colors"
             >
               {link.label}
             </a>
@@ -56,7 +56,7 @@ export default function ProNav() {
           href={REGISTER_URL}
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center gap-1.5 bg-[#3F5F7A] text-white text-sm font-medium px-4 py-2 rounded-lg hover:bg-[#334D63] transition-colors"
+          className="flex items-center gap-1.5 bg-[#315F72] text-white text-sm font-medium px-4 py-2 rounded-lg hover:bg-[#274B5A] transition-colors"
         >
           1년 무료 시작
           <ExternalLink size={14} />

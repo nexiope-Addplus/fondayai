@@ -51,12 +51,12 @@ export default function ProContact() {
 
             <div className="mt-8 space-y-4">
               <div className="flex items-center gap-3 text-slate-600">
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#EEF3F7]">
-                  <Mail className="h-4 w-4 text-[#3F5F7A]" />
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#EEF7F8]">
+                  <Mail className="h-4 w-4 text-[#315F72]" />
                 </div>
                 <div>
                   <p className="text-sm text-slate-400">{"이메일"}</p>
-                  <a href="mailto:nexiope@gmail.com" className="text-sm font-semibold text-slate-900 hover:text-[#3F5F7A]">
+                  <a href="mailto:nexiope@gmail.com" className="text-sm font-semibold text-slate-900 hover:text-[#315F72]">
                     nexiope@gmail.com
                   </a>
                 </div>
@@ -74,7 +74,7 @@ export default function ProContact() {
               <p className="mt-2 text-sm text-slate-500">{"빠른 시일 내에 답변드리겠습니다."}</p>
             </div>
           ) : (
-            <form onSubmit={handleSubmit} className="rounded-2xl border border-slate-200 bg-[#F7F8FA] p-6 shadow-sm">
+            <form onSubmit={handleSubmit} className="rounded-2xl border border-[#E8D7CA] bg-[#FFF8F1] p-6 shadow-sm">
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="mb-1.5 block text-sm font-medium text-slate-700">{"이름"} <span className="text-red-400">*</span></label>
@@ -84,7 +84,7 @@ export default function ProContact() {
                     onChange={(e) => setName(e.target.value)}
                     placeholder="홍길동"
                     required
-                    className="h-11 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm outline-none focus:border-[#3F5F7A] focus:ring-2 focus:ring-[#3F5F7A]/10"
+                    className="h-11 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm outline-none focus:border-[#315F72] focus:ring-2 focus:ring-[#315F72]/10"
                   />
                 </div>
                 <div>
@@ -95,7 +95,7 @@ export default function ProContact() {
                     onChange={(e) => setPhone(e.target.value)}
                     placeholder="010-0000-0000"
                     required
-                    className="h-11 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm outline-none focus:border-[#3F5F7A] focus:ring-2 focus:ring-[#3F5F7A]/10"
+                    className="h-11 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm outline-none focus:border-[#315F72] focus:ring-2 focus:ring-[#315F72]/10"
                   />
                 </div>
               </div>
@@ -106,7 +106,7 @@ export default function ProContact() {
                   value={shopName}
                   onChange={(e) => setShopName(e.target.value)}
                   placeholder="피부관리샵 이름 (선택)"
-                  className="h-11 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm outline-none focus:border-[#3F5F7A] focus:ring-2 focus:ring-[#3F5F7A]/10"
+                  className="h-11 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm outline-none focus:border-[#315F72] focus:ring-2 focus:ring-[#315F72]/10"
                 />
               </div>
               <div className="mt-4">
@@ -116,13 +116,13 @@ export default function ProContact() {
                   onChange={(e) => setMessage(e.target.value)}
                   placeholder="궁금한 점이나 요청 사항을 자유롭게 적어주세요"
                   rows={3}
-                  className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm outline-none resize-none focus:border-[#3F5F7A] focus:ring-2 focus:ring-[#3F5F7A]/10"
+                  className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm outline-none resize-none focus:border-[#315F72] focus:ring-2 focus:ring-[#315F72]/10"
                 />
               </div>
               <button
                 type="submit"
                 disabled={sending || !name.trim() || !phone.trim()}
-                className="mt-4 flex h-11 w-full items-center justify-center gap-2 rounded-lg bg-[#3F5F7A] text-sm font-semibold text-white hover:bg-[#334D63] transition-colors disabled:opacity-50"
+                className="mt-4 flex h-11 w-full items-center justify-center gap-2 rounded-lg bg-[#315F72] text-sm font-semibold text-white hover:bg-[#274B5A] transition-colors disabled:opacity-50"
               >
                 {sending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
                 {sending ? "보내는 중..." : "문의하기"}

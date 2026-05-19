@@ -29,7 +29,7 @@ const STEPS = [
 
 export default function ProSolution() {
   return (
-    <section id="solution" className="py-20 bg-[#F7F8FA]">
+    <section id="solution" className="py-20 bg-[#F4FAFA]">
       <div className="max-w-6xl mx-auto px-6 text-center">
         <h2
           className="text-[32px] font-bold text-slate-900"
@@ -43,10 +43,10 @@ export default function ProSolution() {
             <div key={step.num} className="flex items-center">
               {/* Step card */}
               <div className="flex flex-col items-center text-center w-44">
-                <div className="w-14 h-14 rounded-2xl bg-[#3F5F7A]/10 flex items-center justify-center mb-3">
-                  <step.icon size={24} className="text-[#3F5F7A]" />
+                <div className="w-14 h-14 rounded-2xl bg-[#315F72]/10 flex items-center justify-center mb-3">
+                  <step.icon size={24} className="text-[#315F72]" />
                 </div>
-                <span className="text-xs font-bold text-[#64748B] mb-1">
+                <span className="text-xs font-bold text-[#C9815E] mb-1">
                   STEP {step.num}
                 </span>
                 <p className="font-semibold text-slate-900">{step.title}</p>
@@ -78,7 +78,7 @@ export default function ProSolution() {
             { src: "/pro/report.png", label: "Step 4 · 리포트 공유" },
           ].map((item) => (
             <div key={item.label} className="text-center">
-              <div className="rounded-[14px] bg-[#17212B] p-[5px] shadow-lg">
+              <div className="rounded-[14px] bg-[#24313A] p-[5px] shadow-lg">
                 <div className="rounded-[9px] overflow-hidden">
                   <img src={item.src} alt={item.label} className="w-full block" />
                 </div>

@@ -6,11 +6,11 @@ const TRUST_ITEMS = ["선착순 30곳", "카드 등록 없음", "가입 후 바�
 
 export default function ProHero() {
   return (
-    <section className="relative overflow-hidden bg-gradient-to-br from-[#F7F8FA] via-white to-[#EEF3F7]">
+    <section className="relative overflow-hidden bg-gradient-to-br from-[#FFF8F1] via-white to-[#EEF7F8]">
       <div className="max-w-6xl mx-auto px-6 py-20 md:py-28 grid md:grid-cols-2 gap-12 items-center">
         {/* Text */}
         <div>
-          <div className="inline-flex items-center rounded-full bg-[#3F5F7A]/10 px-4 py-1.5 text-sm font-bold text-[#3F5F7A]">
+          <div className="inline-flex items-center rounded-full bg-[#315F72]/10 px-4 py-1.5 text-sm font-bold text-[#315F72]">
             얼리 파트너 30곳 한정 · 가입 후 1년 무료
           </div>
           <h1
@@ -31,7 +31,7 @@ export default function ProHero() {
               href={REGISTER_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 bg-[#3F5F7A] text-white font-semibold px-6 py-3 rounded-xl hover:bg-[#334D63] transition-colors"
+              className="inline-flex items-center gap-2 bg-[#315F72] text-white font-semibold px-6 py-3 rounded-xl hover:bg-[#274B5A] transition-colors"
             >
               지금 가입하고 1년 무료 받기
               <ArrowRight size={18} />
@@ -53,7 +53,7 @@ export default function ProHero() {
           <div className="mt-6 flex flex-wrap gap-4 text-sm text-slate-500">
             {TRUST_ITEMS.map((item, i) => (
               <span key={i} className="flex items-center gap-1">
-                <span className="w-1 h-1 rounded-full bg-[#3F5F7A]" />
+                <span className="w-1 h-1 rounded-full bg-[#315F72]" />
                 {item}
               </span>
             ))}
@@ -62,7 +62,7 @@ export default function ProHero() {
 
         {/* Dashboard in tablet frame */}
         <div className="flex justify-center">
-          <div className="rounded-[24px] bg-[#17212B] p-[10px] shadow-2xl">
+          <div className="rounded-[24px] bg-[#24313A] p-[10px] shadow-2xl">
             <div className="rounded-[14px] overflow-hidden">
               <img
                 src="/pro/dashboard.png"

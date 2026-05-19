@@ -4,7 +4,7 @@ const REGISTER_URL = "https://pro.fondayai.com/register";
 
 export default function ProFooter() {
   return (
-    <footer className="bg-[#17212B] text-white">
+    <footer className="bg-[#24313A] text-white">
       {/* Final CTA */}
       <div className="max-w-6xl mx-auto px-6 py-16 text-center">
         <h2
@@ -20,7 +20,7 @@ export default function ProFooter() {
           href={REGISTER_URL}
           target="_blank"
           rel="noopener noreferrer"
-          className="mt-6 inline-flex items-center gap-2 bg-white text-[#3F5F7A] font-semibold px-6 py-3 rounded-xl hover:bg-slate-100 transition-colors"
+          className="mt-6 inline-flex items-center gap-2 bg-white text-[#315F72] font-semibold px-6 py-3 rounded-xl hover:bg-slate-100 transition-colors"
         >
           지금 가입하고 1년 무료 받기
           <ArrowRight size={18} />
@@ -32,7 +32,7 @@ export default function ProFooter() {
         <div className="max-w-6xl mx-auto px-6 py-6 flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-slate-400">
           <div className="flex items-center gap-2">
             <span className="font-bold text-white">Fonday</span>
-            <span className="text-xs bg-[#64748B] text-white px-1.5 py-0.5 rounded-full">
+            <span className="text-xs bg-[#C9815E] text-white px-1.5 py-0.5 rounded-full">
               Pro
             </span>
           </div>

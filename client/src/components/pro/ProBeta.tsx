@@ -4,7 +4,7 @@ const REGISTER_URL = "https://pro.fondayai.com/register";
 
 export default function ProBeta() {
   return (
-    <section className="py-16 bg-gradient-to-br from-[#3F5F7A] to-[#17212B] text-white">
+    <section className="py-16 bg-gradient-to-br from-[#315F72] via-[#4F7484] to-[#A8664B] text-white">
       <div className="max-w-6xl mx-auto px-6">
         <div className="grid md:grid-cols-[1.2fr_0.8fr] gap-10 items-center">
           <div>
@@ -30,7 +30,7 @@ export default function ProBeta() {
               href={REGISTER_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="mt-6 inline-flex items-center gap-2 bg-white text-[#3F5F7A] font-semibold px-6 py-3 rounded-xl hover:bg-white/90 transition-colors"
+              className="mt-6 inline-flex items-center gap-2 bg-white text-[#315F72] font-semibold px-6 py-3 rounded-xl hover:bg-white/90 transition-colors"
             >
               {"지금 가입하기"}
               <ArrowRight size={18} />
