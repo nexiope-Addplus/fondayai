@@ -3,3 +3,11 @@ node_modules
 .DS_Store
 *.log
 .gstack/
+
+# ADK / AI agent tooling (local dev only)
+.agents/
+.autopus/
+.claude/
+.codex/
+.gemini/
+.mcp.json

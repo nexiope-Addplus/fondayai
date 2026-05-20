@@ -1,14 +1,24 @@
 <!DOCTYPE html>
 <html lang="ko">
   <head>
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-PERVBS4BXC"></script>
+    <!-- 토스 미니앱 감지 (모든 외부 스크립트보다 먼저 실행) -->
     <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-
-      gtag('config', 'G-PERVBS4BXC');
+      (function(){
+        var t = window.__AIT__ || /TossApp/.test(navigator.userAgent) || /\.tossmini\.com$/.test(location.hostname);
+        if (t) { document.documentElement.classList.add('toss-miniapp'); window.__TOSS__ = true; }
+      })();
+    </script>
+    <!-- Google tag (gtag.js) — 토스에서는 스킵 -->
+    <script>
+      if (!window.__TOSS__) {
+        var s = document.createElement('script');
+        s.async = true; s.src = 'https://www.googletagmanager.com/gtag/js?id=G-PERVBS4BXC';
+        document.head.appendChild(s);
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-PERVBS4BXC');
+      }
     </script>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
@@ -22,7 +32,7 @@
     <link rel="canonical" href="https://fondayai.com/" />
     <link rel="icon" type="image/png" href="/favicon.png" />
     <link rel="manifest" href="/manifest.json" />
-    <meta name="theme-color" content="#4A7C6E" />
+    <meta name="theme-color" content="#315F72" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <meta name="apple-mobile-web-app-title" content="Fonday" />
@@ -63,32 +73,46 @@
       }
     }
     </script>
-    <!-- Microsoft Clarity -->
+    <!-- Microsoft Clarity — 토스에서는 스킵 -->
     <script type="text/javascript">
-      (function(c,l,a,r,i,t,y){
-          c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
-          t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
-          y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
-      })(window, document, "clarity", "script", "vqj3sm0rd7");
+      if (!window.__TOSS__) {
+        (function(c,l,a,r,i,t,y){
+            c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+            t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+            y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+        })(window, document, "clarity", "script", "vqj3sm0rd7");
+      }
     </script>
-    <meta name="google-adsense-account" content="ca-pub-5928664043346684">
-    <!-- AdSense: 자동 광고 비활성화 (콘텐츠가 있는 화면에만 수동 광고 단위 사용) -->
+    <!-- AdSense — 토스에서는 스킵 (토스 인앱 광고 별도) -->
     <script>
-      window.adsbygoogle = window.adsbygoogle || [];
-      // SPA에서 action/navigation 화면에 자동 광고가 삽입되지 않도록 페이지 레벨 광고 비활성화
-      window.adsbygoogle.push({ enable_page_level_ads: false });
+      if (!window.__TOSS__) {
+        var meta = document.createElement('meta');
+        meta.name = 'google-adsense-account'; meta.content = 'ca-pub-5928664043346684';
+        document.head.appendChild(meta);
+        window.adsbygoogle = window.adsbygoogle || [];
+        window.adsbygoogle.push({ enable_page_level_ads: false });
+        var ads = document.createElement('script');
+        ads.async = true; ads.crossOrigin = 'anonymous';
+        ads.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5928664043346684';
+        document.head.appendChild(ads);
+      }
     </script>
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5928664043346684"
-     crossorigin="anonymous"></script>
-    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
-    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
-    <style>
-      @font-face { font-family: 'LINESeedKR'; font-weight: 100 300; src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_11-01@1.0/LINESeedKR-Th.woff2') format('woff2'); font-display: swap; }
-      @font-face { font-family: 'LINESeedKR'; font-weight: 400 500; src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_11-01@1.0/LINESeedKR-Rg.woff2') format('woff2'); font-display: swap; }
-      @font-face { font-family: 'LINESeedKR'; font-weight: 600 900; src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_11-01@1.0/LINESeedKR-Bd.woff2') format('woff2'); font-display: swap; }
-    </style>
-    <script type="module" crossorigin src="/assets/index-B6j2E3xQ.js"></script>
-    <link rel="stylesheet" crossorigin href="/assets/index-BjZWeii6.css">
+    <!-- 비-토스 환경에서만 커스텀 폰트 로드 -->
+    <script>
+      if (!document.documentElement.classList.contains('toss-miniapp')) {
+        var link = document.createElement('link');
+        link.rel = 'preconnect'; link.href = 'https://cdn.jsdelivr.net'; link.crossOrigin = '';
+        document.head.appendChild(link);
+        var css = document.createElement('link');
+        css.rel = 'stylesheet'; css.href = 'https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css'; css.crossOrigin = '';
+        document.head.appendChild(css);
+        var s = document.createElement('style');
+        s.textContent = "@font-face{font-family:'LINESeedKR';font-weight:100 300;src:url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_11-01@1.0/LINESeedKR-Th.woff2') format('woff2');font-display:swap}@font-face{font-family:'LINESeedKR';font-weight:400 500;src:url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_11-01@1.0/LINESeedKR-Rg.woff2') format('woff2');font-display:swap}@font-face{font-family:'LINESeedKR';font-weight:600 900;src:url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_11-01@1.0/LINESeedKR-Bd.woff2') format('woff2');font-display:swap}";
+        document.head.appendChild(s);
+      }
+    </script>
+    <script type="module" crossorigin src="/assets/index-C-K09zVY.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-qylmbnAP.css">
   </head>
   <body>
     <div id="root">
@@ -115,12 +139,12 @@
     <!-- noscript: 크롤러·JS 비활성 환경을 위한 퍼블리셔 콘텐츠 -->
     <noscript>
       <div style="max-width:480px;margin:0 auto;padding:24px 20px;font-family:sans-serif;color:#333">
-        <h1 style="font-size:22px;font-weight:900;color:#4A7C6E">Fonday — AI 바우만 피부 타입 스캐너</h1>
+        <h1 style="font-size:22px;font-weight:900;color:#315F72">Fonday — AI 바우만 피부 타입 스캐너</h1>
         <p style="margin-top:8px;font-size:14px;line-height:1.7;color:#555">
           스마트폰 사진 한 장으로 <strong>바우만 피부 타입</strong>을 AI가 즉시 진단합니다.
           10가지 피부 지표 점수, 맞춤 스킨케어 루틴, 핵심 성분까지 무료로 제공합니다.
         </p>
-        <h2 style="font-size:16px;font-weight:700;color:#4A7C6E;margin-top:20px">바우만 피부 타입이란?</h2>
+        <h2 style="font-size:16px;font-weight:700;color:#315F72;margin-top:20px">바우만 피부 타입이란?</h2>
         <p style="font-size:13px;line-height:1.7;color:#555">
           피부과 전문의 레슬리 바우만 박사가 개발한 분류법으로, 유수분(O/D)·민감도(S/R)·색소(P/N)·노화(W/T) 4가지 축의 조합으로
           16가지 피부 타입을 정의합니다. Fonday AI는 이 기준으로 개인화된 피부 솔루션을 제공합니다.
@@ -129,8 +153,8 @@
           이 서비스를 이용하려면 JavaScript를 활성화해 주세요.
         </p>
         <p style="margin-top:12px;font-size:12px;color:#aaa">
-          <a href="/privacy.html" style="color:#4A7C6E">개인정보처리방침</a> ·
-          <a href="/terms.html" style="color:#4A7C6E">이용약관</a>
+          <a href="/privacy.html" style="color:#315F72">개인정보처리방침</a> ·
+          <a href="/terms.html" style="color:#315F72">이용약관</a>
         </p>
       </div>
     </noscript>
