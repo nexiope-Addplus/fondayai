@@ -32,6 +32,7 @@ import {
   buildRepresentativeRoutine,
   buildCosmeticCorrelationSignals,
   apiBase, appFetch,
+  isTossMiniApp,
 } from "./utils";
 import { CosmeticsRegisterModal } from "./CosmeticsRegisterModal";
 import { CosmeticsReportCard } from "./CosmeticsReportCard";
@@ -207,10 +208,37 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
     setDeletingId(null);
   };
 
-  if (!user) {
+  // user === undefined: still loading auth state
+  if (user === undefined) {
     return (
       <div className="flex items-center justify-center min-h-[calc(100dvh-64px)]">
         <div className="w-8 h-8 rounded-full border-2 border-stone-200 border-t-[#4A7C6E] animate-spin" />
+      </div>
+    );
+  }
+
+  // user === null: not logged in
+  if (!user) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[calc(100dvh-64px)] px-6 text-center" style={{ background: PAGE_GRADIENT }}>
+        <div className="w-14 h-14 rounded-full flex items-center justify-center mb-4" style={{ background: TINT_GREEN }}>
+          <Droplets className="w-7 h-7" style={{ color: DEEP_GREEN }} />
+        </div>
+        <p className="text-[17px] font-bold mb-1.5" style={{ color: TEXT_HEADING, fontFamily: FONT_HEADING }}>
+          {t("cosmetics.myTitle")}
+        </p>
+        <p className="text-[13px] mb-6 text-kr-pretty" style={{ color: TEXT_SECONDARY }}>
+          {t("cosmetics.loginRequired", "로그인하고 나만의 루틴을 관리해보세요")}
+        </p>
+        {onLogin && !isTossMiniApp() && (
+          <button
+            onClick={() => onLogin("kakao", "routine")}
+            className="px-6 py-3 rounded-full text-[14px] font-bold text-white"
+            style={{ background: DEEP_GREEN }}
+          >
+            {t("common.login", "로그인")}
+          </button>
+        )}
       </div>
     );
   }

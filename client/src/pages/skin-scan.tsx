@@ -175,8 +175,12 @@ export default function SkinScanPage() {
   }, [isSimulated]);
   useEffect(() => { tossLogin(); }, [tossLogin]);
 
-  // 토스 미니앱: 로그인은 getAnonymousKey로 자동 처리됨 — no-op
-  const openLoginPopup = useCallback((_provider: string, _returnTab?: string) => {}, []);
+  const openLoginPopup = useCallback((provider: string, returnTab?: string) => {
+    if (isTossMiniApp()) return; // toss: auto-login via getAnonymousKey
+    if (returnTab) localStorage.setItem("fonday_return_tab", returnTab);
+    const lang = localStorage.getItem("fonday_lang") || "ko";
+    window.location.href = `/auth/${provider}?lang=${lang}`;
+  }, []);
 
   // 로그인 후 게스트 스캔 연결
   useEffect(() => {
