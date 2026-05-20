@@ -219,6 +219,7 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
 
   // user === null: not logged in
   if (!user) {
+    const isKo = i18n.language === "ko";
     return (
       <div className="flex flex-col items-center justify-center min-h-[calc(100dvh-64px)] px-6 text-center" style={{ background: PAGE_GRADIENT }}>
         <div className="w-14 h-14 rounded-full flex items-center justify-center mb-4" style={{ background: TINT_GREEN }}>
@@ -231,13 +232,39 @@ export function RoutineTab({ user, onLogin }: { user: any; onLogin?: (p: "kakao"
           {t("cosmetics.loginRequired", "로그인하고 나만의 루틴을 관리해보세요")}
         </p>
         {onLogin && !isTossMiniApp() && (
-          <button
-            onClick={() => onLogin("kakao", "routine")}
-            className="px-6 py-3 rounded-full text-[14px] font-bold text-white"
-            style={{ background: DEEP_GREEN }}
-          >
-            {t("common.login", "로그인")}
-          </button>
+          <div className="w-full max-w-xs space-y-3">
+            {isKo ? (
+              <button
+                onClick={() => onLogin("kakao", "routine")}
+                className="w-full py-3.5 rounded-2xl text-sm font-semibold flex items-center justify-center gap-2"
+                style={{ background: "#FEE500", color: "#3C1E1E" }}
+              >
+                <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                  <path fillRule="evenodd" clipRule="evenodd" d="M9 1C4.582 1 1 3.79 1 7.222c0 2.154 1.386 4.045 3.484 5.14L3.62 15.5a.25.25 0 0 0 .368.274L7.9 13.39A9.63 9.63 0 0 0 9 13.444c4.418 0 8-2.791 8-6.222C17 3.79 13.418 1 9 1Z" fill="#3C1E1E" />
+                </svg>
+                {t("cosmetics.loginGateKakao", "카카오로 시작하기")}
+              </button>
+            ) : (
+              <button
+                onClick={() => onLogin("line", "routine")}
+                className="w-full py-3.5 rounded-2xl text-sm font-semibold flex items-center justify-center gap-2 text-white"
+                style={{ background: "#06C755" }}
+              >
+                <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                  <path d="M15 7.56c0-3.16-3.13-5.73-6.98-5.73S1.04 4.4 1.04 7.56c0 2.83 2.47 5.2 5.82 5.65.23.05.53.15.61.35.07.18.05.46.02.64l-.1.58c-.03.18-.14.69.6.38.74-.32 3.98-2.38 5.43-4.07C14.54 9.88 15 8.78 15 7.56Z" fill="white" />
+                </svg>
+                {t("cosmetics.loginGateLine", "LINEで始める")}
+              </button>
+            )}
+            <button
+              onClick={() => onLogin("google", "routine")}
+              className="w-full py-3.5 rounded-2xl text-sm font-semibold flex items-center justify-center gap-2 bg-white text-[#6B5D55]"
+              style={{ border: "1px solid #E0DBD5" }}
+            >
+              <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" className="w-4 h-4" alt="" />
+              {t("cosmetics.loginGateGoogle", "Google로 시작하기")}
+            </button>
+          </div>
         )}
       </div>
     );
