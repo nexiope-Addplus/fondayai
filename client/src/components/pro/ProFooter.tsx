@@ -1,6 +1,6 @@
 import { ArrowRight } from "lucide-react";
 
-const REGISTER_URL = "https://pro.fondayai.com/register";
+const REGISTER_URL = "https://pro.fondayai.com/";
 
 export default function ProFooter() {
   return (

@@ -1,6 +1,6 @@
 import { ArrowRight, Play } from "lucide-react";
 
-const REGISTER_URL = "https://pro.fondayai.com/register";
+const REGISTER_URL = "https://pro.fondayai.com/";
 
 const TRUST_ITEMS = ["선착순 30곳", "카드 등록 없음", "가입 후 바로 사용"];
 

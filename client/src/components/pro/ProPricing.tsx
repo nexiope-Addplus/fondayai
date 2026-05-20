@@ -1,6 +1,6 @@
 import { Check } from "lucide-react";
 
-const REGISTER_URL = "https://pro.fondayai.com/register";
+const REGISTER_URL = "https://pro.fondayai.com/";
 
 interface Plan {
   name: string;

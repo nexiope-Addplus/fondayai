@@ -9,7 +9,7 @@ const NAV_LINKS = [
   { label: "문의", href: "#contact" },
 ];
 
-const REGISTER_URL = "https://pro.fondayai.com/register";
+const REGISTER_URL = "https://pro.fondayai.com/";
 
 export default function ProNav() {
   // Smooth scroll to section

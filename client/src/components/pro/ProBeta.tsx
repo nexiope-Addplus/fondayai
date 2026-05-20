@@ -1,6 +1,6 @@
 import { ArrowRight, Users, Zap } from "lucide-react";
 
-const REGISTER_URL = "https://pro.fondayai.com/register";
+const REGISTER_URL = "https://pro.fondayai.com/";
 
 export default function ProBeta() {
   return (
