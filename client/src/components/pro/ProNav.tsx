@@ -1,4 +1,5 @@
 import { ExternalLink } from "lucide-react";
+import BrandLogo from "./BrandLogo";
 
 const NAV_LINKS = [
   { label: "기능", href: "#features" },
@@ -31,8 +32,9 @@ export default function ProNav() {
           }}
           className="flex items-center gap-2 cursor-pointer"
         >
-          <span className="text-xl font-bold text-[#315F72]">Fonday</span>
-          <span className="text-xs font-semibold bg-[#C9815E] text-white px-2 py-0.5 rounded-full">
+          <BrandLogo size={32} />
+          <span className="text-xl font-bold text-[#115048]">Fonday</span>
+          <span className="text-xs font-semibold bg-[#2E9D8F] text-white px-2 py-0.5 rounded-full">
             Pro
           </span>
         </a>
@@ -44,7 +46,7 @@ export default function ProNav() {
               key={link.href}
               href={link.href}
               onClick={(e) => handleClick(e, link.href)}
-              className="text-sm text-slate-600 hover:text-[#315F72] transition-colors"
+              className="text-sm text-slate-600 hover:text-[#2E9D8F] transition-colors"
             >
               {link.label}
             </a>
@@ -56,7 +58,7 @@ export default function ProNav() {
           href={REGISTER_URL}
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center gap-1.5 bg-[#315F72] text-white text-sm font-medium px-4 py-2 rounded-lg hover:bg-[#274B5A] transition-colors"
+          className="flex items-center gap-1.5 bg-[#2E9D8F] text-white text-sm font-bold px-4 py-2 rounded-lg shadow-md shadow-[#2E9D8F]/25 hover:bg-[#1E7E72] transition-colors"
         >
           1년 무료 시작
           <ExternalLink size={14} />
